@@ -15,7 +15,7 @@ import org.thymeleaf.templatemode.TemplateMode;
 
 @EnableWebMvc
 @Configuration
-@ComponentScan({"com.mkyong.web"})
+@ComponentScan({"com.mkyong.presentacion", "com.mkyong.dominio", "com.mkyong.infraestructura"})
 public class SpringWebConfig implements WebMvcConfigurer {
 
     // Spring + Thymeleaf need this
@@ -62,7 +62,6 @@ public class SpringWebConfig implements WebMvcConfigurer {
         templateEngine.setEnableSpringELCompiler(true);
         return templateEngine;
     }
-
     // Spring + Thymeleaf
     // Configure Thymeleaf View Resolver
     @Bean

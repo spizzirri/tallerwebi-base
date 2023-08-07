@@ -1,5 +1,6 @@
 package com.mkyong;
 
+import com.mkyong.config.HibernateConfig;
 import com.mkyong.config.SpringWebConfig;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
@@ -15,7 +16,7 @@ public class MyServletInitializer
     // controller, view resolver, handler mapping
     @Override
     protected Class<?>[] getServletConfigClasses() {
-        return new Class[]{SpringWebConfig.class};
+        return new Class[]{SpringWebConfig.class, HibernateConfig.class};
     }
 
     @Override

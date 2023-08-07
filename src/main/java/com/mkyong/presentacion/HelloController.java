@@ -1,4 +1,4 @@
-package com.mkyong.web;
+package com.mkyong.presentacion;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
