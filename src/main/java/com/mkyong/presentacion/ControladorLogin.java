@@ -71,11 +71,10 @@ public class ControladorLogin {
     public ModelAndView irAHome() {
         return new ModelAndView("home");
     }
-   /*
+
     @RequestMapping(path = "/", method = RequestMethod.GET)
     public ModelAndView inicio() {
         return new ModelAndView("redirect:/login");
     }
-    */
 }
 
