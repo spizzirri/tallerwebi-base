@@ -1,6 +1,6 @@
 package com.mkyong;
 
-import com.mkyong.config.SpringWebConfig;
+import com.mkyong.config.SpringWebTestConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(SpringExtension.class)
 @WebAppConfiguration
-@ContextConfiguration(classes = {SpringWebConfig.class})
+@ContextConfiguration(classes = {SpringWebTestConfig.class})
 public class HelloControllerTest {
 
     @Autowired
