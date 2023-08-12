@@ -24,5 +24,7 @@ $ mvn clean jetty:run
 * Hibernate 5.4.24.Final
 * Mockito 5.3.1
 
+## 3. GitHub Actions
+* [Documentacion](https://docs.github.com/es/actions/quickstart)
 
 *_Proyecto modificado en base a: [Spring MVC hello world example (Maven and Thymeleaf)](https://mkyong.com/spring-mvc/spring-mvc-hello-world-example/) _*

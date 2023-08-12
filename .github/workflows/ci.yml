@@ -1,0 +1,18 @@
+name: integracion_continua
+run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
+on: [push]
+jobs:
+  Explore-GitHub-Actions:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "🎉 Esta tarea (job) fue lanzado automaticamente por el evento ${{ github.event_name }}"
+      - run: echo "🐧 Esta tarea esta corriendo en un servidor ${{ runner.os }} por GitHub!"
+      - run: echo "🔎 El nombre de la rama es ${{ github.ref }} y tu repositorio es ${{ github.repository }}."
+      - name: Descargando el codigo
+        uses: actions/checkout@v3
+      - run: echo "💡 El repositorio ${{ github.repository }} ha sido clonado."
+      - run: echo "🖥️ El workflow esta listo para testear el codigo"
+      - name: List files in the repository
+        run: |
+          mvn clean test
+      - run: echo "🍏 El estado de la tarea es ${{ job.status }}."
