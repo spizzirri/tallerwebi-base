@@ -8,8 +8,13 @@ $ mvn clean jetty:run
 
 # http://localhost:8080/spring
 ```
+## 2. Thymeleaf
+* [Documentacion](https://www.thymeleaf.org/doc/tutorials/3.0/usingthymeleaf.html)
 
-## 2. Tecnologías:
+## 3. GitHub Actions
+* [Documentacion](https://docs.github.com/es/actions/quickstart)
+
+## 4. Tecnologías:
 * Java 11
 * Spring 5.2.22.RELEASE
 * Thymeleaf 3.0.15.RELEASE
@@ -23,8 +28,5 @@ $ mvn clean jetty:run
 * JUnit 5.9
 * Hibernate 5.4.24.Final
 * Mockito 5.3.1
-
-## 3. GitHub Actions
-* [Documentacion](https://docs.github.com/es/actions/quickstart)
 
 *_Proyecto modificado en base a: [Spring MVC hello world example (Maven and Thymeleaf)](https://mkyong.com/spring-mvc/spring-mvc-hello-world-example/) _*

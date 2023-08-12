@@ -12,7 +12,7 @@ jobs:
         uses: actions/checkout@v3
       - run: echo "💡 El repositorio ${{ github.repository }} ha sido clonado."
       - run: echo "🖥️ El workflow esta listo para testear el codigo"
-      - name: List files in the repository
+      - name: Corriendo las pruebas
         run: |
           mvn clean test
       - run: echo "🍏 El estado de la tarea es ${{ job.status }}."
