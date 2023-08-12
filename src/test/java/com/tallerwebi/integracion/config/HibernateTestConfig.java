@@ -1,4 +1,4 @@
-package com.mkyong.integracion.config;
+package com.tallerwebi.integracion.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,7 +28,7 @@ public class HibernateTestConfig {
     public LocalSessionFactoryBean sessionFactory(DataSource dataSource) {
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
         sessionFactory.setDataSource(dataSource);
-        sessionFactory.setPackagesToScan("com.mkyong.dominio");
+        sessionFactory.setPackagesToScan("com.tallerwebi.dominio");
         sessionFactory.setHibernateProperties(hibernateProperties());
         return sessionFactory;
     }

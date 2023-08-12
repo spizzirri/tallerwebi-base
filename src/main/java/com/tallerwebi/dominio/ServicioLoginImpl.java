@@ -1,6 +1,6 @@
-package com.mkyong.dominio;
+package com.tallerwebi.dominio;
 
-import com.mkyong.dominio.excepcion.UsuarioExistente;
+import com.tallerwebi.dominio.excepcion.UsuarioExistente;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

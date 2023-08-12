@@ -1,4 +1,4 @@
-package com.mkyong.dominio.excepcion;
+package com.tallerwebi.dominio.excepcion;
 
 public class UsuarioExistente extends Exception {
 

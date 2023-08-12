@@ -1,4 +1,4 @@
-package com.mkyong.dominio;
+package com.tallerwebi.dominio;
 
 public interface RepositorioUsuario {
 

@@ -1,7 +1,7 @@
-package com.mkyong;
+package com.tallerwebi;
 
-import com.mkyong.config.HibernateConfig;
-import com.mkyong.config.SpringWebConfig;
+import com.tallerwebi.config.HibernateConfig;
+import com.tallerwebi.config.SpringWebConfig;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
 public class MyServletInitializer

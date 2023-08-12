@@ -1,4 +1,4 @@
-package com.mkyong.dominio;
+package com.tallerwebi.dominio;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

@@ -1,6 +1,6 @@
-package com.mkyong.dominio;
+package com.tallerwebi.dominio;
 
-import com.mkyong.dominio.excepcion.UsuarioExistente;
+import com.tallerwebi.dominio.excepcion.UsuarioExistente;
 
 public interface ServicioLogin {
 

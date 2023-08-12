@@ -1,8 +1,8 @@
-package com.mkyong.presentacion;
+package com.tallerwebi.presentacion;
 
-import com.mkyong.dominio.ServicioLogin;
-import com.mkyong.dominio.Usuario;
-import com.mkyong.dominio.excepcion.UsuarioExistente;
+import com.tallerwebi.dominio.ServicioLogin;
+import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.excepcion.UsuarioExistente;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
