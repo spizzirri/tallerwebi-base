@@ -1,11 +1,9 @@
-Spring MVC hello world example (Maven and Thymeleaf)
+Proyecto base Taller Web I (Maven and Thymeleaf)
 ===============================
 
 This is the source code for the article - [Spring MVC hello world example (Maven and Thymeleaf)](https://mkyong.com/spring-mvc/spring-mvc-hello-world-example/).
 
-_P.S This tutorial is NOT a Spring Boot application, just pure Spring Web MVC!_
-
-## 1. Technologies and tools used:
+## 1. Tecnologías:
 * Java 11
 * Spring 5.2.22.RELEASE
 * Thymeleaf 3.0.15.RELEASE
@@ -17,16 +15,15 @@ _P.S This tutorial is NOT a Spring Boot application, just pure Spring Web MVC!_
 * Spring Test 5.2.22.RELEASE
 * Hamcrest 2.2
 * JUnit 5.9
+* Hibernate 5.4.24.Final
+* Mockito 5.3.1
 
-## 2. How to run this project?
+## 2. Como iniciar el proyecto
 ```shell
-$ git clone https://github.com/mkyong/spring-mvc/
-
-$ cd spring-mvc-hello-world
 
 $ mvn clean jetty:run
 
-# visit http://localhost:8080/spring
-
-# visit http://localhost:8080/spring/hello/mkyong
+# http://localhost:8080/spring
 ```
+
+*_Proyecto modificado en base a: [Spring MVC hello world example (Maven and Thymeleaf)](https://mkyong.com/spring-mvc/spring-mvc-hello-world-example/) _*
