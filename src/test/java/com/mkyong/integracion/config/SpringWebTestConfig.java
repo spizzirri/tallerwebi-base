@@ -1,4 +1,4 @@
-package com.mkyong.config;
+package com.mkyong.integracion.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
