@@ -1,10 +1,10 @@
 <!DOCTYPE HTML>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <title>Spring Web MVC Thymeleaf Hello World Example</title>
+    <title>Taller Web I</title>
 
     <!-- Boostrap core css -->
     <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.2.0/css/bootstrap.min.css}"/>
@@ -17,7 +17,7 @@
 <body>
 
 <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-    <a class="navbar-brand" href="#">Mkyong.com</a>
+    <a class="navbar-brand" href="#">UNLAM</a>
 </nav>
 
 <main role="main" class="container">
@@ -28,10 +28,13 @@
                 <h3 class="form-signin-heading">Taller Web I</h3>
                 <hr class="colorgraph"><br>
 
-                <input th:field="*{email}" id="email" type="email" class="form-control" />
-                <input th:field="*{password}" type="password" id="password" class="form-control"/>
+                <input th:field="*{email}" id="email" type="email" class="form-control" required/>
+                <input th:field="*{password}" type="password" id="password" class="form-control" required/>
 
-                <button class="btn btn-lg btn-primary btn-block" Type="Submit"/>Login</button>
+                <button class="btn btn-lg btn-primary btn-block" Type="Submit">Login</button>
+
+                <p th:if="${error != null}" class="alert alert-danger" th:text="'Error ' + ${error}">
+                </p>
             </form>
             <a href="nuevo-usuario">Registrarme</a>
         </div>
