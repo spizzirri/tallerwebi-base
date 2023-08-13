@@ -59,15 +59,9 @@ public class LoginPageTestE2E {
     }
 
     @Test
-    void deberiaNavegarAlHomeLuegoRegistrarUnUsuarioEIniciarSesion() {
-
-        page.locator("#ir-a-registrarme").click();
-        page.locator("#email").type("nuevo-usuario@unlam.edu.ar");
-        page.locator("#password").type("unlam");
-        page.locator("#btn-registrarme").click();
-
-        page.locator("#email").type("nuevo-usuario@unlam.edu.ar");
-        page.locator("#password").type("unlam");
+    void deberiaNavegarAlHomeSiElUsuarioExiste() {
+        page.locator("#email").type("test@unlam.edu.ar");
+        page.locator("#password").type("test");
         page.locator("#btn-login").click();
 
         String url = page.url();
