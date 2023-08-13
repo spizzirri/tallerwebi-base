@@ -18,6 +18,7 @@
         <junit.version>5.9.0</junit.version>
         <mockito.version>5.3.1</mockito.version>
         <hibernate.version>5.4.24.Final</hibernate.version>
+        <playwright.version>1.36.0</playwright.version>
     </properties>
 
     <dependencies>
@@ -99,6 +100,12 @@
             <version>${hibernate.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.microsoft.playwright</groupId>
+            <artifactId>playwright</artifactId>
+            <version>${playwright.version}</version>
+            <scope>test</scope>
+        </dependency>
         <!-- compile only, deployed container will provide this -->
         <!--
         <dependency>
