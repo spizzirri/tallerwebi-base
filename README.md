@@ -23,7 +23,7 @@ $ mvn clean jetty:run
 ```
 ### Correr las pruebas en otra terminal
 ```shell
-$ mvn test -Dtest="LoginPageTestE2E"
+$ mvn test -Dtest="VistaLoginE2E"
 ```
 
 ## 6. Tecnologías:
