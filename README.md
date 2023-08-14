@@ -40,5 +40,6 @@ $ mvn test -Dtest="LoginPageTestE2E"
 * JUnit 5.9
 * Hibernate 5.4.24.Final
 * Mockito 5.3.1
+* Playwright 1.36.0
 
 *_Proyecto modificado en base a: [Spring MVC hello world example (Maven and Thymeleaf)](https://mkyong.com/spring-mvc/spring-mvc-hello-world-example/) _*
