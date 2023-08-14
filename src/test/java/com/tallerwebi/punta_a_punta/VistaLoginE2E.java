@@ -1,6 +1,7 @@
 package com.tallerwebi.punta_a_punta;
 
 import com.microsoft.playwright.*;
+import com.tallerwebi.punta_a_punta.vistas.VistaLogin;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -10,13 +11,12 @@ import org.junit.jupiter.api.Test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsStringIgnoringCase;
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
-public class LoginPageTestE2E {
+public class VistaLoginE2E {
 
     static Playwright playwright;
     static Browser browser;
-
     BrowserContext context;
-    Page page;
+    VistaLogin vistaLogin;
 
     @BeforeAll
     static void abrirNavegador() {
@@ -34,8 +34,8 @@ public class LoginPageTestE2E {
     @BeforeEach
     void crearContextoYPagina() {
         context = browser.newContext();
-        page = context.newPage();
-        page.navigate("localhost:8080/spring");
+        Page page = context.newPage();
+        vistaLogin = new VistaLogin(page);
     }
 
     @AfterEach
@@ -45,26 +45,25 @@ public class LoginPageTestE2E {
 
     @Test
     void deberiaDecirUNLAMEnElNavbar() {
-        String texto = page.locator("nav a.navbar-brand").textContent();
+        String texto = vistaLogin.obtenerTextoDeLaBarraDeNavegacion();
         assertThat("UNLAM", equalToIgnoringCase(texto));
     }
 
     @Test
     void deberiaDarUnErrorAlNoCompletarElLoginYTocarElBoton() {
-        page.locator("#email").type("damian@unlam.edu.ar");
-        page.locator("#password").type("unlam");
-        page.locator("#btn-login").click();
-        String texto = page.locator("p.alert.alert-danger").textContent();
+        vistaLogin.escribirEMAIL("damian@unlam.edu.ar");
+        vistaLogin.escribirClave("unlam");
+        vistaLogin.darClickEnIniciarSesion();
+        String texto = vistaLogin.obtenerMensajeDeError();
         assertThat("Error Usuario o clave incorrecta", equalToIgnoringCase(texto));
     }
 
     @Test
     void deberiaNavegarAlHomeSiElUsuarioExiste() {
-        page.locator("#email").type("test@unlam.edu.ar");
-        page.locator("#password").type("test");
-        page.locator("#btn-login").click();
-
-        String url = page.url();
+        vistaLogin.escribirEMAIL("test@unlam.edu.ar");
+        vistaLogin.escribirClave("test");
+        vistaLogin.darClickEnIniciarSesion();
+        String url = vistaLogin.obtenerURLActual();
         assertThat(url, containsStringIgnoringCase("/spring/home"));
     }
 }
