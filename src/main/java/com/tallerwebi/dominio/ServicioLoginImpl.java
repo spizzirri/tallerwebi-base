@@ -10,25 +10,25 @@ import javax.transaction.Transactional;
 @Transactional
 public class ServicioLoginImpl implements ServicioLogin {
 
-    private RepositorioUsuario servicioLoginDao;
+    private RepositorioUsuario repositorioUsuario;
 
     @Autowired
-    public ServicioLoginImpl(RepositorioUsuario servicioLoginDao){
-        this.servicioLoginDao = servicioLoginDao;
+    public ServicioLoginImpl(RepositorioUsuario repositorioUsuario){
+        this.repositorioUsuario = repositorioUsuario;
     }
 
     @Override
     public Usuario consultarUsuario (String email, String password) {
-        return servicioLoginDao.buscarUsuario(email, password);
+        return repositorioUsuario.buscarUsuario(email, password);
     }
 
     @Override
     public void registrar(Usuario usuario) throws UsuarioExistente {
-        Usuario usuarioEncontrado = servicioLoginDao.buscarUsuario(usuario.getEmail(), usuario.getPassword());
+        Usuario usuarioEncontrado = repositorioUsuario.buscarUsuario(usuario.getEmail(), usuario.getPassword());
         if(usuarioEncontrado != null){
             throw new UsuarioExistente();
         }
-        servicioLoginDao.guardar(usuario);
+        repositorioUsuario.guardar(usuario);
     }
 
 }
