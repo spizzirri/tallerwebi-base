@@ -19,6 +19,7 @@
         <mockito.version>5.3.1</mockito.version>
         <hibernate.version>5.4.24.Final</hibernate.version>
         <playwright.version>1.36.0</playwright.version>
+        <hsqldb.version>2.3.2</hsqldb.version>
     </properties>
 
     <dependencies>
@@ -44,7 +45,7 @@
         <dependency>
             <groupId>org.hsqldb</groupId>
             <artifactId>hsqldb</artifactId>
-            <version>2.3.2</version>
+            <version>${hsqldb.version}</version>
         </dependency>
 
         <dependency>
@@ -149,7 +150,7 @@
                 <artifactId>jetty-maven-plugin</artifactId>
                 <version>9.4.45.v20220203</version>
                 <configuration>
-                    <scanIntervalSeconds>10</scanIntervalSeconds>
+                    <scanIntervalSeconds>2</scanIntervalSeconds>
                     <webApp>
                         <contextPath>/spring</contextPath>
                     </webApp>
