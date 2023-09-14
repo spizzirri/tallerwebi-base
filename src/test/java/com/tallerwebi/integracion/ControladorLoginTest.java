@@ -32,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class ControladorLoginTest {
 
 	private Usuario usuarioMock;
+
 	@Autowired
 	private WebApplicationContext wac;
 	private MockMvc mockMvc;
