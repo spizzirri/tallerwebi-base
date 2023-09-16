@@ -8,4 +8,6 @@ public interface RepositorioViaje {
     Viaje buscarPorId(Long id);
 
     List<Viaje> buscarPorDestino(String destino);
+
+    void actualizar(Viaje viaje);
 }

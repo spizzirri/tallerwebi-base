@@ -43,4 +43,9 @@ public class RepositorioViajeImpl implements RepositorioViaje {
         return sessionFactory.getCurrentSession().createQuery(criteria).getResultList();
     }
 
+    @Override
+    public void actualizar(Viaje viaje) {
+        sessionFactory.getCurrentSession().save(viaje);
+    }
+
 }

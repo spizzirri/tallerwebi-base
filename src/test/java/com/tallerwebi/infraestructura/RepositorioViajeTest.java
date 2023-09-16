@@ -68,6 +68,29 @@ public class RepositorioViajeTest {
         }
 
     }
+    @Transactional
+    @Rollback
+    @Test
+    public void queSePuedaModificarElDestinoDeUnViaje(){
+        //preparacion
+        Viaje viaje = new Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando");
+
+        //ejecucion
+        repositorio.guardar(viaje);
+
+        String nuevoDestino = "Salta";
+        viaje.setDestino(nuevoDestino);
+        repositorio.actualizar(viaje);
+
+        Viaje viajeModificado = repositorio.buscarPorId(viaje.getId());
+
+        //validacion
+        assertThat(viajeModificado , is(notNullValue()));
+        assertThat(viajeModificado.getDestino(), equalTo(nuevoDestino));
+
+
+    }
+
 
 
 
