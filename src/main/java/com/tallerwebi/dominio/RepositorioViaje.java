@@ -9,7 +9,7 @@ public interface RepositorioViaje {
 
     Viaje buscarPorId(Long id);
 
-    List<Viaje> listarViajes();
+    List<Viaje> buscarPorDestino(String destino);
 
-    List<Viaje> buscarPorOrigen(String origen);
+    void actualizar(Viaje viaje);
 }
