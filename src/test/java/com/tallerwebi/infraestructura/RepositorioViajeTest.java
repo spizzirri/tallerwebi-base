@@ -19,6 +19,7 @@ import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SpringExtension.class)
 @WebAppConfiguration
@@ -51,7 +52,7 @@ public class RepositorioViajeTest {
         //preparacion
 
         Viaje viaje = new Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando");
-        Viaje viaje2 = new Viaje(1L,"Buenos Aires", "Tucuman","20/10/2023 14:05:00", 2, "probando");
+        Viaje viaje2 = new Viaje(2L,"Buenos Aires", "Tucuman","20/10/2023 14:05:00", 2, "probando");
         //ejecucion
         repositorio.guardar(viaje);
         repositorio.guardar(viaje2);
@@ -59,5 +60,21 @@ public class RepositorioViajeTest {
         List <Viaje> busqueda = repositorio.buscarPorFecha(viaje2.getFecha_hora());
         //validacion
         assertThat( busqueda , is(hasSize(1)));
+    }
+
+    @Transactional
+    @Rollback
+    @Test
+    public void queSePuedaEliminarUnViaje(){
+
+        Viaje viaje = new Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando");
+
+        repositorio.guardar(viaje);
+
+         repositorio.eliminar(viaje);
+
+         Viaje eliminado = repositorio.buscarPorId(viaje.getId());
+
+        assertThat(eliminado, is(nullValue()));
     }
 }

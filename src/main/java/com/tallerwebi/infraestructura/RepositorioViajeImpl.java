@@ -36,4 +36,7 @@ public class RepositorioViajeImpl implements RepositorioViaje {
             .add(Restrictions.eq("fecha_hora",fechaHora))
             .list();
     }
+
+    @Override
+    public void eliminar(Viaje viaje) {sessionFactory.getCurrentSession().delete(viaje);}
 }

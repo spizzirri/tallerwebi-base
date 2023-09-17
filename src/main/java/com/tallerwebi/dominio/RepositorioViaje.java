@@ -10,4 +10,6 @@ public interface RepositorioViaje {
     Viaje buscarPorId(Long id);
 
     List<Viaje> buscarPorFecha(String fechaHora);
+
+    void eliminar(Viaje viaje);
 }
