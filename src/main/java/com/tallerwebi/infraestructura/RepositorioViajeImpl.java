@@ -59,5 +59,13 @@ public class RepositorioViajeImpl implements RepositorioViaje {
     }
 
     @Override
+    public List<Viaje> buscarPorFecha(String fechaHora) {
+        return sessionFactory.getCurrentSession().createQuery("FROM Viaje V WHERE V.fecha_hora = :fechaHora", Viaje.class )
+                .setParameter("fechaHora",fechaHora)
+
+                .list();
+    }
+
+    @Override
     public void eliminar(Viaje viaje) {sessionFactory.getCurrentSession().delete(viaje);}
 }

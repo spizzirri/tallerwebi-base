@@ -1,6 +1,7 @@
 package com.tallerwebi.infraestructura;
 
 import com.tallerwebi.dominio.RepositorioViaje;
+import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.Viaje;
 import com.tallerwebi.integracion.config.HibernateTestConfig;
 import com.tallerwebi.integracion.config.SpringWebTestConfig;
@@ -36,7 +37,6 @@ public class RepositorioViajeTest {
     @Test
     public void queSePuedaCrearUnViajeYseGuarde(){
         //preparacion
-
          Viaje viaje = new Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando");
         //ejecucion
         repositorio.guardar(viaje);
@@ -135,6 +135,9 @@ public class RepositorioViajeTest {
         assertThat(busqueda.size(), equalTo(2));
     }
 
+    @Transactional
+    @Rollback
+    @Test
     public void queSePuedaBuscarViajesPorFecha(){
         //preparacion
 
@@ -147,6 +150,7 @@ public class RepositorioViajeTest {
         List <Viaje> busqueda = repositorio.buscarPorFecha(viaje2.getFecha_hora());
         //validacion
         assertThat( busqueda , is(hasSize(1)));
+        assertThat(busqueda, is(notNullValue()));
     }
 
     @Transactional
