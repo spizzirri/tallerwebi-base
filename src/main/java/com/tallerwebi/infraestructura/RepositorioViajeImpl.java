@@ -57,4 +57,7 @@ public class RepositorioViajeImpl implements RepositorioViaje {
     public List<Viaje> buscarPorOrigen(String origen) {
         return sessionFactory.getCurrentSession().createQuery("FROM Viaje V WHERE V.origen = :origen_viaje", Viaje.class).setParameter("origen_viaje",origen).list();
     }
+
+    @Override
+    public void eliminar(Viaje viaje) {sessionFactory.getCurrentSession().delete(viaje);}
 }

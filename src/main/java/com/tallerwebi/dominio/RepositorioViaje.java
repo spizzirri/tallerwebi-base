@@ -16,4 +16,8 @@ public interface RepositorioViaje {
     List<Viaje> listarViajes();
 
     List<Viaje> buscarPorOrigen(String origen);
+
+    List<Viaje> buscarPorFecha(String fechaHora);
+
+    void eliminar(Viaje viaje);
 }
