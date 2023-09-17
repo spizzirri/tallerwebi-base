@@ -9,5 +9,11 @@ public interface RepositorioViaje {
 
     Viaje buscarPorId(Long id);
 
-    List<Viaje> buscarPorFecha(String fechaHora);
+    List<Viaje> buscarPorDestino(String destino);
+
+    void actualizar(Viaje viaje);
+
+    List<Viaje> listarViajes();
+
+    List<Viaje> buscarPorOrigen(String origen);
 }
