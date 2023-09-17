@@ -91,8 +91,46 @@ public class RepositorioViajeTest {
 
     }
 
+    @Transactional
+    @Rollback
+    @Test
+    public void queSePuedanListarLosViajes(){
 
+        Viaje viaje1 = new Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando1");
+        Viaje viaje2 = new Viaje(2L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando2");
+        Viaje viaje3 = new Viaje(3L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando3");
+        //ejecucion
+        repositorio.guardar(viaje1);
+        repositorio.guardar(viaje2);
+        repositorio.guardar(viaje3);
 
+        List<Viaje> busqueda = repositorio.listarViajes();
+        //validacion
+        assertThat(busqueda , is(notNullValue()));
+        assertThat(busqueda.size(), equalTo(3));
+    }
 
+    @Transactional
+    @Rollback
+    @Test
+    public void queSePuedaBuscarViajePorOrigen(){
 
+        Viaje viaje1 = new Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando1");
+        Viaje viaje2 = new Viaje(2L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando2");
+        Viaje viaje3 = new Viaje(3L,"Entre Rios", "Tucuman", LocalDateTime.now().toString(), 2, "probando3");
+        //ejecucion
+        repositorio.guardar(viaje1);
+        repositorio.guardar(viaje2);
+        repositorio.guardar(viaje3);
+
+         List<Viaje> busqueda = repositorio.buscarPorOrigen(viaje3.getOrigen());
+        //validacion
+        assertThat(busqueda , is(notNullValue()));
+        assertThat(busqueda.size(), equalTo(1));
+
+        busqueda = repositorio.buscarPorOrigen(viaje2.getOrigen());
+
+        assertThat(busqueda , is(notNullValue()));
+        assertThat(busqueda.size(), equalTo(2));
+    }
 }

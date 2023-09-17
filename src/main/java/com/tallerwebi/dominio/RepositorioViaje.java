@@ -12,4 +12,8 @@ public interface RepositorioViaje {
     List<Viaje> buscarPorDestino(String destino);
 
     void actualizar(Viaje viaje);
+
+    List<Viaje> listarViajes();
+
+    List<Viaje> buscarPorOrigen(String origen);
 }

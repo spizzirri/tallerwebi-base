@@ -15,7 +15,6 @@ import java.util.List;
 public class RepositorioViajeImpl implements RepositorioViaje {
 
     private  SessionFactory sessionFactory;
-    private List<Viaje> viajesEncontrados;
 
     @Autowired
     public RepositorioViajeImpl(SessionFactory sessionFactory){
@@ -33,6 +32,7 @@ public class RepositorioViajeImpl implements RepositorioViaje {
         return sessionFactory.getCurrentSession().get(Viaje.class,id);
     }
 
+
     @Override
     public List<Viaje> buscarPorDestino(String destino) {
         CriteriaBuilder builder = sessionFactory.getCurrentSession().getCriteriaBuilder();
@@ -48,4 +48,13 @@ public class RepositorioViajeImpl implements RepositorioViaje {
         sessionFactory.getCurrentSession().save(viaje);
     }
 
+    @Override
+    public List<Viaje> listarViajes() {
+        return sessionFactory.getCurrentSession().createQuery("FROM Viaje", Viaje.class).list();
+    }
+
+    @Override
+    public List<Viaje> buscarPorOrigen(String origen) {
+        return sessionFactory.getCurrentSession().createQuery("FROM Viaje V WHERE V.origen = :origen_viaje", Viaje.class).setParameter("origen_viaje",origen).list();
+    }
 }
