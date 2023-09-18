@@ -31,6 +31,10 @@ public class Viaje {
         this.id_usuario =  creador;
     }
 
+    public Viaje(Long id) {
+        this.id = id;
+    }
+
     public String getDescripcion() {
         return this.descripcion;
     }
