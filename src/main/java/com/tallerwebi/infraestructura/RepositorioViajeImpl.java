@@ -16,7 +16,6 @@ import java.util.List;
 public class RepositorioViajeImpl implements RepositorioViaje {
 
     private  SessionFactory sessionFactory;
-    private Long usuario;
 
     @Autowired
     public RepositorioViajeImpl(SessionFactory sessionFactory){
@@ -77,4 +76,13 @@ public class RepositorioViajeImpl implements RepositorioViaje {
                 .list();
 
     }
+
+    @Override
+    public List buscarPorOrigenDestinoYfecha(String origen, String destino, String fechaHora) {
+        return sessionFactory.getCurrentSession().createCriteria(Viaje.class)
+                .add(Restrictions.eq("origen",origen))
+                .add(Restrictions.eq("destino", destino))
+                .add(Restrictions.eq("fecha_hora",fechaHora))
+                .list();
+                    }
 }
