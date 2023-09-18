@@ -10,8 +10,10 @@ import java.util.List;
 
 @Service
 public class ServicioViajeImpl implements ServicioViaje {
-    private RepositorioViaje repositorioViaje;
+
     @Autowired
+    private RepositorioViaje repositorioViaje;
+
     public ServicioViajeImpl(RepositorioViaje repositorioViaje) {
         this.repositorioViaje = repositorioViaje;
     }
@@ -34,5 +36,10 @@ public class ServicioViajeImpl implements ServicioViaje {
     @Override
     public List<Viaje> obtenerViajesPorFecha(String fecha) {
         return repositorioViaje.buscarPorFecha(fecha);
+    }
+
+    @Override
+    public List<Viaje> obtenerViajesPorFiltroMultiple(String origen, String destino, String fecha) {
+        return repositorioViaje.buscarPorOrigenDestinoYfecha(origen,destino,fecha);
     }
 }

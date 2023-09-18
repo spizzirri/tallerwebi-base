@@ -90,6 +90,28 @@ public class ServicioViajeTest {
         }
     }
 
+    @Test
+    public void queSePuedanBuscarViajesPorMultiplesFiltros(){
+
+        List <Viaje> viajesEsperados = new ArrayList();
+        viajesEsperados.add(new  Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando", 1L));
+        viajesEsperados.add(new  Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando", 1L));
+        viajesEsperados.add(new  Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando", 1L));
+
+        when(this.repositorioViaje.buscarPorOrigenDestinoYfecha(anyString(),anyString(),anyString())).thenReturn(viajesEsperados);
+
+        List <Viaje> viajesObtenidos = this.servicioViaje.obtenerViajesPorFiltroMultiple("Buenos Aires","Tucuman",LocalDateTime.now().withSecond(0).withNano(0).toString());
+
+        assertThat(viajesObtenidos,not(empty()));
+        assertThat(viajesObtenidos.size(), is(3) );
+
+        for (Viaje viaje: viajesObtenidos) {
+            assertThat(viaje.getOrigen(),equalTo(viajesEsperados.get(0).getOrigen()));
+            assertThat(viaje.getDestino(),equalTo(viajesEsperados.get(0).getDestino()));
+            assertThat(viaje.getFecha_hora(),equalTo(viajesEsperados.get(0).getFecha_hora()));
+        }
+    }
+
     private List<Viaje> generarViajes(int cantidadDeseada) {
         List <Viaje>   viajes = new ArrayList<>();
         for( int i=1; i<=cantidadDeseada; i++){
