@@ -14,9 +14,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -37,7 +34,8 @@ public class RepositorioViajeTest {
     @Test
     public void queSePuedaCrearUnViajeYseGuarde(){
         //preparacion
-         Viaje viaje = new Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando");
+        Usuario creador = new Usuario(5L);
+        Viaje viaje = new Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando", creador.getId());
         //ejecucion
         repositorio.guardar(viaje);
 
@@ -51,9 +49,10 @@ public class RepositorioViajeTest {
     @Test
     public void queSePuedaBuscarViajesPorDestino(){
         //preparacion
-        Viaje viaje = new Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando");
-        Viaje viaje2 = new Viaje(1L,"Buenos Aires", "Bariloche", LocalDateTime.now().toString(), 3, "probando");
-        Viaje viaje3 = new Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 4, "probando");
+        Usuario creador = new Usuario(5L);
+        Viaje viaje = new Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando", creador.getId());
+        Viaje viaje2 = new Viaje(1L,"Buenos Aires", "Bariloche", LocalDateTime.now().toString(), 3, "probando", creador.getId());
+        Viaje viaje3 = new Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 4, "probando", creador.getId());
 
         //ejecucion
         repositorio.guardar(viaje);
@@ -74,7 +73,8 @@ public class RepositorioViajeTest {
     @Test
     public void queSePuedaModificarElDestinoDeUnViaje(){
         //preparacion
-        Viaje viaje = new Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando");
+        Usuario creador = new Usuario(5L);
+        Viaje viaje = new Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando", creador.getId());
 
         //ejecucion
         repositorio.guardar(viaje);
@@ -96,10 +96,11 @@ public class RepositorioViajeTest {
     @Rollback
     @Test
     public void queSePuedanListarLosViajes(){
+        Usuario creador = new Usuario(5L);
 
-        Viaje viaje1 = new Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando1");
-        Viaje viaje2 = new Viaje(2L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando2");
-        Viaje viaje3 = new Viaje(3L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando3");
+        Viaje viaje1 = new Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando1", creador.getId());
+        Viaje viaje2 = new Viaje(2L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando2", creador.getId());
+        Viaje viaje3 = new Viaje(3L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando3", creador.getId());
         //ejecucion
         repositorio.guardar(viaje1);
         repositorio.guardar(viaje2);
@@ -116,9 +117,10 @@ public class RepositorioViajeTest {
     @Test
     public void queSePuedaBuscarViajePorOrigen(){
 
-        Viaje viaje1 = new Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando1");
-        Viaje viaje2 = new Viaje(2L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando2");
-        Viaje viaje3 = new Viaje(3L,"Entre Rios", "Tucuman", LocalDateTime.now().toString(), 2, "probando3");
+        Usuario creador = new Usuario(5L);
+        Viaje viaje1 = new Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando1", creador.getId());
+        Viaje viaje2 = new Viaje(2L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando2", creador.getId());
+        Viaje viaje3 = new Viaje(3L,"Entre Rios", "Tucuman", LocalDateTime.now().toString(), 2, "probando3", creador.getId());
         //ejecucion
         repositorio.guardar(viaje1);
         repositorio.guardar(viaje2);
@@ -140,9 +142,9 @@ public class RepositorioViajeTest {
     @Test
     public void queSePuedaBuscarViajesPorFecha(){
         //preparacion
-
-        Viaje viaje = new Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando");
-        Viaje viaje2 = new Viaje(2L,"Buenos Aires", "Tucuman","20/10/2023 14:05:00", 2, "probando");
+        Usuario creador = new Usuario(5L);
+        Viaje viaje = new Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando", creador.getId());
+        Viaje viaje2 = new Viaje(2L,"Buenos Aires", "Tucuman","20/10/2023 14:05:00", 2, "probando", creador.getId());
         //ejecucion
         repositorio.guardar(viaje);
         repositorio.guardar(viaje2);
@@ -158,7 +160,8 @@ public class RepositorioViajeTest {
     @Test
     public void queSePuedaEliminarUnViaje(){
 
-        Viaje viaje = new Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando");
+        Usuario creador = new Usuario(5L);
+        Viaje viaje = new Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando", creador.getId());
 
         repositorio.guardar(viaje);
 
@@ -167,5 +170,26 @@ public class RepositorioViajeTest {
          Viaje eliminado = repositorio.buscarPorId(viaje.getId());
 
         assertThat(eliminado, is(nullValue()));
+    }
+    
+    @Transactional
+    @Rollback
+    @Test
+    public void queSePuedaBuscarViajesCreadosPorUnUsuario(){
+
+        Usuario creador = new Usuario(5L);
+        Viaje viaje = new Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando", creador.getId());
+        Viaje viaje2 = new Viaje(1L,"Buenos Aires", "Rosario", LocalDateTime.now().toString(), 2, "probando", creador.getId());
+
+        repositorio.guardar(viaje);
+        repositorio.guardar(viaje2);
+        
+        List <Viaje> buscados = repositorio.buscarPorUsuario(creador.getId());
+
+        for (Viaje viajesObtenidos : buscados) {
+            assertThat(viajesObtenidos.getIdUsuario(),equalTo(creador.getId()));
+        }
+        assertThat(buscados, is(notNullValue()));
+        assertThat(buscados,is(hasSize(2)));
     }
 }

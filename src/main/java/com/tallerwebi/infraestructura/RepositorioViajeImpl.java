@@ -3,6 +3,7 @@ package com.tallerwebi.infraestructura;
 import com.tallerwebi.dominio.RepositorioViaje;
 import com.tallerwebi.dominio.Viaje;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -15,6 +16,7 @@ import java.util.List;
 public class RepositorioViajeImpl implements RepositorioViaje {
 
     private  SessionFactory sessionFactory;
+    private Long usuario;
 
     @Autowired
     public RepositorioViajeImpl(SessionFactory sessionFactory){
@@ -60,12 +62,19 @@ public class RepositorioViajeImpl implements RepositorioViaje {
 
     @Override
     public List<Viaje> buscarPorFecha(String fechaHora) {
-        return sessionFactory.getCurrentSession().createQuery("FROM Viaje V WHERE V.fecha_hora = :fechaHora", Viaje.class )
-                .setParameter("fechaHora",fechaHora)
-
+        return sessionFactory.getCurrentSession().createCriteria(Viaje.class)
+                .add(Restrictions.eq("fecha_hora",fechaHora))
                 .list();
     }
 
     @Override
     public void eliminar(Viaje viaje) {sessionFactory.getCurrentSession().delete(viaje);}
+
+    @Override
+    public List<Viaje> buscarPorUsuario(Long idUsuario) {
+        return sessionFactory.getCurrentSession().createCriteria(Viaje.class)
+                .add(Restrictions.eq("id_usuario",idUsuario))
+                .list();
+
+    }
 }

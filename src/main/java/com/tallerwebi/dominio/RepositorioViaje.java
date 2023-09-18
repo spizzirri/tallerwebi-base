@@ -1,7 +1,5 @@
 package com.tallerwebi.dominio;
 
-import org.springframework.stereotype.Repository;
-
 import java.util.List;
 
 public interface RepositorioViaje {
@@ -20,4 +18,6 @@ public interface RepositorioViaje {
     List<Viaje> buscarPorFecha(String fechaHora);
 
     void eliminar(Viaje viaje);
+
+    List<Viaje> buscarPorUsuario(Long idUsuario);
 }
