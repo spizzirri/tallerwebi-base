@@ -1,35 +1,397 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
+
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>TravelAndo</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="description" content="Agency HTML Template">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta name="author" content="Themefisher">
+  <meta name="generator" content="Themefisher Classified Marketplace Template v1.0">
 
-  <title>Taller Web I</title>
+  <meta name="theme-name" content="classimax" />
 
-  <!-- Boostrap core css -->
-  <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.2.0/css/bootstrap.min.css}"/>
+  <link href="plugins/bootstrap/bootstrap.min.css" rel="stylesheet">
+  <link href="plugins/bootstrap/bootstrap-slider.css" rel="stylesheet">
+  <link href="plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+  <link href="plugins/slick/slick.css" rel="stylesheet">
+  <link href="plugins/slick/slick-theme.css" rel="stylesheet">
+  <link href="plugins/jquery-nice-select/css/nice-select.css" rel="stylesheet">
 
-  <!-- custom style -->
-  <link rel="stylesheet" th:href="@{/css/main.css}"/>
+  <link rel="stylesheet" th:href="@{/css/style.css}"/>
 
 </head>
 
-<body>
+<body class="body-wrapper">
 
-<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-  <a class="navbar-brand" href="#">UNLAM</a>
-</nav>
 
-<main role="main" class="container">
-  <div class = "container">
-    <h1>Bienvenidos a Taller Web 1</h1>
+<header>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <nav class="navbar navbar-expand-lg navbar-light navigation">
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                  aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav ml-auto main-nav ">
+              <li class="nav-item active">
+                <a class="nav-link" href="index.html">Home</a>
+              </li>
+              <li class="nav-item dropdown dropdown-slide @@dashboard">
+                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#!">Dashboard<span><i class="fa fa-angle-down"></i></span>
+                </a>
 
-    <a href="login.html" class="btn btn-lg btn-primary btn-block">Volver</a>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item @@dashboardPage" href="dashboard.html">Dashboard</a></li>
+                  <li><a class="dropdown-item @@dashboardMyAds" href="dashboard-my-ads.html">Dashboard My Ads</a></li>
+                  <li><a class="dropdown-item @@dashboardFavouriteAds" href="dashboard-favourite-ads.html">Dashboard Favourite Ads</a></li>
+                  <li><a class="dropdown-item @@dashboardArchivedAds" href="dashboard-archived-ads.html">Dashboard Archived Ads</a></li>
+                  <li><a class="dropdown-item @@dashboardPendingAds" href="dashboard-pending-ads.html">Dashboard Pending Ads</a></li>
+
+                  <li class="dropdown dropdown-submenu dropright">
+                    <a class="dropdown-item dropdown-toggle" href="#!" id="dropdown0501" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Sub Menu</a>
+
+                    <ul class="dropdown-menu" aria-labelledby="dropdown0501">
+                      <li><a class="dropdown-item" href="index.html">Submenu 01</a></li>
+                      <li><a class="dropdown-item" href="index.html">Submenu 02</a></li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+              <li class="nav-item dropdown dropdown-slide @@pages">
+                <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Pages <span><i class="fa fa-angle-down"></i></span>
+                </a>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item @@about" href="about-us.html">About Us</a></li>
+                  <li><a class="dropdown-item @@contact" href="contact-us.html">Contact Us</a></li>
+                  <li><a class="dropdown-item @@profile" href="user-profile.html">User Profile</a></li>
+                  <li><a class="dropdown-item @@404" href="404.html">404 Page</a></li>
+                  <li><a class="dropdown-item @@package" href="package.html">Package</a></li>
+                  <li><a class="dropdown-item @@singlePage" href="single.html">Single Page</a></li>
+                  <li><a class="dropdown-item @@store" href="store.html">Store Single</a></li>
+                  <li><a class="dropdown-item @@blog" href="blog.html">Blog</a></li>
+                  <li><a class="dropdown-item @@singleBlog" href="single-blog.html">Blog Details</a></li>
+                  <li><a class="dropdown-item @@terms" href="terms-condition.html">Terms &amp; Conditions</a></li>
+                </ul>
+              </li>
+              <li class="nav-item dropdown dropdown-slide @@listing">
+                <a class="nav-link dropdown-toggle" href="#!" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Listing <span><i class="fa fa-angle-down"></i></span>
+                </a>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item @@category" href="category.html">Ad-Gird View</a></li>
+                  <li><a class="dropdown-item @@listView" href="ad-list-view.html">Ad-List View</a></li>
+
+                  <li class="dropdown dropdown-submenu dropleft">
+                    <a class="dropdown-item dropdown-toggle" href="#!" id="dropdown0201" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Sub Menu</a>
+
+                    <ul class="dropdown-menu" aria-labelledby="dropdown0201">
+                      <li><a class="dropdown-item" href="index.html">Submenu 01</a></li>
+                      <li><a class="dropdown-item" href="index.html">Submenu 02</a></li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+            <ul class="navbar-nav ml-auto mt-10">
+              <li class="nav-item">
+                <a class="nav-link login-button" href="login.html">Login</a>
+              </li>
+            </ul>
+          </div>
+        </nav>
+      </div>
+    </div>
   </div>
-</main>
-<!-- /.container -->
+</header>
 
-<!-- Boostrap core js -->
-<script type="text/javascript" th:src="@{webjars/bootstrap/5.2.0/js/bootstrap.min.js}"></script>
+<section class="hero-area bg-1 text-center overly">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="content-block">
+          <h1>Encontrá tu próximo compañero de viaje</h1>
+        </div>
+        <div class="advance-search">
+          <div class="container">
+            <div class="row justify-content-center">
+              <div class="col-lg-12 col-md-12 align-content-center">
+                <form>
+                  <div class="form-row">
+                    <div class="form-group col-xl-4 col-lg-3 col-md-6">
+                      <input type="text" class="form-control my-2 my-lg-1" id="inputtext4"
+                             placeholder="Origen">
+                    </div>
+                    <div class="form-group col-lg-3 col-md-6">
+                      <input type="text" class="form-control my-2 my-lg-1" id="inputtext4"
+                             placeholder="Destino">
+                    </div>
+                    <div class="form-group col-lg-3 col-md-6">
+                      <input type="date" class="form-control my-2 my-lg-1" id="inputLocation4">
+                    </div>
+                    <div class="form-group col-xl-2 col-lg-3 col-md-6 align-self-center">
+                      <button type="submit" class="btn btn-primary active w-100">Buscar Viaje</button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="popular-deals section bg-gray">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="section-title">
+          <h2>Provincias populares</h2>
+          <p>Les destacamos las provincias mas visitadas por nuestros usuarios</p>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="trending-ads-slide">
+          <div class="col-sm-12 col-lg-4">
+            <div class="product-item bg-light">
+              <div class="card">
+                <div class="thumb-content">
+                  <a href="#">
+                    <img class="card-img-top img-fluid" src="images/products/san-rafael.jpg" alt="Card image cap">
+                  </a>
+                </div>
+                <div class="card-body">
+                  <h4 class="card-title"><a href="#">Mendoza</a></h4>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-12 col-lg-4">
+            <div class="product-item bg-light">
+              <div class="card">
+                <div class="thumb-content">
+                  <a href="#">
+                    <img class="card-img-top img-fluid" src="images/products/cordoba.jpg" alt="Card image cap">
+                  </a>
+                </div>
+                <div class="card-body">
+                  <h4 class="card-title"><a href="#">Córdoba</a></h4>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-12 col-lg-4">
+            <div class="product-item bg-light">
+              <div class="card">
+                <div class="thumb-content">
+                  <a href="#">
+                    <img class="card-img-top img-fluid" src="images/products/neuquen.jpg" alt="Card image cap">
+                  </a>
+                </div>
+                <div class="card-body">
+                  <h4 class="card-title"><a href="#">Neuquén</a></h4>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-12 col-lg-4">
+            <div class="product-item bg-light">
+              <div class="card">
+                <div class="thumb-content">
+                  <a href="#">
+                    <img class="card-img-top img-fluid" src="images/products/salta.jpg" alt="Card image cap">
+                  </a>
+                </div>
+                <div class="card-body">
+                  <h4 class="card-title"><a href="#">Salta</a></h4>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class=" section">
+  <div class="container">
+    <div class="row">
+      <div class="col-12">
+        <div class="section-title">
+          <h2>Todos los viajes</h2>
+        </div>
+        <!-- <div class="row">
+            <div class="col-lg-3 offset-lg-0 col-md-5 offset-md-1 col-sm-6">
+                <div class="category-block">
+                    <div class="header">
+                        <i class="fa fa-laptop icon-bg-1"></i>
+                        <h4>Electronics</h4>
+                    </div>
+                    <ul class="category-list">
+                        <li><a href="category.html">Laptops <span>93</span></a></li>
+                        <li><a href="category.html">Iphone <span>233</span></a></li>
+                        <li><a href="category.html">Microsoft <span>183</span></a></li>
+                        <li><a href="category.html">Monitors <span>343</span></a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-3 offset-lg-0 col-md-5 offset-md-1 col-sm-6">
+                <div class="category-block">
+                    <div class="header">
+                        <i class="fa fa-apple icon-bg-2"></i>
+                        <h4>Restaurants</h4>
+                    </div>
+                    <ul class="category-list">
+                        <li><a href="category.html">Cafe <span>393</span></a></li>
+                        <li><a href="category.html">Fast food <span>23</span></a></li>
+                        <li><a href="category.html">Restaurants <span>13</span></a></li>
+                        <li><a href="category.html">Food Track<span>43</span></a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-3 offset-lg-0 col-md-5 offset-md-1 col-sm-6">
+                <div class="category-block">
+                    <div class="header">
+                        <i class="fa fa-home icon-bg-3"></i>
+                        <h4>Real Estate</h4>
+                    </div>
+                    <ul class="category-list">
+                        <li><a href="category.html">Farms <span>93</span></a></li>
+                        <li><a href="category.html">Gym <span>23</span></a></li>
+                        <li><a href="category.html">Hospitals <span>83</span></a></li>
+                        <li><a href="category.html">Parolurs <span>33</span></a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-3 offset-lg-0 col-md-5 offset-md-1 col-sm-6">
+                <div class="category-block">
+                    <div class="header">
+                        <i class="fa fa-shopping-basket icon-bg-4"></i>
+                        <h4>Shoppings</h4>
+                    </div>
+                    <ul class="category-list">
+                        <li><a href="category.html">Mens Wears <span>53</span></a></li>
+                        <li><a href="category.html">Accessories <span>212</span></a></li>
+                        <li><a href="category.html">Kids Wears <span>133</span></a></li>
+                        <li><a href="category.html">It & Software <span>143</span></a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-3 offset-lg-0 col-md-5 offset-md-1 col-sm-6">
+                <div class="category-block">
+                    <div class="header">
+                        <i class="fa fa-briefcase icon-bg-5"></i>
+                        <h4>Jobs</h4>
+                    </div>
+                    <ul class="category-list">
+                        <li><a href="category.html">It Jobs <span>93</span></a></li>
+                        <li><a href="category.html">Cleaning & Washing <span>233</span></a></li>
+                        <li><a href="category.html">Management <span>183</span></a></li>
+                        <li><a href="category.html">Voluntary Works <span>343</span></a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-3 offset-lg-0 col-md-5 offset-md-1 col-sm-6">
+                <div class="category-block">
+                    <div class="header">
+                        <i class="fa fa-car icon-bg-6"></i>
+                        <h4>Vehicles</h4>
+                    </div>
+                    <ul class="category-list">
+                        <li><a href="category.html">Bus <span>193</span></a></li>
+                        <li><a href="category.html">Cars <span>23</span></a></li>
+                        <li><a href="category.html">Motobike <span>33</span></a></li>
+                        <li><a href="category.html">Rent a car <span>73</span></a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-3 offset-lg-0 col-md-5 offset-md-1 col-sm-6">
+                <div class="category-block">
+                    <div class="header">
+                        <i class="fa fa-paw icon-bg-7"></i>
+                        <h4>Pets</h4>
+                    </div>
+                    <ul class="category-list">
+                        <li><a href="category.html">Cats <span>65</span></a></li>
+                        <li><a href="category.html">Dogs <span>23</span></a></li>
+                        <li><a href="category.html">Birds <span>113</span></a></li>
+                        <li><a href="category.html">Others <span>43</span></a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-3 offset-lg-0 col-md-5 offset-md-1 col-sm-6">
+                <div class="category-block">
+
+                    <div class="header">
+                        <i class="fa fa-laptop icon-bg-8"></i>
+                        <h4>Services</h4>
+                    </div>
+                    <ul class="category-list">
+                        <li><a href="category.html">Cleaning <span>93</span></a></li>
+                        <li><a href="category.html">Car Washing <span>233</span></a></li>
+                        <li><a href="category.html">Clothing <span>183</span></a></li>
+                        <li><a href="category.html">Business <span>343</span></a></li>
+                    </ul>
+                </div>
+            </div>
+
+
+        </div> -->
+      </div>
+    </div>
+  </div>
+</section>
+<section class="call-to-action overly bg-3 section-sm">
+  <div class="container">
+    <div class="row justify-content-md-center text-center">
+      <div class="col-md-8">
+
+      </div>
+    </div>
+  </div>
+</section>
+<footer class="footer-bottom">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-6 text-center text-lg-left mb-3 mb-lg-0">
+      </div>
+      <div class="col-lg-6">
+        <ul class="social-media-icons text-center text-lg-right">
+          <li><a class="fa fa-facebook" href="https://www.facebook.com/themefisher"></a></li>
+          <li><a class="fa fa-twitter" href="https://www.twitter.com/themefisher"></a></li>
+          <li><a class="fa fa-github-alt" href="https://www.github.com/themefisher"></a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-top-to">
+    <i class="fa fa-angle-up"></i>
+  </div>
+</footer>
+
+<script src="plugins/jquery/jquery.min.js"></script>
+<script src="plugins/bootstrap/popper.min.js"></script>
+<script src="plugins/bootstrap/bootstrap.min.js"></script>
+<script src="plugins/bootstrap/bootstrap-slider.js"></script>
+<script src="plugins/tether/js/tether.min.js"></script>
+<script src="plugins/raty/jquery.raty-fa.js"></script>
+<script src="plugins/slick/slick.min.js"></script>
+<script src="plugins/jquery-nice-select/js/jquery.nice-select.min.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCcABaamniA6OL5YvYSpB3pFMNrXwXnLwU" defer></script>
+<script src="plugins/google-map/map.js" defer></script>
+
+<script th:src="@{js/script.js}"></script>
+
 </body>
+
 </html>
