@@ -197,9 +197,11 @@ public class RepositorioViajeTest {
     @Test
     public void queSePuedaBuscarPorOrigenDestinoYfecha(){
 
-        Viaje viaje = new Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando");
-        Viaje viaje2 = new Viaje(1L,"Buenos Aires", "Jujuy", LocalDateTime.now().toString(), 2, "probando");
-        Viaje viaje3 = new Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando");
+        Usuario usuario = new Usuario(5L);
+
+        Viaje viaje = new Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando", usuario.getId());
+        Viaje viaje2 = new Viaje(1L,"Buenos Aires", "Jujuy", LocalDateTime.now().toString(), 2, "probando", usuario.getId());
+        Viaje viaje3 = new Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando", usuario.getId());
 
         repositorio.guardar(viaje);
         repositorio.guardar(viaje2);
