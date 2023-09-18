@@ -64,7 +64,7 @@ public class Viaje {
     }
 
     public String getOrigen() {
-        return origen;
+        return this.origen;
     }
 
     public void setOrigen(String origen) {

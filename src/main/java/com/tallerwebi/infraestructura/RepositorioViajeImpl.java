@@ -39,4 +39,13 @@ public class RepositorioViajeImpl implements RepositorioViaje {
 
     @Override
     public void eliminar(Viaje viaje) {sessionFactory.getCurrentSession().delete(viaje);}
+
+    @Override
+    public List buscarPorOrigenDestinoYfecha(String origen, String destino, String fechaHora) {
+        return sessionFactory.getCurrentSession().createCriteria(Viaje.class)
+                .add(Restrictions.eq("origen",origen))
+                .add(Restrictions.eq("destino", destino))
+                .add(Restrictions.eq("fecha_hora",fechaHora))
+                .list();
+                    }
 }
