@@ -142,7 +142,7 @@ public class RepositorioViajeTest {
     public void queSePuedaBuscarViajesPorFecha(){
         //preparacion
         Usuario creador = new Usuario(5L);
-        Viaje viaje = new Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando", creador.getId());
+        Viaje viaje = new Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().withSecond(0).withNano(0).toString(), 2, "probando", creador.getId());
         Viaje viaje2 = new Viaje(2L,"Buenos Aires", "Tucuman","20/10/2023 14:05:00", 2, "probando", creador.getId());
         //ejecucion
         repositorio.guardar(viaje);
@@ -199,9 +199,9 @@ public class RepositorioViajeTest {
 
         Usuario usuario = new Usuario(5L);
 
-        Viaje viaje = new Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando", usuario.getId());
-        Viaje viaje2 = new Viaje(1L,"Buenos Aires", "Jujuy", LocalDateTime.now().toString(), 2, "probando", usuario.getId());
-        Viaje viaje3 = new Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando", usuario.getId());
+        Viaje viaje = new Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().withSecond(0).withNano(0).toString(), 2, "probando", usuario.getId());
+        Viaje viaje2 = new Viaje(1L,"Buenos Aires", "Jujuy", LocalDateTime.now().withSecond(0).withNano(0).toString(), 2, "probando", usuario.getId());
+        Viaje viaje3 = new Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().withSecond(0).withNano(0).toString(), 2, "probando", usuario.getId());
 
         repositorio.guardar(viaje);
         repositorio.guardar(viaje2);

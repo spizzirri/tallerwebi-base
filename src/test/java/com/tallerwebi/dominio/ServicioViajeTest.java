@@ -75,9 +75,9 @@ public class ServicioViajeTest {
     @Test
     public void queSePuedanBuscarViajesPorFecha(){
         List <Viaje> viajesEsperados = new ArrayList();
-        viajesEsperados.add(new  Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando", 1L));
-        viajesEsperados.add(new  Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando", 1L));
-        viajesEsperados.add(new  Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando", 1L));
+        viajesEsperados.add(new  Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().withSecond(0).withNano(0).toString(), 2, "probando", 1L));
+        viajesEsperados.add(new  Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().withSecond(0).withNano(0).toString(), 2, "probando", 1L));
+        viajesEsperados.add(new  Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().withSecond(0).withNano(0).toString(), 2, "probando", 1L));
         when(this.repositorioViaje.buscarPorFecha(anyString())).thenReturn(viajesEsperados);
 
         List <Viaje> viajesObtenidos = this.servicioViaje.obtenerViajesPorFecha(LocalDateTime.now().withSecond(0).withNano(0).toString());
@@ -94,9 +94,9 @@ public class ServicioViajeTest {
     public void queSePuedanBuscarViajesPorMultiplesFiltros(){
 
         List <Viaje> viajesEsperados = new ArrayList();
-        viajesEsperados.add(new  Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando", 1L));
-        viajesEsperados.add(new  Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando", 1L));
-        viajesEsperados.add(new  Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().toString(), 2, "probando", 1L));
+        viajesEsperados.add(new  Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().withSecond(0).withNano(0).toString(), 2, "probando", 1L));
+        viajesEsperados.add(new  Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().withSecond(0).withNano(0).toString(), 2, "probando", 1L));
+        viajesEsperados.add(new  Viaje(1L,"Buenos Aires", "Tucuman", LocalDateTime.now().withSecond(0).withNano(0).toString(), 2, "probando", 1L));
 
         when(this.repositorioViaje.buscarPorOrigenDestinoYfecha(anyString(),anyString(),anyString())).thenReturn(viajesEsperados);
 
