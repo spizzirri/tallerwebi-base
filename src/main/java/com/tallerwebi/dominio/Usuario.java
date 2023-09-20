@@ -15,6 +15,34 @@ public class Usuario {
     private String password;
     private String rol;
     private Boolean activo = false;
+    private String nombre;
+    private  String apellido;
+    private Long dni;
+    private String fecha_nac;
+    private Integer cod_area;
+    private Long telefono;
+
+
+    //TODO: constructor de pruebas.
+    public Usuario(Long id){
+        this.id = id;
+    }
+    public Usuario(){};
+
+    public Usuario(Long id, String nombre, String apellido, Long dni, String fecha_nac, Integer cod_area, Long telefono, String email, String password, Integer calificacion, Boolean activo) {
+        this.id = id;
+        this.nombre = nombre;
+        this.apellido = apellido;
+        this.dni = dni;
+        this.fecha_nac = fecha_nac;
+        this.cod_area = cod_area;
+        this.telefono = telefono;
+        this.email = email;
+        this.password= password;
+        this.activo = activo;
+
+
+    }
 
     public Long getId() {
         return id;
