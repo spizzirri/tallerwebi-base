@@ -12,14 +12,28 @@
 
   <meta name="theme-name" content="classimax" />
 
-  <link href="plugins/bootstrap/bootstrap.min.css" rel="stylesheet">
-  <link href="plugins/bootstrap/bootstrap-slider.css" rel="stylesheet">
-  <link href="plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-  <link href="plugins/slick/slick.css" rel="stylesheet">
-  <link href="plugins/slick/slick-theme.css" rel="stylesheet">
-  <link href="plugins/jquery-nice-select/css/nice-select.css" rel="stylesheet">
+  <!-- Use Thymeleaf expressions for CSS URLs -->
+  <link th:href="@{/plugins/bootstrap/bootstrap.min.css}" rel="stylesheet">
+  <link th:href="@{/plugins/bootstrap/bootstrap-slider.css}" rel="stylesheet">
+  <link th:href="@{/plugins/font-awesome/css/font-awesome.min.css}" rel="stylesheet">
+  <link th:href="@{/plugins/slick/slick.css}" rel="stylesheet">
+  <link th:href="@{/plugins/slick/slick-theme.css}" rel="stylesheet">
+  <link th:href="@{/plugins/jquery-nice-select/css/nice-select.css}" rel="stylesheet">
 
-  <link rel="stylesheet" th:href="@{/css/style.css}"/>
+  <!-- Use Thymeleaf expressions for JavaScript URLs -->
+  <script th:src="@{/plugins/jquery/jquery.min.js}"></script>
+  <script th:src="@{/plugins/bootstrap/popper.min.js}"></script>
+  <script th:src="@{/plugins/bootstrap/bootstrap.min.js}"></script>
+  <script th:src="@{/plugins/bootstrap/bootstrap-slider.js}"></script>
+  <script th:src="@{/plugins/tether/js/tether.min.js}"></script>
+  <script th:src="@{/plugins/raty/jquery.raty-fa.js}"></script>
+  <script th:src="@{/plugins/slick/slick.min.js}"></script>
+  <script th:src="@{/plugins/jquery-nice-select/js/jquery.nice-select.min.js}"></script>
+  <script th:src="@{/plugins/google-map/map.js}" defer></script>
+
+  <!-- Use Thymeleaf expressions for your custom CSS and JavaScript -->
+  <link th:href="@{/css/style.css}" rel="stylesheet">
+  <script th:src="@{/js/script.js}"></script>
 
 </head>
 
@@ -38,9 +52,9 @@
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav ml-auto main-nav ">
               <li class="nav-item active">
-                <a class="nav-link" href="index.html">Home</a>
+                <a class="nav-link" href="home">Home</a>
               </li>
-              <li class="nav-item dropdown dropdown-slide @@dashboard">
+              <!--<li class="nav-item dropdown dropdown-slide @@dashboard">
                 <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#!">Dashboard<span><i class="fa fa-angle-down"></i></span>
                 </a>
 
@@ -60,8 +74,8 @@
                     </ul>
                   </li>
                 </ul>
-              </li>
-              <li class="nav-item dropdown dropdown-slide @@pages">
+              </li>-->
+              <!--<li class="nav-item dropdown dropdown-slide @@pages">
                 <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   Pages <span><i class="fa fa-angle-down"></i></span>
                 </a>
@@ -77,8 +91,8 @@
                   <li><a class="dropdown-item @@singleBlog" href="single-blog.html">Blog Details</a></li>
                   <li><a class="dropdown-item @@terms" href="terms-condition.html">Terms &amp; Conditions</a></li>
                 </ul>
-              </li>
-              <li class="nav-item dropdown dropdown-slide @@listing">
+              </li>-->
+              <!--<li class="nav-item dropdown dropdown-slide @@listing">
                 <a class="nav-link dropdown-toggle" href="#!" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   Listing <span><i class="fa fa-angle-down"></i></span>
                 </a>
@@ -95,6 +109,9 @@
                     </ul>
                   </li>
                 </ul>
+              </li>-->
+              <li class="nav-item">
+                <a class="nav-link" href="nuevo-usuario">Perfil</a>
               </li>
             </ul>
             <ul class="navbar-nav ml-auto mt-10">
@@ -127,7 +144,7 @@
                              placeholder="Origen">
                     </div>
                     <div class="form-group col-lg-3 col-md-6">
-                      <input type="text" class="form-control my-2 my-lg-1" id="inputtext4"
+                      <input type="text" class="form-control my-2 my-lg-1" id="inputtext5"
                              placeholder="Destino">
                     </div>
                     <div class="form-group col-lg-3 col-md-6">
