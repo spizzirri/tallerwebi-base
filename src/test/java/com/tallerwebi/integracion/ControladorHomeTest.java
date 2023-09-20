@@ -1,6 +1,5 @@
 package com.tallerwebi.integracion;
 
-import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.integracion.config.HibernateTestConfig;
 import com.tallerwebi.integracion.config.SpringWebTestConfig;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +14,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -28,7 +29,7 @@ public class ControladorHomeTest {
     private MockMvc mockMvc;
 
     @BeforeEach
-    public void init(){
+    public void init() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
     }
 
@@ -37,5 +38,16 @@ public class ControladorHomeTest {
         MvcResult mvcResult = this.mockMvc.perform(get("/home"))
                 .andExpect(status().isOk())
                 .andReturn();
+    }
+
+
+    @Test
+    public void debeRetornarVistaHomeCuandoSeNavegaAHome() throws Exception {
+        MvcResult mvcResult = this.mockMvc.perform(get("/home"))
+                .andExpect(status().isOk())
+                .andReturn();
+
+
+        assertThat(mvcResult.getModelAndView().getViewName(), is("home"));
     }
 }

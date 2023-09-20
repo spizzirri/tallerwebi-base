@@ -1,17 +1,11 @@
 package com.tallerwebi.presentacion;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-
 @Controller
-public class HomeController {
+public class ControladorHome {
      @RequestMapping("/home")
      public ModelAndView irAHome(){
          /*DatosHome dato1 = new DatosHome("Mendoza",new Date());
@@ -30,7 +24,7 @@ public class HomeController {
 
 
     // Constructor para crear algunos viajes ficticios
-    public HomeController() {
+    public ControladorHome() {
 
     }
 
