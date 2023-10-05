@@ -1,4 +1,4 @@
-package com.tallerwebi.integracion.config;
+package com.tallerwebi.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;

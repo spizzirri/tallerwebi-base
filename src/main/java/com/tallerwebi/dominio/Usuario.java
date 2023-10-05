@@ -16,6 +16,15 @@ public class Usuario {
     private String rol;
     private Boolean activo = false;
 
+    public Usuario() {}
+
+    public Usuario(String email, String password, String rol, Boolean activo) {
+        this.email = email;
+        this.password = password;
+        this.rol = rol;
+        this.activo = activo;
+    }
+
     public Long getId() {
         return id;
     }
