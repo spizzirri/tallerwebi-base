@@ -8,7 +8,10 @@ public class Auto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Enumerated(EnumType.STRING)
     private Marca marca;
+    @Column(unique = true)
     private String patente;
     @ManyToOne(cascade = CascadeType.ALL)
     private Usuario usuario;

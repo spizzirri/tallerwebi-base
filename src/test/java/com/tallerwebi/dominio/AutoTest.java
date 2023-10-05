@@ -5,10 +5,10 @@ import com.tallerwebi.config.SpringWebTestConfig;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -28,6 +28,8 @@ public class AutoTest {
     private SessionFactory sessionFactory;
 
     @Test
+    @Rollback
+    @Transactional
     public void debeGuardarElUsuarioAlmismoTiempoQueGuardaElAuto(){
         Auto auto = dadoQueSeGuardaUnAuto();
         List<Usuario> usuarios = cuandoBuscoAlUsuarioDelAutoPorEmail(auto.getUsuario().getEmail());
