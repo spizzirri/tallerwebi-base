@@ -6,8 +6,11 @@ import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.excepcion.UsuarioExistente;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
+import java.io.IOException;
+import java.util.Base64;
 
 @Service("servicioLogin")
 @Transactional
@@ -26,10 +29,17 @@ public class ServicioLoginImpl implements ServicioLogin {
     }
 
     @Override
-    public void registrar(Usuario usuario) throws UsuarioExistente {
+    public void registrar(Usuario usuario, MultipartFile imagen) throws UsuarioExistente {
         Usuario usuarioEncontrado = repositorioUsuario.buscarUsuario(usuario.getEmail(), usuario.getPassword());
         if(usuarioEncontrado != null){
             throw new UsuarioExistente();
+        }
+        if(imagen != null) {
+            try {
+                usuario.setImagen(Base64.getEncoder().encode(imagen.getBytes()));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
         repositorioUsuario.guardar(usuario);
     }

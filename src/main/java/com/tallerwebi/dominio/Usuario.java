@@ -1,9 +1,6 @@
 package com.tallerwebi.dominio;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 public class Usuario {
@@ -15,6 +12,9 @@ public class Usuario {
     private String password;
     private String rol;
     private Boolean activo = false;
+
+    @Lob
+    private byte[] imagen;
 
     public Long getId() {
         return id;
@@ -47,10 +47,15 @@ public class Usuario {
         this.activo = activo;
     }
 
+    public byte[] getImagen() {
+        return imagen;
+    }
+    public void setImagen(byte[] imagen) {
+        this.imagen = imagen;
+    }
     public boolean activo() {
         return activo;
     }
-
     public void activar() {
         activo = true;
     }
