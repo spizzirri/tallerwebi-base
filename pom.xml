@@ -160,6 +160,9 @@
                 <version>9.4.45.v20220203</version>
                 <configuration>
                     <scanIntervalSeconds>2</scanIntervalSeconds>
+                    <httpConnector>
+                        <port>8080</port>
+                    </httpConnector>
                     <webApp>
                         <contextPath>/spring</contextPath>
                     </webApp>
