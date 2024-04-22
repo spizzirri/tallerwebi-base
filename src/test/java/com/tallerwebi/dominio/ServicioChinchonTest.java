@@ -8,7 +8,7 @@ import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-public class ChinchonTest {
+public class ServicioChinchonTest {
 
     @Test
     public void debeDevolverCHINCHONCuandoTodasLasCartasSonConsecutivasYDelMismoPalo(){
