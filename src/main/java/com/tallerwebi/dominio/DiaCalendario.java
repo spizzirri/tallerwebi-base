@@ -1,5 +1,7 @@
 package com.tallerwebi.dominio;
 
+import java.util.Objects;
+
 public class DiaCalendario {
 
     private Integer dia;
@@ -34,5 +36,27 @@ public class DiaCalendario {
 
     public void setAno(Integer ano) {
         this.ano = ano;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DiaCalendario that = (DiaCalendario) o;
+        return Objects.equals(dia, that.dia) && Objects.equals(mes, that.mes) && Objects.equals(ano, that.ano);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(dia, mes, ano);
+    }
+
+    @Override
+    public String toString() {
+        return "DiaCalendario{" +
+                "dia=" + dia +
+                ", mes=" + mes +
+                ", ano=" + ano +
+                '}';
     }
 }
