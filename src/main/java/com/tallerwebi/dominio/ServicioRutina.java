@@ -1,7 +1,7 @@
 package com.tallerwebi.dominio;
 
 import com.tallerwebi.dominio.excepcion.UsuarioNoEsInstructorException;
-import org.jetbrains.annotations.NotNull;
+
 
 public class ServicioRutina {
     public Rutina obtenerRutinaParaUsuario(Usuario usuario) {
@@ -17,7 +17,7 @@ public class ServicioRutina {
 
     }
 
-    public void agregarEjercicioARutina(Usuario usuario, @NotNull Rutina rutina, Ejercicio ejercicio) throws UsuarioNoEsInstructorException {
+    public void agregarEjercicioARutina(Usuario usuario, Rutina rutina, Ejercicio ejercicio) throws UsuarioNoEsInstructorException {
 
         if (usuario.isInstructor()){
             rutina.getEjercicios().add(ejercicio);
