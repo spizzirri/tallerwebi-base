@@ -9,65 +9,62 @@
     <!-- Boostrap core css -->
     <link rel="stylesheet" th:href="@{https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css}" />
 
-
     <!-- custom style -->
     <link rel="stylesheet" th:href="@{/css/main.css}"/>
-
 </head>
-
 <body>
-
 <header>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
-        <div class="container-fluid">
-            <img src="" alt="logo">
-            <a class="navbar-brand" href="#">MagnusGym</a>
-            <div class="collapse navbar-collapse" id="navbarScroll">
-                <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll" style="--bs-scroll-height: 100px;">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" id="navbarDropdown"
-                           aria-expanded="false">
-                            Opciones
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="#">Rutina</a></li>
-                            <li><a class="dropdown-item" href="#">Calendario</a></li>
-                            <li><a class="dropdown-item" href="#">Gyms cercanos</a></li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
+    <nav class="navbar">
+        <div class="logo">
+            <img th:src="@{/img/logoMagnusFitSolo.png}" alt="Logo" class="logo-img">
+            <h1 class="logo-text">MagnusFit</h1>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#">Rutina</a></li>
+            <li><a href="#">Calendario</a></li>
+            <li><a href="#">Gyms cercanos</a></li>
+        </ul>
+        <div class="user-profile">
+            <span class="user-name">Nombre</span>
+            <img th:src="@{/img/usuario.png}" alt="Usuario" class="user-img">
         </div>
     </nav>
 </header>
-<!--<main>-->
-<!--  &lt;!&ndash; Contenido principal de la página &ndash;&gt;-->
-<!--</main>-->
 
-<!--<footer>-->
-<!--  &lt;!&ndash; Pie de página &ndash;&gt;-->
-<!--</footer>-->
-<!--&lt;!&ndash; /.container &ndash;&gt;-->
-<script>
-    // Espera a que el DOM esté completamente cargado
-    document.addEventListener('DOMContentLoaded', function () {
-        // Obtiene el enlace dropdown-toggle y su menú correspondiente
-        var dropdownToggle = document.querySelector('.dropdown-toggle');
-        var dropdownMenu = document.querySelector('.dropdown-menu');
+<main class="main-content">
+    <div class="container">
+        <h1 class="main-title">Bienvenido a Tu Sitio Web</h1>
+        <p class="main-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum vehicula turpis a lacus interdum, in ultrices mi ultricies. Proin et urna vel ipsum vehicula varius. Nam feugiat posuere justo sed ultrices.</p>
+        <p class="main-text">Sed rutrum odio sit amet metus consequat, ut pulvinar ex efficitur. Curabitur pretium, urna sit amet fringilla molestie, neque odio eleifend mi, nec fermentum urna est vitae lectus.</p>
+        <a href="#" class="main-btn">Descubre más</a>
+    </div>
+</main>
 
-        // Agrega un evento click al enlace dropdown-toggle
-        dropdownToggle.addEventListener('click', function (e) {
-            e.preventDefault(); // Detiene la acción predeterminada del enlace
-
-            // Verifica si el menú está oculto
-            if (dropdownMenu.style.display === 'none' || dropdownMenu.style.display === '') {
-                dropdownMenu.style.display = 'block'; // Muestra el menú
-            } else {
-                dropdownMenu.style.display = 'none'; // Oculta el menú
-            }
-        });
-    });
-</script>
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <img th:src="@{/img/logoMagnusFit.png}" alt="Logo">
+            </div>
+            <div class="footer-links">
+                <ul>
+                    <li><a href="#">Inicio</a></li>
+                    <li><a href="#">Acerca de</a></li>
+                    <li><a href="#">Servicios</a></li>
+                    <li><a href="#">Contacto</a></li>
+                </ul>
+            </div>
+            <div class="footer-social">
+                <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+        <div class="footer-text">
+            <p>&copy; 2024 MagnusFit | Todos los derechos reservados</p>
+        </div>
+    </div>
+</footer>
 
 <!-- Boostrap core js -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
