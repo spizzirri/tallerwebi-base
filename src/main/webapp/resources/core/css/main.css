@@ -113,6 +113,12 @@ header {
     }
 }
 
+@media screen and (min-width: 1025px) {
+    .card {
+    width: 600px !important;
+    }
+}
+
 .main-content {
     padding: 4rem 0.5rem;
     background-color: #1f1f1f;
