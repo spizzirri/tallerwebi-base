@@ -7,11 +7,13 @@ public class DiaCalendario {
     private Integer dia;
     private Integer mes;
     private Integer ano;
+    private Rendimiento rendimiento;
 
-    public DiaCalendario(Integer dia, Integer mes, Integer ano) {
+    public DiaCalendario(Integer dia, Integer ano, Integer mes, Rendimiento rendimiento) {
         this.dia = dia;
-        this.mes = mes;
         this.ano = ano;
+        this.mes = mes;
+        this.rendimiento = Rendimiento.DESCANSO; // Valor predeterminado
     }
 
     public Integer getDia() {
@@ -59,4 +61,13 @@ public class DiaCalendario {
                 ", ano=" + ano +
                 '}';
     }
+
+    public Rendimiento getRendimiento() {
+        return rendimiento;
+    }
+
+    public void setRendimiento(Rendimiento rendimiento) {
+        this.rendimiento = rendimiento;
+    }
+
 }

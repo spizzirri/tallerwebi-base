@@ -2,6 +2,7 @@ package com.tallerwebi.infraestructura;
 
 import com.tallerwebi.dominio.DiaCalendario;
 import com.tallerwebi.dominio.Calendario;
+import com.tallerwebi.dominio.Rendimiento;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -18,8 +19,8 @@ public class RepositorioCalendarioTest {
     @Test
     public void queSePuedaGuardarDiasEnElCalendario(){
         Calendario calendario = new Calendario();
-        calendario.agregarDia(new DiaCalendario(1,2,2024));
-        calendario.agregarDia(new DiaCalendario(2,2,2024));
+        calendario.agregarDia(new DiaCalendario(1,2,2024, Rendimiento.NORMAL));
+        calendario.agregarDia(new DiaCalendario(2,2,2024, Rendimiento.NORMAL));
         Integer respuestaObtenida = calendario.getCantidadDias();
         Integer respuestaEsperada = 2;
         assertThat(respuestaObtenida,equalTo(respuestaEsperada));
@@ -28,8 +29,8 @@ public class RepositorioCalendarioTest {
     @Test
     public void queSePuedaImprimirLosDiasCreadosEnElCalendario() {
         Calendario calendario = new Calendario();
-        calendario.agregarDia(new DiaCalendario(1, 2, 2024));
-        calendario.agregarDia(new DiaCalendario(2, 2, 2024));
+        calendario.agregarDia(new DiaCalendario(1, 2, 2024, Rendimiento.NORMAL));
+        calendario.agregarDia(new DiaCalendario(2, 2, 2024, Rendimiento.NORMAL));
 
         String respuestaObtenida = calendario.toString();
         String respuestaEsperada = "Calendario{ [DiaCalendario{dia=1, mes=2, ano=2024}, DiaCalendario{dia=2, mes=2, ano=2024}]}";
@@ -39,9 +40,9 @@ public class RepositorioCalendarioTest {
     @Test
     public void queNoSePuedaAgregarDosMismosDiasCalendario(){
         Calendario calendario = new Calendario();
-        calendario.agregarDia(new DiaCalendario(1, 2, 2024));
-        calendario.agregarDia(new DiaCalendario(1, 2, 2024));
-        calendario.agregarDia(new DiaCalendario(2, 2, 2024));
+        calendario.agregarDia(new DiaCalendario(1, 2, 2024, Rendimiento.NORMAL));
+        calendario.agregarDia(new DiaCalendario(1, 2, 2024, Rendimiento.NORMAL));
+        calendario.agregarDia(new DiaCalendario(2, 2, 2024, Rendimiento.NORMAL));
         Integer respuestaObtenida = calendario.getCantidadDias();
         Integer respuestaEsperada = 2;
         assertThat(respuestaObtenida,equalTo(respuestaEsperada));
@@ -50,10 +51,10 @@ public class RepositorioCalendarioTest {
     @Test
     public void queSePuedanOrdenarTodosLosDiasDelCalendarioSegunSuFechaMasCercanaAlAno() {
         Calendario calendario = new Calendario();
-        calendario.agregarDia(new DiaCalendario(1, 2, 2024));
-        calendario.agregarDia(new DiaCalendario(15, 7, 2023));
-        calendario.agregarDia(new DiaCalendario(5, 9, 2025));
-        calendario.agregarDia(new DiaCalendario(10, 12, 2023));
+        calendario.agregarDia(new DiaCalendario(1, 2, 2024, Rendimiento.NORMAL));
+        calendario.agregarDia(new DiaCalendario(15, 7, 2023, Rendimiento.NORMAL));
+        calendario.agregarDia(new DiaCalendario(5, 9, 2025, Rendimiento.NORMAL));
+        calendario.agregarDia(new DiaCalendario(10, 12, 2023, Rendimiento.NORMAL));
 
         calendario.ordenarDiasPorFechaCercana();
 
