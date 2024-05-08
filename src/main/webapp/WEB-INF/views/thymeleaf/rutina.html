@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mi rutina</title>
+</head>
+<body>
+<h1>Detalle de Rutina</h1>
+
+<div id="rutina-detalle">
+    <p><b>Tipo de Rutina:</b> {{ rutina.tipoRutina }}</p>
+    <p><b>Nombre:</b> {{ rutina.nombreRutina }}</p>
+    <ul>
+        <li th:each="ejercicio : ${rutina.ejercicios}">
+            {{ ejercicio }}
+        </li>
+    </ul>
+</div>
+
+</body>
+</html>
