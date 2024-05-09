@@ -123,6 +123,10 @@ header {
     .main-content{
         padding: 4rem 3.5rem !important;
         }
+
+        .container{
+        width: 60% !important;
+        }
 }
 
 .main-content {
@@ -206,6 +210,9 @@ header {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 15px;
+}
+.d-block w-100{
+width: 60% !important;
 }
 
 .footer-content {

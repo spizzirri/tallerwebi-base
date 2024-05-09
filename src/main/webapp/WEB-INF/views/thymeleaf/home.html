@@ -39,19 +39,26 @@
     margin-bottom: 40px;
 }
 
-.btn {
-    display: inline-block;
-    background-color: #007bff;
-    color: #fff;
-    font-size: 16px;
-    padding: 10px 20px;
-    text-decoration: none;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
+.btn-inscribirse:not(:disabled):not(.disabled) {
+    cursor: pointer;
 }
 
-.btn:hover {
-    background-color: #0056b3;
+.btn-inscribirse{
+    display: inline-block;
+    font-weight: 400;
+    color: #212529;
+    text-align: center;
+    vertical-align: middle;
+    background-color: #0056b3 !important;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-radius: .25rem;
+    transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
 
 /* Estilos específicos para dispositivos móviles */
@@ -67,67 +74,6 @@
     .btn {
         padding: 8px 16px;
     }
-}
-        .carousel-inner {
-  position: relative;
-  width: 100%;
-  overflow: hidden;
-}
-
-.carousel-item {
-  position: relative;
-  display: none;
-  float: left;
-  width: 100%;
-}
-
-.carousel-item.active {
-  display: block;
-}
-
-.carousel-item img {
-  width: 100%;
-  height: auto;
-}
-
-/* Estilos para los controles del carousel */
-.carousel-control-prev,
-.carousel-control-next {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 1;
-  display: inline-block;
-}
-
-.carousel-control-prev {
-  left: 10px;
-}
-
-.carousel-control-next {
-  right: 10px;
-}
-
-.carousel-control-prev-icon,
-.carousel-control-next-icon {
-  width: 30px;
-  height: 30px;
-  background-color: rgba(0, 0, 0, 0.5);
-  border-radius: 50%;
-  color: #fff;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.carousel-control-prev-icon:before,
-.carousel-control-next-icon:before {
-  content: '\2039'; /* Código Unicode para la flecha izquierda */
-  font-size: 20px;
-}
-
-.carousel-control-next-icon:before {
-  content: '\203A'; /* Código Unicode para la flecha derecha */
 }
     </style>
 </head>
@@ -159,11 +105,6 @@
     </div>
 </main>
 <div class="featured-section">
-    <div class="container-featured">
-        <h2>Dieta Personalizada</h2>
-        <p>Descubre cómo mejorar tu salud y alcanzar tus metas fitness con nuestro dieta personalizado.</p>
-        <a href="#" class="btn">Inscribirse</a>
-    </div>
     <div class="container">
         <div id="carouselExample" class="carousel slide" data-ride="carousel">
             <div class="carousel-inner">
@@ -186,6 +127,11 @@
                 <span class="sr-only">Siguiente</span>
             </a>
         </div>
+    </div>
+    <div class="container-featured">
+        <h2>Dieta Personalizada</h2>
+        <p>Descubre cómo mejorar tu salud y alcanzar tus metas fitness con nuestro dieta personalizado.</p>
+        <a href="#" class="btn-inscribirse">Inscribirse</a>
     </div>
 </div>
 <footer class="footer">
