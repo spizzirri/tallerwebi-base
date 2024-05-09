@@ -7,6 +7,25 @@
     <link rel="stylesheet" href="styles.css" th:href="@{/css/main.css}">
 </head>
 <body>
+
+<header>
+    <!--
+    <nav class="navbar">
+        <div class="logo">
+            <img th:src="@{/img/logoMagnusFitSolo.png}" alt="Logo" class="logo-img">
+            <h1 class="logo-text">MagnusFit</h1>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#">Rutina</a></li>
+            <li><a href="#">Calendario</a></li>
+            <li><a href="gym-cercano">Gyms cercanos</a></li>
+        </ul>
+        <div class="user-profile">
+            <span class="user-name">Nombre</span>
+            <img th:src="@{/img/usuario.png}" alt="Usuario" class="user-img">
+        </div>
+    </nav>
+-->
 <nav class="navbar">
     <div class="logo">
         <img th:src="@{/img/logoMagnusFitSolo.png}" alt="Logo" class="logo-img">
@@ -23,6 +42,7 @@
         <img th:src="@{/img/usuario.png}" alt="Usuario" class="user-img">
     </div>
 </nav>
+
 </header>
 
 <div class="main-content">
@@ -50,31 +70,5 @@
         </div>
     </div>
 </div>
-
-<footer class="footer">
-    <div class="container">
-        <div class="footer-content">
-            <div class="footer-logo">
-                <img src="logo.png" alt="Logo" th:src="@{/img/logoMagnusFit.png}">
-            </div>
-            <div class="footer-links">
-                <ul>
-                    <li><a href="#">Inicio</a></li>
-                    <li><a href="#">Clases</a></li>
-                    <li><a href="#">Horarios</a></li>
-                    <li><a href="#">Contacto</a></li>
-                </ul>
-            </div>
-            <div class="footer-social">
-                <span class="social-icon">S</span>
-                <span class="social-icon">T</span>
-                <span class="social-icon">F</span>
-            </div>
-        </div>
-        <div class="footer-text">
-            <p>Derechos reservados © 2024 Gimnasio App</p>
-        </div>
-    </div>
-</footer>
 </body>
 </html>
