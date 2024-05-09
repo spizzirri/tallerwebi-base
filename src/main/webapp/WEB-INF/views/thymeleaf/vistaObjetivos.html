@@ -10,7 +10,7 @@
 <body>
 <div class="container mt-5">
     <h2>Definir Objetivos de Entrenamiento</h2>
-    <form action="/guardar-objetivos" method="post">
+    <form th:action="@{/rutina}" method="GET">
         <div class="mb-3">
             <label for="objetivo" class="form-label">Selecciona tu objetivo:</label>
             <select class="form-select" id="objetivo" name="objetivo">
