@@ -26,22 +26,40 @@
 
 <main role="main" class="container">
 
-  <div class = "container">
-    <div id="loginbox" style="margin-top:50px;" class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
-      <form action="#" th:action="@{/registrarme}" method="POST" th:object="${usuario}">
-        <h3 class="form-signin-heading">Nuevo Usuario</h3>
-        <hr class="colorgraph"><br>
-
-        <input th:field="*{email}" id="email" class="form-control" style="margin: 0.5rem;" placeholder="Gmail" required/>
-        <input th:field="*{password}" type="password" id="password" class="form-control" style="margin: 0.5rem;" placeholder="Contraseña" required/>
-
-        <button id="btn-registrarme" class="btn btn-lg btn-primary btn-block" Type="Submit" style="margin: 0.5rem;">Registrarme</button>
-        <p th:if="${error != null}" class="alert alert-danger" th:text="'Error ' + ${error}">
-        </p>
-      </form>
-
+  <!--     FORMULARIO INSCRIPCION      -->
+  <form class="row g-3" action="#" th:action="@{/registrarme}" method="POST" th:object="${usuario}">
+    <div class="col-md-6">
+      <label for="email" class="form-label">Email</label>
+      <input th:field="*{email}" id="email" class="form-control" required/>
     </div>
-  </div>
+    <div class="col-md-6">
+      <label for="password" class="form-label">Password</label>
+      <input th:field="*{password}" type="password" id="password" class="form-control" required/>
+    </div>
+    <div class="col-6">
+      <label for="nombre" class="form-label">Nombre</label>
+      <input th:field="*{nombre}" type="text" class="form-control" id="nombre">
+    </div>
+    <div class="col-6">
+      <label for="apellido" class="form-label">Apellido</label>
+      <input th:field="*{apellido}" type="text" class="form-control" id="apellido">
+    </div>
+    <div class="col-md-6">
+      <label for="ciudad" class="form-label">Ciudad</label>
+      <input th:field="*{ciudad}" type="text" class="form-control" id="ciudad">
+    </div>
+    <div class="col-md-4">
+      <label for="sexo" class="form-label">Seleccione sexo</label>
+      <select id="sexo" class="form-select">
+        <option>M</option>
+        <option>F</option>
+      </select>
+    </div>
+
+    <div class="col-12">
+      <button type="submit" class="btn btn-primary">Registrarse</button>
+    </div>
+  </form>
 
 </main>
 <!-- /.container -->
