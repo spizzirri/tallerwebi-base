@@ -16,9 +16,13 @@
 
 <body>
 
-<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-  <a class="navbar-brand" href="#">UNLAM</a>
+<nav class="navbar" style="background-color:white; color:black; justify-content: center;">
+  <div class="logo">
+    <img th:src="@{/img/logoMagnusFitSolo.png}" alt="Logo" class="logo-img">
+    <h1 class="logo-text">MagnusFit</h1>
+  </div>
 </nav>
+
 
 <main role="main" class="container">
 
@@ -28,10 +32,10 @@
         <h3 class="form-signin-heading">Nuevo Usuario</h3>
         <hr class="colorgraph"><br>
 
-        <input th:field="*{email}" id="email" class="form-control" required/>
-        <input th:field="*{password}" type="password" id="password" class="form-control" required/>
+        <input th:field="*{email}" id="email" class="form-control" style="margin: 0.5rem;" placeholder="Gmail" required/>
+        <input th:field="*{password}" type="password" id="password" class="form-control" style="margin: 0.5rem;" placeholder="Contraseña" required/>
 
-        <button id="btn-registrarme" class="btn btn-lg btn-primary btn-block" Type="Submit">Registrarme</button>
+        <button id="btn-registrarme" class="btn btn-lg btn-primary btn-block" Type="Submit" style="margin: 0.5rem;">Registrarme</button>
         <p th:if="${error != null}" class="alert alert-danger" th:text="'Error ' + ${error}">
         </p>
       </form>
