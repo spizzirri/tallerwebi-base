@@ -144,8 +144,11 @@
             <li><a th:action="@{/irGymCercano}" href="gym-cercano">Gyms cercanos</a></li>
         </ul>
         <div class="user-profile">
-            <span class="user-name">Nombre</span>
-            <img th:src="@{/img/usuario.png}" alt="Usuario" class="user-img">
+            <a href="perfil" th:action="@{/irPerfil}">
+                <span class="user-name">Nombre</span>
+                <img th:src="@{/img/usuario.png}" alt="Usuario" class="user-img">
+            </a>
+
         </div>
     </nav>
 </header>
