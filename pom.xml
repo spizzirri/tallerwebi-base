@@ -24,6 +24,7 @@
 
     <dependencies>
 
+
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
@@ -35,6 +36,7 @@
             <artifactId>spring-orm</artifactId>
             <version>${spring.version}</version>
         </dependency>
+
 
         <dependency>
             <groupId>org.springframework</groupId>
@@ -107,6 +109,9 @@
             <version>${playwright.version}</version>
             <scope>test</scope>
         </dependency>
+
+
+
         <!-- compile only, deployed container will provide this -->
         <!--
         <dependency>
