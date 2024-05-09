@@ -96,6 +96,7 @@ header {
     .user-name {
         display: none;
     }
+
 }
 
 /* Media queries para tablets */
@@ -111,12 +112,17 @@ header {
     .user-name {
         display: none;
     }
+
 }
 
 @media screen and (min-width: 1025px) {
     .card {
     width: 600px !important;
     }
+
+    .main-content{
+        padding: 4rem 3.5rem !important;
+        }
 }
 
 .main-content {
@@ -158,6 +164,7 @@ header {
 .main-btn:hover {
     background-color: #0056b3;
 }
+
 .section-map{
     padding-top: 4rem;
     width:100%;
