@@ -21,9 +21,10 @@
             <h1 class="logo-text">MagnusFit</h1>
         </div>
         <ul class="nav-links">
+            <li><a th:action="@{/irAHome}" href="home">Inicio</a></li>
             <li><a href="#">Rutina</a></li>
             <li><a href="#">Calendario</a></li>
-            <li><a href="gym-cercano">Gyms cercanos</a></li>
+            <li><a th:action="@{/irGymCercano}" href="gym-cercano">Gyms cercanos</a></li>
         </ul>
         <div class="user-profile">
             <span class="user-name">Nombre</span>
@@ -31,8 +32,43 @@
         </div>
     </nav>
 </header>
-
-
-
+<main>
+    <section class="section-map" style="padding-bottom:4rem;">
+        <div class="card">
+            <div class="card-header">
+                Mapa
+            </div>
+            <div class="card-body">
+                <div id="map"></div>
+            </div>
+        </div>
+    </section>
+</main>
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <img th:src="@{/img/logoMagnusFit.png}" alt="Logo">
+            </div>
+            <div class="footer-links">
+                <ul>
+                    <li><a href="#">Inicio</a></li>
+                    <li><a href="#">Servicios</a></li>
+                    <li><a href="#">Contacto</a></li>
+                </ul>
+            </div>
+            <div class="footer-social">
+                <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+        <div class="footer-text">
+            <p>&copy; 2024 MagnusFit | Todos los derechos reservados</p>
+        </div>
+    </div>
+</footer>
+<!-- Boostrap core js -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
 </body>
 </html>

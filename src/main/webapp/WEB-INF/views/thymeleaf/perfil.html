@@ -7,23 +7,22 @@
     <link rel="stylesheet" href="styles.css" th:href="@{/css/main.css}">
 </head>
 <body>
-<header>
+<nav class="navbar">
     <div class="logo">
-        <img class="logo-img" src="logo.png" alt="Logo" th:src="@{/img/logoMagnusFitSolo.png}">
-        <h1 class="logo-text">Gimnasio App</h1>
+        <img th:src="@{/img/logoMagnusFitSolo.png}" alt="Logo" class="logo-img">
+        <h1 class="logo-text">MagnusFit</h1>
     </div>
-    <nav class="navbar">
-        <ul class="nav-links">
-            <li><a href="#">Inicio</a></li>
-            <li><a href="#">Clases</a></li>
-            <li><a href="#">Horarios</a></li>
-            <li><a href="#">Contacto</a></li>
-        </ul>
-        <div class="user-profile">
-            <img class="user-img" src="user.png" alt="User" th:src="@{/images/user.png}">
-            <span class="user-name">Juan Pérez</span>
-        </div>
-    </nav>
+    <ul class="nav-links">
+        <li><a th:action="@{/irAHome}" href="home">Inicio</a></li>
+        <li><a href="#">Rutina</a></li>
+        <li><a href="#">Calendario</a></li>
+        <li><a th:action="@{/irGymCercano}" href="gym-cercano">Gyms cercanos</a></li>
+    </ul>
+    <div class="user-profile">
+        <span class="user-name">Nombre</span>
+        <img th:src="@{/img/usuario.png}" alt="Usuario" class="user-img">
+    </div>
+</nav>
 </header>
 
 <div class="main-content">
