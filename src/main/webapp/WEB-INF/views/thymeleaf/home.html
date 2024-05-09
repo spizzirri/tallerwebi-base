@@ -12,6 +12,60 @@
     <link rel="stylesheet" th:href="@{/css/main.css}"/>
     <!-- Enlace al archivo de estilos de Font Awesome -->
     <link rel="stylesheet" th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css}">
+    <style>
+        .container-featured{
+        max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;}
+        /* Estilos específicos para el bloque featured-section */
+.featured-section {
+    background-color: #fff;
+    padding: 80px 0;
+    text-align: center;
+}
+
+.featured-title {
+    color: #black;
+    font-size: 36px;
+    margin-bottom: 20px;
+}
+
+.featured-description {
+    color: #666;
+    font-size: 18px;
+    margin-bottom: 40px;
+}
+
+.btn {
+    display: inline-block;
+    background-color: #007bff;
+    color: #fff;
+    font-size: 16px;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+    background-color: #0056b3;
+}
+
+/* Estilos específicos para dispositivos móviles */
+@media (max-width: 768px) {
+    .featured-title {
+        font-size: 28px;
+    }
+
+    .featured-description {
+        font-size: 16px;
+    }
+
+    .btn {
+        padding: 8px 16px;
+    }
+}
+    </style>
 </head>
 <body>
 <header>
@@ -41,6 +95,14 @@
         <a href="#" class="main-btn">Descubre más</a>
     </div>
 </main>
+<div class="featured-section">
+    <div class="container-featured">
+        <h2>Dieta Personalizada</h2>
+        <p>Descubre cómo mejorar tu salud y alcanzar tus metas fitness con nuestro dieta personalizado.</p>
+        <a href="#" class="btn">Inscribirse</a>
+    </div>
+</div>
+
 <footer class="footer">
     <div class="container">
         <div class="footer-content">
