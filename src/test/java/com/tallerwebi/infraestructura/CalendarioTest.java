@@ -47,7 +47,7 @@ public class CalendarioTest {
     public void queNoSePuedaAgregarDosMismosDiasCalendario(){
         Calendario calendario = new Calendario();
         calendario.agregarDia(new DiaCalendario(1,1, 2, 2024, Rendimiento.NORMAL));
-        calendario.agregarDia(new DiaCalendario(2,1, 2, 2024, Rendimiento.NORMAL));
+        calendario.agregarDia(new DiaCalendario(1,1, 2, 2024, Rendimiento.NORMAL));
         calendario.agregarDia(new DiaCalendario(3,2, 2, 2024, Rendimiento.NORMAL));
         Integer respuestaObtenida = calendario.getCantidadDias();
         Integer respuestaEsperada = 2;

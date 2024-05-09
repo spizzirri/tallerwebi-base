@@ -16,8 +16,11 @@
 
 <body>
 
-<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-    <a class="navbar-brand" href="#">UNLAM</a>
+<nav class="navbar" style="background-color:white; color:black; justify-content: center;">
+    <div class="logo">
+        <img th:src="@{/img/logoMagnusFitSolo.png}" alt="Logo" class="logo-img">
+        <h1 class="logo-text">MagnusFit</h1>
+    </div>
 </nav>
 
 <main role="main" class="container">
@@ -25,18 +28,18 @@
     <div class = "container">
         <div id="loginbox" style="margin-top:50px;" class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
             <form action="#" th:action="@{/validar-login}" method="POST" th:object="${datosLogin}">
-                <h3 class="form-signin-heading">Taller Web I</h3>
+                <h3 class="form-signin-heading">Iniciar Sesion</h3>
                 <hr class="colorgraph"><br>
 
-                <input th:field="*{email}" id="email" type="email" class="form-control" required/>
-                <input th:field="*{password}" type="password" id="password" class="form-control" required/>
+                <input th:field="*{email}" id="email" type="email" class="form-control" required style="margin: 0.5rem;" placeholder="Gmail"/>
+                <input th:field="*{password}" type="password" id="password" class="form-control" placeholder="Contraseña" required style="margin: 0.5rem;"/>
 
-                <button id="btn-login" class="btn btn-lg btn-primary btn-block" Type="Submit">Login</button>
+                <button id="btn-login" class="btn btn-lg btn-primary btn-block" Type="Submit" style="margin: 0.5rem;">Login</button>
 
                 <p th:if="${error != null}" class="alert alert-danger" th:text="'Error ' + ${error}">
                 </p>
             </form>
-            <a id="ir-a-registrarme" href="nuevo-usuario">Registrarme</a>
+            <a id="ir-a-registrarme" href="nuevo-usuario" style="margin: 0.5rem;">Registrarme</a>
         </div>
     </div>
 </main>
