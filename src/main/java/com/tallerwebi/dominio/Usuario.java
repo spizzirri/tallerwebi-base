@@ -11,55 +11,10 @@ public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String nombre;
-    private String apellido;
     private String email;
     private String password;
     private String rol;
-    private Objetivo objetivo;
     private Boolean activo = false;
-
-    private boolean isInstructor = false;
-
-
-    public Usuario() {
-
-    }
-    public Usuario(String nombre, Objetivo objetivo) {
-        this.nombre = nombre;
-        this.objetivo = objetivo;
-    }
-
-    public Usuario(String nombre, String apellido, String email, String password) {
-        this.nombre = nombre;
-        this.apellido =  apellido;
-        this.email = email;
-        this.password = password;
-    }
-
-    public Usuario(String nombre, String apellido, String email, String password, boolean isInstructor) {
-        this.nombre = nombre;
-        this.apellido =  apellido;
-        this.email = email;
-        this.password = password;
-        this.isInstructor = isInstructor;
-    }
-
-    public Usuario(String nombre, String apellido, String email, String password, Objetivo objetivo) {
-        this.nombre = nombre;
-        this.apellido =  apellido;
-        this.email = email;
-        this.password = password;
-        this.objetivo = objetivo;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
 
     public Long getId() {
         return id;
@@ -98,29 +53,5 @@ public class Usuario {
 
     public void activar() {
         activo = true;
-    }
-
-    public Objetivo getObjetivo() {
-        return objetivo;
-    }
-
-    public void setObjetivo(Objetivo objetivo) {
-        this.objetivo = objetivo;
-    }
-
-    public String getApellido() {
-        return apellido;
-    }
-
-    public void setApellido(String apellido) {
-        this.apellido = apellido;
-    }
-
-    public boolean isInstructor() {
-        return isInstructor;
-    }
-
-    public void setInstructor(boolean instructor) {
-        isInstructor = instructor;
     }
 }
