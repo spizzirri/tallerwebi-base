@@ -1,4 +1,4 @@
-package com.tallerwebi.infraestructura;
+package com.tallerwebi.dominio;
 
 import org.springframework.stereotype.Service;
 

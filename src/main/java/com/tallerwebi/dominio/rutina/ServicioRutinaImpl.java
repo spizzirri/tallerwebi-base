@@ -1,11 +1,16 @@
-package com.tallerwebi.dominio;
+package com.tallerwebi.dominio.rutina;
 
+import com.tallerwebi.dominio.Ejercicio;
+import com.tallerwebi.dominio.Objetivo;
+import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.excepcion.UsuarioNoEsInstructorException;
 
+import java.util.List;
 
-public class ServicioRutina {
+
+public class ServicioRutinaImpl implements ServicioRutina {
     public Rutina obtenerRutinaParaUsuario(Usuario usuario) {
-        return new Rutina("Rutina test",Objetivo.PERDIDA_DE_PESO);
+        return new Rutina("Rutina test", Objetivo.PERDIDA_DE_PESO);
     }
 
     public Rutina crearRutina(Usuario usuario,String nombre,Objetivo objetivo) throws UsuarioNoEsInstructorException {
@@ -24,5 +29,10 @@ public class ServicioRutina {
         }else {
             throw new UsuarioNoEsInstructorException();
         }
+    }
+
+    @Override
+    public List<Rutina> obtenerRutinas() {
+        return List.of();
     }
 }

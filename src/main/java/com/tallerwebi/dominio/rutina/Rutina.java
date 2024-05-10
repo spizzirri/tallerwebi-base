@@ -1,5 +1,6 @@
-package com.tallerwebi.dominio;
+package com.tallerwebi.dominio.rutina;
 
+import com.tallerwebi.dominio.Ejercicio;
 import com.tallerwebi.dominio.Objetivo;
 
 import java.util.ArrayList;
