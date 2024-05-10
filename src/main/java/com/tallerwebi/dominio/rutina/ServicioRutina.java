@@ -6,5 +6,4 @@ public interface ServicioRutina {
 
     List<Rutina> obtenerRutinas ();
 
-
 }

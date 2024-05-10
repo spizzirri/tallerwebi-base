@@ -4,10 +4,13 @@ import com.tallerwebi.dominio.Ejercicio;
 import com.tallerwebi.dominio.Objetivo;
 import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.excepcion.UsuarioNoEsInstructorException;
+import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
-
+@Service
+@Transactional
 public class ServicioRutinaImpl implements ServicioRutina {
     public Rutina obtenerRutinaParaUsuario(Usuario usuario) {
         return new Rutina("Rutina test", Objetivo.PERDIDA_DE_PESO);

@@ -28,22 +28,22 @@ public class RepositorioDiaCalendarioTest {
 
     private RepositorioDiaCalendario repositorioDiaCalendario;
 
-//    @BeforeEach
-//    public void init(){
-//    this.repositorioDiaCalendario = new RepositorioDiaCalendarioImpl(this.sessionFactory);
-//    }
-//
-//    @Test
-//    @Transactional
-//    public void queSePuedaGuardarUnDiaCalendario(){
-//        LocalDate fechaEsperada = LocalDate.of(2024, 5, 10);
-//        DiaCalendario diaCalendario = new DiaCalendario(1L, fechaEsperada ,TipoRendimiento.DESCANSO);
-//        this.repositorioDiaCalendario.guardar(diaCalendario);
-//        DiaCalendario diaObtenido = (DiaCalendario) this.sessionFactory.getCurrentSession()
-//                .createQuery("FROM DiaCalendario Where id = 1L")
-//                .getSingleResult();
-//        assertThat(diaObtenido, equalTo(diaCalendario));
-//    }
+    @BeforeEach
+    public void init(){
+    this.repositorioDiaCalendario = new RepositorioDiaCalendarioImpl(this.sessionFactory);
+    }
+
+    @Test
+    @Transactional
+    public void queSePuedaGuardarUnDiaCalendario(){
+        LocalDate fechaEsperada = LocalDate.of(2024, 5, 10);
+        DiaCalendario diaCalendario = new DiaCalendario(1L, fechaEsperada ,TipoRendimiento.DESCANSO);
+        this.repositorioDiaCalendario.guardar(diaCalendario);
+        DiaCalendario diaObtenido = (DiaCalendario) this.sessionFactory.getCurrentSession()
+                .createQuery("FROM DiaCalendario Where id = 1L")
+                .getSingleResult();
+        assertThat(diaObtenido, equalTo(diaCalendario));
+    }
 
 
 
