@@ -1,7 +1,7 @@
 package com.tallerwebi.infraestructura;
 
-import com.tallerwebi.dominio.DiaCalendario;
-import com.tallerwebi.dominio.RepositorioDiaCalendario;
+import com.tallerwebi.dominio.calendario.DiaCalendario;
+import com.tallerwebi.dominio.calendario.RepositorioDiaCalendario;
 
 import java.util.HashMap;
 import java.util.Map;

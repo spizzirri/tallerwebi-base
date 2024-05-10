@@ -1,4 +1,4 @@
-package com.tallerwebi.dominio;
+package com.tallerwebi.dominio.calendario;
 
 import java.util.Objects;
 
@@ -7,14 +7,14 @@ public class DiaCalendario {
     private Integer dia;
     private Integer mes;
     private Integer ano;
-    private Rendimiento rendimiento;
+    private TipoRendimiento tipoRendimiento;
 
-    public DiaCalendario(Integer id, Integer dia, Integer mes, Integer ano, Rendimiento rendimiento) {
+    public DiaCalendario(Integer id, Integer dia, Integer mes, Integer ano, TipoRendimiento tipoRendimiento) {
         this.id = id;
         this.dia = dia;
         this.mes = mes;
         this.ano = ano;
-        this.rendimiento = Rendimiento.DESCANSO;
+        this.tipoRendimiento = TipoRendimiento.DESCANSO;
     }
 
     public Integer getId() {
@@ -54,12 +54,12 @@ public class DiaCalendario {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DiaCalendario that = (DiaCalendario) o;
-        return Objects.equals(id, that.id) && Objects.equals(dia, that.dia) && Objects.equals(mes, that.mes) && Objects.equals(ano, that.ano) && rendimiento == that.rendimiento;
+        return Objects.equals(id, that.id) && Objects.equals(dia, that.dia) && Objects.equals(mes, that.mes) && Objects.equals(ano, that.ano) && tipoRendimiento == that.tipoRendimiento;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, dia, mes, ano, rendimiento);
+        return Objects.hash(id, dia, mes, ano, tipoRendimiento);
     }
 
     @Override
@@ -69,16 +69,16 @@ public class DiaCalendario {
                 ", dia=" + dia +
                 ", mes=" + mes +
                 ", ano=" + ano +
-                ", rendimiento=" + rendimiento +
+                ", rendimiento=" + tipoRendimiento +
                 '}';
     }
 
-    public Rendimiento getRendimiento() {
-        return rendimiento;
+    public TipoRendimiento getRendimiento() {
+        return tipoRendimiento;
     }
 
-    public void setRendimiento(Rendimiento rendimiento) {
-        this.rendimiento = rendimiento;
+    public void setRendimiento(TipoRendimiento tipoRendimiento) {
+        this.tipoRendimiento = tipoRendimiento;
     }
 
 }
