@@ -1,7 +1,7 @@
 package com.tallerwebi.infraestructura;
 
-import com.tallerwebi.dominio.calendario.DiaCalendario;
-import com.tallerwebi.dominio.calendario.RepositorioDiaCalendario;
+import com.tallerwebi.dominio.calendario.ItemRendimiento;
+import com.tallerwebi.dominio.calendario.RepositorioCalendario;
 import com.tallerwebi.dominio.calendario.TipoRendimiento;
 import com.tallerwebi.infraestructura.config.HibernateTestInfraestructuraConfig;
 import org.hibernate.SessionFactory;
@@ -21,28 +21,28 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {HibernateTestInfraestructuraConfig.class})
-public class RepositorioDiaCalendarioTest {
+public class RepositorioCalendarioTest {
 
     @Autowired
     private SessionFactory sessionFactory;
 
-    private RepositorioDiaCalendario repositorioDiaCalendario;
+    private RepositorioCalendario repositorioCalendario;
 
     @BeforeEach
     public void init(){
-    this.repositorioDiaCalendario = new RepositorioDiaCalendarioImpl(this.sessionFactory);
+    this.repositorioCalendario = new RepositorioCalendarioImpl(this.sessionFactory);
     }
 
     @Test
     @Transactional
     public void queSePuedaGuardarUnDiaCalendario(){
-        LocalDate fechaEsperada = LocalDate.of(2024, 5, 10);
-        DiaCalendario diaCalendario = new DiaCalendario(1L, fechaEsperada ,TipoRendimiento.DESCANSO);
-        this.repositorioDiaCalendario.guardar(diaCalendario);
-        DiaCalendario diaObtenido = (DiaCalendario) this.sessionFactory.getCurrentSession()
-                .createQuery("FROM DiaCalendario Where id = 1L")
+        LocalDate fechaActual = LocalDate.now(); // Obtener fecha actual
+        ItemRendimiento itemRendimiento = new ItemRendimiento(1L, fechaActual, TipoRendimiento.DESCANSO);
+        this.repositorioCalendario.guardar(itemRendimiento);
+        ItemRendimiento diaObtenido = (ItemRendimiento) this.sessionFactory.getCurrentSession()
+                .createQuery("FROM ItemRendimiento Where id = 1L")
                 .getSingleResult();
-        assertThat(diaObtenido, equalTo(diaCalendario));
+        assertThat(diaObtenido, equalTo(itemRendimiento));
     }
 
 

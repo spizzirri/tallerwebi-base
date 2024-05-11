@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 @Entity
-public class DiaCalendario {
+public class ItemRendimiento {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -16,10 +16,10 @@ public class DiaCalendario {
     @Column(name = "tipoRendimiento", nullable = false)
     private TipoRendimiento tipoRendimiento;
 
-    public DiaCalendario() {
+    public ItemRendimiento() {
     }
 
-    public DiaCalendario(Long id, LocalDate fecha, TipoRendimiento tipoRendimiento) {
+    public ItemRendimiento(Long id, LocalDate fecha, TipoRendimiento tipoRendimiento) {
         this.id = id;
         this.fecha = fecha;
         this.tipoRendimiento = tipoRendimiento;
@@ -45,7 +45,7 @@ public class DiaCalendario {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        DiaCalendario that = (DiaCalendario) o;
+        ItemRendimiento that = (ItemRendimiento) o;
         return Objects.equals(id, that.id) && Objects.equals(fecha, that.fecha) && tipoRendimiento == that.tipoRendimiento;
     }
 
