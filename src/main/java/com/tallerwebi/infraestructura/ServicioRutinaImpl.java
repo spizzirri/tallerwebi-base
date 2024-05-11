@@ -1,7 +1,6 @@
 package com.tallerwebi.dominio.rutina;
 
-import com.tallerwebi.dominio.Ejercicio;
-import com.tallerwebi.dominio.Objetivo;
+import com.tallerwebi.dominio.objetivo.Objetivo;
 import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.excepcion.UsuarioNoEsInstructorException;
 import org.springframework.stereotype.Service;

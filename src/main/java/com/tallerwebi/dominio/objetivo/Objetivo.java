@@ -1,4 +1,4 @@
-package com.tallerwebi.dominio;
+package com.tallerwebi.dominio.objetivo;
 
 public enum Objetivo {
     PERDIDA_DE_PESO,

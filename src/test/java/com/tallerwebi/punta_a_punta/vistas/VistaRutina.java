@@ -1,6 +1,6 @@
 package com.tallerwebi.punta_a_punta.vistas;
 import com.microsoft.playwright.Page;
-import com.tallerwebi.dominio.TipoRutina;
+import com.tallerwebi.dominio.rutina.TipoRutina;
 
 import java.util.ArrayList;
 import java.util.List;

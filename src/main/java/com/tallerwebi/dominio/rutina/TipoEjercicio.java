@@ -1,4 +1,4 @@
-package com.tallerwebi.dominio;
+package com.tallerwebi.dominio.rutina;
 
 public enum TipoEjercicio {
     CARDIO, FUERZA

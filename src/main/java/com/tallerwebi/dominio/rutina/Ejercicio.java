@@ -1,4 +1,6 @@
-package com.tallerwebi.dominio;
+package com.tallerwebi.dominio.rutina;
+
+import com.tallerwebi.dominio.objetivo.GrupoMuscularObjetivo;
 
 public class Ejercicio {
 
