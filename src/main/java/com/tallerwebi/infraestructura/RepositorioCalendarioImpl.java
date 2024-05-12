@@ -31,14 +31,25 @@ public class RepositorioCalendarioImpl implements RepositorioCalendario {
     }
 
     @Override
-    public void guardar(ItemRendimiento dia) {
+    public ItemRendimiento guardar(ItemRendimiento dia) {
         this.sessionFactory.getCurrentSession().save(dia);
+        return dia;
     }
 
     @Override
     public void vaciarCalendario() {
         Session session = this.sessionFactory.getCurrentSession();
         session.createQuery("DELETE FROM ItemRendimiento").executeUpdate();
+    }
+
+    @Override
+    public List<ItemRendimiento> buscarPorTipoRendimiento(TipoRendimiento tipoRendimiento) {
+        return List.of();
+    }
+
+    @Override
+    public void eliminar(ItemRendimiento dia) {
+        this.sessionFactory.getCurrentSession().delete(dia);
     }
 
     @Override

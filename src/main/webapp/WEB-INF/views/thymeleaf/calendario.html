@@ -96,8 +96,19 @@
         </div>
     </nav>
 </header>
-
-
+<main>
+    <section class="section-map" style="padding-bottom:4rem;">
+        <div class="card">
+            <div class="card-header">
+                <p th:if="${message != null}" class="alert alert-info" th:text="${message}">
+                </p>
+            </div>
+            <div class="card-body">
+                <div id="map"></div>
+            </div>
+        </div>
+    </section>
+</main>
 <footer class="footer">
     <div class="container">
         <div class="footer-content">

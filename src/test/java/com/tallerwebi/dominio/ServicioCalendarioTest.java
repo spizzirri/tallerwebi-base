@@ -1,18 +1,23 @@
-package com.tallerwebi.infraestructura;
+package com.tallerwebi.dominio;
 
-import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.tallerwebi.dominio.calendario.RepositorioCalendario;
+import com.tallerwebi.dominio.calendario.ServicioItemRendimiento;
+import com.tallerwebi.dominio.calendario.ServicioItemRendimientoImpl;
+import org.junit.jupiter.api.BeforeEach;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.mock;
 
 public class ServicioCalendarioTest {
 
+    private ServicioItemRendimiento servicioItemRendimiento;
+    private RepositorioCalendario repositorioCalendario;
 
-
+    @BeforeEach
+    public void init(){
+        this.repositorioCalendario = mock(RepositorioCalendario.class);
+        this.servicioItemRendimiento = new ServicioItemRendimientoImpl(this.repositorioCalendario);
+    }
 
 //    @Test
 //    public void queSePuedanObtenerTodosLosItems(){
