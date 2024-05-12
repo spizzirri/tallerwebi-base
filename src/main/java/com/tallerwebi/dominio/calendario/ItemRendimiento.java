@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 @Entity
+//@Table(name = "itemrendimiento")
 public class ItemRendimiento {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,8 +20,7 @@ public class ItemRendimiento {
     public ItemRendimiento() {
     }
 
-    public ItemRendimiento(Long id, LocalDate fecha, TipoRendimiento tipoRendimiento) {
-        this.id = id;
+    public ItemRendimiento(LocalDate fecha, TipoRendimiento tipoRendimiento) {
         this.fecha = fecha;
         this.tipoRendimiento = tipoRendimiento;
     }

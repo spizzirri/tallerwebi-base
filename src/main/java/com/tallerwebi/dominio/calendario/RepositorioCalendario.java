@@ -1,12 +1,10 @@
 package com.tallerwebi.dominio.calendario;
 
-import com.tallerwebi.dominio.excepcion.ItemRendimientoNoEncontradoException;
-
 public interface RepositorioCalendario {
 
         void guardar(ItemRendimiento dia);
-        ItemRendimiento buscar(Integer id);
-        void modificar(ItemRendimiento dia);
+        ItemRendimiento buscar(long id);
         void actualizar(ItemRendimiento itemRendimiento);
+        void vaciarCalendario();
 
 }

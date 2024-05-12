@@ -3,18 +3,16 @@ package com.tallerwebi.infraestructura;
 import com.tallerwebi.dominio.calendario.ItemRendimiento;
 import com.tallerwebi.dominio.calendario.RepositorioCalendario;
 import com.tallerwebi.dominio.calendario.TipoRendimiento;
-import com.tallerwebi.dominio.excepcion.ItemRendimientoNoEncontradoException;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-@Repository("repositorioDiaCalendario")
+@Repository("repositorioCalendario")
 public class RepositorioCalendarioImpl implements RepositorioCalendario {
 
     private SessionFactory sessionFactory;
@@ -29,9 +27,8 @@ public class RepositorioCalendarioImpl implements RepositorioCalendario {
     public RepositorioCalendarioImpl() {
         this.calendarioItems = new ArrayList<>();
         LocalDate fechaActual = LocalDate.now(); // Obtener fecha actual
-        calendarioItems.add(new ItemRendimiento(1L, fechaActual, TipoRendimiento.DESCANSO));
+        calendarioItems.add(new ItemRendimiento(fechaActual, TipoRendimiento.DESCANSO));
     }
-
 
     @Override
     public void guardar(ItemRendimiento dia) {
@@ -39,19 +36,21 @@ public class RepositorioCalendarioImpl implements RepositorioCalendario {
     }
 
     @Override
-    public ItemRendimiento buscar(Integer id) {
-        return null;
+    public void vaciarCalendario() {
+        Session session = this.sessionFactory.getCurrentSession();
+        session.createQuery("DELETE FROM ItemRendimiento").executeUpdate();
     }
 
     @Override
-    public void modificar(ItemRendimiento dia) {}
+    public ItemRendimiento buscar(long id) {
+        Session session = this.sessionFactory.getCurrentSession();
+        return session.get(ItemRendimiento.class, id);
+    }
 
     @Override
     public void actualizar(ItemRendimiento itemRendimiento) {
         this.sessionFactory.getCurrentSession().merge(itemRendimiento);
     }
-
-
 
 
 }

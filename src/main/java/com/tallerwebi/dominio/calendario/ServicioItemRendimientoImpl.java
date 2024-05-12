@@ -12,4 +12,6 @@ public class ServicioItemRendimientoImpl implements ServicioItemRendimiento {
     public List<ItemRendimiento> obtenerItems() {
         return List.of();
     }
+
+
 }
