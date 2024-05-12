@@ -3,6 +3,7 @@ package com.tallerwebi.infraestructura;
 import com.tallerwebi.dominio.calendario.ItemRendimiento;
 import com.tallerwebi.dominio.calendario.RepositorioCalendario;
 import com.tallerwebi.dominio.calendario.TipoRendimiento;
+import com.tallerwebi.dominio.excepcion.ItemRendimientoNoEncontradoException;
 import com.tallerwebi.infraestructura.config.HibernateTestInfraestructuraConfig;
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,6 +44,22 @@ public class RepositorioCalendarioTest {
                 .createQuery("FROM ItemRendimiento Where id = 1L")
                 .getSingleResult();
         assertThat(diaObtenido, equalTo(itemRendimiento));
+    }
+
+    @Test
+    @Transactional
+    public void queSePuedaActualizarUnDiaCalendario() {
+        LocalDate fechaActual = LocalDate.now();
+        ItemRendimiento itemRendimiento = new ItemRendimiento(2L, fechaActual ,TipoRendimiento.DESCANSO);
+        this.repositorioCalendario.guardar(itemRendimiento);
+
+        itemRendimiento.setTipoRendimiento(TipoRendimiento.ALTO);
+        this.repositorioCalendario.actualizar(itemRendimiento);
+
+        ItemRendimiento diaObtenido = (ItemRendimiento) this.sessionFactory.getCurrentSession()
+                .createQuery("FROM ItemRendimiento Where id = 2L")
+                .getSingleResult();
+        assertThat(diaObtenido.getTipoRendimiento(), equalTo(TipoRendimiento.ALTO));
     }
 
 

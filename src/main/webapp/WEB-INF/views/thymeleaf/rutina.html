@@ -15,13 +15,15 @@
         </div>
         <ul class="nav-links">
             <li><a th:action="@{/irAHome}" href="home">Inicio</a></li>
-            <li><a th:action="@{/irRutina}" href="rutina">Rutina</a></li>
+            <li><a id="ir-a-vistaObjetivos" href="vistaObjetivos">Rutina</a></li>
             <li><a th:action="@{/irCalendario}" href="calendario">Calendario</a></li>
             <li><a th:action="@{/irGymCercano}" href="gym-cercano">Gyms cercanos</a></li>
         </ul>
         <div class="user-profile">
-            <span class="user-name">Nombre</span>
-            <img th:src="@{/img/usuario.png}" alt="Usuario" class="user-img">
+            <a href="perfil" th:action="@{/irPerfil}">
+                <span class="user-name">Nombre</span>
+                <img th:src="@{/img/usuario.png}" alt="Usuario" class="user-img">
+            </a>
         </div>
     </nav>
 </header>

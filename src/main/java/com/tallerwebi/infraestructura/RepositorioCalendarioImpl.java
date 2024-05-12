@@ -3,6 +3,7 @@ package com.tallerwebi.infraestructura;
 import com.tallerwebi.dominio.calendario.ItemRendimiento;
 import com.tallerwebi.dominio.calendario.RepositorioCalendario;
 import com.tallerwebi.dominio.calendario.TipoRendimiento;
+import com.tallerwebi.dominio.excepcion.ItemRendimientoNoEncontradoException;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -44,6 +45,13 @@ public class RepositorioCalendarioImpl implements RepositorioCalendario {
 
     @Override
     public void modificar(ItemRendimiento dia) {}
+
+    @Override
+    public void actualizar(ItemRendimiento itemRendimiento) {
+        this.sessionFactory.getCurrentSession().merge(itemRendimiento);
+    }
+
+
 
 
 }

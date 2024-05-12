@@ -63,11 +63,11 @@ public class ItemRendimiento {
                 '}';
     }
 
-    public TipoRendimiento getRendimiento() {
+    public TipoRendimiento getTipoRendimiento() {
         return tipoRendimiento;
     }
 
-    public void setRendimiento(TipoRendimiento tipoRendimiento) {
+    public void setTipoRendimiento(TipoRendimiento tipoRendimiento) {
         this.tipoRendimiento = tipoRendimiento;
     }
 
