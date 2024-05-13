@@ -1,11 +1,14 @@
 package com.tallerwebi.dominio.calendario;
 
+import com.tallerwebi.presentacion.DatosItemRendimiento;
+
 import java.util.List;
 
-public interface ServicioItemRendimiento {
+public interface ServicioCalendario {
 
-    List<ItemRendimiento> obtenerItems();
-    List<ItemRendimiento> obtenerItemsPorTipoRendimiento(TipoRendimiento tipoRendimiento);
+    List<DatosItemRendimiento> obtenerItems();
+//    List<DatosItemRendimiento> obtenerItemsPorTipoRendimiento(TipoRendimiento tipoRendimiento);
+    //.....................................................
     ItemRendimiento getItemPorId(Long id);
     ItemRendimiento guardarItemRendimiento(ItemRendimiento itemRendimiento);
     ItemRendimiento actualizarItemRendimiento(ItemRendimiento itemRendimiento);

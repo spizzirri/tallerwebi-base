@@ -1,39 +1,38 @@
 package com.tallerwebi.dominio;
 
-import com.tallerwebi.dominio.calendario.RepositorioCalendario;
-import com.tallerwebi.dominio.calendario.ServicioItemRendimiento;
-import com.tallerwebi.dominio.calendario.ServicioItemRendimientoImpl;
+import com.tallerwebi.dominio.calendario.*;
+import com.tallerwebi.presentacion.DatosItemRendimiento;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ServicioCalendarioTest {
 
-    private ServicioItemRendimiento servicioItemRendimiento;
+    private ServicioCalendario servicioCalendario;
     private RepositorioCalendario repositorioCalendario;
 
     @BeforeEach
     public void init(){
         this.repositorioCalendario = mock(RepositorioCalendario.class);
-        this.servicioItemRendimiento = new ServicioItemRendimientoImpl(this.repositorioCalendario);
+        this.servicioCalendario = new ServicioCalendarioImpl(this.repositorioCalendario);
     }
 
-//    @Test
-//    public void queSePuedanObtenerTodosLosItems(){
-//        // preparacion
-//        List<Item> itemsMock = new ArrayList<>();
-//        itemsMock.add(new Item(1L, TipoItem.ESPADA));
-//        itemsMock.add(new Item(2L,TipoItem.ESCUDO));
-//        itemsMock.add(new Item(3L,TipoItem.ESCUDO));
-//        when(this.repositorioInventario.get()).thenReturn(itemsMock);
-//
-//        // ejecucion
-//        List<DatosItem> items = this.servicioInventario.get();
-//
-//        // verificacion
-//        assertThat(items.size(), equalTo(3)); // Existan 3 elementos
-//    }
+    @Test
+    public void queSePuedanObtenerTodosLosItemsRendimiento(){
+        // ejecucion
+        List<DatosItemRendimiento> itemsRendimientos = this.servicioCalendario.obtenerItems();
+
+        // verificacion
+        assertThat(itemsRendimientos.size(), equalTo(3)); // Existan 3 elementos
+    }
 //
 //    @Test
 //    public void queAlBuscarItemsPorTipoItemESPADADevuelvaLosItemsCorrespondientes(){

@@ -31,6 +31,11 @@ public class RepositorioCalendarioImpl implements RepositorioCalendario {
     }
 
     @Override
+    public List<ItemRendimiento> obtenerItems() {
+        return List.of();
+    }
+
+    @Override
     public ItemRendimiento guardar(ItemRendimiento dia) {
         this.sessionFactory.getCurrentSession().save(dia);
         return dia;

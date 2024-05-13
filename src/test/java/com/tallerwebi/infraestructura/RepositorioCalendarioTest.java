@@ -2,9 +2,7 @@ package com.tallerwebi.infraestructura;
 
 import com.tallerwebi.dominio.calendario.ItemRendimiento;
 import com.tallerwebi.dominio.calendario.RepositorioCalendario;
-import com.tallerwebi.dominio.calendario.ServicioItemRendimientoImpl;
 import com.tallerwebi.dominio.calendario.TipoRendimiento;
-import com.tallerwebi.dominio.excepcion.ItemRendimientoNoEncontradoException;
 import com.tallerwebi.infraestructura.config.HibernateTestInfraestructuraConfig;
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
