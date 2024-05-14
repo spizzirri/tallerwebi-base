@@ -33,20 +33,21 @@ public class ServicioCalendarioTest {
         // verificacion
         assertThat(itemsRendimientos.size(), equalTo(3)); // Existan 3 elementos
     }
-//
-//    @Test
-//    public void queAlBuscarItemsPorTipoItemESPADADevuelvaLosItemsCorrespondientes(){
-//        // preparacion
-//        List<Item> itemsMock = new ArrayList<>();
-//        itemsMock.add(new Item(1L,TipoItem.ESPADA));
-//        when(this.repositorioInventario.getByTipoItem(TipoItem.ESPADA)).thenReturn(itemsMock);
-//
-//        // ejecucion
-//        List<DatosItem> items = this.servicioInventario.getByTipoItem(TipoItem.ESPADA);
-//
-//        // verificacion
-//        assertThat(items.size(), equalTo(1)); // Existan 1 elementos
-//    }
-//}
 
+    @Test
+    public void queAlBuscarItemRendimientoPorTipoRendimientoNormalDevuelvaLosItemsCorrespondientes(){
+        // preparacion
+        LocalDate fechaActual = LocalDate.now(); // Obtener fecha actual
+        List<ItemRendimiento> itemsMock = new ArrayList<>();
+        itemsMock.add(new ItemRendimiento(fechaActual,TipoRendimiento.NORMAL));
+        when(this.repositorioCalendario.buscarPorTipoRendimiento(TipoRendimiento.NORMAL)).thenReturn(itemsMock);
+
+        // ejecucion
+        List<DatosItemRendimiento> items = this.servicioCalendario.obtenerItemsPorTipoRendimiento(TipoRendimiento.NORMAL);
+
+        // verificacion
+        assertThat(items.size(), equalTo(1)); // Existan 1 elementos
+    }
 }
+
+

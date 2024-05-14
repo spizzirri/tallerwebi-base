@@ -32,10 +32,16 @@ public class ServicioCalendarioImpl implements ServicioCalendario {
         return datosItemRendimiento;
     }
 
-//    @Override
-//    public List<DatosItemRendimiento> obtenerItemsPorTipoRendimiento(TipoRendimiento tipoRendimiento) {
-//        return repositorioCalendario.buscarPorTipoRendimiento(tipoRendimiento);
-//    }
+    @Override
+    public List<DatosItemRendimiento> obtenerItemsPorTipoRendimiento(TipoRendimiento tipoRendimiento) {
+        List<DatosItemRendimiento> itemsRendimientoFiltrados = new ArrayList<>();
+        for (ItemRendimiento itemRendimiento : this.listaItemRendimiento) {
+            if (itemRendimiento.getTipoRendimiento().equals(tipoRendimiento)){
+                itemsRendimientoFiltrados.add(new DatosItemRendimiento(itemRendimiento));
+            }
+        }
+        return itemsRendimientoFiltrados;
+    }
 
     //..................................................................
     @Override

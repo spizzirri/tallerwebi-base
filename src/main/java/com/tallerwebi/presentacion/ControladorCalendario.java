@@ -26,26 +26,6 @@ public class ControladorCalendario {
         return new ModelAndView(viewNam,model);
     }
 
-//    @RequestMapping(path = "/calendario", method = RequestMethod.GET)
-//    public void seleccionarTipoRendimiento(MockHttpServletRequest request, MockHttpServletResponse response, ModelAndView modelAndView) {
-//        String viewNam = "calendario";
-//        String tipoRendimientoSeleccionado = request.getParameter("tipoRendimiento");
-//
-//        List<TipoRendimiento> opcionesRendimiento = servicioItemRendimiento.obtenerOpcionesRendimiento();
-//
-//        // Add options to the model view
-//        modelAndView.addObject("opcionesRendimiento", opcionesRendimiento);
-//
-//        // Handle potential null value (optional)
-//        if (tipoRendimientoSeleccionado != null) {
-//            modelAndView.addObject("tipoRendimientoSeleccionado", tipoRendimientoSeleccionado);
-//        } else {
-//            // Handle the case where no type is selected (optional)
-//        }
-//
-//        // Rest of your logic to render the view (replace with your implementation)
-//        // ...
-//    }
 
 
 }

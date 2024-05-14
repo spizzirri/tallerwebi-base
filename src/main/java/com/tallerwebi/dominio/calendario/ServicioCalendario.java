@@ -7,7 +7,7 @@ import java.util.List;
 public interface ServicioCalendario {
 
     List<DatosItemRendimiento> obtenerItems();
-//    List<DatosItemRendimiento> obtenerItemsPorTipoRendimiento(TipoRendimiento tipoRendimiento);
+    List<DatosItemRendimiento> obtenerItemsPorTipoRendimiento(TipoRendimiento tipoRendimiento);
     //.....................................................
     ItemRendimiento getItemPorId(Long id);
     ItemRendimiento guardarItemRendimiento(ItemRendimiento itemRendimiento);
