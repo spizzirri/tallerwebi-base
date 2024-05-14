@@ -8,20 +8,15 @@ import java.util.*;
 public class ServicioCalendarioImpl implements ServicioCalendario {
 
     private RepositorioCalendario repositorioCalendario;
-    private List<ItemRendimiento> listaItemRendimiento;
     LocalDate fechaActual = LocalDate.now(); // Obtener fecha actual
 
     public ServicioCalendarioImpl(RepositorioCalendario repositorioCalendario){
         this.repositorioCalendario = repositorioCalendario;
-        this.listaItemRendimiento = new ArrayList<>();
-        listaItemRendimiento.add(new ItemRendimiento(fechaActual, TipoRendimiento.DESCANSO));
-        listaItemRendimiento.add(new ItemRendimiento(fechaActual, TipoRendimiento.NORMAL));
-        listaItemRendimiento.add(new ItemRendimiento(fechaActual, TipoRendimiento.DESCANSO));
     }
 
     @Override
-    public List<DatosItemRendimiento> obtenerItems() {
-        return this.convertirADatosItemRendimiento(this.listaItemRendimiento);
+    public List<DatosItemRendimiento> obtenerItemsRendimiento() {
+        return this.convertirADatosItemRendimiento(this.repositorioCalendario.obtenerItemsRendimiento());
     }
 
     private List<DatosItemRendimiento> convertirADatosItemRendimiento(List<ItemRendimiento> listaItemRendimiento) {
@@ -34,24 +29,33 @@ public class ServicioCalendarioImpl implements ServicioCalendario {
 
     @Override
     public List<DatosItemRendimiento> obtenerItemsPorTipoRendimiento(TipoRendimiento tipoRendimiento) {
+        return convertirADatosItemRendimiento(this.repositorioCalendario.obtenerItemsPorTipoRendimiento(tipoRendimiento));
+    }
+
+    @Override
+    public List<DatosItemRendimiento> guardarItemRendimiento(ItemRendimiento itemRendimiento) {
+        // Save the itemRendimiento object
+        this.repositorioCalendario.guardar(itemRendimiento);
+        // Retrieve saved items
+        List<ItemRendimiento> itemsGuardados = this.repositorioCalendario.obtenerItemsRendimiento();
+        // Convert items to DatosItemRendimiento
         List<DatosItemRendimiento> itemsRendimientoFiltrados = new ArrayList<>();
-        for (ItemRendimiento itemRendimiento : this.listaItemRendimiento) {
-            if (itemRendimiento.getTipoRendimiento().equals(tipoRendimiento)){
-                itemsRendimientoFiltrados.add(new DatosItemRendimiento(itemRendimiento));
-            }
+        for (ItemRendimiento itemRendimientoGuardado : itemsGuardados) {
+            itemsRendimientoFiltrados.add(new DatosItemRendimiento(itemRendimientoGuardado));
         }
+        // Return the list of DatosItemRendimiento
         return itemsRendimientoFiltrados;
+    }
+
+    @Override
+    public void setRepositorioCalendario(RepositorioCalendario mockRepositorio) {
+        this.repositorioCalendario = mockRepositorio;
     }
 
     //..................................................................
     @Override
     public ItemRendimiento getItemPorId(Long id) {
         return repositorioCalendario.buscar(id);
-    }
-
-    @Override
-    public ItemRendimiento guardarItemRendimiento(ItemRendimiento itemRendimiento) {
-        return repositorioCalendario.guardar(itemRendimiento);
     }
 
     @Override

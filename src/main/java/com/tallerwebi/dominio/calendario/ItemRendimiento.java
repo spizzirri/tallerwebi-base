@@ -25,6 +25,12 @@ public class ItemRendimiento {
         this.tipoRendimiento = tipoRendimiento;
     }
 
+    public ItemRendimiento(Long id, LocalDate fecha, TipoRendimiento tipoRendimiento) {
+        this.id = id;
+        this.fecha = fecha;
+        this.tipoRendimiento = tipoRendimiento;
+    }
+
     public Long getId() {
         return id;
     }

@@ -1,6 +1,9 @@
 package com.tallerwebi.presentacion;
 
+import com.tallerwebi.dominio.calendario.RepositorioCalendario;
 import com.tallerwebi.dominio.calendario.ServicioCalendario;
+import com.tallerwebi.dominio.calendario.ServicioCalendarioImpl;
+import com.tallerwebi.infraestructura.RepositorioCalendarioImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.servlet.ModelAndView;
@@ -14,11 +17,13 @@ public class ControladorCalendarioTest {
 
   private ServicioCalendario servicioCalendario;
   private ControladorCalendario controladorCalendario;
+  private RepositorioCalendario repositorioCalendario;
 
     @BeforeEach
     public void init() {
-        this.servicioCalendario = mock(ServicioCalendario.class);
-        this.controladorCalendario = new ControladorCalendario(this.servicioCalendario);
+        this.repositorioCalendario = new RepositorioCalendarioImpl();
+        this.servicioCalendario = new ServicioCalendarioImpl(this.repositorioCalendario);
+        this.controladorCalendario = new ControladorCalendario((ServicioCalendarioImpl)this.servicioCalendario);
     }
 
     @Test

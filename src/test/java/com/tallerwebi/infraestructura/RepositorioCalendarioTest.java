@@ -123,5 +123,18 @@ public class RepositorioCalendarioTest {
         assertThat(diasRestantes.isEmpty(), equalTo(true));
     }
 
+    @Test
+    @Transactional
+    public void queSePuedanObtenerTodosLosItemRendimientoEnLista() {
+        LocalDate fecha1 = LocalDate.of(2024, 5, 10);
+        LocalDate fecha2 = LocalDate.of(2024, 5, 11);
+        ItemRendimiento itemRendimiento1 = new ItemRendimiento(fecha1, TipoRendimiento.NORMAL);
+        ItemRendimiento itemRendimiento2 = new ItemRendimiento(fecha2, TipoRendimiento.DESCANSO);
+        this.repositorioCalendario.guardar(itemRendimiento1);
+        this.repositorioCalendario.guardar(itemRendimiento2);
+        List<ItemRendimiento> diasObtenidos = this.repositorioCalendario.obtenerItemsRendimiento();
+        assertThat(diasObtenidos.size(), equalTo(2));
+    }
+
 
 }

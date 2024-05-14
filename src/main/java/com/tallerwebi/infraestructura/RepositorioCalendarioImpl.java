@@ -28,11 +28,15 @@ public class RepositorioCalendarioImpl implements RepositorioCalendario {
         this.calendarioItems = new ArrayList<>();
         LocalDate fechaActual = LocalDate.now(); // Obtener fecha actual
         calendarioItems.add(new ItemRendimiento(fechaActual, TipoRendimiento.DESCANSO));
+        calendarioItems.add(new ItemRendimiento(fechaActual, TipoRendimiento.DESCANSO));
+        calendarioItems.add(new ItemRendimiento(fechaActual, TipoRendimiento.DESCANSO));
     }
 
     @Override
-    public List<ItemRendimiento> obtenerItems() {
-        return List.of();
+    public List<ItemRendimiento> obtenerItemsRendimiento() {
+        return this.sessionFactory.getCurrentSession()
+                .createQuery("FROM ItemRendimiento", ItemRendimiento.class)
+                .getResultList();
     }
 
     @Override
@@ -48,7 +52,7 @@ public class RepositorioCalendarioImpl implements RepositorioCalendario {
     }
 
     @Override
-    public List<ItemRendimiento> buscarPorTipoRendimiento(TipoRendimiento tipoRendimiento) {
+    public List<ItemRendimiento> obtenerItemsPorTipoRendimiento(TipoRendimiento tipoRendimiento) {
         return List.of();
     }
 

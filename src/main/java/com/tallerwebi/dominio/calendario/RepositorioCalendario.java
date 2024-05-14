@@ -6,13 +6,13 @@ import java.util.List;
 
 public interface RepositorioCalendario {
 
-        List<ItemRendimiento> obtenerItems();
+        List<ItemRendimiento> obtenerItemsRendimiento();
         ItemRendimiento guardar(ItemRendimiento dia);
         ItemRendimiento buscar(long id);
         void actualizar(ItemRendimiento itemRendimiento);
         void vaciarCalendario();
         //nuevos a testear
-        List<ItemRendimiento> buscarPorTipoRendimiento(TipoRendimiento tipoRendimiento);
+        List<ItemRendimiento> obtenerItemsPorTipoRendimiento(TipoRendimiento tipoRendimiento);
         void eliminar(ItemRendimiento itemRendimiento);
 
 }
