@@ -6,8 +6,9 @@ import com.tallerwebi.dominio.calendario.ServicioCalendarioImpl;
 import com.tallerwebi.infraestructura.RepositorioCalendarioImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.web.servlet.ModelAndView;
-
+import com.tallerwebi.dominio.calendario.ServicioCalendario;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.equalToIgnoringCase;
@@ -17,13 +18,12 @@ public class ControladorCalendarioTest {
 
   private ServicioCalendario servicioCalendario;
   private ControladorCalendario controladorCalendario;
-  private RepositorioCalendario repositorioCalendario;
+//  private RepositorioCalendario repositorioCalendario;
 
     @BeforeEach
     public void init() {
-        this.repositorioCalendario = new RepositorioCalendarioImpl();
-        this.servicioCalendario = new ServicioCalendarioImpl(this.repositorioCalendario);
-        this.controladorCalendario = new ControladorCalendario((ServicioCalendarioImpl)this.servicioCalendario);
+        this.servicioCalendario = mock(ServicioCalendario.class);
+        this.controladorCalendario = new ControladorCalendario(this.servicioCalendario);
     }
 
     @Test
@@ -43,7 +43,8 @@ public class ControladorCalendarioTest {
 //        String message = modelAndView.getModel().get("message").toString();
 //
 //        assertThat(modelAndView.getViewName(),equalTo("calendario"));//vista correcta
-//        assertThat(message, equalToIgnoringCase("¿Como fué tu entrenamiento hoy?"));//mensaje correcto
+//        assertThat(message, equalToIgnoringCase("¿Cmo fue tu entrenamiento hoy?"));//mensaje correcto
+//        assertThat(message, equalToIgnoringCase("¿Cómo fue tu entrenamiento hoy?"));//mensaje correcto
 //    }
 
 

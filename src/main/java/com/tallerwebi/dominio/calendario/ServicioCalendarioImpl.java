@@ -7,6 +7,7 @@ import java.util.*;
 @Service
 public class ServicioCalendarioImpl implements ServicioCalendario {
 
+    private List<ItemRendimiento> listaItemRendimiento;
     private RepositorioCalendario repositorioCalendario;
     LocalDate fechaActual = LocalDate.now(); // Obtener fecha actual
 

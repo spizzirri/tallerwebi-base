@@ -1,13 +1,11 @@
 package com.tallerwebi.dominio;
 
 import com.tallerwebi.dominio.calendario.*;
-import com.tallerwebi.infraestructura.RepositorioCalendarioImpl;
 import com.tallerwebi.presentacion.DatosItemRendimiento;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,18 +19,22 @@ public class ServicioCalendarioTest {
 
     private ServicioCalendario servicioCalendario;
     private RepositorioCalendario repositorioCalendario;
-
+    LocalDate fechaActual = LocalDate.now(); // Obtener fecha actual
     @BeforeEach
     public void init(){
-        this.repositorioCalendario = new RepositorioCalendarioImpl();
+        this.repositorioCalendario = mock(RepositorioCalendario.class);
         this.servicioCalendario = new ServicioCalendarioImpl(this.repositorioCalendario);
     }
 
     @Test
     public void queSePuedanObtenerTodosLosItemsRendimiento(){
+        List<ItemRendimiento> itemsMock = new ArrayList<>();
+        itemsMock.add(new ItemRendimiento(fechaActual, TipoRendimiento.DESCANSO));
+        itemsMock.add(new ItemRendimiento(fechaActual, TipoRendimiento.DESCANSO));
+        itemsMock.add(new ItemRendimiento(fechaActual, TipoRendimiento.DESCANSO));
         // ejecucion
-        List<DatosItemRendimiento> itemsRendimientos = this.servicioCalendario.obtenerItemsRendimiento();
-
+        when(this.repositorioCalendario.obtenerItemsRendimiento()).thenReturn(itemsMock);
+//        List<DatosItemRendimiento> itemsRendimientos = this.servicioCalendario.obtenerItemsRendimiento();
         // verificacion
         assertThat(itemsRendimientos.size(), equalTo(3)); // Existan 3 elementos
     }
