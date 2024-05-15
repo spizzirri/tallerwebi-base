@@ -2,14 +2,15 @@ package com.tallerwebi.dominio.calendario;
 import com.tallerwebi.presentacion.DatosItemRendimiento;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.*;
 @Service
+@Transactional
 public class ServicioCalendarioImpl implements ServicioCalendario {
 
     private List<ItemRendimiento> listaItemRendimiento;
     private RepositorioCalendario repositorioCalendario;
-    LocalDate fechaActual = LocalDate.now(); // Obtener fecha actual
 
     public ServicioCalendarioImpl(RepositorioCalendario repositorioCalendario){
         this.repositorioCalendario = repositorioCalendario;
@@ -22,7 +23,7 @@ public class ServicioCalendarioImpl implements ServicioCalendario {
 
     private List<DatosItemRendimiento> convertirADatosItemRendimiento(List<ItemRendimiento> listaItemRendimiento) {
     List<DatosItemRendimiento> datosItemRendimiento = new ArrayList<>();
-        for (ItemRendimiento itemRendimiento: this.listaItemRendimiento) {
+        for (ItemRendimiento itemRendimiento: listaItemRendimiento) {
             datosItemRendimiento.add(new DatosItemRendimiento(itemRendimiento));
         }
         return datosItemRendimiento;
@@ -34,18 +35,8 @@ public class ServicioCalendarioImpl implements ServicioCalendario {
     }
 
     @Override
-    public List<DatosItemRendimiento> guardarItemRendimiento(ItemRendimiento itemRendimiento) {
-        // Save the itemRendimiento object
+    public void guardarItemRendimiento(ItemRendimiento itemRendimiento) {
         this.repositorioCalendario.guardar(itemRendimiento);
-        // Retrieve saved items
-        List<ItemRendimiento> itemsGuardados = this.repositorioCalendario.obtenerItemsRendimiento();
-        // Convert items to DatosItemRendimiento
-        List<DatosItemRendimiento> itemsRendimientoFiltrados = new ArrayList<>();
-        for (ItemRendimiento itemRendimientoGuardado : itemsGuardados) {
-            itemsRendimientoFiltrados.add(new DatosItemRendimiento(itemRendimientoGuardado));
-        }
-        // Return the list of DatosItemRendimiento
-        return itemsRendimientoFiltrados;
     }
 
     @Override
@@ -61,7 +52,8 @@ public class ServicioCalendarioImpl implements ServicioCalendario {
 
     @Override
     public ItemRendimiento actualizarItemRendimiento(ItemRendimiento itemRendimiento) {
-        return repositorioCalendario.guardar(itemRendimiento);
+        repositorioCalendario.guardar(itemRendimiento);
+        return itemRendimiento;
     }
 
     @Override

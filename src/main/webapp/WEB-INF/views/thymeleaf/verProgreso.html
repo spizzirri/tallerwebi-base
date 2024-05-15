@@ -1,3 +1,4 @@
+<!DOCTYPE HTML>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
@@ -96,30 +97,10 @@
     </nav>
 </header>
 <main style="background-color: #1f1f1f !important; padding-top: 2rem; padding-bottom: 2rem;">
-    <div class="background">
-        <div class="centering">
-            <div class="articles">
-                <article>
-                    <figure>
-                        <img
-                                th:src="@{/img/entrenamiento.jpg}"
-                                alt="Preview"
-                        >
-                    </figure>
-                    <div class="article-preview">
-                        <h2 th:if="${message != null}" th:text="${message}"></h2>
-                        <form action="#" th:action="@{/verProgreso}" method="POST" th:object="${itemRendimiento}">
-                            <select th:field="*{tipoRendimiento}" required>
-                                <option th:each="tipoRendimiento : ${T(com.tallerwebi.dominio.calendario.TipoRendimiento).values()}"
-                                        th:value="${tipoRendimiento}" th:text="${tipoRendimiento}">
-                                </option>
-                            </select>
-                            <button type="submit">Guardar</button>
-                        </form>
-                    </div>
-                </article>
-            </div>
-    </div>
+    <tr th:each="item : ${datosItemRendimiento}">
+        <td th:text="${item.fecha}"></td>
+        <td th:text="${item.tipoRendimiento}"></td>
+    </tr>
 </main>
 <footer class="footer">
     <div class="container">

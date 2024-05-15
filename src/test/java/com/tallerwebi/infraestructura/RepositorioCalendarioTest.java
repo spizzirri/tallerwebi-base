@@ -38,8 +38,7 @@ public class RepositorioCalendarioTest {
     @Test
     @Transactional
     public void queSePuedaGuardarUnDiaCalendario(){
-        LocalDate fechaActual = LocalDate.now(); // Obtener fecha actual
-        ItemRendimiento itemRendimiento = new ItemRendimiento(fechaActual, TipoRendimiento.DESCANSO);
+        ItemRendimiento itemRendimiento = new ItemRendimiento(TipoRendimiento.DESCANSO);
         this.repositorioCalendario.guardar(itemRendimiento);
         this.sessionFactory.getCurrentSession().refresh(itemRendimiento);
         Long idGuardado = itemRendimiento.getId();
@@ -53,8 +52,7 @@ public class RepositorioCalendarioTest {
     @Test
     @Transactional
     public void queSePuedaActualizarUnDiaCalendario() {
-        LocalDate fechaActual = LocalDate.now();
-        ItemRendimiento itemRendimiento = new ItemRendimiento(fechaActual ,TipoRendimiento.DESCANSO);
+        ItemRendimiento itemRendimiento = new ItemRendimiento(TipoRendimiento.DESCANSO);
         this.repositorioCalendario.guardar(itemRendimiento);
 
         itemRendimiento.setTipoRendimiento(TipoRendimiento.ALTO);
@@ -71,7 +69,7 @@ public class RepositorioCalendarioTest {
     @Transactional
     public void queSePuedaBuscarUnItemRendimientoPorId() {
         LocalDate fechaActual = LocalDate.now();
-        ItemRendimiento itemRendimiento = new ItemRendimiento(fechaActual, TipoRendimiento.BAJO);
+        ItemRendimiento itemRendimiento = new ItemRendimiento(TipoRendimiento.BAJO);
         this.repositorioCalendario.guardar(itemRendimiento);
 
         Long idGuardado = itemRendimiento.getId();
@@ -84,12 +82,9 @@ public class RepositorioCalendarioTest {
     @Test
     @Transactional
     public void queSePuedanObtenerTodosLosItemRendimiento() {
-        LocalDate fecha1 = LocalDate.of(2024, 5, 10);
-        LocalDate fecha2 = LocalDate.of(2024, 5, 11);
-        LocalDate fecha3 = LocalDate.of(2024, 5, 12);
-        ItemRendimiento itemRendimiento1 = new ItemRendimiento(fecha1, TipoRendimiento.NORMAL);
-        ItemRendimiento itemRendimiento2 = new ItemRendimiento(fecha2, TipoRendimiento.DESCANSO);
-        ItemRendimiento itemRendimiento3 = new ItemRendimiento(fecha3, TipoRendimiento.BAJO);
+        ItemRendimiento itemRendimiento1 = new ItemRendimiento(TipoRendimiento.NORMAL);
+        ItemRendimiento itemRendimiento2 = new ItemRendimiento(TipoRendimiento.DESCANSO);
+        ItemRendimiento itemRendimiento3 = new ItemRendimiento(TipoRendimiento.BAJO);
         this.repositorioCalendario.guardar(itemRendimiento1);
         this.repositorioCalendario.guardar(itemRendimiento2);
         this.repositorioCalendario.guardar(itemRendimiento3);
@@ -107,11 +102,8 @@ public class RepositorioCalendarioTest {
     @Test
     @Transactional
     public void queSePuedaVaciarElCalendario() {
-        // Arrange (Create and save some ItemRendimiento objects)
-        LocalDate fecha1 = LocalDate.of(2024, 5, 10);
-        LocalDate fecha2 = LocalDate.of(2024, 5, 11);
-        ItemRendimiento itemRendimiento1 = new ItemRendimiento(fecha1, TipoRendimiento.BAJO);
-        ItemRendimiento itemRendimiento2 = new ItemRendimiento(fecha2, TipoRendimiento.DESCANSO);
+        ItemRendimiento itemRendimiento1 = new ItemRendimiento(TipoRendimiento.BAJO);
+        ItemRendimiento itemRendimiento2 = new ItemRendimiento(TipoRendimiento.DESCANSO);
         this.repositorioCalendario.guardar(itemRendimiento1);
         this.repositorioCalendario.guardar(itemRendimiento2);
 
@@ -126,10 +118,9 @@ public class RepositorioCalendarioTest {
     @Test
     @Transactional
     public void queSePuedanObtenerTodosLosItemRendimientoEnLista() {
-        LocalDate fecha1 = LocalDate.of(2024, 5, 10);
-        LocalDate fecha2 = LocalDate.of(2024, 5, 11);
-        ItemRendimiento itemRendimiento1 = new ItemRendimiento(fecha1, TipoRendimiento.NORMAL);
-        ItemRendimiento itemRendimiento2 = new ItemRendimiento(fecha2, TipoRendimiento.DESCANSO);
+
+        ItemRendimiento itemRendimiento1 = new ItemRendimiento(TipoRendimiento.NORMAL);
+        ItemRendimiento itemRendimiento2 = new ItemRendimiento(TipoRendimiento.DESCANSO);
         this.repositorioCalendario.guardar(itemRendimiento1);
         this.repositorioCalendario.guardar(itemRendimiento2);
         List<ItemRendimiento> diasObtenidos = this.repositorioCalendario.obtenerItemsRendimiento();

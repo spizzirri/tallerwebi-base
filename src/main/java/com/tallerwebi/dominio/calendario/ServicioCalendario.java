@@ -8,7 +8,7 @@ public interface ServicioCalendario {
 
     List<DatosItemRendimiento> obtenerItemsRendimiento();
     List<DatosItemRendimiento> obtenerItemsPorTipoRendimiento(TipoRendimiento tipoRendimiento);
-    List<DatosItemRendimiento> guardarItemRendimiento(ItemRendimiento itemRendimiento);
+    void guardarItemRendimiento(ItemRendimiento itemRendimiento);
     void setRepositorioCalendario(RepositorioCalendario mockRepositorio);
     //.....................................................
     ItemRendimiento getItemPorId(Long id);

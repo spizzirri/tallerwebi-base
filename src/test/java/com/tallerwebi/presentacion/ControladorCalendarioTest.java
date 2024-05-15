@@ -1,18 +1,22 @@
 package com.tallerwebi.presentacion;
 
-import com.tallerwebi.dominio.calendario.RepositorioCalendario;
-import com.tallerwebi.dominio.calendario.ServicioCalendario;
-import com.tallerwebi.dominio.calendario.ServicioCalendarioImpl;
+import com.tallerwebi.dominio.calendario.*;
 import com.tallerwebi.infraestructura.RepositorioCalendarioImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.ModelAndView;
 import com.tallerwebi.dominio.calendario.ServicioCalendario;
+
+import java.time.LocalDate;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.equalToIgnoringCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 public class ControladorCalendarioTest {
 
@@ -37,12 +41,16 @@ public class ControladorCalendarioTest {
     }
 
     @Test
-    public void queAlPresionarUnItemRendimientoGuardeElItem(){
-        ModelAndView modelAndView = this.controladorCalendario.guardarItemRendimientoSeleccionado();
-        //mensaje
-        String message = modelAndView.getModel().get("message").toString();
+    public void testGuardarItemRendimientoSuccess() {
+        ItemRendimiento itemRendimiento = new ItemRendimiento(TipoRendimiento.DESCANSO);
 
-        assertThat(modelAndView.getViewName(),equalTo("calendario"));//vista correcta
-        assertThat(message, equalToIgnoringCase("¿Cómo fue tu entrenamiento hoy?"));//mensaje correcto
+        // Call the guardarItemRendimiento method
+        ModelAndView modelAndView = controladorCalendario.verProgreso(itemRendimiento);
+
+        // Verify that servicioCalendario.guardarItemRendimiento was called
+        verify(servicioCalendario).guardarItemRendimiento(itemRendimiento);
+
+        ModelMap model = modelAndView.getModelMap();
+        assertEquals("redirect:/verProgreso", modelAndView.getViewName());
     }
 }

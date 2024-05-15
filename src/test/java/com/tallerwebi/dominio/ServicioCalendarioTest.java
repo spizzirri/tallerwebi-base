@@ -9,8 +9,7 @@ import java.util.List;
 import com.tallerwebi.dominio.calendario.TipoRendimiento;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class ServicioCalendarioTest {
 
@@ -27,9 +26,9 @@ public class ServicioCalendarioTest {
     @Test
     public void queSePuedanObtenerTodosLosItemsRendimiento(){
         List<ItemRendimiento> itemsMock = new ArrayList<>();
-        itemsMock.add(new ItemRendimiento(fechaActual, TipoRendimiento.DESCANSO));
-        itemsMock.add(new ItemRendimiento(fechaActual, TipoRendimiento.DESCANSO));
-        itemsMock.add(new ItemRendimiento(fechaActual, TipoRendimiento.DESCANSO));
+        itemsMock.add(new ItemRendimiento(TipoRendimiento.DESCANSO));
+        itemsMock.add(new ItemRendimiento(TipoRendimiento.DESCANSO));
+        itemsMock.add(new ItemRendimiento(TipoRendimiento.DESCANSO));
         // ejecucion
         when(this.repositorioCalendario.obtenerItemsRendimiento()).thenReturn(itemsMock);
 //        List<DatosItemRendimiento> itemsRendimientos = this.servicioCalendario.obtenerItemsRendimiento();
@@ -40,9 +39,8 @@ public class ServicioCalendarioTest {
     @Test
     public void queAlBuscarItemRendimientoPorTipoRendimientoNormalDevuelvaLosItemsCorrespondientes(){
         // preparacion
-        LocalDate fechaActual = LocalDate.now(); // Obtener fecha actual
         List<ItemRendimiento> itemsMock = new ArrayList<>();
-        itemsMock.add(new ItemRendimiento(fechaActual,TipoRendimiento.NORMAL));
+        itemsMock.add(new ItemRendimiento(TipoRendimiento.NORMAL));
         when(this.repositorioCalendario.obtenerItemsPorTipoRendimiento(TipoRendimiento.NORMAL)).thenReturn(itemsMock);
         // ejecucion
 //      List<DatosItemRendimiento> items = this.servicioCalendario.obtenerItemsPorTipoRendimiento(TipoRendimiento.NORMAL);
@@ -52,12 +50,14 @@ public class ServicioCalendarioTest {
 
     @Test
     public void queSePuedaGuardarItemRendimiento() {
-        LocalDate fecha = LocalDate.of(2024, 5, 15);
         List<ItemRendimiento> itemsMock = new ArrayList<>();
         TipoRendimiento tipoRendimiento = TipoRendimiento.NORMAL;
-        ItemRendimiento itemRendimientoMock = new ItemRendimiento(fecha, tipoRendimiento);
-        when(this.repositorioCalendario.guardar(itemRendimientoMock)).thenReturn(itemRendimientoMock);
-        assertThat(itemRendimientoMock.getTipoRendimiento(), equalTo(TipoRendimiento.NORMAL));
+        ItemRendimiento itemRendimientoMock = new ItemRendimiento(tipoRendimiento);
+
+        servicioCalendario.guardarItemRendimiento(itemRendimientoMock);
+
+        // Assert (Verify interactions)
+        verify(repositorioCalendario).guardar(itemRendimientoMock);
     }
 
 

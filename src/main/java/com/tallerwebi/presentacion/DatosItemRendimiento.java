@@ -20,6 +20,10 @@ public class DatosItemRendimiento {
         this.fecha = itemRendimiento.getFecha();
     }
 
+    public DatosItemRendimiento() {
+
+    }
+
     public LocalDate getFecha() {
         return fecha;
     }

@@ -7,7 +7,7 @@ import java.util.List;
 public interface RepositorioCalendario {
 
         List<ItemRendimiento> obtenerItemsRendimiento();
-        ItemRendimiento guardar(ItemRendimiento dia);
+        void guardar(ItemRendimiento dia);
         ItemRendimiento buscar(long id);
         void actualizar(ItemRendimiento itemRendimiento);
         void vaciarCalendario();
