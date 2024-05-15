@@ -26,6 +26,11 @@ public class ControladorCalendario {
         return new ModelAndView(viewNam,model);
     }
 
+    @RequestMapping(path = "/calendario", method = RequestMethod.GET)
+    public ModelAndView guardarItemRendimientoSeleccionado() {
+        String viewNam = "calendario";
+        ModelMap model = new ModelMap();
+        model.
 
-
+    }
 }

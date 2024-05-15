@@ -36,33 +36,13 @@ public class ControladorCalendarioTest {
         assertThat(message, equalToIgnoringCase("¿Cómo fue tu entrenamiento hoy?"));//mensaje correcto
     }
 
-//    @Test
-//    public void queAlIrALaPantallaDeCalendarioMeMuestreLosTiposRendimientos(){
-//        ModelAndView modelAndView = this.controladorCalendario.mostrarTiposRendimientos();
-//        //mensaje
-//        String message = modelAndView.getModel().get("message").toString();
-//
-//        assertThat(modelAndView.getViewName(),equalTo("calendario"));//vista correcta
-//        assertThat(message, equalToIgnoringCase("¿Cmo fue tu entrenamiento hoy?"));//mensaje correcto
-//        assertThat(message, equalToIgnoringCase("¿Cómo fue tu entrenamiento hoy?"));//mensaje correcto
-//    }
+    @Test
+    public void queAlPresionarUnItemRendimientoGuardeElItem(){
+        ModelAndView modelAndView = this.controladorCalendario.guardarItemRendimientoSeleccionado();
+        //mensaje
+        String message = modelAndView.getModel().get("message").toString();
 
-
-//    @Test
-//    public void queSeMuestreElTipoDeRendimientoSeleccionado() throws Exception {
-//        //preparacion
-//        ModelAndView modelAndView = new ModelAndView();
-//        MockHttpServletRequest request = new MockHttpServletRequest();
-//        MockHttpServletResponse response = new MockHttpServletResponse();
-//
-//        //ejecucion
-//        request.setParameter("tipoRendimiento", "ALTO");
-//        controladorCalendario.seleccionarTipoRendimiento(request, response, modelAndView);
-//
-//        //verficacion
-//        Map<String, Object> model = modelAndView.getModel();
-//        assertThat(model.get("tipoRendimientoSeleccionado"), equalTo("ALTO"));
-//    }
-
-
+        assertThat(modelAndView.getViewName(),equalTo("calendario"));//vista correcta
+        assertThat(message, equalToIgnoringCase("¿Cómo fue tu entrenamiento hoy?"));//mensaje correcto
+    }
 }
