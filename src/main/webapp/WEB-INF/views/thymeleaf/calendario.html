@@ -11,70 +11,6 @@
     <link rel="stylesheet" th:href="@{/css/main.css}"/>
     <!-- Enlace al archivo de estilos de Font Awesome -->
     <link rel="stylesheet" th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css}">
-    <style>
-        .container-featured{
-        max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-    color: black;
-    padding: 2rem 0.5rem;
-    }
-        /* Estilos específicos para el bloque featured-section */
-.featured-section {
-    background-color: #fff;
-    padding: 80px 0;
-    text-align: center;
-}
-
-.featured-title {
-    color: #black;
-    font-size: 36px;
-    margin-bottom: 20px;
-}
-
-.featured-description {
-    color: #666;
-    font-size: 18px;
-    margin-bottom: 40px;
-}
-
-.btn-inscribirse:not(:disabled):not(.disabled) {
-    cursor: pointer;
-}
-
-.btn-inscribirse{
-    display: inline-block;
-    font-weight: 400;
-    color: #212529;
-    text-align: center;
-    vertical-align: middle;
-    background-color: #0056b3 !important;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    padding: .375rem .75rem;
-    font-size: 1rem;
-    line-height: 1.5;
-    border-radius: .25rem;
-    transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
-}
-
-/* Estilos específicos para dispositivos móviles */
-@media (max-width: 768px) {
-    .featured-title {
-        font-size: 28px;
-    }
-
-    .featured-description {
-        font-size: 16px;
-    }
-
-    .btn {
-        padding: 8px 16px;
-    }
-}
-    </style>
 </head>
 <body class="body-calendario">
 <header>
@@ -108,13 +44,13 @@
                     </figure>
                     <div class="article-preview">
                         <h2 th:if="${message != null}" th:text="${message}"></h2>
-                        <form action="#" th:action="@{/verProgreso}" method="POST" th:object="${itemRendimiento}">
-                            <select th:field="*{tipoRendimiento}" required>
+                        <form action="#" class="form-estilo" th:action="@{/verProgreso}" method="POST" th:object="${itemRendimiento}">
+                            <select class="select-estilo" th:field="*{tipoRendimiento}" required>
                                 <option th:each="tipoRendimiento : ${T(com.tallerwebi.dominio.calendario.TipoRendimiento).values()}"
                                         th:value="${tipoRendimiento}" th:text="${tipoRendimiento}">
                                 </option>
                             </select>
-                            <button type="submit">Guardar</button>
+                            <button type="submit" class="boton-guardar">Guardar</button>
                         </form>
                     </div>
                 </article>

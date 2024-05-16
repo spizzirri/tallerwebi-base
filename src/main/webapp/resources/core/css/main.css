@@ -285,54 +285,65 @@ body-calendario {
     transform: scale(1.5);
 }
 
+.form-estilo{
+display:flex;
+flex-direction: column;
+align-items: center;
+}
 
-.button {
-    margin: 1rem;
-    background-color: #333333;
+
+.select-estilo{
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+    color: #333;
+    outline: none;
+    width: 70% !important;
+    padding: 0.5rem !important;
+    margin: 2rem !important;
+}
+
+
+.select-estilo option {
+    background-color: #fff;
+    color: #333;
+}
+
+
+.boton-guardar {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #007bff; /* Azul */
     color: #fff;
+    border: none;
+    border-radius: 5px;
     cursor: pointer;
-    font-size: 1rem;
-    line-height: 2.5rem;
-    max-width: 160px;
-    width: 100%;
-    letter-spacing: 0.3rem;
-    font-weight: 600;
-    position: relative;
-    text-decoration: none;
-    text-transform: uppercase;
-    display: flex;
-    justify-content: center;
-    transition: all 1s ease-in;
+    outline: none;
 }
 
-.button rect {
-    fill: none;
-    stroke: #fff;
-    stroke-width: 2;
-    stroke-dasharray: 450, 0;
-    transition: all 0.5s linear;
+
+.select-estilo option:nth-of-type(1) {
+    background-color: #28a745; /* Verde */
+    width: 100px;
 }
 
-.button:hover {
-    color:#262626
+/* Estilo para la opción Normal */
+.select-estilo option:nth-of-type(2) {
+    background-color: #ffc107; /* Amarillo */
+    width: 100px;
 }
 
-.button svg {
-    height: 40px;
-    left: 0;
-    top: 0;
-    position: absolute;
-    width: 100%;
+/* Estilo para la opción Baja */
+.select-estilo option:nth-of-type(3) {
+    background-color: #dc3545; /* Rojo */
+    width: 100px;
 }
 
-.button:hover rect {
-    stroke-width: 5;
-    stroke-dasharray: 20, 300;
-    stroke-dashoffset: 48;
-    stroke: #262626;
-    transition: all 2s cubic-bezier(
-        0.22, 1, 0.25, 1
-    );
+/* Estilo para la opción Descanso */
+.select-estilo option:nth-of-type(4) {
+    background-color: #6c757d; /* Gris */
+    width: 100px;
 }
 
 .footer {

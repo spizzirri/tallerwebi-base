@@ -16,13 +16,16 @@ import java.util.List;
 public class RepositorioCalendarioImpl implements RepositorioCalendario {
 
     private SessionFactory sessionFactory;
+    private List<ItemRendimiento> itemsRendimiento = new ArrayList<>();
 
     @Autowired
     public RepositorioCalendarioImpl(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
+        this.itemsRendimiento = new ArrayList<>();
+        itemsRendimiento.add(new ItemRendimiento(TipoRendimiento.BAJO));
+        itemsRendimiento.add(new ItemRendimiento(TipoRendimiento.DESCANSO));
+        itemsRendimiento.add(new ItemRendimiento(TipoRendimiento.ALTO));
     }
-
-    private List<ItemRendimiento> calendarioItems;
 
     @Override
     public List<ItemRendimiento> obtenerItemsRendimiento() {

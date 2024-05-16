@@ -8,11 +8,15 @@ public interface RepositorioCalendario {
 
         List<ItemRendimiento> obtenerItemsRendimiento();
         void guardar(ItemRendimiento dia);
-        ItemRendimiento buscar(long id);
+        List<ItemRendimiento> obtenerItemsPorTipoRendimiento(TipoRendimiento tipoRendimiento);
+
+
+
+
+
+        //nuevos a testear
         void actualizar(ItemRendimiento itemRendimiento);
         void vaciarCalendario();
-        //nuevos a testear
-        List<ItemRendimiento> obtenerItemsPorTipoRendimiento(TipoRendimiento tipoRendimiento);
         void eliminar(ItemRendimiento itemRendimiento);
-
+        ItemRendimiento buscar(long id);
 }
