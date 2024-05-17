@@ -22,13 +22,13 @@ public class ControladorVerProgreso {
         this.servicioCalendario = servicioCalendario;
     }
 
-    @RequestMapping(path = "/verProgreso", method = {RequestMethod.POST, RequestMethod.GET})
-    public ModelAndView irVerProgreso() {
-        List<DatosItemRendimiento> datosItemRendimiento = servicioCalendario.obtenerItemsRendimiento();
-        ModelMap model = new ModelMap();
-        model.put("datosItemRendimiento", datosItemRendimiento);
-        return new ModelAndView("verProgreso", model);
-    }
+//    @RequestMapping(path = "/verProgreso", method = {RequestMethod.POST, RequestMethod.GET})
+//    public ModelAndView irVerProgreso() {
+//        List<DatosItemRendimiento> datosItemRendimiento = servicioCalendario.obtenerItemsRendimiento();
+//        ModelMap model = new ModelMap();
+//        model.put("datosItemRendimiento", datosItemRendimiento);
+//        return new ModelAndView("verProgreso", model);
+//    }
 
 
 }

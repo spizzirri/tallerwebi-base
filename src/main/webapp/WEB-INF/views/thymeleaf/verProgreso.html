@@ -12,70 +12,6 @@
     <link rel="stylesheet" th:href="@{/css/main.css}"/>
     <!-- Enlace al archivo de estilos de Font Awesome -->
     <link rel="stylesheet" th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css}">
-    <style>
-        .container-featured{
-        max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-    color: black;
-    padding: 2rem 0.5rem;
-    }
-        /* Estilos específicos para el bloque featured-section */
-.featured-section {
-    background-color: #fff;
-    padding: 80px 0;
-    text-align: center;
-}
-
-.featured-title {
-    color: #black;
-    font-size: 36px;
-    margin-bottom: 20px;
-}
-
-.featured-description {
-    color: #666;
-    font-size: 18px;
-    margin-bottom: 40px;
-}
-
-.btn-inscribirse:not(:disabled):not(.disabled) {
-    cursor: pointer;
-}
-
-.btn-inscribirse{
-    display: inline-block;
-    font-weight: 400;
-    color: #212529;
-    text-align: center;
-    vertical-align: middle;
-    background-color: #0056b3 !important;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    padding: .375rem .75rem;
-    font-size: 1rem;
-    line-height: 1.5;
-    border-radius: .25rem;
-    transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
-}
-
-/* Estilos específicos para dispositivos móviles */
-@media (max-width: 768px) {
-    .featured-title {
-        font-size: 28px;
-    }
-
-    .featured-description {
-        font-size: 16px;
-    }
-
-    .btn {
-        padding: 8px 16px;
-    }
-}
-    </style>
 </head>
 <body class="body-calendario">
 <header>
@@ -96,11 +32,24 @@
         </div>
     </nav>
 </header>
-<main style="background-color: #1f1f1f !important; padding-top: 2rem; padding-bottom: 2rem;">
-    <tr th:each="item : ${datosItemRendimiento}">
-        <td th:text="${item.fecha}"></td>
-        <td th:text="${item.tipoRendimiento}"></td>
-    </tr>
+<main style="background-color: #1f1f1f !important; padding-top: 3rem; padding-bottom: 3.5rem; display: flex;
+    flex-direction: column;
+    align-items: center;">
+    <h1 class="progreso-h1">Progreso</h1>
+    <table class="styled-table">
+        <thead>
+        <tr>
+            <th>Fecha</th>
+            <th>Tipo de Rendimiento</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="item : ${datosItemRendimiento}">
+            <td th:text="${item.fecha}"></td>
+            <td th:text="${item.tipoRendimiento}" class="tipo-rendimiento"></td>
+        </tr>
+        </tbody>
+    </table>
 </main>
 <footer class="footer">
     <div class="container">
@@ -133,5 +82,6 @@
 <!-- Bootstrap JS -->
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 
+<script th:src="@{/js/main.js}"></script>
 </body>
 </html>

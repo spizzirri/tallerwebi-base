@@ -44,7 +44,7 @@
                     </figure>
                     <div class="article-preview">
                         <h2 th:if="${message != null}" th:text="${message}"></h2>
-                        <form action="#" class="form-estilo" th:action="@{/verProgreso}" method="POST" th:object="${itemRendimiento}">
+                        <form action="#" class="form-estilo" th:action="@{/calendario}" method="POST" th:object="${itemRendimiento}">
                             <select class="select-estilo" th:field="*{tipoRendimiento}" required>
                                 <option th:each="tipoRendimiento : ${T(com.tallerwebi.dominio.calendario.TipoRendimiento).values()}"
                                         th:value="${tipoRendimiento}" th:text="${tipoRendimiento}">

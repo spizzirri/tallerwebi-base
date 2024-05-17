@@ -346,6 +346,116 @@ align-items: center;
     width: 100px;
 }
 
+.progreso-h1 {
+    margin-top: 20px;
+    color: white;
+}
+
+.styled-table {
+    width: 60%;
+    margin-top: 1.8rem;
+    margin-bottom: 3rem;
+    font-size: 18px;
+    border-collapse: collapse;
+    text-align: left;
+    background-color: #2c2c2c;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    color: white !important;
+}
+
+.styled-table thead tr {
+    background-color: #a8a8a8;
+    color: #ffffff;
+    text-align: center;
+}
+
+.styled-table th, .styled-table td {
+    padding: 12px 15px;
+    text-align:center;
+}
+
+.styled-table tbody tr {
+    border-bottom: 1px solid #dddddd;
+}
+
+.styled-table tbody tr:nth-of-type(even) {
+    background-color: #3a3a3a;
+}
+
+.styled-table tbody tr:last-of-type {
+    border-bottom: 2px solid #a8a8a8;
+}
+
+.styled-table tbody tr:hover {
+    background-color: #575757;
+}
+
+.tipo-alto::before {
+    content: '';
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: green;
+    margin-right: 5px; /* Espacio entre el círculo y el texto */
+}
+
+.tipo-normal::before {
+    content: '';
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: yellow;
+    margin-right: 5px; /* Espacio entre el círculo y el texto */
+}
+
+.tipo-bajo::before {
+    content: '';
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: red;
+    margin-right: 5px; /* Espacio entre el círculo y el texto */
+}
+
+.tipo-descanso::before {
+    content: '';
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: grey;
+    margin-right: 5px; /* Espacio entre el círculo y el texto */
+}
+
+
+/* Media Queries */
+@media (max-width: 768px) {
+    .styled-table {
+        font-size: 16px;
+    }
+
+    .styled-table th, .styled-table td {
+        padding: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .styled-table {
+        font-size: 14px;
+    }
+
+    .styled-table th, .styled-table td {
+        padding: 8px;
+    }
+}
+
+
+
 .footer {
     background-color: #fff;
     padding: 30px 0;

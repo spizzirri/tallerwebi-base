@@ -9,7 +9,7 @@ import java.util.*;
 @Transactional
 public class ServicioCalendarioImpl implements ServicioCalendario {
 
-    private List<ItemRendimiento> listaItemRendimiento;
+
     private RepositorioCalendario repositorioCalendario;
 
     public ServicioCalendarioImpl(RepositorioCalendario repositorioCalendario){

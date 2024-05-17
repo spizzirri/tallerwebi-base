@@ -1,11 +1,14 @@
 package com.tallerwebi.dominio.calendario;
 
+import com.tallerwebi.dominio.Usuario;
+
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
-//@Table(name = "itemrendimiento")
+@Table(name = "itemrendimiento")
 public class ItemRendimiento {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

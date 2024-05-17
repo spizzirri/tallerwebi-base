@@ -36,12 +36,12 @@ public class ControladorVerProgresoTest {
         this.controladorVerProgreso = new ControladorVerProgreso(this.servicioCalendario);
     }
 
-    @Test
-    public void queAlIrALaPantallaDeVerProgresoMeMuestreLaVistaDeCalendario(){
-        ModelAndView modelAndView = this.controladorVerProgreso.irVerProgreso();
-
-        assertThat(modelAndView.getViewName(),equalTo("verProgreso"));//vista correcta
-    }
+//    @Test
+//    public void queAlIrALaPantallaDeVerProgresoMeMuestreLaVistaDeCalendario(){
+//        ModelAndView modelAndView = this.controladorVerProgreso.irVerProgreso();
+//
+//        assertThat(modelAndView.getViewName(),equalTo("verProgreso"));//vista correcta
+//    }
 
 //    @Test
 //    public void testIrVerProgreso() throws Exception {

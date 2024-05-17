@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Controller
 public class ControladorCalendario {
@@ -43,6 +44,14 @@ public class ControladorCalendario {
         itemRendimiento.setFecha(LocalDate.now());
         servicioCalendario.guardarItemRendimiento(itemRendimiento);
         return new ModelAndView("redirect:/verProgreso");
+    }
+
+    @RequestMapping(path = "/verProgreso", method = {RequestMethod.POST, RequestMethod.GET})
+    public ModelAndView irVerProgreso() {
+        List<DatosItemRendimiento> datosItemRendimiento = servicioCalendario.obtenerItemsRendimiento();
+        ModelMap model = new ModelMap();
+        model.put("datosItemRendimiento", datosItemRendimiento);
+        return new ModelAndView("verProgreso", model);
     }
 
 }

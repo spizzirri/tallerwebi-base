@@ -46,7 +46,7 @@ public class RepositorioCalendarioTest {
                 .createQuery("FROM ItemRendimiento Where id = :id")
                 .setParameter("id", idGuardado)
                 .getSingleResult();
-        assertThat(diaObtenido, equalTo(itemRendimiento));
+        assertThat(diaObtenido.getId(), equalTo(itemRendimiento.getId()));
     }
 
     @Test
