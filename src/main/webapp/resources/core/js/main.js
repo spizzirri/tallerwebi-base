@@ -1,3 +1,5 @@
+
+//que coloque un color segun el tipoRendimiento
 document.addEventListener('DOMContentLoaded', function() {
     var tipoRendimientoCells = document.querySelectorAll('.tipo-rendimiento');
 

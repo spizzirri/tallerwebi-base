@@ -15,11 +15,14 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import javax.transaction.Transactional;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.List;
 
 import static net.bytebuddy.matcher.ElementMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {HibernateTestInfraestructuraConfig.class})
@@ -37,7 +40,7 @@ public class RepositorioCalendarioTest {
 
     @Test
     @Transactional
-    public void queSePuedaGuardarUnDiaCalendario(){
+    public void queSePuedaGuardarUnItemRendimiento(){
         ItemRendimiento itemRendimiento = new ItemRendimiento(TipoRendimiento.DESCANSO);
         this.repositorioCalendario.guardar(itemRendimiento);
         this.sessionFactory.getCurrentSession().refresh(itemRendimiento);
@@ -51,7 +54,24 @@ public class RepositorioCalendarioTest {
 
     @Test
     @Transactional
-    public void queSePuedaActualizarUnDiaCalendario() {
+    public void queAlGuardarMasDeUnItemRendimientoElMismoDiaRecibaError() {
+        // Crear y guardar un ItemRendimiento con una fecha específica
+        LocalDate fechaEspecifica = LocalDate.of(2024, Month.MAY, 15);
+        ItemRendimiento itemRendimiento1 = new ItemRendimiento(fechaEspecifica, TipoRendimiento.DESCANSO);
+        repositorioCalendario.guardar(itemRendimiento1);
+
+        // Intentar guardar otro ItemRendimiento en la misma fecha (debería lanzar una excepción)
+        ItemRendimiento itemRendimiento2 = new ItemRendimiento(fechaEspecifica, TipoRendimiento.DESCANSO);
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            repositorioCalendario.guardar(itemRendimiento2);
+        });
+        // Verificar el mensaje de la excepción
+        assertEquals("Ya existe un ItemRendimiento para esta fecha.", exception.getMessage());
+    }
+
+    @Test
+    @Transactional
+    public void queSePuedaActualizarUnItemRendimiento() {
         ItemRendimiento itemRendimiento = new ItemRendimiento(TipoRendimiento.DESCANSO);
         this.repositorioCalendario.guardar(itemRendimiento);
 
@@ -63,20 +83,6 @@ public class RepositorioCalendarioTest {
                 .setParameter("id", idGuardado)
                 .getSingleResult();
         assertThat(diaObtenido.getTipoRendimiento(), equalTo(TipoRendimiento.ALTO));
-    }
-
-    @Test
-    @Transactional
-    public void queSePuedaBuscarUnItemRendimientoPorId() {
-        LocalDate fechaActual = LocalDate.now();
-        ItemRendimiento itemRendimiento = new ItemRendimiento(TipoRendimiento.BAJO);
-        this.repositorioCalendario.guardar(itemRendimiento);
-
-        Long idGuardado = itemRendimiento.getId();
-        ItemRendimiento diaObtenido = this.repositorioCalendario.buscar(idGuardado.longValue());
-
-        // Assert (Verify the retrieved object is the same as the saved one)
-        assertThat(diaObtenido, equalTo(itemRendimiento));
     }
 
     @Test

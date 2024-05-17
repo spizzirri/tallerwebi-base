@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Repository("repositorioCalendario")
@@ -31,7 +32,21 @@ public class RepositorioCalendarioImpl implements RepositorioCalendario {
 
     @Override
     public void guardar(ItemRendimiento itemRendimiento) {
-        this.sessionFactory.getCurrentSession().save(itemRendimiento);
+        if (!existeItemRendimientoPorFecha(itemRendimiento.getFecha())) {
+            this.sessionFactory.getCurrentSession().save(itemRendimiento);
+        } else {
+            throw new RuntimeException("Ya existe un ItemRendimiento para esta fecha.");
+        }
+    }
+
+    @Override
+    public boolean existeItemRendimientoPorFecha(LocalDate fecha) {
+        String hql = "SELECT count(*) FROM ItemRendimiento WHERE fecha = :fecha";
+        Long count = this.sessionFactory.getCurrentSession()
+                .createQuery(hql, Long.class)
+                .setParameter("fecha", fecha)
+                .uniqueResult();
+        return count > 0;
     }
 
     @Override
@@ -50,11 +65,6 @@ public class RepositorioCalendarioImpl implements RepositorioCalendario {
         this.sessionFactory.getCurrentSession().delete(dia);
     }
 
-    @Override
-    public ItemRendimiento buscar(long id) {
-        Session session = this.sessionFactory.getCurrentSession();
-        return session.get(ItemRendimiento.class, id);
-    }
 
     @Override
     public void actualizar(ItemRendimiento itemRendimiento) {

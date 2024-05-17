@@ -39,16 +39,7 @@ public class ServicioCalendarioImpl implements ServicioCalendario {
         this.repositorioCalendario.guardar(itemRendimiento);
     }
 
-    @Override
-    public void setRepositorioCalendario(RepositorioCalendario mockRepositorio) {
-        this.repositorioCalendario = mockRepositorio;
-    }
-
     //..................................................................
-    @Override
-    public ItemRendimiento getItemPorId(Long id) {
-        return repositorioCalendario.buscar(id);
-    }
 
     @Override
     public ItemRendimiento actualizarItemRendimiento(ItemRendimiento itemRendimiento) {

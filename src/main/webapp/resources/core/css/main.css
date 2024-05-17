@@ -285,31 +285,59 @@ body-calendario {
     transform: scale(1.5);
 }
 
-.form-estilo{
-display:flex;
-flex-direction: column;
-align-items: center;
+.form-estilo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-
-.select-estilo{
+.select-estilo {
     font-size: 16px;
     border: 1px solid #ccc;
     border-radius: 5px;
     background-color: #fff;
     color: #333;
     outline: none;
-    width: 70% !important;
-    padding: 0.5rem !important;
-    margin: 2rem !important;
+    width: 70%;
+    padding: 0.5rem;
+    margin: 2rem;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"><path fill="%23333" d="M2 0L0 2h4zM2 5L0 3h4z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 0.65rem auto;
 }
-
 
 .select-estilo option {
     background-color: #fff;
     color: #333;
+    padding: 0.5rem;
 }
 
+.select-estilo option:nth-of-type(1) {
+    background-color: #28a745; /* Verde */
+    color: white; /* Texto en blanco */
+}
+
+/* Estilo para la opción Normal */
+.select-estilo option:nth-of-type(2) {
+    background-color: #ffc107; /* Amarillo */
+    color: white; /* Texto en blanco */
+}
+
+/* Estilo para la opción Baja */
+.select-estilo option:nth-of-type(3) {
+    background-color: #dc3545; /* Rojo */
+    color: white; /* Texto en blanco */
+}
+
+/* Estilo para la opción Descanso */
+.select-estilo option:nth-of-type(4) {
+    background-color: #6c757d; /* Gris */
+    color: white; /* Texto en blanco */
+}
 
 .boton-guardar {
     padding: 10px 20px;
@@ -322,28 +350,18 @@ align-items: center;
     outline: none;
 }
 
-
-.select-estilo option:nth-of-type(1) {
-    background-color: #28a745; /* Verde */
-    width: 100px;
+.boton-guardar:hover {
+    background-color: #0056b3; /* Azul más oscuro */
+    transform: scale(1.05);
 }
 
-/* Estilo para la opción Normal */
-.select-estilo option:nth-of-type(2) {
-    background-color: #ffc107; /* Amarillo */
-    width: 100px;
+.select-estilo:hover {
+    border-color: #007bff;
 }
 
-/* Estilo para la opción Baja */
-.select-estilo option:nth-of-type(3) {
-    background-color: #dc3545; /* Rojo */
-    width: 100px;
-}
-
-/* Estilo para la opción Descanso */
-.select-estilo option:nth-of-type(4) {
-    background-color: #6c757d; /* Gris */
-    width: 100px;
+.select-estilo:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 }
 
 .progreso-h1 {
