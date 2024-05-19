@@ -3,6 +3,7 @@ package com.tallerwebi.infraestructura;
 import com.tallerwebi.dominio.calendario.ItemRendimiento;
 import com.tallerwebi.dominio.calendario.RepositorioCalendario;
 import com.tallerwebi.dominio.calendario.TipoRendimiento;
+import com.tallerwebi.dominio.excepcion.ItemRendimientoDuplicadoException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,7 @@ public class RepositorioCalendarioImpl implements RepositorioCalendario {
         if (!existeItemRendimientoPorFecha(itemRendimiento.getFecha())) {
             this.sessionFactory.getCurrentSession().save(itemRendimiento);
         } else {
-            throw new RuntimeException("Ya existe un ItemRendimiento para esta fecha.");
+            throw new ItemRendimientoDuplicadoException("No se puede guardar tu rendimiento más de una vez el mismo día.");
         }
     }
 

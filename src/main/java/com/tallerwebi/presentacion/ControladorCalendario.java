@@ -4,6 +4,7 @@ import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.calendario.ItemRendimiento;
 import com.tallerwebi.dominio.calendario.ServicioCalendario;
 import com.tallerwebi.dominio.calendario.TipoRendimiento;
+import com.tallerwebi.dominio.excepcion.ItemRendimientoDuplicadoException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -38,13 +39,20 @@ public class ControladorCalendario {
         return new ModelAndView(viewName, model);
     }
 
-    @RequestMapping(path ="/calendario", method = RequestMethod.POST)
+    @RequestMapping(path = "/calendario", method = RequestMethod.POST)
     public ModelAndView verProgreso(@ModelAttribute("itemRendimiento") ItemRendimiento itemRendimiento) {
         ModelMap model = new ModelMap();
         itemRendimiento.setFecha(LocalDate.now());
-        servicioCalendario.guardarItemRendimiento(itemRendimiento);
-        return new ModelAndView("redirect:/verProgreso");
+
+        try {
+            servicioCalendario.guardarItemRendimiento(itemRendimiento);
+            return new ModelAndView("redirect:/verProgreso");
+        } catch (ItemRendimientoDuplicadoException e) {
+            model.addAttribute("error", e.getMessage());
+            return new ModelAndView("calendario", model);
+        }
     }
+
 
     @RequestMapping(path = "/verProgreso", method = {RequestMethod.POST, RequestMethod.GET})
     public ModelAndView irVerProgreso() {
@@ -53,5 +61,7 @@ public class ControladorCalendario {
         model.put("datosItemRendimiento", datosItemRendimiento);
         return new ModelAndView("verProgreso", model);
     }
+
+
 
 }

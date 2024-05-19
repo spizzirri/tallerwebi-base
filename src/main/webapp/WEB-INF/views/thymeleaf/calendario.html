@@ -49,6 +49,9 @@
                                         th:value="${tipoRendimiento}" th:text="${tipoRendimiento}">
                                 </option>
                             </select>
+                            <div th:if="${error}" class="alert alert-danger" role="alert" style="margin-bottom: 1.8rem;">
+                                <p th:text="${error}" style="margin-bottom: 0rem !important;"></p>
+                            </div>
                             <button type="submit" class="boton-guardar">Guardar</button>
                         </form>
                     </div>
