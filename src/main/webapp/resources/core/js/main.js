@@ -1,3 +1,15 @@
+//progreso home
+document.addEventListener("DOMContentLoaded", function() {
+    var tipoRendimiento = document.querySelector(".progreso-container span").innerText;
+    var barraProgreso = document.querySelector(".barra-progreso");
+    if (tipoRendimiento === "ALTO") {
+        barraProgreso.style.backgroundColor = "#2ecc71"; // Verde
+    } else if (tipoRendimiento === "NORMAL") {
+        barraProgreso.style.backgroundColor = "#f1c40f"; // Amarillo
+    } else if (tipoRendimiento === "BAJO") {
+        barraProgreso.style.backgroundColor = "#e74c3c"; // Rojo
+    }
+});
 
 //que coloque un color segun el tipoRendimiento
 document.addEventListener('DOMContentLoaded', function() {

@@ -12,9 +12,7 @@ public interface RepositorioCalendario {
         void guardar(ItemRendimiento dia);
         List<ItemRendimiento> obtenerItemsPorTipoRendimiento(TipoRendimiento tipoRendimiento);
         boolean existeItemRendimientoPorFecha(LocalDate fecha);
-        TipoRendimiento obtenerTipoRendimientoMasSeleccionado();
-
-
+        ItemRendimiento obtenerItemMasSeleccionado();
 
         //nuevos a testear
         void actualizar(ItemRendimiento itemRendimiento);

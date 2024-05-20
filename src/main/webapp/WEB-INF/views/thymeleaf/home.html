@@ -75,21 +75,6 @@
         padding: 8px 16px;
     }
 }
-
-        .bar {
-            width: 100px;
-            height: 20px;
-            background-color: green; /* Color de la barra por defecto */
-        }
-        .bar-alto {
-            background-color: red; /* Color de la barra para tipo ALTO */
-        }
-        .bar-normal {
-            background-color: yellow; /* Color de la barra para tipo NORMAL */
-        }
-        .bar-bajo {
-            background-color: green; /* Color de la barra para tipo BAJO */
-        }
     </style>
 </head>
 <body>
@@ -115,12 +100,17 @@
 </header>
 
 <main class="main-content">
-    <article style="width: 100%; display:flex; align-items:center; justify-content: center; color: white;">
-    <h4>Progreso</h4>
-    <div th:class="'bar bar-' + ${tipoRendimiento}">
-        <span th:text="${tipoRendimiento}"></span>
-    </div>
-    </article>
+    <section style="width:100%; display:flex; justify-content:center;">
+        <a th:href="@{/verProgreso}" style="width:80%;">
+            <article class="progreso-container">
+                <p>Progreso
+                    <span th:text="${itemMasSeleccionado.tipoRendimiento}">
+            </span>
+                </p>
+                <div class="barra-progreso"></div>
+            </article>
+        </a>
+    </section>
     <div class="container">
         <h1 class="main-title">Tu Entrenador Personal</h1>
         <p class="main-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum vehicula turpis a lacus interdum, in ultrices mi ultricies. Proin et urna vel ipsum vehicula varius. Nam feugiat posuere justo sed ultrices.</p>
@@ -164,6 +154,6 @@
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <!-- Bootstrap JS -->
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
-
+<script th:src="@{/js/main.js}"></script>
 </body>
 </html>

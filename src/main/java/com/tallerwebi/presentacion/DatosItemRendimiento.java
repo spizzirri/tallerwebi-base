@@ -10,9 +10,9 @@ public class DatosItemRendimiento {
     private LocalDate fecha;
     private TipoRendimiento tipoRendimiento;
 
-    public DatosItemRendimiento(TipoRendimiento tipoRendimiento, LocalDate fecha) {
-        this.tipoRendimiento = tipoRendimiento;
+    public DatosItemRendimiento(LocalDate fecha, TipoRendimiento tipoRendimiento) {
         this.fecha = fecha;
+        this.tipoRendimiento = tipoRendimiento;
     }
 
     public DatosItemRendimiento(ItemRendimiento itemRendimiento) {

@@ -111,36 +111,22 @@ public class RepositorioCalendarioTest {
     }
 
     @Test
+    @Transactional
     void queSePuedaObtenerTipoRendimientoMasSeleccionado() {
-        // Crear una instancia del RepositorioCalendario
-        RepositorioCalendarioImpl repositorioCalendarioMock = new RepositorioCalendarioImpl(mockSessionFactory());
-        // Definir los tipos de rendimiento
-        TipoRendimiento[] tiposRendimiento = {TipoRendimiento.ALTO, TipoRendimiento.NORMAL, TipoRendimiento.BAJO};
-        // Crear una lista de items de rendimiento con varios tipos
-        List<ItemRendimiento> itemsRendimiento = Arrays.asList(
-                new ItemRendimiento(LocalDate.now(), TipoRendimiento.ALTO),
-                new ItemRendimiento(LocalDate.now(), TipoRendimiento.ALTO),
-                new ItemRendimiento(LocalDate.now(), TipoRendimiento.NORMAL),
-                new ItemRendimiento(LocalDate.now(), TipoRendimiento.BAJO),
-                new ItemRendimiento(LocalDate.now(), TipoRendimiento.NORMAL)
-        );
-        // Mock de obtenerItemsRendimiento() para devolver la lista creada
-        when(repositorioCalendarioMock.obtenerItemsRendimiento()).thenReturn(itemsRendimiento);
+        ItemRendimiento itemRendimiento1 = new ItemRendimiento(LocalDate.now().minusDays(15), TipoRendimiento.ALTO);
+        ItemRendimiento itemRendimiento2 = new ItemRendimiento(LocalDate.now().minusDays(14), TipoRendimiento.ALTO);
+        ItemRendimiento itemRendimiento3 = new ItemRendimiento(LocalDate.now().minusDays(13), TipoRendimiento.BAJO);
+        ItemRendimiento itemRendimiento4 = new ItemRendimiento(LocalDate.now().minusDays(12), TipoRendimiento.NORMAL);
+
+        this.repositorioCalendario.guardar(itemRendimiento1);
+        this.repositorioCalendario.guardar(itemRendimiento2);
+        this.repositorioCalendario.guardar(itemRendimiento3);
+        this.repositorioCalendario.guardar(itemRendimiento4);
         // Verificar que el tipo de rendimiento más seleccionado sea el esperado
-        assertEquals(TipoRendimiento.ALTO, repositorioCalendarioMock.obtenerTipoRendimientoMasSeleccionado());
+        ItemRendimiento itemMasSeleccionado = repositorioCalendario.obtenerItemMasSeleccionado();
+        assertEquals(TipoRendimiento.ALTO, itemMasSeleccionado.getTipoRendimiento());
     }
 
-    // Método para simular un SessionFactory con Mockito
-    private SessionFactory mockSessionFactory() {
-        SessionFactory sessionFactory = Mockito.mock(SessionFactory.class);
-        Session session = Mockito.mock(Session.class);
-        Query<ItemRendimiento> query = Mockito.mock(Query.class);
-
-        when(sessionFactory.getCurrentSession()).thenReturn(session);
-        when(session.createQuery(Mockito.anyString(), Mockito.eq(ItemRendimiento.class))).thenReturn(query);
-
-        return sessionFactory;
-    }
 
     @Test
     @Transactional

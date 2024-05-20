@@ -11,8 +11,6 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Repository("repositorioCalendario")
 public class RepositorioCalendarioImpl implements RepositorioCalendario {
@@ -51,31 +49,33 @@ public class RepositorioCalendarioImpl implements RepositorioCalendario {
     }
 
     @Override
-    public TipoRendimiento obtenerTipoRendimientoMasSeleccionado() {
-        Map<TipoRendimiento, Long> conteoTipoRendimiento = obtenerConteoTipoRendimiento();
-        conteoTipoRendimiento.remove(TipoRendimiento.DESCANSO); // Eliminar el tipo DESCANSO del mapa
+    public ItemRendimiento obtenerItemMasSeleccionado() {
+        String hql = "SELECT ir.tipoRendimiento, COUNT(ir) FROM ItemRendimiento ir " +
+                "WHERE ir.tipoRendimiento != :descanso " +
+                "GROUP BY ir.tipoRendimiento " +
+                "ORDER BY COUNT(ir) DESC";
 
-        if (conteoTipoRendimiento.isEmpty()) {
-            return null; // Si no hay otros tipos de rendimiento seleccionados, retorna null
+        List<Object[]> results = this.sessionFactory.getCurrentSession()
+                .createQuery(hql)
+                .setParameter("descanso", TipoRendimiento.DESCANSO)
+                .setMaxResults(1)
+                .getResultList();
+
+        if (results.isEmpty()) {
+            return null;
         }
+        TipoRendimiento tipoRendimientoMasSeleccionado = (TipoRendimiento) results.get(0)[0];
 
-        return conteoTipoRendimiento.entrySet().stream()
-                .max(Map.Entry.comparingByValue())
-                .map(Map.Entry::getKey)
-                .orElse(null);
+        hql = "FROM ItemRendimiento ir WHERE ir.tipoRendimiento = :tipoRendimiento ORDER BY ir.fecha DESC";
+        List<ItemRendimiento> items = this.sessionFactory.getCurrentSession()
+                .createQuery(hql, ItemRendimiento.class)
+                .setParameter("tipoRendimiento", tipoRendimientoMasSeleccionado)
+                .setMaxResults(1)
+                .getResultList();
+
+        return items.isEmpty() ? null : items.get(0);
     }
 
-    private Map<TipoRendimiento, Long> obtenerConteoTipoRendimiento() {
-        List<ItemRendimiento> itemsRendimiento = obtenerItemsRendimiento();
-
-        Map<TipoRendimiento, Long> conteoTipoRendimiento = itemsRendimiento.stream()
-                .collect(Collectors.groupingBy(
-                        ItemRendimiento::getTipoRendimiento,
-                        Collectors.counting()
-                ));
-
-        return conteoTipoRendimiento;
-    }
 
     @Override
     public void vaciarCalendario() {

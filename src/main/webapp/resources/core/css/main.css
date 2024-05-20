@@ -381,7 +381,7 @@ body-calendario {
 
 .progreso-h1 {
     margin-top: 20px;
-    color: white;
+    color: #fff;
 }
 
 .styled-table {
@@ -399,7 +399,7 @@ body-calendario {
 }
 
 .styled-table thead tr {
-    background-color: #a8a8a8;
+    background-color: #2b62cf;
     color: #ffffff;
     text-align: center;
 }
@@ -418,7 +418,7 @@ body-calendario {
 }
 
 .styled-table tbody tr:last-of-type {
-    border-bottom: 2px solid #a8a8a8;
+   /* border-bottom: 2px solid #2b62cf;*/
 }
 
 .styled-table tbody tr:hover {
@@ -487,7 +487,81 @@ body-calendario {
     }
 }
 
+.progreso-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 3rem;
+    color: white !important;
+    background-color: #2b62cf;
+    padding: 1rem;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Sombra suave */
+    transition: transform 0.3s ease; /* Transición para el agrandamiento */
+}
 
+.progreso-container:hover {
+    transform: scale(1.05); /* Agrandamiento al pasar el mouse */
+}
+
+.progreso-container p {
+    margin: 0 !important;
+    font-size: 1.5em;
+    text-align: center;
+}
+
+.barra-progreso {
+    height: 10px;
+    width: 100%;
+    margin-top: 10px;
+    border-radius: 5px;
+}
+
+.ALTO {
+    color: #2ecc71; /* Verde */
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+.NORMAL {
+    color: #f1c40f; /* Amarillo */
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+.BAJO {
+    color: #e74c3c; /* Rojo */
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+
+.barra-progreso {
+    height: 10px;
+    width: 100%;
+    margin-top: 10px;
+    border-radius: 5px;
+}
+
+.ALTO {
+    color: #2ecc71; /* Verde */
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+.NORMAL {
+    color: #f1c40f; /* Amarillo */
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+.BAJO {
+    color: #e74c3c; /* Rojo */
+    font-weight: bold;
+    font-size: 1.2em;
+}
 
 .footer {
     background-color: #fff;

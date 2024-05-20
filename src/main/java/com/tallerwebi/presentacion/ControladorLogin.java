@@ -2,6 +2,7 @@ package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.ServicioLogin;
 import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.calendario.ItemRendimiento;
 import com.tallerwebi.dominio.calendario.ServicioCalendario;
 import com.tallerwebi.dominio.calendario.TipoRendimiento;
 import com.tallerwebi.dominio.excepcion.UsuarioExistente;
@@ -35,36 +36,17 @@ public class ControladorLogin {
         return new ModelAndView("login", modelo);
     }
 
-//    @RequestMapping(path = "/validar-login", method = RequestMethod.POST)
-//    public ModelAndView validarLogin(@ModelAttribute("datosLogin") DatosLogin datosLogin, HttpServletRequest request) {
-//        ModelMap model = new ModelMap();
-//        Usuario usuarioBuscado = servicioLogin.consultarUsuario(datosLogin.getEmail(), datosLogin.getPassword());
-//        if (usuarioBuscado != null) {
-//            request.getSession().setAttribute("ROL", usuarioBuscado.getRol());
-//            return new ModelAndView("redirect:/home");
-//        } else {
-//            model.put("error", "Usuario o clave incorrecta");
-//        }
-//        return new ModelAndView("login", model);
-//    }
-
     @RequestMapping(path = "/validar-login", method = RequestMethod.POST)
     public ModelAndView validarLogin(@ModelAttribute("datosLogin") DatosLogin datosLogin, HttpServletRequest request) {
+        ModelMap model = new ModelMap();
         Usuario usuarioBuscado = servicioLogin.consultarUsuario(datosLogin.getEmail(), datosLogin.getPassword());
         if (usuarioBuscado != null) {
             request.getSession().setAttribute("ROL", usuarioBuscado.getRol());
-            TipoRendimiento tipoRendimiento = servicioCalendario.obtenerTipoRendimientoMasSeleccionado();
-
-            if (tipoRendimiento != null) {
-                return new ModelAndView("redirect:/home?tipoRendimiento=" + tipoRendimiento);
-            } else {
-                return new ModelAndView("redirect:/home?tipoRendimiento=NO_DATA");
-            }
+            return new ModelAndView("redirect:/home");
         } else {
-            ModelMap model = new ModelMap();
             model.put("error", "Usuario o clave incorrecta");
-            return new ModelAndView("login", model);
         }
+        return new ModelAndView("login", model);
     }
 
 
@@ -90,25 +72,18 @@ public class ControladorLogin {
         return new ModelAndView("nuevo-usuario", model);
     }
 
-//    @RequestMapping(path = "/home", method = RequestMethod.GET)
-//    public ModelAndView irAHome() {
-//        return new ModelAndView("home");
-//    }
-
     @RequestMapping(path = "/home", method = RequestMethod.GET)
-    public ModelAndView irAHome(HttpServletRequest request) {
-        String tipoRendimiento = request.getParameter("tipoRendimiento");
-        ModelAndView mav = new ModelAndView("home");
+    public ModelAndView irAHome() {
+        ModelAndView modelAndView = new ModelAndView("home");
 
-        if (tipoRendimiento != null) {
-            mav.addObject("tipoRendimiento", tipoRendimiento);
-        } else {
-            mav.addObject("tipoRendimiento", "No hay datos disponibles");
-        }
+        // Obtener el ItemRendimiento más seleccionado
+        DatosItemRendimiento itemMasSeleccionado = servicioLogin.obtenerItemMasSeleccionado();
 
-        return mav;
+        // Añadir el ItemRendimiento más seleccionado al modelo
+        modelAndView.addObject("itemMasSeleccionado", itemMasSeleccionado);
+
+        return modelAndView;
     }
-
 
     @RequestMapping(path = "/", method = RequestMethod.GET)
     public ModelAndView inicio() {

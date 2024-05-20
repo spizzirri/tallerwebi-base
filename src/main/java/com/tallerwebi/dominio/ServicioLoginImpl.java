@@ -1,6 +1,8 @@
 package com.tallerwebi.dominio;
 
+import com.tallerwebi.dominio.calendario.ServicioCalendario;
 import com.tallerwebi.dominio.excepcion.UsuarioExistente;
+import com.tallerwebi.presentacion.DatosItemRendimiento;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,11 +12,13 @@ import javax.transaction.Transactional;
 @Transactional
 public class ServicioLoginImpl implements ServicioLogin {
 
+    private ServicioCalendario servicioCalendario;
     private RepositorioUsuario repositorioUsuario;
 
     @Autowired
-    public ServicioLoginImpl(RepositorioUsuario repositorioUsuario){
+    public ServicioLoginImpl(RepositorioUsuario repositorioUsuario, ServicioCalendario servicioCalendario) {
         this.repositorioUsuario = repositorioUsuario;
+        this.servicioCalendario = servicioCalendario;
     }
 
     @Override
@@ -29,6 +33,11 @@ public class ServicioLoginImpl implements ServicioLogin {
             throw new UsuarioExistente();
         }
         repositorioUsuario.guardar(usuario);
+    }
+
+    @Override
+    public DatosItemRendimiento obtenerItemMasSeleccionado() {
+        return servicioCalendario.obtenerItemMasSeleccionado();
     }
 
 }

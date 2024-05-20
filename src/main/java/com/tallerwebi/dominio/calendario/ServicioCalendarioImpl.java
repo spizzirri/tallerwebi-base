@@ -3,7 +3,6 @@ import com.tallerwebi.presentacion.DatosItemRendimiento;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.time.LocalDate;
 import java.util.*;
 @Service
 @Transactional
@@ -40,9 +39,11 @@ public class ServicioCalendarioImpl implements ServicioCalendario {
     }
 
     @Override
-    public TipoRendimiento obtenerTipoRendimientoMasSeleccionado() {
-        return this.repositorioCalendario.obtenerTipoRendimientoMasSeleccionado();
+    public DatosItemRendimiento obtenerItemMasSeleccionado() {
+        ItemRendimiento itemRendimiento = repositorioCalendario.obtenerItemMasSeleccionado();
+        return itemRendimiento != null ? new DatosItemRendimiento(itemRendimiento) : null;
     }
+
 
     //..................................................................
 
