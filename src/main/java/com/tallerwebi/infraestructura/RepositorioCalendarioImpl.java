@@ -10,9 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Repository("repositorioCalendario")
 public class RepositorioCalendarioImpl implements RepositorioCalendario {
@@ -48,6 +48,33 @@ public class RepositorioCalendarioImpl implements RepositorioCalendario {
                 .setParameter("fecha", fecha)
                 .uniqueResult();
         return count > 0;
+    }
+
+    @Override
+    public TipoRendimiento obtenerTipoRendimientoMasSeleccionado() {
+        Map<TipoRendimiento, Long> conteoTipoRendimiento = obtenerConteoTipoRendimiento();
+        conteoTipoRendimiento.remove(TipoRendimiento.DESCANSO); // Eliminar el tipo DESCANSO del mapa
+
+        if (conteoTipoRendimiento.isEmpty()) {
+            return null; // Si no hay otros tipos de rendimiento seleccionados, retorna null
+        }
+
+        return conteoTipoRendimiento.entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse(null);
+    }
+
+    private Map<TipoRendimiento, Long> obtenerConteoTipoRendimiento() {
+        List<ItemRendimiento> itemsRendimiento = obtenerItemsRendimiento();
+
+        Map<TipoRendimiento, Long> conteoTipoRendimiento = itemsRendimiento.stream()
+                .collect(Collectors.groupingBy(
+                        ItemRendimiento::getTipoRendimiento,
+                        Collectors.counting()
+                ));
+
+        return conteoTipoRendimiento;
     }
 
     @Override

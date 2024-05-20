@@ -4,10 +4,13 @@ import com.tallerwebi.dominio.calendario.ItemRendimiento;
 import com.tallerwebi.dominio.calendario.RepositorioCalendario;
 import com.tallerwebi.dominio.calendario.TipoRendimiento;
 import com.tallerwebi.infraestructura.config.HibernateTestInfraestructuraConfig;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -16,6 +19,7 @@ import javax.transaction.Transactional;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.Arrays;
 import java.util.List;
 
 import static net.bytebuddy.matcher.ElementMatchers.is;
@@ -23,6 +27,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {HibernateTestInfraestructuraConfig.class})
@@ -103,6 +108,38 @@ public class RepositorioCalendarioTest {
         assertThat(diasObtenidos.get(0), equalTo(itemRendimiento1));
         assertThat(diasObtenidos.get(1), equalTo(itemRendimiento2));
         assertThat(diasObtenidos.get(2), equalTo(itemRendimiento3));
+    }
+
+    @Test
+    void queSePuedaObtenerTipoRendimientoMasSeleccionado() {
+        // Crear una instancia del RepositorioCalendario
+        RepositorioCalendarioImpl repositorioCalendarioMock = new RepositorioCalendarioImpl(mockSessionFactory());
+        // Definir los tipos de rendimiento
+        TipoRendimiento[] tiposRendimiento = {TipoRendimiento.ALTO, TipoRendimiento.NORMAL, TipoRendimiento.BAJO};
+        // Crear una lista de items de rendimiento con varios tipos
+        List<ItemRendimiento> itemsRendimiento = Arrays.asList(
+                new ItemRendimiento(LocalDate.now(), TipoRendimiento.ALTO),
+                new ItemRendimiento(LocalDate.now(), TipoRendimiento.ALTO),
+                new ItemRendimiento(LocalDate.now(), TipoRendimiento.NORMAL),
+                new ItemRendimiento(LocalDate.now(), TipoRendimiento.BAJO),
+                new ItemRendimiento(LocalDate.now(), TipoRendimiento.NORMAL)
+        );
+        // Mock de obtenerItemsRendimiento() para devolver la lista creada
+        when(repositorioCalendarioMock.obtenerItemsRendimiento()).thenReturn(itemsRendimiento);
+        // Verificar que el tipo de rendimiento más seleccionado sea el esperado
+        assertEquals(TipoRendimiento.ALTO, repositorioCalendarioMock.obtenerTipoRendimientoMasSeleccionado());
+    }
+
+    // Método para simular un SessionFactory con Mockito
+    private SessionFactory mockSessionFactory() {
+        SessionFactory sessionFactory = Mockito.mock(SessionFactory.class);
+        Session session = Mockito.mock(Session.class);
+        Query<ItemRendimiento> query = Mockito.mock(Query.class);
+
+        when(sessionFactory.getCurrentSession()).thenReturn(session);
+        when(session.createQuery(Mockito.anyString(), Mockito.eq(ItemRendimiento.class))).thenReturn(query);
+
+        return sessionFactory;
     }
 
     @Test

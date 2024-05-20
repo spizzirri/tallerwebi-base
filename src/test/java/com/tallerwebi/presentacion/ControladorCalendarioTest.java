@@ -18,6 +18,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.equalToIgnoringCase;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -47,50 +48,30 @@ public class ControladorCalendarioTest {
     }
 
     @Test
-    public void testGuardarItemRendimientoSuccess() {
+    public void queSeLogreGuardarUnItemRendimientoRedireccionandoHaciaVerProgreso() {
         ItemRendimiento itemRendimiento = new ItemRendimiento(TipoRendimiento.DESCANSO);
 
-        // Call the guardarItemRendimiento method
         ModelAndView modelAndView = controladorCalendario.verProgreso(itemRendimiento);
 
-        // Verify that servicioCalendario.guardarItemRendimiento was called
         verify(servicioCalendario).guardarItemRendimiento(itemRendimiento);
 
         ModelMap model = modelAndView.getModelMap();
         assertEquals("redirect:/verProgreso", modelAndView.getViewName());
     }
 
-//    @Test
-//    public void queAlGuardarMasDeUnaVezUnItemRendimientoElMismoDiaAparezcaLaExcepcion() throws Exception {
-//        ItemRendimiento itemRendimiento = new ItemRendimiento();
-//        itemRendimiento.setFecha(LocalDate.now());
-//
-//        doThrow(new ItemRendimientoDuplicadoException("No se puede guardar más de una vez el mismo día."))
-//                .when(servicioCalendario)
-//                .guardarItemRendimiento(itemRendimiento);
-//
-//        // Act & Assert
-//        mockMvc.perform(post("/calendario")
-//                        .flashAttr("itemRendimiento", itemRendimiento))
-//                .andExpect(status().isOk())
-//                .andExpect(view().name("calendario"))
-//                .andExpect(model().attributeExists("error"))
-//                .andExpect(model().attribute("error", "No se puede guardar tu rendimiento más de una vez el mismo día."));
-//        ItemRendimiento itemRendimiento = new ItemRendimiento();
-//        itemRendimiento.setFecha(LocalDate.now());
-//        itemRendimiento.setDescripcion("Descripción de prueba");
-//
-//        doThrow(new DuplicateItemRendimientoException("No se puede guardar más de una vez el mismo día."))
-//                .when(itemRendimientoService)
-//                .guardar(itemRendimiento);
-//
-//        // Act
-//        ModelAndView modelAndView = ControladorCalendario.irCalendario(itemRendimiento);
-//
-//        // Assert
-//        assertEquals("calendario", modelAndView.getViewName());
-//        assertTrue(modelAndView.getModel().containsKey("error"));
-//        assertEquals("No se puede guardar tu rendimiento más de una vez el mismo día.", modelAndView.getModel().get("error"));
-//    }
-//    }
+    @Test
+    public void queAlGuardarMasDeUnaVezUnItemRendimientoElMismoDiaAparezcaLaExcepcion() throws Exception {
+        ItemRendimiento itemRendimiento = new ItemRendimiento();
+        itemRendimiento.setFecha(LocalDate.now());
+        doThrow(new ItemRendimientoDuplicadoException("No se puede guardar tu rendimiento más de una vez el mismo día."))
+                .when(servicioCalendario)
+                .guardarItemRendimiento(itemRendimiento);
+
+        ModelAndView modelAndView = controladorCalendario.verProgreso(itemRendimiento);
+
+        assertEquals("calendario", modelAndView.getViewName());
+        assertTrue(modelAndView.getModel().containsKey("error"));
+        assertEquals("No se puede guardar tu rendimiento más de una vez el mismo día.", modelAndView.getModel().get("error"));
+    }
+
 }

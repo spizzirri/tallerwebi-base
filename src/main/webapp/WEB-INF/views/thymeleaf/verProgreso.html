@@ -13,7 +13,7 @@
     <!-- Enlace al archivo de estilos de Font Awesome -->
     <link rel="stylesheet" th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css}">
 </head>
-<body class="body-calendario">
+<body class="body-calendario" style="background-color: #1f1f1f !important;">
 <header>
     <nav class="navbar">
         <div class="logo">
@@ -31,7 +31,7 @@
         </div>
     </nav>
 </header>
-<main style="background-color: #1f1f1f !important; padding-top: 3rem; padding-bottom: 3.5rem; display: flex;
+<main style="padding-top: 3rem; padding-bottom: 3.5rem; display: flex;
     flex-direction: column;
     align-items: center;">
     <h1 class="progreso-h1">Progreso</h1>
@@ -50,30 +50,6 @@
         </tbody>
     </table>
 </main>
-<footer class="footer">
-    <div class="container">
-        <div class="footer-content">
-            <div class="footer-logo">
-                <img th:src="@{/img/logoMagnusFit.png}" alt="Logo">
-            </div>
-            <div class="footer-links">
-                <ul>
-                    <li><a href="#">Inicio</a></li>
-                    <li><a href="#">Servicios</a></li>
-                    <li><a href="#">Contacto</a></li>
-                </ul>
-            </div>
-            <div class="footer-social">
-                <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
-                <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
-                <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
-            </div>
-        </div>
-        <div class="footer-text">
-            <p>&copy; 2024 MagnusFit | Todos los derechos reservados</p>
-        </div>
-    </div>
-</footer>
 <!-- Bootstrap CSS -->
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 <!-- jQuery -->

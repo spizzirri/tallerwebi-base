@@ -2,6 +2,7 @@ package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.ServicioLogin;
 import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.calendario.TipoRendimiento;
 import com.tallerwebi.dominio.excepcion.UsuarioExistente;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -102,4 +103,32 @@ public class ControladorLoginTest {
 		assertThat(modelAndView.getViewName(), equalToIgnoringCase("nuevo-usuario"));
 		assertThat(modelAndView.getModel().get("error").toString(), equalToIgnoringCase("Error al registrar el nuevo usuario"));
 	}
+
+//	@Test
+//	public void testValidarLogin() {
+//		// Mock del usuario encontrado
+//		Usuario usuario = new Usuario();
+//		usuario.setRol("ROLE_USER");
+//
+//		// Mock del tipo de rendimiento
+//		TipoRendimiento tipoRendimiento = TipoRendimiento.ALTO;
+//
+//		// Cuando se llama a consultarUsuario, devolver el usuario mockeado
+//		when(servicioLogin.consultarUsuario(anyString(), anyString())).thenReturn(usuario);
+//
+//		// Cuando se llama a obtenerTipoRendimientoMasSeleccionado, devolver el tipo de rendimiento mockeado
+//		when(servicioCalendario.obtenerTipoRendimientoMasSeleccionado()).thenReturn(tipoRendimiento);
+//
+//		// Llamar al método validarLogin del controlador
+//		ModelAndView modelAndView = controlador.validarLogin(new DatosLogin(), new MockHttpServletRequest());
+//
+//		// Verificar si el ModelAndView no es nulo
+//		assertNotNull(modelAndView);
+//
+//		// Verificar si el ModelAndView redirige a /home
+//		assertEquals("home", modelAndView.getViewName());
+//
+//		// Verificar si el tipo de rendimiento se ha agregado como atributo
+//		assertEquals(tipoRendimiento, modelAndView.getModel().get("tipoRendimiento"));
+//	}
 }

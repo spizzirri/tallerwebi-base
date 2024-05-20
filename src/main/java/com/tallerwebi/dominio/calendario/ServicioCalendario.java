@@ -9,6 +9,7 @@ public interface ServicioCalendario {
     List<DatosItemRendimiento> obtenerItemsRendimiento();
     List<DatosItemRendimiento> obtenerItemsPorTipoRendimiento(TipoRendimiento tipoRendimiento);
     void guardarItemRendimiento(ItemRendimiento itemRendimiento);
+    TipoRendimiento obtenerTipoRendimientoMasSeleccionado();
 
     //.....................................................
     ItemRendimiento actualizarItemRendimiento(ItemRendimiento itemRendimiento);

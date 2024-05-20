@@ -75,6 +75,21 @@
         padding: 8px 16px;
     }
 }
+
+        .bar {
+            width: 100px;
+            height: 20px;
+            background-color: green; /* Color de la barra por defecto */
+        }
+        .bar-alto {
+            background-color: red; /* Color de la barra para tipo ALTO */
+        }
+        .bar-normal {
+            background-color: yellow; /* Color de la barra para tipo NORMAL */
+        }
+        .bar-bajo {
+            background-color: green; /* Color de la barra para tipo BAJO */
+        }
     </style>
 </head>
 <body>
@@ -100,6 +115,12 @@
 </header>
 
 <main class="main-content">
+    <article style="width: 100%; display:flex; align-items:center; justify-content: center; color: white;">
+    <h4>Progreso</h4>
+    <div th:class="'bar bar-' + ${tipoRendimiento}">
+        <span th:text="${tipoRendimiento}"></span>
+    </div>
+    </article>
     <div class="container">
         <h1 class="main-title">Tu Entrenador Personal</h1>
         <p class="main-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum vehicula turpis a lacus interdum, in ultrices mi ultricies. Proin et urna vel ipsum vehicula varius. Nam feugiat posuere justo sed ultrices.</p>
@@ -137,30 +158,6 @@
         <a href="#" class="main-btn">Inscribirse</a>
     </div>
 </div>
-<footer class="footer">
-    <div class="container">
-        <div class="footer-content">
-            <div class="footer-logo">
-                <img th:src="@{/img/logoMagnusFit.png}" alt="Logo">
-            </div>
-            <div class="footer-links">
-                <ul>
-                    <li><a href="#">Inicio</a></li>
-                    <li><a href="#">Servicios</a></li>
-                    <li><a href="#">Contacto</a></li>
-                </ul>
-            </div>
-            <div class="footer-social">
-                <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
-                <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
-                <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
-            </div>
-        </div>
-        <div class="footer-text">
-            <p>&copy; 2024 MagnusFit | Todos los derechos reservados</p>
-        </div>
-    </div>
-</footer>
 <!-- Bootstrap CSS -->
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 <!-- jQuery -->

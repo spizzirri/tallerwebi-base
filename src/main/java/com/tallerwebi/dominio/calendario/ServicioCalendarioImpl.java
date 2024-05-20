@@ -39,6 +39,11 @@ public class ServicioCalendarioImpl implements ServicioCalendario {
         this.repositorioCalendario.guardar(itemRendimiento);
     }
 
+    @Override
+    public TipoRendimiento obtenerTipoRendimientoMasSeleccionado() {
+        return this.repositorioCalendario.obtenerTipoRendimientoMasSeleccionado();
+    }
+
     //..................................................................
 
     @Override
