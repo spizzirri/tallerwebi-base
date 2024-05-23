@@ -6,15 +6,10 @@ import com.tallerwebi.presentacion.DatosRutina;
 
 import java.util.List;
 
-public interface ServicioRutina {
+public interface RepositorioRutina {
+    List<Rutina> getRutinas ();
 
+    Rutina getRutinaByObjetivo(Objetivo objetivo);
 
-    List<DatosRutina> getRutinas ();
-
-    DatosRutina getRutinaByObjetivo(Objetivo objetivo);
-
-    DatosRutina getRutinaParaUsuario(Usuario usuario);
-
-
-
+    Rutina getRutinaParaUsuario(Usuario usuario);
 }

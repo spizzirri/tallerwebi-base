@@ -2,19 +2,24 @@ package com.tallerwebi.dominio.rutina;
 
 import com.tallerwebi.dominio.objetivo.Objetivo;
 
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-
+@Entity
 public class Rutina {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idRutina;
 
     private String nombre;
 
     private Objetivo objetivo;
 
+    @OneToMany
     private List<Ejercicio> ejercicios = new ArrayList<>();
+
 
     public Rutina(String nombre, Objetivo objetivo) {
         this.nombre = nombre;

@@ -1,26 +1,33 @@
 package com.tallerwebi.presentacion;
 
+import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.objetivo.Objetivo;
+import com.tallerwebi.dominio.rutina.RepositorioRutina;
+import static org.mockito.Mockito.*;
+
 import com.tallerwebi.dominio.rutina.Rutina;
 import com.tallerwebi.dominio.rutina.ServicioRutina;
+import com.tallerwebi.dominio.rutina.ServicioRutinaImpl;
+import com.tallerwebi.infraestructura.RepositorioRutinaImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+
 
 public class ControladorRutinaTest {
 
+    private Usuario usuarioMock;
     private ServicioRutina servicioRutina;
     private ControladorRutina controladorRutina;
 
     @BeforeEach
     public void init() {
+        this.usuarioMock = mock(Usuario.class);
         this.servicioRutina = mock(ServicioRutina.class);
         this.controladorRutina = new ControladorRutina(this.servicioRutina);
     }
@@ -32,19 +39,23 @@ public class ControladorRutinaTest {
     }
 
     @Test
-    public void queAlIrALaPantallaDeRutinaSeMuestreLaVistaConRutinas(){
+    public void queAlIrALaPantallaDeRutinaSeMuestreLaVistaConUnaRutinaParaElUsuario(){
         //preparacion
-        List <Rutina> rutinasMock = new ArrayList<>();
-        rutinasMock.add(new Rutina());
-        rutinasMock.add(new Rutina());
-        rutinasMock.add(new Rutina());
-        when(this.servicioRutina.obtenerRutinas()).thenReturn(rutinasMock);
+        Usuario usuarioMock = new Usuario("Lautaro", Objetivo.PERDIDA_DE_PESO);
+        DatosRutina datosRutinaMock = new DatosRutina(new Rutina("ADELGAZAR",Objetivo.PERDIDA_DE_PESO));
+
+        when(this.servicioRutina.getRutinaParaUsuario(usuarioMock)).thenReturn(datosRutinaMock);
+
         //ejecucion
-        ModelAndView modelAndView = this.controladorRutina.irRutina();
+        ModelAndView modelAndView = this.controladorRutina.VerUnaRutinaEnLaPantallaRutina(usuarioMock);
+
         //verificacion
+        DatosRutina rutina = (DatosRutina) modelAndView.getModel().get("rutina");
+
         assertThat(modelAndView.getViewName(),equalTo("rutina"));
-        List<Rutina> rutinasObtenidas = (List<Rutina>) modelAndView.getModel().get("rutinas");
-        assertThat(rutinasObtenidas.size(),equalTo(3));
+        assertThat(rutina.getObjetivo(),equalTo(usuarioMock.getObjetivo()));
     }
+
+
 
 }
