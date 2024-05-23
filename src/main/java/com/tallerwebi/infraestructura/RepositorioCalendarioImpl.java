@@ -3,13 +3,13 @@ package com.tallerwebi.infraestructura;
 import com.tallerwebi.dominio.calendario.ItemRendimiento;
 import com.tallerwebi.dominio.calendario.RepositorioCalendario;
 import com.tallerwebi.dominio.calendario.TipoRendimiento;
+import com.tallerwebi.dominio.excepcion.ItemRendimientoDuplicadoException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 @Repository("repositorioCalendario")
@@ -22,16 +22,6 @@ public class RepositorioCalendarioImpl implements RepositorioCalendario {
         this.sessionFactory = sessionFactory;
     }
 
-    private List<ItemRendimiento> calendarioItems;
-
-    public RepositorioCalendarioImpl() {
-        this.calendarioItems = new ArrayList<>();
-        LocalDate fechaActual = LocalDate.now(); // Obtener fecha actual
-        calendarioItems.add(new ItemRendimiento(fechaActual, TipoRendimiento.DESCANSO));
-        calendarioItems.add(new ItemRendimiento(fechaActual, TipoRendimiento.DESCANSO));
-        calendarioItems.add(new ItemRendimiento(fechaActual, TipoRendimiento.DESCANSO));
-    }
-
     @Override
     public List<ItemRendimiento> obtenerItemsRendimiento() {
         return this.sessionFactory.getCurrentSession()
@@ -40,10 +30,52 @@ public class RepositorioCalendarioImpl implements RepositorioCalendario {
     }
 
     @Override
-    public ItemRendimiento guardar(ItemRendimiento dia) {
-        this.sessionFactory.getCurrentSession().save(dia);
-        return dia;
+    public void guardar(ItemRendimiento itemRendimiento) {
+        if (!existeItemRendimientoPorFecha(itemRendimiento.getFecha())) {
+            this.sessionFactory.getCurrentSession().save(itemRendimiento);
+        } else {
+            throw new ItemRendimientoDuplicadoException("No se puede guardar tu rendimiento más de una vez el mismo día.");
+        }
     }
+
+    @Override
+    public boolean existeItemRendimientoPorFecha(LocalDate fecha) {
+        String hql = "SELECT count(*) FROM ItemRendimiento WHERE fecha = :fecha";
+        Long count = this.sessionFactory.getCurrentSession()
+                .createQuery(hql, Long.class)
+                .setParameter("fecha", fecha)
+                .uniqueResult();
+        return count > 0;
+    }
+
+    @Override
+    public ItemRendimiento obtenerItemMasSeleccionado() {
+        String hql = "SELECT ir.tipoRendimiento, COUNT(ir) FROM ItemRendimiento ir " +
+                "WHERE ir.tipoRendimiento != :descanso " +
+                "GROUP BY ir.tipoRendimiento " +
+                "ORDER BY COUNT(ir) DESC";
+
+        List<Object[]> results = this.sessionFactory.getCurrentSession()
+                .createQuery(hql)
+                .setParameter("descanso", TipoRendimiento.DESCANSO)
+                .setMaxResults(1)
+                .getResultList();
+
+        if (results.isEmpty()) {
+            return null;
+        }
+        TipoRendimiento tipoRendimientoMasSeleccionado = (TipoRendimiento) results.get(0)[0];
+
+        hql = "FROM ItemRendimiento ir WHERE ir.tipoRendimiento = :tipoRendimiento ORDER BY ir.fecha DESC";
+        List<ItemRendimiento> items = this.sessionFactory.getCurrentSession()
+                .createQuery(hql, ItemRendimiento.class)
+                .setParameter("tipoRendimiento", tipoRendimientoMasSeleccionado)
+                .setMaxResults(1)
+                .getResultList();
+
+        return items.isEmpty() ? null : items.get(0);
+    }
+
 
     @Override
     public void vaciarCalendario() {
@@ -61,11 +93,6 @@ public class RepositorioCalendarioImpl implements RepositorioCalendario {
         this.sessionFactory.getCurrentSession().delete(dia);
     }
 
-    @Override
-    public ItemRendimiento buscar(long id) {
-        Session session = this.sessionFactory.getCurrentSession();
-        return session.get(ItemRendimiento.class, id);
-    }
 
     @Override
     public void actualizar(ItemRendimiento itemRendimiento) {

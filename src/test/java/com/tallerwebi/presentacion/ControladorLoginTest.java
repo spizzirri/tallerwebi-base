@@ -2,6 +2,9 @@ package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.ServicioLogin;
 import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.calendario.ItemRendimiento;
+import com.tallerwebi.dominio.calendario.ServicioCalendario;
+import com.tallerwebi.dominio.calendario.TipoRendimiento;
 import com.tallerwebi.dominio.excepcion.UsuarioExistente;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,7 +13,11 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import java.time.LocalDate;
+
+import static javax.swing.UIManager.get;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
 import static org.mockito.Mockito.*;
 
@@ -22,6 +29,8 @@ public class ControladorLoginTest {
 	private HttpServletRequest requestMock;
 	private HttpSession sessionMock;
 	private ServicioLogin servicioLoginMock;
+	private ServicioCalendario servicioCalendario;
+	private ItemRendimiento itemRendimiento;
 
 
 	@BeforeEach
@@ -102,4 +111,20 @@ public class ControladorLoginTest {
 		assertThat(modelAndView.getViewName(), equalToIgnoringCase("nuevo-usuario"));
 		assertThat(modelAndView.getModel().get("error").toString(), equalToIgnoringCase("Error al registrar el nuevo usuario"));
 	}
+
+	@Test
+	public void queSePuedaObtenerElItemRendimientoMasSeleccionado() throws Exception {
+		DatosItemRendimiento itemMasSeleccionado = new DatosItemRendimiento(LocalDate.now().minusDays(10), TipoRendimiento.ALTO);
+
+		when(servicioLoginMock.obtenerItemMasSeleccionado()).thenReturn(itemMasSeleccionado);
+
+		// Llamar directamente al método del controlador
+		ModelAndView modelAndView = controladorLogin.irAHome();
+
+		// Verificaciones
+		assertThat(modelAndView.getViewName(), equalToIgnoringCase("home"));
+		assertThat(modelAndView.getModel().containsKey("itemMasSeleccionado"), equalTo(true));
+		assertThat(modelAndView.getModel().get("itemMasSeleccionado"), equalTo(itemMasSeleccionado));
+	}
+
 }

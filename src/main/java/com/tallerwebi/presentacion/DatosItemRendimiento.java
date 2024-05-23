@@ -10,14 +10,18 @@ public class DatosItemRendimiento {
     private LocalDate fecha;
     private TipoRendimiento tipoRendimiento;
 
-    public DatosItemRendimiento(TipoRendimiento tipoRendimiento, LocalDate fecha) {
-        this.tipoRendimiento = tipoRendimiento;
+    public DatosItemRendimiento(LocalDate fecha, TipoRendimiento tipoRendimiento) {
         this.fecha = fecha;
+        this.tipoRendimiento = tipoRendimiento;
     }
 
     public DatosItemRendimiento(ItemRendimiento itemRendimiento) {
         this.tipoRendimiento = itemRendimiento.getTipoRendimiento();
         this.fecha = itemRendimiento.getFecha();
+    }
+
+    public DatosItemRendimiento() {
+
     }
 
     public LocalDate getFecha() {

@@ -2,17 +2,21 @@ package com.tallerwebi.dominio.calendario;
 
 import com.tallerwebi.presentacion.DatosItemRendimiento;
 
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 public interface RepositorioCalendario {
 
         List<ItemRendimiento> obtenerItemsRendimiento();
-        ItemRendimiento guardar(ItemRendimiento dia);
-        ItemRendimiento buscar(long id);
+        void guardar(ItemRendimiento dia);
+        List<ItemRendimiento> obtenerItemsPorTipoRendimiento(TipoRendimiento tipoRendimiento);
+        boolean existeItemRendimientoPorFecha(LocalDate fecha);
+        ItemRendimiento obtenerItemMasSeleccionado();
+
+        //nuevos a testear
         void actualizar(ItemRendimiento itemRendimiento);
         void vaciarCalendario();
-        //nuevos a testear
-        List<ItemRendimiento> obtenerItemsPorTipoRendimiento(TipoRendimiento tipoRendimiento);
         void eliminar(ItemRendimiento itemRendimiento);
 
 }

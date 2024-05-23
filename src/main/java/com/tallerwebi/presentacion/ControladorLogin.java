@@ -2,6 +2,9 @@ package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.ServicioLogin;
 import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.calendario.ItemRendimiento;
+import com.tallerwebi.dominio.calendario.ServicioCalendario;
+import com.tallerwebi.dominio.calendario.TipoRendimiento;
 import com.tallerwebi.dominio.excepcion.UsuarioExistente;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -10,6 +13,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -17,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 public class ControladorLogin {
 
     private ServicioLogin servicioLogin;
+    private ServicioCalendario servicioCalendario;
 
     @Autowired
     public ControladorLogin(ServicioLogin servicioLogin){
@@ -34,7 +39,6 @@ public class ControladorLogin {
     @RequestMapping(path = "/validar-login", method = RequestMethod.POST)
     public ModelAndView validarLogin(@ModelAttribute("datosLogin") DatosLogin datosLogin, HttpServletRequest request) {
         ModelMap model = new ModelMap();
-
         Usuario usuarioBuscado = servicioLogin.consultarUsuario(datosLogin.getEmail(), datosLogin.getPassword());
         if (usuarioBuscado != null) {
             request.getSession().setAttribute("ROL", usuarioBuscado.getRol());
@@ -44,6 +48,7 @@ public class ControladorLogin {
         }
         return new ModelAndView("login", model);
     }
+
 
     @RequestMapping(path = "/registrarme", method = RequestMethod.POST)
     public ModelAndView registrarme(@ModelAttribute("usuario") Usuario usuario) {
@@ -69,7 +74,15 @@ public class ControladorLogin {
 
     @RequestMapping(path = "/home", method = RequestMethod.GET)
     public ModelAndView irAHome() {
-        return new ModelAndView("home");
+        ModelAndView modelAndView = new ModelAndView("home");
+
+        // Obtener el ItemRendimiento más seleccionado
+        DatosItemRendimiento itemMasSeleccionado = servicioLogin.obtenerItemMasSeleccionado();
+
+        // Añadir el ItemRendimiento más seleccionado al modelo
+        modelAndView.addObject("itemMasSeleccionado", itemMasSeleccionado);
+
+        return modelAndView;
     }
 
     @RequestMapping(path = "/", method = RequestMethod.GET)

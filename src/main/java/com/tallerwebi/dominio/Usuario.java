@@ -1,11 +1,10 @@
 package com.tallerwebi.dominio;
 
+import com.tallerwebi.dominio.calendario.ItemRendimiento;
 import com.tallerwebi.dominio.objetivo.Objetivo;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class Usuario {
@@ -21,6 +20,19 @@ public class Usuario {
     private Boolean activo = false;
     private Objetivo objetivo;
     private Boolean isInstructor = false;
+
+    //relacion de usuario con itemRendimiento 1 - n --> bd
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<ItemRendimiento> itemsRendimiento;
+
+    public List<ItemRendimiento> getItemsRendimiento() {
+        return itemsRendimiento;
+    }
+
+    public void setItemsRendimiento(List<ItemRendimiento> itemsRendimiento) {
+        this.itemsRendimiento = itemsRendimiento;
+    }
+
     public Usuario() {
 
     }

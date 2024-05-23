@@ -1,11 +1,14 @@
 package com.tallerwebi.dominio.calendario;
 
+import com.tallerwebi.dominio.Usuario;
+
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
-//@Table(name = "itemrendimiento")
+@Table(name = "itemrendimiento")
 public class ItemRendimiento {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,16 +20,17 @@ public class ItemRendimiento {
     @Column(name = "tipoRendimiento", nullable = false)
     private TipoRendimiento tipoRendimiento;
 
+    LocalDate fechaActual = LocalDate.now(); // Obtener fecha actual
+
     public ItemRendimiento() {
     }
 
-    public ItemRendimiento(LocalDate fecha, TipoRendimiento tipoRendimiento) {
-        this.fecha = fecha;
+    public ItemRendimiento(TipoRendimiento tipoRendimiento) {
+        this.fecha = fechaActual;
         this.tipoRendimiento = tipoRendimiento;
     }
 
-    public ItemRendimiento(Long id, LocalDate fecha, TipoRendimiento tipoRendimiento) {
-        this.id = id;
+    public ItemRendimiento(LocalDate fecha, TipoRendimiento tipoRendimiento) {
         this.fecha = fecha;
         this.tipoRendimiento = tipoRendimiento;
     }

@@ -1,24 +1,35 @@
 package com.tallerwebi.presentacion;
 
-import com.tallerwebi.dominio.calendario.RepositorioCalendario;
-import com.tallerwebi.dominio.calendario.ServicioCalendario;
-import com.tallerwebi.dominio.calendario.ServicioCalendarioImpl;
+import com.tallerwebi.dominio.calendario.*;
+import com.tallerwebi.dominio.excepcion.ItemRendimientoDuplicadoException;
 import com.tallerwebi.infraestructura.RepositorioCalendarioImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.ModelAndView;
 import com.tallerwebi.dominio.calendario.ServicioCalendario;
+
+import java.time.LocalDate;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.equalToIgnoringCase;
-import static org.mockito.Mockito.mock;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 public class ControladorCalendarioTest {
 
   private ServicioCalendario servicioCalendario;
   private ControladorCalendario controladorCalendario;
-//  private RepositorioCalendario repositorioCalendario;
+
+    @Autowired
+    private MockMvc mockMvc;
 
     @BeforeEach
     public void init() {
@@ -36,33 +47,31 @@ public class ControladorCalendarioTest {
         assertThat(message, equalToIgnoringCase("¿Cómo fue tu entrenamiento hoy?"));//mensaje correcto
     }
 
-//    @Test
-//    public void queAlIrALaPantallaDeCalendarioMeMuestreLosTiposRendimientos(){
-//        ModelAndView modelAndView = this.controladorCalendario.mostrarTiposRendimientos();
-//        //mensaje
-//        String message = modelAndView.getModel().get("message").toString();
-//
-//        assertThat(modelAndView.getViewName(),equalTo("calendario"));//vista correcta
-//        assertThat(message, equalToIgnoringCase("¿Cmo fue tu entrenamiento hoy?"));//mensaje correcto
-//        assertThat(message, equalToIgnoringCase("¿Cómo fue tu entrenamiento hoy?"));//mensaje correcto
-//    }
+    @Test
+    public void queSeLogreGuardarUnItemRendimientoRedireccionandoHaciaVerProgreso() {
+        ItemRendimiento itemRendimiento = new ItemRendimiento(TipoRendimiento.DESCANSO);
 
+        ModelAndView modelAndView = controladorCalendario.verProgreso(itemRendimiento);
 
-//    @Test
-//    public void queSeMuestreElTipoDeRendimientoSeleccionado() throws Exception {
-//        //preparacion
-//        ModelAndView modelAndView = new ModelAndView();
-//        MockHttpServletRequest request = new MockHttpServletRequest();
-//        MockHttpServletResponse response = new MockHttpServletResponse();
-//
-//        //ejecucion
-//        request.setParameter("tipoRendimiento", "ALTO");
-//        controladorCalendario.seleccionarTipoRendimiento(request, response, modelAndView);
-//
-//        //verficacion
-//        Map<String, Object> model = modelAndView.getModel();
-//        assertThat(model.get("tipoRendimientoSeleccionado"), equalTo("ALTO"));
-//    }
+        verify(servicioCalendario).guardarItemRendimiento(itemRendimiento);
 
+        ModelMap model = modelAndView.getModelMap();
+        assertEquals("redirect:/verProgreso", modelAndView.getViewName());
+    }
+
+    @Test
+    public void queAlGuardarMasDeUnaVezUnItemRendimientoElMismoDiaAparezcaLaExcepcion() throws Exception {
+        ItemRendimiento itemRendimiento = new ItemRendimiento();
+        itemRendimiento.setFecha(LocalDate.now());
+        doThrow(new ItemRendimientoDuplicadoException("No se puede guardar tu rendimiento más de una vez el mismo día."))
+                .when(servicioCalendario)
+                .guardarItemRendimiento(itemRendimiento);
+
+        ModelAndView modelAndView = controladorCalendario.verProgreso(itemRendimiento);
+
+        assertEquals("calendario", modelAndView.getViewName());
+        assertTrue(modelAndView.getModel().containsKey("error"));
+        assertEquals("No se puede guardar tu rendimiento más de una vez el mismo día.", modelAndView.getModel().get("error"));
+    }
 
 }
