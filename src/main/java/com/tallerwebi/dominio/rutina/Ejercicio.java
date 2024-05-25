@@ -2,6 +2,7 @@ package com.tallerwebi.dominio.rutina;
 
 import com.tallerwebi.dominio.objetivo.GrupoMuscularObjetivo;
 import com.tallerwebi.dominio.objetivo.Objetivo;
+import org.springframework.validation.ObjectError;
 
 import javax.persistence.*;
 
@@ -13,9 +14,10 @@ public class Ejercicio {
     private Long idEjercicio;
 
     private String nombre;
-    @Column(length = 100, nullable = false)
+
     private String descripcion;
     private GrupoMuscularObjetivo grupoMuscularObjetivo;
+    @Enumerated(EnumType.STRING)
     private Objetivo objetivo;
     private TipoEjercicio tipoEjercicio;
 
@@ -23,6 +25,16 @@ public class Ejercicio {
 
     private Integer repeticiones;
 
+    public Ejercicio(String nombre, Objetivo objetivo, GrupoMuscularObjetivo grupoMuscularObjetivo, Integer series, Integer repeticiones){
+        this.nombre = nombre;
+        this.objetivo = objetivo;
+        this.grupoMuscularObjetivo = grupoMuscularObjetivo;
+        this.series = series;
+        this.repeticiones = repeticiones;
+    }
+    public Ejercicio(){
+
+    }
 
     public String getNombre() {
         return nombre;

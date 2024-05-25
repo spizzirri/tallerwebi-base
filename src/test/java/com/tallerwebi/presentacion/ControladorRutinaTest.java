@@ -7,12 +7,12 @@ import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.rutina.Rutina;
 import com.tallerwebi.dominio.rutina.ServicioRutina;
-import com.tallerwebi.dominio.rutina.ServicioRutinaImpl;
-import com.tallerwebi.infraestructura.RepositorioRutinaImpl;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -27,9 +27,8 @@ public class ControladorRutinaTest {
 
     @BeforeEach
     public void init() {
-        this.usuarioMock = mock(Usuario.class);
         this.servicioRutina = mock(ServicioRutina.class);
-        this.controladorRutina = new ControladorRutina(this.servicioRutina);
+        this.controladorRutina = new ControladorRutina(servicioRutina);
     }
 
     @Test
@@ -39,21 +38,28 @@ public class ControladorRutinaTest {
     }
 
     @Test
-    public void queAlIrALaPantallaDeRutinaSeMuestreLaVistaConUnaRutinaParaElUsuario(){
+    public void QueAlIrALaVistaRutinasMeMuestreRutinasRelacionadasAMiObjetivo(){
         //preparacion
-        Usuario usuarioMock = new Usuario("Lautaro", Objetivo.PERDIDA_DE_PESO);
-        DatosRutina datosRutinaMock = new DatosRutina(new Rutina("ADELGAZAR",Objetivo.PERDIDA_DE_PESO));
+        usuarioMock = new Usuario("Lautaro", Objetivo.PERDIDA_DE_PESO);
 
-        when(this.servicioRutina.getRutinaParaUsuario(usuarioMock)).thenReturn(datosRutinaMock);
+        DatosRutina datosRutinaMock1 = new DatosRutina(new Rutina("Rutina de correr",Objetivo.PERDIDA_DE_PESO));
+        DatosRutina datosRutinaMock2 = new DatosRutina(new Rutina("Rutina de trotar",Objetivo.PERDIDA_DE_PESO));
+        DatosRutina datosRutinaMock3 = new DatosRutina(new Rutina("Rutina de caminar",Objetivo.PERDIDA_DE_PESO));
+        List<DatosRutina> datosRutinasMock = new ArrayList<>();
+        datosRutinasMock.add(datosRutinaMock1);
+        datosRutinasMock.add(datosRutinaMock2);
+        datosRutinasMock.add(datosRutinaMock3);
+
+        when(this.servicioRutina.getRutinasPorObjetivoDeUsuario(usuarioMock)).thenReturn(datosRutinasMock);
 
         //ejecucion
-        ModelAndView modelAndView = this.controladorRutina.VerUnaRutinaEnLaPantallaRutina(usuarioMock);
+        ModelAndView modelAndView = this.controladorRutina.VerRutinasQueLeInteresanAlUsuario(usuarioMock);
 
         //verificacion
-        DatosRutina rutina = (DatosRutina) modelAndView.getModel().get("rutina");
+        List<DatosRutina> rutinasObtenidas = (List<DatosRutina>) modelAndView.getModel().get("rutinas");
 
-        assertThat(modelAndView.getViewName(),equalTo("rutina"));
-        assertThat(rutina.getObjetivo(),equalTo(usuarioMock.getObjetivo()));
+        assertThat(modelAndView.getViewName(),equalTo("rutinas"));
+        assertThat(rutinasObtenidas.size(),equalTo(3));
     }
 
 

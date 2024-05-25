@@ -12,6 +12,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
@@ -23,7 +24,7 @@ public class ControladorRutina {
 
     @Autowired
     public ControladorRutina(ServicioRutina servicioRutina) {
-        this.servicioRutina = (ServicioRutinaImpl)servicioRutina;
+        this.servicioRutina = servicioRutina;
     }
 
     @RequestMapping(path = "/rutina", method = RequestMethod.GET)
@@ -53,6 +54,19 @@ public class ControladorRutina {
         return new ModelAndView("rutina", model);
 
     }
+
+    @RequestMapping(path = "/rutinas", method = RequestMethod.GET)
+    public ModelAndView VerRutinasQueLeInteresanAlUsuario(Usuario usuario) {
+        ModelAndView modelAndView = new ModelAndView("rutinas");
+
+        List<DatosRutina> rutinas = this.servicioRutina.getRutinasPorObjetivoDeUsuario(usuario);
+
+        modelAndView.addObject("rutinas", rutinas);
+
+        return modelAndView;
+
+    }
+
 
 }
 

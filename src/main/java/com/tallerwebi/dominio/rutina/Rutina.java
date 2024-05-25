@@ -1,5 +1,6 @@
 package com.tallerwebi.dominio.rutina;
 
+import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.objetivo.Objetivo;
 
 import javax.persistence.*;
@@ -15,20 +16,20 @@ public class Rutina {
 
     private String nombre;
 
+    @Enumerated(EnumType.STRING)
     private Objetivo objetivo;
 
-    @OneToMany
+    @ManyToMany
     private List<Ejercicio> ejercicios = new ArrayList<>();
 
+    public Rutina() {
+
+    }
 
     public Rutina(String nombre, Objetivo objetivo) {
         this.nombre = nombre;
         this.objetivo = objetivo;
         this.ejercicios = new ArrayList<>();
-    }
-
-    public Rutina() {
-
     }
 
     public Long getIdRutina() {
