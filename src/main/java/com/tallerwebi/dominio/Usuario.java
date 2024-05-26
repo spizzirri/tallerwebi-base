@@ -2,6 +2,7 @@ package com.tallerwebi.dominio;
 
 import com.tallerwebi.dominio.calendario.ItemRendimiento;
 import com.tallerwebi.dominio.objetivo.Objetivo;
+import com.tallerwebi.dominio.reto.Reto;
 
 import javax.persistence.*;
 import java.util.List;
@@ -31,6 +32,18 @@ public class Usuario {
 
     public void setItemsRendimiento(List<ItemRendimiento> itemsRendimiento) {
         this.itemsRendimiento = itemsRendimiento;
+    }
+
+    //relacion de usuario con reto 1 - n --> bd
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Reto> retos;
+
+    public List<Reto> getRetos() {
+        return retos;
+    }
+
+    public void setRetos(List<Reto> retos) {
+        this.retos = retos;
     }
 
     public Usuario() {

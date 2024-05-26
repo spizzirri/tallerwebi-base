@@ -11,7 +11,7 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class ControladorPerfil{
 
-    private ServicioPerfil servicioPerfil;
+    private final ServicioPerfil servicioPerfil;
 
     @Autowired
     public ControladorPerfil(ServicioPerfil servicioPerfil) {

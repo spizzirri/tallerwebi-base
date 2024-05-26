@@ -12,7 +12,7 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class ControladorRutina {
 
-    private ServicioRutina servicioRutina;
+    private final ServicioRutina servicioRutina;
 
     @Autowired
     public ControladorRutina(ServicioRutina servicioRutina) {

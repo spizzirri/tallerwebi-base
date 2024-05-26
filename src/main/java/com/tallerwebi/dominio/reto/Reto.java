@@ -6,17 +6,21 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
+@Table(name = "reto")
 public class Reto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     @Column(name = "nombre" ,nullable = false)
     private String nombre;
 
     @Column(name = "descripcion" ,nullable = false)
     private String descripcion;
+
+    @Column(name = "seleccionado", nullable = false)
+    private boolean seleccionado;
 
     public Reto() {
     }
@@ -25,14 +29,15 @@ public class Reto {
     public Reto(String nombre, String descripcion) {
         this.nombre = nombre;
         this.descripcion = descripcion;
+        this.seleccionado = false;
     }
 
     // Getters y setters
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -52,4 +57,19 @@ public class Reto {
         this.descripcion = descripcion;
     }
 
+    public boolean isSeleccionado() {
+        return seleccionado;
+    }
+
+    public void setSeleccionado(boolean seleccionado) {
+        this.seleccionado = seleccionado;
+    }
+
+    @Override
+    public String toString() {
+        return "Reto{" +
+                "nombre='" + nombre + '\'' +
+                ", descripcion='" + descripcion + '\'' +
+                '}';
+    }
 }
