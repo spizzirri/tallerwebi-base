@@ -19,6 +19,9 @@ public class Reto {
     @Column(name = "descripcion" ,nullable = false)
     private String descripcion;
 
+    @Column(name = "imagen_url", nullable = false) // URL de la imagen
+    private String imagenUrl;
+
     @Column(name = "seleccionado", nullable = false)
     private boolean seleccionado;
 
@@ -26,9 +29,10 @@ public class Reto {
     }
 
     // Constructor con parámetros
-    public Reto(String nombre, String descripcion) {
+    public Reto(String nombre, String descripcion, String imagenUrl) {
         this.nombre = nombre;
         this.descripcion = descripcion;
+        this.imagenUrl = imagenUrl;
         this.seleccionado = false;
     }
 
@@ -55,6 +59,14 @@ public class Reto {
 
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
+    }
+
+    public String getImagenUrl() {
+        return imagenUrl;
+    }
+
+    public void setImagenUrl(String imagenUrl) {
+        this.imagenUrl = imagenUrl;
     }
 
     public boolean isSeleccionado() {

@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -122,26 +122,18 @@
         <p>Nombre: <span th:text="${retoDisponible.nombre}">Nombre del Reto</span></p>
         <p>Descripción: <span th:text="${retoDisponible.descripcion}">Descripción del Reto</span></p>
     </div>
-    <div id="carouselExampleInterval" class="carousel slide" data-bs-ride="carousel">
-        <div class="carousel-inner">
-            <div class="carousel-item active" data-bs-interval="10000">
-                <img src="..." class="d-block w-100" alt="...">
+    <div class="reto-cards">
+        <article class="reto-card">
+            <figure class="reto-image">
+                <img th:src="${retoDisponible.imagenUrl}" alt="Reto Disponible">
+            </figure>
+            <div class="reto-preview">
+                <h2><span th:text="${retoDisponible.nombre}"></span></h2>
+                <p>
+                    <span th:text="${retoDisponible.descripcion}"></span>
+                </p>
             </div>
-            <div class="carousel-item" data-bs-interval="2000">
-                <img src="..." class="d-block w-100" alt="...">
-            </div>
-            <div class="carousel-item">
-                <img src="..." class="d-block w-100" alt="...">
-            </div>
-        </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleInterval" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Previous</span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleInterval" data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Next</span>
-        </button>
+        </article>
     </div>
 </main>
 <div class="featured-section">
