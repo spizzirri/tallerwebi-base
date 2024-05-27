@@ -20,22 +20,36 @@ public class RepositorioRetoImpl implements RepositorioReto {
     }
 
     @Override
-    public Reto obtenerYMarcarReto() {
+    public Reto obtenerReto() {
+//        Session session = this.sessionFactory.getCurrentSession();
+//        // Obtener un reto aleatorio que no haya sido seleccionado
+//        String hql = "FROM Reto WHERE seleccionado = false ORDER BY rand()";
+//        Query<Reto> query = session.createQuery(hql, Reto.class).setMaxResults(1);
+//        Reto reto = query.uniqueResult();
+//        return reto;
         Session session = this.sessionFactory.getCurrentSession();
-        // Obtener un reto aleatorio que no haya sido seleccionado
-        String hql = "FROM Reto WHERE seleccionado = false ORDER BY rand()";
-        Query<Reto> query = session.createQuery(hql, Reto.class).setMaxResults(1);
-        Reto reto = query.uniqueResult();
-
-        if (reto != null) {
-            // Marcar el reto como seleccionado
-            reto.setSeleccionado(true);
-            session.update(reto);
+        Reto reto = null;
+        boolean retoEncontrado = false;
+        while (!retoEncontrado) {
+            // Obtener un reto aleatorio que no haya sido seleccionado
+            String hql = "FROM Reto WHERE seleccionado = false ORDER BY rand()";
+            Query<Reto> query = session.createQuery(hql, Reto.class).setMaxResults(1);
+            reto = query.uniqueResult();
+            if (reto != null) {
+                retoEncontrado = true;
+            }
         }
-
         return reto;
     }
 
-
+    @Override
+    public void empezarReto(Long retoId) {
+        Session session = this.sessionFactory.getCurrentSession();
+        Reto reto = session.get(Reto.class, retoId);
+        if (reto != null) {
+            reto.setSeleccionado(true); // Marcar como seleccionado
+            session.update(reto);
+        }
+    }
 
 }

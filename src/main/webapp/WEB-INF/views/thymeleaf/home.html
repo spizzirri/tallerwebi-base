@@ -74,6 +74,8 @@
     .btn {
         padding: 8px 16px;
     }
+
+
 }
     </style>
 </head>
@@ -118,21 +120,71 @@
         <p class="main-text">Sed rutrum odio sit amet metus consequat, ut pulvinar ex efficitur. Curabitur pretium, urna sit amet fringilla molestie, neque odio eleifend mi, nec fermentum urna est vitae lectus.</p>
         <a href="#" class="main-btn">Descubre más</a>
     </div>
-    <div style="color: white;">
-        <h2>Reto Disponible</h2>
-        <p>Nombre: <span th:text="${retoDisponible.nombre}">Nombre del Reto</span></p>
-        <p>Descripción: <span th:text="${retoDisponible.descripcion}">Descripción del Reto</span></p>
-    </div>
-    <div class="reto-cards">
+    <script>
+        function empezarReto(retoId) {
+            fetch('/empezar-reto?retoId=' + retoId)
+                .then(response => response.text())
+                .then(data => {
+                    if (data === "El reto ha comenzado con éxito.") {
+                        document.getElementById('btn-empezar').style.display = 'none';
+                        document.getElementById('btn-terminado').style.display = 'inline-block';
+                    } else {
+                        alert('Error al iniciar el reto.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error al iniciar el reto.');
+                });
+        }
+
+    </script>
+    <div class="reto-cards" style="display: flex; align-items: center; flex-direction: column; justify-content: center; margin-top: 3.5rem; margin-bottom:2rem;">
+        <h2 style="padding: 1rem; margin-bottom:0rem !important; color: white;">Retos Diarios</h2>
         <article class="reto-card">
-            <figure class="reto-image">
+            <figure class="reto-image" style="margin: 0rem !important">
                 <img th:src="${retoDisponible.imagenUrl}" alt="Reto Disponible">
             </figure>
             <div class="reto-preview">
-                <h2><span th:text="${retoDisponible.nombre}"></span></h2>
-                <p>
-                    <span th:text="${retoDisponible.descripcion}"></span>
-                </p>
+                <h2 style="text-align:center;"><span th:text="${retoDisponible.nombre}"></span></h2>
+                <p><span th:text="${retoDisponible.descripcion}"></span></p>
+<!--                <a href="" class="main-btn" id="btn-empezar" th:if="${!retoDisponible.seleccionado}" th:onclick="'empezarReto(' + ${retoDisponible.id} + ')'">Empezar</a>-->
+<!--                <a href="#" id="btn-terminado" class="main-btn" th:if="${retoDisponible.seleccionado}" style="display: none;">Terminado</a>-->
+                <a href="#" class="main-btn" id="btn-empezar" style="display: none;">Empezar</a>
+                <a href="#" id="btn-terminado" class="main-btn" style="display: none;">Terminado</a>
+
+<!--                <script>-->
+<!--                    function toggleBotones(retoSeleccionado) {-->
+<!--                        if (retoSeleccionado) {-->
+<!--                            // Si el reto está seleccionado, ocultar el botón de "Empezar" y mostrar el botón de "Terminado"-->
+<!--                            document.getElementById('btn-empezar').style.display = 'none';-->
+<!--                            document.getElementById('btn-terminado').style.display = 'inline-block';-->
+<!--                        } else {-->
+<!--                            // Si el reto no está seleccionado, mostrar el botón de "Empezar" y ocultar el botón de "Terminado"-->
+<!--                            document.getElementById('btn-empezar').style.display = 'inline-block';-->
+<!--                            document.getElementById('btn-terminado').style.display = 'none';-->
+<!--                        }-->
+<!--                    }-->
+
+<!--                    // Función para obtener el estado actual del reto del servidor-->
+<!--                    function obtenerEstadoReto() {-->
+<!--                        fetch('/spring/home')-->
+<!--                            .then(response => response.json())-->
+<!--                            .then(data => {-->
+<!--                                // Llamar a la función toggleBotones con el estado del reto-->
+<!--                                toggleBotones(data.retoSeleccionado);-->
+<!--                            })-->
+<!--                            .catch(error => {-->
+<!--                                console.error('Error al obtener el estado del reto:', error);-->
+<!--                            });-->
+<!--                    }-->
+
+<!--                    // Llamar a obtenerEstadoReto inicialmente-->
+<!--                    obtenerEstadoReto();-->
+
+<!--                    // Realizar una solicitud cada 5 segundos para actualizar el estado del reto-->
+<!--                    setInterval(obtenerEstadoReto, 5000); // Cambia 5000 a la cantidad de milisegundos entre cada solicitud (en este caso, 5 segundos)-->
+<!--                </script>-->
             </div>
         </article>
     </div>
@@ -166,6 +218,9 @@
         <p>Descubre cómo mejorar tu salud y alcanzar tus metas fitness con nuestro dieta personalizado.</p>
         <a href="#" class="main-btn">Inscribirse</a>
     </div>
+</div>
+<div id="reto-circulo" class="reto-circulo" style="position: fixed; bottom: 1rem; right: 1rem;">
+    <img id="reto-circulo-img" th:src="@{/img/retoActivo.png}" alt="Reto en progreso" style="border-radius: 50%; width: 100px; height: 80px; border: 1px solid black;">
 </div>
 <!-- Bootstrap CSS -->
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">

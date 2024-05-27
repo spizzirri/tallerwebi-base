@@ -563,13 +563,15 @@ body-calendario {
     font-size: 1.2em;
 }
 
-.reto-cards {
+.reto-container {
     display: flex;
     flex-wrap: wrap;
     margin: 0 auto;
     justify-content: center;
     max-width: 1200px;
     gap: 1.5rem;
+    flex-direction: column; /* Cambia a 'row', 'column-reverse' o 'row-reverse' según sea necesario */
+    width:100%;
 }
 
 .reto-card {
@@ -608,12 +610,30 @@ body-calendario {
 .reto-preview {
     padding: 1.5rem;
     background: white;
+    display: flex;
+        align-items: center;
+        flex-direction: column;
+        justify-content: center;
 }
 
 .reto-image {
     width: 100%;
     height: 14rem;
     overflow: hidden;
+}
+
+.reto-circulo {
+    height: 80px;
+    background-color: black;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hidden {
+    display: none !important;
 }
 
 .footer {

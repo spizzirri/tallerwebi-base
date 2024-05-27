@@ -10,6 +10,7 @@ import com.tallerwebi.dominio.reto.ServicioReto;
 import com.tallerwebi.dominio.reto.ServicioRetoImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
@@ -39,7 +40,7 @@ public class ServicioRetoTest {
         retoMock.setSeleccionado(false);
 
         // Configurar el mock para que devuelva el reto de ejemplo y marcarlo como seleccionado
-        when(repositorioReto.obtenerYMarcarReto()).thenAnswer(invocation -> {
+        when(repositorioReto.obtenerReto()).thenAnswer(invocation -> {
             retoMock.setSeleccionado(true);
             return retoMock;
         });
@@ -55,7 +56,18 @@ public class ServicioRetoTest {
         assertTrue(retoObtenido.isSeleccionado(), "El reto debería estar marcado como seleccionado");
 
         // Verificar que se llamó al método del repositorio
-        verify(repositorioReto, times(1)).obtenerYMarcarReto();
+        verify(repositorioReto, times(1)).obtenerReto();
     }
+
+    @Test
+    public void queAlEmpezarRetoSeLlameAlMetodo() {
+        Long retoId = 123L;
+        servicioReto.empezarReto(retoId);
+        // Verificar que el método empezarReto del repositorio fue invocado con el retoId correcto
+        Mockito.verify(repositorioReto, Mockito.times(1)).empezarReto(retoId);
+    }
+
+
+
 
 }

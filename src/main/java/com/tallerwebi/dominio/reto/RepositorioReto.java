@@ -4,6 +4,7 @@ import com.tallerwebi.dominio.calendario.ItemRendimiento;
 
 public interface RepositorioReto {
 
-    Reto obtenerYMarcarReto();
+    Reto obtenerReto();
+    void empezarReto(Long retoId);
 
 }

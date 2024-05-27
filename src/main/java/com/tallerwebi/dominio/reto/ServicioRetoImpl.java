@@ -1,6 +1,5 @@
 package com.tallerwebi.dominio.reto;
 
-import com.tallerwebi.dominio.calendario.RepositorioCalendario;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -17,8 +16,12 @@ public class ServicioRetoImpl implements ServicioReto{
 
     @Override
     public Reto obtenerRetoDisponible() {
-        return repositorioReto.obtenerYMarcarReto();
+        return repositorioReto.obtenerReto();
     }
 
+    @Override
+    public void empezarReto(Long retoId) {
+        repositorioReto.empezarReto(retoId);
+    }
 
 }
