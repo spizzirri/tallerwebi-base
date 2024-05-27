@@ -1,5 +1,4 @@
 package com.tallerwebi.dominio.rutina;
-
 import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.excepcion.UsuarioSinRutinasException;
 import com.tallerwebi.dominio.objetivo.Objetivo;
@@ -47,6 +46,7 @@ public class ServicioRutinaImpl implements ServicioRutina {
             return rutinas;
         }else {
             throw new UsuarioSinRutinasException();
+
         }
     }
 
@@ -92,6 +92,5 @@ public class ServicioRutinaImpl implements ServicioRutina {
         DatosRutina datosRutina = new DatosRutina(rutina);
         return datosRutina;
     }
-
 
 }

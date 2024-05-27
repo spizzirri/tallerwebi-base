@@ -19,7 +19,7 @@ import java.util.List;
 @Controller
 public class ControladorCalendario {
 
-    private ServicioCalendario servicioCalendario;
+    private final ServicioCalendario servicioCalendario;
 
     @Autowired
     public ControladorCalendario(ServicioCalendario servicioCalendario) {

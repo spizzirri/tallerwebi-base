@@ -20,7 +20,7 @@ import java.util.List;
 @Controller
 public class ControladorRutina {
 
-    private ServicioRutina servicioRutina;
+    private final ServicioRutina servicioRutina;
 
     @Autowired
     public ControladorRutina(ServicioRutina servicioRutina) {

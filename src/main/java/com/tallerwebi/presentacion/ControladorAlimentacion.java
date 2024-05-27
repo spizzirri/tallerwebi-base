@@ -1,6 +1,5 @@
 package com.tallerwebi.presentacion;
-
-import com.tallerwebi.dominio.perfil.ServicioPerfil;
+import com.tallerwebi.dominio.alimentacion.ServicioAlimentacion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -9,18 +8,18 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 @Controller
-public class ControladorPerfil{
+public class ControladorAlimentacion{
 
-    private final ServicioPerfil servicioPerfil;
+    private final ServicioAlimentacion servicioAlimentacion;
 
     @Autowired
-    public ControladorPerfil(ServicioPerfil servicioPerfil) {
-        this.servicioPerfil = servicioPerfil;
+    public ControladorAlimentacion(ServicioAlimentacion servicioAlimentacion) {
+        this.servicioAlimentacion = servicioAlimentacion;
     }
 
-    @RequestMapping(path = "/perfil", method = RequestMethod.GET)
-    public ModelAndView irPerfil() {
-        String viewName = "perfil";
+    @RequestMapping(path = "/alimentacion", method = RequestMethod.GET)
+    public ModelAndView irAlimentacion() {
+        String viewName = "alimentacion";
         ModelMap model = new ModelMap();
         return new ModelAndView(viewName, model);
     }

@@ -6,6 +6,8 @@ import com.tallerwebi.dominio.calendario.ItemRendimiento;
 import com.tallerwebi.dominio.calendario.ServicioCalendario;
 import com.tallerwebi.dominio.calendario.TipoRendimiento;
 import com.tallerwebi.dominio.excepcion.UsuarioExistente;
+import com.tallerwebi.dominio.reto.Reto;
+import com.tallerwebi.dominio.reto.ServicioReto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -20,8 +22,9 @@ import javax.servlet.http.HttpServletRequest;
 @Controller
 public class ControladorLogin {
 
-    private ServicioLogin servicioLogin;
+    private final ServicioLogin servicioLogin;
     private ServicioCalendario servicioCalendario;
+    private ServicioReto servicioReto;
 
     @Autowired
     public ControladorLogin(ServicioLogin servicioLogin){
@@ -82,6 +85,12 @@ public class ControladorLogin {
 
         // Añadir el ItemRendimiento más seleccionado al modelo
         modelAndView.addObject("itemMasSeleccionado", itemMasSeleccionado);
+
+        // Obtener un reto disponible desde el servicio
+        Reto retoDisponible = servicioLogin.obtenerRetoDisponible();
+
+        // Añadir el reto disponible al modelo
+        modelAndView.addObject("retoDisponible", retoDisponible);
 
         return modelAndView;
     }
