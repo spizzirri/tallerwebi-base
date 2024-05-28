@@ -12,7 +12,6 @@
     <link rel="stylesheet" th:href="@{/css/main.css}"/>
     <!-- Enlace al archivo de estilos de Font Awesome -->
     <link rel="stylesheet" th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css}">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         .container-featured{
         max-width: 1200px;
@@ -107,7 +106,7 @@
     <section style="width:100%; display:flex; justify-content:center;">
         <a th:href= "@{/verProgreso}" style="width:80%;">
             <article class="progreso-container">
-                <p>Progreso
+                <p th:if="${itemMasSeleccionado != null}">Progreso
                     <span th:text="${itemMasSeleccionado.tipoRendimiento}">
             </span>
                 </p>
@@ -121,45 +120,27 @@
         <p class="main-text">Sed rutrum odio sit amet metus consequat, ut pulvinar ex efficitur. Curabitur pretium, urna sit amet fringilla molestie, neque odio eleifend mi, nec fermentum urna est vitae lectus.</p>
         <a href="#" class="main-btn">Descubre más</a>
     </div>
+    <div th:if="${error}">
+        <p th:text="${error}"></p>
+    </div>
     <div class="reto-cards" style="display: flex; align-items: center; flex-direction: column; justify-content: center; margin-top: 3.5rem; margin-bottom:2rem;">
         <h2 style="padding: 1rem; margin-bottom:0rem !important; color: white;">Retos Diarios</h2>
         <article class="reto-card">
             <figure class="reto-image" style="margin: 0rem !important">
-                <img th:src="${retoDisponible.imagenUrl}" alt="Reto Disponible">
+                <img th:src="@{${retoDisponible.imagenUrl}}" alt="Reto Disponible">
             </figure>
             <div class="reto-preview">
                 <h2 style="text-align:center;"><span th:text="${retoDisponible.nombre}"></span></h2>
                 <p><span th:text="${retoDisponible.descripcion}"></span></p>
-                <a href="javascript:void(0);" class="main-btn" id="btn-empezar"
-                   th:if="${!retoDisponible.seleccionado}"
-                   th:data-reto-id="${retoDisponible.id}">
-                    Empezar
-                </a>
-                <a href="javascript:void(0);" id="btn-terminado" class="main-btn"
-                   th:if="${retoDisponible.seleccionado}">
+
+                <form th:action="@{/empezar-reto}" method="post" th:if="${!retoDisponible.seleccionado}">
+                    <input type="hidden" name="retoId" th:value="${retoDisponible.id}" />
+                    <button type="submit" class="main-btn">Empezar</button>
+                </form>
+
+                <a href="javascript:void(0);" id="btn-terminado" class="main-btn" th:if="${retoDisponible.seleccionado}">
                     Terminado
                 </a>
-                <script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        document.getElementById('btn-empezar').addEventListener('click', function() {
-                            var retoId = this.getAttribute('data-reto-id');
-                            fetch(`/home/empezar-reto?retoId=${retoId}`, {
-                                method: 'GET'
-                            })
-                            .then(response => {
-                                if (response.ok) {
-                                    document.getElementById('btn-empezar').style.display = 'none';
-                                    document.getElementById('btn-terminado').style.display = 'block';
-                                } else {
-                                    alert('An error occurred: ' + response.statusText);
-                                }
-                            })
-                            .catch(error => {
-                                alert('An error occurred: ' + error);
-                            });
-                        });
-                    });
-                </script>
             </div>
         </article>
     </div>

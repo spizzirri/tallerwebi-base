@@ -6,6 +6,7 @@ import com.tallerwebi.dominio.calendario.ItemRendimiento;
 import com.tallerwebi.dominio.calendario.ServicioCalendario;
 import com.tallerwebi.dominio.calendario.TipoRendimiento;
 import com.tallerwebi.dominio.excepcion.UsuarioExistente;
+import com.tallerwebi.dominio.reto.ServicioReto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.servlet.ModelAndView;
@@ -20,6 +21,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 
 public class ControladorLoginTest {
 
@@ -31,7 +35,7 @@ public class ControladorLoginTest {
 	private ServicioLogin servicioLoginMock;
 	private ServicioCalendario servicioCalendario;
 	private ItemRendimiento itemRendimiento;
-
+	private ServicioReto servicioReto;
 
 	@BeforeEach
 	public void init(){
@@ -126,6 +130,7 @@ public class ControladorLoginTest {
 		assertThat(modelAndView.getModel().containsKey("itemMasSeleccionado"), equalTo(true));
 		assertThat(modelAndView.getModel().get("itemMasSeleccionado"), equalTo(itemMasSeleccionado));
 	}
+
 
 
 
