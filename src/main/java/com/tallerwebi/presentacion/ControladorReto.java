@@ -36,7 +36,7 @@ public class ControladorReto {
             modelAndView.addObject("itemMasSeleccionado", itemMasSeleccionado);
 
             // Añadir retoDisponible al modelo
-            Reto retoDisponible = servicioReto.obtenerRetoDisponible();
+            Reto retoDisponible = servicioReto.obtenerRetoPorId(retoId);
             modelAndView.addObject("retoDisponible", retoDisponible);
 
         } catch (Exception e) {

@@ -6,5 +6,7 @@ public interface ServicioReto {
 
     Reto obtenerRetoDisponible();
     void empezarReto(Long retoId);
+    Reto obtenerRetoPorId(Long retoId);
 
+    
 }

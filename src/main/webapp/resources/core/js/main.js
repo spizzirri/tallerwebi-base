@@ -36,5 +36,26 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-//reto
+document.addEventListener("DOMContentLoaded", function() {
+    // Obtén el botón de empezar y el botón terminado
+    const btnEmpezar = document.getElementById("btn-empezar");
+    const btnTerminado = document.getElementById("btn-terminado");
+
+    // Función para manejar el evento de clic en el botón de empezar
+    btnEmpezar.addEventListener("click", function(event) {
+        // Evita que el formulario se envíe automáticamente
+        event.preventDefault();
+
+        // Verifica si el valor del botón es 'false'
+        if (btnEmpezar.value === 'false') {
+            // Oculta el formulario de empezar y muestra el botón de terminado
+            document.getElementById("form-empezar").style.display = "none";
+            btnTerminado.style.display = "inline-block";
+        }
+    });
+});
+
+
+
+
 

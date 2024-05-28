@@ -67,6 +67,26 @@ public class ServicioRetoTest {
         Mockito.verify(repositorioReto, Mockito.times(1)).empezarReto(retoId);
     }
 
+    @Test
+    public void queVerifiqueQueSePuedeObtenerRetoPorId() {
+        // Crear un reto simulado
+        Reto retoSimulado = new Reto();
+        retoSimulado.setId(1L);
+        retoSimulado.setDescripcion("Descripción del reto");
+        retoSimulado.setSeleccionado(true);
+
+        // Configurar el comportamiento simulado del repositorio
+        when(repositorioReto.obtenerRetoPorId(anyLong())).thenReturn(retoSimulado);
+
+        // Llamar al método del servicio
+        Reto retoObtenido = servicioReto.obtenerRetoPorId(1L);
+
+        // Verificar los resultados
+        assertNotNull(retoObtenido, "El reto obtenido no debería ser nulo");
+        assertEquals(1L, retoObtenido.getId(), "El ID del reto obtenido debería ser 1");
+        assertEquals("Descripción del reto", retoObtenido.getDescripcion(), "La descripción del reto debería ser 'Descripción del reto'");
+        assertEquals(true, retoObtenido.isSeleccionado(), "El reto debería estar marcado como seleccionado");
+    }
 
 
 
