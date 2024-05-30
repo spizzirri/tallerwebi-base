@@ -1,36 +1,51 @@
 package com.tallerwebi.presentacion;
 
+import com.tallerwebi.dominio.ServicioLogin;
 import com.tallerwebi.dominio.reto.Reto;
 import com.tallerwebi.dominio.reto.ServicioReto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 @Controller
-@RequestMapping("/reto")
 public class ControladorReto {
 
     @Autowired
     private ServicioReto servicioReto;
 
     @Autowired
-    public ControladorReto(ServicioReto servicioReto) {this.servicioReto = servicioReto;
+    private ServicioLogin servicioLogin;
+
+    @Autowired
+    public ControladorReto(ServicioReto servicioReto, ServicioLogin servicioLogin) {this.servicioReto = servicioReto;
+        this.servicioLogin = servicioLogin;
     }
 
-    @GetMapping("/home")
-    public ResponseEntity<String> empezarReto(@RequestParam Long retoId) {
+    @RequestMapping(path = "/empezar-reto", method = RequestMethod.POST)
+    public ModelAndView empezarReto(@RequestParam Long retoId) {
+        ModelAndView modelAndView = new ModelAndView("home");
+        modelAndView.addObject("retoId", retoId); // Añadir retoId al modelo
         try {
             servicioReto.empezarReto(retoId);
-            return ResponseEntity.ok("El reto ha comenzado con éxito.");
+
+            // Añadir itemMasSeleccionado al modelo
+            DatosItemRendimiento itemMasSeleccionado = servicioLogin.obtenerItemMasSeleccionado();
+            modelAndView.addObject("itemMasSeleccionado", itemMasSeleccionado);
+
+            // Añadir retoDisponible al modelo
+            Reto retoDisponible = servicioReto.obtenerRetoPorId(retoId);
+            modelAndView.addObject("retoDisponible", retoDisponible);
+
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al iniciar el reto: " + e.getMessage());
+            modelAndView.addObject("error", "An error occurred while starting the challenge: " + e.getMessage());
+            modelAndView.setViewName("errorPage");
         }
+        return modelAndView;
     }
+
+
 
 }

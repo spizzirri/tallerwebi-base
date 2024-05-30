@@ -6,10 +6,13 @@ import com.tallerwebi.dominio.reto.RepositorioReto;
 import com.tallerwebi.dominio.reto.Reto;
 import com.tallerwebi.dominio.reto.ServicioReto;
 import com.tallerwebi.infraestructura.config.HibernateTestInfraestructuraConfig;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.transaction.Transactional;
@@ -17,9 +20,13 @@ import com.tallerwebi.dominio.reto.RepositorioReto;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import static javax.management.Query.eq;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {HibernateTestInfraestructuraConfig.class})
@@ -63,6 +70,17 @@ public class RepositorioRetoTest {
                 .setParameter("id", retoObtenido.getId())
                 .getSingleResult();
         assertThat(retoActualizado.isSeleccionado(), equalTo(true));
+    }
+
+    @Test
+    @Transactional
+    public void queObtenerRetoPorIdDevuelvaElRetoCorrecto() {
+        Long retoId = 1l;
+        // Obtener el reto por ID
+        Reto retoObtenido = repositorioReto.obtenerRetoPorId(retoId);
+        // Verificar que el ID y el estado seleccionado sean correctos
+        assertThat(retoObtenido.getId(), equalTo( retoId));
+        assertThat(retoObtenido.isSeleccionado(), equalTo(true));
     }
 
 
