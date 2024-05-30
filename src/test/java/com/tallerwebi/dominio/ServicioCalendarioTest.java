@@ -36,7 +36,9 @@ public class ServicioCalendarioTest {
         when(this.repositorioCalendario.obtenerItemsRendimiento()).thenReturn(itemsMock);
 //        List<DatosItemRendimiento> itemsRendimientos = this.servicioCalendario.obtenerItemsRendimiento();
         // verificacion
+
         assertThat(itemsMock.size(), equalTo(3)); // Existan 3 elementos
+
     }
 
     @Test

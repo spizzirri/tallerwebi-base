@@ -12,11 +12,6 @@ public class VistaRutina extends VistaWeb {
         page.navigate("localhost:8080/spring/rutina");
     }
 
-    // Método para obtener el tipo de rutina (PERDIDA_DE_PESO, VOLUMEN, DEFINICION)
-    public TipoRutina obtenerTipoRutina() {
-        String textoTipoRutina = obtenerTextoDelElemento("selectorCSS_tipoRutina"); // Reemplazar con el selector real
-        return TipoRutina.valueOf(textoTipoRutina);
-    }
 
     // Método para obtener otros elementos específicos de la Rutina
     public String obtenerNombreRutina() {

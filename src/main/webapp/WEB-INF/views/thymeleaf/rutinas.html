@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Rutinas</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body>
+<h1>Rutinas Relacionadas a tu Objetivo</h1>
+
+<div th:if="${rutinas.empty}">
+    <p>No hay rutinas disponibles para tu objetivo.</p>
+</div>
+
+<div th:unless="${rutinas.empty}">
+    <ul>
+        <li th:each="datosRutina : ${rutinas}">
+            <h2 th:text="${datosRutina.rutina.nombre}">Nombre de la Rutina</h2>
+            <p>Objetivo: <span th:text="${datosRutina.rutina.objetivo}">Objetivo de la Rutina</span></p>
+            <!-- Puedes agregar más detalles aquí según los atributos de la clase Rutina -->
+        </li>
+    </ul>
+</div>
+</body>
+</html>

@@ -2,9 +2,11 @@ package com.tallerwebi.dominio;
 
 import com.tallerwebi.dominio.calendario.ItemRendimiento;
 import com.tallerwebi.dominio.objetivo.Objetivo;
+import com.tallerwebi.dominio.rutina.Rutina;
 import com.tallerwebi.dominio.reto.Reto;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -19,8 +21,13 @@ public class Usuario {
     private String password;
     private String rol;
     private Boolean activo = false;
+    @Enumerated(EnumType.STRING)
     private Objetivo objetivo;
     private Boolean isInstructor = false;
+
+    //relacion de usuario con itemRendimiento 1 - n --> bd
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Rutina> rutinas;
 
     //relacion de usuario con itemRendimiento 1 - n --> bd
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -47,11 +54,12 @@ public class Usuario {
     }
 
     public Usuario() {
-
+        this.rutinas = new ArrayList<>();
     }
     public Usuario(String nombre, Objetivo objetivo) {
         this.nombre = nombre;
         this.objetivo = objetivo;
+        this.rutinas = new ArrayList<>();
     }
 
     public Usuario(String nombre, String apellido, String email, String password) {
@@ -59,6 +67,7 @@ public class Usuario {
         this.apellido =  apellido;
         this.email = email;
         this.password = password;
+        this.rutinas = new ArrayList<>();
     }
 
     public Usuario(String nombre, String apellido, String email, String password, Boolean isInstructor) {
@@ -67,6 +76,7 @@ public class Usuario {
         this.email = email;
         this.password = password;
         this.isInstructor = isInstructor;
+        this.rutinas = new ArrayList<>();
     }
 
     public Usuario(String nombre, String apellido, String email, String password, Objetivo objetivo) {
@@ -75,6 +85,7 @@ public class Usuario {
         this.email = email;
         this.password = password;
         this.objetivo = objetivo;
+        this.rutinas = new ArrayList<>();
     }
 
     public Long getId() {
@@ -132,6 +143,25 @@ public class Usuario {
         this.apellido = apellido;
     }
 
+    public Objetivo getObjetivo() {
+        return objetivo;
+    }
+
+    public Boolean getInstructor() {
+        return isInstructor;
+    }
+
+    public void setInstructor(Boolean instructor) {
+        isInstructor = instructor;
+    }
+
+    public List<Rutina> getRutinas() {
+        return this.rutinas;
+    }
+
+    public void setRutinas(List<Rutina> rutinas) {
+        this.rutinas = rutinas;
+    }
 
     public void setObjetivo(Objetivo objetivo) {
         this.objetivo = objetivo;
