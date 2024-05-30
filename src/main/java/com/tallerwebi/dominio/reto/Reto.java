@@ -22,8 +22,8 @@ public class Reto {
     @Column(name = "imagen_url", nullable = false) // URL de la imagen
     private String imagenUrl;
 
-    @Column(name = "seleccionado", nullable = false)
-    private boolean seleccionado;
+    @Column(name = "seleccionado", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean seleccionado;
 
     public Reto() {
     }
