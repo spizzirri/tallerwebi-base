@@ -1,10 +1,7 @@
 package com.tallerwebi.infraestructura;
 
 import com.tallerwebi.dominio.Usuario;
-import com.tallerwebi.dominio.excepcion.EjercicioNoExisteEnRutinaException;
-import com.tallerwebi.dominio.excepcion.RutinaNoEncontradaException;
-import com.tallerwebi.dominio.excepcion.UsuarioNoTieneLaRutinaBuscadaException;
-import com.tallerwebi.dominio.excepcion.UsuarioSinRutinasException;
+import com.tallerwebi.dominio.excepcion.*;
 import com.tallerwebi.dominio.objetivo.Objetivo;
 import com.tallerwebi.dominio.rutina.Ejercicio;
 import com.tallerwebi.dominio.rutina.RepositorioRutina;
@@ -30,21 +27,24 @@ public class RepositorioRutinaImpl implements RepositorioRutina {
     }
     @Override
     public List<Rutina> getRutinas() {
-        return this.rutinas;
-    }
 
+        String hql = "FROM Rutina";
+        Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
+
+        return (List<Rutina>) query.getResultList();
+    }
 
     @Override
     public Rutina getRutinaByObjetivo(Objetivo objetivo) {
-        Rutina rutinaObtenida = null;
+        String hql = "FROM Rutina WHERE objetivo = :objetivo";
+        Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
+        query.setParameter("objetivo",objetivo);
 
-        for(Rutina rutina : this.rutinas){
-            if(rutina.getObjetivo().equals(objetivo)){
-                rutinaObtenida = rutina;
-            }
+        try {
+            return (Rutina) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
         }
-
-        return rutinaObtenida;
 
     }
 
@@ -55,20 +55,20 @@ public class RepositorioRutinaImpl implements RepositorioRutina {
         Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
         query.setParameter("objetivo",objetivo);
 
-        return query.getResultList();
+        return (List<Rutina>) query.getResultList();
     }
 
     @Override
     public Rutina getRutinaParaUsuario(Usuario usuario) {
-        Rutina rutinaObtenida = null;
+        String hql = "FROM Rutina WHERE objetivo = :objetivo";
+        Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
+        query.setParameter("objetivo",usuario.getObjetivo());
 
-        for(Rutina rutina : this.rutinas){
-            if(rutina.getObjetivo().equals(usuario.getObjetivo())){
-                rutinaObtenida = rutina;
-            }
+        try {
+            return (Rutina) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
         }
-
-        return rutinaObtenida;
     }
 
     @Override
@@ -93,12 +93,22 @@ public class RepositorioRutinaImpl implements RepositorioRutina {
     }
 
     @Override
+    public void eliminarRutina(Rutina rutina) {
+        sessionFactory.getCurrentSession().delete(rutina);
+    }
+
+    @Override
     public void actualizar(Ejercicio ejercicio) {
         this.sessionFactory.getCurrentSession().saveOrUpdate(ejercicio);
     }
 
     @Override
-    public Ejercicio buscarEjercicioEnRutina(Ejercicio ejercicio, Rutina rutina) throws EjercicioNoExisteEnRutinaException {
+    public void eliminarEjercicio(Ejercicio ejercicio) {
+        sessionFactory.getCurrentSession().delete(ejercicio);
+    }
+
+    @Override
+    public Ejercicio buscarEjercicioEnRutina(Ejercicio ejercicio, Rutina rutina) {
         String hql = "SELECT e FROM Rutina r JOIN r.ejercicios e WHERE r.id = :rutinaId AND e.id = :ejercicioId";
         Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
         query.setParameter("rutinaId",rutina.getIdRutina());
@@ -107,7 +117,7 @@ public class RepositorioRutinaImpl implements RepositorioRutina {
         try {
             return (Ejercicio) query.getSingleResult();
         } catch (Exception e) {
-            throw new EjercicioNoExisteEnRutinaException(); // o lanza una excepción personalizada si prefieres manejarlo de esa manera
+            return null;
         }
     }
 
@@ -127,7 +137,7 @@ public class RepositorioRutinaImpl implements RepositorioRutina {
     }
 
     @Override
-    public List<Rutina> getRutinasDeUsuario(Usuario usuario) throws UsuarioSinRutinasException {
+    public List<Rutina> getRutinasDeUsuario(Usuario usuario) {
         String hql = "SELECT r FROM Usuario u JOIN u.rutinas r WHERE u.id = :idUsuario ";
         Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
         query.setParameter("idUsuario",usuario.getId());
@@ -137,7 +147,7 @@ public class RepositorioRutinaImpl implements RepositorioRutina {
     }
 
     @Override
-    public Rutina buscarRutinaEnUsuario(Rutina rutina, Usuario usuario) throws UsuarioNoTieneLaRutinaBuscadaException {
+    public Rutina buscarRutinaEnUsuario(Rutina rutina, Usuario usuario) {
         String hql = "SELECT r FROM Usuario u JOIN u.rutinas r WHERE u.id = :idUsuario AND r.idRutina = :idRutina ";
         Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
         query.setParameter("idUsuario",usuario.getId());
@@ -146,13 +156,43 @@ public class RepositorioRutinaImpl implements RepositorioRutina {
         try {
             return (Rutina) query.getSingleResult();
         } catch (Exception e) {
-            throw new UsuarioNoTieneLaRutinaBuscadaException();
+            return null;
         }
-
     }
 
     @Override
-    public Rutina buscarRutinaPorId(Long idRutina) throws RutinaNoEncontradaException {
+    public void eliminarEjercicioDeRutina(Ejercicio ejercicio, Rutina rutina) {
+        String hql = "DELETE FROM Rutina r WHERE :ejercicio MEMBER OF r.ejercicios AND r.idRutina = :rutinaId";
+        Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
+        query.setParameter("ejercicio", ejercicio);
+        query.setParameter("rutinaId", rutina.getIdRutina());
+        query.executeUpdate();
+    }
+
+    @Override
+    public void eliminarRutinaDeUsuario(Rutina rutina, Usuario usuario) {
+        String hql = "DELETE FROM Usuario u WHERE :rutina MEMBER OF u.rutinas AND u.id = :usuarioId";
+        Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
+        query.setParameter("rutina", rutina);
+        query.setParameter("usuarioId", usuario.getId());
+        query.executeUpdate();
+    }
+
+    @Override //falta testear
+    public Ejercicio buscarEjercicioPorId(Long idEjercicio) {
+        String hql = "FROM Ejercicio WHERE idEjercicio = :id ";
+        Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
+        query.setParameter("id",idEjercicio);
+
+        try {
+            return (Ejercicio) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @Override
+    public Rutina buscarRutinaPorId(Long idRutina) {
         String hql = "FROM Rutina WHERE idRutina = :id ";
         Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
         query.setParameter("id",idRutina);
@@ -160,7 +200,7 @@ public class RepositorioRutinaImpl implements RepositorioRutina {
         try {
             return (Rutina) query.getSingleResult();
         } catch (Exception e) {
-            throw new RutinaNoEncontradaException();
+            return null;
         }
     }
 
@@ -172,6 +212,7 @@ public class RepositorioRutinaImpl implements RepositorioRutina {
 
 
         return (List<Rutina>) query.getResultList();
+
     }
 
     @Override
@@ -180,6 +221,20 @@ public class RepositorioRutinaImpl implements RepositorioRutina {
         Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
         query.setParameter("id",id);
 
+        try {
             return (Usuario) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
     }
+
+    @Override
+    public List<Ejercicio> getEjerciciosDeRutina(Rutina rutina) {
+        String hql = "SELECT e FROM Rutina r JOIN r.ejercicios e WHERE r.idRutina = :rutinaId";
+        Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
+        query.setParameter("rutinaId", rutina.getIdRutina());
+        return (List<Ejercicio>)query.getResultList();
+    }
+
+
 }

@@ -23,8 +23,7 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -175,21 +174,22 @@ public class RepositorioRutinaTest {
     @Test
     @Transactional
     @Rollback
-    public void QueSeBusqueYNoSeEncuentreElEjercicioEnUnaRutina() throws EjercicioNoExisteEnRutinaException {
+    public void QueSeBusqueYNoSeEncuentreElEjercicioEnUnaRutina() {
         //p
-        Rutina rutinaMock = crearRutina("Volumen",Objetivo.GANANCIA_MUSCULAR);
-        Ejercicio ejercicio1 = new Ejercicio("Curl de biceps",Objetivo.GANANCIA_MUSCULAR, GrupoMuscularObjetivo.BRAZOS,4,12);
-        Ejercicio ejercicio2 = new Ejercicio("Burpees",Objetivo.PERDIDA_DE_PESO, GrupoMuscularObjetivo.PIERNAS,4,12);
+        Rutina rutinaMock = crearRutina("Volumen", Objetivo.GANANCIA_MUSCULAR);
+        Ejercicio ejercicio1 = new Ejercicio("Curl de biceps", Objetivo.GANANCIA_MUSCULAR, GrupoMuscularObjetivo.BRAZOS, 4, 12);
+        Ejercicio ejercicio2 = new Ejercicio("Burpees", Objetivo.PERDIDA_DE_PESO, GrupoMuscularObjetivo.PIERNAS, 4, 12);
 
         //e
         this.repositorioRutina.guardarRutina(rutinaMock);
         this.repositorioRutina.guardarEjercicio(ejercicio1);
-        this.repositorioRutina.guardarEjercicioEnRutina(ejercicio1,rutinaMock);
+        this.repositorioRutina.guardarEjercicioEnRutina(ejercicio1, rutinaMock);
+
+        Ejercicio ejercicioObtenido = this.repositorioRutina.buscarEjercicioEnRutina(ejercicio2, rutinaMock);
 
         //v
-        assertThrowsExactly(EjercicioNoExisteEnRutinaException.class, () ->
-                this.repositorioRutina.buscarEjercicioEnRutina(ejercicio2,rutinaMock)
-        );
+        assertThat(ejercicioObtenido,equalTo(null));
+
 
     }
 
@@ -261,7 +261,7 @@ public class RepositorioRutinaTest {
     @Test
     @Transactional
     @Rollback
-    public void QueAlBuscarUnaRutinaEnUnUsuarioArrojeExcepcion() throws UsuarioNoTieneLaRutinaBuscadaException {
+    public void QueAlBuscarUnaRutinaEnUnUsuarioYNoEsteArrojeExcepcion() {
         //p
         Rutina rutinaMock = crearRutina("Volumen",Objetivo.GANANCIA_MUSCULAR);
         Usuario usuarioMock = new Usuario("Lautaro", Objetivo.GANANCIA_MUSCULAR);
@@ -269,17 +269,16 @@ public class RepositorioRutinaTest {
         //e
         this.repositorioRutina.guardarRutina(rutinaMock);
         this.repositorioRutina.guardarUsuario(usuarioMock);
+        Rutina rutinaBuscada = this.repositorioRutina.buscarRutinaEnUsuario(rutinaMock,usuarioMock);
 
         //v
-        assertThrowsExactly(UsuarioNoTieneLaRutinaBuscadaException.class, () ->
-                this.repositorioRutina.buscarRutinaEnUsuario(rutinaMock,usuarioMock)
-        );
+        assertThat(rutinaBuscada,equalTo(null));
     }
 
     @Test
     @Transactional
     @Rollback
-    public void QueSePuedaBuscarUnaRutinaPorSuId() throws RutinaNoEncontradaException {
+    public void QueSePuedaBuscarUnaRutinaPorSuId() {
         //p
         Rutina rutinaMock = crearRutina("Volumen",Objetivo.GANANCIA_MUSCULAR);
 
@@ -332,7 +331,49 @@ public class RepositorioRutinaTest {
         assertTrue(rutinasObtenidas.contains(rutinaCardio2));
     }
 
+    @Test
+    @Transactional
+    @Rollback
+    public void QueSePuedaEliminarEjercicioDeRutina() {
+        // Preparación
+        Rutina rutina = crearRutina("Volumen", Objetivo.GANANCIA_MUSCULAR);
+        Ejercicio ejercicio = new Ejercicio("Curl de biceps", Objetivo.GANANCIA_MUSCULAR, GrupoMuscularObjetivo.BRAZOS, 4, 12);
+        repositorioRutina.guardarRutina(rutina);
+        repositorioRutina.guardarEjercicio(ejercicio);
+        repositorioRutina.guardarEjercicioEnRutina(ejercicio, rutina);
 
+        // Ejecución
+        repositorioRutina.eliminarEjercicioDeRutina(ejercicio, rutina);
+
+        // Verificación
+        Ejercicio ejercicioObtenido = repositorioRutina.buscarEjercicioEnRutina(ejercicio, rutina);
+        assertNull(ejercicioObtenido);
+
+        List<Ejercicio> ejerciciosDeRutina = this.repositorioRutina.getEjerciciosDeRutina(rutina);
+        assertFalse(ejerciciosDeRutina.contains(ejercicio));
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void QueSePuedaEliminarRutinaDeUsuario() {
+        // Preparación
+        Usuario usuario = new Usuario("Juan", Objetivo.GANANCIA_MUSCULAR);
+        Rutina rutina = crearRutina("Volumen", Objetivo.GANANCIA_MUSCULAR);
+        repositorioRutina.guardarUsuario(usuario);
+        repositorioRutina.guardarRutina(rutina);
+        repositorioRutina.asignarRutinaAUsuario(rutina, usuario);
+
+        // Ejecución
+        repositorioRutina.eliminarRutinaDeUsuario(rutina, usuario);
+
+        // Verificación
+        Rutina rutinaObtenida = repositorioRutina.buscarRutinaEnUsuario(rutina, usuario);
+        assertNull(rutinaObtenida);
+
+        List<Rutina> rutinas = repositorioRutina.getRutinasDeUsuario(usuario);
+        assertFalse(rutinas.contains(rutina));
+    }
 
     public Rutina crearRutina(String nombre, Objetivo objetivo){
         Rutina rutina = new Rutina(nombre,objetivo);

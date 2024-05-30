@@ -1,6 +1,6 @@
 package com.tallerwebi.dominio.rutina;
 import com.tallerwebi.dominio.Usuario;
-import com.tallerwebi.dominio.excepcion.UsuarioSinRutinasException;
+import com.tallerwebi.dominio.excepcion.*;
 import com.tallerwebi.dominio.objetivo.Objetivo;
 
 import com.tallerwebi.presentacion.DatosRutina;
@@ -25,6 +25,65 @@ public class ServicioRutinaImpl implements ServicioRutina {
     public List<DatosRutina> getRutinas() {
         return this.convertToDatosRutina(this.repositorioRutina.getRutinas());
     }
+
+    @Override
+    public boolean agregarRutina(Rutina rutina) throws RutinaYaExisteException{
+
+        if (rutina == null || rutina.getNombre() == null || rutina.getNombre().isEmpty() || rutina.getObjetivo() == null ) {
+           return false;
+        }
+
+        if (this.repositorioRutina.buscarRutinaPorId(rutina.getIdRutina()) != null) {
+            throw new RutinaYaExisteException();
+        }
+
+        repositorioRutina.guardarRutina(rutina);
+        return true;
+    }
+
+    @Override
+    public boolean agregarEjercicio(Ejercicio ejercicio) throws EjercicioYaExisteException {
+        if (ejercicio == null || ejercicio.getNombre() == null || ejercicio.getNombre().isEmpty() || ejercicio.getObjetivo() == null
+            || ejercicio.getGrupoMuscularObjetivo() == null || ejercicio.getSeries() <= 0 || ejercicio.getRepeticiones() <= 0) {
+            return false;
+        }
+
+        if (this.repositorioRutina.buscarEjercicioPorId(ejercicio.getIdEjercicio()) != null) {
+            throw new EjercicioYaExisteException();
+        }
+
+        repositorioRutina.guardarEjercicio(ejercicio);
+        return true;
+    }
+
+
+    @Override//falta testear
+    public boolean eliminarRutina(Rutina rutina) throws RutinaNoEncontradaException {
+        Long idRutina = rutina.getIdRutina();
+        Rutina rutinaBuscada = repositorioRutina.buscarRutinaPorId(idRutina);
+
+        if (rutinaBuscada == null) {
+            throw new RutinaNoEncontradaException();
+        }
+
+        repositorioRutina.eliminarRutina(rutinaBuscada);
+        return true;
+
+    }
+
+    @Override//falta testear
+    public boolean eliminarEjercicio(Ejercicio ejercicio) throws EjercicioNoEncontradoException {
+        Long idEjercicio = ejercicio.getIdEjercicio();
+        Ejercicio ejercicioBuscado = repositorioRutina.buscarEjercicioPorId(idEjercicio);
+
+        if (ejercicioBuscado == null) {
+            throw new EjercicioNoEncontradoException();
+        }
+
+        repositorioRutina.eliminarEjercicio(ejercicioBuscado);
+        return true;
+    }
+
 
 
     @Override
@@ -51,7 +110,15 @@ public class ServicioRutinaImpl implements ServicioRutina {
     }
 
     @Override
-    public boolean validarObjetivosDeUsuarioYRutina(Usuario usuario, Rutina rutina) {
+    public boolean validarObjetivosDeUsuarioYRutina(Usuario usuario, Rutina rutina) throws UsuarioNoExisteException, RutinaNoEncontradaException, DiferenciaDeObjetivosExcepcion {
+
+        if(usuario.getId() == null){
+            throw new UsuarioNoExisteException();
+        } else if (rutina.getIdRutina() == null) {
+            throw new RutinaNoEncontradaException();
+        } else if (usuario.getObjetivo() != rutina.getObjetivo()) {
+            throw new DiferenciaDeObjetivosExcepcion();
+        }
         return usuario.getObjetivo().equals(rutina.getObjetivo());
     }
 
@@ -71,8 +138,48 @@ public class ServicioRutinaImpl implements ServicioRutina {
     }
 
     @Override
-    public Usuario getUsuarioPorId(Long id) {
+    public Usuario getUsuarioById(Long id) throws UsuarioNoExisteException {
+
+        if (this.repositorioRutina.getUsuarioPorId(id) == null){
+            throw new UsuarioNoExisteException();
+        }
+
         return this.repositorioRutina.getUsuarioPorId(id);
+
+    }
+
+    @Override
+    public Rutina getRutinaById(Long idRutina) throws RutinaNoEncontradaException {
+
+        Rutina rutina = repositorioRutina.buscarRutinaPorId(idRutina);
+        if (rutina == null) {
+            throw new RutinaNoEncontradaException("La rutina con ID " + idRutina + " no existe.");
+        }
+        return rutina;
+    }
+
+    @Override
+    public Ejercicio getEjercicioById(Long idEjercicio) throws EjercicioNoEncontradoException {
+        Ejercicio ejercicio = repositorioRutina.buscarEjercicioPorId(idEjercicio);
+        if (ejercicio == null) {
+            throw new EjercicioNoEncontradoException("El ejercicio con ID " + idEjercicio + " no existe.");
+        }
+        return ejercicio;
+    }
+
+    @Override
+    public boolean existeRutinaEnUsuario(Rutina rutina, Usuario usuario) {
+
+        Rutina rutinaBuscada = repositorioRutina.buscarRutinaEnUsuario(rutina,usuario);
+
+        return rutinaBuscada != null;
+    }
+
+    @Override
+    public boolean existeEjercicioEnRutina(Ejercicio ejercicio, Rutina rutina) {
+        Ejercicio ejercicioBuscado = repositorioRutina.buscarEjercicioEnRutina(ejercicio,rutina);
+
+        return ejercicioBuscado != null;
     }
 
 
