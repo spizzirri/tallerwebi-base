@@ -55,5 +55,13 @@ public class RepositorioRetoImpl implements RepositorioReto {
         return query.uniqueResult();
     }
 
+    @Override
+    public Reto obtenerRetoEnProceso() {
+        Session session = this.sessionFactory.getCurrentSession();
+        String hql = "FROM Reto WHERE seleccionado = true AND enProceso = true";
+        Query<Reto> query = session.createQuery(hql, Reto.class);
+        return query.uniqueResult();
+    }
+
 
 }

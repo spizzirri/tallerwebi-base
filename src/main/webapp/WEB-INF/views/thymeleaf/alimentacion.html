@@ -13,7 +13,7 @@
     <!-- Enlace al archivo de estilos de Font Awesome -->
     <link rel="stylesheet" th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css}">
 </head>
-<body class="body-calendario">
+<body>
 <header>
     <nav class="navbar">
         <div class="logo">
@@ -31,36 +31,65 @@
         </div>
     </nav>
 </header>
-    <div class="container">
-        <div class="meal-wrapper">
-            <div class="meal-search">
-                <h2 class="tittle">Encontrá recetas para tus ingredientes</h2>
-                <div class="meal-search-box">
-                    <input type="text" class="search-content"
-                    placeholder="Ingresá un ingrediente" id="search-input">
-                    <button type="submit" class="search-btn btn" id="seach-btn">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </div>
-            </div>
+<div class = "container">
+    <div class = "meal-wrapper">
+        <div class = "meal-search">
+            <h2 class = "title">Encontra recetas para tus comidas</h2>
+            <!--<blockquote>Real food doesn't have ingredients, real food is ingredients.<br>
+                <cite>- Jamie Oliver</cite>
+            </blockquote>-->
 
-            <div class="meal-result">
-                <h2 class="tittle">Resultados:</h2>
-                <div id="meal">
-                    <!-- meal item -->
-                    <div class="meal-item">
-                        <div class="meal-img">
-                            <img th:src="@{/img/comida.jpg}" alt="comida">
-                        </div>
-                        <div class="meal-name">
-                            <h3>Potato Chips</h3>
-                            <a href="#" class="recipe-btn">Obtener receta</a>
-                        </div>
-                    </div>
+            <div class = "meal-search-box">
+                <input type = "text" class = "search-control" placeholder="Ingresa un ingrediente" id = "search-input">
+                <button type = "submit" class = "search-btn btn" id = "search-btn">
+                    <i class = "fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class = "meal-result">
+            <h2 class = "title">Resultados:</h2>
+            <div id= "meal">
+                <!-- meal item -->
+                 <div class = "meal-item">
+                  <div class = "meal-img">
+                    <img th:src="@{/img/comida.jpg}" alt = "food">
+                  </div>
+                  <div class = "meal-name">
+                    <h3>Papas fritas</h3>
+                    <a href = "#" class = "recipe-btn">Obtener receta</a>
+                  </div>
+                </div>
+                <!-- end of meal item -->
+            </div>
+        </div>
+
+
+        <div class = "meal-details">
+            <!-- recipe close btn -->
+            <button type = "button" class = "btn recipe-close-btn" id = "recipe-close-btn">
+                <i class = "fas fa-times"></i>
+            </button>
+
+            <!-- meal content -->
+            <div class = "meal-details-content">
+                 <h2 class = "recipe-title">Meals Name Here</h2>
+                <p class = "recipe-category">Category Name</p>
+                <div class = "recipe-instruct">
+                  <h3>Instructions:</h3>
+                  <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Quo blanditiis quis accusantium natus! Porro, reiciendis maiores molestiae distinctio veniam ratione ex provident ipsa, soluta suscipit quam eos velit autem iste!</p>
+                  <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet aliquam voluptatibus ad obcaecati magnam, esse numquam nisi ut adipisci in?</p>
+                </div>
+                <div class = "recipe-meal-img">
+                  <img th:src="@{/img/comida.jpg}" alt = "">
+                </div>
+                <div class = "recipe-link">
+                  <a href = "#" target = "_blank">Watch Video</a>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
 <script th:src="@{/js/alimentacion.js}"></script>
 </body>

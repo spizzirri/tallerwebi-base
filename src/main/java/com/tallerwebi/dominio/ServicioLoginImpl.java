@@ -47,5 +47,10 @@ public class ServicioLoginImpl implements ServicioLogin {
     @Override
     public Reto obtenerRetoDisponible(){return servicioReto.obtenerRetoDisponible();}
 
+    @Override
+    public Reto obtenerRetoEnProceso() {
+        return servicioReto.obtenerRetoEnProceso();
+    }
+
 }
 
