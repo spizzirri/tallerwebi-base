@@ -74,9 +74,7 @@ public class RepositorioRutinaTest {
         List<Rutina> rutinasObtenidas = this.repositorioRutina.getRutinasByObjetivo(Objetivo.PERDIDA_DE_PESO);
 
         //verificacion
-
         assertThat(rutinasObtenidas.size(),equalTo(2));
-
     }
 
     @Test
@@ -85,7 +83,6 @@ public class RepositorioRutinaTest {
     public void QueSePuedaActualizarElNombreDeUnaRutinaExistente(){
         //preparacion
         Rutina rutina = this.crearRutina("Rutina de cardio corriendo",Objetivo.PERDIDA_DE_PESO);
-
 
         //ejecucion
         String nombreEsperado = "Rutina de cardio caminando";
@@ -100,7 +97,6 @@ public class RepositorioRutinaTest {
                 .getSingleResult();
 
         assertThat(rutinaObtenida.getNombre(),equalTo(nombreEsperado));
-
     }
 
     @Test
@@ -109,7 +105,6 @@ public class RepositorioRutinaTest {
     public void QueSePuedanActualizarLasSeriesYRepeticionesDeUnEjercicio(){
         //preparacion
         Ejercicio ejercicio = new Ejercicio("Burpees",Objetivo.PERDIDA_DE_PESO, GrupoMuscularObjetivo.PIERNAS,4,12);
-
 
         //ejecucion
         Integer seriesEsperadas = 8;

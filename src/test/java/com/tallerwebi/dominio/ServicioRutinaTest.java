@@ -93,7 +93,6 @@ public class ServicioRutinaTest {
         //p
         Usuario usuario = new Usuario("Lautaro", Objetivo.GANANCIA_MUSCULAR);
         Rutina rutina = new Rutina("Rutina de volumen",Objetivo.GANANCIA_MUSCULAR);
-        usuario.setId(1L);
         rutina.setIdRutina(1L);
 
         //e
