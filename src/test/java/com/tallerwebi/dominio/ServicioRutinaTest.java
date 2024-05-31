@@ -76,14 +76,18 @@ public class ServicioRutinaTest {
     public void QueArrojeExcepcionSiElUsuarioNoTieneNingunaRutinaAsignada() throws UsuarioSinRutinasException {
         //p
         Usuario usuario = new Usuario("Lautaro", Objetivo.GANANCIA_MUSCULAR);
+        List<Rutina> rutinasmock = new ArrayList<>();
 
         //e
-        when(this.repositorioRutina.getRutinasDeUsuario(usuario)).thenThrow(new UsuarioSinRutinasException());
+        when(this.repositorioRutina.getRutinasDeUsuario(usuario)).thenReturn(rutinasmock);
 
         //v
-        assertThrowsExactly(UsuarioSinRutinasException.class, () ->
-                this.repositorioRutina.getRutinasDeUsuario(usuario)
+        UsuarioSinRutinasException exception = assertThrows(
+                UsuarioSinRutinasException.class,
+                () -> servicioRutina.getRutinasDeUsuario(usuario)
         );
+
+        assertThat(exception.getMessage(), equalTo("El usuario no tiene rutinas asignadas."));
     }
 
     @Transactional

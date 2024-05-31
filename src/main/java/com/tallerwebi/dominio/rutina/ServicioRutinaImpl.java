@@ -105,7 +105,6 @@ public class ServicioRutinaImpl implements ServicioRutina {
             return rutinas;
         }else {
             throw new UsuarioSinRutinasException();
-
         }
     }
 
