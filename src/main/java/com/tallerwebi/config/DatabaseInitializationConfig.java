@@ -18,7 +18,12 @@ public class DatabaseInitializationConfig {
     @Bean
     public DataSourceInitializer dataSourceInitializer() {
         ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
+
         populator.addScript(new ClassPathResource("data.sql"));
+        populator.addScript(new ClassPathResource("ejercicios.sql"));
+        populator.addScript(new ClassPathResource("rutinas.sql"));
+        populator.addScript(new ClassPathResource("retos.sql"));
+        populator.addScript(new ClassPathResource("rutina_ejercicios.sql"));
 
         DataSourceInitializer initializer = new DataSourceInitializer();
         initializer.setDataSource(dataSource);

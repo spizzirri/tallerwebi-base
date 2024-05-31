@@ -16,9 +16,11 @@ public class Ejercicio {
     private String nombre;
 
     private String descripcion;
+    @Enumerated(EnumType.STRING)
     private GrupoMuscularObjetivo grupoMuscularObjetivo;
     @Enumerated(EnumType.STRING)
     private Objetivo objetivo;
+    @Enumerated(EnumType.STRING)
     private TipoEjercicio tipoEjercicio;
 
     private Integer series;
