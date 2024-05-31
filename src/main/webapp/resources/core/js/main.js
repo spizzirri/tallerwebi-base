@@ -36,6 +36,35 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+document.addEventListener('DOMContentLoaded', (event) => {
+    const form = document.getElementById('empezar-reto-form');
+    const btnEmpezar = document.getElementById('btn-empezar');
+    const btnTerminado = document.getElementById('btn-terminado');
+
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();  // Prevenir el comportamiento por defecto del formulario
+
+        const formData = new FormData(form);
+        const url = form.action;
+        const method = form.method;
+
+        fetch(url, {
+            method: method,
+            body: new URLSearchParams(formData)  // Convertir FormData a URLSearchParams
+        }).then(response => {
+            if (response.ok) {
+                // Ocultar el botón "Empezar" y mostrar el botón "Terminado"
+                btnEmpezar.style.display = 'none';
+                btnTerminado.style.display = 'block';
+            } else {
+                // Manejar el error si es necesario
+                console.error('Error starting the challenge');
+            }
+        }).catch(error => {
+            console.error('An error occurred:', error);
+        });
+    });
+});
 
 
 

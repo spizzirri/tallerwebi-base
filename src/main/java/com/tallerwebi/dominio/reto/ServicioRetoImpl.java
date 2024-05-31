@@ -29,4 +29,9 @@ public class ServicioRetoImpl implements ServicioReto{
         return repositorioReto.obtenerRetoPorId(retoId);
     }
 
+    @Override
+    public Reto obtenerRetoEnProceso() {
+        return repositorioReto.obtenerRetoEnProceso();
+    }
+
 }

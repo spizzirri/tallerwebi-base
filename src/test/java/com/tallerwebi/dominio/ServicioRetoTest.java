@@ -35,7 +35,7 @@ public class ServicioRetoTest {
     @Test
     public void queSePuedaObtenerRetoDisponible() {
         // Crear un reto de ejemplo
-        Reto retoMock = new Reto("Reto de Ejemplo", "Descripción del reto de ejemplo", " ");
+        Reto retoMock = new Reto("Reto de Ejemplo", "Descripción del reto de ejemplo");
         retoMock.setId(1L);
         retoMock.setSeleccionado(false);
 
@@ -53,7 +53,7 @@ public class ServicioRetoTest {
         assertEquals(retoMock.getId(), retoObtenido.getId(), "El ID del reto debería coincidir");
         assertEquals(retoMock.getNombre(), retoObtenido.getNombre(), "El nombre del reto debería coincidir");
         assertEquals(retoMock.getDescripcion(), retoObtenido.getDescripcion(), "La descripción del reto debería coincidir");
-        assertTrue(retoObtenido.isSeleccionado(), "El reto debería estar marcado como seleccionado");
+        assertTrue(retoObtenido.getSeleccionado(), "El reto debería estar marcado como seleccionado");
 
         // Verificar que se llamó al método del repositorio
         verify(repositorioReto, times(1)).obtenerReto();
@@ -85,9 +85,34 @@ public class ServicioRetoTest {
         assertNotNull(retoObtenido, "El reto obtenido no debería ser nulo");
         assertEquals(1L, retoObtenido.getId(), "El ID del reto obtenido debería ser 1");
         assertEquals("Descripción del reto", retoObtenido.getDescripcion(), "La descripción del reto debería ser 'Descripción del reto'");
-        assertEquals(true, retoObtenido.isSeleccionado(), "El reto debería estar marcado como seleccionado");
+        assertEquals(true, retoObtenido.getSeleccionado(), "El reto debería estar marcado como seleccionado");
     }
 
+    @Test
+    public void queSePuedaObtenerRetoEnProceso() {
+        // Crear un reto de ejemplo
+        Reto retoMock = new Reto();
+        retoMock.setId(1L);
+        retoMock.setDescripcion("Descripción del reto en proceso");
+        retoMock.setSeleccionado(true);
+        retoMock.setEnProceso(true);
+
+        // Configurar el mock para que devuelva el reto de ejemplo
+        when(repositorioReto.obtenerRetoEnProceso()).thenReturn(retoMock);
+
+        // Llamar al método del servicio
+        Reto retoObtenido = servicioReto.obtenerRetoEnProceso();
+
+        // Verificar el resultado
+        assertNotNull(retoObtenido, "El reto obtenido no debería ser nulo");
+        assertEquals(retoMock.getId(), retoObtenido.getId(), "El ID del reto debería coincidir");
+        assertEquals(retoMock.getDescripcion(), retoObtenido.getDescripcion(), "La descripción del reto debería coincidir");
+        assertEquals(retoMock.getSeleccionado(), retoObtenido.getSeleccionado(), "El reto debería estar marcado como seleccionado");
+        assertEquals(retoMock.getEnProceso(), retoObtenido.getEnProceso(), "El reto debería estar en proceso");
+
+        // Verificar que se llamó al método del repositorio
+        verify(repositorioReto, times(1)).obtenerRetoEnProceso();
+    }
 
 
 }
