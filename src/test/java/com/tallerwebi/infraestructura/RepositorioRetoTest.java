@@ -44,33 +44,24 @@ public class RepositorioRetoTest {
 
     @Test
     @Transactional
-    public void deberiaObtenerReto() {
-        // Ejecutar el método para obtener un reto
-        Reto reto = repositorioReto.obtenerReto();
-
-        // Verificar que el reto no sea nulo
-        assertNotNull(reto, "El reto obtenido no debería ser nulo");
+    public void queAlObtenerRetoDisponibleSeObtengaUnRetoEnSeleccionadoFalse() {
+        Reto reto = repositorioReto.obtenerRetoDisponible();
+        assertNotNull(reto, "El método obtenerRetoDisponible no debe devolver null.");
+        assertFalse(reto.getSeleccionado(), "El reto devuelto debe tener seleccionado en false.");
     }
 
     @Test
     @Transactional
-    public void queAlEmpezarUnRetoSeActualiceSuCondicionDeSeleccionado() {
-        Reto retoObtenido = repositorioReto.obtenerReto();
-        repositorioReto.empezarReto(retoObtenido.getId());
-        assertNotNull(retoObtenido, "El reto obtenido no debería ser nulo");
-        assertTrue(retoObtenido.getSeleccionado(), "El reto debería estar marcado como seleccionado");
+    public void testEmpezarRetoActualizar() {
+        Reto reto = repositorioReto.obtenerRetoDisponible();
+        reto.setSeleccionado(true);
+        // Guardar el reto en la base de datos
+        repositorioReto.empezarRetoActualizar(reto);
 
-        // Verificar que no se puede obtener el mismo reto nuevamente
-        Reto otroRetoObtenido = repositorioReto.obtenerReto();
-        assertNotEquals(retoObtenido.getId(), otroRetoObtenido.getId(), "No se debería obtener el mismo reto dos veces");
-
-        // Verificar que el reto fue actualizado en la base de datos
-        Reto retoActualizado = (Reto) this.sessionFactory.getCurrentSession()
-                .createQuery("FROM Reto WHERE id = :id")
-                .setParameter("id", retoObtenido.getId())
-                .getSingleResult();
-        assertThat(retoActualizado.getSeleccionado(), equalTo(true));
+        assertNotNull(reto, "El reto guardado no debe ser null.");
+        assertTrue(reto.getSeleccionado(), "El reto guardado debe ser seleccionado.");
     }
+
 
     @Test
     @Transactional

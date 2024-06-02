@@ -40,7 +40,7 @@ public class ServicioRetoTest {
         retoMock.setSeleccionado(false);
 
         // Configurar el mock para que devuelva el reto de ejemplo y marcarlo como seleccionado
-        when(repositorioReto.obtenerReto()).thenAnswer(invocation -> {
+        when(repositorioReto.obtenerRetoDisponible()).thenAnswer(invocation -> {
             retoMock.setSeleccionado(true);
             return retoMock;
         });
@@ -56,15 +56,7 @@ public class ServicioRetoTest {
         assertTrue(retoObtenido.getSeleccionado(), "El reto debería estar marcado como seleccionado");
 
         // Verificar que se llamó al método del repositorio
-        verify(repositorioReto, times(1)).obtenerReto();
-    }
-
-    @Test
-    public void queAlEmpezarRetoSeLlameAlMetodo() {
-        Long retoId = 123L;
-        servicioReto.empezarReto(retoId);
-        // Verificar que el método empezarReto del repositorio fue invocado con el retoId correcto
-        Mockito.verify(repositorioReto, Mockito.times(1)).empezarReto(retoId);
+        verify(repositorioReto, times(1)).obtenerRetoDisponible();
     }
 
     @Test

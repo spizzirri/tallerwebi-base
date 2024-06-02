@@ -38,7 +38,7 @@ public class ControladorRutinaTest {
     }
 
     @Test
-    public void QueAlIrALaVistaRutinasMeMuestreRutinasRelacionadasAMiObjetivo(){
+    public void queAlIrALaVistaRutinasMeMuestreRutinasRelacionadasAMiObjetivo(){
         //preparacion
         usuarioMock = new Usuario("Lautaro", Objetivo.PERDIDA_DE_PESO);
 

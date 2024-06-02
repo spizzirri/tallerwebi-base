@@ -20,30 +20,12 @@ public class RepositorioRetoImpl implements RepositorioReto {
     }
 
     @Override
-    public Reto obtenerReto() {
+    public Reto obtenerRetoDisponible() {
         Session session = this.sessionFactory.getCurrentSession();
-        Reto reto = null;
-        boolean retoEncontrado = false;
-        while (!retoEncontrado) {
-            // Obtener un reto aleatorio que no haya sido seleccionado
-            String hql = "FROM Reto WHERE seleccionado = false ORDER BY rand()";
-            Query<Reto> query = session.createQuery(hql, Reto.class).setMaxResults(1);
-            reto = query.uniqueResult();
-            if (reto != null) {
-                retoEncontrado = true;
-            }
-        }
-        return reto;
-    }
+        String hql = "FROM Reto WHERE seleccionado = false ORDER BY rand()";
+        Query <Reto> query = session.createQuery(hql, Reto.class).setMaxResults(1);
 
-    @Override
-    public void empezarReto(Long retoId) {
-        Session session = this.sessionFactory.getCurrentSession();
-        Reto reto = session.get(Reto.class, retoId);
-        if (reto != null) {
-            reto.setSeleccionado(true); // Marcar como seleccionado
-            session.update(reto);
-        }
+        return query.uniqueResult();
     }
 
     @Override
@@ -54,6 +36,15 @@ public class RepositorioRetoImpl implements RepositorioReto {
         query.setParameter("id", retoId);
         return query.uniqueResult();
     }
+
+    @Override
+    public void empezarRetoActualizar(Reto reto) {
+        Session session = this.sessionFactory.getCurrentSession();
+        session.update(reto);
+        session.flush(); // Sincronizar los cambios con la base de datos
+        session.getTransaction().commit();
+}
+
 
     @Override
     public Reto obtenerRetoEnProceso() {

@@ -1,5 +1,6 @@
 package com.tallerwebi.dominio.reto;
 
+import org.hibernate.Session;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -16,13 +17,27 @@ public class ServicioRetoImpl implements ServicioReto{
 
     @Override
     public Reto obtenerRetoDisponible() {
-        return repositorioReto.obtenerReto();
+        Reto reto = null;
+        boolean retoEncontrado = false;
+        while (!retoEncontrado) {
+            reto = repositorioReto.obtenerRetoDisponible();
+            if (reto != null) {
+                retoEncontrado = true;
+            }
+        }
+        return reto;
     }
+
 
     @Override
     public void empezarReto(Long retoId) {
-        repositorioReto.empezarReto(retoId);
+        Reto reto = repositorioReto.obtenerRetoPorId(retoId);
+        if (reto != null) {
+            reto.setSeleccionado(true); // Marcar como seleccionado
+            repositorioReto.empezarRetoActualizar(reto); // Actualizar el reto en el repositorio
+        }
     }
+
 
     @Override
     public Reto obtenerRetoPorId(Long retoId) {
