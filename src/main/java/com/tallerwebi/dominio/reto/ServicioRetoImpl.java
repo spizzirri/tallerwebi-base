@@ -28,16 +28,16 @@ public class ServicioRetoImpl implements ServicioReto{
         return reto;
     }
 
-
     @Override
-    public void empezarReto(Long retoId) {
+    @Transactional
+    public void empezarRetoActualizado(Long retoId) {
         Reto reto = repositorioReto.obtenerRetoPorId(retoId);
         if (reto != null) {
             reto.setSeleccionado(true); // Marcar como seleccionado
+            reto.setEnProceso(true);
             repositorioReto.empezarRetoActualizar(reto); // Actualizar el reto en el repositorio
         }
     }
-
 
     @Override
     public Reto obtenerRetoPorId(Long retoId) {

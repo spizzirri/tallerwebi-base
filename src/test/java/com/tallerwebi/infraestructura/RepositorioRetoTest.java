@@ -52,26 +52,27 @@ public class RepositorioRetoTest {
 
     @Test
     @Transactional
-    public void testEmpezarRetoActualizar() {
+    public void queAlEmpezarRetoActualizarSeActualiceSuSeleccionadoYEnProceso() {
         Reto reto = repositorioReto.obtenerRetoDisponible();
         reto.setSeleccionado(true);
+        reto.setEnProceso(true);
         // Guardar el reto en la base de datos
         repositorioReto.empezarRetoActualizar(reto);
-
-        assertNotNull(reto, "El reto guardado no debe ser null.");
-        assertTrue(reto.getSeleccionado(), "El reto guardado debe ser seleccionado.");
+        Reto retoEnLaBd = repositorioReto.obtenerRetoPorId(reto.getId());
+        assertNotNull(retoEnLaBd, "El reto guardado no debe ser null.");
+        assertTrue(retoEnLaBd.getSeleccionado(), "El reto guardado debe ser seleccionado.");
+        assertTrue(retoEnLaBd.getEnProceso(), "El reto guardado debe estar en true enProceso.");
     }
 
 
     @Test
     @Transactional
-    public void queObtenerRetoPorIdDevuelvaElRetoCorrecto() {
-        Long retoId = 1l;
+    public void queObtenerRetoPorIdDevuelvaElRetoPorId() {
+        Long retoId = 181l;
         // Obtener el reto por ID
         Reto retoObtenido = repositorioReto.obtenerRetoPorId(retoId);
         // Verificar que el ID y el estado seleccionado sean correctos
         assertThat(retoObtenido.getId(), equalTo( retoId));
-        assertThat(retoObtenido.getSeleccionado(), equalTo(true));
     }
 
     @Test

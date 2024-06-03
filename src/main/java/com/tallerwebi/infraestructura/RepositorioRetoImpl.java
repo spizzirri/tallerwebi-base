@@ -24,17 +24,13 @@ public class RepositorioRetoImpl implements RepositorioReto {
         Session session = this.sessionFactory.getCurrentSession();
         String hql = "FROM Reto WHERE seleccionado = false ORDER BY rand()";
         Query <Reto> query = session.createQuery(hql, Reto.class).setMaxResults(1);
-
         return query.uniqueResult();
     }
 
     @Override
     public Reto obtenerRetoPorId(Long retoId) {
-        Session session = this.sessionFactory.getCurrentSession();
-        String hql = "FROM Reto WHERE id = :id AND seleccionado = true";
-        Query<Reto> query = session.createQuery(hql, Reto.class);
-        query.setParameter("id", retoId);
-        return query.uniqueResult();
+        Session session = sessionFactory.getCurrentSession();
+        return session.get(Reto.class, retoId); // Utiliza session.get para obtener el reto por ID
     }
 
     @Override
@@ -42,8 +38,7 @@ public class RepositorioRetoImpl implements RepositorioReto {
         Session session = this.sessionFactory.getCurrentSession();
         session.update(reto);
         session.flush(); // Sincronizar los cambios con la base de datos
-        session.getTransaction().commit();
-}
+    }
 
 
     @Override
@@ -51,8 +46,12 @@ public class RepositorioRetoImpl implements RepositorioReto {
         Session session = this.sessionFactory.getCurrentSession();
         String hql = "FROM Reto WHERE seleccionado = true AND enProceso = true";
         Query<Reto> query = session.createQuery(hql, Reto.class);
+        query.setMaxResults(1);
         return query.uniqueResult();
     }
+
+
+
 
 
 }

@@ -5,7 +5,7 @@ import com.tallerwebi.dominio.calendario.ItemRendimiento;
 public interface ServicioReto {
 
     Reto obtenerRetoDisponible();
-    void empezarReto(Long retoId);
+    void empezarRetoActualizado(Long retoId);
     Reto obtenerRetoPorId(Long retoId);
     Reto obtenerRetoEnProceso();
 

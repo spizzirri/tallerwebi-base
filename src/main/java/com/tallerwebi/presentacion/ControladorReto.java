@@ -29,7 +29,7 @@ public class ControladorReto {
         ModelAndView modelAndView = new ModelAndView("home");
         modelAndView.addObject("retoId", retoId); // Añadir retoId al modelo
         try {
-            servicioReto.empezarReto(retoId);
+            servicioReto.empezarRetoActualizado(retoId);
 
             // Añadir itemMasSeleccionado al modelo
             DatosItemRendimiento itemMasSeleccionado = servicioLogin.obtenerItemMasSeleccionado();
@@ -40,8 +40,8 @@ public class ControladorReto {
             modelAndView.addObject("retoDisponible", retoDisponible);
 
         } catch (Exception e) {
+            // Manejar el error mostrando un mensaje de error en la misma página
             modelAndView.addObject("error", "An error occurred while starting the challenge: " + e.getMessage());
-            modelAndView.setViewName("errorPage");
         }
         return modelAndView;
     }
