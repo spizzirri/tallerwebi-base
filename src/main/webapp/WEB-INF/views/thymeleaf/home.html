@@ -133,7 +133,7 @@
                 <h2 style="text-align:center;"><span th:text="${retoDisponible.nombre}"></span></h2>
                 <p><span th:text="${retoDisponible.descripcion}"></span></p>
                 <!-- Formulario para empezar el reto -->
-                <form th:action="@{/empezar-reto}" method="post" id="empezar-reto-form">
+                <form th:action="@{/empezar-reto}" method="POST" id="empezar-reto-form">
                     <input type="hidden" name="retoId" th:value="${retoDisponible.id}"/>
                     <button type="submit" class="main-btn" id="btn-empezar">Empezar</button>
                 </form>

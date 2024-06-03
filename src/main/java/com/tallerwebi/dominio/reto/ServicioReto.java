@@ -2,6 +2,8 @@ package com.tallerwebi.dominio.reto;
 
 import com.tallerwebi.dominio.calendario.ItemRendimiento;
 
+import javax.transaction.Transactional;
+
 public interface ServicioReto {
 
     Reto obtenerRetoDisponible();
@@ -9,4 +11,6 @@ public interface ServicioReto {
     Reto obtenerRetoPorId(Long retoId);
     Reto obtenerRetoEnProceso();
 
+    @Transactional
+    void terminarReto(Long retoId);
 }

@@ -106,5 +106,25 @@ public class ServicioRetoTest {
         verify(repositorioReto, times(1)).obtenerRetoEnProceso();
     }
 
+    @Test
+    public void queAlTerminarRetoSeActualiceSeleccionadoYEnProceso() {
+        // Arrange
+        Reto retoMock = new Reto();
+        retoMock.setId(1L);
+        retoMock.setSeleccionado(true);
+        retoMock.setEnProceso(true);
+
+        // Configurar el comportamiento del repositorio
+        when(repositorioReto.obtenerRetoPorId(anyLong())).thenReturn(retoMock);
+
+        // Act
+        servicioReto.terminarReto(1L);
+
+        // Assert
+        verify(repositorioReto, times(1)).obtenerRetoPorId(1L);
+        verify(repositorioReto, times(1)).terminarReto(retoMock);
+        assertFalse(retoMock.getSeleccionado(), "El reto debería estar marcado como no seleccionado");
+        assertFalse(retoMock.getEnProceso(), "El reto debería estar marcado como no en proceso");
+    }
 
 }

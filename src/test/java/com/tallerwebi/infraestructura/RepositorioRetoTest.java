@@ -97,7 +97,20 @@ public class RepositorioRetoTest {
         assertTrue(retoObtenido.getEnProceso(), "El reto en proceso debería estar en proceso");
     }
 
-
+    @Test
+    @Transactional
+    public void queAlTerminarRetoSePuedaActualizarSuAtributoSeleccionYEnProceso() {
+        // Arrange
+        Reto reto = repositorioReto.obtenerRetoDisponible();
+        reto.setSeleccionado(true);
+        reto.setEnProceso(true);
+        // Guardar el reto en la base de datos
+        repositorioReto.terminarReto(reto);
+        Reto retoEnLaBd = repositorioReto.obtenerRetoPorId(reto.getId());
+        assertNotNull(retoEnLaBd, "El reto guardado no debe ser null.");
+        assertTrue(retoEnLaBd.getSeleccionado(), "El reto guardado debe ser seleccionado.");
+        assertTrue(retoEnLaBd.getEnProceso(), "El reto guardado debe estar en true enProceso.");
+    }
 
 
 }

@@ -40,6 +40,13 @@ public class ServicioLoginImpl implements ServicioLogin {
     }
 
     @Override
+    public Usuario sumarRachaReto(Usuario usuario) {
+        usuario.sumarRacha();
+        repositorioUsuario.modificar(usuario);
+        return usuario;
+    }
+
+    @Override
     public DatosItemRendimiento obtenerItemMasSeleccionado() {
         return servicioCalendario.obtenerItemMasSeleccionado();
     }

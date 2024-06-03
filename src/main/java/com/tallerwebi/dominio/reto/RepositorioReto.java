@@ -13,4 +13,5 @@ public interface RepositorioReto {
     Reto obtenerRetoEnProceso();
 
 
+    void terminarReto(Reto reto);
 }

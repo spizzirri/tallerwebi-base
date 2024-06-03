@@ -9,6 +9,8 @@ public interface ServicioLogin {
     Usuario consultarUsuario(String email, String password);
     void registrar(Usuario usuario) throws UsuarioExistente;
 
+    Usuario sumarRachaReto(Usuario usuario);
+
     DatosItemRendimiento obtenerItemMasSeleccionado();
 
     Reto obtenerRetoDisponible();

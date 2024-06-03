@@ -50,7 +50,12 @@ public class RepositorioRetoImpl implements RepositorioReto {
         return query.uniqueResult();
     }
 
-
+    @Override
+    public void terminarReto(Reto reto) {
+        Session session = this.sessionFactory.getCurrentSession();
+        session.update(reto);
+        session.flush(); // Sincronizar los cambios con la base de datos
+    }
 
 
 
