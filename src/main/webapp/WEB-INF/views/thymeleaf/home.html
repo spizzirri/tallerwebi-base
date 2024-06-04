@@ -116,9 +116,9 @@
     </section>
     <div class="container">
         <h1 class="main-title">Tu Entrenador Personal</h1>
-        <p class="main-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum vehicula turpis a lacus interdum, in ultrices mi ultricies. Proin et urna vel ipsum vehicula varius. Nam feugiat posuere justo sed ultrices.</p>
-        <p class="main-text">Sed rutrum odio sit amet metus consequat, ut pulvinar ex efficitur. Curabitur pretium, urna sit amet fringilla molestie, neque odio eleifend mi, nec fermentum urna est vitae lectus.</p>
-        <a href="#" class="main-btn">Descubre más</a>
+        <p class="main-text">En nuestro sitio, nos comprometemos a ser tu compañero de fitness y bienestar. Sabemos que cada paso cuenta en tu viaje hacia un estilo de vida más saludable, y estamos aquí para guiarte en cada paso del camino.</p>
+        <p class="main-text">Nuestra misión es proporcionarte las herramientas y la motivación necesarias para alcanzar tus objetivos de fitness. Ya sea que estés buscando perder peso, tonificar tu cuerpo, mejorar tu resistencia o simplemente mantenerte activo, tenemos todo lo que necesitas para lograrlo.</p>
+        <a href="vistaObjetivos" class="main-btn">Comenzar entrenamiento</a>
     </div>
     <div th:if="${error}">
         <p th:text="${error}"></p>
@@ -138,9 +138,14 @@
                     <button type="submit" class="main-btn" id="btn-empezar">Empezar</button>
                 </form>
                 <!-- Botón para marcar como terminado -->
-                <a id="btn-terminado" class="main-btn" style="display: none;">
-                    Terminado
-                </a>
+                <form th:action="@{/terminar-reto}" method="POST" id="terminar-reto-form">
+                    <input type="hidden" name="retoId" th:value="${retoDisponible.id}"/>
+                    <input type="hidden" name="email" th:value="${usuario.email}"/>
+                    <input type="hidden" name="password" th:value="${usuario.password}"/>
+                    <button type="submit" class="main-btn" id="btn-terminado" style="display: none;">
+                        Terminado
+                    </button>
+                </form>
             </div>
         </article>
     </div>
@@ -175,8 +180,9 @@
         <a href="#" class="main-btn">Inscribirse</a>
     </div>
 </div>
-<div id="reto-circulo" class="reto-circulo" style="position: fixed; bottom: 1rem; right: 1rem;">
-    <img id="reto-circulo-img" th:src="@{/img/retoActivo.png}" alt="Reto en progreso" style="border-radius: 50%; width: 100px; height: 80px; border: 1px solid black;">
+<div id="usuario-data" th:data-racha="${usuario.rachaDeRetos}" style="display: none;"></div>
+<div id="reto-circulo" class="reto-circulo">
+    <div id="racha-texto" class="racha-texto"></div>
 </div>
 <!-- Bootstrap CSS -->
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">

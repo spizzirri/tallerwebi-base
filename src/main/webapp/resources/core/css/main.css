@@ -623,14 +623,33 @@ body-calendario {
 }
 
 .reto-circulo {
-    height: 80px;
-    background-color: black;
-    border-radius: 50%;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    width: 100px;
+    height: 100px;
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    background: linear-gradient(0deg, black 0%, #2575fc 100%);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    color: white;
+    font-family: 'Arial', sans-serif;
+    font-weight: bold;
+    font-size: 1.2rem;
+    text-align: center;
 }
+
+.reto-circulo:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    transform: scale(1.05);
+}
+
+.racha-texto {
+    position: relative;
+}
+
 
 .hidden {
     display: none !important;

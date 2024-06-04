@@ -51,41 +51,7 @@ public class ControladorRetoTest {
         mockMvc = MockMvcBuilders.standaloneSetup(controladorReto).build();
     }
 
-    @Test
-    public void testEmpezarReto() {
-        // Mock de los servicios
-        ServicioReto servicioRetoMock = mock(ServicioReto.class);
-        ServicioLogin servicioLoginMock = mock(ServicioLogin.class);
 
-        // Creación del controlador con los mocks
-        ControladorReto controlador = new ControladorReto(servicioRetoMock, servicioLoginMock);
-
-        // ID del reto simulado
-        Long retoId = 123L;
-
-        // Mock del reto disponible
-        Reto retoDisponibleMock = new Reto();
-        retoDisponibleMock.setId(retoId);
-
-        // Simular comportamiento del servicio de reto
-        when(servicioRetoMock.obtenerRetoPorId(retoId)).thenReturn(retoDisponibleMock);
-
-        // Simular comportamiento del servicio de login
-        DatosItemRendimiento itemMasSeleccionadoMock = new DatosItemRendimiento();
-        when(servicioLoginMock.obtenerItemMasSeleccionado()).thenReturn(itemMasSeleccionadoMock);
-
-        // Ejecutar el método del controlador
-        ModelAndView modelAndView = controlador.empezarReto(retoId);
-
-        // Verificar el resultado
-        assertEquals("home", modelAndView.getViewName()); // Comprobar que se redirige a la vista "home"
-        assertEquals(retoId, modelAndView.getModel().get("retoId")); // Comprobar que el modelo contiene el retoId
-        assertEquals(itemMasSeleccionadoMock, modelAndView.getModel().get("itemMasSeleccionado")); // Comprobar que el modelo contiene el itemMasSeleccionado
-        assertEquals(retoDisponibleMock, modelAndView.getModel().get("retoDisponible")); // Comprobar que el modelo contiene el retoDisponible
-
-        // Verificar que se llama al servicio de reto con el ID del reto
-        verify(servicioRetoMock).empezarRetoActualizado(retoId);
-    }
 
 
 

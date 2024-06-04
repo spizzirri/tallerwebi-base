@@ -36,45 +36,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-//document.addEventListener('DOMContentLoaded', (event) => {
-//    const form = document.getElementById('empezar-reto-form');
-//    const btnEmpezar = document.getElementById('btn-empezar');
-//    const btnTerminado = document.getElementById('btn-terminado');
-//
-//    if (!form || !btnEmpezar || !btnTerminado) {
-//        console.error('One or more elements are missing:', {
-//            form: form,
-//            btnEmpezar: btnEmpezar,
-//            btnTerminado: btnTerminado
-//        });
-//        return;
-//    }
-//
-//        form.addEventListener('submit', function(event) {
-//            event.preventDefault();  // Prevenir el comportamiento por defecto del formulario
-//
-//            const formData = new FormData(form);
-//            const url = form.action;
-//            const method = form.method;
-//
-//            fetch(url, {
-//                method: method,
-//                body: new URLSearchParams(formData)  // Convertir FormData a URLSearchParams
-//            }).then(response => {
-//                if (response.ok) {
-//                    // Ocultar el botón "Empezar" y mostrar el botón "Terminado"
-//                    btnEmpezar.style.display = 'none';
-//                    btnTerminado.style.display = 'block';
-//                } else {
-//                    // Manejar el error si es necesario
-//                    console.error('Error starting the challenge');
-//                }
-//            }).catch(error => {
-//                console.error('An error occurred:', error);
-//            });
-//        });
-//    });
-
     document.addEventListener('DOMContentLoaded', function() {
                 const retoId = document.querySelector('input[name="retoId"]').value;
                 const currentUrl = window.location.pathname;
@@ -101,6 +62,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     document.getElementById('btn-terminado').style.display = 'block';
                 });
             });
+
+document.addEventListener('DOMContentLoaded', (event) => {
+    const usuarioDataDiv = document.getElementById('usuario-data');
+    const rachaDeRetos = usuarioDataDiv ? usuarioDataDiv.getAttribute('data-racha') : 0;
+
+    // Actualizar el texto de la racha
+    const rachaTextoDiv = document.getElementById('racha-texto');
+    if (rachaTextoDiv) {
+        rachaTextoDiv.textContent = `Racha Retos: ${rachaDeRetos}`;
+    }
+});
 
 
 

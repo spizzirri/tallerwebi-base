@@ -83,9 +83,10 @@ public class ControladorLogin {
         ModelAndView modelAndView = new ModelAndView("home");
         // Obtener el usuario de la sesión
         Usuario usuario = (Usuario) session.getAttribute("usuario");
-        if (usuario != null) {
-            modelAndView.addObject("usuario", usuario);
+        if (usuario == null) {
+            modelAndView.setViewName("redirect:/login");
         }
+        modelAndView.addObject("usuario", usuario);
         // Obtener el ItemRendimiento más seleccionado
         DatosItemRendimiento itemMasSeleccionado = servicioLogin.obtenerItemMasSeleccionado();
 
