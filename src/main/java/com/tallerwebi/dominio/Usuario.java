@@ -90,13 +90,13 @@ public class Usuario {
         this.rutinas = new ArrayList<>();
     }
 
-    public Usuario(String email, String nombre, String apellido, String password, List<Reto> retos, Integer rachaDeRetos) {
+    public Usuario(String email, String nombre, String apellido, String password, List<Reto> retos) {
         this.email = email;
         this.nombre = nombre;
         this.apellido = apellido;
         this.password = password;
         this.retos = retos;
-        this.rachaDeRetos = rachaDeRetos;
+        this.rachaDeRetos = 0;
     }
 
     public Long getId() {
