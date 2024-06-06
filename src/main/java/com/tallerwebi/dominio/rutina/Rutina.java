@@ -19,11 +19,10 @@ public class Rutina {
     @Enumerated(EnumType.STRING)
     private Objetivo objetivo;
 
-    @ManyToMany
-    private List<Ejercicio> ejercicios = new ArrayList<>();
-
+    @ManyToMany(fetch = FetchType.EAGER)
+    private List<Ejercicio> ejercicios;
     public Rutina() {
-
+        this.ejercicios = new ArrayList<>();
     }
 
     public Rutina(String nombre, Objetivo objetivo) {

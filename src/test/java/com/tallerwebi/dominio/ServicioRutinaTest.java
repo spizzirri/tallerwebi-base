@@ -76,13 +76,14 @@ public class ServicioRutinaTest {
     public void QueArrojeExcepcionSiElUsuarioNoTieneNingunaRutinaAsignada() throws UsuarioSinRutinasException {
         //p
         Usuario usuario = new Usuario("Lautaro", Objetivo.GANANCIA_MUSCULAR);
+        List<Rutina> rutinasMock = new ArrayList<>();
 
         //e
-        when(this.repositorioRutina.getRutinasDeUsuario(usuario)).thenThrow(new UsuarioSinRutinasException());
+        when(this.repositorioRutina.getRutinasDeUsuario(usuario)).thenReturn(rutinasMock);
 
         //v
         assertThrowsExactly(UsuarioSinRutinasException.class, () ->
-                this.repositorioRutina.getRutinasDeUsuario(usuario)
+                this.servicioRutina.getRutinasDeUsuario(usuario)
         );
     }
 
@@ -575,6 +576,27 @@ public class ServicioRutinaTest {
 
         //Verificación
         assertFalse(resultado);
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void queSePuedaObtenerUnaListaDeDatosRutinaDeRutinasConObjetivoPerdidaDePeso() {
+        // Preparación
+        Rutina rutinaMock = new Rutina("Rutina def 1",Objetivo.DEFINICION);
+        Rutina rutinaMock2 = new Rutina("Rutina def 2",Objetivo.DEFINICION);
+        List<Rutina> rutinasEsperadas = new ArrayList<>();
+        rutinasEsperadas.add(rutinaMock);
+        rutinasEsperadas.add(rutinaMock2);
+        Objetivo objetivoMock = Objetivo.DEFINICION;
+
+        //Ejecución
+        when(this.repositorioRutina.getRutinasByObjetivo(objetivoMock)).thenReturn(rutinasEsperadas);
+
+        //Verificación
+        List<DatosRutina> rutinasObtenidas = this.servicioRutina.getRutinasPorObjetivo(objetivoMock);
+
+        assertEquals(rutinasObtenidas.size(),2);
     }
 
 }

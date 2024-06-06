@@ -32,10 +32,16 @@ public interface ServicioRutina {
     Usuario getUsuarioById(Long id) throws UsuarioNoExisteException;
 
     Rutina getRutinaById(Long idRutina) throws RutinaNoEncontradaException;
+    DatosRutina getDatosRutinaById(Long idRutina) throws RutinaNoEncontradaException;
 
     Ejercicio getEjercicioById(Long idEjercicio) throws EjercicioNoEncontradoException;
 
     boolean existeRutinaEnUsuario(Rutina rutina, Usuario usuario);
     boolean existeEjercicioEnRutina(Ejercicio ejercicio, Rutina rutina);
 
+    List<DatosRutina> getRutinasPorObjetivo(Objetivo objetivo);
+
+    DatosRutina getRutinaActualDelUsuario(Usuario usuario);
+
+    void asignarRutinaAUsuario(Rutina rutina, Usuario usuario) throws RutinaYaExisteException;
 }

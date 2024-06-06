@@ -1,0 +1,72 @@
+/* General Styles */
+body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa; /* Light background color */
+}
+
+nav {
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: fixed; /* Fix navbar to top */
+    width: 100%;
+    z-index: 100; /* Ensure navbar stays on top */
+}
+
+.navbar-brand .logo-img {
+    height: 40px; /* Adjust the logo size */
+}
+
+.navbar-brand .logo-text {
+    font-size: 1.5rem; /* Adjust the text size */
+    font-weight: bold;
+}
+
+.user-img {
+    height: 30px; /* Adjust user image size */
+    border-radius: 50%;
+}
+
+.container {
+    margin-top: 80px; /* Space below navbar */
+    margin-bottom: 80px; /* Space above footer */
+}
+
+.card {
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+footer {
+    background-color: #f0f0f0;
+    position: fixed; /* Fix footer to bottom */
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    padding: 20px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .navbar-brand .logo-text {
+        font-size: 1.2rem; /* Adjust text size for smaller screens */
+    }
+
+    .user-name {
+        display: none; /* Hide user name on smaller screens */
+    }
+
+    .container {
+        width: 95%; /* Adjust container width for smaller screens */
+        padding: 0 15px;
+    }
+
+    .card-header h2 {
+        font-size: 1.5rem; /* Adjust header text size for smaller screens */
+    }
+
+    .card-body p {
+        font-size: 1rem; /* Adjust body text size for smaller screens */
+    }
+}

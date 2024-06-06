@@ -4,22 +4,25 @@ import com.tallerwebi.dominio.excepcion.*;
 import com.tallerwebi.dominio.objetivo.Objetivo;
 
 import com.tallerwebi.presentacion.DatosRutina;
+import org.hibernate.Hibernate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class ServicioRutinaImpl implements ServicioRutina {
 
-    private RepositorioRutina repositorioRutina;
-
+    private final RepositorioRutina repositorioRutina;
+    @Autowired
     public ServicioRutinaImpl(RepositorioRutina repositorioRutina){
         this.repositorioRutina = repositorioRutina;
     }
-
-    public ServicioRutinaImpl(){}
-
 
     @Override
     public List<DatosRutina> getRutinas() {
@@ -159,6 +162,16 @@ public class ServicioRutinaImpl implements ServicioRutina {
     }
 
     @Override
+    public DatosRutina getDatosRutinaById(Long idRutina) throws RutinaNoEncontradaException {
+
+        Rutina rutina = repositorioRutina.buscarRutinaPorId(idRutina);
+        if (rutina == null) {
+            throw new RutinaNoEncontradaException("La rutina con ID " + idRutina + " no existe.");
+        }
+        return convertRutinaADatosRutina(rutina);
+    }
+
+    @Override
     public Ejercicio getEjercicioById(Long idEjercicio) throws EjercicioNoEncontradoException {
         Ejercicio ejercicio = repositorioRutina.buscarEjercicioPorId(idEjercicio);
         if (ejercicio == null) {
@@ -182,6 +195,35 @@ public class ServicioRutinaImpl implements ServicioRutina {
         return ejercicioBuscado != null;
     }
 
+    @Override
+    public List<DatosRutina> getRutinasPorObjetivo(Objetivo objetivo) {
+
+        if (objetivo == null) {
+            throw new IllegalArgumentException("El objetivo no puede ser nulo");
+        }
+
+        List<Rutina> rutinas = repositorioRutina.getRutinasByObjetivo(objetivo);
+        if (rutinas == null || rutinas.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return convertToDatosRutina(rutinas);
+    }
+
+    @Override
+    public DatosRutina getRutinaActualDelUsuario(Usuario usuario) {
+        return null;
+    }
+
+    @Override
+    public void asignarRutinaAUsuario(Rutina rutina, Usuario usuario) throws RutinaYaExisteException {
+        Rutina rutinaBuscada = this.repositorioRutina.buscarRutinaEnUsuario(rutina,usuario);
+        if (rutinaBuscada != null){
+            throw new RutinaYaExisteException();
+        }
+
+        this.repositorioRutina.asignarRutinaAUsuario(rutina,usuario);
+    }
 
     private List<DatosRutina> convertToDatosRutina(List<Rutina> rutinas) {
 

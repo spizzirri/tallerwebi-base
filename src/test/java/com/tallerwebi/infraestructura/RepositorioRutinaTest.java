@@ -11,6 +11,7 @@ import com.tallerwebi.dominio.rutina.Ejercicio;
 import com.tallerwebi.dominio.rutina.RepositorioRutina;
 import com.tallerwebi.dominio.rutina.Rutina;
 import com.tallerwebi.infraestructura.config.HibernateTestInfraestructuraConfig;
+import com.tallerwebi.presentacion.DatosRutina;
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -373,6 +374,28 @@ public class RepositorioRutinaTest {
 
         List<Rutina> rutinas = repositorioRutina.getRutinasDeUsuario(usuario);
         assertFalse(rutinas.contains(rutina));
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void queSePuedaObtenerUnaListaDeRutinasConObjetivoDefinicion() {
+        // Preparación
+        Rutina rutinaMock = new Rutina("Rutina def 1",Objetivo.DEFINICION);
+        Rutina rutinaMock2 = new Rutina("Rutina def 2",Objetivo.DEFINICION);
+        Objetivo objetivoMock = Objetivo.DEFINICION;
+        this.sessionFactory.getCurrentSession().save(rutinaMock);
+        this.sessionFactory.getCurrentSession().save(rutinaMock2);
+
+        // Ejecución
+        List<Rutina> rutinasMock = repositorioRutina.getRutinasByObjetivo(objetivoMock);
+
+        // Verificación
+
+
+        assertEquals(rutinasMock.size(),2);
+        assertTrue(rutinasMock.contains(rutinaMock));
+        assertTrue(rutinasMock.contains(rutinaMock2));
     }
 
     public Rutina crearRutina(String nombre, Objetivo objetivo){

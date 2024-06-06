@@ -8,6 +8,7 @@ import com.tallerwebi.dominio.rutina.RepositorioRutina;
 import com.tallerwebi.dominio.rutina.Rutina;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -15,10 +16,9 @@ import java.util.List;
 
 @Repository
 public class RepositorioRutinaImpl implements RepositorioRutina {
-    private List<Rutina> rutinas;
-
+    @Autowired
     private SessionFactory sessionFactory;
-
+    @Autowired
     public RepositorioRutinaImpl(SessionFactory sessionFactory){
         this.sessionFactory = sessionFactory;
     }
@@ -52,10 +52,9 @@ public class RepositorioRutinaImpl implements RepositorioRutina {
     public List<Rutina> getRutinasByObjetivo(Objetivo objetivo) {
 
         String hql = "FROM Rutina WHERE objetivo = :objetivo";
-        Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
-        query.setParameter("objetivo",objetivo);
-
-        return (List<Rutina>) query.getResultList();
+        return sessionFactory.getCurrentSession().createQuery(hql, Rutina.class)
+                .setParameter("objetivo", objetivo)
+                .list();
     }
 
     @Override
@@ -83,8 +82,11 @@ public class RepositorioRutinaImpl implements RepositorioRutina {
 
     @Override
     public void guardarEjercicioEnRutina(Ejercicio ejercicio, Rutina rutina) {
-        rutina.getEjercicios().add(ejercicio);
-        this.sessionFactory.getCurrentSession().save(rutina);
+        Rutina rutinaAAsignar = this.buscarRutinaPorId(rutina.getIdRutina());
+        Ejercicio ejercicioAAsignar = this.getEjercicioById(ejercicio.getIdEjercicio());
+
+        rutinaAAsignar.getEjercicios().add(ejercicioAAsignar);
+        this.sessionFactory.getCurrentSession().save(rutinaAAsignar);
     }
 
     @Override
@@ -123,12 +125,11 @@ public class RepositorioRutinaImpl implements RepositorioRutina {
 
     @Override
     public void asignarRutinaAUsuario(Rutina rutina, Usuario usuario) {
-        this.guardarRutina(rutina);
-        this.guardarUsuario(usuario);
-        usuario.getRutinas().add(rutina);
-        this.sessionFactory.getCurrentSession().update(usuario);
+        Rutina rutinaAAsignar = this.buscarRutinaPorId(rutina.getIdRutina());
+        Usuario usuarioAAsignar = this.getUsuarioPorId(usuario.getId());
 
-
+        usuarioAAsignar.getRutinas().add(rutinaAAsignar);
+        this.sessionFactory.getCurrentSession().update(usuarioAAsignar);
     }
 
     @Override
@@ -221,11 +222,8 @@ public class RepositorioRutinaImpl implements RepositorioRutina {
         Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
         query.setParameter("id",id);
 
-        try {
-            return (Usuario) query.getSingleResult();
-        } catch (Exception e) {
-            return null;
-        }
+        return (Usuario) query.getSingleResult();
+
     }
 
     @Override
@@ -235,6 +233,21 @@ public class RepositorioRutinaImpl implements RepositorioRutina {
         query.setParameter("rutinaId", rutina.getIdRutina());
         return (List<Ejercicio>)query.getResultList();
     }
+
+    @Override
+    public Rutina getRutinaActualDeLUsuario(Usuario usuario) {
+        return null;
+    }
+
+    @Override
+    public Ejercicio getEjercicioById(Long idEjercicio) {
+        String hql = "FROM Ejercicio WHERE idEjercicio = :id ";
+        Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
+        query.setParameter("id",idEjercicio);
+
+        return (Ejercicio) query.getSingleResult();
+    }
+
 
 
 }

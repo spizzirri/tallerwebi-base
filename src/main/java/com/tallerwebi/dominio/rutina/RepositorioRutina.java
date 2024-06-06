@@ -32,6 +32,8 @@ public interface RepositorioRutina {
     Rutina buscarRutinaPorId(Long idRutina);
     List<Rutina> getRutinasPorObjetivoDeUsuario(Usuario usuario);
     Usuario getUsuarioPorId(Long id);
-
     List<Ejercicio> getEjerciciosDeRutina(Rutina rutina);
+    Rutina getRutinaActualDeLUsuario(Usuario usuario);
+
+    Ejercicio getEjercicioById(Long idEjercicio);
 }
