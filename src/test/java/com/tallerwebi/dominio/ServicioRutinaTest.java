@@ -76,6 +76,7 @@ public class ServicioRutinaTest {
     public void QueArrojeExcepcionSiElUsuarioNoTieneNingunaRutinaAsignada() throws UsuarioSinRutinasException {
         //p
         Usuario usuario = new Usuario("Lautaro", Objetivo.GANANCIA_MUSCULAR);
+<<<<<<< HEAD
         List<Rutina> rutinasMock = new ArrayList<>();
 
         //e
@@ -84,7 +85,20 @@ public class ServicioRutinaTest {
         //v
         assertThrowsExactly(UsuarioSinRutinasException.class, () ->
                 this.servicioRutina.getRutinasDeUsuario(usuario)
+=======
+        List<Rutina> rutinasmock = new ArrayList<>();
+
+        //e
+        when(this.repositorioRutina.getRutinasDeUsuario(usuario)).thenReturn(rutinasmock);
+
+        //v
+        UsuarioSinRutinasException exception = assertThrows(
+                UsuarioSinRutinasException.class,
+                () -> servicioRutina.getRutinasDeUsuario(usuario)
+>>>>>>> 4f35be0c3d69ca196298f4213a082a6984710c39
         );
+
+        assertThat(exception.getMessage(), equalTo("El usuario no tiene rutinas asignadas."));
     }
 
     @Transactional
@@ -94,7 +108,6 @@ public class ServicioRutinaTest {
         //p
         Usuario usuario = new Usuario("Lautaro", Objetivo.GANANCIA_MUSCULAR);
         Rutina rutina = new Rutina("Rutina de volumen",Objetivo.GANANCIA_MUSCULAR);
-        usuario.setId(1L);
         rutina.setIdRutina(1L);
 
         //e

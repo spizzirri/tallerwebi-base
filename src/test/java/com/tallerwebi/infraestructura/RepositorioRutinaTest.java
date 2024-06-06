@@ -47,7 +47,7 @@ public class RepositorioRutinaTest {
     @Test
     @Transactional
     @Rollback
-    public void QueSePuedaGuardarUnaNuevaRutina(){
+    public void queSePuedaGuardarUnaNuevaRutina(){
         //preparacion
         Rutina rutina = this.crearRutina("Cardio furioso",Objetivo.PERDIDA_DE_PESO);
 
@@ -65,7 +65,7 @@ public class RepositorioRutinaTest {
     @Test
     @Transactional
     @Rollback
-    public void QuesePuedanObtenerRutinasDePerdidaDePeso(){
+    public void quesePuedanObtenerRutinasDePerdidaDePeso(){
         //preparacion
         this.crearRutina(anyString(),Objetivo.PERDIDA_DE_PESO);
         this.crearRutina(anyString(),Objetivo.PERDIDA_DE_PESO);
@@ -75,18 +75,15 @@ public class RepositorioRutinaTest {
         List<Rutina> rutinasObtenidas = this.repositorioRutina.getRutinasByObjetivo(Objetivo.PERDIDA_DE_PESO);
 
         //verificacion
-
         assertThat(rutinasObtenidas.size(),equalTo(2));
-
     }
 
     @Test
     @Transactional
     @Rollback
-    public void QueSePuedaActualizarElNombreDeUnaRutinaExistente(){
+    public void queSePuedaActualizarElNombreDeUnaRutinaExistente(){
         //preparacion
         Rutina rutina = this.crearRutina("Rutina de cardio corriendo",Objetivo.PERDIDA_DE_PESO);
-
 
         //ejecucion
         String nombreEsperado = "Rutina de cardio caminando";
@@ -101,16 +98,14 @@ public class RepositorioRutinaTest {
                 .getSingleResult();
 
         assertThat(rutinaObtenida.getNombre(),equalTo(nombreEsperado));
-
     }
 
     @Test
     @Transactional
     @Rollback
-    public void QueSePuedanActualizarLasSeriesYRepeticionesDeUnEjercicio(){
+    public void queSePuedanActualizarLasSeriesYRepeticionesDeUnEjercicio(){
         //preparacion
         Ejercicio ejercicio = new Ejercicio("Burpees",Objetivo.PERDIDA_DE_PESO, GrupoMuscularObjetivo.PIERNAS,4,12);
-
 
         //ejecucion
         Integer seriesEsperadas = 8;
@@ -134,7 +129,7 @@ public class RepositorioRutinaTest {
     @Test
     @Transactional
     @Rollback
-    public void QueSePuedaGuardarUnEjercicioEnUnaRutina(){
+    public void queSePuedaGuardarUnEjercicioEnUnaRutina(){
         //p
         Rutina rutinaMock = crearRutina("ADELGAZAR",Objetivo.PERDIDA_DE_PESO);
         Ejercicio ejercicioMock = new Ejercicio("Burpees",Objetivo.PERDIDA_DE_PESO, GrupoMuscularObjetivo.PIERNAS,4,12);
@@ -156,7 +151,7 @@ public class RepositorioRutinaTest {
     @Test
     @Transactional
     @Rollback
-    public void QueSePuedaBuscarUnEjercicioEnUnaRutina() throws EjercicioNoExisteEnRutinaException {
+    public void queSePuedaBuscarUnEjercicioEnUnaRutina() throws EjercicioNoExisteEnRutinaException {
         //p
         Rutina rutinaMock = crearRutina("Volumen",Objetivo.GANANCIA_MUSCULAR);
         Ejercicio ejercicio1 = new Ejercicio("Curl de biceps",Objetivo.GANANCIA_MUSCULAR, GrupoMuscularObjetivo.BRAZOS,4,12);
@@ -175,7 +170,7 @@ public class RepositorioRutinaTest {
     @Test
     @Transactional
     @Rollback
-    public void QueSeBusqueYNoSeEncuentreElEjercicioEnUnaRutina() {
+    public void queSeBusqueYNoSeEncuentreElEjercicioEnUnaRutina() {
         //p
         Rutina rutinaMock = crearRutina("Volumen", Objetivo.GANANCIA_MUSCULAR);
         Ejercicio ejercicio1 = new Ejercicio("Curl de biceps", Objetivo.GANANCIA_MUSCULAR, GrupoMuscularObjetivo.BRAZOS, 4, 12);
@@ -197,7 +192,7 @@ public class RepositorioRutinaTest {
     @Transactional
     @Rollback
     @Test
-    public void QueSePuedaAsignarUnaRutinaAUnUsuario(){
+    public void queSePuedaAsignarUnaRutinaAUnUsuario(){
         //p
         Usuario usuario = new Usuario("Lautaro", Objetivo.GANANCIA_MUSCULAR);
         Rutina rutinaPecho = crearRutina("Rutina de volumen - PECHO",Objetivo.GANANCIA_MUSCULAR);
@@ -219,7 +214,7 @@ public class RepositorioRutinaTest {
     @Transactional
     @Rollback
     @Test
-    public void QueSePuedaSaberQueRutinasTieneElUsuario() throws  UsuarioSinRutinasException {
+    public void queSePuedaSaberQueRutinasTieneElUsuario() throws  UsuarioSinRutinasException {
         //p
         Usuario usuario = new Usuario("Lautaro", Objetivo.GANANCIA_MUSCULAR);
         Rutina rutinaPecho = crearRutina("Rutina de volumen - PECHO",Objetivo.GANANCIA_MUSCULAR);
@@ -243,7 +238,7 @@ public class RepositorioRutinaTest {
     @Test
     @Transactional
     @Rollback
-    public void QueSePuedaBuscarUnaRutinaEnUnUsuario() throws UsuarioNoTieneLaRutinaBuscadaException {
+    public void queSePuedaBuscarUnaRutinaEnUnUsuario() throws UsuarioNoTieneLaRutinaBuscadaException {
         //p
         Rutina rutinaMock = crearRutina("Volumen",Objetivo.GANANCIA_MUSCULAR);
         Usuario usuarioMock = new Usuario("Lautaro", Objetivo.GANANCIA_MUSCULAR);
@@ -262,7 +257,7 @@ public class RepositorioRutinaTest {
     @Test
     @Transactional
     @Rollback
-    public void QueAlBuscarUnaRutinaEnUnUsuarioYNoEsteArrojeExcepcion() {
+    public void queAlBuscarUnaRutinaEnUnUsuarioYNoEsteArrojeExcepcion() {
         //p
         Rutina rutinaMock = crearRutina("Volumen",Objetivo.GANANCIA_MUSCULAR);
         Usuario usuarioMock = new Usuario("Lautaro", Objetivo.GANANCIA_MUSCULAR);
@@ -279,7 +274,7 @@ public class RepositorioRutinaTest {
     @Test
     @Transactional
     @Rollback
-    public void QueSePuedaBuscarUnaRutinaPorSuId() {
+    public void queSePuedaBuscarUnaRutinaPorSuId() {
         //p
         Rutina rutinaMock = crearRutina("Volumen",Objetivo.GANANCIA_MUSCULAR);
 
@@ -294,7 +289,7 @@ public class RepositorioRutinaTest {
     @Test
     @Transactional
     @Rollback
-    public void QueSePuedaBuscarUnUsuarioPorSuId() {
+    public void queSePuedaBuscarUnUsuarioPorSuId() {
         //p
         Usuario usuarioMock = new Usuario("Lautaro", Objetivo.PERDIDA_DE_PESO);
 
@@ -310,7 +305,7 @@ public class RepositorioRutinaTest {
     @Test
     @Transactional
     @Rollback
-    public void QueSePuedaObtenerLasRutinasQueLeInteresanAlUsuarioSegunSuObjetivo()  {
+    public void queSePuedaObtenerLasRutinasQueLeInteresanAlUsuarioSegunSuObjetivo()  {
         //p
         Rutina rutinaVolumen = crearRutina("Volumen",Objetivo.GANANCIA_MUSCULAR);
         Rutina rutinaCardio1= crearRutina("Rutina de cardio - caminar",Objetivo.PERDIDA_DE_PESO);
@@ -335,7 +330,7 @@ public class RepositorioRutinaTest {
     @Test
     @Transactional
     @Rollback
-    public void QueSePuedaEliminarEjercicioDeRutina() {
+    public void queSePuedaEliminarEjercicioDeRutina() {
         // Preparación
         Rutina rutina = crearRutina("Volumen", Objetivo.GANANCIA_MUSCULAR);
         Ejercicio ejercicio = new Ejercicio("Curl de biceps", Objetivo.GANANCIA_MUSCULAR, GrupoMuscularObjetivo.BRAZOS, 4, 12);
@@ -357,7 +352,7 @@ public class RepositorioRutinaTest {
     @Test
     @Transactional
     @Rollback
-    public void QueSePuedaEliminarRutinaDeUsuario() {
+    public void queSePuedaEliminarRutinaDeUsuario() {
         // Preparación
         Usuario usuario = new Usuario("Juan", Objetivo.GANANCIA_MUSCULAR);
         Rutina rutina = crearRutina("Volumen", Objetivo.GANANCIA_MUSCULAR);

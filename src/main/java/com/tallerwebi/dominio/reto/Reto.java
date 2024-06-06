@@ -25,16 +25,24 @@ public class Reto {
     @Column(name = "seleccionado", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean seleccionado;
 
+    @Column(name = "en_proceso", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean enProceso = false;
+
     public Reto() {
     }
 
     // Constructor con parámetros
-    public Reto(String nombre, String descripcion, String imagenUrl) {
+    public Reto(String nombre, String descripcion, String imagenUrl, Boolean enProceso) {
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.imagenUrl = imagenUrl;
         this.seleccionado = false;
+        this.enProceso = false;
     }
+
+    public Reto(String nombre, String descripción) {
+    }
+
 
     // Getters y setters
     public Long getId() {
@@ -69,12 +77,20 @@ public class Reto {
         this.imagenUrl = imagenUrl;
     }
 
-    public boolean isSeleccionado() {
+    public boolean getSeleccionado() {
         return seleccionado;
     }
 
-    public void setSeleccionado(boolean seleccionado) {
+    public void setSeleccionado(Boolean seleccionado) {
         this.seleccionado = seleccionado;
+    }
+
+    public Boolean getEnProceso() {
+        return enProceso;
+    }
+
+    public void setEnProceso(Boolean enProceso) {
+        this.enProceso = enProceso;
     }
 
     @Override

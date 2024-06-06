@@ -20,40 +20,43 @@ public class RepositorioRetoImpl implements RepositorioReto {
     }
 
     @Override
-    public Reto obtenerReto() {
+    public Reto obtenerRetoDisponible() {
         Session session = this.sessionFactory.getCurrentSession();
-        Reto reto = null;
-        boolean retoEncontrado = false;
-        while (!retoEncontrado) {
-            // Obtener un reto aleatorio que no haya sido seleccionado
-            String hql = "FROM Reto WHERE seleccionado = false ORDER BY rand()";
-            Query<Reto> query = session.createQuery(hql, Reto.class).setMaxResults(1);
-            reto = query.uniqueResult();
-            if (reto != null) {
-                retoEncontrado = true;
-            }
-        }
-        return reto;
-    }
-
-    @Override
-    public void empezarReto(Long retoId) {
-        Session session = this.sessionFactory.getCurrentSession();
-        Reto reto = session.get(Reto.class, retoId);
-        if (reto != null) {
-            reto.setSeleccionado(true); // Marcar como seleccionado
-            session.update(reto);
-        }
+        String hql = "FROM Reto WHERE seleccionado = false ORDER BY rand()";
+        Query <Reto> query = session.createQuery(hql, Reto.class).setMaxResults(1);
+        return query.uniqueResult();
     }
 
     @Override
     public Reto obtenerRetoPorId(Long retoId) {
+        Session session = sessionFactory.getCurrentSession();
+        return session.get(Reto.class, retoId); // Utiliza session.get para obtener el reto por ID
+    }
+
+    @Override
+    public void empezarRetoActualizar(Reto reto) {
         Session session = this.sessionFactory.getCurrentSession();
-        String hql = "FROM Reto WHERE id = :id AND seleccionado = true";
+        session.update(reto);
+        session.flush(); // Sincronizar los cambios con la base de datos
+    }
+
+
+    @Override
+    public Reto obtenerRetoEnProceso() {
+        Session session = this.sessionFactory.getCurrentSession();
+        String hql = "FROM Reto WHERE seleccionado = true AND enProceso = true";
         Query<Reto> query = session.createQuery(hql, Reto.class);
-        query.setParameter("id", retoId);
+        query.setMaxResults(1);
         return query.uniqueResult();
     }
+
+    @Override
+    public void terminarReto(Reto reto) {
+        Session session = this.sessionFactory.getCurrentSession();
+        session.update(reto);
+        session.flush(); // Sincronizar los cambios con la base de datos
+    }
+
 
 
 }

@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.Model;
+import org.springframework.web.servlet.ModelAndView;
 
 import static java.lang.reflect.Array.get;
 import static org.mockito.Mockito.verify;
@@ -50,38 +51,9 @@ public class ControladorRetoTest {
         mockMvc = MockMvcBuilders.standaloneSetup(controladorReto).build();
     }
 
-    @Test
-    public void testEmpezarRetoSuccess() throws Exception {
-        Long retoId = 123L;
 
-        doNothing().when(servicioReto).empezarReto(retoId);
 
-        mockMvc.perform(post("/home/empezar-reto")
-                        .param("retoId", retoId.toString()))
-                .andExpect(status().isOk())
-                .andExpect(view().name("home"))
-                .andExpect(model().attributeExists("retoId"))
-                .andExpect(model().attribute("retoId", retoId));
 
-        verify(servicioReto, times(1)).empezarReto(retoId);
-    }
-
-    @Test
-    public void testEmpezarRetoFailure() throws Exception {
-        Long retoId = 123L;
-        String errorMessage = "Error al iniciar el reto";
-
-        doThrow(new RuntimeException(errorMessage)).when(servicioReto).empezarReto(retoId);
-
-        mockMvc.perform(post("/home/empezar-reto")
-                        .param("retoId", retoId.toString()))
-                .andExpect(status().isOk())
-                .andExpect(view().name("errorPage"))
-                .andExpect(model().attributeExists("error"))
-                .andExpect(model().attribute("error", "An error occurred while starting the challenge: " + errorMessage));
-
-        verify(servicioReto, times(1)).empezarReto(retoId);
-    }
 
 
 

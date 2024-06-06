@@ -1,10 +1,11 @@
 body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
     margin: 0;
     padding: 0;
-    background-color: #1f1f1f;
     color: #ccc;
+    background-image: linear-gradient( 89.7deg,  rgba(0,0,0,1) -10.7%, rgba(53,92,125,1) 88.8% );
 }
+
 
 header {
     background-color: #fff;
@@ -146,7 +147,7 @@ a:active {
 
 .main-content {
     padding: 4rem 0.5rem;
-    background-color: #1f1f1f;
+    background-image: linear-gradient( 89.7deg,  rgba(0,0,0,1) -10.7%, rgba(53,92,125,1) 88.8% );
 }
 
 .container {
@@ -225,7 +226,7 @@ a:active {
 }
 
 body-calendario {
-    background-color: var(--background);
+    background-image: linear-gradient( 89.7deg,  rgba(0,0,0,1) -10.7%, rgba(53,92,125,1) 88.8% );
     font-family: Mulish;
     font-size: 16px;
 }
@@ -399,7 +400,7 @@ body-calendario {
 }
 
 .styled-table thead tr {
-    background-color: #2b62cf;
+    background-image: linear-gradient( 296.2deg,  rgba(73,73,73,1) 36.1%, rgba(16,15,15,1) 93.6% );
     color: #ffffff;
     text-align: center;
 }
@@ -495,7 +496,7 @@ body-calendario {
     justify-content: center;
     margin-bottom: 3rem;
     color: white !important;
-    background-color: #2b62cf;
+    background-image: linear-gradient( 296.2deg,  rgba(73,73,73,1) 36.1%, rgba(16,15,15,1) 93.6% );
     padding: 1rem;
     border-radius: 10px;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Sombra suave */
@@ -623,14 +624,33 @@ body-calendario {
 }
 
 .reto-circulo {
-    height: 80px;
-    background-color: black;
-    border-radius: 50%;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    width: 100px;
+    height: 100px;
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    background-image: linear-gradient( 199deg,  rgba(73,73,73,1) 36.1%, rgba(16,15,15,1) 93.6% );
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    color: white;
+    font-family: 'Arial', sans-serif;
+    font-weight: bold;
+    font-size: 1.2rem;
+    text-align: center;
 }
+
+.reto-circulo:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    transform: scale(1.05);
+}
+
+.racha-texto {
+    position: relative;
+}
+
 
 .hidden {
     display: none !important;

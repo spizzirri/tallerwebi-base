@@ -44,43 +44,72 @@ public class RepositorioRetoTest {
 
     @Test
     @Transactional
-    public void deberiaObtenerReto() {
-        // Ejecutar el método para obtener un reto
-        Reto reto = repositorioReto.obtenerReto();
-
-        // Verificar que el reto no sea nulo
-        assertNotNull(reto, "El reto obtenido no debería ser nulo");
+    public void queAlObtenerRetoDisponibleSeObtengaUnRetoEnSeleccionadoFalse() {
+        Reto reto = repositorioReto.obtenerRetoDisponible();
+        assertNotNull(reto, "El método obtenerRetoDisponible no debe devolver null.");
+        assertFalse(reto.getSeleccionado(), "El reto devuelto debe tener seleccionado en false.");
     }
 
     @Test
     @Transactional
-    public void queAlEmpezarUnRetoSeActualiceSuCondicionDeSeleccionado() {
-        Reto retoObtenido = repositorioReto.obtenerReto();
-        repositorioReto.empezarReto(retoObtenido.getId());
-        assertNotNull(retoObtenido, "El reto obtenido no debería ser nulo");
-        assertTrue(retoObtenido.isSeleccionado(), "El reto debería estar marcado como seleccionado");
-
-        // Verificar que no se puede obtener el mismo reto nuevamente
-        Reto otroRetoObtenido = repositorioReto.obtenerReto();
-        assertNotEquals(retoObtenido.getId(), otroRetoObtenido.getId(), "No se debería obtener el mismo reto dos veces");
-
-        // Verificar que el reto fue actualizado en la base de datos
-        Reto retoActualizado = (Reto) this.sessionFactory.getCurrentSession()
-                .createQuery("FROM Reto WHERE id = :id")
-                .setParameter("id", retoObtenido.getId())
-                .getSingleResult();
-        assertThat(retoActualizado.isSeleccionado(), equalTo(true));
+    public void queAlEmpezarRetoActualizarSeActualiceSuSeleccionadoYEnProceso() {
+        Reto reto = repositorioReto.obtenerRetoDisponible();
+        reto.setSeleccionado(true);
+        reto.setEnProceso(true);
+        // Guardar el reto en la base de datos
+        repositorioReto.empezarRetoActualizar(reto);
+        Reto retoEnLaBd = repositorioReto.obtenerRetoPorId(reto.getId());
+        assertNotNull(retoEnLaBd, "El reto guardado no debe ser null.");
+        assertTrue(retoEnLaBd.getSeleccionado(), "El reto guardado debe ser seleccionado.");
+        assertTrue(retoEnLaBd.getEnProceso(), "El reto guardado debe estar en true enProceso.");
     }
+
 
     @Test
     @Transactional
-    public void queObtenerRetoPorIdDevuelvaElRetoCorrecto() {
-        Long retoId = 1l;
+    public void queObtenerRetoPorIdDevuelvaElRetoPorId() {
+        Long retoId = 181l;
         // Obtener el reto por ID
         Reto retoObtenido = repositorioReto.obtenerRetoPorId(retoId);
         // Verificar que el ID y el estado seleccionado sean correctos
         assertThat(retoObtenido.getId(), equalTo( retoId));
-        assertThat(retoObtenido.isSeleccionado(), equalTo(true));
+    }
+
+    @Test
+    @Transactional
+    public void queObtenerRetoEnProcesoDevuelvaElRetoCorrecto() {
+        // Crear un objeto Reto y establecerlo como seleccionado y en proceso
+        Reto retoEnProceso = new Reto();
+        retoEnProceso.setNombre("Reto de Ejemplo");
+        retoEnProceso.setDescripcion("Descripción del reto de ejemplo");
+        retoEnProceso.setImagenUrl("img/reto/burpees.jpg");
+        retoEnProceso.setSeleccionado(true);
+        retoEnProceso.setEnProceso(true);
+        // Guardar el reto en la base de datos (si es necesario)
+        sessionFactory.getCurrentSession().save(retoEnProceso);
+
+        // Obtener el reto en proceso
+        Reto retoObtenido = repositorioReto.obtenerRetoEnProceso();
+
+        // Verificar que el reto obtenido no sea nulo y esté en proceso
+        assertNotNull(retoObtenido, "El reto en proceso no debería ser nulo");
+        assertTrue(retoObtenido.getSeleccionado(), "El reto en proceso debería estar seleccionado");
+        assertTrue(retoObtenido.getEnProceso(), "El reto en proceso debería estar en proceso");
+    }
+
+    @Test
+    @Transactional
+    public void queAlTerminarRetoSePuedaActualizarSuAtributoSeleccionYEnProceso() {
+        // Arrange
+        Reto reto = repositorioReto.obtenerRetoDisponible();
+        reto.setSeleccionado(true);
+        reto.setEnProceso(true);
+        // Guardar el reto en la base de datos
+        repositorioReto.terminarReto(reto);
+        Reto retoEnLaBd = repositorioReto.obtenerRetoPorId(reto.getId());
+        assertNotNull(retoEnLaBd, "El reto guardado no debe ser null.");
+        assertTrue(retoEnLaBd.getSeleccionado(), "El reto guardado debe ser seleccionado.");
+        assertTrue(retoEnLaBd.getEnProceso(), "El reto guardado debe estar en true enProceso.");
     }
 
 

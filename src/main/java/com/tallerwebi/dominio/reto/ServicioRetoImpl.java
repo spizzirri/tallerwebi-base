@@ -16,17 +16,47 @@ public class ServicioRetoImpl implements ServicioReto{
 
     @Override
     public Reto obtenerRetoDisponible() {
-        return repositorioReto.obtenerReto();
+        Reto reto = null;
+        boolean retoEncontrado = false;
+        while (!retoEncontrado) {
+            reto = repositorioReto.obtenerRetoDisponible();
+            if (reto != null) {
+                retoEncontrado = true;
+            }
+        }
+        return reto;
     }
 
     @Override
-    public void empezarReto(Long retoId) {
-        repositorioReto.empezarReto(retoId);
+    @Transactional
+    public void empezarRetoActualizado(Long retoId) {
+        Reto reto = repositorioReto.obtenerRetoPorId(retoId);
+        if (reto != null) {
+            reto.setSeleccionado(true); // Marcar como seleccionado
+            reto.setEnProceso(true);
+            repositorioReto.empezarRetoActualizar(reto); // Actualizar el reto en el repositorio
+        }
     }
 
     @Override
     public Reto obtenerRetoPorId(Long retoId) {
         return repositorioReto.obtenerRetoPorId(retoId);
+    }
+
+    @Override
+    public Reto obtenerRetoEnProceso() {
+        return repositorioReto.obtenerRetoEnProceso();
+    }
+
+    @Override
+    @Transactional
+    public void terminarReto(Long retoId) {
+        Reto reto = repositorioReto.obtenerRetoPorId(retoId);
+        if (reto != null) {
+            reto.setSeleccionado(false); // Marcar como seleccionado
+            reto.setEnProceso(false);
+            repositorioReto.terminarReto(reto); // Actualizar el reto en el repositorio
+        }
     }
 
 }

@@ -4,8 +4,14 @@ import com.tallerwebi.dominio.calendario.ItemRendimiento;
 
 public interface RepositorioReto {
 
-    Reto obtenerReto();
-    void empezarReto(Long retoId);
+    Reto obtenerRetoDisponible();
 
     Reto obtenerRetoPorId(Long retoId);
+
+    void empezarRetoActualizar(Reto reto);
+
+    Reto obtenerRetoEnProceso();
+
+
+    void terminarReto(Reto reto);
 }

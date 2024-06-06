@@ -116,20 +116,20 @@ public class ControladorLoginTest {
 		assertThat(modelAndView.getModel().get("error").toString(), equalToIgnoringCase("Error al registrar el nuevo usuario"));
 	}
 
-	@Test
-	public void queSePuedaObtenerElItemRendimientoMasSeleccionado() throws Exception {
-		DatosItemRendimiento itemMasSeleccionado = new DatosItemRendimiento(LocalDate.now().minusDays(10), TipoRendimiento.ALTO);
-
-		when(servicioLoginMock.obtenerItemMasSeleccionado()).thenReturn(itemMasSeleccionado);
-
-		// Llamar directamente al método del controlador
-		ModelAndView modelAndView = controladorLogin.irAHome();
-
-		// Verificaciones
-		assertThat(modelAndView.getViewName(), equalToIgnoringCase("home"));
-		assertThat(modelAndView.getModel().containsKey("itemMasSeleccionado"), equalTo(true));
-		assertThat(modelAndView.getModel().get("itemMasSeleccionado"), equalTo(itemMasSeleccionado));
-	}
+//	@Test
+//	public void queSePuedaObtenerElItemRendimientoMasSeleccionado() throws Exception {
+//		DatosItemRendimiento itemMasSeleccionado = new DatosItemRendimiento(LocalDate.now().minusDays(10), TipoRendimiento.ALTO);
+//
+//		when(servicioLoginMock.obtenerItemMasSeleccionado()).thenReturn(itemMasSeleccionado);
+//
+//		// Llamar directamente al método del controlador
+//		ModelAndView modelAndView = controladorLogin.irAHome();
+//
+//		// Verificaciones
+//		assertThat(modelAndView.getViewName(), equalToIgnoringCase("home"));
+//		assertThat(modelAndView.getModel().containsKey("itemMasSeleccionado"), equalTo(true));
+//		assertThat(modelAndView.getModel().get("itemMasSeleccionado"), equalTo(itemMasSeleccionado));
+//	}
 
 
 

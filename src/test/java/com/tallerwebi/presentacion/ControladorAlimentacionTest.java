@@ -17,8 +17,6 @@ public class ControladorAlimentacionTest {
 
     private ServicioAlimentacion servicioAlimentacion;
     private ControladorAlimentacion controladorAlimentacion;
-
-    @Autowired
     private MockMvc mockMvc;
 
     @BeforeEach

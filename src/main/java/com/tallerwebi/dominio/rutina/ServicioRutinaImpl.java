@@ -108,7 +108,6 @@ public class ServicioRutinaImpl implements ServicioRutina {
             return rutinas;
         }else {
             throw new UsuarioSinRutinasException();
-
         }
     }
 
@@ -117,9 +116,11 @@ public class ServicioRutinaImpl implements ServicioRutina {
 
         if(usuario.getId() == null){
             throw new UsuarioNoExisteException();
-        } else if (rutina.getIdRutina() == null) {
+        }
+        if (rutina.getIdRutina() == null) {
             throw new RutinaNoEncontradaException();
-        } else if (usuario.getObjetivo() != rutina.getObjetivo()) {
+        }
+        if (usuario.getObjetivo() != rutina.getObjetivo()) {
             throw new DiferenciaDeObjetivosExcepcion();
         }
         return usuario.getObjetivo().equals(rutina.getObjetivo());
