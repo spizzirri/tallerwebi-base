@@ -4,18 +4,12 @@ import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.objetivo.Objetivo;
 import com.tallerwebi.dominio.rutina.Rutina;
 import com.tallerwebi.dominio.rutina.ServicioRutina;
-import com.tallerwebi.dominio.rutina.ServicioRutinaImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.stereotype.Service;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
-
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.List;
 
@@ -94,11 +88,11 @@ public class ControladorRutina {
                 modelAndView.setViewName("rutina");
             } else {
                 // Si el usuario o la rutina no existen, redirigir a la página de rutinas
-                modelAndView.setViewName("redirect:/rutinas");
+                modelAndView.setViewName("redirect:/vistaObjetivos");
             }
         } catch (Exception e) {
             // Si ocurre una excepción, redirigir a la página de rutinas
-            modelAndView.setViewName("redirect:/rutinas");
+            modelAndView.setViewName("redirect:/vistaObjetivos");
         }
 
         return modelAndView;

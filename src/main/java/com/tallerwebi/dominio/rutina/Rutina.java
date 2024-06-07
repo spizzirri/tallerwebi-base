@@ -1,6 +1,7 @@
 package com.tallerwebi.dominio.rutina;
 
 import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.UsuarioRutina;
 import com.tallerwebi.dominio.objetivo.Objetivo;
 
 import javax.persistence.*;
@@ -30,6 +31,9 @@ public class Rutina {
         this.objetivo = objetivo;
         this.ejercicios = new ArrayList<>();
     }
+
+    @OneToMany(mappedBy = "rutina", cascade = CascadeType.ALL)
+    private List<UsuarioRutina> usuarioRutinas;
 
     public Long getIdRutina() {
         return idRutina;
@@ -63,6 +67,13 @@ public class Rutina {
         this.ejercicios = ejercicios;
     }
 
+    public List<UsuarioRutina> getUsuarioRutinas() {
+        return usuarioRutinas;
+    }
+
+    public void setUsuarioRutinas(List<UsuarioRutina> usuarioRutinas) {
+        this.usuarioRutinas = usuarioRutinas;
+    }
 
     @Override
     public String toString() {

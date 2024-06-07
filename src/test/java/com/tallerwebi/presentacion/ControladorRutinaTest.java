@@ -75,13 +75,7 @@ public class ControladorRutinaTest {
     }
 
     @Test
-<<<<<<< HEAD
-    public void QueAlIrALaVistaRutinasMeMuestreRutinasRelacionadasAMiObjetivo(){
-        // Preparación
-        DatosRutina datosRutinaMock1 = new DatosRutina(new Rutina("Rutina de correr", Objetivo.PERDIDA_DE_PESO));
-        DatosRutina datosRutinaMock2 = new DatosRutina(new Rutina("Rutina de trotar", Objetivo.PERDIDA_DE_PESO));
-        DatosRutina datosRutinaMock3 = new DatosRutina(new Rutina("Rutina de caminar", Objetivo.PERDIDA_DE_PESO));
-=======
+
     public void queAlIrALaVistaRutinasMeMuestreRutinasRelacionadasAMiObjetivo(){
         //preparacion
         usuarioMock = new Usuario("Lautaro", Objetivo.PERDIDA_DE_PESO);
@@ -89,7 +83,7 @@ public class ControladorRutinaTest {
         DatosRutina datosRutinaMock1 = new DatosRutina(new Rutina("Rutina de correr",Objetivo.PERDIDA_DE_PESO));
         DatosRutina datosRutinaMock2 = new DatosRutina(new Rutina("Rutina de trotar",Objetivo.PERDIDA_DE_PESO));
         DatosRutina datosRutinaMock3 = new DatosRutina(new Rutina("Rutina de caminar",Objetivo.PERDIDA_DE_PESO));
->>>>>>> 4f35be0c3d69ca196298f4213a082a6984710c39
+
         List<DatosRutina> datosRutinasMock = new ArrayList<>();
         datosRutinasMock.add(datosRutinaMock1);
         datosRutinasMock.add(datosRutinaMock2);

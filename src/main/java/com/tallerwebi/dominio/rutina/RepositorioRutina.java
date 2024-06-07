@@ -6,7 +6,7 @@ import com.tallerwebi.dominio.objetivo.Objetivo;
 import java.util.List;
 
 public interface RepositorioRutina {
-    List<Rutina> getRutinas ();
+    List<Rutina> getRutinas();
 
     Rutina getRutinaByObjetivo(Objetivo objetivo);
 
@@ -15,25 +15,46 @@ public interface RepositorioRutina {
     Rutina getRutinaParaUsuario(Usuario usuario);
 
     void guardarRutina(Rutina rutina);
+
     void actualizar(Rutina rutina);
+
     void eliminarRutina(Rutina rutina);
+
     void guardarEjercicio(Ejercicio ejercicio);
+
     void actualizar(Ejercicio ejercicio);
+
     void eliminarEjercicio(Ejercicio ejercicio);
+
     void guardarEjercicioEnRutina(Ejercicio ejercicio, Rutina rutina);
+
     Ejercicio buscarEjercicioEnRutina(Ejercicio ejercicio, Rutina rutina);
+
     void asignarRutinaAUsuario(Rutina rutina, Usuario usuario);
+
     void guardarUsuario(Usuario usuario);
+
     List<Rutina> getRutinasDeUsuario(Usuario usuario);
+
     Rutina buscarRutinaEnUsuario(Rutina rutina, Usuario usuario);
+
     void eliminarEjercicioDeRutina(Ejercicio ejercicio, Rutina rutina);
+
     void eliminarRutinaDeUsuario(Rutina rutina, Usuario usuario);
+
     Ejercicio buscarEjercicioPorId(Long idEjercicio);
+
     Rutina buscarRutinaPorId(Long idRutina);
+
     List<Rutina> getRutinasPorObjetivoDeUsuario(Usuario usuario);
+
     Usuario getUsuarioPorId(Long id);
+
     List<Ejercicio> getEjerciciosDeRutina(Rutina rutina);
+
     Rutina getRutinaActualDeLUsuario(Usuario usuario);
 
     Ejercicio getEjercicioById(Long idEjercicio);
+
+    Rutina getRutinaActivaDelUsuario(Usuario usuario);
 }

@@ -76,16 +76,7 @@ public class ServicioRutinaTest {
     public void QueArrojeExcepcionSiElUsuarioNoTieneNingunaRutinaAsignada() throws UsuarioSinRutinasException {
         //p
         Usuario usuario = new Usuario("Lautaro", Objetivo.GANANCIA_MUSCULAR);
-<<<<<<< HEAD
-        List<Rutina> rutinasMock = new ArrayList<>();
 
-        //e
-        when(this.repositorioRutina.getRutinasDeUsuario(usuario)).thenReturn(rutinasMock);
-
-        //v
-        assertThrowsExactly(UsuarioSinRutinasException.class, () ->
-                this.servicioRutina.getRutinasDeUsuario(usuario)
-=======
         List<Rutina> rutinasmock = new ArrayList<>();
 
         //e
@@ -95,7 +86,6 @@ public class ServicioRutinaTest {
         UsuarioSinRutinasException exception = assertThrows(
                 UsuarioSinRutinasException.class,
                 () -> servicioRutina.getRutinasDeUsuario(usuario)
->>>>>>> 4f35be0c3d69ca196298f4213a082a6984710c39
         );
 
         assertThat(exception.getMessage(), equalTo("El usuario no tiene rutinas asignadas."));
@@ -527,16 +517,20 @@ public class ServicioRutinaTest {
     public void QueSePuedaSaberSiUnUsuarioTieneUnaRutinaEspecifica(){
         // Preparación
         Usuario usuarioMock = new Usuario("Lautaro",Objetivo.DEFINICION);
+        usuarioMock.setId(1L);
+
         Rutina rutinaMock = new Rutina("Rutina de definicion de piernas",Objetivo.DEFINICION);
-        usuarioMock.getRutinas().add(rutinaMock);
+        rutinaMock.setIdRutina(1L);
 
-        when(this.repositorioRutina.buscarRutinaEnUsuario(rutinaMock,usuarioMock)).thenReturn(rutinaMock);
+        when(this.repositorioRutina.buscarRutinaEnUsuario(rutinaMock, usuarioMock)).thenReturn(rutinaMock);
 
-        //Ejecución
-        boolean resultado = this.servicioRutina.existeRutinaEnUsuario(rutinaMock,usuarioMock);
+        // Ejecución
+        boolean resultado = this.servicioRutina.existeRutinaEnUsuario(rutinaMock, usuarioMock);
 
-        //Verificación
+        // Verificación
         assertTrue(resultado);
+
+        verify(this.repositorioRutina).buscarRutinaEnUsuario(rutinaMock, usuarioMock);
     }
 
     @Test

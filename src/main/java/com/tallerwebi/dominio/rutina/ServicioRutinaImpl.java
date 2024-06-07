@@ -212,8 +212,9 @@ public class ServicioRutinaImpl implements ServicioRutina {
     }
 
     @Override
-    public DatosRutina getRutinaActualDelUsuario(Usuario usuario) {
-        return null;
+    public DatosRutina getRutinaActualDelUsuario(Usuario usuario) throws UsuarioNoExisteException {
+        Usuario usuarioBuscado = this.getUsuarioById(usuario.getId());
+        return convertRutinaADatosRutina(this.repositorioRutina.getRutinaActivaDelUsuario(usuarioBuscado));
     }
 
     @Override

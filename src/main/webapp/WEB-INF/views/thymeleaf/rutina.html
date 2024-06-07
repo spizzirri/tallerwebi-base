@@ -21,16 +21,19 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav mx-auto">
                 <li class="nav-item">
-                    <a class="nav-link" th:href="@{/irAHome}" href="home">Inicio</a>
+                    <a class="nav-link" th:action="@{/irAHome}" href="home">Inicio</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="ir-a-vistaObjetivos" th:href="@{/irVistaObjetivos}" href="vistaObjetivos">Rutina</a>
+                    <a class="nav-link" th:action="@{/irAMiRutina}" href="mi-rutina">Rutina</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" th:href="@{/irCalendario}" href="calendario">Calendario</a>
+                    <a class="nav-link" th:action="@{/irCalendario}" href="calendario">Calendario</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:action="@{/irAlimentacion}" href="alimentacion">Alimentacion</a>
                 </li>
             </ul>
-            <a class="nav-link d-flex align-items-center" th:href="@{/irPerfil}" href="perfil">
+            <a class="nav-link d-flex align-items-center" th:action="@{/irPerfil}" href="perfil">
                 <span class="user-name me-2">Nombre</span>
                 <img th:src="@{/img/usuario.png}" alt="Usuario" class="user-img">
             </a>
@@ -64,7 +67,7 @@
         </div>
     </div>
 </div>
-<<<<<<< HEAD
+
 
 <footer class="bg-light py-3 mt-auto">
     <div class="container text-center">
@@ -73,7 +76,6 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-=======
->>>>>>> 4f35be0c3d69ca196298f4213a082a6984710c39
+
 </body>
 </html>

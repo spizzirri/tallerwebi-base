@@ -41,7 +41,7 @@ public interface ServicioRutina {
 
     List<DatosRutina> getRutinasPorObjetivo(Objetivo objetivo);
 
-    DatosRutina getRutinaActualDelUsuario(Usuario usuario);
+    DatosRutina getRutinaActualDelUsuario(Usuario usuario) throws UsuarioNoExisteException;
 
     void asignarRutinaAUsuario(Rutina rutina, Usuario usuario) throws RutinaYaExisteException;
 }
