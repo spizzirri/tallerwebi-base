@@ -18,16 +18,16 @@
         <div class="collapse navbar-collapse justify-content-center">
             <ul class="nav-links">
                 <li class="nav-item">
-                    <a class="nav-link" th:action="@{/irAHome}" href="home">Inicio</a>
+                    <a class="nav-link" th:href="@{/irAHome}">Inicio</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" th:action="@{/irAMiRutina}" href="mi-rutina">Rutina</a>
+                    <a class="nav-link" th:href="@{/irAMiRutina}">Rutina</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" th:action="@{/irCalendario}" href="calendario">Calendario</a>
+                    <a class="nav-link" th:href="@{/irCalendario}">Calendario</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" th:action="@{/irAlimentacion}" href="alimentacion">Alimentacion</a>
+                    <a class="nav-link" th:href="@{/irAlimentacion}">Alimentacion</a>
                 </li>
             </ul>
         </div>
@@ -39,9 +39,20 @@
         </div>
     </div>
 </nav>
-<div class="p-5"><p th:if="${param.info != null}" class="alert alert-info" th:text="${param.info}"></p></div>
+<div class="p-5">
+    <p th:if="${param.info != null}" class="alert alert-info" th:text="${param.info}"></p>
+</div>
+<div class="col-12">
+    <h1 th:text="'Rutinas de ' + ${objetivoFormateado}+'.'" style="text-align: center"></h1>
+</div>
 <div class="container_rutinas">
     <div class="container">
+        <div class="row mb-3">
+
+            <div class="col-12 text-end">
+            <a th:href="@{/vistaObjetivos}" class="btn btn-info">Modificar Objetivo</a>
+        </div>
+        </div>
         <div class="row">
             <th:block th:each="rutina : ${rutinas}">
                 <div class="col-md-3 col-sm-6 col-xs-12 mb-3">
@@ -52,13 +63,12 @@
                         <div class="card-body">
                             <p th:text="${rutina.descripcion}"></p>
                             <ul>
-                                <li th:each="ejercicio : ${rutina.ejercicios}" th:text="${ejercicio.nombre + ' ' + ejercicio.series + 'x' +  ejercicio.repeticiones}"></li>
+                                <li th:each="ejercicio : ${rutina.ejercicios}" th:text="${ejercicio.nombre + ' ' + ejercicio.series + 'x' + ejercicio.repeticiones}"></li>
                             </ul>
                         </div>
                         <div class="card-footer text-center">
                             <a th:href="@{/asignar-rutina(id=${rutina.id})}" class="btn btn-primary">Tomar Rutina</a>
                         </div>
-
                     </div>
                 </div>
             </th:block>

@@ -39,6 +39,7 @@ public class ControladorRutina {
 
         List<DatosRutina> rutinas = this.servicioRutina.getRutinasPorObjetivo(objetivoEnum);
         modelAndView.addObject("rutinas", rutinas);
+        modelAndView.addObject("objetivoFormateado", objetivoEnum.formatear());
 
         return modelAndView;
     }
@@ -62,6 +63,7 @@ public class ControladorRutina {
             modelAndView.setViewName("rutina");
         } catch (Exception e) {
             modelAndView.setViewName("redirect:/rutinas?objetivo=" + usuario.getObjetivo().toString());
+            modelAndView.addObject("objetivoFormateado", usuario.getObjetivo().formatear());
         }
 
         return modelAndView;
@@ -120,6 +122,7 @@ public class ControladorRutina {
                 // Redirigir a la sección de rutinas en base al objetivo del usuario
                 modelAndView.setViewName("redirect:/rutinas?objetivo=" + usuario.getObjetivo().toString());
                 modelAndView.addObject("info", "Rutina liberada.");
+                modelAndView.addObject("objetivoFormateado", usuario.getObjetivo().formatear());
             } else {
                 // Si el usuario o la rutina no existen, redirigir a la página de objetivos
                 modelAndView.addObject("error", "Error al liberar la rutina.");

@@ -2,7 +2,6 @@ package com.tallerwebi.infraestructura;
 
 import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.UsuarioRutina;
-import com.tallerwebi.dominio.excepcion.*;
 import com.tallerwebi.dominio.objetivo.Objetivo;
 import com.tallerwebi.dominio.rutina.Ejercicio;
 import com.tallerwebi.dominio.rutina.RepositorioRutina;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -261,7 +259,7 @@ public class RepositorioRutinaImpl implements RepositorioRutina {
         Date startOfDay = Date.from(today.atStartOfDay(ZoneId.systemDefault()).toInstant());
         Date endOfDay = Date.from(today.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant());
 
-        String hql = "SELECT ur.rutina FROM UsuarioRutina ur WHERE ur.usuario.id = :userId AND ur.fechaInicio BETWEEN :startOfDay AND :endOfDay AND activo = 1";
+        String hql = "SELECT ur.rutina FROM UsuarioRutina ur WHERE ur.usuario.id = :userId AND ur.activo = true AND ur.fechaInicio BETWEEN :startOfDay AND :endOfDay";
         Query query = sessionFactory.getCurrentSession().createQuery(hql, Rutina.class);
         query.setParameter("userId", usuario.getId());
         query.setParameter("startOfDay", startOfDay);
@@ -273,18 +271,14 @@ public class RepositorioRutinaImpl implements RepositorioRutina {
     @Override
     public void liberarRutinaActivaDelUsuario(Usuario usuario) {
         Usuario usuarioBuscado = this.getUsuarioPorId(usuario.getId());
-        // Obtiene la rutina activa del usuario
         Rutina rutinaActiva = this.getRutinaActivaDelUsuario(usuarioBuscado);
 
-        // Busca la instancia de UsuarioRutina asociada al usuario y a la rutina activa
-        UsuarioRutina usuarioRutinaBuscado = this.buscarUsuarioRutinaPorUsuarioYRutina(usuarioBuscado, rutinaActiva);
+        UsuarioRutina usuarioRutinaBuscado = this.buscarUsuarioRutinaActivoPorUsuarioYRutina(usuarioBuscado, rutinaActiva);
 
-        // Verifica si se encontró la instancia de UsuarioRutina
         if (usuarioRutinaBuscado != null) {
-            // Establece el campo "activo" en 0
+
             usuarioRutinaBuscado.setActivo(false);
 
-            // Guarda los cambios en la base de datos
             this.actualizarUsuarioRutina(usuarioRutinaBuscado);
         }
     }
@@ -300,8 +294,40 @@ public class RepositorioRutinaImpl implements RepositorioRutina {
     }
 
     @Override
+    public List<UsuarioRutina> buscarListaDeUsuarioRutinaPorUsuarioYRutina(Usuario usuario, Rutina rutina) {
+        String hql = "SELECT ur FROM UsuarioRutina ur WHERE ur.usuario.id = :userId AND ur.rutina.id = :rutinaId";
+        Query query = sessionFactory.getCurrentSession().createQuery(hql, UsuarioRutina.class);
+        query.setParameter("userId", usuario.getId());
+        query.setParameter("rutinaId", rutina.getIdRutina());
+
+        return query.getResultList();
+}
+
+
+    @Override
+    public UsuarioRutina buscarUsuarioRutinaActivoPorUsuarioYRutina(Usuario usuario, Rutina rutina) {
+        String hql = "SELECT ur FROM UsuarioRutina ur WHERE ur.usuario = :usuario AND ur.rutina = :rutina AND ur.activo = true ";
+        Query query = sessionFactory.getCurrentSession().createQuery(hql, UsuarioRutina.class);
+        query.setParameter("usuario", usuario);
+        query.setParameter("rutina", rutina);
+
+        return (UsuarioRutina) query.uniqueResult();
+    }
+
+    @Override
+    public UsuarioRutina buscarUsuarioRutinaInactivoPorUsuarioYRutina(Usuario usuario, Rutina rutina) {
+        String hql = "SELECT ur FROM UsuarioRutina ur WHERE ur.usuario = :usuario AND ur.rutina = :rutina AND ur.activo = false ";
+        Query query = sessionFactory.getCurrentSession().createQuery(hql, UsuarioRutina.class);
+        query.setParameter("usuario", usuario);
+        query.setParameter("rutina", rutina);
+
+        return (UsuarioRutina) query.uniqueResult();
+    }
+
+    @Override
     public void actualizarUsuarioRutina(UsuarioRutina usuarioRutina) {
         this.sessionFactory.getCurrentSession().update(usuarioRutina);
     }
+
 
 }

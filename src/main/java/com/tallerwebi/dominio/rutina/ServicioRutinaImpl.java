@@ -218,12 +218,7 @@ public class ServicioRutinaImpl implements ServicioRutina {
     }
 
     @Override
-    public void asignarRutinaAUsuario(Rutina rutina, Usuario usuario) throws RutinaYaExisteException {
-        Rutina rutinaBuscada = this.repositorioRutina.buscarRutinaEnUsuario(rutina,usuario);
-        if (rutinaBuscada != null){
-            throw new RutinaYaExisteException();
-        }
-
+    public void asignarRutinaAUsuario(Rutina rutina, Usuario usuario) {
         this.repositorioRutina.asignarRutinaAUsuario(rutina,usuario);
     }
 
