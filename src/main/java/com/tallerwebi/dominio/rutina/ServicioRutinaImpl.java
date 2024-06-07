@@ -227,6 +227,11 @@ public class ServicioRutinaImpl implements ServicioRutina {
         this.repositorioRutina.asignarRutinaAUsuario(rutina,usuario);
     }
 
+    @Override
+    public void liberarRutinaActivaDelUsuario(Usuario usuario) {
+        this.repositorioRutina.liberarRutinaActivaDelUsuario(usuario);
+    }
+
     private List<DatosRutina> convertToDatosRutina(List<Rutina> rutinas) {
 
         List<DatosRutina> datosRutinas = new ArrayList<>();
@@ -239,9 +244,7 @@ public class ServicioRutinaImpl implements ServicioRutina {
     }
 
     private DatosRutina convertRutinaADatosRutina(Rutina rutina) {
-
-        DatosRutina datosRutina = new DatosRutina(rutina);
-        return datosRutina;
+        return new DatosRutina(rutina);
     }
 
 }

@@ -51,7 +51,6 @@ body {
     border-radius: 50%;
 }
 .container_rutinas {
-    background-color: #1f1f1f;
     padding: 2rem;
     flex-grow: 1;
     display: flex;

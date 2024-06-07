@@ -42,7 +42,17 @@
 </nav>
 
 <div class="container mt-5 pt-5">
-    <div class="row">
+    <p th:if="${error != null}" class="alert alert-danger" th:text="${error}"></p>
+    <div class="row mb-2">
+        <div class="col-md-12 text-end">
+            <form th:action="@{/liberar-rutina}" method="post">
+                <input type="hidden" name="id" th:value="${rutina.id}" />
+                <button type="submit" class="btn btn-danger">Liberar rutina</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="row mt-3">
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header text-center">
@@ -67,7 +77,6 @@
         </div>
     </div>
 </div>
-
 
 <footer class="bg-light py-3 mt-auto">
     <div class="container text-center">

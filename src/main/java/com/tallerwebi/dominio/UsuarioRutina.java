@@ -24,6 +24,9 @@ public class UsuarioRutina {
     @Column(name = "fecha_inicio")
     private Date fechaInicio;
 
+    @Column(name = "activo", columnDefinition = "boolean default false")
+    private boolean activo;
+
     public Long getId() {
         return id;
     }
@@ -50,6 +53,14 @@ public class UsuarioRutina {
 
     public Date getFechaInicio() {
         return fechaInicio;
+    }
+
+    public boolean isActivo() {
+        return activo;
+    }
+
+    public void setActivo(boolean activo) {
+        this.activo = activo;
     }
 
     public void setFechaInicio(Date fechaInicio) {

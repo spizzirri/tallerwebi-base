@@ -44,4 +44,6 @@ public interface ServicioRutina {
     DatosRutina getRutinaActualDelUsuario(Usuario usuario) throws UsuarioNoExisteException;
 
     void asignarRutinaAUsuario(Rutina rutina, Usuario usuario) throws RutinaYaExisteException;
+
+    void liberarRutinaActivaDelUsuario(Usuario usuario);
 }

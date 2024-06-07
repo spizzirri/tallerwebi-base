@@ -6,6 +6,7 @@ import com.tallerwebi.dominio.rutina.Rutina;
 import com.tallerwebi.dominio.rutina.ServicioRutina;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -98,7 +99,40 @@ public class ControladorRutina {
         return modelAndView;
     }
 
+    @PostMapping("/liberar-rutina")
+    public ModelAndView liberarRutina(@RequestParam("id") Long id, HttpSession session) {
+        ModelAndView modelAndView = new ModelAndView();
 
+        try {
+            // Obtener el usuario de la sesión
+            Usuario usuario = (Usuario) session.getAttribute("usuario");
+
+            // Obtener la rutina por su ID
+            Rutina rutina = servicioRutina.getRutinaById(id);
+            DatosRutina datosRutina = servicioRutina.getDatosRutinaById(id);
+            modelAndView.addObject("rutina", datosRutina);
+
+            // Verificar si el usuario y la rutina existen
+            if (usuario != null && rutina != null) {
+                // Libera la rutina activa del usuario
+                servicioRutina.liberarRutinaActivaDelUsuario(usuario);
+
+                // Redirigir a la sección de rutinas en base al objetivo del usuario
+                modelAndView.setViewName("redirect:/rutinas?objetivo=" + usuario.getObjetivo().toString());
+                modelAndView.addObject("info", "Rutina liberada.");
+            } else {
+                // Si el usuario o la rutina no existen, redirigir a la página de objetivos
+                modelAndView.addObject("error", "Error al liberar la rutina.");
+                modelAndView.setViewName("rutina");
+            }
+        } catch (Exception e) {
+            // Si ocurre una excepción, redirigir a la página de objetivos con el mensaje de error
+            modelAndView.addObject("error", "EXCEPCION: error al liberar la rutina.");
+            modelAndView.setViewName("rutina");
+        }
+
+        return modelAndView;
+    }
 
 
 }
