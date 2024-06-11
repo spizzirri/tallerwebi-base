@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import javax.transaction.Transactional;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -107,24 +108,27 @@ public class ServicioRetoTest {
     }
 
     @Test
-    public void queAlTerminarRetoSeActualiceSeleccionadoYEnProceso() {
+    public void queTerminarRetoDevuelvaDiasTranscurridosYActualiceElReto() {
         // Arrange
         Reto retoMock = new Reto();
         retoMock.setId(1L);
         retoMock.setSeleccionado(true);
         retoMock.setEnProceso(true);
+        retoMock.setFechaInicio(LocalDate.now().minusDays(3));
 
         // Configurar el comportamiento del repositorio
         when(repositorioReto.obtenerRetoPorId(anyLong())).thenReturn(retoMock);
 
         // Act
-        servicioReto.terminarReto(1L);
+        long diasPasados = servicioReto.terminarReto(1L);
 
         // Assert
         verify(repositorioReto, times(1)).obtenerRetoPorId(1L);
         verify(repositorioReto, times(1)).terminarReto(retoMock);
+        assertEquals(3, diasPasados, "Los días transcurridos deberían ser 3");
         assertFalse(retoMock.getSeleccionado(), "El reto debería estar marcado como no seleccionado");
         assertFalse(retoMock.getEnProceso(), "El reto debería estar marcado como no en proceso");
+        assertNull(retoMock.getFechaInicio(), "El reto debería tener fechaInicio en null después de terminarlo");
     }
 
 }

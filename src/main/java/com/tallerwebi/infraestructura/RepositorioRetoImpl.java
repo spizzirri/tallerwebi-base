@@ -1,5 +1,6 @@
 package com.tallerwebi.infraestructura;
 
+import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.reto.RepositorioReto;
 import com.tallerwebi.dominio.reto.Reto;
 import org.hibernate.Session;
@@ -56,7 +57,6 @@ public class RepositorioRetoImpl implements RepositorioReto {
         session.update(reto);
         session.flush(); // Sincronizar los cambios con la base de datos
     }
-
 
 
 }

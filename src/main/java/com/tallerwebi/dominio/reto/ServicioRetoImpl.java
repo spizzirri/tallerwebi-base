@@ -3,6 +3,8 @@ package com.tallerwebi.dominio.reto;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 @Service
 @Transactional
@@ -34,6 +36,7 @@ public class ServicioRetoImpl implements ServicioReto{
         if (reto != null) {
             reto.setSeleccionado(true); // Marcar como seleccionado
             reto.setEnProceso(true);
+            reto.setFechaInicio(LocalDate.now());
             repositorioReto.empezarRetoActualizar(reto); // Actualizar el reto en el repositorio
         }
     }
@@ -50,13 +53,22 @@ public class ServicioRetoImpl implements ServicioReto{
 
     @Override
     @Transactional
-    public void terminarReto(Long retoId) {
+    public Long terminarReto(Long retoId) {
         Reto reto = repositorioReto.obtenerRetoPorId(retoId);
+        long diasPasados = 0;
         if (reto != null) {
-            reto.setSeleccionado(false); // Marcar como seleccionado
+            // Calcular la diferencia de días
+            LocalDate fechaInicio = reto.getFechaInicio();
+            LocalDate fechaActual = LocalDate.now();
+            diasPasados = ChronoUnit.DAYS.between(fechaInicio, fechaActual);
+
+            reto.setSeleccionado(false);
             reto.setEnProceso(false);
+            reto.setFechaInicio(null);
             repositorioReto.terminarReto(reto); // Actualizar el reto en el repositorio
         }
+        return diasPasados;
     }
+
 
 }

@@ -182,7 +182,7 @@
                 <configuration>
                     <scanIntervalSeconds>2</scanIntervalSeconds>
                     <httpConnector>
-                        <port>8081</port>
+                        <port>8082</port>
                     </httpConnector>
                     <webApp>
                         <contextPath>/spring</contextPath>

@@ -30,12 +30,11 @@ public class ControladorReto {
 
 
     @RequestMapping(path = "/empezar-reto", method = RequestMethod.POST)
-    public ModelAndView empezarReto(@RequestParam Long retoId, HttpSession session) {
+    public ModelAndView empezarReto(@RequestParam Long retoId,@RequestParam String email, @RequestParam String password, HttpSession session) {
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         if (usuario == null) {
             return new ModelAndView("redirect:/login");
         }
-
         ModelAndView modelAndView = new ModelAndView("home");
         modelAndView.addObject("retoId", retoId); // Añadir retoId al modelo
         try {
@@ -49,8 +48,10 @@ public class ControladorReto {
             Reto retoDisponible = servicioReto.obtenerRetoPorId(retoId);
             modelAndView.addObject("retoDisponible", retoDisponible);
 
-            // Añadir el usuario al modelo
-            modelAndView.addObject("usuario", usuario);
+            Usuario usuarioBuscado = servicioLogin.consultarUsuario(email, password);
+            if (usuarioBuscado != null) {
+                modelAndView.addObject("usuario", usuarioBuscado);
+            }
 
         } catch (Exception e) {
             // Manejar el error mostrando un mensaje de error en la misma página
@@ -73,16 +74,14 @@ public class ControladorReto {
         try {
             Usuario usuarioBuscado = servicioLogin.consultarUsuario(email, password);
             if (usuarioBuscado != null) {
-                servicioLogin.sumarRachaReto(usuarioBuscado);
+                servicioLogin.modificarRachaRetoTerminado(usuarioBuscado, retoId);
                 modelAndView.addObject("usuario", usuarioBuscado);
             }
 
-            // Terminar el reto
-            servicioReto.terminarReto(retoId);
-
-            // Añadir información adicional al modelo si es necesario
             Reto retoDisponible = servicioReto.obtenerRetoDisponible();
-            modelAndView.addObject("retoDisponible", retoDisponible);
+            if (retoDisponible != null) {
+                modelAndView.addObject("retoDisponible", retoDisponible);
+            }
 
             // Añadir itemMasSeleccionado al modelo
             DatosItemRendimiento itemMasSeleccionado = servicioLogin.obtenerItemMasSeleccionado();

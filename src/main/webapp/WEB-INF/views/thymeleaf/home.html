@@ -132,11 +132,18 @@
             <div class="reto-preview">
                 <h2 style="text-align:center;"><span th:text="${retoDisponible.nombre}"></span></h2>
                 <p><span th:text="${retoDisponible.descripcion}"></span></p>
+                <input type="hidden" name="enProceso" th:value="${retoDisponible.enProceso}"/>
                 <!-- Formulario para empezar el reto -->
                 <form th:action="@{/empezar-reto}" method="POST" id="empezar-reto-form">
                     <input type="hidden" name="retoId" th:value="${retoDisponible.id}"/>
+                    <input type="hidden" name="email" th:value="${usuario.email}"/>
+                    <input type="hidden" name="password" th:value="${usuario.password}"/>
                     <button type="submit" class="main-btn" id="btn-empezar">Empezar</button>
                 </form>
+                <!-- Cronómetro -->
+                <div id="cronometro" style="display: none; text-align: center; margin-top: 1rem;">
+                    <p>Tiempo restante: <span id="tiempo-restante"></span></p>
+                </div>
                 <!-- Botón para marcar como terminado -->
                 <form th:action="@{/terminar-reto}" method="POST" id="terminar-reto-form">
                     <input type="hidden" name="retoId" th:value="${retoDisponible.id}"/>

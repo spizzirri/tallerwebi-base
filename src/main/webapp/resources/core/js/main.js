@@ -37,31 +37,21 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
     document.addEventListener('DOMContentLoaded', function() {
-                const retoId = document.querySelector('input[name="retoId"]').value;
-                const currentUrl = window.location.pathname;
+        const retoId = document.querySelector('input[name="retoId"]').value;
+        const enProceso = document.querySelector('input[name="enProceso"]').value === 'true';
 
-                // Check if we are on the home page or the empezar-reto page
-                if (currentUrl === '/spring/home') {
-                    if (localStorage.getItem('retoIniciado_' + retoId)) {
-                        document.getElementById('btn-empezar').style.display = 'block';
-                        document.getElementById('btn-terminado').style.display = 'none';
-                    }
-                } else if (currentUrl === '/spring/empezar-reto') {
-                    document.getElementById('btn-empezar').style.display = 'none';
-                    document.getElementById('btn-terminado').style.display = 'block';
-                }
+        if (enProceso) {
+            // Si el reto está en proceso, mostrar el botón "Terminado"
+            document.getElementById('btn-empezar').style.display = 'none';
+            document.getElementById('btn-terminado').style.display = 'block';
+        } else {
+            // Si el reto no está en proceso, mostrar el botón "Empezar"
+            document.getElementById('btn-empezar').style.display = 'block';
+            document.getElementById('btn-terminado').style.display = 'none';
+        }
 
-                document.getElementById('btn-empezar').addEventListener('click', function() {
-                    // Guardar en localStorage que el reto ha sido iniciado
-                    localStorage.setItem('retoIniciado_' + retoId, true);
 
-                    // Ocultar el botón "Empezar"
-                    document.getElementById('btn-empezar').style.display = 'none';
-
-                    // Mostrar el botón "Terminado"
-                    document.getElementById('btn-terminado').style.display = 'block';
-                });
-            });
+    });
 
 document.addEventListener('DOMContentLoaded', (event) => {
     const usuarioDataDiv = document.getElementById('usuario-data');
