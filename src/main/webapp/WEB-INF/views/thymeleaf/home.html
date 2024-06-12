@@ -127,15 +127,15 @@
     <div class="reto-cards" style="display: flex; align-items: center; flex-direction: column; justify-content: center; margin-top: 3.5rem; margin-bottom:2rem;">
         <h2 style="padding: 1rem; margin-bottom:0rem !important; color: white;">Retos Diarios</h2>
         <article class="reto-card">
-            <figure class="reto-image" style="margin: 0rem !important">
                 <img th:src="@{${retoDisponible.imagenUrl}}" alt="Reto Disponible">
-                <button id="btn-cambiar-reto" class="cambiar-reto-icon">
-                    <i class="fas fa-sync-alt"></i>
-                </button>
-            </figure>
             <div class="reto-preview">
-                <h2 style="text-align:center;"><span th:text="${retoDisponible.nombre}"></span></h2>
-                <p><span th:text="${retoDisponible.descripcion}"></span></p>
+                <div class="container-cambiarReto">
+                    <button id="btn-cambiar-reto" class="cambiar-reto-icon">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+                <h2><span th:text="${retoDisponible.nombre}"></span></h2>
+                <p class="reto-p"><span th:text="${retoDisponible.descripcion}"></span></p>
                 <input type="hidden" name="enProceso" th:value="${retoDisponible.enProceso}"/>
                 <!-- Formulario para empezar el reto -->
                 <form th:action="@{/empezar-reto}" method="POST" id="empezar-reto-form">
