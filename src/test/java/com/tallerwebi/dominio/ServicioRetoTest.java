@@ -124,7 +124,7 @@ public class ServicioRetoTest {
 
         // Assert
         verify(repositorioReto, times(1)).obtenerRetoPorId(1L);
-        verify(repositorioReto, times(1)).terminarReto(retoMock);
+        verify(repositorioReto, times(1)).actualizarReto(retoMock);
         assertEquals(3, diasPasados, "Los días transcurridos deberían ser 3");
         assertFalse(retoMock.getSeleccionado(), "El reto debería estar marcado como no seleccionado");
         assertFalse(retoMock.getEnProceso(), "El reto debería estar marcado como no en proceso");

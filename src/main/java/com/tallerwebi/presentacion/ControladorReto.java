@@ -46,7 +46,12 @@ public class ControladorReto {
 
             // Añadir retoDisponible al modelo
             Reto retoDisponible = servicioReto.obtenerRetoPorId(retoId);
-            modelAndView.addObject("retoDisponible", retoDisponible);
+            if (retoDisponible != null) {
+                modelAndView.addObject("retoDisponible", retoDisponible);
+                long minutosRestantes = servicioReto.calcularTiempoRestante(retoDisponible.getId());
+                modelAndView.addObject("minutosRestantes", minutosRestantes);
+            }
+
 
             Usuario usuarioBuscado = servicioLogin.consultarUsuario(email, password);
             if (usuarioBuscado != null) {

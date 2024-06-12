@@ -17,4 +17,6 @@ public interface ServicioLogin {
     Reto obtenerRetoEnProceso();
 
     Usuario modificarRachaRetoTerminado(Usuario usuario, long retoId);
+
+    long calcularTiempoRestante(Long id);
 }

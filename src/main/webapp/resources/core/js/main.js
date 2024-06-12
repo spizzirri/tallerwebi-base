@@ -65,6 +65,34 @@ document.addEventListener('DOMContentLoaded', (event) => {
 });
 
 
+  document.addEventListener('DOMContentLoaded', function () {
+      let minutosRestantesInput = document.querySelector('input[name="minutosRestantes"]');
+      if (minutosRestantesInput !== null) {
+          let minutosRestantes = minutosRestantesInput.value;
+          if (minutosRestantes > 0) {
+              let tiempoRestanteElement = document.getElementById('tiempo-restante');
+              let segundosRestantes = minutosRestantes * 60;
+
+              function actualizarCronometro() {
+                  let dias = Math.floor(segundosRestantes / (24 * 60 * 60));
+                  let horas = Math.floor((segundosRestantes % (24 * 60 * 60)) / (60 * 60));
+                  let minutos = Math.floor((segundosRestantes % (60 * 60)) / 60);
+                  let segundos = segundosRestantes % 60;
+                  tiempoRestanteElement.textContent = `${dias}d ${horas}h ${minutos}m ${segundos < 10 ? '0' + segundos : segundos}s`;
+                  if (segundosRestantes > 0) {
+                      segundosRestantes--;
+                      setTimeout(actualizarCronometro, 1000);
+                  } else {
+                      tiempoRestanteElement.textContent = 'Tiempo agotado';
+                  }
+              }
+              actualizarCronometro();
+          }
+      }
+  });
+
+
+
 
 
 

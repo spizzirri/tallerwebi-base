@@ -1,6 +1,5 @@
 package com.tallerwebi.infraestructura;
 
-import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.reto.RepositorioReto;
 import com.tallerwebi.dominio.reto.Reto;
 import org.hibernate.Session;
@@ -8,6 +7,8 @@ import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository("repositorioReto")
 public class RepositorioRetoImpl implements RepositorioReto {
@@ -35,7 +36,7 @@ public class RepositorioRetoImpl implements RepositorioReto {
     }
 
     @Override
-    public void empezarRetoActualizar(Reto reto) {
+    public void actualizarReto(Reto reto) {
         Session session = this.sessionFactory.getCurrentSession();
         session.update(reto);
         session.flush(); // Sincronizar los cambios con la base de datos
@@ -52,10 +53,11 @@ public class RepositorioRetoImpl implements RepositorioReto {
     }
 
     @Override
-    public void terminarReto(Reto reto) {
+    public List<Reto> obtenerTodosLosRetos() {
         Session session = this.sessionFactory.getCurrentSession();
-        session.update(reto);
-        session.flush(); // Sincronizar los cambios con la base de datos
+        String hql = "FROM Reto";
+        Query<Reto> query = session.createQuery(hql, Reto.class);
+        return query.list();
     }
 
 

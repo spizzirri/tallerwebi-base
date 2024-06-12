@@ -74,6 +74,11 @@ public class ServicioLoginImpl implements ServicioLogin {
         return usuario;
     }
 
+    @Override
+    public long calcularTiempoRestante(Long id) {
+        return servicioReto.calcularTiempoRestante(id);
+    }
+
 
 }
 

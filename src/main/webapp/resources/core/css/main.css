@@ -606,8 +606,13 @@ body-calendario {
 }
 
 .reto-card:hover img {
-    transform: scale(1.5);
+    transform: scale(1.1);
 }
+
+.reto-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
 
 .reto-preview {
     padding: 1.5rem;
@@ -622,7 +627,25 @@ body-calendario {
     width: 100%;
     height: 14rem;
     overflow: hidden;
+    position: relative;
 }
+
+.cambiar-reto-icon {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            margin: 0.8rem;
+        }
 
 .reto-circulo {
     position: fixed;
@@ -656,6 +679,25 @@ body-calendario {
 .hidden {
     display: none !important;
 }
+
+#cronometro {
+            display: flex;
+            flex-direction: column;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            padding-right: 1rem;
+            padding-left: 1rem;
+            background: #e9ecef;
+            text-align: center;
+            border-radius: 5px;
+        }
+
+#tiempo-restante {
+            display: inline-block;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
 
 .footer {
     background-color: #fff;
