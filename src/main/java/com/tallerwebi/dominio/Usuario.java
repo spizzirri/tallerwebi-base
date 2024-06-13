@@ -24,13 +24,12 @@ public class Usuario {
     @Enumerated(EnumType.STRING)
     private Objetivo objetivo;
     private Boolean isInstructor = false;
-    @Column(name = "racha_de_retos", nullable = false, columnDefinition = "INTEGER DEFAULT 0")
+    @Column(name = "racha_de_retos", columnDefinition = "INTEGER DEFAULT 0")
     private Integer rachaDeRetos;
 
     //relacion de usuario con itemRendimiento 1 - n --> bd
-    @OneToMany(cascade = CascadeType.ALL)
-    private List<Rutina> rutinas;
-
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
+    private List<UsuarioRutina> usuarioRutinas;
     //relacion de usuario con itemRendimiento 1 - n --> bd
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ItemRendimiento> itemsRendimiento;
@@ -56,12 +55,10 @@ public class Usuario {
     }
 
     public Usuario() {
-        this.rutinas = new ArrayList<>();
     }
     public Usuario(String nombre, Objetivo objetivo) {
         this.nombre = nombre;
         this.objetivo = objetivo;
-        this.rutinas = new ArrayList<>();
     }
 
     public Usuario(String nombre, String apellido, String email, String password) {
@@ -69,7 +66,6 @@ public class Usuario {
         this.apellido =  apellido;
         this.email = email;
         this.password = password;
-        this.rutinas = new ArrayList<>();
     }
 
     public Usuario(String nombre, String apellido, String email, String password, Boolean isInstructor) {
@@ -78,7 +74,6 @@ public class Usuario {
         this.email = email;
         this.password = password;
         this.isInstructor = isInstructor;
-        this.rutinas = new ArrayList<>();
     }
 
     public Usuario(String nombre, String apellido, String email, String password, Objetivo objetivo) {
@@ -87,7 +82,6 @@ public class Usuario {
         this.email = email;
         this.password = password;
         this.objetivo = objetivo;
-        this.rutinas = new ArrayList<>();
     }
 
     public Usuario(String email, String nombre, String apellido, String password, List<Reto> retos) {
@@ -166,12 +160,12 @@ public class Usuario {
         isInstructor = instructor;
     }
 
-    public List<Rutina> getRutinas() {
-        return this.rutinas;
+    public List<UsuarioRutina> getUsuarioRutinas() {
+        return usuarioRutinas;
     }
 
-    public void setRutinas(List<Rutina> rutinas) {
-        this.rutinas = rutinas;
+    public void setUsuarioRutinas(List<UsuarioRutina> usuarioRutinas) {
+        this.usuarioRutinas = usuarioRutinas;
     }
 
     public void setObjetivo(Objetivo objetivo) {

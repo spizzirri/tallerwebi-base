@@ -1,24 +1,26 @@
 package com.tallerwebi.infraestructura;
 
 import com.tallerwebi.dominio.Usuario;
-import com.tallerwebi.dominio.excepcion.*;
+import com.tallerwebi.dominio.UsuarioRutina;
 import com.tallerwebi.dominio.objetivo.Objetivo;
 import com.tallerwebi.dominio.rutina.Ejercicio;
 import com.tallerwebi.dominio.rutina.RepositorioRutina;
 import com.tallerwebi.dominio.rutina.Rutina;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 
 @Repository
 public class RepositorioRutinaImpl implements RepositorioRutina {
-    private List<Rutina> rutinas;
-
+    @Autowired
     private SessionFactory sessionFactory;
-
+    @Autowired
     public RepositorioRutinaImpl(SessionFactory sessionFactory){
         this.sessionFactory = sessionFactory;
     }
@@ -50,12 +52,10 @@ public class RepositorioRutinaImpl implements RepositorioRutina {
 
     @Override
     public List<Rutina> getRutinasByObjetivo(Objetivo objetivo) {
-
         String hql = "FROM Rutina WHERE objetivo = :objetivo";
-        Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
-        query.setParameter("objetivo",objetivo);
-
-        return (List<Rutina>) query.getResultList();
+        return sessionFactory.getCurrentSession().createQuery(hql, Rutina.class)
+                .setParameter("objetivo", objetivo)
+                .list();
     }
 
     @Override
@@ -83,8 +83,11 @@ public class RepositorioRutinaImpl implements RepositorioRutina {
 
     @Override
     public void guardarEjercicioEnRutina(Ejercicio ejercicio, Rutina rutina) {
-        rutina.getEjercicios().add(ejercicio);
-        this.sessionFactory.getCurrentSession().save(rutina);
+        Rutina rutinaAAsignar = this.buscarRutinaPorId(rutina.getIdRutina());
+        Ejercicio ejercicioAAsignar = this.getEjercicioById(ejercicio.getIdEjercicio());
+
+        rutinaAAsignar.getEjercicios().add(ejercicioAAsignar);
+        this.sessionFactory.getCurrentSession().save(rutinaAAsignar);
     }
 
     @Override
@@ -123,12 +126,18 @@ public class RepositorioRutinaImpl implements RepositorioRutina {
 
     @Override
     public void asignarRutinaAUsuario(Rutina rutina, Usuario usuario) {
-        this.guardarRutina(rutina);
-        this.guardarUsuario(usuario);
-        usuario.getRutinas().add(rutina);
-        this.sessionFactory.getCurrentSession().update(usuario);
+        Rutina rutinaAAsignar = this.buscarRutinaPorId(rutina.getIdRutina());
+        Usuario usuarioAAsignar = this.getUsuarioPorId(usuario.getId());
 
+        // Create a new UsuarioRutina entity
+        UsuarioRutina usuarioRutina = new UsuarioRutina();
+        usuarioRutina.setUsuario(usuarioAAsignar);
+        usuarioRutina.setRutina(rutinaAAsignar);
+        usuarioRutina.setFechaInicio(new Date());
+        usuarioRutina.setActivo(true);
 
+        // Persist the UsuarioRutina entity
+        this.sessionFactory.getCurrentSession().save(usuarioRutina);
     }
 
     @Override
@@ -138,23 +147,22 @@ public class RepositorioRutinaImpl implements RepositorioRutina {
 
     @Override
     public List<Rutina> getRutinasDeUsuario(Usuario usuario) {
-        String hql = "SELECT r FROM Usuario u JOIN u.rutinas r WHERE u.id = :idUsuario ";
-        Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
-        query.setParameter("idUsuario",usuario.getId());
+        String hql = "SELECT ur.rutina FROM UsuarioRutina ur WHERE ur.usuario.id = :idUsuario";
+        Query<Rutina> query = this.sessionFactory.getCurrentSession().createQuery(hql, Rutina.class);
+        query.setParameter("idUsuario", usuario.getId());
 
-        return (List<Rutina>) query.getResultList();
-
+        return query.getResultList();
     }
 
     @Override
     public Rutina buscarRutinaEnUsuario(Rutina rutina, Usuario usuario) {
-        String hql = "SELECT r FROM Usuario u JOIN u.rutinas r WHERE u.id = :idUsuario AND r.idRutina = :idRutina ";
-        Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
-        query.setParameter("idUsuario",usuario.getId());
-        query.setParameter("idRutina",rutina.getIdRutina());
+        String hql = "SELECT ur.rutina FROM UsuarioRutina ur WHERE ur.usuario.id = :idUsuario AND ur.rutina.idRutina = :idRutina";
+        Query<Rutina> query = this.sessionFactory.getCurrentSession().createQuery(hql, Rutina.class);
+        query.setParameter("idUsuario", usuario.getId());
+        query.setParameter("idRutina", rutina.getIdRutina());
 
         try {
-            return (Rutina) query.getSingleResult();
+            return query.getSingleResult();
         } catch (Exception e) {
             return null;
         }
@@ -171,10 +179,10 @@ public class RepositorioRutinaImpl implements RepositorioRutina {
 
     @Override
     public void eliminarRutinaDeUsuario(Rutina rutina, Usuario usuario) {
-        String hql = "DELETE FROM Usuario u WHERE :rutina MEMBER OF u.rutinas AND u.id = :usuarioId";
+        String hql = "DELETE FROM UsuarioRutina ur WHERE ur.rutina.idRutina = :idRutina AND ur.usuario.id = :idUsuario";
         Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
-        query.setParameter("rutina", rutina);
-        query.setParameter("usuarioId", usuario.getId());
+        query.setParameter("idRutina", rutina.getIdRutina());
+        query.setParameter("idUsuario", usuario.getId());
         query.executeUpdate();
     }
 
@@ -210,9 +218,7 @@ public class RepositorioRutinaImpl implements RepositorioRutina {
         Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
         query.setParameter("objetivo",usuario.getObjetivo());
 
-
         return (List<Rutina>) query.getResultList();
-
     }
 
     @Override
@@ -221,11 +227,7 @@ public class RepositorioRutinaImpl implements RepositorioRutina {
         Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
         query.setParameter("id",id);
 
-        try {
-            return (Usuario) query.getSingleResult();
-        } catch (Exception e) {
-            return null;
-        }
+        return (Usuario) query.getSingleResult();
     }
 
     @Override
@@ -234,6 +236,112 @@ public class RepositorioRutinaImpl implements RepositorioRutina {
         Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
         query.setParameter("rutinaId", rutina.getIdRutina());
         return (List<Ejercicio>)query.getResultList();
+    }
+
+    @Override
+    public Rutina getRutinaActualDeLUsuario(Usuario usuario) {
+        return null;
+    }
+
+    @Override
+    public Ejercicio getEjercicioById(Long idEjercicio) {
+        String hql = "FROM Ejercicio WHERE idEjercicio = :id ";
+        Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
+        query.setParameter("id",idEjercicio);
+
+        return (Ejercicio) query.getSingleResult();
+    }
+
+    @Override
+    public Rutina getRutinaActivaDelUsuario(Usuario usuario) {
+        LocalDate today = LocalDate.now();
+        Date startOfDay = Date.from(today.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        Date endOfDay = Date.from(today.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+        String hql = "SELECT ur.rutina FROM UsuarioRutina ur WHERE ur.usuario.id = :userId AND ur.activo = true AND ur.fechaInicio BETWEEN :startOfDay AND :endOfDay";
+        Query query = sessionFactory.getCurrentSession().createQuery(hql, Rutina.class);
+        query.setParameter("userId", usuario.getId());
+        query.setParameter("startOfDay", startOfDay);
+        query.setParameter("endOfDay", endOfDay);
+
+        return (Rutina) query.getResultList().stream().findFirst().orElse(null);
+    }
+
+    @Override
+    public void liberarRutinaActivaDelUsuario(Usuario usuario) {
+        Usuario usuarioBuscado = this.getUsuarioPorId(usuario.getId());
+        Rutina rutinaActiva = this.getRutinaActivaDelUsuario(usuarioBuscado);
+
+        UsuarioRutina usuarioRutinaBuscado = this.buscarUsuarioRutinaActivoPorUsuarioYRutina(usuarioBuscado, rutinaActiva);
+
+        if (usuarioRutinaBuscado != null) {
+
+            usuarioRutinaBuscado.setActivo(false);
+
+            this.actualizarUsuarioRutina(usuarioRutinaBuscado);
+        }
+    }
+
+    @Override
+    public UsuarioRutina buscarUsuarioRutinaPorUsuarioYRutina(Usuario usuario, Rutina rutina) {
+        String hql = "SELECT ur FROM UsuarioRutina ur WHERE ur.usuario = :usuario AND ur.rutina = :rutina";
+        Query query = sessionFactory.getCurrentSession().createQuery(hql, UsuarioRutina.class);
+        query.setParameter("usuario", usuario);
+        query.setParameter("rutina", rutina);
+
+        return (UsuarioRutina) query.uniqueResult();
+    }
+
+    @Override
+    public List<UsuarioRutina> buscarListaDeUsuarioRutinaPorUsuarioYRutina(Usuario usuario, Rutina rutina) {
+        String hql = "SELECT ur FROM UsuarioRutina ur WHERE ur.usuario.id = :userId AND ur.rutina.id = :rutinaId";
+        Query query = sessionFactory.getCurrentSession().createQuery(hql, UsuarioRutina.class);
+        query.setParameter("userId", usuario.getId());
+        query.setParameter("rutinaId", rutina.getIdRutina());
+
+        return query.getResultList();
+}
+
+
+    @Override
+    public UsuarioRutina buscarUsuarioRutinaActivoPorUsuarioYRutina(Usuario usuario, Rutina rutina) {
+        String hql = "SELECT ur FROM UsuarioRutina ur WHERE ur.usuario = :usuario AND ur.rutina = :rutina AND ur.activo = true ";
+        Query query = sessionFactory.getCurrentSession().createQuery(hql, UsuarioRutina.class);
+        query.setParameter("usuario", usuario);
+        query.setParameter("rutina", rutina);
+
+        return (UsuarioRutina) query.uniqueResult();
+    }
+
+    @Override
+    public UsuarioRutina buscarUltimoUsuarioRutinaInactivoPorUsuarioYRutina(Usuario usuario, Rutina rutina) {
+        String hql = "SELECT ur FROM UsuarioRutina ur WHERE ur.usuario = :usuario AND ur.rutina = :rutina AND ur.activo = false ORDER BY ur.fechaInicio DESC";
+        Query query = sessionFactory.getCurrentSession().createQuery(hql, UsuarioRutina.class);
+        query.setParameter("usuario", usuario);
+        query.setParameter("rutina", rutina);
+        query.setMaxResults(1);
+
+        return (UsuarioRutina) query.uniqueResult();
+    }
+
+
+    @Override
+    public void actualizarUsuarioRutina(UsuarioRutina usuarioRutina) {
+        this.sessionFactory.getCurrentSession().update(usuarioRutina);
+    }
+
+    @Override
+    public void guardarUsuarioRutina(UsuarioRutina usuarioRutina) {
+        sessionFactory.getCurrentSession().saveOrUpdate(usuarioRutina);
+    }
+
+    @Override
+    public Rutina getUltimaRutinaRealizadaPorUsuario(Usuario usuario) {
+        String hql = "SELECT ur.rutina FROM UsuarioRutina ur WHERE ur.usuario = :usuario AND ur.activo = false ORDER BY ur.fechaInicio DESC";
+        Query<Rutina> query = sessionFactory.getCurrentSession().createQuery(hql, Rutina.class);
+        query.setParameter("usuario", usuario);
+
+        return query.setMaxResults(1).uniqueResult();
     }
 
 

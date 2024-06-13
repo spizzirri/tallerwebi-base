@@ -31,13 +31,13 @@
 </header>
 <div class="container mt-5">
     <h2>Definir Objetivos de Entrenamiento</h2>
-    <form th:action="@{/rutina}" method="GET">
+    <form th:action="@{/rutinas}" method="GET">
         <div class="mb-3">
             <label for="objetivo" class="form-label">Selecciona tu objetivo:</label>
             <select class="form-select" id="objetivo" name="objetivo">
-                <option value="perdida-peso">Pérdida de Peso</option>
-                <option value="ganancia-muscular">Ganancia Muscular</option>
-                <option value="tonificacion">Tonificación</option>
+                <option value="PERDIDA_DE_PESO">Pérdida de Peso</option>
+                <option value="GANANCIA_MUSCULAR">Ganancia Muscular</option>
+                <option value="DEFINICION">Definición</option>
             </select>
         </div>
         <button type="submit" class="btn btn-primary">Guardar</button>

@@ -76,6 +76,7 @@ public class ServicioRutinaTest {
     public void QueArrojeExcepcionSiElUsuarioNoTieneNingunaRutinaAsignada() throws UsuarioSinRutinasException {
         //p
         Usuario usuario = new Usuario("Lautaro", Objetivo.GANANCIA_MUSCULAR);
+
         List<Rutina> rutinasmock = new ArrayList<>();
 
         //e
@@ -97,6 +98,7 @@ public class ServicioRutinaTest {
         //p
         Usuario usuario = new Usuario("Lautaro", Objetivo.GANANCIA_MUSCULAR);
         Rutina rutina = new Rutina("Rutina de volumen",Objetivo.GANANCIA_MUSCULAR);
+        usuario.setId(1L);
         rutina.setIdRutina(1L);
 
         //e
@@ -516,16 +518,20 @@ public class ServicioRutinaTest {
     public void QueSePuedaSaberSiUnUsuarioTieneUnaRutinaEspecifica(){
         // Preparación
         Usuario usuarioMock = new Usuario("Lautaro",Objetivo.DEFINICION);
+        usuarioMock.setId(1L);
+
         Rutina rutinaMock = new Rutina("Rutina de definicion de piernas",Objetivo.DEFINICION);
-        usuarioMock.getRutinas().add(rutinaMock);
+        rutinaMock.setIdRutina(1L);
 
-        when(this.repositorioRutina.buscarRutinaEnUsuario(rutinaMock,usuarioMock)).thenReturn(rutinaMock);
+        when(this.repositorioRutina.buscarRutinaEnUsuario(rutinaMock, usuarioMock)).thenReturn(rutinaMock);
 
-        //Ejecución
-        boolean resultado = this.servicioRutina.existeRutinaEnUsuario(rutinaMock,usuarioMock);
+        // Ejecución
+        boolean resultado = this.servicioRutina.existeRutinaEnUsuario(rutinaMock, usuarioMock);
 
-        //Verificación
+        // Verificación
         assertTrue(resultado);
+
+        verify(this.repositorioRutina).buscarRutinaEnUsuario(rutinaMock, usuarioMock);
     }
 
     @Test
@@ -578,6 +584,27 @@ public class ServicioRutinaTest {
 
         //Verificación
         assertFalse(resultado);
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void queSePuedaObtenerUnaListaDeDatosRutinaDeRutinasConObjetivoPerdidaDePeso() {
+        // Preparación
+        Rutina rutinaMock = new Rutina("Rutina def 1",Objetivo.DEFINICION);
+        Rutina rutinaMock2 = new Rutina("Rutina def 2",Objetivo.DEFINICION);
+        List<Rutina> rutinasEsperadas = new ArrayList<>();
+        rutinasEsperadas.add(rutinaMock);
+        rutinasEsperadas.add(rutinaMock2);
+        Objetivo objetivoMock = Objetivo.DEFINICION;
+
+        //Ejecución
+        when(this.repositorioRutina.getRutinasByObjetivo(objetivoMock)).thenReturn(rutinasEsperadas);
+
+        //Verificación
+        List<DatosRutina> rutinasObtenidas = this.servicioRutina.getRutinasPorObjetivo(objetivoMock);
+
+        assertEquals(rutinasObtenidas.size(),2);
     }
 
 }

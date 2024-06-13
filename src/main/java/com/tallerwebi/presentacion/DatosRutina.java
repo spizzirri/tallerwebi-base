@@ -9,6 +9,8 @@ import java.util.List;
 
 public class DatosRutina {
 
+    private Long id;
+
     private String nombre;
 
     private List<Ejercicio> ejercicios;
@@ -24,7 +26,7 @@ public class DatosRutina {
     public DatosRutina(String nombre, Objetivo objetivo){
         this.nombre = nombre;
         this.objetivo = objetivo;
-        this.descripcion = "Rutina para lograr " + this.objetivo;
+        this.descripcion = "Rutina para lograr " + this.objetivo.formatear();
         this.ejercicios = new ArrayList<>();
     }
 
@@ -32,14 +34,15 @@ public class DatosRutina {
         this.nombre = nombre;
         this.ejercicios = ejercicios;
         this.objetivo = objetivo;
-        this.descripcion = "Rutina para lograr " + this.objetivo;
+        this.descripcion = "Rutina para lograr " + this.objetivo.formatear();
     }
 
     public DatosRutina(Rutina rutina){
+        this.id = rutina.getIdRutina();
         this.nombre = rutina.getNombre();
         this.ejercicios = rutina.getEjercicios();
         this.objetivo = rutina.getObjetivo();
-        this.descripcion = "Rutina para lograr " + this.objetivo;
+        this.descripcion = "Rutina para lograr " + this.objetivo.formatear();
     }
 
     public String getNombre() {
@@ -68,6 +71,14 @@ public class DatosRutina {
 
     public String getDescripcion() {
         return descripcion;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public void setDescripcion(String descripcion) {

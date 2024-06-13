@@ -1,6 +1,7 @@
 package com.tallerwebi.infraestructura;
 
 import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.UsuarioRutina;
 import com.tallerwebi.dominio.excepcion.EjercicioNoExisteEnRutinaException;
 import com.tallerwebi.dominio.excepcion.RutinaNoEncontradaException;
 import com.tallerwebi.dominio.excepcion.UsuarioNoTieneLaRutinaBuscadaException;
@@ -11,6 +12,8 @@ import com.tallerwebi.dominio.rutina.Ejercicio;
 import com.tallerwebi.dominio.rutina.RepositorioRutina;
 import com.tallerwebi.dominio.rutina.Rutina;
 import com.tallerwebi.infraestructura.config.HibernateTestInfraestructuraConfig;
+import com.tallerwebi.presentacion.DatosRutina;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,9 +23,13 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import javax.transaction.Transactional;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -41,6 +48,14 @@ public class RepositorioRutinaTest {
     @BeforeEach
     public void init(){
         this.repositorioRutina = new RepositorioRutinaImpl(this.sessionFactory);
+        this.limpiarBaseDeDatos();
+    }
+
+    public void limpiarBaseDeDatos() {
+        Session session = sessionFactory.getCurrentSession();
+        session.createQuery("DELETE FROM UsuarioRutina").executeUpdate();
+        session.createQuery("DELETE FROM Rutina").executeUpdate();
+        session.createQuery("DELETE FROM Usuario").executeUpdate();
     }
 
     @Test
@@ -64,18 +79,26 @@ public class RepositorioRutinaTest {
     @Test
     @Transactional
     @Rollback
-    public void quesePuedanObtenerRutinasDePerdidaDePeso(){
-        //preparacion
-        this.crearRutina(anyString(),Objetivo.PERDIDA_DE_PESO);
-        this.crearRutina(anyString(),Objetivo.PERDIDA_DE_PESO);
-        this.crearRutina(anyString(),Objetivo.GANANCIA_MUSCULAR);
+    public void quesePuedanObtenerRutinasDePerdidaDePeso() {
+        // Preparación
+        Rutina rutina1 = this.crearRutina("Rutina Cardio 1", Objetivo.PERDIDA_DE_PESO);
+        Rutina rutina2 = this.crearRutina("Rutina Cardio 2", Objetivo.PERDIDA_DE_PESO);
+        Rutina rutina3 = this.crearRutina("Rutina Volumen 1", Objetivo.GANANCIA_MUSCULAR);
 
-        //ejecucion
+        // Persistir rutinas
+        sessionFactory.getCurrentSession().save(rutina1);
+        sessionFactory.getCurrentSession().save(rutina2);
+        sessionFactory.getCurrentSession().save(rutina3);
+
+        // Ejecución
         List<Rutina> rutinasObtenidas = this.repositorioRutina.getRutinasByObjetivo(Objetivo.PERDIDA_DE_PESO);
 
-        //verificacion
-        assertThat(rutinasObtenidas.size(),equalTo(2));
+        // Verificación
+        assertThat(rutinasObtenidas.size(), equalTo(2));
+        assertThat(rutinasObtenidas, containsInAnyOrder(rutina1, rutina2));
     }
+
+
 
     @Test
     @Transactional
@@ -191,48 +214,58 @@ public class RepositorioRutinaTest {
     @Transactional
     @Rollback
     @Test
-    public void queSePuedaAsignarUnaRutinaAUnUsuario(){
-        //p
+    public void queSePuedaAsignarUnaRutinaAUnUsuario() {
+        // Preparación
         Usuario usuario = new Usuario("Lautaro", Objetivo.GANANCIA_MUSCULAR);
-        Rutina rutinaPecho = crearRutina("Rutina de volumen - PECHO",Objetivo.GANANCIA_MUSCULAR);
+        Rutina rutinaPecho = crearRutina("Rutina de volumen - PECHO", Objetivo.GANANCIA_MUSCULAR);
 
-        //e
-        // Persistir usuario, rutina y asignar rutina al usuario
+        // Persistir usuario y rutina
+        sessionFactory.getCurrentSession().save(usuario);
+        sessionFactory.getCurrentSession().save(rutinaPecho);
+
+        // Ejecución: Asignar rutina al usuario
         repositorioRutina.asignarRutinaAUsuario(rutinaPecho, usuario);
 
-        // Verificar que la rutina se haya asignado correctamente al usuario
-        Rutina rutinaObtenida = (Rutina) sessionFactory.getCurrentSession()
-                .createQuery("SELECT r FROM Usuario u JOIN u.rutinas r WHERE u.id = :idUsuario AND r.id = :idRutina")
+        // Verificación: Verificar que la rutina se haya asignado correctamente al usuario
+        UsuarioRutina usuarioRutinaObtenida = (UsuarioRutina) sessionFactory.getCurrentSession()
+                .createQuery("SELECT ur FROM UsuarioRutina ur WHERE ur.usuario.id = :idUsuario AND ur.rutina.id = :idRutina")
                 .setParameter("idUsuario", usuario.getId())
                 .setParameter("idRutina", rutinaPecho.getIdRutina())
                 .getSingleResult();
 
-        assertThat(rutinaObtenida, equalTo(rutinaPecho));
+        assertNotNull(usuarioRutinaObtenida);
+        assertThat(usuarioRutinaObtenida.getRutina(), equalTo(rutinaPecho));
+        assertThat(usuarioRutinaObtenida.getUsuario(), equalTo(usuario));
     }
+
 
     @Transactional
     @Rollback
     @Test
-    public void queSePuedaSaberQueRutinasTieneElUsuario() throws  UsuarioSinRutinasException {
-        //p
+    public void queSePuedaSaberQueRutinasTieneElUsuario() throws UsuarioSinRutinasException {
+        // Preparación
         Usuario usuario = new Usuario("Lautaro", Objetivo.GANANCIA_MUSCULAR);
-        Rutina rutinaPecho = crearRutina("Rutina de volumen - PECHO",Objetivo.GANANCIA_MUSCULAR);
-        Rutina rutinaBiceps = crearRutina("Rutina de volumen - BICEPS",Objetivo.GANANCIA_MUSCULAR);
+        Rutina rutinaPecho = crearRutina("Rutina de volumen - PECHO", Objetivo.GANANCIA_MUSCULAR);
+        Rutina rutinaBiceps = crearRutina("Rutina de volumen - BICEPS", Objetivo.GANANCIA_MUSCULAR);
 
-        //e
+        // Persistir usuario
+        sessionFactory.getCurrentSession().save(usuario);
+
+        // Ejecución
         this.repositorioRutina.guardarRutina(rutinaPecho);
         this.repositorioRutina.guardarRutina(rutinaBiceps);
-        this.repositorioRutina.asignarRutinaAUsuario(rutinaPecho,usuario);
-        this.repositorioRutina.asignarRutinaAUsuario(rutinaBiceps,usuario);
+        this.repositorioRutina.asignarRutinaAUsuario(rutinaPecho, usuario);
+        this.repositorioRutina.asignarRutinaAUsuario(rutinaBiceps, usuario);
 
         List<Rutina> rutinasEsperadas = new ArrayList<>();
         rutinasEsperadas.add(rutinaPecho);
         rutinasEsperadas.add(rutinaBiceps);
 
-        //v
+        // Verificación
         List<Rutina> rutinasObtenidas = this.repositorioRutina.getRutinasDeUsuario(usuario);
-        assertThat(rutinasEsperadas, equalTo(rutinasObtenidas));
+        assertThat(rutinasObtenidas, equalTo(rutinasEsperadas));
     }
+
 
     @Test
     @Transactional
@@ -369,6 +402,109 @@ public class RepositorioRutinaTest {
         List<Rutina> rutinas = repositorioRutina.getRutinasDeUsuario(usuario);
         assertFalse(rutinas.contains(rutina));
     }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void queSePuedaObtenerUnaListaDeRutinasConObjetivoDefinicion() {
+        // Preparación
+        Rutina rutinaMock = new Rutina("Rutina def 1",Objetivo.DEFINICION);
+        Rutina rutinaMock2 = new Rutina("Rutina def 2",Objetivo.DEFINICION);
+        Objetivo objetivoMock = Objetivo.DEFINICION;
+        this.sessionFactory.getCurrentSession().save(rutinaMock);
+        this.sessionFactory.getCurrentSession().save(rutinaMock2);
+
+        // Ejecución
+        List<Rutina> rutinasMock = repositorioRutina.getRutinasByObjetivo(objetivoMock);
+
+        // Verificación
+
+
+        assertEquals(rutinasMock.size(),2);
+        assertTrue(rutinasMock.contains(rutinaMock));
+        assertTrue(rutinasMock.contains(rutinaMock2));
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void queSePuedaActualizarUnaRelacionUsuarioRutina() {
+        // Preparación
+        Usuario usuario = new Usuario("Lautaro", Objetivo.GANANCIA_MUSCULAR);
+        Rutina rutina = crearRutina("Rutina de volumen - PECHO", Objetivo.GANANCIA_MUSCULAR);
+
+        // Persistir usuario y rutina
+        sessionFactory.getCurrentSession().save(usuario);
+        sessionFactory.getCurrentSession().save(rutina);
+
+        // Asignar rutina al usuario
+        UsuarioRutina usuarioRutina = new UsuarioRutina();
+        usuarioRutina.setUsuario(usuario);
+        usuarioRutina.setRutina(rutina);
+        usuarioRutina.setActivo(true);
+        usuarioRutina.setFechaInicio(new Date());
+        sessionFactory.getCurrentSession().save(usuarioRutina);
+
+        // Verificar que la relación se haya asignado correctamente
+        UsuarioRutina usuarioRutinaObtenida = this.repositorioRutina.buscarUsuarioRutinaPorUsuarioYRutina(usuario, rutina);
+        assertNotNull(usuarioRutinaObtenida);
+        assertTrue(usuarioRutinaObtenida.isActivo());
+
+        // Actualizar la relación
+        usuarioRutinaObtenida.setActivo(false);
+        this.repositorioRutina.actualizarUsuarioRutina(usuarioRutinaObtenida);
+
+        // Verificar que la relación se haya actualizado correctamente
+        UsuarioRutina usuarioRutinaActualizada = this.repositorioRutina.buscarUsuarioRutinaPorUsuarioYRutina(usuario, rutina);
+        assertNotNull(usuarioRutinaActualizada);
+        assertFalse(usuarioRutinaActualizada.isActivo());
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void queSePuedaSaberCualFueLaUltimaRutinaQueRealizoElUsuario() {
+        // Preparación
+        Usuario usuario = new Usuario("Lautaro", Objetivo.GANANCIA_MUSCULAR);
+        Rutina rutina1 = new Rutina("Rutina de volumen - PECHO", Objetivo.GANANCIA_MUSCULAR);
+        Rutina rutina2 = new Rutina("Rutina de volumen - BICEPS", Objetivo.GANANCIA_MUSCULAR);
+        Rutina rutina3 = new Rutina("Rutina de volumen - ESPALDA", Objetivo.GANANCIA_MUSCULAR);
+
+        this.repositorioRutina.guardarUsuario(usuario);
+        this.repositorioRutina.guardarRutina(rutina1);
+        this.repositorioRutina.guardarRutina(rutina2);
+        this.repositorioRutina.guardarRutina(rutina3);
+
+        UsuarioRutina usuarioRutina1 = new UsuarioRutina(usuario, rutina1);
+        usuarioRutina1.setActivo(false);
+        usuarioRutina1.setFechaInicio(Date.from(LocalDate.now().minusDays(3).atStartOfDay(ZoneId.systemDefault()).toInstant()));
+
+        UsuarioRutina usuarioRutina2 = new UsuarioRutina(usuario, rutina2);
+        usuarioRutina2.setActivo(false);
+        usuarioRutina2.setFechaInicio(Date.from(LocalDate.now().minusDays(2).atStartOfDay(ZoneId.systemDefault()).toInstant()));
+
+        UsuarioRutina usuarioRutina3 = new UsuarioRutina(usuario, rutina3);
+        usuarioRutina3.setActivo(false);
+        usuarioRutina3.setFechaInicio(Date.from(LocalDate.now().minusDays(5).atStartOfDay(ZoneId.systemDefault()).toInstant()));
+
+        UsuarioRutina usuarioRutina4 = new UsuarioRutina(usuario, rutina3);
+        usuarioRutina3.setActivo(false);
+        usuarioRutina3.setFechaInicio(Date.from(LocalDate.now().minusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant()));
+
+        this.repositorioRutina.guardarUsuarioRutina(usuarioRutina1);
+        this.repositorioRutina.guardarUsuarioRutina(usuarioRutina2);
+        this.repositorioRutina.guardarUsuarioRutina(usuarioRutina3);
+        this.repositorioRutina.guardarUsuarioRutina(usuarioRutina4);
+
+        // Ejecución
+        UsuarioRutina usuarioRutinaInactiva = this.repositorioRutina.buscarUltimoUsuarioRutinaInactivoPorUsuarioYRutina(usuario, rutina3);
+
+        // Verificación
+        assertNotNull(usuarioRutinaInactiva);
+        assertThat(usuarioRutinaInactiva.getRutina(), equalTo(rutina3));
+    }
+
+
 
     public Rutina crearRutina(String nombre, Objetivo objetivo){
         Rutina rutina = new Rutina(nombre,objetivo);

@@ -1,0 +1,80 @@
+html, body {
+    height: 100%;
+    margin: 0;
+}
+body {
+    display: flex;
+    flex-direction: column;
+}
+.navbar {
+    background-color: #343a40;
+    padding: 0.5rem 1rem;
+}
+.logo-img {
+    height: 50px;
+    margin-right: 10px;
+}
+.logo-text {
+    color: #ffffff;
+    display: inline;
+    font-size: 1.5rem;
+}
+.nav-links {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    padding-left: 0;
+    margin-bottom: 0;
+    width: 100%;
+}
+.nav-links li a {
+    color: #ffffff;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    transition: background-color 0.3s;
+}
+.nav-links li a:hover {
+    background-color: #495057;
+    border-radius: 5px;
+}
+.user-profile {
+    display: flex;
+    align-items: center;
+}
+.user-name {
+    color: #ffffff;
+    margin-right: 10px;
+}
+.user-img {
+    height: 40px;
+    border-radius: 50%;
+}
+.container_rutinas {
+    padding: 2rem;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.card {
+    background-color: #292b2c;
+    color: #ffffff;
+    border: none;
+}
+.card-header {
+    background-color: #343a40;
+}
+.card-body {
+    background-color: #292b2c;
+}
+.card-body ul {
+    padding-left: 1rem;
+}
+footer {
+    background-color: #343a40;
+    color: #ffffff;
+    text-align: center;
+    padding: 1rem;
+    width: 100%;
+}

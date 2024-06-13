@@ -2,62 +2,75 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Tarjeta de Rutina</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Rutina Detalle</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+    <link rel="stylesheet" th:href="@{/css/rutina.css}"/>
     <link rel="stylesheet" th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css}">
 </head>
-<header>
-    <nav class="navbar">
-        <div class="logo">
-            <img th:src="@{/img/logoMagnusFitSolo.png}" alt="Logo" class="logo-img">
-            <h1 class="logo-text">MagnusFit</h1>
-        </div>
-        <ul class="nav-links">
-            <li><a th:action="@{/irAHome}" href="home">Inicio</a></li>
-            <li><a id="ir-a-vistaObjetivos" href="vistaObjetivos">Rutina</a></li>
-            <li><a th:action="@{/irCalendario}" href="calendario">Calendario</a></li>
-            <li><a th:action="@{/irAlimentacion}" href="alimentacion">Alimentación</a></li>
-        </ul>
-        <div class="user-profile">
-            <a href="perfil" th:action="@{/irPerfil}">
-                <span class="user-name">Nombre</span>
+<<<<<<< HEAD
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand d-flex align-items-center" th:href="@{/}">
+            <img th:src="@{/img/logoMagnusFitSolo.png}" alt="Logo" class="logo-img me-2">
+            <span class="logo-text">MagnusFit</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mx-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:action="@{/irAHome}" href="home">Inicio</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:action="@{/irAMiRutina}" href="mi-rutina">Rutina</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:action="@{/irCalendario}" href="calendario">Calendario</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:action="@{/irAlimentacion}" href="alimentacion">Alimentacion</a>
+                </li>
+            </ul>
+            <a class="nav-link d-flex align-items-center" th:action="@{/irPerfil}" href="perfil">
+                <span class="user-name me-2">Nombre</span>
                 <img th:src="@{/img/usuario.png}" alt="Usuario" class="user-img">
             </a>
         </div>
-    </nav>
-</header>
-<body>
-<div class="container" style="margin-bottom:5rem; margin-top:5rem;">
-    <div class="card mx-auto" style="max-width: 80%;">
-        <div class="card-header">
-            <h2> CARDIO: PERDIDA DE PESO</h2>
-        </div>
-        <div class="card-body">
-            <p><b>Objetivo:</b> Bajar de peso</p>
-            <div class="row">
-                <div class="col-md-6">
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item">
-                            <h4>Burpees</h4>
-                            <p>Un ejercicio compuesto de alto impacto que quema muchas calorías.</p>
-                        </li>
-                        <li class="list-group-item">
-                            <h4>Sentadillas</h4>
-                            <p>Un ejercicio fundamental para fortalecer las piernas y los glúteos.</p>
-                        </li>
-                    </ul>
-                </div>
+    </div>
+</nav>
 
-                <div class="col-md-6">
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item">
-                            <h4>Planchas</h4>
-                            <p>Un ejercicio isométrico que fortalece el core y mejora la postura.</p>
-                        </li>
-                        <li class="list-group-item">
-                            <h4>Remo con pesas</h4>
-                            <p>Un ejercicio compuesto que trabaja la espalda, los brazos y el core.</p>
+<div class="container mt-5 pt-5">
+    <p th:if="${error != null}" class="alert alert-danger" th:text="${error}"></p>
+    <div class="row mb-2">
+        <div class="col-md-12 text-end">
+            <form th:action="@{/liberar-rutina}" method="post">
+                <input type="hidden" name="id" th:value="${rutina.id}" />
+                <button type="submit" class="btn btn-danger">Liberar rutina</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h2 th:text="${rutina.nombre}"></h2>
+                </div>
+                <div class="card-body">
+                    <p th:text="${rutina.descripcion}"></p>
+                    <ul class="list-group">
+                        <li class="list-group-item" th:each="ejercicio : ${rutina.ejercicios}">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p th:text="${ejercicio.nombre}"></p>
+                                </div>
+                                <div class="col-md-6 text-end">
+                                    <p th:text="${ejercicio.series + 'x' + ejercicio.repeticiones}"></p>
+                                </div>
+                            </div>
                         </li>
                     </ul>
                 </div>
@@ -65,5 +78,14 @@
         </div>
     </div>
 </div>
+
+<footer class="bg-light py-3 mt-auto">
+    <div class="container text-center">
+        <p>&copy; 2024 MagnusFit. Todos los derechos reservados.</p>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>
