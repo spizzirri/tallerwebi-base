@@ -67,7 +67,7 @@ public class ControladorReto {
 
 
 
-    @RequestMapping(path = "/terminar-reto", method = RequestMethod.POST)
+    @RequestMapping(path = "/terminar-reto", method = RequestMethod.GET)
     public ModelAndView terminarReto(@RequestParam Long retoId, @RequestParam String email, @RequestParam String password, HttpSession session) {
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         if (usuario == null) {
@@ -76,28 +76,31 @@ public class ControladorReto {
 
         ModelAndView modelAndView = new ModelAndView("home");
         modelAndView.addObject("retoId", retoId);
+        modelAndView.addObject("usuario", usuario); // Asegúrate de agregar el usuario al modelo
+
         try {
-            Usuario usuarioBuscado = servicioLogin.consultarUsuario(email, password);
-            if (usuarioBuscado != null) {
-                servicioLogin.modificarRachaRetoTerminado(usuarioBuscado, retoId);
-                modelAndView.addObject("usuario", usuarioBuscado);
-            }
+            DatosItemRendimiento itemMasSeleccionado = servicioLogin.obtenerItemMasSeleccionado();
+            modelAndView.addObject("itemMasSeleccionado", itemMasSeleccionado);
 
             Reto retoDisponible = servicioReto.obtenerRetoDisponible();
             if (retoDisponible != null) {
                 modelAndView.addObject("retoDisponible", retoDisponible);
             }
 
-            // Añadir itemMasSeleccionado al modelo
-            DatosItemRendimiento itemMasSeleccionado = servicioLogin.obtenerItemMasSeleccionado();
-            modelAndView.addObject("itemMasSeleccionado", itemMasSeleccionado);
+            Usuario usuarioBuscado = servicioLogin.consultarUsuario(email, password);
+            if (usuarioBuscado != null) {
+                servicioLogin.modificarRachaRetoTerminado(usuarioBuscado, retoId);
+                modelAndView.addObject("usuario", usuarioBuscado);
+            }
 
         } catch (Exception e) {
-            // Manejar el error mostrando un mensaje de error en la misma página
             modelAndView.addObject("error", "An error occurred while finishing the challenge: " + e.getMessage());
         }
         return modelAndView;
     }
+
+
+
 
 
 

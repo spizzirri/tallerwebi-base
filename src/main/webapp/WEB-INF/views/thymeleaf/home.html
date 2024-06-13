@@ -150,7 +150,7 @@
                     <p style="margin: 0px !important;"><i class="fas fa-clock"></i><span id="tiempo-restante"></span></p>
                 </div>
                 <!-- Botón para marcar como terminado -->
-                <form th:action="@{/terminar-reto}" method="POST" id="terminar-reto-form">
+                <form th:action="@{/terminar-reto}" method="GET" id="terminar-reto-form">
                     <input type="hidden" name="retoId" th:value="${retoDisponible.id}"/>
                     <input type="hidden" name="email" th:value="${usuario.email}"/>
                     <input type="hidden" name="password" th:value="${usuario.password}"/>
