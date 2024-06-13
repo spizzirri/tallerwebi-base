@@ -17,10 +17,11 @@ header {
 }
 
 .navbar {
-    display: flex;
-    align-items: center;
+    display: flex !important;
+    align-items: center !important;
     flex-grow: 1;
     font-weight: bold;
+    padding: 0px !important;
 }
 
 .logo {
@@ -124,13 +125,20 @@ a:active {
 
 @media screen and (max-width:650px) {
     .navbar{
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
     }
 
+     header{
+        padding: 5px 12px;
+        }
 
+        .nav-links li {
+               margin-right: 6px;
+               margin-left: 6px;
+        }
 }
 
 @media screen and (max-width: 768px) {
@@ -712,26 +720,77 @@ position: relative;
     right: 1rem;
     width: 100px;
     height: 100px;
+    border-radius: 50%;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     display: flex;
     justify-content: center;
     align-items: center;
-    border-radius: 50%;
-    background-image: linear-gradient( 199deg,  rgba(73,73,73,1) 36.1%, rgba(16,15,15,1) 93.6% );
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     color: white;
     font-family: 'Arial', sans-serif;
     font-weight: bold;
     font-size: 1.2rem;
     text-align: center;
+     background-size: cover;
+     background-position: center;
 }
 
 .reto-circulo:hover {
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
     transform: scale(1.05);
+    }
+
+/* Fondo animado */
+.reto-circulo::before {
+    content: '';
+    top: -50%;
+    left: -50%;
+    background: linear-gradient(199deg, rgba(73,73,73,1) 36.1%, rgba(16,15,15,1) 93.6%);
+    animation: moveBackground 5s linear infinite;
+    z-index: -1; /* Poner el fondo animado detrás de todo */
 }
 
+/* Animación de movimiento del fondo */
+@keyframes moveBackground {
+    0% {
+        background-position: 0% 0%;
+    }
+    50% {
+        background-position: 100% 100%;
+    }
+    100% {
+        background-position: 0% 0%;
+    }
+}
+
+/* Estilo del texto */
 .racha-texto {
     position: relative;
+    z-index: 2; /* Asegura que el texto esté por encima de la imagen */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    animation: glow 1.5s ease-in-out infinite alternate;
+    width: 75%;
+    font-size: larger;
+    line-height: 1;
+    height: 15%;
+}
+
+/* Animación de brillo del texto */
+@keyframes glow {
+    from {
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    }
+    to {
+        text-shadow: 0 0 20px rgba(255, 255, 255, 1);
+    }
+}
+
+@media (max-width: 600px) {
+    .reto-circulo {
+        width: 80px;
+        height: 80px;
+        font-size: 1rem;
+    }
 }
 
 

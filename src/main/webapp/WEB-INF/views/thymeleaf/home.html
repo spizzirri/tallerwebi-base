@@ -193,7 +193,7 @@
     </div>
 </div>
 <div id="usuario-data" th:data-racha="${usuario.rachaDeRetos}" style="display: none;"></div>
-<div id="reto-circulo" class="reto-circulo">
+<div id="reto-circulo" class="reto-circulo" th:style="'background-image: url(' + @{/img/iconoRachaRetos.png} + ');'">
     <div id="racha-texto" class="racha-texto"></div>
 </div>
 <!-- Bootstrap CSS -->

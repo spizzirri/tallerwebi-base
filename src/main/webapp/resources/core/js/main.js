@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     // Actualizar el texto de la racha
     const rachaTextoDiv = document.getElementById('racha-texto');
     if (rachaTextoDiv) {
-        rachaTextoDiv.textContent = `Racha Retos: ${rachaDeRetos}`;
+        rachaTextoDiv.textContent = `Racha     ${rachaDeRetos}`;
     }
 });
 
