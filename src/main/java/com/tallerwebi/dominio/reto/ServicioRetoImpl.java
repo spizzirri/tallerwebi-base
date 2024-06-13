@@ -1,8 +1,14 @@
 package com.tallerwebi.dominio.reto;
 
+import org.hibernate.Session;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 @Service
 @Transactional
@@ -16,13 +22,10 @@ public class ServicioRetoImpl implements ServicioReto{
 
     @Override
     public Reto obtenerRetoDisponible() {
-        Reto reto = null;
-        boolean retoEncontrado = false;
-        while (!retoEncontrado) {
+        Reto reto = repositorioReto.obtenerRetoDisponible();
+        if (reto == null) {
+            reiniciarRetos();
             reto = repositorioReto.obtenerRetoDisponible();
-            if (reto != null) {
-                retoEncontrado = true;
-            }
         }
         return reto;
     }
@@ -34,7 +37,8 @@ public class ServicioRetoImpl implements ServicioReto{
         if (reto != null) {
             reto.setSeleccionado(true); // Marcar como seleccionado
             reto.setEnProceso(true);
-            repositorioReto.empezarRetoActualizar(reto); // Actualizar el reto en el repositorio
+            reto.setFechaInicio(LocalDate.now());
+            repositorioReto.actualizarReto(reto); // Actualizar el reto en el repositorio
         }
     }
 
@@ -50,13 +54,43 @@ public class ServicioRetoImpl implements ServicioReto{
 
     @Override
     @Transactional
-    public void terminarReto(Long retoId) {
+    public Long terminarReto(Long retoId) {
         Reto reto = repositorioReto.obtenerRetoPorId(retoId);
+        long diasPasados = 0;
         if (reto != null) {
-            reto.setSeleccionado(false); // Marcar como seleccionado
+            // Calcular la diferencia de días
+            LocalDate fechaInicio = reto.getFechaInicio();
+            LocalDate fechaActual = LocalDate.now();
+            diasPasados = ChronoUnit.DAYS.between(fechaInicio, fechaActual);
             reto.setEnProceso(false);
-            repositorioReto.terminarReto(reto); // Actualizar el reto en el repositorio
+            reto.setFechaInicio(null);
+            repositorioReto.actualizarReto(reto); // Actualizar el reto en el repositorio
+        }
+        return diasPasados;
+    }
+
+    @Override
+    public Long calcularTiempoRestante(Long retoId) {
+        Reto reto = repositorioReto.obtenerRetoPorId(retoId);
+        if (reto == null || reto.getFechaInicio() == null) {
+            return 0L;
+        }
+        LocalDateTime fechaInicio = reto.getFechaInicio().atStartOfDay();
+        LocalDateTime fechaFin = fechaInicio.plusDays(2); // Suponiendo que el reto dura un día
+        LocalDateTime fechaActual = LocalDateTime.now();
+        Duration duracion = Duration.between(fechaActual, fechaFin);
+        return duracion.toMinutes();
+    }
+
+
+    public void reiniciarRetos() {
+        List<Reto> retos = repositorioReto.obtenerTodosLosRetos();
+        for (Reto reto : retos) {
+            reto.setSeleccionado(false);
+            reto.setEnProceso(false);
+            repositorioReto.actualizarReto(reto);
         }
     }
+
 
 }

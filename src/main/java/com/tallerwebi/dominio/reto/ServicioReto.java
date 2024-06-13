@@ -10,7 +10,7 @@ public interface ServicioReto {
     void empezarRetoActualizado(Long retoId);
     Reto obtenerRetoPorId(Long retoId);
     Reto obtenerRetoEnProceso();
+    Long terminarReto(Long retoId);
 
-    @Transactional
-    void terminarReto(Long retoId);
+    Long calcularTiempoRestante(Long retoId);
 }

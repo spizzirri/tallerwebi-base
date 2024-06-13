@@ -39,12 +39,12 @@ public class ServicioLoginImpl implements ServicioLogin {
         repositorioUsuario.guardar(usuario);
     }
 
-    @Override
-    public Usuario sumarRachaReto(Usuario usuario) {
-        usuario.sumarRacha();
-        repositorioUsuario.modificar(usuario);
-        return usuario;
-    }
+//    @Override
+//    public Usuario sumarRachaReto(Usuario usuario) {
+//        usuario.sumarRacha();
+//        repositorioUsuario.modificar(usuario);
+//        return usuario;
+//    }
 
     @Override
     public DatosItemRendimiento obtenerItemMasSeleccionado() {
@@ -58,6 +58,27 @@ public class ServicioLoginImpl implements ServicioLogin {
     public Reto obtenerRetoEnProceso() {
         return servicioReto.obtenerRetoEnProceso();
     }
+
+    @Override
+    public Usuario modificarRachaRetoTerminado(Usuario usuario, long retoId) {
+        long diasPasados = servicioReto.terminarReto(retoId);
+        if (usuario != null) {
+            if (diasPasados < 2) {
+                usuario.sumarRacha();
+                repositorioUsuario.modificar(usuario);
+            } else {
+                usuario.setRachaDeRetos(0); // Resetear la racha
+                repositorioUsuario.modificar(usuario); // Actualizar el usuario en el repositorio
+            }
+        }
+        return usuario;
+    }
+
+    @Override
+    public long calcularTiempoRestante(Long id) {
+        return servicioReto.calcularTiempoRestante(id);
+    }
+
 
 }
 

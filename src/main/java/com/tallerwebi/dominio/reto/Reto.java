@@ -3,6 +3,8 @@ package com.tallerwebi.dominio.reto;
 import com.tallerwebi.dominio.calendario.ItemRendimiento;
 
 import javax.persistence.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -22,6 +24,9 @@ public class Reto {
     @Column(name = "imagen_url", nullable = false) // URL de la imagen
     private String imagenUrl;
 
+    @Column(name = "fecha_inicio")
+    private LocalDate fechaInicio;
+
     @Column(name = "seleccionado", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean seleccionado;
 
@@ -32,10 +37,11 @@ public class Reto {
     }
 
     // Constructor con parámetros
-    public Reto(String nombre, String descripcion, String imagenUrl, Boolean enProceso) {
+    public Reto(String nombre, String descripcion, String imagenUrl, LocalDate fechaInicio) {
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.imagenUrl = imagenUrl;
+        this.fechaInicio = fechaInicio;
         this.seleccionado = false;
         this.enProceso = false;
     }
@@ -75,6 +81,14 @@ public class Reto {
 
     public void setImagenUrl(String imagenUrl) {
         this.imagenUrl = imagenUrl;
+    }
+
+    public LocalDate getFechaInicio() {
+        return fechaInicio;
+    }
+
+    public void setFechaInicio(LocalDate fechaInicio) {
+        this.fechaInicio = fechaInicio;
     }
 
     public boolean getSeleccionado() {

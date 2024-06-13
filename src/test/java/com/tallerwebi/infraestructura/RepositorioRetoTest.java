@@ -57,7 +57,7 @@ public class RepositorioRetoTest {
         reto.setSeleccionado(true);
         reto.setEnProceso(true);
         // Guardar el reto en la base de datos
-        repositorioReto.empezarRetoActualizar(reto);
+        repositorioReto.actualizarReto(reto);
         Reto retoEnLaBd = repositorioReto.obtenerRetoPorId(reto.getId());
         assertNotNull(retoEnLaBd, "El reto guardado no debe ser null.");
         assertTrue(retoEnLaBd.getSeleccionado(), "El reto guardado debe ser seleccionado.");
@@ -105,7 +105,7 @@ public class RepositorioRetoTest {
         reto.setSeleccionado(true);
         reto.setEnProceso(true);
         // Guardar el reto en la base de datos
-        repositorioReto.terminarReto(reto);
+        repositorioReto.actualizarReto(reto);
         Reto retoEnLaBd = repositorioReto.obtenerRetoPorId(reto.getId());
         assertNotNull(retoEnLaBd, "El reto guardado no debe ser null.");
         assertTrue(retoEnLaBd.getSeleccionado(), "El reto guardado debe ser seleccionado.");

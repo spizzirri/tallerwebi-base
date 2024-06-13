@@ -99,10 +99,11 @@ public class ControladorLogin {
         // Si hay un reto en proceso, añadirlo al modelo; si no, obtener un reto disponible
         if (retoEnProceso != null) {
             modelAndView.addObject("retoDisponible", retoEnProceso);
+            long minutosRestantes = servicioLogin.calcularTiempoRestante(retoEnProceso.getId());
+            modelAndView.addObject("minutosRestantes", minutosRestantes);
         } else {
             Reto retoDisponible = servicioLogin.obtenerRetoDisponible();
             modelAndView.addObject("retoDisponible", retoDisponible);
-
         }
         return modelAndView;
     }
