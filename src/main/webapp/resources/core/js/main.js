@@ -60,9 +60,25 @@ document.addEventListener('DOMContentLoaded', (event) => {
     // Actualizar el texto de la racha
     const rachaTextoDiv = document.getElementById('racha-texto');
     if (rachaTextoDiv) {
-        rachaTextoDiv.textContent = `Racha     ${rachaDeRetos}`;
+        rachaTextoDiv.textContent = `Racha ${rachaDeRetos}`;
+
+        // Añadir clase para la animación del texto
+        rachaTextoDiv.classList.add('increment');
+
+        // Añadir clase para la animación del círculo
+        const retoCirculoDiv = document.getElementById('reto-circulo');
+        if (retoCirculoDiv) {
+            retoCirculoDiv.classList.add('increment');
+        }
+
+        // Remover las clases después de la animación
+        setTimeout(() => {
+            rachaTextoDiv.classList.remove('increment');
+            retoCirculoDiv.classList.remove('increment');
+        }, 1000); // La duración de la animación debe coincidir con la del CSS
     }
 });
+
 
 
   document.addEventListener('DOMContentLoaded', function () {

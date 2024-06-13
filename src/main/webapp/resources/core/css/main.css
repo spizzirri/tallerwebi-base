@@ -747,7 +747,7 @@ position: relative;
     left: -50%;
     background: linear-gradient(199deg, rgba(73,73,73,1) 36.1%, rgba(16,15,15,1) 93.6%);
     animation: moveBackground 5s linear infinite;
-    z-index: -1; /* Poner el fondo animado detrás de todo */
+    z-index: -1;
 }
 
 /* Animación de movimiento del fondo */
@@ -778,11 +778,34 @@ position: relative;
 /* Animación de brillo del texto */
 @keyframes glow {
     from {
-        text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        text-shadow: 0 0 20px rgba(255, 255, 255, 0.4); /* Sombra inicial */
     }
     to {
-        text-shadow: 0 0 20px rgba(255, 255, 255, 1);
+        text-shadow: 0 0 35px rgba(255, 255, 255, 1); /* Sombra final más intensa */
     }
+}
+
+@keyframes rachaIncrement {
+    0% {
+        transform: scale(1);
+        color: white;
+    }
+    50% {
+        transform: scale(1.05);
+        color: #afc8f0;
+    }
+    100% {
+        transform: scale(1);
+        color: white;
+    }
+}
+
+.reto-circulo.increment {
+    transform: scale(1.05); /* Ajusta el factor de escala según tu preferencia */
+}
+
+.racha-texto.increment {
+    animation: rachaIncrement 1s ease-in-out;
 }
 
 @media (max-width: 600px) {
