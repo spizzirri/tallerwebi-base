@@ -52,7 +52,6 @@ public class RepositorioRutinaImpl implements RepositorioRutina {
 
     @Override
     public List<Rutina> getRutinasByObjetivo(Objetivo objetivo) {
-
         String hql = "FROM Rutina WHERE objetivo = :objetivo";
         return sessionFactory.getCurrentSession().createQuery(hql, Rutina.class)
                 .setParameter("objetivo", objetivo)
@@ -315,18 +314,34 @@ public class RepositorioRutinaImpl implements RepositorioRutina {
     }
 
     @Override
-    public UsuarioRutina buscarUsuarioRutinaInactivoPorUsuarioYRutina(Usuario usuario, Rutina rutina) {
-        String hql = "SELECT ur FROM UsuarioRutina ur WHERE ur.usuario = :usuario AND ur.rutina = :rutina AND ur.activo = false ";
+    public UsuarioRutina buscarUltimoUsuarioRutinaInactivoPorUsuarioYRutina(Usuario usuario, Rutina rutina) {
+        String hql = "SELECT ur FROM UsuarioRutina ur WHERE ur.usuario = :usuario AND ur.rutina = :rutina AND ur.activo = false ORDER BY ur.fechaInicio DESC";
         Query query = sessionFactory.getCurrentSession().createQuery(hql, UsuarioRutina.class);
         query.setParameter("usuario", usuario);
         query.setParameter("rutina", rutina);
+        query.setMaxResults(1);
 
         return (UsuarioRutina) query.uniqueResult();
     }
 
+
     @Override
     public void actualizarUsuarioRutina(UsuarioRutina usuarioRutina) {
         this.sessionFactory.getCurrentSession().update(usuarioRutina);
+    }
+
+    @Override
+    public void guardarUsuarioRutina(UsuarioRutina usuarioRutina) {
+        sessionFactory.getCurrentSession().saveOrUpdate(usuarioRutina);
+    }
+
+    @Override
+    public Rutina getUltimaRutinaRealizadaPorUsuario(Usuario usuario) {
+        String hql = "SELECT ur.rutina FROM UsuarioRutina ur WHERE ur.usuario = :usuario AND ur.activo = false ORDER BY ur.fechaInicio DESC";
+        Query<Rutina> query = sessionFactory.getCurrentSession().createQuery(hql, Rutina.class);
+        query.setParameter("usuario", usuario);
+
+        return query.setMaxResults(1).uniqueResult();
     }
 
 

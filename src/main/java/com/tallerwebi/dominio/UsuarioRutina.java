@@ -27,6 +27,14 @@ public class UsuarioRutina {
     @Column(name = "activo", columnDefinition = "boolean default false")
     private boolean activo;
 
+    public UsuarioRutina() {
+    }
+
+    public UsuarioRutina(Usuario usuario, Rutina rutina) {
+        this.usuario = usuario;
+        this.rutina = rutina;
+    }
+
     public Long getId() {
         return id;
     }

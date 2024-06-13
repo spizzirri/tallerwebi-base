@@ -67,9 +67,12 @@ public interface RepositorioRutina {
 
     UsuarioRutina buscarUsuarioRutinaActivoPorUsuarioYRutina(Usuario usuario, Rutina rutina);
 
-    UsuarioRutina buscarUsuarioRutinaInactivoPorUsuarioYRutina(Usuario usuario, Rutina rutina);
+    UsuarioRutina buscarUltimoUsuarioRutinaInactivoPorUsuarioYRutina(Usuario usuario, Rutina rutina);
 
     void actualizarUsuarioRutina(UsuarioRutina usuarioRutina);
 
 
+    void guardarUsuarioRutina(UsuarioRutina usuarioRutina);
+
+    Rutina getUltimaRutinaRealizadaPorUsuario(Usuario usuario);
 }

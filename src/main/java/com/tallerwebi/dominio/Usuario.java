@@ -24,7 +24,7 @@ public class Usuario {
     @Enumerated(EnumType.STRING)
     private Objetivo objetivo;
     private Boolean isInstructor = false;
-    @Column(name = "racha_de_retos", nullable = false, columnDefinition = "INTEGER DEFAULT 0")
+    @Column(name = "racha_de_retos", columnDefinition = "INTEGER DEFAULT 0")
     private Integer rachaDeRetos;
 
     //relacion de usuario con itemRendimiento 1 - n --> bd
