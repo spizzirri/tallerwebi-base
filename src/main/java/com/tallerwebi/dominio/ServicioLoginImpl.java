@@ -1,6 +1,7 @@
 package com.tallerwebi.dominio;
 
 import com.tallerwebi.dominio.calendario.ServicioCalendario;
+import com.tallerwebi.dominio.excepcion.NoCambiosRestantesException;
 import com.tallerwebi.dominio.excepcion.UsuarioExistente;
 import com.tallerwebi.dominio.reto.Reto;
 import com.tallerwebi.dominio.reto.ServicioReto;
@@ -70,6 +71,25 @@ public class ServicioLoginImpl implements ServicioLogin {
     @Override
     public long calcularTiempoRestante(Long id) {
         return servicioReto.calcularTiempoRestante(id);
+    }
+
+    @Override
+    public Reto cambiarReto(Long retoId, Usuario usuario) {
+        Reto nuevoReto = null;
+        if (usuario.getCambioReto() > 0) {
+            Reto retoActual = servicioReto.obtenerRetoPorId(retoId);
+            if (retoActual != null) {
+                servicioReto.cambiarReto(retoActual);
+            }
+
+            nuevoReto = servicioReto.obtenerRetoDisponible();
+
+            usuario.setCambioReto(usuario.getCambioReto() - 1);
+            repositorioUsuario.modificar(usuario);
+
+            return nuevoReto;
+        }
+        return nuevoReto;
     }
 
 

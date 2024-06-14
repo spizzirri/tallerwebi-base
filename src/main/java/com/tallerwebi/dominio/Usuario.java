@@ -24,8 +24,10 @@ public class Usuario {
     @Enumerated(EnumType.STRING)
     private Objetivo objetivo;
     private Boolean isInstructor = false;
-    @Column(name = "racha_de_retos", columnDefinition = "INTEGER DEFAULT 0")
+    @Column(name = "rachaDeRetos", columnDefinition = "INTEGER DEFAULT 0")
     private Integer rachaDeRetos;
+    @Column(name = "cambioReto", nullable = false)
+    private Integer cambioReto = 3;
 
     //relacion de usuario con itemRendimiento 1 - n --> bd
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
@@ -91,6 +93,7 @@ public class Usuario {
         this.password = password;
         this.retos = retos;
         this.rachaDeRetos = 0;
+        this.cambioReto = 3;
     }
 
     public Long getId() {
@@ -182,6 +185,14 @@ public class Usuario {
 
     public void setRachaDeRetos(Integer rachaDeRetos) {
         this.rachaDeRetos = rachaDeRetos;
+    }
+
+    public Integer getCambioReto() {
+        return cambioReto;
+    }
+
+    public void setCambioReto(Integer cambioReto) {
+        this.cambioReto = cambioReto;
     }
 
     public Integer sumarRacha() {

@@ -130,9 +130,14 @@
                 <img th:src="@{${retoDisponible.imagenUrl}}" alt="Reto Disponible">
             <div class="reto-preview">
                 <div class="container-cambiarReto">
-                    <button id="btn-cambiar-reto" class="cambiar-reto-icon">
-                        <i class="fas fa-sync-alt"></i>
-                    </button>
+                    <form th:action="@{/cambiar-reto}" method="POST">
+                        <input type="hidden" name="retoId" th:value="${retoDisponible.id}"/>
+                        <input type="hidden" name="email" th:value="${usuario.email}"/>
+                        <input type="hidden" name="password" th:value="${usuario.password}"/>
+                        <button type="submit" class="cambiar-reto-icon">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </form>
                 </div>
                 <h2><span th:text="${retoDisponible.nombre}"></span></h2>
                 <p class="reto-p"><span th:text="${retoDisponible.descripcion}"></span></p>

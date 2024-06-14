@@ -1,6 +1,5 @@
 package com.tallerwebi.dominio.reto;
 
-import org.hibernate.Session;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -90,6 +89,15 @@ public class ServicioRetoImpl implements ServicioReto{
             reto.setEnProceso(false);
             repositorioReto.actualizarReto(reto);
         }
+    }
+
+    @Override
+    public Reto cambiarReto(Reto reto) {
+        if (reto != null) {
+            reto.setSeleccionado(true);
+            repositorioReto.actualizarReto(reto);
+        }
+        return reto;
     }
 
 
