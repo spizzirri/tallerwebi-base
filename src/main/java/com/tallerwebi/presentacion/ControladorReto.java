@@ -77,7 +77,6 @@ public class ControladorReto {
         ModelAndView modelAndView = new ModelAndView("home");
         modelAndView.addObject("retoId", retoId);
         modelAndView.addObject("usuario", usuario); // Asegúrate de agregar el usuario al modelo
-
         try {
             DatosItemRendimiento itemMasSeleccionado = servicioLogin.obtenerItemMasSeleccionado();
             modelAndView.addObject("itemMasSeleccionado", itemMasSeleccionado);
@@ -91,6 +90,7 @@ public class ControladorReto {
             if (usuarioBuscado != null) {
                 servicioLogin.modificarRachaRetoTerminado(usuarioBuscado, retoId);
                 modelAndView.addObject("usuario", usuarioBuscado);
+                session.setAttribute("usuario", usuarioBuscado);
             }
 
         } catch (Exception e) {
