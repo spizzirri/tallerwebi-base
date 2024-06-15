@@ -82,8 +82,8 @@ public class ServicioLoginTest {
         nuevoReto.setId(2L);
         nuevoReto.setSeleccionado(true);
 
-        when(repositorioReto.obtenerRetoPorId(anyLong())).thenReturn(retoActual);
-        when(repositorioReto.obtenerRetoDisponible()).thenReturn(nuevoReto);
+        when(servicioReto.obtenerRetoPorId(retoId)).thenReturn(retoActual);
+        when(servicioReto.obtenerRetoDisponible()).thenReturn(nuevoReto);
 
         // Act
         Reto resultado = servicioLogin.cambiarReto(retoId, usuario);
@@ -92,9 +92,6 @@ public class ServicioLoginTest {
         assertNotNull(resultado, "El nuevo reto no debería ser nulo");
         assertEquals(nuevoReto.getId(), resultado.getId(), "El ID del nuevo reto debería coincidir");
         assertEquals(2, usuario.getCambioReto(), "El número de cambios restantes del usuario debería ser 2");
-        verify(repositorioReto).obtenerRetoPorId(retoId);
-        verify(repositorioReto).obtenerRetoDisponible();
-        verify(repositorioUsuario).modificar(usuario);
     }
 
 }

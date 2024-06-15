@@ -110,7 +110,6 @@ public class ControladorReto {
 
         ModelAndView modelAndView = new ModelAndView("home");
         modelAndView.addObject("retoId", retoId);
-        modelAndView.addObject("usuario", usuario);
 
         try {
             // Obtener el item más seleccionado
@@ -122,10 +121,10 @@ public class ControladorReto {
             if (usuarioBuscado == null) {
                 throw new NoSuchElementException("Usuario no encontrado.");
             }
-
+            modelAndView.addObject("usuario", usuarioBuscado);
             // Cambiar el reto
             Reto nuevoReto = servicioLogin.cambiarReto(retoId, usuarioBuscado);
-            modelAndView.addObject("usuario", usuarioBuscado);
+
             if (nuevoReto != null) {
                 modelAndView.addObject("retoDisponible", nuevoReto);
             } else {

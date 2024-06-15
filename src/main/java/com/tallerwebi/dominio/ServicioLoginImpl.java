@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.NoSuchElementException;
 
 @Service("servicioLogin")
 @Transactional
@@ -84,13 +85,17 @@ public class ServicioLoginImpl implements ServicioLogin {
 
             nuevoReto = servicioReto.obtenerRetoDisponible();
 
-            usuario.setCambioReto(usuario.getCambioReto() - 1);
-            repositorioUsuario.modificar(usuario);
-
-            return nuevoReto;
+            if (nuevoReto != null) {
+                usuario.setCambioReto(usuario.getCambioReto() - 1);
+                repositorioUsuario.modificar(usuario);
+            } else {
+                throw new NoSuchElementException("No se encontró un nuevo reto disponible.");
+            }
         }
         return nuevoReto;
     }
+
+
 
 
 }
