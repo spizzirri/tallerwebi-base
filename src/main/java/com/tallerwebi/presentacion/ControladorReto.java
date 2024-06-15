@@ -91,12 +91,15 @@ public class ControladorReto {
                 modelAndView.addObject("usuario", usuarioBuscado);
                 session.setAttribute("usuario", usuarioBuscado);
             }
-
         } catch (Exception e) {
             modelAndView.addObject("error", "An error occurred while finishing the challenge: " + e.getMessage());
         }
+
+        // Redirigir a /home después de la ejecución del método
+        modelAndView.setViewName("redirect:/home");
         return modelAndView;
     }
+
 
     @RequestMapping(path = "/cambiar-reto", method = RequestMethod.POST)
     public ModelAndView cambiarReto(@RequestParam Long retoId, @RequestParam String email, @RequestParam String password, HttpSession session) {
@@ -104,10 +107,13 @@ public class ControladorReto {
         if (usuario == null) {
             return new ModelAndView("redirect:/login");
         }
+
         ModelAndView modelAndView = new ModelAndView("home");
         modelAndView.addObject("retoId", retoId);
+        modelAndView.addObject("usuario", usuario);
+
         try {
-            // Obtener el ItemRendimiento más seleccionado
+            // Obtener el item más seleccionado
             DatosItemRendimiento itemMasSeleccionado = servicioLogin.obtenerItemMasSeleccionado();
             modelAndView.addObject("itemMasSeleccionado", itemMasSeleccionado);
 

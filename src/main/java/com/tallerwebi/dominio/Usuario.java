@@ -25,8 +25,8 @@ public class Usuario {
     private Objetivo objetivo;
     private Boolean isInstructor = false;
     @Column(name = "rachaDeRetos", columnDefinition = "INTEGER DEFAULT 0")
-    private Integer rachaDeRetos;
-    @Column(name = "cambioReto", nullable = false)
+    private Integer rachaDeRetos = 0;
+    @Column(name = "cambioReto", nullable = false, columnDefinition = "INTEGER DEFAULT 3")
     private Integer cambioReto = 3;
 
     //relacion de usuario con itemRendimiento 1 - n --> bd

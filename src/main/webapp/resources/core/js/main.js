@@ -79,8 +79,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
     }
 });
 
-
-
   document.addEventListener('DOMContentLoaded', function () {
       let minutosRestantesInput = document.querySelector('input[name="minutosRestantes"]');
       if (minutosRestantesInput !== null) {
@@ -107,7 +105,16 @@ document.addEventListener('DOMContentLoaded', (event) => {
       }
   });
 
+  document.addEventListener("DOMContentLoaded", function() {
+              const cambiarRetoIcon = document.querySelector(".cambiar-reto-icon");
+              const currentURL = window.location.href;
 
+              if (currentURL.includes("/home")) {
+                  cambiarRetoIcon.style.display = "block";
+              } else {
+                  cambiarRetoIcon.style.display = "none";
+              }
+          });
 
 
 
