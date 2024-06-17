@@ -12,6 +12,17 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
 import java.util.NoSuchElementException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import javax.servlet.http.HttpSession;
+import java.util.NoSuchElementException;
+
 
 @Controller
 public class ControladorReto {
@@ -80,6 +91,8 @@ public class ControladorReto {
             DatosItemRendimiento itemMasSeleccionado = servicioLogin.obtenerItemMasSeleccionado();
             modelAndView.addObject("itemMasSeleccionado", itemMasSeleccionado);
 
+            session.removeAttribute("retoDisponible");
+
             Reto retoDisponible = servicioReto.obtenerRetoDisponible();
             if (retoDisponible != null) {
                 modelAndView.addObject("retoDisponible", retoDisponible);
@@ -100,45 +113,38 @@ public class ControladorReto {
         return modelAndView;
     }
 
-
     @RequestMapping(path = "/cambiar-reto", method = RequestMethod.POST)
-    public ModelAndView cambiarReto(@RequestParam Long retoId, @RequestParam String email, @RequestParam String password, HttpSession session) {
+    public ModelAndView cambiarReto(@RequestParam Long retoId, @RequestParam String email, @RequestParam String password, HttpSession session, RedirectAttributes redirectAttributes) {
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         if (usuario == null) {
-            return new ModelAndView("redirect:/login");
+            usuario = servicioLogin.consultarUsuario(email, password);
+            if (usuario == null) {
+                return new ModelAndView("redirect:/login");
+            }
         }
-
         ModelAndView modelAndView = new ModelAndView("home");
         modelAndView.addObject("retoId", retoId);
-
         try {
-            // Obtener el item más seleccionado
-            DatosItemRendimiento itemMasSeleccionado = servicioLogin.obtenerItemMasSeleccionado();
-            modelAndView.addObject("itemMasSeleccionado", itemMasSeleccionado);
-
-            // Consultar al usuario
-            Usuario usuarioBuscado = servicioLogin.consultarUsuario(email, password);
-            if (usuarioBuscado == null) {
-                throw new NoSuchElementException("Usuario no encontrado.");
-            }
-            modelAndView.addObject("usuario", usuarioBuscado);
-            // Cambiar el reto
-            Reto nuevoReto = servicioLogin.cambiarReto(retoId, usuarioBuscado);
-
+            Reto nuevoReto = servicioLogin.cambiarReto(retoId, usuario);
             if (nuevoReto != null) {
-                modelAndView.addObject("retoDisponible", nuevoReto);
+                redirectAttributes.addFlashAttribute("retoDisponible", nuevoReto);
+                session.setAttribute("retoDisponible", nuevoReto);
             } else {
-                throw new NoSuchElementException("No se encontró un nuevo reto.");
+                redirectAttributes.addFlashAttribute("error", "No se encontró un nuevo reto disponible.");
             }
-
+        } catch (NoSuchElementException e) {
+            redirectAttributes.addFlashAttribute("error", "No se encontró un nuevo reto disponible.");
         } catch (NoCambiosRestantesException e) {
-            modelAndView.addObject("error", e.getMessage());
-        } catch (Exception e) {
-            modelAndView.addObject("error", "Ocurrió un error inesperado: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "No te quedan cambios. Debes terminar los retos.");
         }
 
+        modelAndView.setViewName("redirect:/home");
         return modelAndView;
     }
+
+
+
+
 
 
 

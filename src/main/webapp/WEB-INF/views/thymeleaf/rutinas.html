@@ -17,18 +17,10 @@
         </div>
         <div class="collapse navbar-collapse justify-content-center">
             <ul class="nav-links">
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/irAHome}">Inicio</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/irAMiRutina}">Rutina</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/irCalendario}">Calendario</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/irAlimentacion}">Alimentacion</a>
-                </li>
+                <li><a th:action="@{/irAHome}" href="home">Inicio</a></li>
+                <li><a th:action="@{/irAMiRutina}" href="mi-rutina">Rutina</a></li>
+                <li><a th:action="@{/irAlimentacion}" href="alimentacion">Alimentación</a></li>
+                <li><a th:action="@{/irCalendario}" href="calendario">Calendario</a></li>
             </ul>
         </div>
         <div class="user-profile">

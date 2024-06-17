@@ -8,7 +8,6 @@
     <link rel="stylesheet" th:href="@{/css/rutina.css}"/>
     <link rel="stylesheet" th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css}">
 </head>
-<<<<<<< HEAD
 <body>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
@@ -20,19 +19,11 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav mx-auto">
-                <li class="nav-item">
-                    <a class="nav-link" th:action="@{/irAHome}" href="home">Inicio</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:action="@{/irAMiRutina}" href="mi-rutina">Rutina</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:action="@{/irCalendario}" href="calendario">Calendario</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:action="@{/irAlimentacion}" href="alimentacion">Alimentacion</a>
-                </li>
+            <ul class="nav-links">
+                <li><a th:action="@{/irAHome}" href="home">Inicio</a></li>
+                <li><a th:action="@{/irAMiRutina}" href="mi-rutina">Rutina</a></li>
+                <li><a th:action="@{/irAlimentacion}" href="alimentacion">Alimentación</a></li>
+                <li><a th:action="@{/irCalendario}" href="calendario">Calendario</a></li>
             </ul>
             <a class="nav-link d-flex align-items-center" th:action="@{/irPerfil}" href="perfil">
                 <span class="user-name me-2">Nombre</span>

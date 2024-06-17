@@ -93,17 +93,23 @@ public class ControladorLogin {
         // Añadir el ItemRendimiento más seleccionado al modelo
         modelAndView.addObject("itemMasSeleccionado", itemMasSeleccionado);
 
-        // Obtener un reto en proceso desde el servicio
+        // Verificar si hay un reto en proceso desde el servicio
         Reto retoEnProceso = servicioLogin.obtenerRetoEnProceso();
-
-        // Si hay un reto en proceso, añadirlo al modelo; si no, obtener un reto disponible
         if (retoEnProceso != null) {
             modelAndView.addObject("retoDisponible", retoEnProceso);
             long minutosRestantes = servicioLogin.calcularTiempoRestante(retoEnProceso.getId());
             modelAndView.addObject("minutosRestantes", minutosRestantes);
         } else {
-            Reto retoDisponible = servicioLogin.obtenerRetoDisponible();
+            // Verificar si hay un reto en la sesión
+            Reto retoDisponible = (Reto) session.getAttribute("retoDisponible");
+            if (retoDisponible == null) {
+                // Obtener un nuevo reto disponible si no hay uno en la sesión
+                retoDisponible = servicioLogin.obtenerRetoDisponible();
+                // Guardar el nuevo reto disponible en la sesión
+                session.setAttribute("retoDisponible", retoDisponible);
+            }
             modelAndView.addObject("retoDisponible", retoDisponible);
+            session.setAttribute("retoDisponible", retoDisponible);
         }
         return modelAndView;
     }

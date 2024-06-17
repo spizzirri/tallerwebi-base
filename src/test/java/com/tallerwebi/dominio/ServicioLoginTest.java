@@ -1,12 +1,15 @@
 package com.tallerwebi.dominio;
 
 import com.tallerwebi.dominio.calendario.ServicioCalendario;
+import com.tallerwebi.dominio.excepcion.NoCambiosRestantesException;
 import com.tallerwebi.dominio.reto.RepositorioReto;
 import com.tallerwebi.dominio.reto.Reto;
 import com.tallerwebi.dominio.reto.ServicioReto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -68,30 +71,70 @@ public class ServicioLoginTest {
     }
 
     @Test
-    public void queCambiarRetoFuncionaCorrectamente() {
-        // Arrange
+        public void queCambiarRetoFuncionaCorrectamente() {
+            // Arrange
+            Long retoId = 1L;
+            Usuario usuario = new Usuario();
+            usuario.setCambioReto(3);
+
+            Reto retoActual = new Reto();
+            retoActual.setId(retoId);
+            retoActual.setSeleccionado(false);
+
+            Reto nuevoReto = new Reto();
+            nuevoReto.setId(2L);
+            retoActual.setSeleccionado(false);
+
+            when(servicioReto.obtenerRetoPorId(retoId)).thenReturn(retoActual);
+            when(servicioReto.obtenerRetoDisponible()).thenReturn(nuevoReto);
+
+            // Act
+            Reto resultado = servicioLogin.cambiarReto(retoId, usuario);
+
+            // Assert
+            assertNotNull(resultado, "El nuevo reto no debería ser nulo");
+            assertEquals(nuevoReto.getId(), resultado.getId(), "El ID del nuevo reto debería coincidir");
+            assertEquals(2, usuario.getCambioReto(), "El número de cambios restantes del usuario debería ser 2");
+    }
+
+    @Test
+    public void queAlCambiarRetoUsuarioConCambiosDisponiblesSeLogreCorrectamente() {
+        // Configuración de prueba
         Long retoId = 1L;
         Usuario usuario = new Usuario();
-        usuario.setCambioReto(3);
+        usuario.setCambioReto(1);
 
-        Reto retoActual = new Reto();
-        retoActual.setId(retoId);
-        retoActual.setSeleccionado(false);
-
-        Reto nuevoReto = new Reto();
-        nuevoReto.setId(2L);
-        nuevoReto.setSeleccionado(true);
+        Reto retoActual = new Reto(retoId);
+        Reto nuevoReto = new Reto(2L);
 
         when(servicioReto.obtenerRetoPorId(retoId)).thenReturn(retoActual);
         when(servicioReto.obtenerRetoDisponible()).thenReturn(nuevoReto);
 
-        // Act
+        // Ejecución del método
         Reto resultado = servicioLogin.cambiarReto(retoId, usuario);
 
-        // Assert
-        assertNotNull(resultado, "El nuevo reto no debería ser nulo");
-        assertEquals(nuevoReto.getId(), resultado.getId(), "El ID del nuevo reto debería coincidir");
-        assertEquals(2, usuario.getCambioReto(), "El número de cambios restantes del usuario debería ser 2");
+        // Verificación
+        assertNotNull(resultado);
+        assertEquals(nuevoReto, resultado);
+        assertEquals(0, usuario.getCambioReto());
+    }
+
+    @Test
+    public void alCambiarRetoElUsuarioSinCambiosDisponibles() {
+        // Configuración de prueba
+        Long retoId = 1L;
+        Usuario usuario = new Usuario();
+        usuario.setCambioReto(0);
+
+        // Ejecución y verificación
+        NoCambiosRestantesException exception = assertThrows(NoCambiosRestantesException.class, () -> {
+            servicioLogin.cambiarReto(retoId, usuario);
+        });
+        assertEquals("No te quedan cambios. Debes terminar los retos.", exception.getMessage());
+
+        verify(servicioReto, never()).obtenerRetoPorId(anyLong());
+        verify(servicioReto, never()).obtenerRetoDisponible();
+        verify(repositorioUsuario, never()).modificar(usuario);
     }
 
 }

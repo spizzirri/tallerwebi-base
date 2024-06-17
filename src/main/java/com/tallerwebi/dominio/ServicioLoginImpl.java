@@ -76,24 +76,26 @@ public class ServicioLoginImpl implements ServicioLogin {
 
     @Override
     public Reto cambiarReto(Long retoId, Usuario usuario) {
-        Reto nuevoReto = null;
         if (usuario.getCambioReto() > 0) {
             Reto retoActual = servicioReto.obtenerRetoPorId(retoId);
             if (retoActual != null) {
                 servicioReto.cambiarReto(retoActual);
             }
 
-            nuevoReto = servicioReto.obtenerRetoDisponible();
-
+            Reto nuevoReto = servicioReto.obtenerRetoDisponible();
             if (nuevoReto != null) {
                 usuario.setCambioReto(usuario.getCambioReto() - 1);
                 repositorioUsuario.modificar(usuario);
             } else {
                 throw new NoSuchElementException("No se encontró un nuevo reto disponible.");
             }
+            return nuevoReto;
+        } else {
+            throw new NoCambiosRestantesException("No te quedan cambios. Debes terminar los retos.");
         }
-        return nuevoReto;
     }
+
+
 
 
 
