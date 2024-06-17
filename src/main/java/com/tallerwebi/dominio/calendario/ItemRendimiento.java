@@ -20,13 +20,11 @@ public class ItemRendimiento {
     @Column(name = "tipoRendimiento", nullable = false)
     private TipoRendimiento tipoRendimiento;
 
-    LocalDate fechaActual = LocalDate.now(); // Obtener fecha actual
-
     public ItemRendimiento() {
     }
 
     public ItemRendimiento(TipoRendimiento tipoRendimiento) {
-        this.fecha = fechaActual;
+        this.fecha = LocalDate.now();
         this.tipoRendimiento = tipoRendimiento;
     }
 

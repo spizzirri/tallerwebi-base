@@ -9,8 +9,6 @@ public interface ServicioLogin {
     Usuario consultarUsuario(String email, String password);
     void registrar(Usuario usuario) throws UsuarioExistente;
 
-//    Usuario sumarRachaReto(Usuario usuario);
-
     DatosItemRendimiento obtenerItemMasSeleccionado();
 
     Reto obtenerRetoDisponible();
@@ -19,4 +17,6 @@ public interface ServicioLogin {
     Usuario modificarRachaRetoTerminado(Usuario usuario, long retoId);
 
     long calcularTiempoRestante(Long id);
+
+    Reto cambiarReto(Long retoId, Usuario usuario);
 }

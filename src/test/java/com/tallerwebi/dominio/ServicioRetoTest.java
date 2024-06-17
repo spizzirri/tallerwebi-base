@@ -131,4 +131,19 @@ public class ServicioRetoTest {
         assertNull(retoMock.getFechaInicio(), "El reto debería tener fechaInicio en null después de terminarlo");
     }
 
+    @Test
+    public void queSePuedaCambiarReto() {
+        Reto retoMock = new Reto();
+        retoMock.setId(1L);
+        retoMock.setSeleccionado(false);
+
+        doNothing().when(repositorioReto).actualizarReto(any(Reto.class));
+
+        Reto retoCambiado = servicioReto.cambiarReto(retoMock);
+
+        assertNotNull(retoCambiado, "El reto cambiado no debería ser nulo");
+        assertTrue(retoCambiado.getSeleccionado(), "El reto debería estar marcado como seleccionado");
+        verify(repositorioReto, times(1)).actualizarReto(retoMock);
+    }
+
 }

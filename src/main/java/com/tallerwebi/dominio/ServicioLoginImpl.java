@@ -1,6 +1,7 @@
 package com.tallerwebi.dominio;
 
 import com.tallerwebi.dominio.calendario.ServicioCalendario;
+import com.tallerwebi.dominio.excepcion.NoCambiosRestantesException;
 import com.tallerwebi.dominio.excepcion.UsuarioExistente;
 import com.tallerwebi.dominio.reto.Reto;
 import com.tallerwebi.dominio.reto.ServicioReto;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.NoSuchElementException;
 
 @Service("servicioLogin")
 @Transactional
@@ -38,13 +40,6 @@ public class ServicioLoginImpl implements ServicioLogin {
         }
         repositorioUsuario.guardar(usuario);
     }
-
-//    @Override
-//    public Usuario sumarRachaReto(Usuario usuario) {
-//        usuario.sumarRacha();
-//        repositorioUsuario.modificar(usuario);
-//        return usuario;
-//    }
 
     @Override
     public DatosItemRendimiento obtenerItemMasSeleccionado() {
@@ -78,6 +73,31 @@ public class ServicioLoginImpl implements ServicioLogin {
     public long calcularTiempoRestante(Long id) {
         return servicioReto.calcularTiempoRestante(id);
     }
+
+    @Override
+    public Reto cambiarReto(Long retoId, Usuario usuario) {
+        if (usuario.getCambioReto() > 0) {
+            Reto retoActual = servicioReto.obtenerRetoPorId(retoId);
+            if (retoActual != null) {
+                servicioReto.cambiarReto(retoActual);
+            }
+
+            Reto nuevoReto = servicioReto.obtenerRetoDisponible();
+            if (nuevoReto != null) {
+                usuario.setCambioReto(usuario.getCambioReto() - 1);
+                repositorioUsuario.modificar(usuario);
+            } else {
+                throw new NoSuchElementException("No se encontró un nuevo reto disponible.");
+            }
+            return nuevoReto;
+        } else {
+            throw new NoCambiosRestantesException("No te quedan cambios. Debes terminar los retos.");
+        }
+    }
+
+
+
+
 
 
 }

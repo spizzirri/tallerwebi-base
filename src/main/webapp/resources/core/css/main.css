@@ -24,6 +24,17 @@ header {
     padding: 0px !important;
 }
 
+.navbar-login{
+    background-color:white;
+    color:black;
+    justify-content:center;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem; display: flex !important;
+    align-items: center !important;
+    flex-grow: 1;
+    font-weight: bold;"
+}
+
 .logo {
     display: flex;
     align-items: center;
@@ -839,64 +850,14 @@ position: relative;
             font-weight: bold;
         }
 
-.footer {
-    background-color: #fff;
-    padding: 30px 0;
-}
-
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 15px;
-}
-.d-block w-100{
-width: 60% !important;
-}
-
-.footer-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.footer-logo img {
-    max-width: 150px;
-}
-
-.footer-links ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-}
-
-.footer-links li {
-    display: inline-block;
-    margin-right: 20px;
-}
-
-.footer-links li a {
-    text-decoration: none;
-    color: #333;
-    font-weight: bold;
-}
-
-.footer-social .social-icon {
-    color: #333;
-    margin-right: 15px;
-    font-size: 20px;
-}
-
-.footer-text p {
-    margin: 0;
-    font-size: 14px;
-    color: #666;
-    text-align: center;
-}
-.list-group-item {
-    flex: 1;
-    padding: 15px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    flex-basis: 0;
+.cartelito {
+        position: absolute;
+        background-color: #28a745;
+        color: white;
+        font-size: 15px;
+        padding: 4px 8px;
+        border-radius: 8px;
+        top: 3.5px;
+        right: 40px;
+        z-index: 1;
 }

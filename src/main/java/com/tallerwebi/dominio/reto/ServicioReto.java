@@ -13,4 +13,6 @@ public interface ServicioReto {
     Long terminarReto(Long retoId);
 
     Long calcularTiempoRestante(Long retoId);
+
+    Reto cambiarReto(Reto reto);
 }

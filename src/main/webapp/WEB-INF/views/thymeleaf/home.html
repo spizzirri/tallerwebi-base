@@ -90,8 +90,8 @@
         <ul class="nav-links">
             <li><a th:action="@{/irAHome}" href="home">Inicio</a></li>
             <li><a th:action="@{/irAMiRutina}" href="mi-rutina">Rutina</a></li>
-            <li><a th:action="@{/irCalendario}" href="calendario">Calendario</a></li>
             <li><a th:action="@{/irAlimentacion}" href="alimentacion">Alimentación</a></li>
+            <li><a th:action="@{/irCalendario}" href="calendario">Calendario</a></li>
         </ul>
         <div class="user-profile">
             <a href="perfil" th:action="@{/irPerfil}">
@@ -121,18 +121,25 @@
         <p class="main-text">Nuestra misión es proporcionarte las herramientas y la motivación necesarias para alcanzar tus objetivos de fitness. Ya sea que estés buscando perder peso, tonificar tu cuerpo, mejorar tu resistencia o simplemente mantenerte activo, tenemos todo lo que necesitas para lograrlo.</p>
         <a href="vistaObjetivos" class="main-btn">Comenzar entrenamiento</a>
     </div>
-    <div th:if="${error}">
-        <p th:text="${error}"></p>
-    </div>
     <div class="reto-cards" style="display: flex; align-items: center; flex-direction: column; justify-content: center; margin-top: 3.5rem; margin-bottom:2rem;">
         <h2 style="padding: 1rem; margin-bottom:0rem !important; color: white;">Retos Diarios</h2>
         <article class="reto-card">
                 <img th:src="@{${retoDisponible.imagenUrl}}" alt="Reto Disponible">
             <div class="reto-preview">
                 <div class="container-cambiarReto">
-                    <button id="btn-cambiar-reto" class="cambiar-reto-icon">
-                        <i class="fas fa-sync-alt"></i>
-                    </button>
+                    <div th:if="${error}" class="alert alert-danger">
+                        <p th:text="${error}"></p>
+                    </div>
+                    <form th:action="@{/cambiar-reto}" method="POST" id="cambiarRetoForm">
+                        <input type="hidden" name="retoId" th:value="${retoDisponible.id}"/>
+                        <input type="hidden" name="email" th:value="${usuario.email}"/>
+                        <input type="hidden" name="password" th:value="${usuario.password}"/>
+                        <input type="hidden" name="cambioReto" th:value="${usuario.cambioReto}"/>
+                        <button type="submit" class="cambiar-reto-icon">
+                            <i class="fas fa-sync-alt"></i>
+                            <span class="cartelito" id="cambiosDisponibles" style="display: none;"></span>
+                        </button>
+                    </form>
                 </div>
                 <h2><span th:text="${retoDisponible.nombre}"></span></h2>
                 <p class="reto-p"><span th:text="${retoDisponible.descripcion}"></span></p>
@@ -150,7 +157,7 @@
                     <p style="margin: 0px !important;"><i class="fas fa-clock"></i><span id="tiempo-restante"></span></p>
                 </div>
                 <!-- Botón para marcar como terminado -->
-                <form th:action="@{/terminar-reto}" method="POST" id="terminar-reto-form">
+                <form th:action="@{/terminar-reto}" method="GET" id="terminar-reto-form">
                     <input type="hidden" name="retoId" th:value="${retoDisponible.id}"/>
                     <input type="hidden" name="email" th:value="${usuario.email}"/>
                     <input type="hidden" name="password" th:value="${usuario.password}"/>

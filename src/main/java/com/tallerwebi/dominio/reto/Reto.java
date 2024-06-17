@@ -49,6 +49,9 @@ public class Reto {
     public Reto(String nombre, String descripción) {
     }
 
+    public Reto(long l) {
+    }
+
 
     // Getters y setters
     public Long getId() {

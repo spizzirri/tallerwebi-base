@@ -9,32 +9,25 @@
     <link rel="stylesheet" th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css}">
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="container-fluid">
-        <a class="navbar-brand d-flex align-items-center" th:href="@{/}">
-            <img th:src="@{/img/logoMagnusFitSolo.png}" alt="Logo" class="logo-img me-2">
-            <span class="logo-text">MagnusFit</span>
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav mx-auto">
-                <li class="nav-item">
-                    <a class="nav-link" th:action="@{/irAHome}" href="home">Inicio</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:action="@{/irAMiRutina}" href="mi-rutina">Rutina</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:action="@{/irCalendario}" href="calendario">Calendario</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:action="@{/irAlimentacion}" href="alimentacion">Alimentacion</a>
-                </li>
+<nav class="navbar navbar-expand-lg">
+    <div class="container-fluid d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center">
+            <img th:src="@{/img/logoMagnusFitSolo.png}" alt="Logo" class="logo-img">
+            <h1 class="logo-text">MagnusFit</h1>
+        </div>
+        <div class="collapse navbar-collapse justify-content-center">
+
+            <ul class="nav-links">
+                <li><a th:action="@{/irAHome}" href="home">Inicio</a></li>
+                <li><a th:action="@{/irAMiRutina}" href="mi-rutina">Rutina</a></li>
+                <li><a th:action="@{/irAlimentacion}" href="alimentacion">Alimentación</a></li>
+                <li><a th:action="@{/irCalendario}" href="calendario">Calendario</a></li>
+
             </ul>
-            <a class="nav-link d-flex align-items-center" th:action="@{/irPerfil}" href="perfil">
-                <span class="user-name me-2">Nombre</span>
+        </div>
+        <div class="user-profile">
+            <a th:href="@{/irPerfil}" href="perfil">
+                <span class="user-name">Nombre</span>
                 <img th:src="@{/img/usuario.png}" alt="Usuario" class="user-img">
             </a>
         </div>

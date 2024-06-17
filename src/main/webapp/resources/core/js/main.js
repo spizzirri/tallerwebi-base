@@ -79,8 +79,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
     }
 });
 
-
-
   document.addEventListener('DOMContentLoaded', function () {
       let minutosRestantesInput = document.querySelector('input[name="minutosRestantes"]');
       if (minutosRestantesInput !== null) {
@@ -107,8 +105,36 @@ document.addEventListener('DOMContentLoaded', (event) => {
       }
   });
 
+  document.addEventListener("DOMContentLoaded", function() {
+              const cambiarRetoIcon = document.querySelector(".cambiar-reto-icon");
+              const currentURL = window.location.href;
 
+              if (currentURL.includes("/home")) {
+                  cambiarRetoIcon.style.display = "block";
+              } else {
+                  cambiarRetoIcon.style.display = "none";
+              }
+          });
 
+document.getElementById("cambiarRetoForm").addEventListener("submit", function(event) {
+   var cambiosDisponibles = document.querySelector('input[name="cambioReto"]').value;
+
+       // Mostrar el número temporalmente
+       var cambiosDisponiblesSpan = document.getElementById("cambiosDisponibles");
+       cambiosDisponiblesSpan.textContent = cambiosDisponibles;
+       cambiosDisponiblesSpan.style.display = "inline-block";
+
+       // Evitar que el formulario se envíe inmediatamente
+       event.preventDefault();
+
+       // Programar el envío del formulario después de 3 segundos (3000 milisegundos)
+       setTimeout(function() {
+           // Ocultar el cartelito
+           cambiosDisponiblesSpan.style.display = "none";
+           // Ahora, permitir que el formulario se envíe
+           document.getElementById("cambiarRetoForm").submit();
+       }, 1500); // 3 segundos
+    });
 
 
 

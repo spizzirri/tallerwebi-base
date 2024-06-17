@@ -16,19 +16,13 @@
             <h1 class="logo-text">MagnusFit</h1>
         </div>
         <div class="collapse navbar-collapse justify-content-center">
-            <ul class="navbar-nav mx-auto">
-                <li class="nav-item">
-                    <a class="nav-link" th:action="@{/irAHome}" href="home">Inicio</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:action="@{/irAMiRutina}" href="mi-rutina">Rutina</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:action="@{/irCalendario}" href="calendario">Calendario</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:action="@{/irAlimentacion}" href="alimentacion">Alimentacion</a>
-                </li>
+
+            <ul class="nav-links">
+                <li><a th:action="@{/irAHome}" href="home">Inicio</a></li>
+                <li><a th:action="@{/irAMiRutina}" href="mi-rutina">Rutina</a></li>
+                <li><a th:action="@{/irAlimentacion}" href="alimentacion">Alimentación</a></li>
+                <li><a th:action="@{/irCalendario}" href="calendario">Calendario</a></li>
+
             </ul>
         </div>
         <div class="user-profile">
