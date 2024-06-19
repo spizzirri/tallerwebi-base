@@ -24,14 +24,13 @@ public class Perfil {
     }
 
     // Constructor con parámetros
-    public Perfil(Integer edad, Double peso, Integer altura, String genero, String nivelActividad,
+    public Perfil(Integer edad, Double peso, Integer altura, String genero,
                   String objetivoFitness, String condicionesAlternas, String experienciaEjercicio,
                   String suplementos) {
         this.edad = edad;
         this.peso = peso;
         this.altura = altura;
         this.genero = genero;
-        this.nivelActividad = nivelActividad;
         this.objetivoFitness = objetivoFitness;
         this.condicionesAlternas = condicionesAlternas;
         this.experienciaEjercicio = experienciaEjercicio;
@@ -79,14 +78,6 @@ public class Perfil {
         this.genero = genero;
     }
 
-    public String getNivelActividad() {
-        return nivelActividad;
-    }
-
-    public void setNivelActividad(String nivelActividad) {
-        this.nivelActividad = nivelActividad;
-    }
-
     public String getObjetivoFitness() {
         return objetivoFitness;
     }
@@ -122,12 +113,11 @@ public class Perfil {
     @Override
     public String toString() {
         return "Perfil{" +
-                "id=" + id +
                 ", edad=" + edad +
                 ", peso=" + peso +
                 ", altura=" + altura +
                 ", genero='" + genero + '\'' +
-                ", nivelActividad='" + nivelActividad + '\'' +
+                ", nivelActividad='" + '\'' +
                 ", objetivoFitness='" + objetivoFitness + '\'' +
                 ", condicionesAlternas='" + condicionesAlternas + '\'' +
                 ", experienciaEjercicio='" + experienciaEjercicio + '\'' +

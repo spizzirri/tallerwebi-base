@@ -5,6 +5,6 @@ import javax.transaction.Transactional;
 
 @Service
 @Transactional
-public class ServicioPerfilImpl {
+public class ServicioPerfilImpl implements ServicioPerfil {
 
 }
