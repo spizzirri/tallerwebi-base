@@ -1,7 +1,5 @@
 package com.tallerwebi.presentacion;
 
-import com.tallerwebi.dominio.calendario.ServicioCalendario;
-import com.tallerwebi.dominio.perfil.ServicioPerfil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +8,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.equalToIgnoringCase;
 import static org.mockito.Mockito.mock;
 
 public class ControladorPerfilTest {

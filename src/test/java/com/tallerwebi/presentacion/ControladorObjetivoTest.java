@@ -1,6 +1,6 @@
 package com.tallerwebi.presentacion;
 
-import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.usuario.Usuario;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -26,20 +26,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
-public class ObjetivosControllerTest {
+public class ControladorObjetivoTest {
 
     @Mock
     private DataSource dataSource;
 
     @InjectMocks
-    private ObjetivosController objetivosController;
+    private ControladorObjetivo controladorObjetivo;
 
     private MockMvc mockMvc;
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(objetivosController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(controladorObjetivo).build();
     }
 
     @Test
@@ -75,7 +75,7 @@ public class ObjetivosControllerTest {
         Long idUsuario = 1L;
         String objetivo = "Nuevo Objetivo";
 
-        objetivosController.guardarObjetivoUsuario(idUsuario, objetivo);
+        controladorObjetivo.guardarObjetivoUsuario(idUsuario, objetivo);
 
         verify(preparedStatement).setLong(1, idUsuario);
         verify(preparedStatement).setString(2, objetivo);
@@ -91,7 +91,7 @@ public class ObjetivosControllerTest {
         Long idUsuario = 1L;
         String objetivo = "Nuevo Objetivo";
 
-        objetivosController.guardarObjetivoUsuario(idUsuario, objetivo);
+        controladorObjetivo.guardarObjetivoUsuario(idUsuario, objetivo);
 
         verify(dataSource).getConnection();
     }
@@ -121,7 +121,7 @@ public class ObjetivosControllerTest {
         when(resultSet.getLong("id")).thenReturn(usuario.getId());
         when(resultSet.getString("email")).thenReturn(usuario.getEmail());
 
-        Usuario result = objetivosController.obtenerUsuarioPorEmail(email);
+        Usuario result = controladorObjetivo.obtenerUsuarioPorEmail(email);
 
         verify(preparedStatement).setString(1, email);
         assertEquals(usuario.getId(), result.getId());
@@ -141,7 +141,7 @@ public class ObjetivosControllerTest {
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(false);
 
-        Usuario result = objetivosController.obtenerUsuarioPorEmail(email);
+        Usuario result = controladorObjetivo.obtenerUsuarioPorEmail(email);
 
         verify(preparedStatement).setString(1, email);
         assertNull(result);

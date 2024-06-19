@@ -1,10 +1,9 @@
 package com.tallerwebi.presentacion;
 
-import com.tallerwebi.dominio.ServicioLogin;
-import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.usuario.ServicioLogin;
+import com.tallerwebi.dominio.usuario.Usuario;
 import com.tallerwebi.dominio.calendario.ItemRendimiento;
 import com.tallerwebi.dominio.calendario.ServicioCalendario;
-import com.tallerwebi.dominio.calendario.TipoRendimiento;
 import com.tallerwebi.dominio.excepcion.UsuarioExistente;
 import com.tallerwebi.dominio.reto.ServicioReto;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,16 +13,11 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import java.time.LocalDate;
-
 import static javax.swing.UIManager.get;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 
 public class ControladorLoginTest {
 

@@ -1,8 +1,8 @@
 package com.tallerwebi.presentacion;
 
-import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.usuario.Usuario;
 import com.tallerwebi.dominio.objetivo.Objetivo;
-import com.tallerwebi.dominio.rutina.RepositorioRutina;
+
 import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.rutina.Rutina;
@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;

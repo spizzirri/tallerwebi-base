@@ -1,6 +1,6 @@
 package com.tallerwebi.dominio.objetivo;
 
-import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.usuario.Usuario;
 
 import javax.persistence.*;
 

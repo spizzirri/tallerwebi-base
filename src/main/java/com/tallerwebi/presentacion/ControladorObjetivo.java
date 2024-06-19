@@ -1,6 +1,6 @@
 package com.tallerwebi.presentacion;
 
-import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.usuario.Usuario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,12 +14,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 @Controller
-public class ObjetivosController {
+public class ControladorObjetivo {
 
     private final DataSource dataSource;
 
     @Autowired
-    public ObjetivosController(DataSource dataSource) {
+    public ControladorObjetivo(DataSource dataSource) {
         this.dataSource = dataSource;
     }
 
@@ -63,8 +63,8 @@ public class ObjetivosController {
         }
     }
 
-    @GetMapping("/vistaObjetivos")
+    @GetMapping("/objetivo")
     public String mostrarVistaObjetivos() {
-        return "vistaObjetivos";
+        return "objetivo";
     }
 }

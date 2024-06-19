@@ -1,9 +1,7 @@
 package com.tallerwebi.presentacion;
 
-import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.calendario.ItemRendimiento;
 import com.tallerwebi.dominio.calendario.ServicioCalendario;
-import com.tallerwebi.dominio.calendario.TipoRendimiento;
 import com.tallerwebi.dominio.excepcion.ItemRendimientoDuplicadoException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

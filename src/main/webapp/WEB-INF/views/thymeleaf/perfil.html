@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Perfil de Usuario</title>
-    <link rel="stylesheet" href="styles.css" th:href="@{/css/main.css}">
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
 </head>
 <body>
 
@@ -30,30 +30,5 @@
     </nav>
 </header>
 
-<div class="main-content">
-    <div class="container">
-        <h1 class="main-title">Perfil de Usuario</h1>
-        <div class="container">
-            <form id="profileForm">
-                <label for="nombre">Nombre:</label>
-                <input type="text" id="nombre" name="nombre" value="" readonly>
-
-                <label for="email">Correo Electrónico:</label>
-                <input type="email" id="email" name="email" value="" readonly>
-
-                <label for="contraseña">Contraseña:</label>
-                <input type="password" id="contraseña" name="contraseña" value="" readonly>
-
-                <label for="fechaNacimiento">Fecha de Nacimiento:</label>
-                <input type="date" id="fechaNacimiento" name="fechaNacimiento" value="" readonly>
-
-                <label for="peso">Peso(kg):</label>
-                <input type="number" id="peso" name="peso" value="76">
-
-                <input type="submit" value="Modificar Información">
-            </form>
-        </div>
-    </div>
-</div>
 </body>
 </html>

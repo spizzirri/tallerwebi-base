@@ -5,6 +5,10 @@ import com.tallerwebi.dominio.excepcion.NoCambiosRestantesException;
 import com.tallerwebi.dominio.reto.RepositorioReto;
 import com.tallerwebi.dominio.reto.Reto;
 import com.tallerwebi.dominio.reto.ServicioReto;
+import com.tallerwebi.dominio.usuario.RepositorioUsuario;
+import com.tallerwebi.dominio.usuario.ServicioLogin;
+import com.tallerwebi.dominio.usuario.ServicioLoginImpl;
+import com.tallerwebi.dominio.usuario.Usuario;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -15,8 +19,6 @@ import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.client.ExpectedCount.times;
 
 public class ServicioLoginTest {
 

@@ -1,12 +1,10 @@
-package com.tallerwebi.dominio;
+package com.tallerwebi.dominio.usuario;
 
 import com.tallerwebi.dominio.calendario.ItemRendimiento;
 import com.tallerwebi.dominio.objetivo.Objetivo;
-import com.tallerwebi.dominio.rutina.Rutina;
 import com.tallerwebi.dominio.reto.Reto;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity

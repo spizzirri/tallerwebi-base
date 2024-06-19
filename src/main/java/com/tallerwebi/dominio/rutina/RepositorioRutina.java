@@ -1,7 +1,7 @@
 package com.tallerwebi.dominio.rutina;
 
-import com.tallerwebi.dominio.Usuario;
-import com.tallerwebi.dominio.UsuarioRutina;
+import com.tallerwebi.dominio.usuario.Usuario;
+import com.tallerwebi.dominio.usuario.UsuarioRutina;
 import com.tallerwebi.dominio.objetivo.Objetivo;
 
 import java.util.List;

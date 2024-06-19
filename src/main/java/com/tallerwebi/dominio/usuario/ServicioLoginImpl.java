@@ -1,4 +1,4 @@
-package com.tallerwebi.dominio;
+package com.tallerwebi.dominio.usuario;
 
 import com.tallerwebi.dominio.calendario.ServicioCalendario;
 import com.tallerwebi.dominio.excepcion.NoCambiosRestantesException;

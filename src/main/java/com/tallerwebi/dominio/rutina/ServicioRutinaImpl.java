@@ -1,10 +1,9 @@
 package com.tallerwebi.dominio.rutina;
-import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.usuario.Usuario;
 import com.tallerwebi.dominio.excepcion.*;
 import com.tallerwebi.dominio.objetivo.Objetivo;
 
 import com.tallerwebi.presentacion.DatosRutina;
-import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +11,6 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional

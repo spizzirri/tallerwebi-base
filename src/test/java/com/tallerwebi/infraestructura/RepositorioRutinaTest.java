@@ -1,9 +1,8 @@
 package com.tallerwebi.infraestructura;
 
-import com.tallerwebi.dominio.Usuario;
-import com.tallerwebi.dominio.UsuarioRutina;
+import com.tallerwebi.dominio.usuario.Usuario;
+import com.tallerwebi.dominio.usuario.UsuarioRutina;
 import com.tallerwebi.dominio.excepcion.EjercicioNoExisteEnRutinaException;
-import com.tallerwebi.dominio.excepcion.RutinaNoEncontradaException;
 import com.tallerwebi.dominio.excepcion.UsuarioNoTieneLaRutinaBuscadaException;
 import com.tallerwebi.dominio.excepcion.UsuarioSinRutinasException;
 import com.tallerwebi.dominio.objetivo.GrupoMuscularObjetivo;
@@ -12,7 +11,6 @@ import com.tallerwebi.dominio.rutina.Ejercicio;
 import com.tallerwebi.dominio.rutina.RepositorioRutina;
 import com.tallerwebi.dominio.rutina.Rutina;
 import com.tallerwebi.infraestructura.config.HibernateTestInfraestructuraConfig;
-import com.tallerwebi.presentacion.DatosRutina;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +29,6 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 

@@ -4,8 +4,8 @@ import com.tallerwebi.dominio.excepcion.*;
 import com.tallerwebi.dominio.objetivo.GrupoMuscularObjetivo;
 import com.tallerwebi.dominio.objetivo.Objetivo;
 import com.tallerwebi.dominio.rutina.*;
+import com.tallerwebi.dominio.usuario.Usuario;
 import com.tallerwebi.presentacion.DatosRutina;
-import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.annotation.Rollback;
@@ -18,7 +18,6 @@ import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 

@@ -1,6 +1,6 @@
 package com.tallerwebi.presentacion;
 
-import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.usuario.Usuario;
 import com.tallerwebi.dominio.objetivo.Objetivo;
 import com.tallerwebi.dominio.rutina.Rutina;
 import com.tallerwebi.dominio.rutina.ServicioRutina;
@@ -54,7 +54,7 @@ public class ControladorRutina {
         }
 
         if (usuario.getObjetivo() == null) {
-            return new ModelAndView("redirect:/vistaObjetivos");
+            return new ModelAndView("redirect:/objetivo");
         }
 
         try {
@@ -91,11 +91,11 @@ public class ControladorRutina {
                 modelAndView.setViewName("rutina");
             } else {
                 // Si el usuario o la rutina no existen, redirigir a la página de rutinas
-                modelAndView.setViewName("redirect:/vistaObjetivos");
+                modelAndView.setViewName("redirect:/objetivo");
             }
         } catch (Exception e) {
             // Si ocurre una excepción, redirigir a la página de rutinas
-            modelAndView.setViewName("redirect:/vistaObjetivos");
+            modelAndView.setViewName("redirect:/objetivo");
         }
 
         return modelAndView;
