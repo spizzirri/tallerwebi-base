@@ -22,6 +22,7 @@ header {
     flex-grow: 1;
     font-weight: bold;
     padding: 0px !important;
+    justify-content:space-between;
 }
 
 .navbar-login{
@@ -32,7 +33,7 @@ header {
     padding-bottom: 0.5rem; display: flex !important;
     align-items: center !important;
     flex-grow: 1;
-    font-weight: bold;"
+    font-weight: bold;
 }
 
 .logo {
@@ -109,6 +110,13 @@ header {
     align-items: center;
     color: inherit !important;
     text-decoration: none !important;
+}
+
+.a-profile{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
 }
 
 .user-img {
@@ -968,3 +976,82 @@ position: relative;
             background-color: #0056b3;
             border-color: #0056b3;
         }
+
+        .perfil-form-container {
+                    max-width: 600px;
+                    margin: 50px auto;
+                    padding: 20px;
+                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                    border-radius: 8px;
+                    background-color: #f7f7f7;
+                }
+                .perfil-form-container h2 {
+                    text-align: center;
+                    margin-bottom: 20px;
+                    color: #1f1f1f;
+                }
+                .perfil-form-group {
+                    margin-bottom: 15px;
+                }
+                .perfil-form-group label {
+                    display: block;
+                    margin-bottom: 5px;
+                    font-weight: bold;
+                    color: #1f1f1f;
+                }
+                .perfil-form-group input,
+                .perfil-form-group select {
+                    width: 100%;
+                    padding: 10px;
+                    border: 1px solid #ced4da;
+                    border-radius: 4px;
+                    box-sizing: border-box;
+                }
+                .perfil-btn {
+                    width: 100%;
+                    padding: 10px;
+                    background-color: #007bff;
+                    border: none;
+                    border-radius: 4px;
+                    color: white;
+                    font-weight: bold;
+                    cursor: pointer;
+                }
+                .perfil-btn:hover {
+                    background-color: #0056b3;
+                }
+
+                /* Media Queries for responsiveness */
+                @media (max-width: 768px) {
+                    .perfil-form-container {
+                        padding: 15px;
+                        margin: 2rem 3rem;
+                    }
+                    .perfil-form-group input,
+                    .perfil-form-group select {
+                        padding: 8px;
+                    }
+                    .perfil-btn {
+                        padding: 8px;
+                    }
+                }
+
+                @media (max-width: 480px) {
+                    .perfil-form-container {
+                        padding: 10px;
+                        margin: 2rem 3rem;
+                    }
+                    .perfil-form-container h2 {
+                        font-size: 1.5em;
+                    }
+                    .perfil-form-group label {
+                        font-size: 0.9em;
+                    }
+                    .perfil-form-group input,
+                    .perfil-form-group select {
+                        padding: 6px;
+                    }
+                    .perfil-btn {
+                        padding: 6px;
+                    }
+                }

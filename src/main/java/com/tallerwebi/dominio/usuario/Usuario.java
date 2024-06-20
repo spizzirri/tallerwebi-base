@@ -2,6 +2,7 @@ package com.tallerwebi.dominio.usuario;
 
 import com.tallerwebi.dominio.calendario.ItemRendimiento;
 import com.tallerwebi.dominio.objetivo.Objetivo;
+import com.tallerwebi.dominio.perfil.Perfil;
 import com.tallerwebi.dominio.reto.Reto;
 
 import javax.persistence.*;
@@ -26,13 +27,15 @@ public class Usuario {
     private Integer rachaDeRetos = 0;
     @Column(name = "cambioReto", nullable = false, columnDefinition = "INTEGER DEFAULT 3")
     private Integer cambioReto = 3;
-
     //relacion de usuario con itemRendimiento 1 - n --> bd
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     private List<UsuarioRutina> usuarioRutinas;
     //relacion de usuario con itemRendimiento 1 - n --> bd
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ItemRendimiento> itemsRendimiento;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "perfil_id", referencedColumnName = "idPerfil")
+    private Perfil perfil;
 
     public List<ItemRendimiento> getItemsRendimiento() {
         return itemsRendimiento;

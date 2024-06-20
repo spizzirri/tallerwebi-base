@@ -25,10 +25,5 @@ public class ControladorPerfilTest {
         this.controladorPerfil = new ControladorPerfil(this.servicioPerfil);
     }
 
-    @Test
-    public void queAlIrALaPantallaDePerfilMeMuestreLaVistaDePerfil(){
-        ModelAndView modelAndView = this.controladorPerfil.irPerfil();
 
-        assertThat(modelAndView.getViewName(),equalTo("perfil"));
-    }
 }

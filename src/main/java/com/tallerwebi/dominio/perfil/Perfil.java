@@ -1,5 +1,7 @@
 package com.tallerwebi.dominio.perfil;
 
+import com.tallerwebi.dominio.usuario.Usuario;
+
 import javax.persistence.*;
 
 @Entity
@@ -18,6 +20,8 @@ public class Perfil {
     private String condicionesAlternas;
     private String experienciaEjercicio;
     private String suplementos;
+    @OneToOne(mappedBy = "perfil")
+    private Usuario usuario;
 
     // Constructor por defecto
     public Perfil() {
@@ -38,11 +42,11 @@ public class Perfil {
     }
 
     // Getters y Setters
-    public Long getId() {
+    public Long getIdPerfil() {
         return idPerfil;
     }
 
-    public void setId(Long idPerfil) {
+    public void setIdPerfil(Long idPerfil) {
         this.idPerfil = idPerfil;
     }
 
