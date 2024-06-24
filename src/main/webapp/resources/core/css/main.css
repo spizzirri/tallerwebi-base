@@ -1125,3 +1125,37 @@ position: relative;
     }
 
   }
+
+  .recomendacion-section {
+      background-color: #5a5b5e;
+      color: white;
+      border-radius: 10px;
+      padding: 20px;
+      max-width: 60%;
+      margin: 50px auto;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      position: relative;
+  }
+
+  .recomendacion-section::before {
+      content: "Entrenador:";
+      font-weight: bold;
+      display: block;
+      margin-bottom: 10px;
+  }
+
+  @keyframes typing {
+      from { width: 0 }
+      to { width: 100% }
+  }
+
+  .recomendacion-section p {
+      display: inline-block;
+      width: 100%;
+      animation: typing 4s steps(50, end), blink-caret .75s step-end infinite;
+  }
+
+  @keyframes blink-caret {
+      from, to { border-color: transparent }
+      50% { border-color: white; }
+  }

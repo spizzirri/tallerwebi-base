@@ -30,7 +30,8 @@
 <main style="display: flex;
     justify-content: center;
     align-items: center;
-    margin: 3rem 2rem;">
+    margin: 3rem 2rem;
+    flex-direction: column;">
     <div class="perfil-form-container">
         <h2>Mis Características</h2>
         <form th:action="@{/guardar}" method="POST" accept-charset="UTF-8" id="perfilForm">
@@ -77,10 +78,10 @@
                             <a th:href="@{/objetivo}" class="objetivo-link">Seleccionar Objetivo</a>
                         </div>
                     </div>
-                    <div class="perfil-form-group">
-                        <label for="condicionesAlternas">Condiciones Médicas</label>
-                        <input type="text" id="condicionesAlternas" name="condicionesAlternas" th:value="${perfil.condicionesAlternas}">
-                    </div>
+<!--                    <div class="perfil-form-group">-->
+<!--                        <label for="condicionesAlternas">Condiciones Médicas</label>-->
+<!--                        <input type="text" id="condicionesAlternas" name="condicionesAlternas" th:value="${perfil.condicionesAlternas}">-->
+<!--                    </div>-->
                     <div class="perfil-form-group">
                         <label for="experienciaEjercicio">Experiencia en Ejercicio</label>
                         <select id="experienciaEjercicio" name="experienciaEjercicio" th:value="${perfil.experienciaEjercicio}" required>
@@ -92,15 +93,15 @@
                     </div>
                     <div class="perfil-form-group">
                         <label for="suplementos">Suplementos</label>
-                        <input list="suplementosOptions" id="suplementos" name="suplementos" th:value="${perfil.suplementos}">
-                        <datalist id="suplementosOptions">
-                            <option value="Ninguno">
-                            <option value="Proteína de suero">
-                            <option value="Creatina">
-                            <option value="Pre-entrenamientos">
-                            <option value="Recuperativos">
-                            <option value="Otros">
-                        </datalist>
+                        <select id="suplementos" name="suplementos" th:value="${perfil.suplementos}" required>
+                            <option value="">Selecciona un suplemento</option>
+                            <option value="Ninguno" th:selected="${perfil.suplementos == 'Ninguno'}">Ninguno</option>
+                            <option value="Proteína de suero" th:selected="${perfil.suplementos == 'Proteína de suero'}">Proteína de suero</option>
+                            <option value="Creatina" th:selected="${perfil.suplementos == 'Creatina'}">Creatina</option>
+                            <option value="Pre-entrenamientos" th:selected="${perfil.suplementos == 'Pre-entrenamientos'}">Pre-entrenamientos</option>
+                            <option value="Recuperativos" th:selected="${perfil.suplementos == 'Recuperativos'}">Recuperativos</option>
+                            <option value="Otros" th:selected="${perfil.suplementos == 'Otros'}">Otros</option>
+                        </select>
                     </div>
                 </div>
                 <div class="container-btn">
@@ -109,6 +110,16 @@
                 </div>
             </div>
         </form>
+    </div>
+    <!-- Sección de Recomendación -->
+    <div class="recomendacion-section">
+        <h3>Recomendación</h3>
+        <div th:if="${perfil.recomendacion != null}">
+            <p th:text="${perfil.recomendacion}"></p>
+        </div>
+        <div th:if="${perfil.recomendacion == null}">
+            <p>Complete los campos para ver la recomendación.</p>
+        </div>
     </div>
 </main>
 <script th:src="@{/js/main.js}"></script>

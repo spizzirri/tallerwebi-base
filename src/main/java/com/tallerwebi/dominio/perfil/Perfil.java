@@ -20,6 +20,7 @@ public class Perfil {
     private String condicionesAlternas;
     private String experienciaEjercicio;
     private String suplementos;
+    private String recomendacion;
     @OneToOne(mappedBy = "perfil")
     private Usuario usuario;
 
@@ -39,6 +40,19 @@ public class Perfil {
         this.condicionesAlternas = condicionesAlternas;
         this.experienciaEjercicio = experienciaEjercicio;
         this.suplementos = suplementos;
+    }
+
+    public Perfil(Integer edad, Double peso, Integer altura, String genero, String objetivoFitness, String condicionesAlternas, String experienciaEjercicio, String suplementos, String recomendacion, Usuario usuario) {
+        this.edad = edad;
+        this.peso = peso;
+        this.altura = altura;
+        this.genero = genero;
+        this.objetivoFitness = objetivoFitness;
+        this.condicionesAlternas = condicionesAlternas;
+        this.experienciaEjercicio = experienciaEjercicio;
+        this.suplementos = suplementos;
+        this.recomendacion = recomendacion;
+        this.usuario = usuario;
     }
 
     // Getters y Setters
@@ -120,6 +134,14 @@ public class Perfil {
 
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
+    }
+
+    public String getRecomendacion() {
+        return recomendacion;
+    }
+
+    public void setRecomendacion(String recomendacion) {
+        this.recomendacion = recomendacion;
     }
 
     @Override

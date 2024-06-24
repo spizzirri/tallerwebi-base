@@ -46,6 +46,10 @@ public class ControladorPerfil{
         // Si no existe perfil, crear uno nuevo
         if (perfil == null) {
             perfil = new Perfil();
+        } else {
+            // Generar la recomendación
+            String recomendacion = servicioPerfil.generarRecomendacion(perfil);
+            perfil.setRecomendacion(recomendacion);
         }
 
         modelAndView.addObject("usuario", usuario);
@@ -61,6 +65,10 @@ public class ControladorPerfil{
             return new ModelAndView("redirect:/login");
         }
 
+        // Generar la recomendación
+        String recomendacion = servicioPerfil.generarRecomendacion(perfil);
+        perfil.setRecomendacion(recomendacion);
+
         ModelAndView modelAndView = new ModelAndView("redirect:/perfil");
         modelAndView.addObject("usuario", usuario);
 
@@ -68,5 +76,6 @@ public class ControladorPerfil{
 
         return modelAndView;
     }
+
 
 }

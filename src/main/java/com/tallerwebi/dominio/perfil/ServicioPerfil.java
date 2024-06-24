@@ -11,4 +11,6 @@ public interface ServicioPerfil {
 
     @Transactional
     void actualizarPerfil(Long idPerfil, Perfil perfilActualizado);
+
+    String generarRecomendacion(Perfil perfil);
 }
