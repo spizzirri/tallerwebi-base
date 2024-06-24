@@ -2,6 +2,9 @@ package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.perfil.Perfil;
 import com.tallerwebi.dominio.perfil.ServicioPerfil;
+import com.tallerwebi.dominio.usuario.ServicioLogin;
+import com.tallerwebi.dominio.usuario.ServicioLoginImpl;
+import com.tallerwebi.dominio.usuario.Usuario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -18,44 +21,52 @@ import javax.servlet.http.HttpSession;
 @Controller
 public class ControladorPerfil{
 
-    private final ServicioPerfil servicioPerfil;
+    @Autowired
+    private ServicioPerfil servicioPerfil;
 
     @Autowired
-    public ControladorPerfil(ServicioPerfil servicioPerfil) {
+    private ServicioLogin servicioLogin;
+
+    @Autowired
+    public ControladorPerfil(ServicioPerfil servicioPerfil, ServicioLogin servicioLogin) {
         this.servicioPerfil = servicioPerfil;
+        this.servicioLogin = servicioLogin;
     }
 
     @RequestMapping(path = "/perfil", method = RequestMethod.GET)
-    public ModelAndView irPerfil(@RequestParam(required = false) Long idPerfil, HttpSession session) {
-        ModelAndView modelAndView = new ModelAndView("perfil");
-        Perfil perfil = null;
-
-        // Verificar si se ha proporcionado un ID de perfil
-        if (idPerfil != null) {
-            perfil = servicioPerfil.obtenerPerfilPorId(idPerfil);
+    public ModelAndView irPerfil(HttpSession session) {
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        if (usuario == null) {
+            return new ModelAndView("redirect:/login");
         }
 
-        // Si el perfil es null, inicializar un nuevo objeto Perfil
+        Perfil perfil = usuario.getPerfil();
+        ModelAndView modelAndView = new ModelAndView("perfil");
+
+        // Si no existe perfil, crear uno nuevo
         if (perfil == null) {
             perfil = new Perfil();
         }
 
-        // Agregar el perfil al modelo
+        modelAndView.addObject("usuario", usuario);
         modelAndView.addObject("perfil", perfil);
-        session.setAttribute("perfil", perfil);
 
         return modelAndView;
     }
 
     @RequestMapping(path = "/guardar", method = RequestMethod.POST)
-    public String guardarPerfil(@ModelAttribute Perfil perfil, HttpSession session) {
+    public ModelAndView guardarPerfil(@ModelAttribute Perfil perfil, HttpSession session) {
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        if (usuario == null) {
+            return new ModelAndView("redirect:/login");
+        }
 
-    }
+        ModelAndView modelAndView = new ModelAndView("redirect:/perfil");
+        modelAndView.addObject("usuario", usuario);
 
-    @RequestMapping(path = "/perfil/actualizar", method = RequestMethod.POST)
-    public String actualizarPerfil(@RequestParam Long idPerfil, @ModelAttribute Perfil perfil) {
-        servicioPerfil.actualizarPerfil(idPerfil, perfil);
-        return "redirect:/perfil?idPerfil=" + idPerfil;
+        servicioLogin.guardarPerfil(usuario, perfil);
+
+        return modelAndView;
     }
 
 }

@@ -3,6 +3,9 @@ package com.tallerwebi.dominio.usuario;
 import com.tallerwebi.dominio.calendario.ServicioCalendario;
 import com.tallerwebi.dominio.excepcion.NoCambiosRestantesException;
 import com.tallerwebi.dominio.excepcion.UsuarioExistente;
+import com.tallerwebi.dominio.objetivo.Objetivo;
+import com.tallerwebi.dominio.perfil.Perfil;
+import com.tallerwebi.dominio.perfil.ServicioPerfil;
 import com.tallerwebi.dominio.reto.Reto;
 import com.tallerwebi.dominio.reto.ServicioReto;
 import com.tallerwebi.presentacion.DatosItemRendimiento;
@@ -19,12 +22,15 @@ public class ServicioLoginImpl implements ServicioLogin {
     private ServicioCalendario servicioCalendario;
     private RepositorioUsuario repositorioUsuario;
     private ServicioReto servicioReto;
+    private ServicioPerfil servicioPerfil;
+    private Objetivo objetivo;
 
     @Autowired
-    public ServicioLoginImpl(RepositorioUsuario repositorioUsuario, ServicioCalendario servicioCalendario, ServicioReto servicioReto) {
+    public ServicioLoginImpl(RepositorioUsuario repositorioUsuario, ServicioCalendario servicioCalendario, ServicioReto servicioReto, ServicioPerfil servicioPerfil) {
         this.repositorioUsuario = repositorioUsuario;
         this.servicioCalendario = servicioCalendario;
         this.servicioReto = servicioReto;
+        this.servicioPerfil = servicioPerfil;
     }
 
     @Override
@@ -95,8 +101,19 @@ public class ServicioLoginImpl implements ServicioLogin {
         }
     }
 
+    @Override
+    public void guardarPerfil(Usuario usuario, Perfil perfil) {
+        perfil.setUsuario(usuario);
+        usuario.setPerfil(perfil);
+        repositorioUsuario.modificar(usuario);
+        servicioPerfil.guardarPerfil(perfil);
+    }
 
-
+    @Override
+    public void guardarObjetivo(Usuario usuario, Objetivo objetivo) {
+        usuario.setObjetivo(objetivo);
+        repositorioUsuario.modificar(usuario);
+    }
 
 
 

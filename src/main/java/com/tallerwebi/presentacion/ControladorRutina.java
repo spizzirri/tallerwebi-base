@@ -1,5 +1,6 @@
 package com.tallerwebi.presentacion;
 
+import com.tallerwebi.dominio.usuario.ServicioLogin;
 import com.tallerwebi.dominio.usuario.Usuario;
 import com.tallerwebi.dominio.objetivo.Objetivo;
 import com.tallerwebi.dominio.rutina.Rutina;
@@ -19,14 +20,21 @@ public class ControladorRutina {
 
 
     private final ServicioRutina servicioRutina;
+    private final ServicioLogin servicioLogin;
 
     @Autowired
-    public ControladorRutina(ServicioRutina servicioRutina) {
+    public ControladorRutina(ServicioRutina servicioRutina, ServicioLogin servicioLogin) {
         this.servicioRutina = servicioRutina;
+        this.servicioLogin = servicioLogin;
     }
 
     @RequestMapping(path = "/rutinas", method = RequestMethod.GET)
-    public ModelAndView VerRutinasQueLeInteresanAlUsuario(@RequestParam("objetivo") String objetivo) {
+    public ModelAndView VerRutinasQueLeInteresanAlUsuario(@RequestParam("objetivo") String objetivo, HttpSession session) {
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        if (usuario == null) {
+            return new ModelAndView("redirect:/login");
+        }
+
         ModelAndView modelAndView = new ModelAndView("rutinas");
 
         Objetivo objetivoEnum;
@@ -40,7 +48,7 @@ public class ControladorRutina {
         List<DatosRutina> rutinas = this.servicioRutina.getRutinasPorObjetivo(objetivoEnum);
         modelAndView.addObject("rutinas", rutinas);
         modelAndView.addObject("objetivoFormateado", objetivoEnum.formatear());
-
+        servicioLogin.guardarObjetivo(usuario, objetivoEnum);
         return modelAndView;
     }
 

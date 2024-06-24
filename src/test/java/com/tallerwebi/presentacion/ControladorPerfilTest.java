@@ -19,11 +19,11 @@ public class ControladorPerfilTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @BeforeEach
-    public void init() {
-        this.servicioPerfil = mock(ServicioPerfil.class);
-        this.controladorPerfil = new ControladorPerfil(this.servicioPerfil);
-    }
+//    @BeforeEach
+//    public void init() {
+//        this.servicioPerfil = mock(ServicioPerfil.class);
+//        this.controladorPerfil = new ControladorPerfil(this.servicioPerfil);
+//    }
 
 
 }

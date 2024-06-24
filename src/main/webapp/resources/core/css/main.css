@@ -128,9 +128,22 @@ header {
 
 .user-name {
     font-size: 1rem;
-    color: black !important;
+    color: #1f1f1f !important;
     text-decoration: none !important;
 }
+
+.name-link{
+    color: #1f1f1f !important;
+    text-decoration: none !important;
+}
+
+.name-link-container{
+display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1f1f1f !important;
+    text-decoration: none !important;
+    }
 
 a {
     text-decoration: none !important;
@@ -977,81 +990,138 @@ position: relative;
             border-color: #0056b3;
         }
 
-        .perfil-form-container {
-                    max-width: 600px;
-                    margin: 50px auto;
-                    padding: 20px;
-                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-                    border-radius: 8px;
-                    background-color: #f7f7f7;
-                }
-                .perfil-form-container h2 {
-                    text-align: center;
-                    margin-bottom: 20px;
-                    color: #1f1f1f;
-                }
-                .perfil-form-group {
-                    margin-bottom: 15px;
-                }
-                .perfil-form-group label {
-                    display: block;
-                    margin-bottom: 5px;
-                    font-weight: bold;
-                    color: #1f1f1f;
-                }
-                .perfil-form-group input,
-                .perfil-form-group select {
-                    width: 100%;
-                    padding: 10px;
-                    border: 1px solid #ced4da;
-                    border-radius: 4px;
-                    box-sizing: border-box;
-                }
-                .perfil-btn {
-                    width: 100%;
-                    padding: 10px;
-                    background-color: #007bff;
-                    border: none;
-                    border-radius: 4px;
-                    color: white;
-                    font-weight: bold;
-                    cursor: pointer;
-                }
-                .perfil-btn:hover {
-                    background-color: #0056b3;
-                }
+    .perfil-form-container {
+        background-color: #ffffff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        max-width: 600px;
+        width: 100%;
+    }
 
-                /* Media Queries for responsiveness */
-                @media (max-width: 768px) {
-                    .perfil-form-container {
-                        padding: 15px;
-                        margin: 2rem 3rem;
-                    }
-                    .perfil-form-group input,
-                    .perfil-form-group select {
-                        padding: 8px;
-                    }
-                    .perfil-btn {
-                        padding: 8px;
-                    }
-                }
+    .perfil-form-container:hover{
+    transform: scale(1.05);
+    }
 
-                @media (max-width: 480px) {
-                    .perfil-form-container {
-                        padding: 10px;
-                        margin: 2rem 3rem;
-                    }
-                    .perfil-form-container h2 {
-                        font-size: 1.5em;
-                    }
-                    .perfil-form-group label {
-                        font-size: 0.9em;
-                    }
-                    .perfil-form-group input,
-                    .perfil-form-group select {
-                        padding: 6px;
-                    }
-                    .perfil-btn {
-                        padding: 6px;
-                    }
-                }
+    .perfil-form-container h2 {
+        text-align: center;
+        color: #333333;
+        margin-bottom: 20px;
+    }
+
+    .perfil-section {
+        display: none;
+    }
+
+    .perfil-section.show {
+        display: block;
+    }
+
+    .perfil-form-row {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+
+    .perfil-form-group {
+        flex-basis: calc(50% - 10px);
+        margin-bottom: 15px;
+        margin-top: 0.8rem;
+    }
+
+    .perfil-form-group.full-width {
+        flex-basis: 100%;
+    }
+
+    .perfil-form-group label {
+        display: block;
+        margin-bottom: 5px;
+        color: #333333;
+    }
+
+    .perfil-form-group input,
+    .perfil-form-group select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #cccccc;
+        border-radius: 4px;
+        font-size: 14px;
+        color: #333333;
+    }
+
+    .perfil-form-group input[type="text"][readonly] {
+        background-color: #f9f9f9;
+    }
+
+    .perfil-form-group select {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTggMTJsNC00SDRMMCA4bDQtNHoiIGZpbGw9IiM0NDQ0NDQiLz4KPC9zdmc+Cg==') no-repeat right 10px center;
+        background-size: 10px 10px;
+    }
+
+    .perfil-form-group a {
+        display: block;
+        margin-top: 10px;
+        color: #007bff;
+        text-decoration: none;
+        text-align: center;
+    }
+
+    .perfil-form-group a:hover {
+        text-decoration: underline;
+    }
+
+.objetivo-link {
+    display: inline-block;
+    padding: 8.5px !important;
+    background-color: #007bff;
+    color: #fff !important;
+    text-decoration: none;
+    border-radius: 4px;
+    text-align: center;
+    transition: background-color 0.3s ease;
+    margin: 0px !important;
+}
+
+.objetivo-link:hover {
+    background-color: #0056b3;
+}
+
+    .perfil-btn,
+    .perfil-btn-next {
+            padding: 10px 20px;
+            background-color: #184399;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+    .perfil-btn {
+          background-color: #007bff;
+        }
+
+       .perfil-btn:hover,
+       .perfil-btn-next:hover{
+        background-color: #0056b3;
+       }
+
+       .container-btn{
+       display: flex;
+           align-items: center;
+           flex-direction: row;
+           justify-content: space-between;
+           margin-top: 1.2rem;
+       }
+
+@media (max-width: 800px) {
+    .perfil-form-group {
+        flex-basis: 100%; /* Ocupa el ancho completo en dispositivos pequeños */
+    }
+
+  }

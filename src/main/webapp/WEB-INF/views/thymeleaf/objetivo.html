@@ -22,8 +22,8 @@
             <li><a th:action="@{/irCalendario}" href="calendario">Calendario</a></li>
         </ul>
         <div class="user-profile">
-            <a href="perfil" th:action="@{/irPerfil}">
-                <span class="user-name">Nombre</span>
+            <a class="name-link-container" href="perfil" th:action="@{/irPerfil}">
+                <span th:text="${usuario != null ? usuario.nombre : 'nombre'}" class="name-link"></span>
                 <img th:src="@{/img/usuario.png}" alt="Usuario" class="user-img">
             </a>
         </div>

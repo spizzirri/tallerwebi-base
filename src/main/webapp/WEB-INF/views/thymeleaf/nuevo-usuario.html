@@ -31,7 +31,7 @@
       <form action="#" th:action="@{/registrarme}" method="POST" th:object="${usuario}">
         <h3 class="form-signin-heading">Nuevo Usuario</h3>
         <hr class="colorgraph"><br>
-
+        <input th:field="*{nombre}" id="nombre" class="form-control" style="margin: 0.5rem;" placeholder="Nombre" required/>
         <input th:field="*{email}" id="email" class="form-control" style="margin: 0.5rem;" placeholder="Gmail" required/>
         <input th:field="*{password}" type="password" id="password" class="form-control" style="margin: 0.5rem;" placeholder="Contraseña" required/>
 

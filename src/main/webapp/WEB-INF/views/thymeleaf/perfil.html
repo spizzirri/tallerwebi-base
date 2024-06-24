@@ -20,67 +20,97 @@
             <li><a th:action="@{/irCalendario}" href="calendario">Calendario</a></li>
         </ul>
         <div class="user-profile">
-            <a class="a-profile" href="perfil" th:action="@{/irPerfil}">
-                <span th:text="${usuario != null ? usuario.nombre : 'nombre'}"></span>
+            <a class="name-link-container" href="perfil" th:action="@{/irPerfil}">
+                <span th:text="${usuario != null ? usuario.nombre : 'nombre'}" class="name-link"></span>
                 <img th:src="@{/img/usuario.png}" alt="Usuario" class="user-img">
             </a>
         </div>
     </nav>
 </header>
-<div class="perfil-form-container">
-    <h2 th:text="${perfil.idPerfil != null} ? 'Modificar Características' : 'Mis Características'"></h2>
-    <form th:action="${perfil.idPerfil != null} ? @{/perfil/actualizar(idPerfil=${perfil.idPerfil})} : @{/perfil/guardar}" method="post">
-        <input type="hidden" name="idPerfil" th:value="${perfil.idPerfil}"/>
-        <div class="perfil-form-group">
-            <label for="edad">Edad</label>
-            <input type="number" id="edad" name="edad" th:value="${perfil.edad}" required>
-        </div>
-        <div class="perfil-form-group">
-            <label for="peso">Peso (kg)</label>
-            <input type="number" step="0.1" id="peso" name="peso" th:value="${perfil.peso}" required>
-        </div>
-        <div class="perfil-form-group">
-            <label for="altura">Altura (cm)</label>
-            <input type="number" id="altura" name="altura" th:value="${perfil.altura}" required>
-        </div>
-        <div class="perfil-form-group">
-            <label for="genero">Género</label>
-            <select id="genero" name="genero" th:value="${perfil.genero}" required>
-                <option value="">Selecciona tu género</option>
-                <option value="Masculino" th:selected="${perfil.genero == 'Masculino'}">Masculino</option>
-                <option value="Femenino" th:selected="${perfil.genero == 'Femenino'}">Femenino</option>
-                <option value="Otro" th:selected="${perfil.genero == 'Otro'}">Otro</option>
-            </select>
-        </div>
-        <div class="perfil-form-group">
-            <label for="objetivoFitness">Objetivo Fitness</label>
-            <select id="objetivoFitness" name="objetivoFitness" th:value="${perfil.objetivoFitness}" required>
-                <option value="">Selecciona tu objetivo</option>
-                <option value="Pérdida de Peso" th:selected="${perfil.objetivoFitness == 'Pérdida de Peso'}">Pérdida de Peso</option>
-                <option value="Ganancia Muscular" th:selected="${perfil.objetivoFitness == 'Ganancia Muscular'}">Ganancia Muscular</option>
-                <option value="Definición" th:selected="${perfil.objetivoFitness == 'Definición'}">Definición</option>
-            </select>
-        </div>
-        <div class="perfil-form-group">
-            <label for="condicionesAlternas">Condiciones Médicas</label>
-            <input type="text" id="condicionesAlternas" name="condicionesAlternas" th:value="${perfil.condicionesAlternas}">
-        </div>
-        <div class="perfil-form-group">
-            <label for="experienciaEjercicio">Experiencia en Ejercicio</label>
-            <select id="experienciaEjercicio" name="experienciaEjercicio" th:value="${perfil.experienciaEjercicio}" required>
-                <option value="">Selecciona tu nivel</option>
-                <option value="Principiante" th:selected="${perfil.experienciaEjercicio == 'Principiante'}">Principiante</option>
-                <option value="Intermedio" th:selected="${perfil.experienciaEjercicio == 'Intermedio'}">Intermedio</option>
-                <option value="Avanzado" th:selected="${perfil.experienciaEjercicio == 'Avanzado'}">Avanzado</option>
-            </select>
-        </div>
-        <div class="perfil-form-group">
-            <label for="suplementos">Suplementos</label>
-            <input type="text" id="suplementos" name="suplementos" th:value="${perfil.suplementos}">
-        </div>
-        <button type="submit" class="perfil-btn" th:text="${perfil.idPerfil != null} ? 'Modificar' : 'Guardar'"></button>
-    </form>
-</div>
+<main style="display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 3rem 2rem;">
+    <div class="perfil-form-container">
+        <h2>Mis Características</h2>
+        <form th:action="@{/guardar}" method="POST" accept-charset="UTF-8" id="perfilForm">
+            <div class="perfil-section" id="sectionDatosPersonales">
+                <h3 style="color: #333333;">Datos Personales</h3>
+                <div class="perfil-form-row">
+                    <div class="perfil-form-group">
+                        <label for="edad">Edad</label>
+                        <input type="number" id="edad" name="edad" th:value="${perfil.edad}" required>
+                    </div>
+                    <div class="perfil-form-group">
+                        <label for="peso">Peso (kg)</label>
+                        <input type="number" step="0.1" id="peso" name="peso" th:value="${perfil.peso}" required>
+                    </div>
+                    <div class="perfil-form-group">
+                        <label for="altura">Altura (cm)</label>
+                        <input type="number" id="altura" name="altura" th:value="${perfil.altura}" required>
+                    </div>
+                    <div class="perfil-form-group">
+                        <label for="genero">Género</label>
+                        <select id="genero" name="genero" th:value="${perfil.genero}" required>
+                            <option value="">Selecciona tu género</option>
+                            <option value="Masculino" th:selected="${perfil.genero == 'Masculino'}">Masculino</option>
+                            <option value="Femenino" th:selected="${perfil.genero == 'Femenino'}">Femenino</option>
+                            <option value="Otro" th:selected="${perfil.genero == 'Otro'}">Otro</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="container-btn" style="justify-content: flex-end !important;">
+                <button type="button" class="perfil-btn-next" onclick="mostrarSeccion('sectionObjetivo')">Siguiente</button>
+                </div>
+            </div>
 
+            <div class="perfil-section" id="sectionObjetivo" style="display: none;">
+                <h3 style="color: #333333;">Objetivo Fitness</h3>
+                <div class="perfil-form-row">
+                    <div class="perfil-form-group">
+                        <label for="objetivoFitness">Objetivo Fitness</label>
+                        <div th:if="${usuario.objetivo != null}">
+                            <input type="text" id="objetivoFitness" name="objetivoFitness" th:value="${usuario.objetivo}" readonly>
+                        </div>
+                        <!-- Mostrar el enlace solo si el objetivo es null -->
+                        <div th:if="${usuario.objetivo == null}" class="objetivo-link-container">
+                            <a th:href="@{/objetivo}" class="objetivo-link">Seleccionar Objetivo</a>
+                        </div>
+                    </div>
+                    <div class="perfil-form-group">
+                        <label for="condicionesAlternas">Condiciones Médicas</label>
+                        <input type="text" id="condicionesAlternas" name="condicionesAlternas" th:value="${perfil.condicionesAlternas}">
+                    </div>
+                    <div class="perfil-form-group">
+                        <label for="experienciaEjercicio">Experiencia en Ejercicio</label>
+                        <select id="experienciaEjercicio" name="experienciaEjercicio" th:value="${perfil.experienciaEjercicio}" required>
+                            <option value="">Selecciona tu nivel</option>
+                            <option value="Principiante" th:selected="${perfil.experienciaEjercicio == 'Principiante'}">Principiante</option>
+                            <option value="Intermedio" th:selected="${perfil.experienciaEjercicio == 'Intermedio'}">Intermedio</option>
+                            <option value="Avanzado" th:selected="${perfil.experienciaEjercicio == 'Avanzado'}">Avanzado</option>
+                        </select>
+                    </div>
+                    <div class="perfil-form-group">
+                        <label for="suplementos">Suplementos</label>
+                        <input list="suplementosOptions" id="suplementos" name="suplementos" th:value="${perfil.suplementos}">
+                        <datalist id="suplementosOptions">
+                            <option value="Ninguno">
+                            <option value="Proteína de suero">
+                            <option value="Creatina">
+                            <option value="Pre-entrenamientos">
+                            <option value="Recuperativos">
+                            <option value="Otros">
+                        </datalist>
+                    </div>
+                </div>
+                <div class="container-btn">
+                <button type="button" class="perfil-btn-next" onclick="mostrarSeccion('sectionDatosPersonales')">Anterior</button>
+                <button type="submit" class="perfil-btn">Guardar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</main>
+<script th:src="@{/js/main.js}"></script>
 </body>
 </html>

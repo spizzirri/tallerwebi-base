@@ -200,5 +200,11 @@ public class Usuario {
         return this.rachaDeRetos += 1;
     }
 
+    public Perfil getPerfil() {
+        return perfil;
+    }
 
+    public void setPerfil(Perfil perfil) {
+        this.perfil = perfil;
+    }
 }

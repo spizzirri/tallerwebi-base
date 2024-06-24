@@ -2,6 +2,7 @@ package com.tallerwebi.dominio;
 
 import com.tallerwebi.dominio.calendario.ServicioCalendario;
 import com.tallerwebi.dominio.excepcion.NoCambiosRestantesException;
+import com.tallerwebi.dominio.perfil.ServicioPerfil;
 import com.tallerwebi.dominio.reto.RepositorioReto;
 import com.tallerwebi.dominio.reto.Reto;
 import com.tallerwebi.dominio.reto.ServicioReto;
@@ -27,6 +28,7 @@ public class ServicioLoginTest {
     private ServicioCalendario servicioCalendario;
     private ServicioLogin servicioLogin;
     private ServicioReto servicioReto;
+    private ServicioPerfil servicioPerfil;
 
 
     @BeforeEach
@@ -35,7 +37,8 @@ public class ServicioLoginTest {
         this.repositorioUsuario = mock(RepositorioUsuario.class);
         this.servicioCalendario = mock(ServicioCalendario.class);
         this.servicioReto = mock(ServicioReto.class);
-        this.servicioLogin = new ServicioLoginImpl(this.repositorioUsuario, this.servicioCalendario, this.servicioReto);
+        this.servicioPerfil = mock(ServicioPerfil.class);
+        this.servicioLogin = new ServicioLoginImpl(this.repositorioUsuario, this.servicioCalendario, this.servicioReto, this.servicioPerfil);
     }
 
 

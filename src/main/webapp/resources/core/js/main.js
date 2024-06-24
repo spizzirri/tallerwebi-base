@@ -37,6 +37,26 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
+// Asegura que la primera sección esté visible al cargar la página
+document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById('sectionDatosPersonales').classList.add('show');
+});
+
+// Función para mostrar/ocultar secciones y gestionar los botones de navegación
+function mostrarSeccion(idSeccion) {
+    var seccionActual = document.querySelector('.perfil-section.show');
+    if (seccionActual) {
+        seccionActual.classList.remove('show');
+        seccionActual.style.display = 'none';
+    }
+
+    var seccionSiguiente = document.getElementById(idSeccion);
+    if (seccionSiguiente) {
+        seccionSiguiente.classList.add('show');
+        seccionSiguiente.style.display = 'block';
+    }
+}
+
 
 
 
