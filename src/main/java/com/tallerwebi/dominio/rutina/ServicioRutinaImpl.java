@@ -219,7 +219,10 @@ public class ServicioRutinaImpl implements ServicioRutina {
 
     @Override
     public void asignarRutinaAUsuario(Rutina rutina, Usuario usuario) {
-        this.repositorioRutina.asignarRutinaAUsuario(rutina,usuario);
+        Rutina rutinaActivaBuscada = this.repositorioRutina.getRutinaActivaDelUsuario(usuario);
+        if(rutinaActivaBuscada == null){
+            this.repositorioRutina.asignarRutinaAUsuario(rutina,usuario);
+        }
     }
 
     @Override
