@@ -88,7 +88,9 @@ body {
     margin-bottom: 20px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-
+.card-header{
+    color:black;
+}
 footer {
     background-color: #f0f0f0;
     color: black;
@@ -98,6 +100,7 @@ footer {
     text-align: center;
     padding: 20px;
 }
+
 
 /* Responsive Adjustments */
 @media (max-width: 768px) {

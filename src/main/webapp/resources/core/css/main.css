@@ -1126,36 +1126,58 @@ position: relative;
 
   }
 
-  .recomendacion-section {
-      background-color: #5a5b5e;
-      color: white;
-      border-radius: 10px;
-      padding: 20px;
-      max-width: 60%;
-      margin: 50px auto;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      position: relative;
-  }
+.recomendacion-section {
+    color: white;
+    border-radius: 10px;
+    padding: 20px;
+    max-width: 60%;
+    margin: 50px auto;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
 
-  .recomendacion-section::before {
-      content: "Entrenador:";
-      font-weight: bold;
-      display: block;
-      margin-bottom: 10px;
-  }
+.recomendacion-section::before {
+    content: "Consejo MagnusFit:";
+    font-weight: bold;
+    font-size: 1.2em;
+    display: block;
+    margin-bottom: 10px;
+    color: #ffd700;
+    animation: fadeIn 2s ease-in-out;
+}
 
-  @keyframes typing {
-      from { width: 0 }
-      to { width: 100% }
-  }
+@media (max-width: 800px) {
+    .recomendacion-section {
+        max-width: 70%;
+    }
+}
 
-  .recomendacion-section p {
-      display: inline-block;
-      width: 100%;
-      animation: typing 4s steps(50, end), blink-caret .75s step-end infinite;
-  }
+@media (max-width: 600px) {
+    .recomendacion-section {
+        max-width: 100%;
+    }
+}
 
-  @keyframes blink-caret {
-      from, to { border-color: transparent }
-      50% { border-color: white; }
-  }
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.recomendacion-text {
+    overflow: hidden;
+    display: inline-block;
+    position: relative;
+    animation: slide-in 1s forwards;
+}
+
+@keyframes slide-in {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}

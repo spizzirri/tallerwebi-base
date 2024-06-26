@@ -113,9 +113,8 @@
     </div>
     <!-- Sección de Recomendación -->
     <div class="recomendacion-section">
-        <h3>Recomendación</h3>
-        <div th:if="${perfil.recomendacion != null}">
-            <p th:text="${perfil.recomendacion}"></p>
+        <div th:if="${perfil.recomendacion != null}" id="recomendacionContainer">
+            <p class="recomendacion-text" th:text="${perfil.recomendacion}"></p>
         </div>
         <div th:if="${perfil.recomendacion == null}">
             <p>Complete los campos para ver la recomendación.</p>
