@@ -70,8 +70,8 @@ public class ControladorRutina {
             modelAndView.addObject("rutina", rutina);
             modelAndView.setViewName("rutina");
         } catch (Exception e) {
-            modelAndView.setViewName("redirect:/rutinas?objetivo=" + usuario.getObjetivo().toString());
-            modelAndView.addObject("objetivoFormateado", usuario.getObjetivo().formatear());
+            String objetivoFormateado = usuario.getObjetivo().formatear();
+            modelAndView.setViewName("redirect:/rutinas?objetivo=" + usuario.getObjetivo().toString() + "&objetivoFormateado=" + objetivoFormateado);
         }
 
         return modelAndView;
@@ -82,19 +82,14 @@ public class ControladorRutina {
         ModelAndView modelAndView = new ModelAndView();
 
         try {
-            // Obtener el usuario de la sesión
             Usuario usuario = (Usuario) session.getAttribute("usuario");
 
-            // Obtener la rutina por su ID
             Rutina rutina = servicioRutina.getRutinaById(id);
             DatosRutina datosRutina = servicioRutina.getDatosRutinaById(id);
 
-            // Verificar si el usuario y la rutina existen
             if (usuario != null && rutina != null) {
-                // Asignar la rutina al usuario
                 servicioRutina.asignarRutinaAUsuario(rutina, usuario);
 
-                // Agregar la rutina al modelo
                 modelAndView.addObject("rutina", datosRutina);
                 modelAndView.setViewName("rutina");
             } else {
@@ -114,30 +109,23 @@ public class ControladorRutina {
         ModelAndView modelAndView = new ModelAndView();
 
         try {
-            // Obtener el usuario de la sesión
             Usuario usuario = (Usuario) session.getAttribute("usuario");
 
-            // Obtener la rutina por su ID
             Rutina rutina = servicioRutina.getRutinaById(id);
             DatosRutina datosRutina = servicioRutina.getDatosRutinaById(id);
             modelAndView.addObject("rutina", datosRutina);
 
-            // Verificar si el usuario y la rutina existen
             if (usuario != null && rutina != null) {
-                // Libera la rutina activa del usuario
                 servicioRutina.liberarRutinaActivaDelUsuario(usuario);
 
-                // Redirigir a la sección de rutinas en base al objetivo del usuario
                 modelAndView.setViewName("redirect:/rutinas?objetivo=" + usuario.getObjetivo().toString());
                 modelAndView.addObject("info", "Rutina liberada.");
                 modelAndView.addObject("objetivoFormateado", usuario.getObjetivo().formatear());
             } else {
-                // Si el usuario o la rutina no existen, redirigir a la página de objetivos
                 modelAndView.addObject("error", "Error al liberar la rutina.");
                 modelAndView.setViewName("rutina");
             }
         } catch (Exception e) {
-            // Si ocurre una excepción, redirigir a la página de objetivos con el mensaje de error
             modelAndView.addObject("error", "EXCEPCION: error al liberar la rutina.");
             modelAndView.setViewName("rutina");
         }
