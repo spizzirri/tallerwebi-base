@@ -2,6 +2,7 @@ package com.tallerwebi.dominio;
 
 import com.tallerwebi.dominio.calendario.ItemRendimiento;
 import com.tallerwebi.dominio.objetivo.Objetivo;
+import com.tallerwebi.dominio.rutina.EstadoEjercicio;
 import com.tallerwebi.dominio.rutina.Rutina;
 import com.tallerwebi.dominio.reto.Reto;
 
@@ -35,6 +36,9 @@ public class Usuario {
     //relacion de usuario con itemRendimiento 1 - n --> bd
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ItemRendimiento> itemsRendimiento;
+
+    @OneToMany(mappedBy = "usuario")
+    private List<EstadoEjercicio> estadosEjercicios;
 
     public List<ItemRendimiento> getItemsRendimiento() {
         return itemsRendimiento;
@@ -199,5 +203,11 @@ public class Usuario {
         return this.rachaDeRetos += 1;
     }
 
+    public List<EstadoEjercicio> getEstadosEjercicios() {
+        return estadosEjercicios;
+    }
 
+    public void setEstadosEjercicios(List<EstadoEjercicio> estadosEjercicios) {
+        this.estadosEjercicios = estadosEjercicios;
+    }
 }
