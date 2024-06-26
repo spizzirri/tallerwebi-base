@@ -4,12 +4,14 @@ import com.tallerwebi.dominio.usuario.Usuario;
 import com.tallerwebi.dominio.usuario.UsuarioRutina;
 import com.tallerwebi.dominio.objetivo.Objetivo;
 import com.tallerwebi.dominio.rutina.Ejercicio;
+import com.tallerwebi.dominio.rutina.EstadoEjercicio;
 import com.tallerwebi.dominio.rutina.RepositorioRutina;
 import com.tallerwebi.dominio.rutina.Rutina;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -138,7 +140,52 @@ public class RepositorioRutinaImpl implements RepositorioRutina {
 
         // Persist the UsuarioRutina entity
         this.sessionFactory.getCurrentSession().save(usuarioRutina);
+
+        // Inicializar los estados de los ejercicios
+        inicializarEstadosEjercicios(rutinaAAsignar, usuarioAAsignar);
     }
+
+    public EstadoEjercicio findEstadoEjercicioByUsuarioAndEjercicio(Usuario usuario, Ejercicio ejercicio) {
+        String hql = "FROM EstadoEjercicio WHERE usuario = :usuario AND ejercicio = :ejercicio";
+        return sessionFactory.getCurrentSession().createQuery(hql, EstadoEjercicio.class)
+                .setParameter("usuario", usuario)
+                .setParameter("ejercicio", ejercicio)
+                .uniqueResult();
+    }
+
+    public void saveEstadoEjercicio(EstadoEjercicio estadoEjercicio) {
+        sessionFactory.getCurrentSession().save(estadoEjercicio);
+    }
+
+    public List<Ejercicio> findEjerciciosByRutina(Rutina rutina) {
+        String sql = "SELECT e.* FROM Ejercicio e " +
+                "JOIN rutina_ejercicio re ON e.idEjercicio = re.ejercicios_idEjercicio " +
+                "WHERE re.Rutina_idRutina = :rutinaId";
+        return sessionFactory.getCurrentSession().createNativeQuery(sql, Ejercicio.class)
+                .setParameter("rutinaId", rutina.getIdRutina())
+                .list();
+    }
+
+    private void inicializarEstadosEjercicios(Rutina rutina, Usuario usuario) {
+        String sql = "SELECT e.* FROM ejercicio e " +
+                "JOIN rutina_ejercicio re ON e.idEjercicio = re.ejercicios_idEjercicio " +
+                "WHERE re.Rutina_idRutina = :rutinaId";
+
+        List<Ejercicio> ejercicios = this.sessionFactory.getCurrentSession()
+                .createNativeQuery(sql, Ejercicio.class)
+                .setParameter("rutinaId", rutina.getIdRutina())
+                .list();
+
+        for (Ejercicio ejercicio : ejercicios) {
+            EstadoEjercicio estadoEjercicio = new EstadoEjercicio();
+            estadoEjercicio.setUsuario(usuario);
+            estadoEjercicio.setEjercicio(ejercicio);
+            estadoEjercicio.setEstado(EstadoEjercicio.Estado.NO_EMPEZADO);
+
+            this.sessionFactory.getCurrentSession().save(estadoEjercicio);
+        }
+    }
+
 
     @Override
     public void guardarUsuario(Usuario usuario) {
