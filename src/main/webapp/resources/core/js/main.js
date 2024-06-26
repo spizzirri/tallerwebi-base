@@ -57,29 +57,29 @@ function mostrarSeccion(idSeccion) {
     }
 }
 
-
 document.addEventListener("DOMContentLoaded", function () {
-    const recomendacionElement = document.querySelector(".recomendacion-section p");
+    const recomendacionElement = document.querySelector(".recomendacion-section .recomendacion-text");
     if (!recomendacionElement) return;  // Verifica si el elemento existe
 
-    const text = recomendacionElement.textContent;
-    recomendacionElement.textContent = '';
+    const htmlContent = recomendacionElement.innerHTML;
+    recomendacionElement.innerHTML = '';
 
     let index = 0;
     function type() {
-        if (index < text.length) {
-            recomendacionElement.textContent += text.charAt(index);
+        if (index < htmlContent.length) {
+            recomendacionElement.innerHTML += htmlContent.charAt(index);
             index++;
             setTimeout(type, 50); // Ajusta el tiempo según sea necesario
         } else {
-            recomendacionElement.style.borderRight = 'none';
+            recomendacionElement.classList.remove('cursor');
         }
     }
 
-    if (text.length > 0) {
-        recomendacionElement.style.borderRight = '0.15em solid white'; // Añadir el cursor de escritura
+    if (htmlContent.length > 0) {
+        recomendacionElement.classList.add('cursor'); // Añadir el cursor de escritura
         type();
     }
 });
+
 
 

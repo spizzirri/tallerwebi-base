@@ -9,7 +9,7 @@ public class ServicioPerfilImpl implements ServicioPerfil {
 
     private RepositorioPerfil repositorioPerfil;
 
-    public ServicioPerfilImpl(RepositorioPerfil repositorioPerfil){
+    public ServicioPerfilImpl(RepositorioPerfil repositorioPerfil) {
         this.repositorioPerfil = repositorioPerfil;
     }
 
@@ -52,94 +52,103 @@ public class ServicioPerfilImpl implements ServicioPerfil {
     public String generarRecomendacion(Perfil perfil) {
         StringBuilder recomendacion = new StringBuilder();
 
-        // Recomendaciones según el objetivo fitness
-        switch (perfil.getObjetivoFitness().toUpperCase()) {
-            case "PERDIDA_DE_PESO":
-                recomendacion.append("Para perder peso, es fundamental mantener una dieta balanceada y un déficit calórico moderado. ");
-                break;
-            case "GANANCIA_MUSCULAR":
-                recomendacion.append("Para ganar masa muscular, aumenta tu ingesta calórica con alimentos ricos en proteínas. ");
-                recomendacion.append("Es crucial descansar adecuadamente para permitir la recuperación muscular. ");
-                break;
-            case "DEFINICION":
-                recomendacion.append("Para mantenerte en forma, sigue una dieta equilibrada y variada. ");
-                break;
-            default:
-                recomendacion.append("Establece un objetivo fitness claro para obtener recomendaciones más específicas. ");
-        }
+        // Obtener atributos del perfil
+        String objetivoFitness = perfil.getObjetivoFitness().toUpperCase();
+        String experienciaEjercicio = perfil.getExperienciaEjercicio().toLowerCase();
+        String genero = perfil.getGenero().toLowerCase();
+        double peso = perfil.getPeso();
+        String suplementos = perfil.getSuplementos();
+        int edad = perfil.getEdad();
 
-        // Recomendaciones según la experiencia en ejercicio
-        switch (perfil.getExperienciaEjercicio().toLowerCase()) {
-            case "principiante":
-                recomendacion.append("Como principiante, empieza con ejercicios de baja intensidad y aumenta gradualmente la carga y la intensidad. Aprende la técnica adecuada para evitar lesiones. ");
-                break;
-            case "intermedio":
-                recomendacion.append("Como intermedio, varía tus rutinas para evitar el estancamiento y aumenta progresivamente la intensidad de tus entrenamientos. ");
-                break;
-            case "avanzado":
-                recomendacion.append("Como avanzado, desafía tus límites con rutinas intensivas y técnicas avanzadas como el entrenamiento en circuito o HIIT. ");
-                break;
-        }
-
-        // Recomendaciones según el peso y género
-        if (perfil.getGenero() != null && perfil.getPeso() > 0) {
-            if (perfil.getGenero().equalsIgnoreCase("masculino")) {
-                if (perfil.getPeso() < 60) {
-                    recomendacion.append("Tu peso es más bajo de lo habitual para un hombre. Asegúrate de consumir suficientes calorías y nutrientes para mantener tu salud y energía. ");
-                } else if (perfil.getPeso() >= 60 && perfil.getPeso() <= 90) {
-                    recomendacion.append("Tu peso está dentro del rango saludable para un hombre. Mantén una dieta equilibrada y ajusta tu ingesta calórica según tu nivel de actividad y objetivos fitness. ");
-                } else if (perfil.getPeso() > 90) {
-                    recomendacion.append("Tu peso es relativamente alto. Enfócate en una dieta balanceada y ejercicios que promuevan la salud cardiovascular y la fuerza muscular. ");
-                }
-            } else if (perfil.getGenero().equalsIgnoreCase("femenino")) {
-                if (perfil.getPeso() < 50) {
-                    recomendacion.append("Tu peso es más bajo de lo habitual para una mujer. Asegúrate de consumir suficientes calorías y nutrientes para mantener tu salud y energía. ");
-                } else if (perfil.getPeso() >= 50 && perfil.getPeso() <= 70) {
-                    recomendacion.append("Tu peso está dentro del rango saludable para una mujer. Mantén una dieta equilibrada y ajusta tu ingesta calórica según tu nivel de actividad y objetivos fitness. ");
-                } else if (perfil.getPeso() > 70) {
-                    recomendacion.append("Tu peso es relativamente alto. Enfócate en una dieta balanceada y ejercicios que promuevan la salud cardiovascular y la fuerza muscular. ");
-                }
-            } else {
-                recomendacion.append("Tu peso está dentro de un rango saludable. Asegúrate de mantener una dieta equilibrada y ajustar tu actividad física según tus objetivos personales. ");
-            }
-        }
-
-        // Recomendaciones según los suplementos seleccionados
-        if (perfil.getSuplementos() != null && !perfil.getSuplementos().isEmpty() && !perfil.getSuplementos().equalsIgnoreCase("ninguno")) {
-            switch (perfil.getSuplementos()) {
-                case "Proteína de suero":
-                    recomendacion.append("La proteína de suero ayuda en la recuperación muscular después de los entrenamientos intensos. ");
+        // Combinaciones de atributos para recomendaciones específicas
+        if (objetivoFitness.equals("PERDIDA_DE_PESO") && experienciaEjercicio.equals("principiante") && edad < 20) {
+            recomendacion.append("Para perder peso siendo joven y principiante, mantén una dieta balanceada y comienza con ejercicios de baja intensidad. Aumenta gradualmente la intensidad y asegúrate de consumir suficientes nutrientes. ");
+        } else if (objetivoFitness.equals("GANANCIA_MUSCULAR") && experienciaEjercicio.equals("intermedio") && edad >= 20 && edad < 40) {
+            recomendacion.append("Para ganar masa muscular como intermedio en tus 20s o 30s, aumenta tu ingesta calórica con proteínas y varía tus rutinas. Descansa adecuadamente para la recuperación muscular. ");
+        } else if (objetivoFitness.equals("DEFINICION") && experienciaEjercicio.equals("avanzado") && edad >= 40) {
+            recomendacion.append("Para definir tus músculos como avanzado y mayor de 40, sigue una dieta equilibrada y realiza rutinas intensivas. Mantén la flexibilidad con ejercicios de bajo impacto. ");
+        } else {
+            // Recomendaciones generales si no se encuentra una combinación específica
+            switch (objetivoFitness) {
+                case "PERDIDA_DE_PESO":
+                    recomendacion.append("Para perder peso, mantén una dieta balanceada y un déficit calórico moderado. ");
                     break;
-                case "Creatina":
-                    recomendacion.append("La creatina puede ser beneficiosa para mejorar la fuerza y la potencia durante los entrenamientos de alta intensidad. ");
+                case "GANANCIA_MUSCULAR":
+                    recomendacion.append("Para ganar masa muscular, aumenta tu ingesta calórica con alimentos ricos en proteínas. ");
                     break;
-                case "Pre-entrenamientos":
-                    recomendacion.append("Los pre-entrenamientos pueden aumentar tu energía y mejorar el enfoque durante tus sesiones de ejercicio. ");
-                    break;
-                case "Recuperativos":
-                    recomendacion.append("Los suplementos recuperativos pueden acelerar la recuperación muscular y reducir el dolor post-entrenamiento. ");
-                    break;
-                case "Otros":
-                    recomendacion.append("Consulte con un profesional de la salud o un nutricionista para obtener recomendaciones específicas sobre el suplemento seleccionado. ");
+                case "DEFINICION":
+                    recomendacion.append("Para definir tus músculos, sigue una dieta equilibrada y variada. ");
                     break;
                 default:
-                    recomendacion.append("Considera incorporar el suplemento ").append(perfil.getSuplementos());
-                    recomendacion.append(" para complementar tu alimentación y apoyar tus objetivos de fitness. ");
+                    recomendacion.append("Establece un objetivo fitness claro para obtener recomendaciones más específicas. ");
+            }
+
+            switch (experienciaEjercicio) {
+                case "principiante":
+                    recomendacion.append("Como principiante, empieza con ejercicios de baja intensidad y aumenta gradualmente la carga. ");
+                    break;
+                case "intermedio":
+                    recomendacion.append("Como intermedio, varía tus rutinas para evitar el estancamiento y aumenta la intensidad. ");
+                    break;
+                case "avanzado":
+                    recomendacion.append("Como avanzado, desafía tus límites con rutinas intensivas y técnicas avanzadas. ");
+                    break;
+            }
+
+            if (genero != null && peso > 0) {
+                if (genero.equals("masculino")) {
+                    if (peso < 60) {
+                        recomendacion.append("Tu peso es bajo para un hombre, consume suficientes calorías y nutrientes. ");
+                    } else if (peso >= 60 && peso <= 90) {
+                        recomendacion.append("Tu peso está en el rango saludable para un hombre, mantén una dieta equilibrada. ");
+                    } else if (peso > 90) {
+                        recomendacion.append("Tu peso es alto, enfócate en una dieta balanceada y ejercicios cardiovasculares. ");
+                    }
+                } else if (genero.equals("femenino")) {
+                    if (peso < 50) {
+                        recomendacion.append("Tu peso es bajo para una mujer, consume suficientes calorías y nutrientes. ");
+                    } else if (peso >= 50 && peso <= 70) {
+                        recomendacion.append("Tu peso está en el rango saludable para una mujer, mantén una dieta equilibrada. ");
+                    } else if (peso > 70) {
+                        recomendacion.append("Tu peso es alto, enfócate en una dieta balanceada y ejercicios cardiovasculares. ");
+                    }
+                }
+            }
+
+            if (edad < 20) {
+                recomendacion.append("A tu edad, establece buenos hábitos de ejercicio y nutrición. Incorpora actividades variadas y divertidas. ");
+            } else if (edad >= 20 && edad < 40) {
+                recomendacion.append("En esta etapa, enfócate en construir y mantener tu masa muscular y capacidad cardiovascular. ");
+            } else if (edad >= 40 && edad < 60) {
+                recomendacion.append("A partir de los 40, mantén la flexibilidad y la salud cardiovascular con ejercicios de bajo impacto. ");
+            } else if (edad >= 60) {
+                recomendacion.append("A los 60 y más, enfócate en ejercicios de bajo impacto que mejoren la movilidad y el equilibrio. ");
+            }
+
+            if (suplementos != null && !suplementos.isEmpty() && !suplementos.equalsIgnoreCase("ninguno")) {
+                switch (suplementos) {
+                    case "Proteína de suero":
+                        recomendacion.append("La proteína de suero ayuda en la recuperación muscular. ");
+                        break;
+                    case "Creatina":
+                        recomendacion.append("La creatina mejora la fuerza y potencia. ");
+                        break;
+                    case "Pre-entrenamientos":
+                        recomendacion.append("Los pre-entrenamientos aumentan tu energía y enfoque. ");
+                        break;
+                    case "Recuperativos":
+                        recomendacion.append("Los recuperativos aceleran la recuperación muscular. ");
+                        break;
+                    case "Otros":
+                        recomendacion.append("Consulta con un profesional para recomendaciones específicas sobre suplementos. ");
+                        break;
+                    default:
+                        recomendacion.append("Considera incorporar el suplemento ").append(suplementos).append(" para apoyar tus objetivos. ");
+                }
             }
         }
 
-        // Recomendaciones adicionales según la edad
-        if (perfil.getEdad() < 20) {
-            recomendacion.append("A tu edad, es importante establecer buenos hábitos de ejercicio y nutrición desde temprano. Incorpora actividades variadas y divertidas para mantener el interés. ");
-        } else if (perfil.getEdad() >= 20 && perfil.getEdad() < 40) {
-            recomendacion.append("En esta etapa, enfócate en construir y mantener tu masa muscular y capacidad cardiovascular. Una rutina equilibrada con ejercicios de fuerza y cardio es ideal. ");
-        } else if (perfil.getEdad() >= 40 && perfil.getEdad() < 60) {
-            recomendacion.append("A partir de los 40, es crucial mantener la flexibilidad y la salud cardiovascular. Considera incluir ejercicios de bajo impacto y técnicas de recuperación como el yoga o el pilates. ");
-        } else if (perfil.getEdad() >= 60) {
-            recomendacion.append("Para mantenerte saludable a los 60 y más, enfócate en ejercicios de bajo impacto que mejoren la movilidad, el equilibrio y la fuerza. Consulta con un profesional de la salud antes de comenzar un nuevo régimen de ejercicio. ");
-        }
-
-        return recomendacion.toString();
+        return recomendacion.toString().trim(); // Trim para eliminar espacios en blanco adicionales
     }
 
 
