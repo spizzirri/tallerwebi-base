@@ -125,3 +125,18 @@ footer {
         font-size: 1rem; /* Adjust body text size for smaller screens */
     }
 }
+/* Definir los estilos para el select según el estado */
+.estado-no-empezado {
+    background-color: lightgray;
+    color: black;
+}
+
+.estado-incompleto {
+    background-color: lightcoral;
+    color: white;
+}
+
+.estado-completo {
+    background-color: lightgreen;
+    color: black;
+}

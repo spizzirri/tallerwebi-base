@@ -1,5 +1,6 @@
 package com.tallerwebi.presentacion;
 
+import com.tallerwebi.dominio.rutina.EstadoEjercicio;
 import com.tallerwebi.dominio.usuario.ServicioLogin;
 import com.tallerwebi.dominio.usuario.Usuario;
 import com.tallerwebi.dominio.objetivo.Objetivo;
@@ -67,7 +68,9 @@ public class ControladorRutina {
 
         try {
             DatosRutina rutina = servicioRutina.getRutinaActualDelUsuario(usuario);
+            List<EstadoEjercicio> estadosEjercicios = servicioRutina.getEstadosEjercicios(usuario, rutina);
             modelAndView.addObject("rutina", rutina);
+            modelAndView.addObject("estadosEjercicios", estadosEjercicios);
             modelAndView.setViewName("rutina");
         } catch (Exception e) {
             String objetivoFormateado = usuario.getObjetivo().formatear();
@@ -131,6 +134,18 @@ public class ControladorRutina {
         }
 
         return modelAndView;
+    }
+
+    @PostMapping("/actualizar-estado-ejercicio")
+    public String actualizarEstadoEjercicio(@RequestParam("idEjercicio") Long idEjercicio, @RequestParam("estado") EstadoEjercicio.Estado estado, HttpSession session) {
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+
+        servicioRutina.actualizarEstadoEjercicio(usuario, idEjercicio, estado);
+        return "redirect:/mi-rutina";
     }
 
 

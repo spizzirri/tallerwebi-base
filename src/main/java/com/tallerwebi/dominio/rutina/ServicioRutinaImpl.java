@@ -228,6 +228,17 @@ public class ServicioRutinaImpl implements ServicioRutina {
         this.repositorioRutina.liberarRutinaActivaDelUsuario(usuario);
     }
 
+    @Override
+    public void actualizarEstadoEjercicio(Usuario usuario, Long ejercicioId, EstadoEjercicio.Estado estado) {
+        repositorioRutina.actualizarEstadoEjercicio(usuario, ejercicioId, estado);
+    }
+
+
+    @Override
+    public List<EstadoEjercicio> getEstadosEjercicios(Usuario usuario, DatosRutina rutina) {
+        return repositorioRutina.findEstadosEjercicios(usuario, rutina);
+    }
+
     private List<DatosRutina> convertToDatosRutina(List<Rutina> rutinas) {
 
         List<DatosRutina> datosRutinas = new ArrayList<>();

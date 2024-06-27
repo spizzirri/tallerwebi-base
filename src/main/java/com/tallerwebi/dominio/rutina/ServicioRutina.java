@@ -46,4 +46,8 @@ public interface ServicioRutina {
     void asignarRutinaAUsuario(Rutina rutina, Usuario usuario) throws RutinaYaExisteException;
 
     void liberarRutinaActivaDelUsuario(Usuario usuario);
+
+    void actualizarEstadoEjercicio(Usuario usuario, Long ejercicioId, EstadoEjercicio.Estado estado);
+
+    List<EstadoEjercicio> getEstadosEjercicios(Usuario usuario, DatosRutina rutina);
 }
