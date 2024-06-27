@@ -50,4 +50,6 @@ public interface ServicioRutina {
     void actualizarEstadoEjercicio(Usuario usuario, Long ejercicioId, EstadoEjercicio.Estado estado);
 
     List<EstadoEjercicio> getEstadosEjercicios(Usuario usuario, DatosRutina rutina);
+
+    Rendimiento calcularRendimiento(List<EstadoEjercicio> estadosEjercicios);
 }

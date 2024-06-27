@@ -94,7 +94,7 @@ public class ControladorRutina {
                 servicioRutina.asignarRutinaAUsuario(rutina, usuario);
 
                 modelAndView.addObject("rutina", datosRutina);
-                modelAndView.setViewName("rutina");
+                modelAndView.setViewName("redirect:/mi-rutina");
             } else {
                 // Si el usuario o la rutina no existen, redirigir a la página de rutinas
                 modelAndView.setViewName("redirect:/objetivo");
