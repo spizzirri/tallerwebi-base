@@ -9,30 +9,26 @@
     <link rel="stylesheet" th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css}">
 </head>
 <body>
-<nav class="navbar navbar-expand-lg">
-    <div class="container-fluid d-flex justify-content-between align-items-center">
-        <div class="d-flex align-items-center">
+<header>
+    <nav class="navbar">
+        <div class="logo">
             <img th:src="@{/img/logoMagnusFitSolo.png}" alt="Logo" class="logo-img">
             <h1 class="logo-text">MagnusFit</h1>
         </div>
-        <div class="collapse navbar-collapse justify-content-center">
-
-            <ul class="nav-links">
-                <li><a th:action="@{/irAHome}" href="home">Inicio</a></li>
-                <li><a th:action="@{/irAMiRutina}" href="mi-rutina">Rutina</a></li>
-                <li><a th:action="@{/irAlimentacion}" href="alimentacion">Alimentación</a></li>
-                <li><a th:action="@{/irCalendario}" href="calendario">Calendario</a></li>
-
-            </ul>
-        </div>
+        <ul class="nav-links">
+            <li><a th:action="@{/irAHome}" href="home">Inicio</a></li>
+            <li><a th:action="@{/irAMiRutina}" href="mi-rutina">Rutina</a></li>
+            <li><a th:action="@{/irAlimentacion}" href="alimentacion">Alimentación</a></li>
+            <li><a th:action="@{/irCalendario}" href="calendario">Calendario</a></li>
+        </ul>
         <div class="user-profile">
             <a class="name-link-container" href="perfil" th:action="@{/irPerfil}">
                 <span th:text="${usuario != null ? usuario.nombre : 'nombre'}" class="name-link"></span>
                 <img th:src="@{/img/usuario.png}" alt="Usuario" class="user-img">
             </a>
         </div>
-    </div>
-</nav>
+    </nav>
+</header>
 <div class="p-5">
     <p th:if="${param.info != null}" class="alert alert-info" th:text="${param.info}"></p>
 </div>
