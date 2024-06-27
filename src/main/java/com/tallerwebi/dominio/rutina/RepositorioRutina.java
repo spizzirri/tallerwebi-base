@@ -3,6 +3,7 @@ package com.tallerwebi.dominio.rutina;
 import com.tallerwebi.dominio.usuario.Usuario;
 import com.tallerwebi.dominio.usuario.UsuarioRutina;
 import com.tallerwebi.dominio.objetivo.Objetivo;
+import com.tallerwebi.presentacion.DatosRutina;
 
 import java.util.List;
 
@@ -75,4 +76,8 @@ public interface RepositorioRutina {
     void guardarUsuarioRutina(UsuarioRutina usuarioRutina);
 
     Rutina getUltimaRutinaRealizadaPorUsuario(Usuario usuario);
+
+    void actualizarEstadoEjercicio(Usuario usuario, Long ejercicioId, EstadoEjercicio.Estado estado);
+
+    List<EstadoEjercicio> findEstadosEjercicios(Usuario usuario, DatosRutina rutina);
 }

@@ -53,25 +53,59 @@
                         <li class="list-group-item" th:each="ejercicio : ${rutina.ejercicios}">
                             <div class="row">
                                 <div class="col-md-6">
-                                    <p th:text="${ejercicio.nombre}"></p>
+                                    <p th:text="${ejercicio.nombre}" style="font-weight: bold"></p>
+                                    <p th:text="${ejercicio.descripcion}"></p>
                                 </div>
                                 <div class="col-md-6 text-end">
                                     <p th:text="${ejercicio.series + 'x' + ejercicio.repeticiones}"></p>
                                 </div>
                             </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <form th:action="@{/actualizar-estado-ejercicio}" method="post">
+                                        <!-- Hidden input for ejercicio id -->
+                                        <input type="hidden" name="idEjercicio" th:value="${ejercicio.idEjercicio}" />
+
+                                        <!-- Find corresponding estadoEjercicio for the current ejercicio -->
+                                        <th:block th:each="estado : ${estadosEjercicios}">
+                                            <th:block th:if="${estado.ejercicio.idEjercicio == ejercicio.idEjercicio}">
+                                                <p>Estado actual:
+                                                    <span th:text="${estado.estado.toString().replace('_',' ')}"
+                                                          th:class="${estado.estado.toString() == 'COMPLETO' ? 'estado-completo' :
+                                                                     (estado.estado.toString() == 'INCOMPLETO' ? 'estado-incompleto' :
+                                                                     'estado-no-empezado')}">
+                                                    </span>
+                                                </p>
+                                            </th:block>
+
+
+                                            <th:block th:if="${estado.ejercicio.idEjercicio == ejercicio.idEjercicio}">
+                                                <select name="estado">
+                                                    <option th:value="NO_EMPEZADO" th:selected="${estado.estado.toString() == 'NO_EMPEZADO'}"
+                                                            th:classappend="${estado.estado.toString() == 'NO_EMPEZADO' ? 'estado-no-empezado' : ''}">NO EMPEZADO</option>
+                                                    <option th:value="INCOMPLETO" th:selected="${estado.estado.toString() == 'INCOMPLETO'}"
+                                                            th:classappend="${estado.estado.toString() == 'INCOMPLETO' ? 'estado-incompleto' : ''}">INCOMPLETO</option>
+                                                    <option th:value="COMPLETO" th:selected="${estado.estado.toString() == 'COMPLETO'}"
+                                                            th:classappend="${estado.estado.toString() == 'COMPLETO' ? 'estado-completo' : ''}">COMPLETO</option>
+                                                </select>
+                                            </th:block>
+
+                                        </th:block>
+
+                                        <button type="submit" class="btn btn-primary">Actualizar</button>
+                                    </form>
+                                </div>
+                            </div>
                         </li>
                     </ul>
+                    <div class="text-center mt-3">
+                        <button type="button" class="btn btn-success">Guardar resultados</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<footer class="bg-light py-3 mt-auto">
-    <div class="container text-center">
-        <p>&copy; 2024 MagnusFit. Todos los derechos reservados.</p>
-    </div>
-</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 

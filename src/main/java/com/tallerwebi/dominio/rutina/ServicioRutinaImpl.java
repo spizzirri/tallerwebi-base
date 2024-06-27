@@ -228,6 +228,55 @@ public class ServicioRutinaImpl implements ServicioRutina {
         this.repositorioRutina.liberarRutinaActivaDelUsuario(usuario);
     }
 
+    @Override
+    public void actualizarEstadoEjercicio(Usuario usuario, Long ejercicioId, EstadoEjercicio.Estado estado) {
+        repositorioRutina.actualizarEstadoEjercicio(usuario, ejercicioId, estado);
+    }
+
+
+    @Override
+    public List<EstadoEjercicio> getEstadosEjercicios(Usuario usuario, DatosRutina rutina) {
+        return repositorioRutina.findEstadosEjercicios(usuario, rutina);
+    }
+
+    @Override
+    public Rendimiento calcularRendimiento(List<EstadoEjercicio> estadosEjercicios) {
+        int completos = 0;
+        int incompletos = 0;
+        int noEmpezados = 0;
+
+        for (EstadoEjercicio estado : estadosEjercicios) {
+            switch (estado.getEstado()) {
+                case COMPLETO:
+                    completos++;
+                    break;
+                case INCOMPLETO:
+                    incompletos++;
+                    break;
+                case NO_EMPEZADO:
+                    noEmpezados++;
+                    break;
+            }
+        }
+
+        int totalEjercicios = completos + incompletos + noEmpezados;
+
+        if (totalEjercicios == 0) {
+            return Rendimiento.BAJO; // Si no se encuentran ejercicios, devolver BAJO por defecto
+        }
+
+        double porcentajeCompletos = (double) completos / totalEjercicios;
+        double porcentajeIncompletos = (double) incompletos / totalEjercicios;
+
+        if (porcentajeCompletos > 0.75) {
+            return Rendimiento.ALTO;
+        } else if (porcentajeCompletos > 0.5 || porcentajeIncompletos < 0.5) {
+            return Rendimiento.MEDIO;
+        } else {
+            return Rendimiento.BAJO;
+        }
+    }
+
     private List<DatosRutina> convertToDatosRutina(List<Rutina> rutinas) {
 
         List<DatosRutina> datosRutinas = new ArrayList<>();
