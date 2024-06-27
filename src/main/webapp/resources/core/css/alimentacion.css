@@ -36,9 +36,11 @@
 .meal-wrapper{
     max-width: 1280px;
     margin: 0 auto;
+    margin-top: 3rem;
     padding: 2rem;
     background: #fff;
     text-align: center;
+    border-radius: 8px;
 }
 .meal-search{
     margin: 2rem 0;
