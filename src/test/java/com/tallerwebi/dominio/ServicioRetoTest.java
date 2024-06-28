@@ -35,7 +35,7 @@ public class ServicioRetoTest {
 
     @Test
     public void queSePuedaObtenerRetoDisponible() {
-        // Crear un reto de ejemplo
+        // preparación
         Reto retoMock = new Reto("Reto de Ejemplo", "Descripción del reto de ejemplo");
         retoMock.setId(1L);
         retoMock.setSeleccionado(false);

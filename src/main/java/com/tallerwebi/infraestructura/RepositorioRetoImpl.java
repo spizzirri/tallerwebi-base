@@ -13,7 +13,6 @@ import java.util.List;
 @Repository("repositorioReto")
 public class RepositorioRetoImpl implements RepositorioReto {
 
-    @Autowired
     private SessionFactory sessionFactory;
 
     @Autowired

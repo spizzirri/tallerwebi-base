@@ -1,5 +1,6 @@
 package com.tallerwebi.dominio.reto;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -10,11 +11,11 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
-@Transactional
 public class ServicioRetoImpl implements ServicioReto{
 
     private RepositorioReto repositorioReto;
 
+    @Autowired
     public ServicioRetoImpl(RepositorioReto repositorioReto){
         this.repositorioReto = repositorioReto;
     }
@@ -30,7 +31,6 @@ public class ServicioRetoImpl implements ServicioReto{
     }
 
     @Override
-    @Transactional
     public void empezarRetoActualizado(Long retoId) {
         Reto reto = repositorioReto.obtenerRetoPorId(retoId);
         if (reto != null) {
@@ -52,7 +52,6 @@ public class ServicioRetoImpl implements ServicioReto{
     }
 
     @Override
-    @Transactional
     public Long terminarReto(Long retoId) {
         Reto reto = repositorioReto.obtenerRetoPorId(retoId);
         long diasPasados = 0;

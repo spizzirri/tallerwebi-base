@@ -28,10 +28,10 @@ public class ServicioRutinaImpl implements ServicioRutina {
     }
 
     @Override
-    public boolean agregarRutina(Rutina rutina) throws RutinaYaExisteException{
+    public boolean agregarRutina(Rutina rutina) throws RutinaYaExisteException, RutinaInvalidaException {
 
         if (rutina == null || rutina.getNombre() == null || rutina.getNombre().isEmpty() || rutina.getObjetivo() == null ) {
-           return false;
+            throw new RutinaInvalidaException();
         }
 
         if (this.repositorioRutina.buscarRutinaPorId(rutina.getIdRutina()) != null) {
@@ -43,10 +43,10 @@ public class ServicioRutinaImpl implements ServicioRutina {
     }
 
     @Override
-    public boolean agregarEjercicio(Ejercicio ejercicio) throws EjercicioYaExisteException {
+    public boolean agregarEjercicio(Ejercicio ejercicio) throws EjercicioYaExisteException, EjercicioInvalidoException {
         if (ejercicio == null || ejercicio.getNombre() == null || ejercicio.getNombre().isEmpty() || ejercicio.getObjetivo() == null
             || ejercicio.getGrupoMuscularObjetivo() == null || ejercicio.getSeries() <= 0 || ejercicio.getRepeticiones() <= 0) {
-            return false;
+            throw new EjercicioInvalidoException();
         }
 
         if (this.repositorioRutina.buscarEjercicioPorId(ejercicio.getIdEjercicio()) != null) {

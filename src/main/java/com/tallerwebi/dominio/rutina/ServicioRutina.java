@@ -11,9 +11,9 @@ public interface ServicioRutina {
 
     List<DatosRutina> getRutinas ();
 
-    boolean agregarRutina(Rutina rutina) throws RutinaYaExisteException;
+    boolean agregarRutina(Rutina rutina) throws RutinaYaExisteException, RutinaInvalidaException;
 
-    boolean agregarEjercicio(Ejercicio ejercicio) throws EjercicioYaExisteException;
+    boolean agregarEjercicio(Ejercicio ejercicio) throws EjercicioYaExisteException, EjercicioInvalidoException;
 
     boolean eliminarRutina(Rutina rutina) throws RutinaNoEncontradaException;
 

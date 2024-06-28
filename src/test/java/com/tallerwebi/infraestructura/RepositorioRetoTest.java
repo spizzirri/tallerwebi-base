@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.transaction.Transactional;
 import com.tallerwebi.dominio.reto.RepositorioReto;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -28,8 +29,8 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {HibernateTestInfraestructuraConfig.class})
+@ExtendWith(SpringExtension.class) //Esta anotación principal se encarga de garantizar que el contexto para la db se instancie correctamente
+@ContextConfiguration(classes = {HibernateTestInfraestructuraConfig.class}) //
 public class RepositorioRetoTest {
 
     private RepositorioReto repositorioReto;
@@ -44,6 +45,7 @@ public class RepositorioRetoTest {
 
     @Test
     @Transactional
+    @Rollback
     public void queAlObtenerRetoDisponibleSeObtengaUnRetoEnSeleccionadoFalse() {
         Reto reto = repositorioReto.obtenerRetoDisponible();
         assertNotNull(reto, "El método obtenerRetoDisponible no debe devolver null.");
@@ -52,6 +54,7 @@ public class RepositorioRetoTest {
 
     @Test
     @Transactional
+    @Rollback
     public void queAlEmpezarRetoActualizarSeActualiceSuSeleccionadoYEnProceso() {
         Reto reto = repositorioReto.obtenerRetoDisponible();
         reto.setSeleccionado(true);
@@ -67,6 +70,7 @@ public class RepositorioRetoTest {
 
     @Test
     @Transactional
+    @Rollback
     public void queObtenerRetoPorIdDevuelvaElRetoPorId() {
         Long retoId = 181l;
         // Obtener el reto por ID
@@ -77,6 +81,7 @@ public class RepositorioRetoTest {
 
     @Test
     @Transactional
+    @Rollback
     public void queObtenerRetoEnProcesoDevuelvaElRetoCorrecto() {
         // Crear un objeto Reto y establecerlo como seleccionado y en proceso
         Reto retoEnProceso = new Reto();
@@ -99,6 +104,7 @@ public class RepositorioRetoTest {
 
     @Test
     @Transactional
+    @Rollback
     public void queAlTerminarRetoSePuedaActualizarSuAtributoSeleccionYEnProceso() {
         // Arrange
         Reto reto = repositorioReto.obtenerRetoDisponible();

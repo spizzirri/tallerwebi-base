@@ -16,17 +16,11 @@ public class HibernateTestInfraestructuraConfig {
     @Bean
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
-        dataSource.setUrl("jdbc:mysql://localhost:3308/magnusfit_tw1");
-        dataSource.setUsername("root");
+        dataSource.setDriverClassName("org.hsqldb.jdbcDriver");
+        dataSource.setUrl("jdbc:hsqldb:mem:db_");
+        dataSource.setUsername("sa");
         dataSource.setPassword("");
         return dataSource;
-//        DriverManagerDataSource dataSource = new DriverManagerDataSource();
-//        dataSource.setDriverClassName("org.hsqldb.jdbcDriver");
-//        dataSource.setUrl("jdbc:hsqldb:mem:db_");
-//        dataSource.setUsername("sa");
-//        dataSource.setPassword("");
-//        return dataSource;
     }
 
     @Bean

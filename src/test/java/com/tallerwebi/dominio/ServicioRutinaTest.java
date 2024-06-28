@@ -3,6 +3,7 @@ package com.tallerwebi.dominio;
 import com.tallerwebi.dominio.excepcion.*;
 import com.tallerwebi.dominio.objetivo.GrupoMuscularObjetivo;
 import com.tallerwebi.dominio.objetivo.Objetivo;
+import com.tallerwebi.dominio.reto.ServicioReto;
 import com.tallerwebi.dominio.rutina.*;
 import com.tallerwebi.dominio.usuario.Usuario;
 import com.tallerwebi.presentacion.DatosRutina;
@@ -272,7 +273,7 @@ public class ServicioRutinaTest {
     @Test
     @Transactional
     @Rollback
-    public void QueSePuedaAgregarUnaRutina() throws RutinaYaExisteException {
+    public void QueSePuedaAgregarUnaRutina() throws RutinaYaExisteException, RutinaInvalidaException {
         // Preparación
         Rutina rutinaMock = new Rutina("Rutina de pecho",Objetivo.GANANCIA_MUSCULAR);
         rutinaMock.setIdRutina(2L);

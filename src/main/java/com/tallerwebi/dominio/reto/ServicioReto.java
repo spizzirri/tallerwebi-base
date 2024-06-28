@@ -3,7 +3,7 @@ package com.tallerwebi.dominio.reto;
 import com.tallerwebi.dominio.calendario.ItemRendimiento;
 
 import javax.transaction.Transactional;
-
+@Transactional
 public interface ServicioReto {
 
     Reto obtenerRetoDisponible();
