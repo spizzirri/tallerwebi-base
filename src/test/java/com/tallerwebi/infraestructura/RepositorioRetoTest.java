@@ -15,11 +15,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import com.tallerwebi.dominio.reto.RepositorioReto;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.time.LocalDate;
 
 import static javax.management.Query.eq;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -46,22 +50,43 @@ public class RepositorioRetoTest {
     @Test
     @Transactional
     @Rollback
-    public void queAlObtenerRetoDisponibleSeObtengaUnRetoEnSeleccionadoFalse() {
+    public void queAlObtenerRetoDisponibleSeObtengaUnRetoConSuAtributoSeleccionadoEnFalse() {
         Reto reto = repositorioReto.obtenerRetoDisponible();
         assertNotNull(reto, "El método obtenerRetoDisponible no debe devolver null.");
         assertFalse(reto.getSeleccionado(), "El reto devuelto debe tener seleccionado en false.");
     }
 
+    private Reto dadoQueExistenRetosEnLaBaseDeDatos() {
+        LocalDate fecha = LocalDate.now();
+        Reto retoGuardado = new Reto("nombre","descripcion", "descripcion", fecha);
+        this.repositorioReto.guardarReto(retoGuardado);
+
+        return  retoGuardado;
+    }
+
     @Test
     @Transactional
     @Rollback
-    public void queAlEmpezarRetoActualizarSeActualiceSuSeleccionadoYEnProceso() {
-        Reto reto = repositorioReto.obtenerRetoDisponible();
+    public void queAlActualizarUnRetoConSeleccionadoEnFalseYEnProcesoEnFalseSePuedanCambiarSusAtributosYQuedenGuardadosDadoQueYaHayRetosCargadosEnLaBaseDeDatos() {
+        //preparacion
+        Reto reto = dadoQueExistenRetosEnLaBaseDeDatos();
+
+        Session session = sessionFactory.getCurrentSession();
+        String hql = "FROM Reto WHERE seleccionado = false ORDER BY rand()";
+        Query<Reto> query = session.createQuery(hql, Reto.class).setMaxResults(1);
+        reto = query.uniqueResult();
+
         reto.setSeleccionado(true);
         reto.setEnProceso(true);
-        // Guardar el reto en la base de datos
+
+        //ejecucion
         repositorioReto.actualizarReto(reto);
-        Reto retoEnLaBd = repositorioReto.obtenerRetoPorId(reto.getId());
+
+        Query<Reto> queryActualizado = session.createQuery("FROM Reto WHERE id = :id", Reto.class);
+        queryActualizado.setParameter("id", reto.getId());
+        Reto retoEnLaBd = queryActualizado.getSingleResult();
+
+        // verificacion
         assertNotNull(retoEnLaBd, "El reto guardado no debe ser null.");
         assertTrue(retoEnLaBd.getSeleccionado(), "El reto guardado debe ser seleccionado.");
         assertTrue(retoEnLaBd.getEnProceso(), "El reto guardado debe estar en true enProceso.");

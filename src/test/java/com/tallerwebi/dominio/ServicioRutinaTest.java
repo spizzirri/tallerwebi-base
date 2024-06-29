@@ -314,7 +314,7 @@ public class ServicioRutinaTest {
     @Test
     @Transactional
     @Rollback
-    public void QueSePuedaAgregarUnEjercicio() throws EjercicioYaExisteException {
+    public void QueSePuedaAgregarUnEjercicio() throws EjercicioYaExisteException, EjercicioInvalidoException {
         // Preparación
         Ejercicio ejercicioMock = new Ejercicio("Press banca",Objetivo.GANANCIA_MUSCULAR,GrupoMuscularObjetivo.PECHO,4,12);
         ejercicioMock.setIdEjercicio(1L);
@@ -355,7 +355,7 @@ public class ServicioRutinaTest {
     @Test
     @Transactional
     @Rollback
-    public void QueNoSePuedaAgregarEjercicioPorqueNoTieneObjetivoDefinido() throws EjercicioYaExisteException {
+    public void QueNoSePuedaAgregarEjercicioPorqueNoTieneObjetivoDefinido() throws EjercicioYaExisteException, EjercicioInvalidoException {
         // Preparación
         Ejercicio ejercicioMock = new Ejercicio("Curl de biceps", null, GrupoMuscularObjetivo.BRAZOS, 4, 12);
 
@@ -368,7 +368,7 @@ public class ServicioRutinaTest {
     @Test
     @Transactional
     @Rollback
-    public void QueNoSePuedaAgregarEjercicioPorqueNoTieneNombre() throws EjercicioYaExisteException {
+    public void QueNoSePuedaAgregarEjercicioPorqueNoTieneNombre() throws EjercicioYaExisteException, EjercicioInvalidoException {
         // Preparación
         Ejercicio ejercicioMock = new Ejercicio(null, Objetivo.GANANCIA_MUSCULAR, GrupoMuscularObjetivo.BRAZOS, 4, 12);
 
@@ -379,7 +379,7 @@ public class ServicioRutinaTest {
     @Test
     @Transactional
     @Rollback
-    public void QueNoSePuedaAgregarEjercicioPorqueNoTieneGrupoMuscularObjetivo() throws EjercicioYaExisteException {
+    public void QueNoSePuedaAgregarEjercicioPorqueNoTieneGrupoMuscularObjetivo() throws EjercicioYaExisteException, EjercicioInvalidoException {
         // Preparación
         Ejercicio ejercicioMock = new Ejercicio("Curl de biceps", Objetivo.GANANCIA_MUSCULAR, null, 4, 12);
 
@@ -390,7 +390,7 @@ public class ServicioRutinaTest {
     @Test
     @Transactional
     @Rollback
-    public void QueNoSePuedaAgregarEjercicioPorqueNoTieneSeriesDefinidas() throws EjercicioYaExisteException {
+    public void QueNoSePuedaAgregarEjercicioPorqueNoTieneSeriesDefinidas() throws EjercicioYaExisteException, EjercicioInvalidoException {
         // Preparación
         Ejercicio ejercicioMock = new Ejercicio("Curl de biceps", Objetivo.GANANCIA_MUSCULAR, GrupoMuscularObjetivo.BRAZOS, 0, 12);
 
@@ -401,7 +401,7 @@ public class ServicioRutinaTest {
     @Test
     @Transactional
     @Rollback
-    public void QueNoSePuedaAgregarEjercicioPorqueNoTieneRepeticionesDefinidas() throws EjercicioYaExisteException {
+    public void QueNoSePuedaAgregarEjercicioPorqueNoTieneRepeticionesDefinidas() throws EjercicioYaExisteException, EjercicioInvalidoException {
         // Preparación
         Ejercicio ejercicioMock = new Ejercicio("Curl de biceps", Objetivo.GANANCIA_MUSCULAR, GrupoMuscularObjetivo.BRAZOS, 4, 0);
 

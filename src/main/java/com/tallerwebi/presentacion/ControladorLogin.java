@@ -83,6 +83,7 @@ public class ControladorLogin {
             modelAndView.setViewName("redirect:/login");
         }
         modelAndView.addObject("usuario", usuario);
+        session.setAttribute("usuario", usuario);
         // Obtener el ItemRendimiento más seleccionado
         DatosItemRendimiento itemMasSeleccionado = servicioLogin.obtenerItemMasSeleccionado();
 

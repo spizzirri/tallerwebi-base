@@ -52,6 +52,9 @@ public class Reto {
     public Reto(long l) {
     }
 
+    public Reto(String reto1, String descripcion, String imagen) {
+    }
+
 
     // Getters y setters
     public Long getId() {

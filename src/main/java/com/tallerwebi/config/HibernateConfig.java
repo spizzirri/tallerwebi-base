@@ -24,7 +24,7 @@ public class HibernateConfig {
 //        DriverManagerDataSource dataSource = new DriverManagerDataSource();
 //        dataSource.setDriverClassName("org.hsqldb.jdbcDriver");
 //        dataSource.setUrl("jdbc:hsqldb:mem:db_");
-//        dataSource.setUsername("sa");
+//        dataSource.setUsername("root");
 //        dataSource.setPassword("");
 //        return dataSource;
     }

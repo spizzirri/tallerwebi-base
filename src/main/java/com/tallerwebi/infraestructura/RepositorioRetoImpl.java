@@ -15,9 +15,17 @@ public class RepositorioRetoImpl implements RepositorioReto {
 
     private SessionFactory sessionFactory;
 
+
+
     @Autowired
     public RepositorioRetoImpl(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
+    }
+
+    @Override
+    public void guardarReto(Reto reto) {
+        Session session = sessionFactory.getCurrentSession();
+        session.save(reto);
     }
 
     @Override

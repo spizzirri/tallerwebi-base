@@ -6,6 +6,8 @@ import java.util.List;
 
 public interface RepositorioReto {
 
+    void guardarReto(Reto reto);
+
     Reto obtenerRetoDisponible();
 
     Reto obtenerRetoPorId(Long retoId);
