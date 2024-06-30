@@ -49,7 +49,6 @@ public class RepositorioRetoImpl implements RepositorioReto {
         session.flush(); // Sincronizar los cambios con la base de datos
     }
 
-
     @Override
     public Reto obtenerRetoEnProceso() {
         Session session = this.sessionFactory.getCurrentSession();

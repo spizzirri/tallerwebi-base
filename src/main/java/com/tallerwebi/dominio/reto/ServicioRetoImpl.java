@@ -74,14 +74,14 @@ public class ServicioRetoImpl implements ServicioReto{
             return 0L;
         }
         LocalDateTime fechaInicio = reto.getFechaInicio().atStartOfDay();
-        LocalDateTime fechaFin = fechaInicio.plusDays(2); // Suponiendo que el reto dura un día
+        LocalDateTime fechaFin = fechaInicio.plusDays(1).plusHours(23).plusMinutes(59);
         LocalDateTime fechaActual = LocalDateTime.now();
         Duration duracion = Duration.between(fechaActual, fechaFin);
         return duracion.toMinutes();
     }
 
 
-    public void reiniciarRetos() {
+    private void reiniciarRetos() {
         List<Reto> retos = repositorioReto.obtenerTodosLosRetos();
         for (Reto reto : retos) {
             reto.setSeleccionado(false);

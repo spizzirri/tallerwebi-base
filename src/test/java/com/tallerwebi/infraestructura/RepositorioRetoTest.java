@@ -24,6 +24,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static javax.management.Query.eq;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -183,6 +184,24 @@ public class RepositorioRetoTest {
         assertTrue(retoEnLaBd.getSeleccionado(), "El reto guardado debe ser seleccionado.");
         assertFalse(retoEnLaBd.getEnProceso(), "El reto guardado debe estar en true enProceso.");
     }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void dadoQueExistenRetosEnLaBaseDeDatosYRetosEnProcesoQueSePuedanObtenerTodosLosRetosDeLaBaseDeDatos() {
+        // preparación
+        dadoQueExistenRetosEnLaBaseDeDatos();
+        dadoQueExistenRetosEnProcesoEnLaBaseDeDatos();
+
+        // ejecución
+        List<Reto> todosLosRetos = repositorioReto.obtenerTodosLosRetos();
+
+        // verificación
+        assertThat(todosLosRetos.size(),equalTo(2));
+        assertNotNull(todosLosRetos, "La lista de retos no debería ser nula");
+        assertFalse(todosLosRetos.isEmpty(), "La lista de retos no debería estar vacía");
+    }
+
 
 
 }

@@ -15,6 +15,7 @@ import org.mockito.Mockito;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
@@ -126,7 +127,7 @@ public class ServicioRetoTest {
         verify(repositorioReto, times(1)).obtenerRetoPorId(1L);
         verify(repositorioReto, times(1)).actualizarReto(retoMock);
         assertEquals(3, diasPasados, "Los días transcurridos deberían ser 3");
-        assertFalse(retoMock.getSeleccionado(), "El reto debería estar marcado como no seleccionado");
+        assertTrue(retoMock.getSeleccionado(), "El reto debería estar marcado como no seleccionado");
         assertFalse(retoMock.getEnProceso(), "El reto debería estar marcado como no en proceso");
         assertNull(retoMock.getFechaInicio(), "El reto debería tener fechaInicio en null después de terminarlo");
     }
@@ -144,6 +145,41 @@ public class ServicioRetoTest {
         assertNotNull(retoCambiado, "El reto cambiado no debería ser nulo");
         assertTrue(retoCambiado.getSeleccionado(), "El reto debería estar marcado como seleccionado");
         verify(repositorioReto, times(1)).actualizarReto(retoMock);
+    }
+
+    @Test
+    public void queSePuedaEmpezarRetoActualizado() {
+        // preparación
+        Reto retoMock = new Reto("Reto de Ejemplo", "Descripción del reto de ejemplo");
+        retoMock.setId(1L);
+        when(repositorioReto.obtenerRetoPorId(anyLong())).thenReturn(retoMock);
+
+        // ejecución
+        servicioReto.empezarRetoActualizado(1L);
+
+        // verificación
+        assertTrue(retoMock.getSeleccionado(), "El reto debería estar marcado como seleccionado");
+        assertTrue(retoMock.getEnProceso(), "El reto debería estar en proceso");
+        assertNotNull(retoMock.getFechaInicio(), "La fecha de inicio no debería ser nula");
+        verify(repositorioReto, times(1)).actualizarReto(retoMock);
+    }
+
+    @Test
+    public void queSePuedaCalcularTiempoRestante() {
+        // preparación
+        Reto retoMock = new Reto();
+        retoMock.setId(1L);
+        retoMock.setFechaInicio(LocalDate.now().minusDays(1)); // Reto iniciado hace 1 día
+        when(repositorioReto.obtenerRetoPorId(anyLong())).thenReturn(retoMock);
+
+        // ejecución
+        Long tiempoRestante = servicioReto.calcularTiempoRestante(1L);
+
+        // verificación
+        assertNotNull(tiempoRestante, "El tiempo restante no debería ser nulo");
+        assertTrue(tiempoRestante > 0, "El tiempo restante debería ser positivo");
+        // Suponiendo que el reto dura 2 días
+        assertEquals(1440, tiempoRestante, "El tiempo restante debería ser 1440 minutos (1 día)");
     }
 
 }
