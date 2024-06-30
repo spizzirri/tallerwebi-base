@@ -50,6 +50,30 @@ public class RepositorioRetoTest {
     @Test
     @Transactional
     @Rollback
+    public void queSePuedaGuardarUnRetoEnLaBaseDeDatosYVerificarQueEsteGuardadoConSusAtributosIguales() {
+        //preparacion
+        LocalDate fecha = LocalDate.now();
+        Reto reto = new Reto("nombre","descripcion", "descripcion", fecha);
+
+        //ejecucion
+        repositorioReto.guardarReto(reto);
+
+        Session session = sessionFactory.getCurrentSession();
+        Query<Reto> queryActualizado = session.createQuery("FROM Reto WHERE id = :id", Reto.class);
+        queryActualizado.setParameter("id", reto.getId());
+        Reto retoGuardado = queryActualizado.getSingleResult();
+
+        //verificacion
+        assertThat(reto,equalTo(retoGuardado));
+        assertNotNull(retoGuardado);
+        assertEquals("nombre", retoGuardado.getNombre());
+        assertEquals("descripcion", retoGuardado.getDescripcion());
+    }
+
+
+    @Test
+    @Transactional
+    @Rollback
     public void queAlObtenerRetoDisponibleSeObtengaUnRetoConSuAtributoSeleccionadoEnFalse() {
         Reto reto = repositorioReto.obtenerRetoDisponible();
         assertNotNull(reto, "El método obtenerRetoDisponible no debe devolver null.");
@@ -96,51 +120,68 @@ public class RepositorioRetoTest {
     @Test
     @Transactional
     @Rollback
-    public void queObtenerRetoPorIdDevuelvaElRetoPorId() {
-        Long retoId = 181l;
-        // Obtener el reto por ID
-        Reto retoObtenido = repositorioReto.obtenerRetoPorId(retoId);
-        // Verificar que el ID y el estado seleccionado sean correctos
-        assertThat(retoObtenido.getId(), equalTo( retoId));
+    public void dadoQueExistenRetosEnLaBaseDeDatosSePuedaObetenerUnoEspecificoPorId() {
+        //preparacion
+        Reto reto = dadoQueExistenRetosEnLaBaseDeDatos();
+        //ejecucion
+        Reto retoObtenido = repositorioReto.obtenerRetoPorId(reto.getId());
+        //verificacion
+        assertThat(retoObtenido.getId(), equalTo(reto.getId()));
+    }
+
+    private Reto dadoQueExistenRetosEnProcesoEnLaBaseDeDatos() {
+        LocalDate fecha = LocalDate.now();
+        Reto retoEnProceso = new Reto("nombre","descripcion", "descripcion", fecha);
+        retoEnProceso.setSeleccionado(true);
+        retoEnProceso.setEnProceso(true);
+        this.repositorioReto.guardarReto(retoEnProceso);
+
+        return  retoEnProceso;
     }
 
     @Test
     @Transactional
     @Rollback
-    public void queObtenerRetoEnProcesoDevuelvaElRetoCorrecto() {
-        // Crear un objeto Reto y establecerlo como seleccionado y en proceso
-        Reto retoEnProceso = new Reto();
-        retoEnProceso.setNombre("Reto de Ejemplo");
-        retoEnProceso.setDescripcion("Descripción del reto de ejemplo");
-        retoEnProceso.setImagenUrl("img/reto/burpees.jpg");
-        retoEnProceso.setSeleccionado(true);
-        retoEnProceso.setEnProceso(true);
-        // Guardar el reto en la base de datos (si es necesario)
-        sessionFactory.getCurrentSession().save(retoEnProceso);
+    public void dadoQueExistenRetosEnProcesoEnLaBaseDeDatosQueAlObtenerUnRetoEnProcesoDevuelvaElRetoAdecuado() {
+        //preparacion
+        Reto retoEnProceso = dadoQueExistenRetosEnProcesoEnLaBaseDeDatos();
 
-        // Obtener el reto en proceso
+        //ejecucion
         Reto retoObtenido = repositorioReto.obtenerRetoEnProceso();
 
-        // Verificar que el reto obtenido no sea nulo y esté en proceso
+        //verificacion
+        assertThat(retoEnProceso,equalTo(retoObtenido));
         assertNotNull(retoObtenido, "El reto en proceso no debería ser nulo");
         assertTrue(retoObtenido.getSeleccionado(), "El reto en proceso debería estar seleccionado");
         assertTrue(retoObtenido.getEnProceso(), "El reto en proceso debería estar en proceso");
     }
 
+    private Reto dadoQueExistenRetosEnProcesoEnLaBaseDeDatosParaTerminar() {
+        LocalDate fecha = LocalDate.now();
+        Reto retoEnProceso = new Reto("nombre","descripcion", "descripcion", fecha);
+        retoEnProceso.setEnProceso(false);
+        retoEnProceso.setSeleccionado(true);
+        retoEnProceso.setFechaInicio(null);
+        this.repositorioReto.guardarReto(retoEnProceso);
+
+        return  retoEnProceso;
+    }
+
     @Test
     @Transactional
     @Rollback
-    public void queAlTerminarRetoSePuedaActualizarSuAtributoSeleccionYEnProceso() {
-        // Arrange
-        Reto reto = repositorioReto.obtenerRetoDisponible();
-        reto.setSeleccionado(true);
-        reto.setEnProceso(true);
-        // Guardar el reto en la base de datos
-        repositorioReto.actualizarReto(reto);
-        Reto retoEnLaBd = repositorioReto.obtenerRetoPorId(reto.getId());
+    public void dadoQueExistenRetosEnProcesoEnLaBaseDeDatosParaTerminarQueAlTerminarRetoSePuedaActualizarSuAtributosFechaYEnProceso() {
+        //preparacion
+        Reto retoEnProceso = dadoQueExistenRetosEnProcesoEnLaBaseDeDatosParaTerminar();
+
+        //ejecucion
+        Reto retoEnLaBd = repositorioReto.obtenerRetoPorId(retoEnProceso.getId());
+
+        //verificacion
+        assertThat(retoEnProceso,equalTo(retoEnLaBd));
         assertNotNull(retoEnLaBd, "El reto guardado no debe ser null.");
         assertTrue(retoEnLaBd.getSeleccionado(), "El reto guardado debe ser seleccionado.");
-        assertTrue(retoEnLaBd.getEnProceso(), "El reto guardado debe estar en true enProceso.");
+        assertFalse(retoEnLaBd.getEnProceso(), "El reto guardado debe estar en true enProceso.");
     }
 
 
