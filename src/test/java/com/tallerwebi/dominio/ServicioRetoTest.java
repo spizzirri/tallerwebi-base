@@ -35,95 +35,87 @@ public class ServicioRetoTest {
     }
 
     @Test
-    public void queSePuedaObtenerRetoDisponible() {
+    public void dadoQueExistenRetosGuardadosEnLaBaseDeDatosQueSePuedaTraerUnRetoDisponible() {
         // preparación
         Reto retoMock = new Reto("Reto de Ejemplo", "Descripción del reto de ejemplo");
         retoMock.setId(1L);
         retoMock.setSeleccionado(false);
 
-        // Configurar el mock para que devuelva el reto de ejemplo y marcarlo como seleccionado
         when(repositorioReto.obtenerRetoDisponible()).thenAnswer(invocation -> {
             retoMock.setSeleccionado(true);
             return retoMock;
         });
 
-        // Llamar al método del servicio
+        //ejecucion
         Reto retoObtenido = servicioReto.obtenerRetoDisponible();
 
-        // Verificar el resultado
+        //verificacion
         assertNotNull(retoObtenido, "El reto obtenido no debería ser nulo");
         assertEquals(retoMock.getId(), retoObtenido.getId(), "El ID del reto debería coincidir");
         assertEquals(retoMock.getNombre(), retoObtenido.getNombre(), "El nombre del reto debería coincidir");
         assertEquals(retoMock.getDescripcion(), retoObtenido.getDescripcion(), "La descripción del reto debería coincidir");
         assertTrue(retoObtenido.getSeleccionado(), "El reto debería estar marcado como seleccionado");
-
-        // Verificar que se llamó al método del repositorio
         verify(repositorioReto, times(1)).obtenerRetoDisponible();
     }
 
     @Test
-    public void queVerifiqueQueSePuedeObtenerRetoPorId() {
-        // Crear un reto simulado
+    public void dadoQueExistenRetosGuardadosEnLaBaseDeDatosQueSePuedaTraerUnRetoEspecificoPorId() {
+        //preparacion
         Reto retoSimulado = new Reto();
         retoSimulado.setId(1L);
         retoSimulado.setDescripcion("Descripción del reto");
         retoSimulado.setSeleccionado(true);
 
-        // Configurar el comportamiento simulado del repositorio
         when(repositorioReto.obtenerRetoPorId(anyLong())).thenReturn(retoSimulado);
 
-        // Llamar al método del servicio
+        //ejecucion
         Reto retoObtenido = servicioReto.obtenerRetoPorId(1L);
 
-        // Verificar los resultados
+        //verificacion
         assertNotNull(retoObtenido, "El reto obtenido no debería ser nulo");
         assertEquals(1L, retoObtenido.getId(), "El ID del reto obtenido debería ser 1");
         assertEquals("Descripción del reto", retoObtenido.getDescripcion(), "La descripción del reto debería ser 'Descripción del reto'");
-        assertEquals(true, retoObtenido.getSeleccionado(), "El reto debería estar marcado como seleccionado");
+        assertTrue(retoObtenido.getSeleccionado(), "El reto debería estar marcado como seleccionado");
     }
 
     @Test
-    public void queSePuedaObtenerRetoEnProceso() {
-        // Crear un reto de ejemplo
+    public void dadoQueExisteUnRetoEnProcesoEnLaBaseDeDatosQueSeLogreObtener() {
+        //preparacion
         Reto retoMock = new Reto();
         retoMock.setId(1L);
         retoMock.setDescripcion("Descripción del reto en proceso");
         retoMock.setSeleccionado(true);
         retoMock.setEnProceso(true);
 
-        // Configurar el mock para que devuelva el reto de ejemplo
         when(repositorioReto.obtenerRetoEnProceso()).thenReturn(retoMock);
 
-        // Llamar al método del servicio
+        //ejecucion
         Reto retoObtenido = servicioReto.obtenerRetoEnProceso();
 
-        // Verificar el resultado
+        //verificacion
         assertNotNull(retoObtenido, "El reto obtenido no debería ser nulo");
         assertEquals(retoMock.getId(), retoObtenido.getId(), "El ID del reto debería coincidir");
         assertEquals(retoMock.getDescripcion(), retoObtenido.getDescripcion(), "La descripción del reto debería coincidir");
         assertEquals(retoMock.getSeleccionado(), retoObtenido.getSeleccionado(), "El reto debería estar marcado como seleccionado");
         assertEquals(retoMock.getEnProceso(), retoObtenido.getEnProceso(), "El reto debería estar en proceso");
-
-        // Verificar que se llamó al método del repositorio
         verify(repositorioReto, times(1)).obtenerRetoEnProceso();
     }
 
     @Test
-    public void queTerminarRetoDevuelvaDiasTranscurridosYActualiceElReto() {
-        // Arrange
+    public void dadoQueExisteUnRetoEnProcesoTerminarRetoDevuelvaDiasTranscurridosYActualiceElReto() {
+        //preparacion
         Reto retoMock = new Reto();
         retoMock.setId(1L);
         retoMock.setSeleccionado(true);
         retoMock.setEnProceso(true);
         retoMock.setFechaInicio(LocalDate.now().minusDays(3));
 
-        // Configurar el comportamiento del repositorio
         when(repositorioReto.obtenerRetoPorId(anyLong())).thenReturn(retoMock);
 
-        // Act
+        //ejecucion
         long diasPasados = servicioReto.terminarReto(1L);
 
-        // Assert
+        //verificacion
         verify(repositorioReto, times(1)).obtenerRetoPorId(1L);
         verify(repositorioReto, times(1)).actualizarReto(retoMock);
         assertEquals(3, diasPasados, "Los días transcurridos deberían ser 3");
