@@ -32,9 +32,8 @@ public class ControladorReto {
         this.servicioLogin = servicioLogin;
     }
 
-
     @RequestMapping(path = "/empezar-reto", method = RequestMethod.POST)
-    public ModelAndView empezarReto(@RequestParam Long retoId,@RequestParam String email, @RequestParam String password, HttpSession session) {
+    public ModelAndView empezarReto(@RequestParam Long retoId, @RequestParam String email, @RequestParam String password, HttpSession session) {
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         if (usuario == null) {
             return new ModelAndView("redirect:/login");
@@ -56,19 +55,19 @@ public class ControladorReto {
                 modelAndView.addObject("minutosRestantes", minutosRestantes);
             }
 
-
             Usuario usuarioBuscado = servicioLogin.consultarUsuario(email, password);
             if (usuarioBuscado != null) {
                 modelAndView.addObject("usuario", usuarioBuscado);
             }
 
-        } catch (Exception e) {
+        } catch (NoSuchElementException e) {
+            modelAndView.addObject("error", "El reto no existe: " + e.getMessage());
+        } catch (RuntimeException e) {
             // Manejar el error mostrando un mensaje de error en la misma página
-            modelAndView.addObject("error", "An error occurred while starting the challenge: " + e.getMessage());
+            modelAndView.addObject("error", "Ocurrió un error al iniciar el reto: " + e.getMessage());
         }
         return modelAndView;
     }
-
 
 
     @RequestMapping(path = "/terminar-reto", method = RequestMethod.GET)
@@ -98,10 +97,11 @@ public class ControladorReto {
                 modelAndView.addObject("usuario", usuarioBuscado);
                 session.setAttribute("usuario", usuarioBuscado);
             }
-        } catch (Exception e) {
-            modelAndView.addObject("error", "An error occurred while finishing the challenge: " + e.getMessage());
+        } catch (NoSuchElementException e) {
+            modelAndView.addObject("error", "El reto no existe: " + e.getMessage());
+        } catch (RuntimeException e) {
+            modelAndView.addObject("error", "Ocurrió un error al terminar el reto: " + e.getMessage());
         }
-
         // Redirigir a /home después de la ejecución del método
         modelAndView.setViewName("redirect:/home");
         return modelAndView;
@@ -127,9 +127,11 @@ public class ControladorReto {
                 redirectAttributes.addFlashAttribute("error", "No se encontró un nuevo reto disponible.");
             }
         } catch (NoSuchElementException e) {
-            redirectAttributes.addFlashAttribute("error", "No se encontró un nuevo reto disponible.");
+            redirectAttributes.addFlashAttribute("error", "No se encontró un nuevo reto disponible: " + e.getMessage());
         } catch (NoCambiosRestantesException e) {
             redirectAttributes.addFlashAttribute("error", "No te quedan cambios. Debes terminar los retos.");
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("error", "Ocurrió un error al cambiar el reto: " + e.getMessage());
         }
 
         modelAndView.setViewName("redirect:/home");
