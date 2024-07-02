@@ -5,6 +5,6 @@ import javax.transaction.Transactional;
 import java.util.*;
 @Service
 @Transactional
-public class ServicioAlimentacionImpl extends ServicioAlimentacion {
+public class ServicioAlimentacionImpl implements ServicioAlimentacion {
 
 }
