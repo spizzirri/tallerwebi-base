@@ -1,5 +1,6 @@
 package com.tallerwebi.dominio.reto;
 
+import com.tallerwebi.dominio.excepcion.RetoNoEncontradoException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -71,14 +72,15 @@ public class ServicioRetoImpl implements ServicioReto{
     public Long calcularTiempoRestante(Long retoId) {
         Reto reto = repositorioReto.obtenerRetoPorId(retoId);
         if (reto == null || reto.getFechaInicio() == null) {
-            return 0L;
+            throw new RetoNoEncontradoException("Reto no encontrado.");
         }
         LocalDateTime fechaInicio = reto.getFechaInicio().atStartOfDay();
-        LocalDateTime fechaFin = fechaInicio.plusDays(1).plusHours(23).plusMinutes(59);
+        LocalDateTime fechaFin = fechaInicio.plusDays(2); // El reto dura 2 días completos
         LocalDateTime fechaActual = LocalDateTime.now();
         Duration duracion = Duration.between(fechaActual, fechaFin);
         return duracion.toMinutes();
     }
+
 
 
     private void reiniciarRetos() {

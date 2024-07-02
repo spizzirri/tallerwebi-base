@@ -4,6 +4,7 @@ import com.tallerwebi.dominio.calendario.ItemRendimiento;
 import com.tallerwebi.dominio.calendario.RepositorioCalendario;
 import com.tallerwebi.dominio.calendario.ServicioCalendarioImpl;
 import com.tallerwebi.dominio.calendario.TipoRendimiento;
+import com.tallerwebi.dominio.excepcion.RetoNoEncontradoException;
 import com.tallerwebi.dominio.reto.RepositorioReto;
 import com.tallerwebi.dominio.reto.Reto;
 import com.tallerwebi.dominio.reto.ServicioReto;
@@ -13,7 +14,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import javax.transaction.Transactional;
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -125,43 +128,54 @@ public class ServicioRetoTest {
     }
 
     @Test
-    public void queSePuedaCambiarReto() {
+    public void dadoQueExistenRetosEnLaBaseDeDatosYQueElUsuarioPoseaCambiosDisponiblesQuePuedaCambiarElRetoExistente() {
+        //preparacion
         Reto retoMock = new Reto();
         retoMock.setId(1L);
         retoMock.setSeleccionado(false);
 
         doNothing().when(repositorioReto).actualizarReto(any(Reto.class));
 
+        //ejecucion
         Reto retoCambiado = servicioReto.cambiarReto(retoMock);
 
+        //verificacion
         assertNotNull(retoCambiado, "El reto cambiado no debería ser nulo");
         assertTrue(retoCambiado.getSeleccionado(), "El reto debería estar marcado como seleccionado");
         verify(repositorioReto, times(1)).actualizarReto(retoMock);
     }
 
     @Test
-    public void queSePuedaEmpezarRetoActualizado() {
-        // preparación
+    public void dadoQueExisteElRetoEnLaBaseDeDatosYElUsuarioLoVeEnLaInterfazQuePuedaEmpezarElReto() {
+        //preparación
         Reto retoMock = new Reto("Reto de Ejemplo", "Descripción del reto de ejemplo");
         retoMock.setId(1L);
         when(repositorioReto.obtenerRetoPorId(anyLong())).thenReturn(retoMock);
 
-        // ejecución
+        //ejecución
         servicioReto.empezarRetoActualizado(1L);
 
-        // verificación
+        //verificación
         assertTrue(retoMock.getSeleccionado(), "El reto debería estar marcado como seleccionado");
         assertTrue(retoMock.getEnProceso(), "El reto debería estar en proceso");
         assertNotNull(retoMock.getFechaInicio(), "La fecha de inicio no debería ser nula");
         verify(repositorioReto, times(1)).actualizarReto(retoMock);
     }
 
+    private Long calcularTiempoRestanteEsperado(LocalDateTime fechaInicioMock) {
+        LocalDateTime fechaFin = fechaInicioMock.plusDays(2);
+        LocalDateTime fechaActual = LocalDateTime.now();
+        Duration duracionEsperada = Duration.between(fechaActual, fechaFin);
+        return duracionEsperada.toMinutes();
+    }
+
     @Test
-    public void queSePuedaCalcularTiempoRestante() {
+    public void dadoQueExisteElRetoEnProcesoEnLaBaseDeDatosQueSePuedaCalcularElTiempoRestanteDelMismoEnCurso() {
         // preparación
+        LocalDateTime fechaInicioMock = LocalDateTime.now().minusDays(1).withHour(0).withMinute(0).withSecond(0).withNano(0); // Reto iniciado hace exactamente 1 día
         Reto retoMock = new Reto();
         retoMock.setId(1L);
-        retoMock.setFechaInicio(LocalDate.now().minusDays(1)); // Reto iniciado hace 1 día
+        retoMock.setFechaInicio(fechaInicioMock.toLocalDate());
         when(repositorioReto.obtenerRetoPorId(anyLong())).thenReturn(retoMock);
 
         // ejecución
@@ -170,8 +184,22 @@ public class ServicioRetoTest {
         // verificación
         assertNotNull(tiempoRestante, "El tiempo restante no debería ser nulo");
         assertTrue(tiempoRestante > 0, "El tiempo restante debería ser positivo");
-        // Suponiendo que el reto dura 2 días
-        assertEquals(1440, tiempoRestante, "El tiempo restante debería ser 1440 minutos (1 día)");
+
+        Long tiempoRestanteEsperado = calcularTiempoRestanteEsperado(fechaInicioMock);
+
+        assertEquals(tiempoRestanteEsperado, tiempoRestante, "El tiempo restante debería ser el esperado");
+    }
+
+
+    @Test
+    public void dadoQueRetoNoExisteEnLaBaseDeDatosQueLanceRetoNoEncontradoException() {
+        // preparación
+        when(repositorioReto.obtenerRetoPorId(anyLong())).thenReturn(null);
+
+        // verificación
+        assertThrows(RetoNoEncontradoException.class, () -> {
+            servicioReto.calcularTiempoRestante(1L);
+        }, "Debería lanzar RetoNoEncontradoException cuando el reto no se encuentra o no tiene fecha de inicio");
     }
 
 }
