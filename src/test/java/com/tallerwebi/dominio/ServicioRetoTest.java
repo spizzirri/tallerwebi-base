@@ -49,10 +49,10 @@ public class ServicioRetoTest {
             return retoMock;
         });
 
-        //ejecucion
+        // ejecucion
         Reto retoObtenido = servicioReto.obtenerRetoDisponible();
 
-        //verificacion
+        // verificacion
         assertNotNull(retoObtenido, "El reto obtenido no debería ser nulo");
         assertEquals(retoMock.getId(), retoObtenido.getId(), "El ID del reto debería coincidir");
         assertEquals(retoMock.getNombre(), retoObtenido.getNombre(), "El nombre del reto debería coincidir");
@@ -63,7 +63,7 @@ public class ServicioRetoTest {
 
     @Test
     public void dadoQueExistenRetosGuardadosEnLaBaseDeDatosQueSePuedaTraerUnRetoEspecificoPorId() {
-        //preparacion
+        // preparacion
         Reto retoSimulado = new Reto();
         retoSimulado.setId(1L);
         retoSimulado.setDescripcion("Descripción del reto");
@@ -71,10 +71,10 @@ public class ServicioRetoTest {
 
         when(repositorioReto.obtenerRetoPorId(anyLong())).thenReturn(retoSimulado);
 
-        //ejecucion
+        // ejecucion
         Reto retoObtenido = servicioReto.obtenerRetoPorId(1L);
 
-        //verificacion
+        // verificacion
         assertNotNull(retoObtenido, "El reto obtenido no debería ser nulo");
         assertEquals(1L, retoObtenido.getId(), "El ID del reto obtenido debería ser 1");
         assertEquals("Descripción del reto", retoObtenido.getDescripcion(), "La descripción del reto debería ser 'Descripción del reto'");
@@ -82,8 +82,20 @@ public class ServicioRetoTest {
     }
 
     @Test
+    public void dadoQueRetoNoExisteObtenerRetoPorIdDeberiaLanzarRetoNoEncontradoException() {
+        // preparación
+        when(repositorioReto.obtenerRetoPorId(anyLong())).thenReturn(null);
+
+        // verificación
+        assertThrows(RetoNoEncontradoException.class, () -> {
+            servicioReto.obtenerRetoPorId(1L);
+        }, "Debería lanzar RetoNoEncontradoException cuando el reto no se encuentra");
+    }
+
+
+    @Test
     public void dadoQueExisteUnRetoEnProcesoEnLaBaseDeDatosQueSeLogreObtener() {
-        //preparacion
+        // preparacion
         Reto retoMock = new Reto();
         retoMock.setId(1L);
         retoMock.setDescripcion("Descripción del reto en proceso");
@@ -92,10 +104,10 @@ public class ServicioRetoTest {
 
         when(repositorioReto.obtenerRetoEnProceso()).thenReturn(retoMock);
 
-        //ejecucion
+        // ejecucion
         Reto retoObtenido = servicioReto.obtenerRetoEnProceso();
 
-        //verificacion
+        // verificacion
         assertNotNull(retoObtenido, "El reto obtenido no debería ser nulo");
         assertEquals(retoMock.getId(), retoObtenido.getId(), "El ID del reto debería coincidir");
         assertEquals(retoMock.getDescripcion(), retoObtenido.getDescripcion(), "La descripción del reto debería coincidir");
@@ -106,7 +118,7 @@ public class ServicioRetoTest {
 
     @Test
     public void dadoQueExisteUnRetoEnProcesoTerminarRetoDevuelvaDiasTranscurridosYActualiceElReto() {
-        //preparacion
+        // preparacion
         Reto retoMock = new Reto();
         retoMock.setId(1L);
         retoMock.setSeleccionado(true);
@@ -115,10 +127,10 @@ public class ServicioRetoTest {
 
         when(repositorioReto.obtenerRetoPorId(anyLong())).thenReturn(retoMock);
 
-        //ejecucion
+        // ejecucion
         long diasPasados = servicioReto.terminarReto(1L);
 
-        //verificacion
+        // verificacion
         verify(repositorioReto, times(1)).obtenerRetoPorId(1L);
         verify(repositorioReto, times(1)).actualizarReto(retoMock);
         assertEquals(3, diasPasados, "Los días transcurridos deberían ser 3");
@@ -129,17 +141,17 @@ public class ServicioRetoTest {
 
     @Test
     public void dadoQueExistenRetosEnLaBaseDeDatosYQueElUsuarioPoseaCambiosDisponiblesQuePuedaCambiarElRetoExistente() {
-        //preparacion
+        // preparacion
         Reto retoMock = new Reto();
         retoMock.setId(1L);
         retoMock.setSeleccionado(false);
 
         doNothing().when(repositorioReto).actualizarReto(any(Reto.class));
 
-        //ejecucion
+        // ejecucion
         Reto retoCambiado = servicioReto.cambiarReto(retoMock);
 
-        //verificacion
+        // verificacion
         assertNotNull(retoCambiado, "El reto cambiado no debería ser nulo");
         assertTrue(retoCambiado.getSeleccionado(), "El reto debería estar marcado como seleccionado");
         verify(repositorioReto, times(1)).actualizarReto(retoMock);
@@ -147,15 +159,15 @@ public class ServicioRetoTest {
 
     @Test
     public void dadoQueExisteElRetoEnLaBaseDeDatosYElUsuarioLoVeEnLaInterfazQuePuedaEmpezarElReto() {
-        //preparación
+        // preparación
         Reto retoMock = new Reto("Reto de Ejemplo", "Descripción del reto de ejemplo");
         retoMock.setId(1L);
         when(repositorioReto.obtenerRetoPorId(anyLong())).thenReturn(retoMock);
 
-        //ejecución
+        // ejecución
         servicioReto.empezarRetoActualizado(1L);
 
-        //verificación
+        // verificación
         assertTrue(retoMock.getSeleccionado(), "El reto debería estar marcado como seleccionado");
         assertTrue(retoMock.getEnProceso(), "El reto debería estar en proceso");
         assertNotNull(retoMock.getFechaInicio(), "La fecha de inicio no debería ser nula");
@@ -202,4 +214,61 @@ public class ServicioRetoTest {
         }, "Debería lanzar RetoNoEncontradoException cuando el reto no se encuentra o no tiene fecha de inicio");
     }
 
+    @Test
+    public void dadoQueNoExistenRetosDisponiblesSeReinicianLosRetosYSeObtieneUno() {
+        // preparación
+        when(repositorioReto.obtenerRetoDisponible()).thenReturn(null).thenReturn(new Reto());
+        doNothing().when(repositorioReto).actualizarReto(any(Reto.class));
+        when(repositorioReto.obtenerTodosLosRetos()).thenReturn(Arrays.asList(new Reto(), new Reto()));
+
+        // ejecución
+        Reto retoObtenido = servicioReto.obtenerRetoDisponible();
+
+        // verificación
+        assertNotNull(retoObtenido, "El reto obtenido no debería ser nulo");
+        verify(repositorioReto, times(2)).obtenerRetoDisponible();
+        verify(repositorioReto, times(1)).obtenerTodosLosRetos();
+        verify(repositorioReto, times(2)).actualizarReto(any(Reto.class));
+    }
+
+    @Test
+    public void dadoQueElRetoNoExisteAlEmpezarDeberiaLanzarRetoNoEncontradoException() {
+        // preparación
+        when(repositorioReto.obtenerRetoPorId(anyLong())).thenReturn(null);
+
+        // verificación
+        assertThrows(RetoNoEncontradoException.class, () -> {
+            servicioReto.empezarRetoActualizado(1L);
+        }, "Debería lanzar RetoNoEncontradoException cuando el reto no se encuentra");
+    }
+
+    @Test
+    public void dadoQueRetoNoTieneFechaDeInicioQueLanceRetoNoEncontradoException() {
+        // preparación
+        Reto retoMock = new Reto();
+        retoMock.setId(1L);
+        when(repositorioReto.obtenerRetoPorId(anyLong())).thenReturn(retoMock);
+
+        // verificación
+        assertThrows(RetoNoEncontradoException.class, () -> {
+            servicioReto.calcularTiempoRestante(1L);
+        }, "Debería lanzar RetoNoEncontradoException cuando el reto no tiene fecha de inicio");
+    }
+
+    @Test
+    public void dadoQueRetoEsNuloCambiarRetoDeberiaLanzarIllegalArgumentException() {
+        // preparación
+        Reto retoMock = null;
+
+        // verificación
+        assertThrows(IllegalArgumentException.class, () -> {
+            servicioReto.cambiarReto(retoMock);
+        }, "Debería lanzar IllegalArgumentException cuando el reto es nulo");
+
+        verify(repositorioReto, times(0)).actualizarReto(any(Reto.class));
+    }
+
+
 }
+
+

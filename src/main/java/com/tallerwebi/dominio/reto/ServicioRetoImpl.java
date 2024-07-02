@@ -34,18 +34,25 @@ public class ServicioRetoImpl implements ServicioReto{
     @Override
     public void empezarRetoActualizado(Long retoId) {
         Reto reto = repositorioReto.obtenerRetoPorId(retoId);
-        if (reto != null) {
-            reto.setSeleccionado(true); // Marcar como seleccionado
-            reto.setEnProceso(true);
-            reto.setFechaInicio(LocalDate.now());
-            repositorioReto.actualizarReto(reto); // Actualizar el reto en el repositorio
+        if (reto == null) {
+            throw new RetoNoEncontradoException("Reto no encontrado.");
         }
+        reto.setSeleccionado(true); // Marcar como seleccionado
+        reto.setEnProceso(true);
+        reto.setFechaInicio(LocalDate.now());
+        repositorioReto.actualizarReto(reto); // Actualizar el reto en el repositorio
     }
+
 
     @Override
     public Reto obtenerRetoPorId(Long retoId) {
-        return repositorioReto.obtenerRetoPorId(retoId);
+        Reto reto = repositorioReto.obtenerRetoPorId(retoId);
+        if (reto == null) {
+            throw new RetoNoEncontradoException("Reto no encontrado.");
+        }
+        return reto;
     }
+
 
     @Override
     public Reto obtenerRetoEnProceso() {
@@ -94,12 +101,14 @@ public class ServicioRetoImpl implements ServicioReto{
 
     @Override
     public Reto cambiarReto(Reto reto) {
-        if (reto != null) {
-            reto.setSeleccionado(true);
-            repositorioReto.actualizarReto(reto);
+        if (reto == null) {
+            throw new IllegalArgumentException("El reto no puede ser nulo.");
         }
+        reto.setSeleccionado(true);
+        repositorioReto.actualizarReto(reto);
         return reto;
     }
+
 
 
 }
