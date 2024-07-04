@@ -54,7 +54,7 @@ public interface RepositorioRutina {
 
     List<Ejercicio> getEjerciciosDeRutina(Rutina rutina);
 
-    Rutina getRutinaActualDeLUsuario(Usuario usuario);
+    Rutina getRutinaActualDelUsuario(Usuario usuario);
 
     Ejercicio getEjercicioById(Long idEjercicio);
 

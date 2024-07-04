@@ -317,8 +317,13 @@ public class RepositorioRutinaImpl implements RepositorioRutina {
     }
 
     @Override
-    public Rutina getRutinaActualDeLUsuario(Usuario usuario) {
-        return null;
+    @Transactional
+    public Rutina getRutinaActualDelUsuario(Usuario usuario) {
+        String hql = "SELECT ur.rutina FROM UsuarioRutina ur WHERE ur.usuario = :usuario AND ur.activo = true";
+        return sessionFactory.getCurrentSession()
+                .createQuery(hql, Rutina.class)
+                .setParameter("usuario", usuario)
+                .uniqueResult();
     }
 
     @Override

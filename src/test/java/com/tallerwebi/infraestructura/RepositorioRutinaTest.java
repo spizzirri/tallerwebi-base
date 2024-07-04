@@ -76,6 +76,24 @@ public class RepositorioRutinaTest {
     @Test
     @Transactional
     @Rollback
+    public void queSePuedaGuardarUnUsuario(){
+        //preparacion
+        Usuario usuario = new Usuario("Lautaro",Objetivo.GANANCIA_MUSCULAR);
+
+        //ejecucion
+        this.repositorioRutina.guardarUsuario(usuario);
+
+        //verificacion
+        Usuario usuarioObtenido = (Usuario) this.sessionFactory.getCurrentSession()
+                .createQuery("FROM Usuario where nombre = 'Lautaro' AND objetivo = 'GANANCIA_MUSCULAR'")
+                .getSingleResult();
+        assertThat(usuarioObtenido,equalTo(usuario));
+
+    }
+
+    @Test
+    @Transactional
+    @Rollback
     public void quesePuedanObtenerRutinasDePerdidaDePeso() {
         // Preparación
         Rutina rutina1 = this.crearRutina("Rutina Cardio 1", Objetivo.PERDIDA_DE_PESO);
@@ -93,6 +111,30 @@ public class RepositorioRutinaTest {
         // Verificación
         assertThat(rutinasObtenidas.size(), equalTo(2));
         assertThat(rutinasObtenidas, containsInAnyOrder(rutina1, rutina2));
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void quesePuedanObtenerLosEjerciciosQueTieneUnaRutina() {
+        // Preparación
+        Rutina rutinaMock = this.crearRutina("Rutina Cardio 1", Objetivo.PERDIDA_DE_PESO);
+        Ejercicio ejercicioMock = new Ejercicio("Burpees",Objetivo.PERDIDA_DE_PESO, GrupoMuscularObjetivo.PIERNAS,4,12);
+        Ejercicio ejercicioMock2 = new Ejercicio("Burpees",Objetivo.PERDIDA_DE_PESO, GrupoMuscularObjetivo.PIERNAS,4,12);
+
+        sessionFactory.getCurrentSession().save(rutinaMock);
+        sessionFactory.getCurrentSession().save(ejercicioMock);
+        sessionFactory.getCurrentSession().save(ejercicioMock2);
+
+        this.repositorioRutina.guardarEjercicioEnRutina(ejercicioMock,rutinaMock);
+        this.repositorioRutina.guardarEjercicioEnRutina(ejercicioMock2,rutinaMock);
+
+        // Ejecución
+        List<Ejercicio> ejerciciosObtenidos = this.repositorioRutina.getEjerciciosDeRutina(rutinaMock);
+
+        // Verificación
+        assertThat(ejerciciosObtenidos.size(), equalTo(2));
+        assertThat(ejerciciosObtenidos, containsInAnyOrder(ejercicioMock, ejercicioMock2));
     }
 
 
@@ -239,7 +281,7 @@ public class RepositorioRutinaTest {
     @Transactional
     @Rollback
     @Test
-    public void queSePuedaSaberQueRutinasTieneElUsuario() throws UsuarioSinRutinasException {
+    public void queSePuedaObtenerLasRutinasQueTieneAsignadasUnUsuario() throws UsuarioSinRutinasException {
         // Preparación
         Usuario usuario = new Usuario("Lautaro", Objetivo.GANANCIA_MUSCULAR);
         Rutina rutinaPecho = crearRutina("Rutina de volumen - PECHO", Objetivo.GANANCIA_MUSCULAR);
@@ -267,7 +309,7 @@ public class RepositorioRutinaTest {
     @Test
     @Transactional
     @Rollback
-    public void queSePuedaBuscarUnaRutinaEnUnUsuario() throws UsuarioNoTieneLaRutinaBuscadaException {
+    public void queSePuedaSaberSiUnaRutinaFueAsignadaAUnUsuario() throws UsuarioNoTieneLaRutinaBuscadaException {
         //p
         Rutina rutinaMock = crearRutina("Volumen",Objetivo.GANANCIA_MUSCULAR);
         Usuario usuarioMock = new Usuario("Lautaro", Objetivo.GANANCIA_MUSCULAR);
@@ -318,7 +360,22 @@ public class RepositorioRutinaTest {
     @Test
     @Transactional
     @Rollback
-    public void queSePuedaBuscarUnUsuarioPorSuId() {
+    public void queSePuedaBuscarUnEjercicioPorSuId() {
+        //p
+        Ejercicio ejercicioMock = new Ejercicio("Curl de biceps", Objetivo.GANANCIA_MUSCULAR, GrupoMuscularObjetivo.BRAZOS, 4, 12);
+
+        //e
+        this.repositorioRutina.guardarEjercicio(ejercicioMock);
+        Ejercicio ejercicioObtenido = this.repositorioRutina.buscarEjercicioPorId(ejercicioMock.getIdEjercicio());
+
+        //v
+        assertThat(ejercicioObtenido, equalTo(ejercicioMock));
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void queSePuedaObtenerUnUsuarioPorSuId() {
         //p
         Usuario usuarioMock = new Usuario("Lautaro", Objetivo.PERDIDA_DE_PESO);
 
@@ -334,7 +391,7 @@ public class RepositorioRutinaTest {
     @Test
     @Transactional
     @Rollback
-    public void queSePuedaObtenerLasRutinasQueLeInteresanAlUsuarioSegunSuObjetivo()  {
+    public void queSePuedanObtenerTodasLasRutinasConElMismoObjetivoQueElUsuarioTiene()  {
         //p
         Rutina rutinaVolumen = crearRutina("Volumen",Objetivo.GANANCIA_MUSCULAR);
         Rutina rutinaCardio1= crearRutina("Rutina de cardio - caminar",Objetivo.PERDIDA_DE_PESO);
@@ -359,7 +416,7 @@ public class RepositorioRutinaTest {
     @Test
     @Transactional
     @Rollback
-    public void queSePuedaEliminarEjercicioDeRutina() {
+    public void queSePuedaEliminarUnEjercicioDeUnaRutina() {
         // Preparación
         Rutina rutina = crearRutina("Volumen", Objetivo.GANANCIA_MUSCULAR);
         Ejercicio ejercicio = new Ejercicio("Curl de biceps", Objetivo.GANANCIA_MUSCULAR, GrupoMuscularObjetivo.BRAZOS, 4, 12);
@@ -381,7 +438,7 @@ public class RepositorioRutinaTest {
     @Test
     @Transactional
     @Rollback
-    public void queSePuedaEliminarRutinaDeUsuario() {
+    public void queSePuedaEliminarUnaRutinaDeUnUsuario() {
         // Preparación
         Usuario usuario = new Usuario("Juan", Objetivo.GANANCIA_MUSCULAR);
         Rutina rutina = crearRutina("Volumen", Objetivo.GANANCIA_MUSCULAR);
@@ -399,6 +456,27 @@ public class RepositorioRutinaTest {
         List<Rutina> rutinas = repositorioRutina.getRutinasDeUsuario(usuario);
         assertFalse(rutinas.contains(rutina));
     }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void queSePuedaObtenerLaRutinaActivaDelUsuario() {
+        // Preparación
+        Usuario usuarioMock = new Usuario("Juan", Objetivo.GANANCIA_MUSCULAR);
+        Rutina rutinaMock = crearRutina("Volumen", Objetivo.GANANCIA_MUSCULAR);
+
+        repositorioRutina.guardarUsuario(usuarioMock);
+        repositorioRutina.guardarRutina(rutinaMock);
+        repositorioRutina.asignarRutinaAUsuario(rutinaMock, usuarioMock);
+
+        // Ejecución
+        Rutina rutinaObtenida = repositorioRutina.getRutinaActualDelUsuario(usuarioMock);
+
+        // Verificación
+        assertNotNull(rutinaObtenida);
+        assertThat(rutinaObtenida, equalTo(rutinaMock));
+    }
+
 
     @Test
     @Transactional
