@@ -1,5 +1,6 @@
 package com.tallerwebi.dominio.reto;
 
+import com.tallerwebi.dominio.excepcion.RetoNoEncontradoException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,18 +34,25 @@ public class ServicioRetoImpl implements ServicioReto{
     @Override
     public void empezarRetoActualizado(Long retoId) {
         Reto reto = repositorioReto.obtenerRetoPorId(retoId);
-        if (reto != null) {
-            reto.setSeleccionado(true); // Marcar como seleccionado
-            reto.setEnProceso(true);
-            reto.setFechaInicio(LocalDate.now());
-            repositorioReto.actualizarReto(reto); // Actualizar el reto en el repositorio
+        if (reto == null) {
+            throw new RetoNoEncontradoException("Reto no encontrado.");
         }
+        reto.setSeleccionado(true); // Marcar como seleccionado
+        reto.setEnProceso(true);
+        reto.setFechaInicio(LocalDate.now());
+        repositorioReto.actualizarReto(reto); // Actualizar el reto en el repositorio
     }
+
 
     @Override
     public Reto obtenerRetoPorId(Long retoId) {
-        return repositorioReto.obtenerRetoPorId(retoId);
+        Reto reto = repositorioReto.obtenerRetoPorId(retoId);
+        if (reto == null) {
+            throw new RetoNoEncontradoException("Reto no encontrado.");
+        }
+        return reto;
     }
+
 
     @Override
     public Reto obtenerRetoEnProceso() {
@@ -71,17 +79,18 @@ public class ServicioRetoImpl implements ServicioReto{
     public Long calcularTiempoRestante(Long retoId) {
         Reto reto = repositorioReto.obtenerRetoPorId(retoId);
         if (reto == null || reto.getFechaInicio() == null) {
-            return 0L;
+            throw new RetoNoEncontradoException("Reto no encontrado.");
         }
         LocalDateTime fechaInicio = reto.getFechaInicio().atStartOfDay();
-        LocalDateTime fechaFin = fechaInicio.plusDays(2); // Suponiendo que el reto dura un día
+        LocalDateTime fechaFin = fechaInicio.plusDays(2); // El reto dura 2 días completos
         LocalDateTime fechaActual = LocalDateTime.now();
         Duration duracion = Duration.between(fechaActual, fechaFin);
         return duracion.toMinutes();
     }
 
 
-    public void reiniciarRetos() {
+
+    private void reiniciarRetos() {
         List<Reto> retos = repositorioReto.obtenerTodosLosRetos();
         for (Reto reto : retos) {
             reto.setSeleccionado(false);
@@ -92,12 +101,14 @@ public class ServicioRetoImpl implements ServicioReto{
 
     @Override
     public Reto cambiarReto(Reto reto) {
-        if (reto != null) {
-            reto.setSeleccionado(true);
-            repositorioReto.actualizarReto(reto);
+        if (reto == null) {
+            throw new IllegalArgumentException("El reto no puede ser nulo.");
         }
+        reto.setSeleccionado(true);
+        repositorioReto.actualizarReto(reto);
         return reto;
     }
+
 
 
 }

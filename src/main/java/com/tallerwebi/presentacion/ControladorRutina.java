@@ -30,14 +30,14 @@ public class ControladorRutina {
     }
 
     @RequestMapping(path = "/rutinas", method = RequestMethod.GET)
-    public ModelAndView VerRutinasQueLeInteresanAlUsuario(@RequestParam("objetivo") String objetivo, HttpSession session) {
+    public ModelAndView verRutinasQueLeInteresanAlUsuario(@RequestParam("objetivo") String objetivo, HttpSession session) {
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         if (usuario == null) {
             return new ModelAndView("redirect:/login");
         }
 
         ModelAndView modelAndView = new ModelAndView("rutinas");
-
+        modelAndView.addObject("usuario", usuario);
         Objetivo objetivoEnum;
         try {
             objetivoEnum = Objetivo.valueOf(objetivo);
@@ -57,6 +57,7 @@ public class ControladorRutina {
     public ModelAndView irAMiRutina(HttpSession session) {
         ModelAndView modelAndView = new ModelAndView();
         Usuario usuario = (Usuario) session.getAttribute("usuario");
+        modelAndView.addObject("usuario", usuario);
 
         if (usuario == null) {
             return new ModelAndView("redirect:/login");
@@ -86,7 +87,7 @@ public class ControladorRutina {
 
         try {
             Usuario usuario = (Usuario) session.getAttribute("usuario");
-
+            modelAndView.addObject("usuario", usuario);
             Rutina rutina = servicioRutina.getRutinaById(id);
             DatosRutina datosRutina = servicioRutina.getDatosRutinaById(id);
 
@@ -113,7 +114,7 @@ public class ControladorRutina {
 
         try {
             Usuario usuario = (Usuario) session.getAttribute("usuario");
-
+            modelAndView.addObject("usuario", usuario);
             Rutina rutina = servicioRutina.getRutinaById(id);
             DatosRutina datosRutina = servicioRutina.getDatosRutinaById(id);
             modelAndView.addObject("rutina", datosRutina);
