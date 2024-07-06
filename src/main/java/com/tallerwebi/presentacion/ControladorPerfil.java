@@ -91,4 +91,11 @@ public class ControladorPerfil {
 
         return modelAndView;
     }
+
+    @RequestMapping(path = "/cerrar-sesion", method = RequestMethod.POST)
+    public String cerrarSesion(HttpSession session) {
+        session.invalidate();
+        return "redirect:/login";
+    }
+
 }

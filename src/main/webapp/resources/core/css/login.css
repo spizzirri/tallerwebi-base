@@ -1,0 +1,77 @@
+body{
+ background-image: linear-gradient( 89.7deg,  rgba(0,0,0,1) -10.7%, rgba(53,92,125,1) 88.8% ) !important;
+  animation: gradientAnimation 15s ease infinite;
+             background-size: 400% 400%;
+}
+
+.custom-shape {
+            position: absolute;
+            width: 300%;
+            height: 300%;
+            top: -100%;
+            left: -100%;
+            background-color: #4f46e5;
+            clip-path: polygon(0 25%, 100% 0%, 100% 100%, 0% 100%);
+            animation: moveShape 15s linear infinite;
+        }
+
+        @keyframes moveShape {
+       @keyframes gradientAnimation {
+                  0% {
+                      background-position: 0% 50%;
+                  }
+                  50% {
+                      background-position: 100% 50%;
+                  }
+                  100% {
+                      background-position: 0% 50%;
+                  }
+              }
+        }
+
+ .overlay {
+            background: rgba(0, 0, 0, 0.6);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .motivational-text {
+            font-size: 1.25rem;
+            color: #ffffff;
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        .navbar-login{
+            background-color:white;
+            color:black;
+            justify-content:center;
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem; display: flex !important;
+            align-items: center !important;
+            flex-grow: 1;
+            font-weight: bold;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-img {
+            width: 50px;
+            height: 50px;
+        }
+
+        .logo-text {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1f1f1f;
+        }

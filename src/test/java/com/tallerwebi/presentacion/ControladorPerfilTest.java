@@ -168,4 +168,17 @@ public class ControladorPerfilTest {
         assertTrue(((String) modelAndView.getModel().get("mensaje")).contains("Error al guardar el perfil: Error generando recomendación"));
     }
 
+    @Test
+    public void queAlPresionarElBotonCerrarSesionRedireccioneAlLogin() {
+        // Preparación
+        when(session.getAttribute("usuario")).thenReturn(new Usuario());
+
+        // Ejecución
+        String result = controladorPerfil.cerrarSesion(session);
+
+        // Verificación
+        assertEquals("redirect:/login", result);
+    }
+
+
 }
