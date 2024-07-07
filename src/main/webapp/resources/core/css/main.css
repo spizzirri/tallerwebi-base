@@ -410,19 +410,19 @@ body-calendario {
 }
 
 .select-estilo option:nth-of-type(1) {
-    background-color: #28a745; /* Verde */
+    background-color: #6cce82; /* Verde */
     color: white; /* Texto en blanco */
 }
 
 /* Estilo para la opción Normal */
 .select-estilo option:nth-of-type(2) {
-    background-color: #ffc107; /* Amarillo */
+    background-color: #e8c764; /* Amarillo */
     color: white; /* Texto en blanco */
 }
 
 /* Estilo para la opción Baja */
 .select-estilo option:nth-of-type(3) {
-    background-color: #dc3545; /* Rojo */
+    background-color: #dd505e; /* Rojo */
     color: white; /* Texto en blanco */
 }
 
@@ -776,7 +776,7 @@ position: relative;
     content: '';
     top: -50%;
     left: -50%;
-    background: linear-gradient(199deg, rgba(73,73,73,1) 36.1%, rgba(16,15,15,1) 93.6%);
+    background-image: radial-gradient(circle farthest-corner at 48.4% 47.5%, rgb(169 8 8) 0%, rgb(38 0 0) 90%);
     animation: moveBackground 5s linear infinite;
     z-index: -1;
 }
@@ -823,7 +823,7 @@ position: relative;
     }
     50% {
         transform: scale(1.05);
-        color: #afc8f0;
+        color: #e67777; /* Cambia el color a rojo en el medio de la animación */
     }
     100% {
         transform: scale(1);

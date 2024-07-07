@@ -6,14 +6,13 @@
 
     <title>Taller Web I</title>
 
-    <!-- Boostrap core css -->
-    <link rel="stylesheet" th:href="@{https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css}" />
     <!-- custom style -->
     <link rel="stylesheet" th:href="@{/css/main.css}"/>
     <!-- Enlace al archivo de estilos de Font Awesome -->
     <link rel="stylesheet" th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css}">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body class="body-calendario" style="background-color: #1f1f1f !important;">
+<body class="body-calendario" style="height: 100vh;">
 <header>
     <nav class="navbar">
         <div class="logo">
@@ -34,25 +33,33 @@
         </div>
     </nav>
 </header>
-<main style="padding-top: 3rem; padding-bottom: 3.5rem; display: flex;
-    flex-direction: column;
-    align-items: center;">
-    <h1 class="progreso-h1">Progreso</h1>
-    <table class="styled-table">
-        <thead>
-        <tr>
-            <th>Fecha</th>
-            <th>Tipo de Rendimiento</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="item : ${datosItemRendimiento}">
-            <td th:text="${item.fecha}"></td>
-            <td th:text="${item.tipoRendimiento}" class="tipo-rendimiento"></td>
-        </tr>
-        </tbody>
-    </table>
+<main class="py-6 px-4 md:py-12 md:px-0 flex flex-col items-center">
+    <h1 class="text-2xl md:text-3xl font-bold mb-4 md:mb-8 text-gray-100">Progreso</h1>
+    <div class="w-full max-w-7xl">
+        <div class="grid grid-cols-1 md:grid-cols-7 gap-2 md:gap-4 text-center font-semibold">
+            <div class="hidden md:block">Lun</div>
+            <div class="hidden md:block">Mar</div>
+            <div class="hidden md:block">Mié</div>
+            <div class="hidden md:block">Jue</div>
+            <div class="hidden md:block">Vie</div>
+            <div class="hidden md:block">Sáb</div>
+            <div class="hidden md:block">Dom</div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-7 gap-2 md:gap-4 mt-2 md:mt-4">
+            <div th:each="item : ${datosItemRendimiento}" class="bg-white border rounded-lg p-2 flex flex-col items-center text-center shadow-sm">
+                <td th:text="${item.fecha}"></td>
+                <div class="text-xs md:text-sm tipo-rendimiento" th:text="${item.tipoRendimiento}"></div>
+            </div>
+            <!-- Si hay días vacíos al inicio del mes -->
+            <div th:each="emptyDay : ${emptyDays}" class="border rounded-lg p-2 flex flex-col items-center text-center shadow-sm">
+                <!-- Día vacío -->
+            </div>
+        </div>
+    </div>
 </main>
+
+
+
 <!-- Bootstrap CSS -->
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 <!-- jQuery -->
