@@ -13,26 +13,41 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body class="body-calendario" style="height: 100vh;">
-<header>
-    <nav class="navbar">
-        <div class="logo">
-            <img th:src="@{/img/logoMagnusFitSolo.png}" alt="Logo" class="logo-img">
-            <h1 class="logo-text">MagnusFit</h1>
-        </div>
+<header class="bg-white p-4 flex items-center justify-between relative">
+    <!-- Botón de hamburguesa -->
+    <div class="block md:hidden">
+        <button id="menu-btn" class="focus:outline-none">
+            <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12h18M3 6h18M3 18h18"></path>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Logo y Nombre del Sitio -->
+    <div class="flex items-center space-x-2">
+        <img th:src="@{/img/logoMagnusFitSolo.png}" alt="Logo" class="h-8">
+        <h1 class="logo-text text-black font-bold text-lg">MagnusFit</h1>
+    </div>
+
+    <!-- Menú de navegación (oculto por defecto en móviles) -->
+    <nav class="hidden md:flex space-x-4 flex-1 justify-center">
         <ul class="nav-links">
-            <li><a th:action="@{/irAHome}" href="home">Inicio</a></li>
-            <li><a th:action="@{/irAMiRutina}" href="mi-rutina">Rutina</a></li>
-            <li><a th:action="@{/irAlimentacion}" href="alimentacion">Alimentación</a></li>
-            <li><a th:action="@{/irCalendario}" href="calendario">Calendario</a></li>
+            <li><a th:action="@{/irAHome}" href="home" class="font-semibold">Inicio</a></li>
+            <li><a th:action="@{/irAMiRutina}" href="mi-rutina" class="font-semibold">Rutina</a></li>
+            <li><a th:action="@{/irAlimentacion}" href="alimentacion" class="font-semibold">Alimentación</a></li>
+            <li><a th:action="@{/irCalendario}" href="calendario" class="font-semibold">Calendario</a></li>
         </ul>
-        <div class="user-profile">
-            <a class="name-link-container" href="perfil" th:action="@{/irPerfil}">
-                <span th:text="${usuario != null ? usuario.nombre : 'nombre'}" class="name-link"></span>
-                <img th:src="@{/img/usuario.png}" alt="Usuario" class="user-img">
-            </a>
-        </div>
     </nav>
+
+    <!-- Perfil del usuario -->
+    <div class="flex items-center space-x-4">
+        <a class="flex items-center text-black" href="perfil" th:action="@{/irPerfil}">
+            <span th:text="${usuario != null ? usuario.nombre : 'nombre'}" class="name-link mr-2 hidden md:flex font-semibold"></span>
+            <img th:src="@{/img/usuario.png}" alt="Usuario" class="h-8 w-8 rounded-full">
+        </a>
+    </div>
 </header>
+
 <main class="py-6 px-4 md:py-12 md:px-0 flex flex-col items-center">
     <h1 class="text-2xl md:text-3xl font-bold mb-4 md:mb-8 text-gray-100">Progreso</h1>
     <div class="w-full max-w-7xl">
@@ -68,5 +83,6 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 
 <script th:src="@{/js/main.js}"></script>
+<script th:src="@{/js/hamburguesa.js}"></script>
 </body>
 </html>

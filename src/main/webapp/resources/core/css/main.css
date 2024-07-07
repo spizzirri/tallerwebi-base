@@ -6,6 +6,10 @@ body {
     Background-image: radial-gradient(circle farthest-corner at 48.4% 47.5%, rgb(169 8 8) 0%, rgb(38 0 0) 90%);
 }
 
+.gradient-bg {
+    background-image: linear-gradient(296.2deg, rgba(73, 73, 73, 1) 36.1%, rgba(16, 15, 15, 1) 93.6%);
+}
+
 header {
     background-color: #fff;
     padding: 5px 40px;
@@ -60,8 +64,6 @@ header {
 }
 
 .nav-links li {
-       margin-right: 12px;
-       margin-left: 12px;
        cursor: pointer; /* Cambia el cursor al pasar sobre el elemento */
        transition: color 0.3s ease; /* Transición suave para el cambio de color */
        position: relative;
@@ -97,13 +99,21 @@ header {
     font-size: 1.2rem;
 }
 
-@media(width >= 930px){
+@media(width >= 768px){
 
     .nav-links li{
-    margin-right: 22px;
-    margin-left: 22px;
+        margin-right: 10px;
+        margin-left: 10px;
     }
     }
+
+    @media(width >= 980px){
+
+        .nav-links li{
+            margin-right: 18px;
+            margin-left: 18px;
+        }
+        }
 
 .user-profile {
     display: flex;
@@ -849,7 +859,7 @@ position: relative;
 
 
 .hidden {
-    display: none !important;
+    display: none;
 }
 
 #cronometro {

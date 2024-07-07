@@ -12,28 +12,60 @@
     <link rel="stylesheet" th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
 <body class="min-h-screen">
-<header>
-    <nav class="navbar">
-        <div class="logo">
-            <img th:src="@{/img/logoMagnusFitSolo.png}" alt="Logo" class="logo-img">
-            <h1 class="logo-text">MagnusFit</h1>
-        </div>
+<header class="bg-white p-4 flex items-center justify-between relative">
+    <!-- Botón de hamburguesa -->
+    <div class="block md:hidden">
+        <button id="menu-btn" class="focus:outline-none">
+            <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12h18M3 6h18M3 18h18"></path>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Logo y Nombre del Sitio -->
+    <div class="flex items-center space-x-2">
+        <img th:src="@{/img/logoMagnusFitSolo.png}" alt="Logo" class="h-8">
+        <h1 class="logo-text text-black font-bold text-lg">MagnusFit</h1>
+    </div>
+
+    <!-- Menú de navegación (oculto por defecto en móviles) -->
+    <nav class="hidden md:flex space-x-4 flex-1 justify-center">
         <ul class="nav-links">
-            <li><a th:action="@{/irAHome}" href="home">Inicio</a></li>
-            <li><a th:action="@{/irAMiRutina}" href="mi-rutina">Rutina</a></li>
-            <li><a th:action="@{/irAlimentacion}" href="alimentacion">Alimentación</a></li>
-            <li><a th:action="@{/irCalendario}" href="calendario">Calendario</a></li>
+            <li><a th:action="@{/irAHome}" href="home" class="font-semibold">Inicio</a></li>
+            <li><a th:action="@{/irAMiRutina}" href="mi-rutina" class="font-semibold">Rutina</a></li>
+            <li><a th:action="@{/irAlimentacion}" href="alimentacion" class="font-semibold">Alimentación</a></li>
+            <li><a th:action="@{/irCalendario}" href="calendario" class="font-semibold">Calendario</a></li>
         </ul>
-        <div class="user-profile">
-            <a class="name-link-container" href="perfil" th:action="@{/irPerfil}">
-                <span th:text="${usuario != null ? usuario.nombre : 'nombre'}" class="name-link"></span>
-                <img th:src="@{/img/usuario.png}" alt="Usuario" class="user-img">
-            </a>
-        </div>
     </nav>
+
+    <!-- Perfil del usuario -->
+    <div class="flex items-center space-x-4">
+        <a class="flex items-center text-black" href="perfil" th:action="@{/irPerfil}">
+            <span th:text="${usuario != null ? usuario.nombre : 'nombre'}" class="name-link mr-2 hidden md:flex font-semibold"></span>
+            <img th:src="@{/img/usuario.png}" alt="Usuario" class="h-8 w-8 rounded-full">
+        </a>
+    </div>
 </header>
+
+<!-- Menú lateral para pantallas pequeñas -->
+<div id="side-menu" class="fixed inset-y-0 left-0 w-64 text-white transform -translate-x-full transition-transform md:hidden z-50 gradient-bg">
+    <nav class="flex flex-col space-y-4 p-4">
+        <button id="close-menu" class="text-white flex items-center justify-center focus:outline-none mb-4">
+            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+            <span>Volver</span>
+        </button>
+        <a th:action="@{/irAHome}" href="home" class="hover:bg-red-900 p-2 rounded text-white">Inicio</a>
+        <a th:action="@{/irAMiRutina}" href="mi-rutina" class="hover:bg-red-900 p-2 rounded text-white">Rutina</a>
+        <a th:action="@{/irAlimentacion}" href="alimentacion" class="hover:bg-red-900 p-2 rounded text-white">Alimentación</a>
+        <a th:action="@{/irCalendario}" href="calendario" class="hover:bg-red-900 p-2 rounded text-white">Calendario</a>
+    </nav>
+</div>
+
 <main class="main-content">
     <section style="width:100%; display:flex; justify-content:center;">
         <a th:href= "@{/verProgreso}" style="width:80%;">
@@ -47,7 +79,7 @@
     </section>
     <div class="container">
         <h1 class="main-title">Tu Entrenador Personal</h1>
-        <p class="main-text">En nuestro sitio, nos comprometemos a ser tu compañero de fitness y bienestar. Sabemos que cada paso cuenta en tu viaje hacia un estilo de vida más saludable, y estamos aquí para guiarte en cada paso del camino.</p>
+        <p class="main-text">Somos tu compañero de fitness y bienestar. Sabemos que cada paso cuenta en tu viaje hacia un estilo de vida más saludable, y estamos aquí para guiarte en cada paso del camino.</p>
         <a th:action="@{/irAMiRutina}" href="mi-rutina" class="main-btn">Comenzar entrenamiento</a>
     </div>
     <div class="reto-cards" style="display: flex; align-items: center; flex-direction: column; justify-content: center; margin-top: 3rem; margin-bottom:2rem;">
@@ -111,7 +143,7 @@
             <div class="flex max-w-xl flex-col items-center justify-between bg-white rounded-3xl shadow-md overflow-hidden transition-transform transform hover:scale-105 p-6">
                 <div class="group relative">
                     <h3 class="mt-3 text-lg font-semibold leading-6 text-gray-900 group-hover:text-gray-600">
-                        <a th:action="@{/irAlimentacion}" href="alimentacion">
+                        <a th:action="@{/irAlimentacion}" href="alimentacion" class="text-red-800">
                             <span class="absolute inset-0"></span>
                             Comidas segun tu objetivo
                         </a>
@@ -127,7 +159,7 @@
             <div class="flex max-w-xl flex-col items-center justify-between bg-white rounded-3xl shadow-md overflow-hidden transition-transform transform hover:scale-105 p-6">
                 <div class="group relative">
                     <h3 class="mt-3 text-lg font-semibold leading-6 text-gray-900 group-hover:text-gray-600">
-                        <a th:action="@{/irAMiRutina}" href="mi-rutina">
+                        <a th:action="@{/irAMiRutina}" href="mi-rutina" class="text-red-800">
                             <span class="absolute inset-0"></span>
                             Encuentra ejercicios personalizados
                         </a>
@@ -143,7 +175,7 @@
             <div class="flex max-w-xl flex-col items-center justify-between bg-white rounded-3xl shadow-md overflow-hidden transition-transform transform hover:scale-105 p-6">
                 <div class="group relative">
                     <h3 class="mt-3 text-lg font-semibold leading-6 text-gray-900 group-hover:text-gray-600">
-                        <a th:action="@{/irCalendario}" href="calendario">
+                        <a th:action="@{/irCalendario}" href="calendario" class="text-red-800">
                             <span class="absolute inset-0"></span>
                             Organiza tus entrenamientos
                         </a>
@@ -171,5 +203,6 @@
 <!-- Bootstrap JS -->
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 <script th:src="@{/js/home.js}"></script>
+<script th:src="@{/js/hamburguesa.js}"></script>
 </body>
 </html>
