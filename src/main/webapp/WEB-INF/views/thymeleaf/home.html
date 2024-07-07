@@ -6,152 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Taller Web I</title>
 
-    <!-- Bootstrap core css -->
-    <link rel="stylesheet" th:href="@{https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css}" />
     <!-- custom style -->
     <link rel="stylesheet" th:href="@{/css/main.css}"/>
     <!-- Enlace al archivo de estilos de Font Awesome -->
     <link rel="stylesheet" th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        .container-featured{
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-            color: black;
-            padding: 2rem 0.5rem;
-        }
-        /* Estilos específicos para el bloque featured-section */
-        .featured-section {
-            background-color: #fff;
-            padding: 80px 0;
-            text-align: center;
-        }
-
-        .featured-title {
-            color: #000;
-            font-size: 36px;
-            margin-bottom: 20px;
-        }
-
-        .featured-description {
-            color: #666;
-            font-size: 18px;
-            margin-bottom: 40px;
-        }
-
-        .btn-inscribirse:not(:disabled):not(.disabled) {
-            cursor: pointer;
-        }
-
-        .btn-inscribirse{
-            display: inline-block;
-            font-weight: 400;
-            color: #212529;
-            text-align: center;
-            vertical-align: middle;
-            background-color: #0056b3 !important;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-            padding: .375rem .75rem;
-            font-size: 1rem;
-            line-height: 1.5;
-            border-radius: .25rem;
-            transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
-        }
-
-        /* Estilos específicos para dispositivos móviles */
-        @media (max-width: 768px) {
-            .featured-title {
-                font-size: 28px;
-            }
-
-            .featured-description {
-                font-size: 16px;
-            }
-
-            .btn {
-                padding: 8px 16px;
-            }
-        }
-
-        .info-section {
-
-            padding: 50px 0;
-            text-align: center;
-        }
-
-        .info-section h2 {
-            color: #ffffff;
-            font-size: 30px;
-            margin-bottom: 20px;
-        }
-
-        .info-section h3{
-            color: #cccccc;
-            font-size: 18px;
-            margin-bottom: 40px;
-        }
-
-        .info-section p {
-            color: black;
-            font-size: 18px;
-            margin-bottom: 40px;
-        }
-
-        .info-cards {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-
-        .info-card {
-            background-color: #ffffff;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            border-radius: 8px;
-            overflow: hidden;
-            max-width: 300px;
-            text-align: left;
-        }
-
-        .info-card img {
-            width: 100%;
-        }
-
-        .info-card-body {
-            padding: 20px;
-        }
-
-        .info-card-title {
-            color: #333;
-            font-size: 24px;
-            margin-bottom: 10px;
-        }
-
-        .info-card-text {
-            color: #555;
-            font-size: 16px;
-            margin-bottom: 20px;
-        }
-
-        .info-card-btn {
-            background-color: #0056b3;
-            color: white;
-            padding: 10px 20px;
-            text-decoration: none;
-            border-radius: 4px;
-            transition: background-color 0.3s ease;
-        }
-
-        .info-card-btn:hover {
-            background-color: #003f7f;
-        }
-    </style>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
+<body class="min-h-screen">
 <header>
     <nav class="navbar">
         <div class="logo">
@@ -187,11 +49,10 @@
     <div class="container">
         <h1 class="main-title">Tu Entrenador Personal</h1>
         <p class="main-text">En nuestro sitio, nos comprometemos a ser tu compañero de fitness y bienestar. Sabemos que cada paso cuenta en tu viaje hacia un estilo de vida más saludable, y estamos aquí para guiarte en cada paso del camino.</p>
-        <p class="main-text">Nuestra misión es proporcionarte las herramientas y la motivación necesarias para alcanzar tus objetivos de fitness. Ya sea que estés buscando perder peso, tonificar tu cuerpo, mejorar tu resistencia o simplemente mantenerte activo, tenemos todo lo que necesitas para lograrlo.</p>
         <a href="vistaObjetivos" class="main-btn">Comenzar entrenamiento</a>
     </div>
-    <div class="reto-cards" style="display: flex; align-items: center; flex-direction: column; justify-content: center; margin-top: 3.5rem; margin-bottom:2rem;">
-        <h2 style="padding: 1rem; margin-bottom:0rem !important; color: white;">Retos Diarios</h2>
+    <div class="reto-cards" style="display: flex; align-items: center; flex-direction: column; justify-content: center; margin-top: 3rem; margin-bottom:2rem;">
+        <h2 style="padding: 1rem; margin-bottom:0.5rem !important; color: white;">Retos Diarios</h2>
         <article class="reto-card">
             <img th:src="@{${retoDisponible.imagenUrl}}" alt="Reto Disponible">
             <div class="reto-preview">
@@ -237,74 +98,67 @@
             </div>
         </article>
     </div>
-
-    <section class="info-section">
-        <div class="container">
-            <h2>Descubre más</h2>
-            <h3>Explora las siguientes secciones para obtener más información y recursos que te ayudarán en tu viaje de fitness.</h3>
-            <div class="info-cards">
-                <div class="info-card">
-                    <img th:src="@{/img/nutricion.png}" alt="Nutrición">
-                    <div class="info-card-body">
-                        <h3 class="info-card-title">Nutrición</h3>
-                        <p class="info-card-text">Aprende sobre una alimentación equilibrada para complementar tu entrenamiento.</p>
-                        <a href="alimentacion" class="info-card-btn">Ver más</a>
-                    </div>
-                </div>
-                <div class="info-card">
-                    <img th:src="@{/img/ejercicio.png}" alt="Nutrición">
-                    <div class="info-card-body">
-                        <h3 class="info-card-title">Ejercicios</h3>
-                        <p class="info-card-text">Encuentra ejercicios personalizados para mejorar tu rutina diaria.</p>
-                        <a href="mi-rutina" class="info-card-btn">Ver más</a>
-                    </div>
-                </div>
-                <div class="info-card">
-                    <img th:src="@{/img/calendario.png}" alt="Nutrición">
-                    <div class="info-card-body">
-                        <h3 class="info-card-title">Calendario</h3>
-                        <p class="info-card-text">Organiza tus entrenamientos y seguimiento de progreso.</p>
-                        <a href="calendario" class="info-card-btn">Ver más</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
 </main>
 
-<div class="featured-section">
-    <div class="container">
-        <div id="carouselExample" class="carousel slide" data-ride="carousel">
-            <div class="carousel-inner">
-                <div class="carousel-item active">
-                    <img th:src="@{/img/comidaSaludable.jpg}" class="d-block w-100" alt="...">
+<div class="bg-white py-24 sm:py-32">
+    <div class="mx-auto max-w-7xl px-6 lg:px-8">
+        <div class="mx-auto max-w-2xl lg:mx-0">
+            <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Descubre más</h2>
+            <h3 class="mt-2 text-lg leading-8 text-gray-600">Explora las siguientes secciones para obtener más información y recursos que te ayudarán en tu viaje de fitness.</h3>
+        </div>
+        <div class="mx-auto mt-10 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 border-t border-gray-200 pt-10 sm:mt-16 sm:pt-16 lg:mx-0 lg:max-w-none lg:grid-cols-3">
+
+            <!-- Nutrición -->
+            <div class="flex max-w-xl flex-col items-center justify-between bg-white rounded-lg shadow-md overflow-hidden transition-transform transform hover:scale-105 p-6">
+                <div class="group relative">
+                    <h3 class="mt-3 text-lg font-semibold leading-6 text-gray-900 group-hover:text-gray-600">
+                        <a href="#">
+                            <span class="absolute inset-0"></span>
+                            Aprende sobre una alimentación equilibrada
+                        </a>
+                    </h3>
+                    <p class="mt-5 line-clamp-3 text-sm leading-6 text-gray-600">Aprende sobre una alimentación equilibrada para complementar tu entrenamiento.</p>
                 </div>
-                <div class="carousel-item">
-                    <img th:src="@{/img/entrenamiento.jpg}" class="d-block w-100" alt="...">
-                </div>
-                <div class="carousel-item">
-                    <img th:src="@{/img/mujerGym.jpg}" class="d-block w-100" alt="...">
+                <div class="relative flex items-center justify-center gap-x-4">
+                    <img th:src="@{/img/nutricion.png}" alt="Nutrición" class="h-32 w-32 md:h-48 md:w-48 rounded-full bg-gray-50 object-cover object-center">
                 </div>
             </div>
-            <a class="carousel-control-prev" href="#carouselExample" role="button" data-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="sr-only">Anterior</span>
-            </a>
-            <a class="carousel-control-next" href="#carouselExample" role="button" data-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="sr-only">Siguiente</span>
-            </a>
+
+            <!-- Ejercicios -->
+            <div class="flex max-w-xl flex-col items-center justify-between bg-white rounded-lg shadow-md overflow-hidden transition-transform transform hover:scale-105 p-6">
+                <div class="group relative">
+                    <h3 class="mt-3 text-lg font-semibold leading-6 text-gray-900 group-hover:text-gray-600">
+                        <a href="#">
+                            <span class="absolute inset-0"></span>
+                            Encuentra ejercicios personalizados
+                        </a>
+                    </h3>
+                    <p class="mt-5 line-clamp-3 text-sm leading-6 text-gray-600">Encuentra ejercicios personalizados para mejorar tu rutina diaria.</p>
+                </div>
+                <div class="relative flex items-center justify-center gap-x-4">
+                    <img th:src="@{/img/ejercicio.png}" alt="Ejercicio" class="h-32 w-32 md:h-48 md:w-48 rounded-full bg-gray-50 object-cover object-center">
+                </div>
+            </div>
+
+            <!-- Calendario -->
+            <div class="flex max-w-xl flex-col items-center justify-between bg-white rounded-lg shadow-md overflow-hidden transition-transform transform hover:scale-105 p-6">
+                <div class="group relative">
+                    <h3 class="mt-3 text-lg font-semibold leading-6 text-gray-900 group-hover:text-gray-600">
+                        <a href="#">
+                            <span class="absolute inset-0"></span>
+                            Organiza tus entrenamientos
+                        </a>
+                    </h3>
+                    <p class="mt-5 line-clamp-3 text-sm leading-6 text-gray-600">Organiza tus entrenamientos y seguimiento de progreso.</p>
+                </div>
+                <div class="relative flex items-center justify-center gap-x-4">
+                    <img th:src="@{/img/calendario.png}" alt="Calendario" class="h-32 w-32 md:h-48 md:w-48 rounded-full bg-gray-50 object-cover object-center">
+                </div>
+            </div>
+
         </div>
     </div>
-    <div class="container-featured">
-        <h2>Dieta Personalizada</h2>
-        <p>Descubre cómo mejorar tu salud y alcanzar tus metas fitness con nuestro dieta personalizado.</p>
-        <a href="#" class="main-btn">Inscribirse</a>
-    </div>
 </div>
-
-
 
 <div id="usuario-data" th:data-racha="${usuario.rachaDeRetos}" style="display: none;"></div>
 <div id="reto-circulo" class="reto-circulo" th:style="'background-image: url(' + @{/img/iconoRachaRetos.png} + ');'">

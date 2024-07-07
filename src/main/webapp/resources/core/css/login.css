@@ -1,33 +1,42 @@
-body{
- background-image: linear-gradient( 89.7deg,  rgba(0,0,0,1) -10.7%, rgba(53,92,125,1) 88.8% ) !important;
-  animation: gradientAnimation 15s ease infinite;
-             background-size: 400% 400%;
+body {
+    background-image: linear-gradient( 179deg,  rgba(0,0,0,1) 9.2%, rgba(127,16,16,1) 103.9% );
 }
 
-.custom-shape {
-            position: absolute;
-            width: 300%;
-            height: 300%;
-            top: -100%;
-            left: -100%;
-            background-color: #4f46e5;
-            clip-path: polygon(0 25%, 100% 0%, 100% 100%, 0% 100%);
-            animation: moveShape 15s linear infinite;
-        }
+.animated-lines {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: -1;
+}
 
-        @keyframes moveShape {
-       @keyframes gradientAnimation {
-                  0% {
-                      background-position: 0% 50%;
-                  }
-                  50% {
-                      background-position: 100% 50%;
-                  }
-                  100% {
-                      background-position: 0% 50%;
-                  }
-              }
-        }
+.line {
+    position: absolute;
+    width: 2px;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.line:nth-child(1) { left: 10%; animation: moveLine 7s linear infinite; }
+.line:nth-child(2) { left: 20%; animation: moveLine 10s linear infinite; }
+.line:nth-child(3) { left: 30%; animation: moveLine 8s linear infinite; }
+.line:nth-child(4) { left: 40%; animation: moveLine 12s linear infinite; }
+.line:nth-child(5) { left: 50%; animation: moveLine 9s linear infinite; }
+.line:nth-child(6) { left: 60%; animation: moveLine 11s linear infinite; }
+.line:nth-child(7) { left: 70%; animation: moveLine 10s linear infinite; }
+.line:nth-child(8) { left: 80%; animation: moveLine 7s linear infinite; }
+.line:nth-child(9) { left: 90%; animation: moveLine 8s linear infinite; }
+
+@keyframes moveLine {
+    0% {
+        transform: translateY(-100%);
+    }
+    100% {
+        transform: translateY(100%);
+    }
+}
 
  .overlay {
             background: rgba(0, 0, 0, 0.6);
@@ -41,6 +50,7 @@ body{
             justify-content: center;
             align-items: center;
         }
+
         .motivational-text {
             font-size: 1.25rem;
             color: #ffffff;
