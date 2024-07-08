@@ -9,6 +9,7 @@ import com.tallerwebi.dominio.usuario.Usuario;
 import com.tallerwebi.dominio.reto.Reto;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -64,10 +65,12 @@ public class Usuario {
     }
 
     public Usuario() {
+        this.usuarioRutinas = new ArrayList<>();
     }
     public Usuario(String nombre, Objetivo objetivo) {
         this.nombre = nombre;
         this.objetivo = objetivo;
+        this.usuarioRutinas = new ArrayList<>();
     }
 
     public Usuario(String nombre, String apellido, String email, String password) {
@@ -75,6 +78,7 @@ public class Usuario {
         this.apellido =  apellido;
         this.email = email;
         this.password = password;
+        this.usuarioRutinas = new ArrayList<>();
     }
 
     public Usuario(String nombre, String apellido, String email, String password, Boolean isInstructor) {
@@ -83,6 +87,7 @@ public class Usuario {
         this.email = email;
         this.password = password;
         this.isInstructor = isInstructor;
+        this.usuarioRutinas = new ArrayList<>();
     }
 
     public Usuario(String nombre, String apellido, String email, String password, Objetivo objetivo) {
@@ -91,6 +96,7 @@ public class Usuario {
         this.email = email;
         this.password = password;
         this.objetivo = objetivo;
+        this.usuarioRutinas = new ArrayList<>();
     }
 
     public Usuario(String email, String nombre, String apellido, String password, List<Reto> retos) {
@@ -101,6 +107,7 @@ public class Usuario {
         this.retos = retos;
         this.rachaDeRetos = 0;
         this.cambioReto = 3;
+        this.usuarioRutinas = new ArrayList<>();
     }
 
     public Long getId() {

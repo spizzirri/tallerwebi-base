@@ -236,7 +236,7 @@ public class ServicioRutinaImpl implements ServicioRutina {
 
     @Override
     public List<EstadoEjercicio> getEstadosEjercicios(Usuario usuario, DatosRutina rutina) {
-        return repositorioRutina.findEstadosEjercicios(usuario, rutina);
+        return repositorioRutina.getEstadoEjercicioList(usuario, rutina);
     }
 
     @Override
