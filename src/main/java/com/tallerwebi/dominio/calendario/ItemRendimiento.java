@@ -2,6 +2,8 @@ package com.tallerwebi.dominio.calendario;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.format.TextStyle;
+import java.util.Locale;
 import java.util.Objects;
 
 @Entity
@@ -17,12 +19,16 @@ public class ItemRendimiento {
     @Column(name = "tipoRendimiento", nullable = false)
     private TipoRendimiento tipoRendimiento;
 
+    @Column(name = "nombreDia", nullable = false)
+    private String diaNombre;
+
     public ItemRendimiento() {
     }
 
     public ItemRendimiento(TipoRendimiento tipoRendimiento) {
         this.fecha = LocalDate.now();
         this.tipoRendimiento = tipoRendimiento;
+        this.diaNombre = fecha.getDayOfWeek().getDisplayName(TextStyle.FULL, new Locale("es"));
     }
 
     public ItemRendimiento(LocalDate fecha, TipoRendimiento tipoRendimiento) {
@@ -44,6 +50,14 @@ public class ItemRendimiento {
 
     public void setFecha(LocalDate fecha) {
         this.fecha = fecha;
+    }
+
+    public String getDiaNombre() {
+        return diaNombre;
+    }
+
+    public void setDiaNombre(String diaNombre) {
+        this.diaNombre = diaNombre;
     }
 
     @Override

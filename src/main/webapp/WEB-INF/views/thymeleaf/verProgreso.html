@@ -48,6 +48,22 @@
     </div>
 </header>
 
+<!-- Menú lateral para pantallas pequeñas -->
+<div id="side-menu" class="fixed inset-y-0 left-0 w-64 text-white transform -translate-x-full transition-transform md:hidden z-50 gradient-bg">
+    <nav class="flex flex-col space-y-4 p-4">
+        <button id="close-menu" class="text-white flex items-center justify-center focus:outline-none mb-4">
+            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+            <span>Volver</span>
+        </button>
+        <a th:action="@{/irAHome}" href="home" class="hover:bg-blue-500 p-2 rounded text-white">Inicio</a>
+        <a th:action="@{/irAMiRutina}" href="mi-rutina" class="hover:bg-blue-500 p-2 rounded text-white">Rutina</a>
+        <a th:action="@{/irAlimentacion}" href="alimentacion" class="hover:bg-blue-500 p-2 rounded text-white">Alimentación</a>
+        <a th:action="@{/irCalendario}" href="calendario" class="hover:bg-blue-500 p-2 rounded text-white">Calendario</a>
+    </nav>
+</div>
+
 <main class="py-6 px-4 md:py-12 md:px-0 flex flex-col items-center">
     <h1 class="text-2xl md:text-3xl font-bold mb-4 md:mb-8 text-gray-100">Progreso</h1>
     <div class="w-full max-w-7xl">
