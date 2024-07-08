@@ -3,7 +3,9 @@ package com.tallerwebi.infraestructura;
 import com.tallerwebi.dominio.perfil.Perfil;
 import com.tallerwebi.dominio.perfil.RepositorioPerfil;
 import com.tallerwebi.dominio.reto.RepositorioReto;
+import com.tallerwebi.dominio.reto.Reto;
 import com.tallerwebi.infraestructura.config.HibernateTestInfraestructuraConfig;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,6 +16,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.transaction.Transactional;
+
+import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -36,7 +40,20 @@ public class RepositorioPerfilTest {
     @Test
     @Transactional
     @Rollback
-    public void queSeLogreGuardarPerfilYBuscarloPorIdPerfil() {
+    public void dadoQueExisteUnPerfilEnLaBaseDeDatosQueSeLogreObtenerPorIdPerfil() {
+        // preparación
+        Perfil perfilGuardado = dadoQueExisteUnPerfilEnLaBaseDeDatos();
+
+        // ejecución
+        Perfil perfilObtenido = repositorioPerfil.obtenerPerfilPorId(perfilGuardado.getIdPerfil());
+
+        // verificación
+        assertNotNull(perfilGuardado);
+        assertEquals(30, perfilObtenido.getEdad());
+        assertEquals(70.0, perfilObtenido.getPeso());
+    }
+
+    private Perfil dadoQueExisteUnPerfilEnLaBaseDeDatos() {
         Perfil perfil = new Perfil();
         perfil.setEdad(30);
         perfil.setPeso(70.0);
@@ -47,49 +64,59 @@ public class RepositorioPerfilTest {
         perfil.setExperienciaEjercicio("Intermedio");
         perfil.setSuplementos("Proteína");
 
-        repositorioPerfil.guardarPerfil(perfil);
+        this.repositorioPerfil.guardarPerfil(perfil);
 
-        assertNotNull(perfil.getIdPerfil());
-
-        // Obtener el perfil de la base de datos y verificar los atributos
-        Perfil perfilGuardado = repositorioPerfil.obtenerPerfilPorId(perfil.getIdPerfil());
-        assertNotNull(perfilGuardado);
-        assertEquals(30, perfilGuardado.getEdad());
-        assertEquals(70.0, perfilGuardado.getPeso());
+        return  perfil;
     }
 
     @Test
     @Transactional
     @Rollback
-    public void queSeLogreActualizarPerfil() {
-        // Crear y guardar un perfil inicial
-        Perfil perfilInicial = new Perfil();
-        perfilInicial.setEdad(30);
-        perfilInicial.setPeso(70.0);
-        perfilInicial.setAltura(175);
-        perfilInicial.setGenero("Masculino");
-        perfilInicial.setObjetivoFitness("Ganancia Muscular");
-        perfilInicial.setCondicionesAlternas("Ninguna");
-        perfilInicial.setExperienciaEjercicio("Intermedio");
-        perfilInicial.setSuplementos("Proteína");
+    public void dadoQueExisteUnPerfilEnLaBaseDeDatosQueSePuedaActualizarloYVerificarSusCambios() {
+        // preparación
+        Perfil perfilActualizado = dadoQueExisteUnPerfilEnLaBaseDeDatos();
 
-        repositorioPerfil.guardarPerfil(perfilInicial);
+        perfilActualizado.setPeso(75.0);
+        perfilActualizado.setAltura(180);
 
-        // Modificar algunos atributos del perfil
-        perfilInicial.setPeso(75.0);
-        perfilInicial.setAltura(180);
+        // ejecución
+        repositorioPerfil.actualizarPerfil(perfilActualizado);
 
-        // Actualizar el perfil en la base de datos
-        repositorioPerfil.actualizarPerfil(perfilInicial);
-
-        // Obtener el perfil actualizado de la base de datos
-        Perfil perfilActualizado = repositorioPerfil.obtenerPerfilPorId(perfilInicial.getIdPerfil());
-
-        // Verificar que los cambios se hayan guardado correctamente
+        // verificación
         assertEquals(75.0, perfilActualizado.getPeso());
         assertEquals(180, perfilActualizado.getAltura());
-
     }
 
+    @Test
+    @Transactional
+    @Rollback
+    public void queSeLogreGuardarUnPerfilEnLaBaseDeDatos() {
+        // preparación
+        Perfil perfil = new Perfil();
+        perfil.setEdad(30);
+        perfil.setPeso(70.0);
+        perfil.setAltura(175);
+        perfil.setGenero("Masculino");
+        perfil.setObjetivoFitness("Ganancia Muscular");
+        perfil.setCondicionesAlternas("Ninguna");
+        perfil.setExperienciaEjercicio("Intermedio");
+        perfil.setSuplementos("Proteína");
+
+        // ejecución
+        this.repositorioPerfil.guardarPerfil(perfil);
+
+        // verificación
+        assertNotNull(perfil.getIdPerfil());
+        Session session = sessionFactory.getCurrentSession();
+        Perfil perfilGuardado = (Perfil) session.createSQLQuery("SELECT * FROM Perfil WHERE idPerfil = :idPerfil")
+                .addEntity(Perfil.class)
+                .setParameter("idPerfil", perfil.getIdPerfil())
+                .uniqueResult();
+
+        assertNotNull(perfilGuardado);
+        assertEquals(30, perfilGuardado.getEdad());
+        assertEquals(70.0, perfilGuardado.getPeso());
+
+    }
 
 }

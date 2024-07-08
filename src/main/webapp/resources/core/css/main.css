@@ -3,9 +3,12 @@ body {
     margin: 0;
     padding: 0;
     color: #ccc;
-    background-image: linear-gradient( 89.7deg,  rgba(0,0,0,1) -10.7%, rgba(53,92,125,1) 88.8% );
+    Background-image: radial-gradient(circle farthest-corner at 48.4% 47.5%, rgb(169 8 8) 0%, rgb(38 0 0) 90%);
 }
 
+.gradient-bg {
+    background-image: linear-gradient(296.2deg, rgba(73, 73, 73, 1) 36.1%, rgba(16, 15, 15, 1) 93.6%);
+}
 
 header {
     background-color: #fff;
@@ -50,6 +53,7 @@ header {
     margin: 0;
     font-size: 1.5rem;
     font-weight: bold;
+    color: #1f1f1f;
 }
 
 .nav-links {
@@ -60,8 +64,6 @@ header {
 }
 
 .nav-links li {
-       margin-right: 12px;
-       margin-left: 12px;
        cursor: pointer; /* Cambia el cursor al pasar sobre el elemento */
        transition: color 0.3s ease; /* Transición suave para el cambio de color */
        position: relative;
@@ -97,13 +99,21 @@ header {
     font-size: 1.2rem;
 }
 
-@media(width >= 930px){
+@media(width >= 768px){
 
     .nav-links li{
-    margin-right: 22px;
-    margin-left: 22px;
+        margin-right: 10px;
+        margin-left: 10px;
     }
     }
+
+    @media(width >= 980px){
+
+        .nav-links li{
+            margin-right: 18px;
+            margin-left: 18px;
+        }
+        }
 
 .user-profile {
     display: flex;
@@ -223,8 +233,7 @@ a:active {
 }
 
 .main-content {
-    padding: 4rem 0.5rem;
-    background-image: linear-gradient( 89.7deg,  rgba(0,0,0,1) -10.7%, rgba(53,92,125,1) 88.8% );
+    padding: 3.3rem 0.5rem;
 }
 
 .container {
@@ -411,19 +420,19 @@ body-calendario {
 }
 
 .select-estilo option:nth-of-type(1) {
-    background-color: #28a745; /* Verde */
+    background-color: #6cce82; /* Verde */
     color: white; /* Texto en blanco */
 }
 
 /* Estilo para la opción Normal */
 .select-estilo option:nth-of-type(2) {
-    background-color: #ffc107; /* Amarillo */
+    background-color: #e8c764; /* Amarillo */
     color: white; /* Texto en blanco */
 }
 
 /* Estilo para la opción Baja */
 .select-estilo option:nth-of-type(3) {
-    background-color: #dc3545; /* Rojo */
+    background-color: #dd505e; /* Rojo */
     color: white; /* Texto en blanco */
 }
 
@@ -777,7 +786,7 @@ position: relative;
     content: '';
     top: -50%;
     left: -50%;
-    background: linear-gradient(199deg, rgba(73,73,73,1) 36.1%, rgba(16,15,15,1) 93.6%);
+    background-image: radial-gradient(circle farthest-corner at 48.4% 47.5%, rgb(169 8 8) 0%, rgb(38 0 0) 90%);
     animation: moveBackground 5s linear infinite;
     z-index: -1;
 }
@@ -824,7 +833,7 @@ position: relative;
     }
     50% {
         transform: scale(1.05);
-        color: #afc8f0;
+        color: #e67777; /* Cambia el color a rojo en el medio de la animación */
     }
     100% {
         transform: scale(1);
@@ -850,7 +859,7 @@ position: relative;
 
 
 .hidden {
-    display: none !important;
+    display: none;
 }
 
 #cronometro {
@@ -1181,3 +1190,139 @@ position: relative;
         opacity: 1;
     }
 }
+
+.container-featured{
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            color: black;
+            padding: 2rem 0.5rem;
+        }
+        /* Estilos específicos para el bloque featured-section */
+        .featured-section {
+            background-color: #fff;
+            padding: 80px 0;
+            text-align: center;
+        }
+
+        .featured-title {
+            color: #000;
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+
+        .featured-description {
+            color: #666;
+            font-size: 18px;
+            margin-bottom: 40px;
+        }
+
+        .btn-inscribirse:not(:disabled):not(.disabled) {
+            cursor: pointer;
+        }
+
+        .btn-inscribirse{
+            display: inline-block;
+            font-weight: 400;
+            color: #212529;
+            text-align: center;
+            vertical-align: middle;
+            background-color: #0056b3 !important;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            padding: .375rem .75rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            border-radius: .25rem;
+            transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+        }
+
+        /* Estilos específicos para dispositivos móviles */
+        @media (max-width: 768px) {
+            .featured-title {
+                font-size: 28px;
+            }
+
+            .featured-description {
+                font-size: 16px;
+            }
+
+            .btn {
+                padding: 8px 16px;
+            }
+        }
+
+        .info-section {
+
+            padding: 50px 0;
+            text-align: center;
+        }
+
+        .info-section h2 {
+            color: #ffffff;
+            font-size: 30px;
+            margin-bottom: 20px;
+        }
+
+        .info-section h3{
+            color: #cccccc;
+            font-size: 18px;
+            margin-bottom: 40px;
+        }
+
+        .info-section p {
+            color: black;
+            font-size: 18px;
+            margin-bottom: 40px;
+        }
+
+        .info-cards {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .info-card {
+            background-color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            max-width: 300px;
+            text-align: left;
+        }
+
+        .info-card img {
+            width: 100%;
+        }
+
+        .info-card-body {
+            padding: 20px;
+        }
+
+        .info-card-title {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .info-card-text {
+            color: #555;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        .info-card-btn {
+            background-color: #0056b3;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        .info-card-btn:hover {
+            background-color: #003f7f;
+        }

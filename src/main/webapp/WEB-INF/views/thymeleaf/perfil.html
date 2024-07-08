@@ -5,28 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Perfil de Usuario</title>
     <link rel="stylesheet" th:href="@{/css/main.css}"/>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body>
-<header>
-    <nav class="navbar">
-        <div class="logo">
-            <img th:src="@{/img/logoMagnusFitSolo.png}" alt="Logo" class="logo-img">
-            <h1 class="logo-text">MagnusFit</h1>
-        </div>
+<header class="bg-white p-4 flex items-center justify-between relative">
+    <!-- Botón de hamburguesa -->
+    <div class="block md:hidden">
+        <button id="menu-btn" class="focus:outline-none">
+            <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12h18M3 6h18M3 18h18"></path>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Logo y Nombre del Sitio -->
+    <div class="flex items-center space-x-2">
+        <img th:src="@{/img/logoMagnusFitSolo.png}" alt="Logo" class="h-8">
+        <h1 class="logo-text text-black font-bold text-lg">MagnusFit</h1>
+    </div>
+
+    <!-- Menú de navegación (oculto por defecto en móviles) -->
+    <nav class="hidden md:flex space-x-4 flex-1 justify-center">
         <ul class="nav-links">
-            <li><a th:action="@{/irAHome}" href="home">Inicio</a></li>
-            <li><a th:action="@{/irAMiRutina}" href="mi-rutina">Rutina</a></li>
-            <li><a th:action="@{/irAlimentacion}" href="alimentacion">Alimentación</a></li>
-            <li><a th:action="@{/irCalendario}" href="calendario">Calendario</a></li>
+            <li><a th:action="@{/irAHome}" href="home" class="font-semibold">Inicio</a></li>
+            <li><a th:action="@{/irAMiRutina}" href="mi-rutina" class="font-semibold">Rutina</a></li>
+            <li><a th:action="@{/irAlimentacion}" href="alimentacion" class="font-semibold">Alimentación</a></li>
+            <li><a th:action="@{/irCalendario}" href="calendario" class="font-semibold">Calendario</a></li>
         </ul>
-        <div class="user-profile">
-            <a class="name-link-container" href="perfil" th:action="@{/irPerfil}">
-                <span th:text="${usuario != null ? usuario.nombre : 'nombre'}" class="name-link"></span>
-                <img th:src="@{/img/usuario.png}" alt="Usuario" class="user-img">
-            </a>
-        </div>
     </nav>
+
+    <!-- Perfil del usuario -->
+    <div class="flex items-center space-x-4">
+        <a class="flex items-center text-black" href="perfil" th:action="@{/irPerfil}">
+            <span th:text="${usuario != null ? usuario.nombre : 'nombre'}" class="name-link mr-2 hidden md:flex font-semibold"></span>
+            <img th:src="@{/img/usuario.png}" alt="Usuario" class="h-8 w-8 rounded-full">
+        </a>
+    </div>
 </header>
+
+<!-- Menú lateral para pantallas pequeñas -->
+<div id="side-menu" class="fixed inset-y-0 left-0 w-64 text-white transform -translate-x-full transition-transform md:hidden z-50 gradient-bg">
+    <nav class="flex flex-col space-y-4 p-4">
+        <button id="close-menu" class="text-white flex items-center justify-center focus:outline-none mb-4">
+            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+            <span>Volver</span>
+        </button>
+        <a th:action="@{/irAHome}" href="home" class="hover:bg-red-900 p-2 rounded text-white">Inicio</a>
+        <a th:action="@{/irAMiRutina}" href="mi-rutina" class="hover:bg-red-900 p-2 rounded text-white">Rutina</a>
+        <a th:action="@{/irAlimentacion}" href="alimentacion" class="hover:bg-red-900 p-2 rounded text-white">Alimentación</a>
+        <a th:action="@{/irCalendario}" href="calendario" class="hover:bg-red-900 p-2 rounded text-white">Calendario</a>
+    </nav>
+</div>
 <main style="display: flex;
     justify-content: center;
     align-items: center;
@@ -120,7 +151,13 @@
             <p>Complete los campos para ver la recomendación.</p>
         </div>
     </div>
+    <form th:action="@{/cerrar-sesion}" method="POST" class="mt-6">
+        <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-300 ease-in-out">
+            Cerrar Sesión
+        </button>
+    </form>
 </main>
 <script th:src="@{/js/main.js}"></script>
+<script th:src="@{/js/hamburguesa.js}"></script>
 </body>
 </html>

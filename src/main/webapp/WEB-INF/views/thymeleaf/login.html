@@ -1,51 +1,66 @@
-<!DOCTYPE HTML>
+
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
     <title>Taller Web I</title>
-
-    <!-- Boostrap core css -->
-    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.2.0/css/bootstrap.min.css}"/>
-
-    <!-- custom style -->
-    <link rel="stylesheet" th:href="@{/css/main.css}"/>
-
+    <link rel="stylesheet" th:href="@{/css/login.css}"/>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 
-<body>
-
-<nav class="navbar-login" >
-    <div class="logo">
-        <img th:src="@{/img/logoMagnusFitSolo.png}" alt="Logo" class="logo-img">
-        <h1 class="logo-text">MagnusFit</h1>
+<body class="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+<nav class="w-full bg-white shadow-md py-4 fixed top-0 z-20">
+    <div class="container mx-auto flex justify-center items-center">
+        <div class="flex items-center">
+            <img th:src="@{/img/logoMagnusFitSolo.png}" alt="Logo" class="logo-img">
+            <h1 class="logo-text">MagnusFit</h1>
+        </div>
     </div>
 </nav>
 
-<main role="main" class="container">
+<div class="animated-lines">
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+</div>
 
-    <div class = "container">
-        <div id="loginbox" style="margin-top:50px;" class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
-            <form action="#" th:action="@{/validar-login}" method="POST" th:object="${datosLogin}">
-                <h3 class="form-signin-heading">Iniciar Sesion</h3>
-                <hr class="colorgraph"><br>
-
-                <input th:field="*{email}" id="email" type="email" class="form-control" required style="margin: 0.5rem;" placeholder="Gmail"/>
-                <input th:field="*{password}" type="password" id="password" class="form-control" placeholder="Contraseña" required style="margin: 0.5rem;"/>
-
-                <button id="btn-login" class="btn btn-lg btn-primary btn-block" Type="Submit" style="margin: 0.5rem;">Login</button>
-
-                <p th:if="${error != null}" class="alert alert-danger" th:text="'Error ' + ${error}">
-                </p>
-            </form>
-            <a id="ir-a-registrarme" href="nuevo-usuario" style="margin: 0.5rem;">Registrarme</a>
-        </div>
-    </div>
-</main>
-<!-- /.container -->
-
-<!-- Boostrap core js -->
-<script type="text/javascript" th:src="@{webjars/bootstrap/5.2.0/js/bootstrap.min.js}"></script>
+<div class="login-wrapper relative z-10 w-full max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md sm:mx-4">
+    <main class="relative">
+        <h3 class="text-2xl font-semibold text-gray-800 mb-4 text-center">Iniciar Sesión</h3>
+        <hr class="border-gray-300 mb-4">
+        <form action="#" th:action="@{/validar-login}" method="POST" th:object="${datosLogin}">
+            <div class="mb-4">
+                <label for="email" class="block text-gray-700">Correo Electrónico</label>
+                <div class="relative">
+                    <input th:field="*{email}" id="email" type="email" class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 pl-2" placeholder="Correo Electrónico" required>
+                    <span class="absolute left-3 top-2.5 text-gray-400">
+                            <i class="fas fa-envelope"></i>
+                        </span>
+                </div>
+            </div>
+            <div class="mb-4">
+                <label for="password" class="block text-gray-700">Contraseña</label>
+                <div class="relative">
+                    <input th:field="*{password}" type="password" id="password" class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 pl-2" placeholder="Contraseña" required>
+                    <span class="absolute left-3 top-2.5 text-gray-400">
+                            <i class="fas fa-lock"></i>
+                        </span>
+                </div>
+            </div>
+            <button id="btn-login" class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-400" type="submit">Login</button>
+            <p th:if="${error != null}" class="alert alert-danger mt-4" th:text="'Error ' + ${error}"></p>
+        </form>
+        <a id="ir-a-registrarme" href="nuevo-usuario" class="block text-center text-blue-500 hover:underline mt-4">Registrarme</a>
+    </main>
+</div>
+<div class="motivational-text text-center text-gray-100 mb-4 mt-12">
+    <p>Descubre un nuevo camino hacia tu mejor versión iniciando sesión ahora.</p>
+</div>
 </body>
 </html>
