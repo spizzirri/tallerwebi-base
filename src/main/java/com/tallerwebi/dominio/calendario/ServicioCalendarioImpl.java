@@ -1,8 +1,11 @@
 package com.tallerwebi.dominio.calendario;
+import com.tallerwebi.dominio.excepcion.ItemRendimientoDuplicadoException;
 import com.tallerwebi.presentacion.DatosItemRendimiento;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDate;
 import java.util.*;
 @Service
 @Transactional
@@ -11,6 +14,7 @@ public class ServicioCalendarioImpl implements ServicioCalendario {
 
     private RepositorioCalendario repositorioCalendario;
 
+    @Autowired
     public ServicioCalendarioImpl(RepositorioCalendario repositorioCalendario){
         this.repositorioCalendario = repositorioCalendario;
     }
@@ -29,13 +33,14 @@ public class ServicioCalendarioImpl implements ServicioCalendario {
     }
 
     @Override
-    public List<DatosItemRendimiento> obtenerItemsPorTipoRendimiento(TipoRendimiento tipoRendimiento) {
-        return convertirADatosItemRendimiento(this.repositorioCalendario.obtenerItemsPorTipoRendimiento(tipoRendimiento));
-    }
-
-    @Override
     public void guardarItemRendimiento(ItemRendimiento itemRendimiento) {
-        this.repositorioCalendario.guardar(itemRendimiento);
+        if (!repositorioCalendario.existeItemRendimientoPorFecha(itemRendimiento.getFecha())) {
+            itemRendimiento.setFecha(LocalDate.now());
+            itemRendimiento.setDiaNombre();
+            repositorioCalendario.guardar(itemRendimiento);
+        } else {
+            throw new ItemRendimientoDuplicadoException("No se puede guardar tu rendimiento más de una vez el mismo día.");
+        }
     }
 
     @Override
@@ -43,25 +48,5 @@ public class ServicioCalendarioImpl implements ServicioCalendario {
         ItemRendimiento itemRendimiento = repositorioCalendario.obtenerItemMasSeleccionado();
         return itemRendimiento != null ? new DatosItemRendimiento(itemRendimiento) : null;
     }
-
-
-    //..................................................................
-
-    @Override
-    public ItemRendimiento actualizarItemRendimiento(ItemRendimiento itemRendimiento) {
-        repositorioCalendario.guardar(itemRendimiento);
-        return itemRendimiento;
-    }
-
-    @Override
-    public void eliminarItemRendimiento(ItemRendimiento dia) {
-        repositorioCalendario.eliminar(dia);
-    }
-
-    @Override
-    public List<TipoRendimiento> obtenerOpcionesRendimiento() {
-        return List.of();
-    }
-
 
 }

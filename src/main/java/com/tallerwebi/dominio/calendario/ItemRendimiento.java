@@ -56,8 +56,10 @@ public class ItemRendimiento {
         return diaNombre;
     }
 
-    public void setDiaNombre(String diaNombre) {
-        this.diaNombre = diaNombre;
+    public void setDiaNombre() {
+        if (this.fecha != null) {
+            this.diaNombre = this.fecha.getDayOfWeek().getDisplayName(TextStyle.FULL, new Locale("es"));
+        }
     }
 
     @Override

@@ -54,7 +54,6 @@ public class ControladorCalendario {
         }
 
         ModelMap model = new ModelMap();
-        itemRendimiento.setFecha(LocalDate.now());
 
         try {
             servicioCalendario.guardarItemRendimiento(itemRendimiento);

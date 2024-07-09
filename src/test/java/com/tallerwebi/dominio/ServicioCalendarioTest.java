@@ -4,9 +4,12 @@ import com.tallerwebi.dominio.calendario.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
+
 import com.tallerwebi.dominio.calendario.TipoRendimiento;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -42,27 +45,21 @@ public class ServicioCalendarioTest {
     }
 
     @Test
-    public void queAlBuscarItemRendimientoPorTipoRendimientoNormalDevuelvaLosItemsCorrespondientes() {
+    public void dadoQueElUsuarioGuardaUnItemRendimientoQueSePuedaGuardarItemRendimiento() {
         // preparacion
-        List<ItemRendimiento> itemsMock = new ArrayList<>();
-        itemsMock.add(new ItemRendimiento(TipoRendimiento.NORMAL));
-        when(this.repositorioCalendario.obtenerItemsPorTipoRendimiento(TipoRendimiento.NORMAL)).thenReturn(itemsMock);
-        // ejecucion
-//      List<DatosItemRendimiento> items = this.servicioCalendario.obtenerItemsPorTipoRendimiento(TipoRendimiento.NORMAL);
-        // verificacion
-        assertThat(itemsMock.size(), equalTo(1)); // Existan 1 elementos
-    }
-
-    @Test
-    public void queSePuedaGuardarItemRendimiento() {
-        List<ItemRendimiento> itemsMock = new ArrayList<>();
         TipoRendimiento tipoRendimiento = TipoRendimiento.NORMAL;
-        ItemRendimiento itemRendimientoMock = new ItemRendimiento(tipoRendimiento);
+        ItemRendimiento itemRendimientoMock = new ItemRendimiento();
+        itemRendimientoMock.setTipoRendimiento(tipoRendimiento);
 
+        when(repositorioCalendario.existeItemRendimientoPorFecha(any(LocalDate.class))).thenReturn(false);
+
+        // ejecucion
         servicioCalendario.guardarItemRendimiento(itemRendimientoMock);
 
-        // Assert (Verify interactions)
+        // verificacion
         verify(repositorioCalendario).guardar(itemRendimientoMock);
+        assertEquals(LocalDate.now(), itemRendimientoMock.getFecha());
+        assertEquals(LocalDate.now().getDayOfWeek().getDisplayName(TextStyle.FULL, new Locale("es")), itemRendimientoMock.getDiaNombre());
     }
 
     @Test

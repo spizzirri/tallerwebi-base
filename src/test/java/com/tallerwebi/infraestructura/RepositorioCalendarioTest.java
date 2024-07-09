@@ -76,22 +76,6 @@ public class RepositorioCalendarioTest {
 
     @Test
     @Transactional
-    public void queSePuedaActualizarUnItemRendimiento() {
-        ItemRendimiento itemRendimiento = new ItemRendimiento(TipoRendimiento.DESCANSO);
-        this.repositorioCalendario.guardar(itemRendimiento);
-
-        itemRendimiento.setTipoRendimiento(TipoRendimiento.ALTO);
-        this.repositorioCalendario.actualizar(itemRendimiento);
-        Long idGuardado = itemRendimiento.getId();
-        ItemRendimiento diaObtenido = (ItemRendimiento) this.sessionFactory.getCurrentSession()
-                .createQuery("FROM ItemRendimiento Where id = :id")
-                .setParameter("id", idGuardado)
-                .getSingleResult();
-        assertThat(diaObtenido.getTipoRendimiento(), equalTo(TipoRendimiento.ALTO));
-    }
-
-    @Test
-    @Transactional
     public void queSePuedanObtenerTodosLosItemRendimiento() {
         ItemRendimiento itemRendimiento1 = new ItemRendimiento(TipoRendimiento.NORMAL);
         ItemRendimiento itemRendimiento2 = new ItemRendimiento(TipoRendimiento.DESCANSO);
@@ -127,22 +111,6 @@ public class RepositorioCalendarioTest {
         assertEquals(TipoRendimiento.ALTO, itemMasSeleccionado.getTipoRendimiento());
     }
 
-
-    @Test
-    @Transactional
-    public void queSePuedaVaciarElCalendario() {
-        ItemRendimiento itemRendimiento1 = new ItemRendimiento(TipoRendimiento.BAJO);
-        ItemRendimiento itemRendimiento2 = new ItemRendimiento(TipoRendimiento.DESCANSO);
-        this.repositorioCalendario.guardar(itemRendimiento1);
-        this.repositorioCalendario.guardar(itemRendimiento2);
-
-        this.repositorioCalendario.vaciarCalendario();
-        List<ItemRendimiento> diasRestantes = this.sessionFactory.getCurrentSession()
-                .createQuery("FROM ItemRendimiento", ItemRendimiento.class)
-                .getResultList();
-
-        assertThat(diasRestantes.isEmpty(), equalTo(true));
-    }
 
     @Test
     @Transactional
