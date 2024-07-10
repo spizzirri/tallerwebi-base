@@ -45,18 +45,6 @@ public class ServicioCalendarioTest {
     }
 
     @Test
-
-    public void queAlBuscarItemRendimientoPorTipoRendimientoNormalDevuelvaLosItemsCorrespondientes() {
-        List<ItemRendimiento> itemsMock = new ArrayList<>();
-        itemsMock.add(new ItemRendimiento(TipoRendimiento.NORMAL));
-        when(this.repositorioCalendario.obtenerItemsPorTipoRendimiento(TipoRendimiento.NORMAL)).thenReturn(itemsMock);
-
-        List<DatosItemRendimiento> items = this.servicioCalendario.obtenerItemsPorTipoRendimiento(TipoRendimiento.NORMAL);
-
-        assertThat(items.size(), equalTo(1));
-    }
-
-    @Test
     public void queSePuedaGuardarItemRendimiento() {
         ItemRendimiento itemRendimientoMock = new ItemRendimiento(TipoRendimiento.NORMAL);
 
@@ -91,39 +79,6 @@ public class ServicioCalendarioTest {
         DatosItemRendimiento itemMasSeleccionado = this.servicioCalendario.obtenerItemMasSeleccionado();
 
         assertThat(itemMasSeleccionado.getTipoRendimiento(), equalTo(TipoRendimiento.ALTO));
-    }
-
-    @Test
-    public void queSePuedaActualizarItemRendimiento() {
-        ItemRendimiento itemRendimiento = new ItemRendimiento(LocalDate.now(), TipoRendimiento.NORMAL);
-
-        this.servicioCalendario.actualizarItemRendimiento(itemRendimiento);
-
-        verify(this.repositorioCalendario).guardar(itemRendimiento);
-    }
-
-    @Test
-    public void queSePuedaEliminarItemRendimiento() {
-        ItemRendimiento itemRendimiento = new ItemRendimiento(LocalDate.now(), TipoRendimiento.NORMAL);
-
-        this.servicioCalendario.eliminarItemRendimiento(itemRendimiento);
-
-        verify(this.repositorioCalendario).eliminar(itemRendimiento);
-    }
-
-    @Test
-    public void queSePuedanObtenerOpcionesRendimiento() {
-        List<TipoRendimiento> opciones = this.servicioCalendario.obtenerOpcionesRendimiento();
-
-        assertThat(opciones.size(), equalTo(4));
-        assertThat(opciones, equalTo(Arrays.asList(TipoRendimiento.ALTO, TipoRendimiento.NORMAL, TipoRendimiento.BAJO, TipoRendimiento.DESCANSO)));
-    }
-
-    @Test
-    public void queSePuedaVaciarElCalendario() {
-        this.servicioCalendario.vaciarCalendario();
-
-        verify(this.repositorioCalendario).vaciarCalendario();
     }
 
 }

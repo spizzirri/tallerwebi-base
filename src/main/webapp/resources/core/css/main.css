@@ -581,7 +581,6 @@ body-calendario {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin-bottom: 3rem;
     color: white !important;
     background-image: linear-gradient( 296.2deg,  rgba(73,73,73,1) 36.1%, rgba(16,15,15,1) 93.6% );
     padding: 1rem;

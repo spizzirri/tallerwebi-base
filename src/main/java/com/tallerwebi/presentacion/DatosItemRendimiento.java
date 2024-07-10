@@ -9,15 +9,12 @@ public class DatosItemRendimiento {
 
     private LocalDate fecha;
     private TipoRendimiento tipoRendimiento;
-
-    public DatosItemRendimiento(LocalDate fecha, TipoRendimiento tipoRendimiento) {
-        this.fecha = fecha;
-        this.tipoRendimiento = tipoRendimiento;
-    }
+    private String diaNombre;
 
     public DatosItemRendimiento(ItemRendimiento itemRendimiento) {
         this.tipoRendimiento = itemRendimiento.getTipoRendimiento();
         this.fecha = itemRendimiento.getFecha();
+        this.diaNombre = itemRendimiento.getDiaNombre();
     }
 
     public DatosItemRendimiento() {
@@ -39,4 +36,13 @@ public class DatosItemRendimiento {
     public void setTipoRendimiento(TipoRendimiento tipoRendimiento) {
         this.tipoRendimiento = tipoRendimiento;
     }
+
+    public String getDiaNombre() {
+        return diaNombre;
+    }
+
+    public void setDiaNombre(String diaNombre) {
+        this.diaNombre = diaNombre;
+    }
+
 }
