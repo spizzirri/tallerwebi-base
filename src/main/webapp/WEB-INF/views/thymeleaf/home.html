@@ -59,25 +59,28 @@
             </svg>
             <span>Volver</span>
         </button>
-        <a th:action="@{/irAHome}" href="home" class="hover:bg-red-900 p-2 rounded text-white">Inicio</a>
-        <a th:action="@{/irAMiRutina}" href="mi-rutina" class="hover:bg-red-900 p-2 rounded text-white">Rutina</a>
-        <a th:action="@{/irAlimentacion}" href="alimentacion" class="hover:bg-red-900 p-2 rounded text-white">Alimentación</a>
-        <a th:action="@{/irCalendario}" href="calendario" class="hover:bg-red-900 p-2 rounded text-white">Calendario</a>
+        <a th:action="@{/irAHome}" href="home" class="hover:bg-blue-500 p-2 rounded text-white">Inicio</a>
+        <a th:action="@{/irAMiRutina}" href="mi-rutina" class="hover:bg-blue-500 p-2 rounded text-white">Rutina</a>
+        <a th:action="@{/irAlimentacion}" href="alimentacion" class="hover:bg-blue-500 p-2 rounded text-white">Alimentación</a>
+        <a th:action="@{/irCalendario}" href="calendario" class="hover:bg-blue-500 p-2 rounded text-white">Calendario</a>
     </nav>
 </div>
 
 <main class="main-content">
     <section style="width:100%; display:flex; justify-content:center;">
-        <a th:href= "@{/verProgreso}" style="width:80%;">
+        <a th:href="@{/verProgreso}" style="width:80%;">
             <article class="progreso-container">
                 <p th:if="${itemMasSeleccionado != null}">Progreso
                     <span th:text="${itemMasSeleccionado.tipoRendimiento}"></span>
+                </p>
+                <p th:if="${itemMasSeleccionado == null}" class="font-semibold">
+                    <span th:text="${mensaje}"></span>
                 </p>
                 <div class="barra-progreso"></div>
             </article>
         </a>
     </section>
-    <div class="container">
+    <div class="container mt-12">
         <h1 class="main-title">Tu Entrenador Personal</h1>
         <p class="main-text">Somos tu compañero de fitness y bienestar. Sabemos que cada paso cuenta en tu viaje hacia un estilo de vida más saludable, y estamos aquí para guiarte en cada paso del camino.</p>
         <a th:action="@{/irAMiRutina}" href="mi-rutina" class="main-btn">Comenzar entrenamiento</a>
@@ -143,7 +146,7 @@
             <div class="flex max-w-xl flex-col items-center justify-between bg-white rounded-3xl shadow-md overflow-hidden transition-transform transform hover:scale-105 p-6">
                 <div class="group relative">
                     <h3 class="mt-3 text-lg font-semibold leading-6 text-gray-900 group-hover:text-gray-600">
-                        <a th:action="@{/irAlimentacion}" href="alimentacion" class="text-red-800">
+                        <a th:action="@{/irAlimentacion}" href="alimentacion">
                             <span class="absolute inset-0"></span>
                             Comidas segun tu objetivo
                         </a>
@@ -159,7 +162,7 @@
             <div class="flex max-w-xl flex-col items-center justify-between bg-white rounded-3xl shadow-md overflow-hidden transition-transform transform hover:scale-105 p-6">
                 <div class="group relative">
                     <h3 class="mt-3 text-lg font-semibold leading-6 text-gray-900 group-hover:text-gray-600">
-                        <a th:action="@{/irAMiRutina}" href="mi-rutina" class="text-red-800">
+                        <a th:action="@{/irAMiRutina}" href="mi-rutina">
                             <span class="absolute inset-0"></span>
                             Encuentra ejercicios personalizados
                         </a>
@@ -175,7 +178,7 @@
             <div class="flex max-w-xl flex-col items-center justify-between bg-white rounded-3xl shadow-md overflow-hidden transition-transform transform hover:scale-105 p-6">
                 <div class="group relative">
                     <h3 class="mt-3 text-lg font-semibold leading-6 text-gray-900 group-hover:text-gray-600">
-                        <a th:action="@{/irCalendario}" href="calendario" class="text-red-800">
+                        <a th:action="@{/irCalendario}" href="calendario">
                             <span class="absolute inset-0"></span>
                             Organiza tus entrenamientos
                         </a>

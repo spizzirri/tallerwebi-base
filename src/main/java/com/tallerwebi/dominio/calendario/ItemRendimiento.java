@@ -2,6 +2,8 @@ package com.tallerwebi.dominio.calendario;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.format.TextStyle;
+import java.util.Locale;
 import java.util.Objects;
 
 @Entity
@@ -17,17 +19,24 @@ public class ItemRendimiento {
     @Column(name = "tipoRendimiento", nullable = false)
     private TipoRendimiento tipoRendimiento;
 
+    @Column(name = "diaNombre", nullable = false)
+    private String diaNombre;
+
     public ItemRendimiento() {
+        this.fecha = LocalDate.now();
+        this.diaNombre = fecha.getDayOfWeek().getDisplayName(TextStyle.FULL, new Locale("es"));
     }
 
     public ItemRendimiento(TipoRendimiento tipoRendimiento) {
         this.fecha = LocalDate.now();
         this.tipoRendimiento = tipoRendimiento;
+        this.diaNombre = fecha.getDayOfWeek().getDisplayName(TextStyle.FULL, new Locale("es"));
     }
 
     public ItemRendimiento(LocalDate fecha, TipoRendimiento tipoRendimiento) {
         this.fecha = fecha;
         this.tipoRendimiento = tipoRendimiento;
+        this.diaNombre = fecha.getDayOfWeek().getDisplayName(TextStyle.FULL, new Locale("es"));
     }
 
     public Long getId() {
@@ -44,6 +53,17 @@ public class ItemRendimiento {
 
     public void setFecha(LocalDate fecha) {
         this.fecha = fecha;
+        this.diaNombre = fecha.getDayOfWeek().getDisplayName(TextStyle.FULL, new Locale("es"));
+    }
+
+    public String getDiaNombre() {
+        return diaNombre;
+    }
+
+    public void setDiaNombre() {
+        if (this.fecha != null) {
+            this.diaNombre = this.fecha.getDayOfWeek().getDisplayName(TextStyle.FULL, new Locale("es"));
+        }
     }
 
     @Override
@@ -65,6 +85,7 @@ public class ItemRendimiento {
                 "id=" + id +
                 ", fecha=" + fecha +
                 ", tipoRendimiento=" + tipoRendimiento +
+                ", diaNombre='" + diaNombre + '\'' +
                 '}';
     }
 
@@ -75,5 +96,4 @@ public class ItemRendimiento {
     public void setTipoRendimiento(TipoRendimiento tipoRendimiento) {
         this.tipoRendimiento = tipoRendimiento;
     }
-
 }

@@ -13,7 +13,7 @@
     <link rel="stylesheet" th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css}">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body class="body-calendario">
+<body class="body-calendario min-h-screen">
 <header class="bg-white p-4 flex items-center justify-between relative">
     <!-- Botón de hamburguesa -->
     <div class="block md:hidden">
@@ -58,10 +58,10 @@
             </svg>
             <span>Volver</span>
         </button>
-        <a th:action="@{/irAHome}" href="home" class="hover:bg-red-900 p-2 rounded text-white">Inicio</a>
-        <a th:action="@{/irAMiRutina}" href="mi-rutina" class="hover:bg-red-900 p-2 rounded text-white">Rutina</a>
-        <a th:action="@{/irAlimentacion}" href="alimentacion" class="hover:bg-red-900 p-2 rounded text-white">Alimentación</a>
-        <a th:action="@{/irCalendario}" href="calendario" class="hover:bg-red-900 p-2 rounded text-white">Calendario</a>
+        <a th:action="@{/irAHome}" href="home" class="hover:bg-blue-500 p-2 rounded text-white">Inicio</a>
+        <a th:action="@{/irAMiRutina}" href="mi-rutina" class="hover:bg-blue-500 p-2 rounded text-white">Rutina</a>
+        <a th:action="@{/irAlimentacion}" href="alimentacion" class="hover:bg-blue-500 p-2 rounded text-white">Alimentación</a>
+        <a th:action="@{/irCalendario}" href="calendario" class="hover:bg-blue-500 p-2 rounded text-white">Calendario</a>
     </nav>
 </div>
 

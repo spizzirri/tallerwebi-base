@@ -48,32 +48,40 @@
     </div>
 </header>
 
+<!-- Menú lateral para pantallas pequeñas -->
+<div id="side-menu" class="fixed inset-y-0 left-0 w-64 text-white transform -translate-x-full transition-transform md:hidden z-50 gradient-bg">
+    <nav class="flex flex-col space-y-4 p-4">
+        <button id="close-menu" class="text-white flex items-center justify-center focus:outline-none mb-4">
+            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+            <span>Volver</span>
+        </button>
+        <a th:action="@{/irAHome}" href="home" class="hover:bg-blue-500 p-2 rounded text-white">Inicio</a>
+        <a th:action="@{/irAMiRutina}" href="mi-rutina" class="hover:bg-blue-500 p-2 rounded text-white">Rutina</a>
+        <a th:action="@{/irAlimentacion}" href="alimentacion" class="hover:bg-blue-500 p-2 rounded text-white">Alimentación</a>
+        <a th:action="@{/irCalendario}" href="calendario" class="hover:bg-blue-500 p-2 rounded text-white">Calendario</a>
+    </nav>
+</div>
+
 <main class="py-6 px-4 md:py-12 md:px-0 flex flex-col items-center">
     <h1 class="text-2xl md:text-3xl font-bold mb-4 md:mb-8 text-gray-100">Progreso</h1>
     <div class="w-full max-w-7xl">
-        <div class="grid grid-cols-1 md:grid-cols-7 gap-2 md:gap-4 text-center font-semibold">
-            <div class="hidden md:block">Lun</div>
-            <div class="hidden md:block">Mar</div>
-            <div class="hidden md:block">Mié</div>
-            <div class="hidden md:block">Jue</div>
-            <div class="hidden md:block">Vie</div>
-            <div class="hidden md:block">Sáb</div>
-            <div class="hidden md:block">Dom</div>
+        <div th:if="${sinRendimiento}" class="bg-white border rounded-lg p-4 flex flex-col items-center text-center shadow-sm">
+            <p class="text-xl md:text-sm font-semibold text-gray-600" th:text="${mensaje}"></p>
+            <form th:action="@{/calendario}" method="GET" class="mt-2 md:mt-4">
+                <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-200">Ir a Calendario</button>
+            </form>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-7 gap-2 md:gap-4 mt-2 md:mt-4">
+        <div th:if="!${sinRendimiento}" class="grid grid-cols-1 md:grid-cols-7 gap-2 md:gap-4 mt-2 md:mt-4">
             <div th:each="item : ${datosItemRendimiento}" class="bg-white border rounded-lg p-2 flex flex-col items-center text-center shadow-sm">
-                <td th:text="${item.fecha}"></td>
-                <div class="text-xs md:text-sm tipo-rendimiento" th:text="${item.tipoRendimiento}"></div>
-            </div>
-            <!-- Si hay días vacíos al inicio del mes -->
-            <div th:each="emptyDay : ${emptyDays}" class="border rounded-lg p-2 flex flex-col items-center text-center shadow-sm">
-                <!-- Día vacío -->
+                <div class="text-xs md:text-sm font-semibold dia-nombre" th:text="${item.diaNombre}"></div>
+                <div class="text-xs md:text-sm font-semibold fecha" th:text="${item.fecha}"></div>
+                <div class="text-xs md:text-sm font-semibold tipo-rendimiento" th:text="${item.tipoRendimiento}"></div>
             </div>
         </div>
     </div>
 </main>
-
-
 
 <!-- Bootstrap CSS -->
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">

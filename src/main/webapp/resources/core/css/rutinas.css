@@ -3,9 +3,12 @@ body {
     margin: 0;
     padding: 0;
     color: #ccc;
-   background-image: linear-gradient( 179deg,  rgba(0,0,0,1) 9.2%, rgba(127,16,16,1) 103.9% );
+    background-image: linear-gradient(89.7deg,  rgba(0,0,0,1) -10.7%, rgba(53,92,125,1) 88.8% );
 }
 
+.gradient-bg {
+    background-image: linear-gradient(296.2deg, rgba(73, 73, 73, 1) 36.1%, rgba(16, 15, 15, 1) 93.6%);
+}
 
 header {
     background-color: #fff;
