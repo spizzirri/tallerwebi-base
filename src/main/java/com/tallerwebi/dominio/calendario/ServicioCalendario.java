@@ -15,5 +15,6 @@ public interface ServicioCalendario {
     ItemRendimiento actualizarItemRendimiento(ItemRendimiento itemRendimiento);
     void eliminarItemRendimiento(ItemRendimiento itemRendimiento);
     List<TipoRendimiento> obtenerOpcionesRendimiento();
+    void vaciarCalendario();
 
 }

@@ -3,7 +3,6 @@ package com.tallerwebi.presentacion;
 import com.tallerwebi.dominio.calendario.*;
 import com.tallerwebi.dominio.excepcion.ItemRendimientoDuplicadoException;
 import com.tallerwebi.dominio.usuario.Usuario;
-import com.tallerwebi.infraestructura.RepositorioCalendarioImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -12,10 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.ModelAndView;
-import com.tallerwebi.dominio.calendario.ServicioCalendario;
 
 import javax.servlet.http.HttpSession;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -23,13 +23,11 @@ import static org.hamcrest.Matchers.equalToIgnoringCase;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 public class ControladorCalendarioTest {
 
-  private ServicioCalendario servicioCalendario;
-  private ControladorCalendario controladorCalendario;
+    private ServicioCalendario servicioCalendario;
+    private ControladorCalendario controladorCalendario;
 
     @Autowired
     private MockMvc mockMvc;
@@ -60,6 +58,15 @@ public class ControladorCalendarioTest {
     }
 
     @Test
+    public void queAlIrALaPantallaDeCalendarioSinUsuarioRedirijaALogin() {
+        when(session.getAttribute("usuario")).thenReturn(null);
+
+        ModelAndView modelAndView = controladorCalendario.irCalendario(session);
+
+        assertEquals("redirect:/login", modelAndView.getViewName()); // Verificar redirección a login
+    }
+
+    @Test
     public void queSeLogreGuardarUnItemRendimientoRedireccionandoHaciaVerProgreso() {
         ItemRendimiento itemRendimiento = new ItemRendimiento(TipoRendimiento.DESCANSO);
 
@@ -72,7 +79,17 @@ public class ControladorCalendarioTest {
     }
 
     @Test
-    public void queAlGuardarMasDeUnaVezUnItemRendimientoElMismoDiaAparezcaLaExcepcion() throws Exception {
+    public void queSeLogreGuardarUnItemRendimientoSinUsuarioRedirijaALogin() {
+        when(session.getAttribute("usuario")).thenReturn(null);
+        ItemRendimiento itemRendimiento = new ItemRendimiento(TipoRendimiento.DESCANSO);
+
+        ModelAndView modelAndView = controladorCalendario.verProgreso(itemRendimiento, session);
+
+        assertEquals("redirect:/login", modelAndView.getViewName()); // Verificar redirección a login
+    }
+
+    @Test
+    public void queAlGuardarMasDeUnaVezUnItemRendimientoElMismoDiaAparezcaLaExcepcion() {
         ItemRendimiento itemRendimiento = new ItemRendimiento();
         itemRendimiento.setFecha(LocalDate.now());
         doThrow(new ItemRendimientoDuplicadoException("No se puede guardar tu rendimiento más de una vez el mismo día."))
@@ -87,4 +104,24 @@ public class ControladorCalendarioTest {
         assertTrue(modelAndView.getModel().containsKey("usuario")); // verificar que el usuario está en el modelo
     }
 
+    @Test
+    public void queAlIrVerProgresoMeMuestreLaVistaDeVerProgreso() {
+        List<DatosItemRendimiento> datosItemRendimiento = new ArrayList<>();
+        when(servicioCalendario.obtenerItemsRendimiento()).thenReturn(datosItemRendimiento);
+
+        ModelAndView modelAndView = controladorCalendario.irVerProgreso(session);
+
+        assertThat(modelAndView.getViewName(), equalTo("verProgreso")); // vista correcta
+        assertTrue(modelAndView.getModel().containsKey("datosItemRendimiento")); // verificar que los datos están en el modelo
+        assertTrue(modelAndView.getModel().containsKey("usuario")); // verificar que el usuario está en el modelo
+    }
+
+    @Test
+    public void queAlIrVerProgresoSinUsuarioRedirijaALogin() {
+        when(session.getAttribute("usuario")).thenReturn(null);
+
+        ModelAndView modelAndView = controladorCalendario.irVerProgreso(session);
+
+        assertEquals("redirect:/login", modelAndView.getViewName()); // Verificar redirección a login
+    }
 }

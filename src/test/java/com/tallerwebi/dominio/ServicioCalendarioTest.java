@@ -1,13 +1,15 @@
 package com.tallerwebi.dominio;
+
 import com.tallerwebi.presentacion.DatosItemRendimiento;
 import com.tallerwebi.dominio.calendario.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import com.tallerwebi.dominio.calendario.TipoRendimiento;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -17,8 +19,6 @@ public class ServicioCalendarioTest {
 
     private ServicioCalendario servicioCalendario;
     private RepositorioCalendario repositorioCalendario;
-
-    LocalDate fechaActual = LocalDate.now(); // Obtener fecha actual
 
     @BeforeEach
     public void init() {
@@ -32,55 +32,74 @@ public class ServicioCalendarioTest {
         itemsMock.add(new ItemRendimiento(TipoRendimiento.DESCANSO));
         itemsMock.add(new ItemRendimiento(TipoRendimiento.DESCANSO));
         itemsMock.add(new ItemRendimiento(TipoRendimiento.DESCANSO));
-        // ejecucion
         when(this.repositorioCalendario.obtenerItemsRendimiento()).thenReturn(itemsMock);
-//        List<DatosItemRendimiento> itemsRendimientos = this.servicioCalendario.obtenerItemsRendimiento();
-        // verificacion
 
-        assertThat(itemsMock.size(), equalTo(3)); // Existan 3 elementos
+        List<DatosItemRendimiento> itemsRendimientos = this.servicioCalendario.obtenerItemsRendimiento();
 
+        assertThat(itemsRendimientos.size(), equalTo(3));
     }
 
     @Test
     public void queAlBuscarItemRendimientoPorTipoRendimientoNormalDevuelvaLosItemsCorrespondientes() {
-        // preparacion
         List<ItemRendimiento> itemsMock = new ArrayList<>();
         itemsMock.add(new ItemRendimiento(TipoRendimiento.NORMAL));
         when(this.repositorioCalendario.obtenerItemsPorTipoRendimiento(TipoRendimiento.NORMAL)).thenReturn(itemsMock);
-        // ejecucion
-//      List<DatosItemRendimiento> items = this.servicioCalendario.obtenerItemsPorTipoRendimiento(TipoRendimiento.NORMAL);
-        // verificacion
-        assertThat(itemsMock.size(), equalTo(1)); // Existan 1 elementos
+
+        List<DatosItemRendimiento> items = this.servicioCalendario.obtenerItemsPorTipoRendimiento(TipoRendimiento.NORMAL);
+
+        assertThat(items.size(), equalTo(1));
     }
 
     @Test
     public void queSePuedaGuardarItemRendimiento() {
-        List<ItemRendimiento> itemsMock = new ArrayList<>();
-        TipoRendimiento tipoRendimiento = TipoRendimiento.NORMAL;
-        ItemRendimiento itemRendimientoMock = new ItemRendimiento(tipoRendimiento);
+        ItemRendimiento itemRendimientoMock = new ItemRendimiento(TipoRendimiento.NORMAL);
 
-        servicioCalendario.guardarItemRendimiento(itemRendimientoMock);
+        this.servicioCalendario.guardarItemRendimiento(itemRendimientoMock);
 
-        // Assert (Verify interactions)
-        verify(repositorioCalendario).guardar(itemRendimientoMock);
+        verify(this.repositorioCalendario).guardar(itemRendimientoMock);
     }
 
     @Test
     public void queSePuedaObtenerTipoRendimientoMasSeleccionado() {
-        // Crear los ítems de rendimiento mock
         ItemRendimiento itemRendimiento1 = new ItemRendimiento(LocalDate.now().minusDays(15), TipoRendimiento.ALTO);
-        ItemRendimiento itemRendimiento2 = new ItemRendimiento(LocalDate.now().minusDays(14), TipoRendimiento.ALTO);
-        ItemRendimiento itemRendimiento3 = new ItemRendimiento(LocalDate.now().minusDays(13), TipoRendimiento.BAJO);
-        ItemRendimiento itemRendimiento4 = new ItemRendimiento(LocalDate.now().minusDays(12), TipoRendimiento.NORMAL);
+        when(this.repositorioCalendario.obtenerItemMasSeleccionado()).thenReturn(itemRendimiento1);
 
-        List<ItemRendimiento> items = Arrays.asList(itemRendimiento1, itemRendimiento2, itemRendimiento3, itemRendimiento4);
-        when(repositorioCalendario.obtenerItemMasSeleccionado()).thenReturn(itemRendimiento1);
-        DatosItemRendimiento itemMasSeleccionado = servicioCalendario.obtenerItemMasSeleccionado();
+        DatosItemRendimiento itemMasSeleccionado = this.servicioCalendario.obtenerItemMasSeleccionado();
 
         assertThat(itemMasSeleccionado.getTipoRendimiento(), equalTo(TipoRendimiento.ALTO));
     }
 
+    @Test
+    public void queSePuedaActualizarItemRendimiento() {
+        ItemRendimiento itemRendimiento = new ItemRendimiento(LocalDate.now(), TipoRendimiento.NORMAL);
 
+        this.servicioCalendario.actualizarItemRendimiento(itemRendimiento);
 
+        verify(this.repositorioCalendario).guardar(itemRendimiento);
+    }
+
+    @Test
+    public void queSePuedaEliminarItemRendimiento() {
+        ItemRendimiento itemRendimiento = new ItemRendimiento(LocalDate.now(), TipoRendimiento.NORMAL);
+
+        this.servicioCalendario.eliminarItemRendimiento(itemRendimiento);
+
+        verify(this.repositorioCalendario).eliminar(itemRendimiento);
+    }
+
+    @Test
+    public void queSePuedanObtenerOpcionesRendimiento() {
+        List<TipoRendimiento> opciones = this.servicioCalendario.obtenerOpcionesRendimiento();
+
+        assertThat(opciones.size(), equalTo(4));
+        assertThat(opciones, equalTo(Arrays.asList(TipoRendimiento.ALTO, TipoRendimiento.NORMAL, TipoRendimiento.BAJO, TipoRendimiento.DESCANSO)));
+    }
+
+    @Test
+    public void queSePuedaVaciarElCalendario() {
+        this.servicioCalendario.vaciarCalendario();
+
+        verify(this.repositorioCalendario).vaciarCalendario();
+    }
 
 }

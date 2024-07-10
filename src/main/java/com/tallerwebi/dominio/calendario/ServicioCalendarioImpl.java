@@ -35,6 +35,9 @@ public class ServicioCalendarioImpl implements ServicioCalendario {
 
     @Override
     public void guardarItemRendimiento(ItemRendimiento itemRendimiento) {
+        if (itemRendimiento.getTipoRendimiento() == null) {
+            throw new IllegalArgumentException("Tipo de rendimiento no puede ser nulo.");
+        }
         this.repositorioCalendario.guardar(itemRendimiento);
     }
 
@@ -60,7 +63,12 @@ public class ServicioCalendarioImpl implements ServicioCalendario {
 
     @Override
     public List<TipoRendimiento> obtenerOpcionesRendimiento() {
-        return List.of();
+        return List.of(TipoRendimiento.ALTO, TipoRendimiento.NORMAL, TipoRendimiento.BAJO, TipoRendimiento.DESCANSO);
+    }
+
+    @Override
+    public void vaciarCalendario() {
+        repositorioCalendario.vaciarCalendario();
     }
 
 

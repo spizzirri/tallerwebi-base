@@ -23,6 +23,8 @@ public class ItemRendimiento {
     private String diaNombre;
 
     public ItemRendimiento() {
+        this.fecha = LocalDate.now();
+        this.diaNombre = fecha.getDayOfWeek().getDisplayName(TextStyle.FULL, new Locale("es"));
     }
 
     public ItemRendimiento(TipoRendimiento tipoRendimiento) {
@@ -34,6 +36,7 @@ public class ItemRendimiento {
     public ItemRendimiento(LocalDate fecha, TipoRendimiento tipoRendimiento) {
         this.fecha = fecha;
         this.tipoRendimiento = tipoRendimiento;
+        this.diaNombre = fecha.getDayOfWeek().getDisplayName(TextStyle.FULL, new Locale("es"));
     }
 
     public Long getId() {
@@ -50,6 +53,7 @@ public class ItemRendimiento {
 
     public void setFecha(LocalDate fecha) {
         this.fecha = fecha;
+        this.diaNombre = fecha.getDayOfWeek().getDisplayName(TextStyle.FULL, new Locale("es"));
     }
 
     public String getDiaNombre() {
@@ -79,6 +83,7 @@ public class ItemRendimiento {
                 "id=" + id +
                 ", fecha=" + fecha +
                 ", tipoRendimiento=" + tipoRendimiento +
+                ", diaNombre='" + diaNombre + '\'' +
                 '}';
     }
 
@@ -89,5 +94,4 @@ public class ItemRendimiento {
     public void setTipoRendimiento(TipoRendimiento tipoRendimiento) {
         this.tipoRendimiento = tipoRendimiento;
     }
-
 }

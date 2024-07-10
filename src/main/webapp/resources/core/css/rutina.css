@@ -238,7 +238,7 @@ a:active {
     .card-body p {
         font-size: 1rem; /* Adjust body text size for smaller screens */
     }
-}
+
 /* Definir los estilos para el select según el estado */
 .estado-no-empezado {
     background-color: lightgray;

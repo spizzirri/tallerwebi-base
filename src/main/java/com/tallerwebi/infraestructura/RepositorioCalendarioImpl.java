@@ -31,12 +31,17 @@ public class RepositorioCalendarioImpl implements RepositorioCalendario {
 
     @Override
     public void guardar(ItemRendimiento itemRendimiento) {
+        if (itemRendimiento.getTipoRendimiento() == null) {
+            throw new IllegalArgumentException("Tipo de rendimiento no puede ser nulo.");
+        }
+
         if (!existeItemRendimientoPorFecha(itemRendimiento.getFecha())) {
             this.sessionFactory.getCurrentSession().save(itemRendimiento);
         } else {
-            throw new ItemRendimientoDuplicadoException("No se puede guardar tu rendimiento más de una vez el mismo día.");
+            throw new ItemRendimientoDuplicadoException("Ya existe un ItemRendimiento para esta fecha.");
         }
     }
+
 
     @Override
     public boolean existeItemRendimientoPorFecha(LocalDate fecha) {
@@ -85,8 +90,13 @@ public class RepositorioCalendarioImpl implements RepositorioCalendario {
 
     @Override
     public List<ItemRendimiento> obtenerItemsPorTipoRendimiento(TipoRendimiento tipoRendimiento) {
-        return List.of();
+        String hql = "FROM ItemRendimiento WHERE tipoRendimiento = :tipoRendimiento";
+        return this.sessionFactory.getCurrentSession()
+                .createQuery(hql, ItemRendimiento.class)
+                .setParameter("tipoRendimiento", tipoRendimiento)
+                .getResultList();
     }
+
 
     @Override
     public void eliminar(ItemRendimiento dia) {

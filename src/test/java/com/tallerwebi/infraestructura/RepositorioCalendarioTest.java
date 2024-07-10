@@ -93,22 +93,32 @@ public class RepositorioCalendarioTest {
     @Test
     @Transactional
     public void queSePuedanObtenerTodosLosItemRendimiento() {
-        ItemRendimiento itemRendimiento1 = new ItemRendimiento(TipoRendimiento.NORMAL);
-        ItemRendimiento itemRendimiento2 = new ItemRendimiento(TipoRendimiento.DESCANSO);
-        ItemRendimiento itemRendimiento3 = new ItemRendimiento(TipoRendimiento.BAJO);
+        // Crear los objetos ItemRendimiento con diferentes fechas
+        ItemRendimiento itemRendimiento1 = new ItemRendimiento(LocalDate.now().minusDays(2), TipoRendimiento.NORMAL);
+        ItemRendimiento itemRendimiento2 = new ItemRendimiento(LocalDate.now().minusDays(1), TipoRendimiento.DESCANSO);
+        ItemRendimiento itemRendimiento3 = new ItemRendimiento(LocalDate.now(), TipoRendimiento.BAJO);
+
+        // Guardar los objetos en el repositorio
         this.repositorioCalendario.guardar(itemRendimiento1);
         this.repositorioCalendario.guardar(itemRendimiento2);
         this.repositorioCalendario.guardar(itemRendimiento3);
 
-        List<ItemRendimiento> diasObtenidos = this.sessionFactory.getCurrentSession()
+        // Limpiar la sesión actual para asegurar que se reflejen los cambios
+        sessionFactory.getCurrentSession().flush();
+        sessionFactory.getCurrentSession().clear();
+
+        // Obtener todos los ItemRendimiento de la base de datos
+        List<ItemRendimiento> diasObtenidos = sessionFactory.getCurrentSession()
                 .createQuery("FROM ItemRendimiento", ItemRendimiento.class)
                 .getResultList();
 
+        // Verificar que se obtuvieron los tres objetos guardados
         assertThat(diasObtenidos.size(), equalTo(3));
         assertThat(diasObtenidos.get(0), equalTo(itemRendimiento1));
         assertThat(diasObtenidos.get(1), equalTo(itemRendimiento2));
         assertThat(diasObtenidos.get(2), equalTo(itemRendimiento3));
     }
+
 
     @Test
     @Transactional
@@ -131,30 +141,112 @@ public class RepositorioCalendarioTest {
     @Test
     @Transactional
     public void queSePuedaVaciarElCalendario() {
+        // Crear dos ItemRendimiento con fechas diferentes
         ItemRendimiento itemRendimiento1 = new ItemRendimiento(TipoRendimiento.BAJO);
+        itemRendimiento1.setFecha(LocalDate.now());
         ItemRendimiento itemRendimiento2 = new ItemRendimiento(TipoRendimiento.DESCANSO);
+        itemRendimiento2.setFecha(LocalDate.now().plusDays(1));
+
+        // Guardar los items en el repositorio
         this.repositorioCalendario.guardar(itemRendimiento1);
         this.repositorioCalendario.guardar(itemRendimiento2);
 
+        // Vaciar el calendario
         this.repositorioCalendario.vaciarCalendario();
+
+        // Obtener todos los ItemRendimiento del repositorio para verificar que esté vacío
         List<ItemRendimiento> diasRestantes = this.sessionFactory.getCurrentSession()
                 .createQuery("FROM ItemRendimiento", ItemRendimiento.class)
                 .getResultList();
 
+        // Verificar que el calendario está vacío
         assertThat(diasRestantes.isEmpty(), equalTo(true));
     }
+
 
     @Test
     @Transactional
     public void queSePuedanObtenerTodosLosItemRendimientoEnLista() {
-
+        // Crear dos ItemRendimiento con fechas diferentes
         ItemRendimiento itemRendimiento1 = new ItemRendimiento(TipoRendimiento.NORMAL);
+        itemRendimiento1.setFecha(LocalDate.now());
         ItemRendimiento itemRendimiento2 = new ItemRendimiento(TipoRendimiento.DESCANSO);
+        itemRendimiento2.setFecha(LocalDate.now().plusDays(1));
+
+        // Guardar los items en el repositorio
         this.repositorioCalendario.guardar(itemRendimiento1);
         this.repositorioCalendario.guardar(itemRendimiento2);
+
+        // Obtener todos los ItemRendimiento del repositorio
         List<ItemRendimiento> diasObtenidos = this.repositorioCalendario.obtenerItemsRendimiento();
+
+        // Verificar que se obtuvieron los dos items guardados
         assertThat(diasObtenidos.size(), equalTo(2));
     }
+
+
+
+    @Test
+    @Transactional
+    public void queSePuedaVerificarSiExisteItemRendimientoPorFecha() {
+        LocalDate fechaEspecifica = LocalDate.of(2024, Month.MAY, 15);
+        ItemRendimiento itemRendimiento = new ItemRendimiento(fechaEspecifica, TipoRendimiento.DESCANSO);
+        this.repositorioCalendario.guardar(itemRendimiento);
+
+        boolean existe = this.repositorioCalendario.existeItemRendimientoPorFecha(fechaEspecifica);
+        assertThat(existe, equalTo(true));
+
+        boolean noExiste = this.repositorioCalendario.existeItemRendimientoPorFecha(LocalDate.of(2024, Month.JUNE, 15));
+        assertThat(noExiste, equalTo(false));
+    }
+
+    @Test
+    @Transactional
+    public void queSePuedanObtenerItemsPorTipoRendimiento() {
+        // Crear los objetos ItemRendimiento con diferentes fechas
+        ItemRendimiento itemRendimiento1 = new ItemRendimiento(LocalDate.now().minusDays(2), TipoRendimiento.NORMAL);
+        ItemRendimiento itemRendimiento2 = new ItemRendimiento(LocalDate.now().minusDays(1), TipoRendimiento.DESCANSO);
+        ItemRendimiento itemRendimiento3 = new ItemRendimiento(LocalDate.now(), TipoRendimiento.NORMAL);
+
+        // Guardar los objetos en el repositorio
+        this.repositorioCalendario.guardar(itemRendimiento1);
+        this.repositorioCalendario.guardar(itemRendimiento2);
+        this.repositorioCalendario.guardar(itemRendimiento3);
+
+        // Obtener y verificar los items con TipoRendimiento.NORMAL
+        List<ItemRendimiento> itemsNormales = this.repositorioCalendario.obtenerItemsPorTipoRendimiento(TipoRendimiento.NORMAL);
+        System.out.println("Items normales: " + itemsNormales);
+
+        assertThat(itemsNormales.size(), equalTo(2));
+        assertThat(itemsNormales.get(0), equalTo(itemRendimiento1));
+        assertThat(itemsNormales.get(1), equalTo(itemRendimiento3));
+
+        // Obtener y verificar los items con TipoRendimiento.DESCANSO
+        List<ItemRendimiento> itemsDescanso = this.repositorioCalendario.obtenerItemsPorTipoRendimiento(TipoRendimiento.DESCANSO);
+        System.out.println("Items de descanso: " + itemsDescanso);
+
+        assertThat(itemsDescanso.size(), equalTo(1));
+        assertThat(itemsDescanso.get(0), equalTo(itemRendimiento2));
+    }
+
+
+
+    @Test
+    @Transactional
+    public void queSePuedaEliminarUnItemRendimiento() {
+        ItemRendimiento itemRendimiento = new ItemRendimiento(TipoRendimiento.BAJO);
+        this.repositorioCalendario.guardar(itemRendimiento);
+        Long idGuardado = itemRendimiento.getId();
+
+        this.repositorioCalendario.eliminar(itemRendimiento);
+        ItemRendimiento itemEliminado = this.sessionFactory.getCurrentSession()
+                .createQuery("FROM ItemRendimiento WHERE id = :id", ItemRendimiento.class)
+                .setParameter("id", idGuardado)
+                .uniqueResult();
+
+        assertThat(itemEliminado, equalTo(null));
+    }
+
 
 
 }

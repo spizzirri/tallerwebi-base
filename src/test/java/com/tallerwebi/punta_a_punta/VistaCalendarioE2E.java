@@ -23,12 +23,13 @@ public class VistaCalendarioE2E {
     static void abrirNavegador() {
         playwright = Playwright.create();
         browser = playwright.chromium().launch();
-        //browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false).setSlowMo(50));
+        System.out.println("Navegador abierto.");
     }
 
     @AfterAll
     static void cerrarNavegador() {
         playwright.close();
+        System.out.println("Navegador cerrado.");
     }
 
     @BeforeEach
@@ -44,17 +45,23 @@ public class VistaCalendarioE2E {
     }
 
     @Test
-    void deberiaMostrarTituloDelCalendario() {
-        String titulo = vistaCalendario.obtenerTituloDelCalendario();
-        assertThat("Calendario", equalToIgnoringCase(titulo));
+    void deberiaMostrarTituloDeLaPagina() {
+        String texto = vistaCalendario.obtenerTextoDeLaPagina();
+        assertThat("¿Cómo fue tu entrenamiento hoy?", equalToIgnoringCase(texto));
     }
 
     @Test
-    void deberiaAgregarUnEventoAlCalendario() {
-        vistaCalendario.seleccionarFecha("2024-07-04");
-        vistaCalendario.agregarEvento("Reunión de prueba");
-        vistaCalendario.darClickEnAgregarEvento();
-        String mensaje = vistaCalendario.obtenerMensajeDeConfirmacion();
-        assertThat("Evento agregado exitosamente", equalToIgnoringCase(mensaje));
+    void deberiaMostrarErrorSiNoSeCompletaElFormulario() {
+        vistaCalendario.darClickEnGuardar();
+        String texto = vistaCalendario.obtenerMensajeDeError();
+        assertThat("Error: debe completar todos los campos", equalToIgnoringCase(texto));
+    }
+
+    @Test
+    void deberiaGuardarItemRendimiento() {
+        vistaCalendario.seleccionarTipoRendimiento("ALTO");
+        vistaCalendario.darClickEnGuardar();
+        String url = vistaCalendario.obtenerURLActual();
+        assertThat(url, containsStringIgnoringCase("/verProgreso"));
     }
 }
