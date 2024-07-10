@@ -35,6 +35,14 @@ public class UsuarioRutina {
         this.rutina = rutina;
     }
 
+    public UsuarioRutina(Usuario usuario, Rutina rutina, Date fechaInicio, boolean activo) {
+        this.usuario = usuario;
+        this.rutina = rutina;
+        this.fechaInicio = fechaInicio;
+        this.activo = activo;
+    }
+
+
     public Long getId() {
         return id;
     }
@@ -64,7 +72,7 @@ public class UsuarioRutina {
     }
 
     public boolean isActivo() {
-        return activo;
+        return this.activo;
     }
 
     public void setActivo(boolean activo) {

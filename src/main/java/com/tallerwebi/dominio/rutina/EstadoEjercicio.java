@@ -28,6 +28,10 @@ public class EstadoEjercicio {
     public EstadoEjercicio() {
     }
 
+    public EstadoEjercicio(Estado estado) {
+        this.estado = estado;
+    }
+
     public enum Estado {
         COMPLETO,
         INCOMPLETO,

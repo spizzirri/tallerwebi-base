@@ -752,7 +752,7 @@ public class RepositorioRutinaTest {
     @Test
     @Transactional
     @Rollback
-    public void queSePuedaSaberCualFueLaUltimaRutinaQueRealizoElUsuario() {
+    public void queSePuedaSaberCualFueLaUltimaRelacionUsuarioRutinaQueRealizoElUsuario() {
         // Preparación
         Usuario usuario = new Usuario("Lautaro", Objetivo.GANANCIA_MUSCULAR);
         Rutina rutina1 = new Rutina("Rutina de volumen - PECHO", Objetivo.GANANCIA_MUSCULAR);
@@ -791,6 +791,37 @@ public class RepositorioRutinaTest {
         // Verificación
         assertNotNull(usuarioRutinaInactiva);
         assertThat(usuarioRutinaInactiva.getRutina(), equalTo(rutina3));
+    }
+
+    @Test
+    @Transactional
+    public void queSePuedaObtenerUltimaRutinaRealizadaPorUsuario() {
+        // Preparación
+        Usuario usuarioMock = new Usuario("Juan", Objetivo.GANANCIA_MUSCULAR);
+        repositorioRutina.guardarUsuario(usuarioMock);
+
+        Rutina rutina1 = new Rutina("Rutina 1", Objetivo.GANANCIA_MUSCULAR);
+        Rutina rutina2 = new Rutina("Rutina 2", Objetivo.GANANCIA_MUSCULAR);
+        Rutina rutina3 = new Rutina("Rutina 3", Objetivo.GANANCIA_MUSCULAR);
+
+        repositorioRutina.guardarRutina(rutina1);
+        repositorioRutina.guardarRutina(rutina2);
+        repositorioRutina.guardarRutina(rutina3);
+
+        UsuarioRutina usuarioRutina1 = new UsuarioRutina(usuarioMock, rutina1, new Date(1000000000000L), false);
+        UsuarioRutina usuarioRutina2 = new UsuarioRutina(usuarioMock, rutina2, new Date(2000000000000L), false);
+        UsuarioRutina usuarioRutina3 = new UsuarioRutina(usuarioMock, rutina3, new Date(3000000000000L), false);
+
+        sessionFactory.getCurrentSession().save(usuarioRutina1);
+        sessionFactory.getCurrentSession().save(usuarioRutina2);
+        sessionFactory.getCurrentSession().save(usuarioRutina3);
+
+        // Ejecución
+        Rutina ultimaRutina = repositorioRutina.getUltimaRutinaRealizadaPorUsuario(usuarioMock);
+
+        // Verificación
+        assertNotNull(ultimaRutina);
+        assertEquals("Rutina 3", ultimaRutina.getNombre());
     }
 
 

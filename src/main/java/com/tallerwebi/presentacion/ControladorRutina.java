@@ -1,5 +1,6 @@
 package com.tallerwebi.presentacion;
 
+import com.tallerwebi.dominio.excepcion.ListaDeRutinasVaciaException;
 import com.tallerwebi.dominio.rutina.EstadoEjercicio;
 import com.tallerwebi.dominio.usuario.ServicioLogin;
 import com.tallerwebi.dominio.usuario.Usuario;
@@ -30,7 +31,7 @@ public class ControladorRutina {
     }
 
     @RequestMapping(path = "/rutinas", method = RequestMethod.GET)
-    public ModelAndView verRutinasQueLeInteresanAlUsuario(@RequestParam("objetivo") String objetivo, HttpSession session) {
+    public ModelAndView verRutinasQueLeInteresanAlUsuario(@RequestParam("objetivo") String objetivo, HttpSession session) throws ListaDeRutinasVaciaException {
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         if (usuario == null) {
             return new ModelAndView("redirect:/login");

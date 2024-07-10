@@ -353,13 +353,22 @@ public class RepositorioRutinaImpl implements RepositorioRutina {
 
     @Override
     public void liberarRutinaActivaDelUsuario(Usuario usuario) {
-        Usuario usuarioBuscado = this.getUsuarioPorId(usuario.getId());
-        Rutina rutinaActiva = this.getRutinaActivaDelUsuario(usuarioBuscado);
-        UsuarioRutina usuarioRutinaBuscado = this.buscarUsuarioRutinaActivoPorUsuarioYRutina(usuarioBuscado, rutinaActiva);
+        System.out.println("entro al metodo del repo");
+        String hql = "FROM UsuarioRutina ur WHERE ur.usuario.id = :usuarioId AND ur.activo = true ";
+        Query<UsuarioRutina> query = sessionFactory.getCurrentSession().createQuery(hql, UsuarioRutina.class);
+        query.setParameter("usuarioId", usuario.getId());
+        UsuarioRutina usuarioRutinaBuscado = query.uniqueResult();
 
-        usuarioRutinaBuscado.setActivo(false);
 
+        if (usuarioRutinaBuscado != null) {
+            usuarioRutinaBuscado.setActivo(false);
+            this.sessionFactory.getCurrentSession().saveOrUpdate(usuarioRutinaBuscado);
+            System.out.println("Encontro el usuarioRutina");
+        }else {
+            System.out.println("no hace nada");
+        }
     }
+
 
     @Override
     public UsuarioRutina buscarUsuarioRutinaPorUsuarioYRutina(Usuario usuario, Rutina rutina) {

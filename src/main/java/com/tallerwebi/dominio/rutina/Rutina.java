@@ -23,12 +23,14 @@ public class Rutina {
     private List<Ejercicio> ejercicios;
     public Rutina() {
         this.ejercicios = new ArrayList<>();
+        this.usuarioRutinas = new ArrayList<>();
     }
 
     public Rutina(String nombre, Objetivo objetivo) {
         this.nombre = nombre;
         this.objetivo = objetivo;
         this.ejercicios = new ArrayList<>();
+        this.usuarioRutinas = new ArrayList<>();
     }
 
     @OneToMany(mappedBy = "rutina", cascade = CascadeType.ALL)
