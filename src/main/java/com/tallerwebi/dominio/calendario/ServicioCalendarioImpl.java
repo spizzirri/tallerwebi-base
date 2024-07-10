@@ -34,20 +34,10 @@ public class ServicioCalendarioImpl implements ServicioCalendario {
 
     @Override
     public void guardarItemRendimiento(ItemRendimiento itemRendimiento) {
-
         if (itemRendimiento.getTipoRendimiento() == null) {
             throw new IllegalArgumentException("Tipo de rendimiento no puede ser nulo.");
         }
         this.repositorioCalendario.guardar(itemRendimiento);
-
-        if (!repositorioCalendario.existeItemRendimientoPorFecha(itemRendimiento.getFecha())) {
-            itemRendimiento.setFecha(LocalDate.now());
-            itemRendimiento.setDiaNombre();
-            repositorioCalendario.guardar(itemRendimiento);
-        } else {
-            throw new ItemRendimientoDuplicadoException("No se puede guardar tu rendimiento más de una vez el mismo día.");
-        }
-
     }
 
     @Override
@@ -57,7 +47,10 @@ public class ServicioCalendarioImpl implements ServicioCalendario {
     }
 
 
-
+    @Override
+    public List<DatosItemRendimiento> obtenerItemsPorTipoRendimiento(TipoRendimiento tipoRendimiento) {
+        return convertirADatosItemRendimiento(this.repositorioCalendario.obtenerItemsPorTipoRendimiento(tipoRendimiento));
+    }
 
 
     @Override

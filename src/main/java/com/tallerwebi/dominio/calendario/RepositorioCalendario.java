@@ -15,4 +15,12 @@ public interface RepositorioCalendario {
 
         ItemRendimiento obtenerItemMasSeleccionado();
 
+    void actualizar(ItemRendimiento itemRendimiento);
+    void vaciarCalendario();
+
+    List<ItemRendimiento> obtenerItemsPorTipoRendimiento(TipoRendimiento tipoRendimiento);
+
+    void eliminar(ItemRendimiento dia);
+
+
 }

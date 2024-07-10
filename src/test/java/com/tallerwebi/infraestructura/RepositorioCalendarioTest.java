@@ -76,6 +76,22 @@ public class RepositorioCalendarioTest {
 
     @Test
     @Transactional
+    public void queSePuedaActualizarUnItemRendimiento() {
+        ItemRendimiento itemRendimiento = new ItemRendimiento(TipoRendimiento.DESCANSO);
+        this.repositorioCalendario.guardar(itemRendimiento);
+
+        itemRendimiento.setTipoRendimiento(TipoRendimiento.ALTO);
+        this.repositorioCalendario.actualizar(itemRendimiento);
+        Long idGuardado = itemRendimiento.getId();
+        ItemRendimiento diaObtenido = (ItemRendimiento) this.sessionFactory.getCurrentSession()
+                .createQuery("FROM ItemRendimiento Where id = :id")
+                .setParameter("id", idGuardado)
+                .getSingleResult();
+        assertThat(diaObtenido.getTipoRendimiento(), equalTo(TipoRendimiento.ALTO));
+    }
+
+    @Test
+    @Transactional
     public void queSePuedanObtenerTodosLosItemRendimiento() {
         // Crear los objetos ItemRendimiento con diferentes fechas
         ItemRendimiento itemRendimiento1 = new ItemRendimiento(LocalDate.now().minusDays(2), TipoRendimiento.NORMAL);

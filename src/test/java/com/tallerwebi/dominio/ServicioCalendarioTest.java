@@ -63,6 +63,7 @@ public class ServicioCalendarioTest {
         this.servicioCalendario.guardarItemRendimiento(itemRendimientoMock);
 
         verify(this.repositorioCalendario).guardar(itemRendimientoMock);
+    }
 
     public void dadoQueElUsuarioGuardaUnItemRendimientoQueSePuedaGuardarItemRendimiento() {
         // preparacion
@@ -126,3 +127,4 @@ public class ServicioCalendarioTest {
     }
 
 }
+
