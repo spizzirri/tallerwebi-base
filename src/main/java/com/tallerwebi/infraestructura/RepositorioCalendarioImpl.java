@@ -4,7 +4,6 @@ import com.tallerwebi.dominio.calendario.ItemRendimiento;
 import com.tallerwebi.dominio.calendario.RepositorioCalendario;
 import com.tallerwebi.dominio.calendario.TipoRendimiento;
 import com.tallerwebi.dominio.excepcion.ItemRendimientoDuplicadoException;
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -31,6 +30,7 @@ public class RepositorioCalendarioImpl implements RepositorioCalendario {
 
     @Override
     public void guardar(ItemRendimiento itemRendimiento) {
+
         if (itemRendimiento.getTipoRendimiento() == null) {
             throw new IllegalArgumentException("Tipo de rendimiento no puede ser nulo.");
         }
@@ -40,6 +40,9 @@ public class RepositorioCalendarioImpl implements RepositorioCalendario {
         } else {
             throw new ItemRendimientoDuplicadoException("Ya existe un ItemRendimiento para esta fecha.");
         }
+
+        this.sessionFactory.getCurrentSession().save(itemRendimiento);
+
     }
 
 
@@ -80,6 +83,7 @@ public class RepositorioCalendarioImpl implements RepositorioCalendario {
 
         return items.isEmpty() ? null : items.get(0);
     }
+
 
 
     @Override
