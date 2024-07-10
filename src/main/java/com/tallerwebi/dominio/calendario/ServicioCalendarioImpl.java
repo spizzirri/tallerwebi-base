@@ -21,7 +21,11 @@ public class ServicioCalendarioImpl implements ServicioCalendario {
 
     @Override
     public List<DatosItemRendimiento> obtenerItemsRendimiento() {
-        return this.convertirADatosItemRendimiento(this.repositorioCalendario.obtenerItemsRendimiento());
+        List<ItemRendimiento> items = this.repositorioCalendario.obtenerItemsRendimiento();
+        if (items == null || items.isEmpty()) {
+            return Collections.emptyList(); // Retorna una lista vacía en lugar de null
+        }
+        return this.convertirADatosItemRendimiento(items);
     }
 
     private List<DatosItemRendimiento> convertirADatosItemRendimiento(List<ItemRendimiento> listaItemRendimiento) {
@@ -34,10 +38,13 @@ public class ServicioCalendarioImpl implements ServicioCalendario {
 
     @Override
     public void guardarItemRendimiento(ItemRendimiento itemRendimiento) {
-        if (itemRendimiento.getTipoRendimiento() == null) {
-            throw new IllegalArgumentException("Tipo de rendimiento no puede ser nulo.");
+        if (!repositorioCalendario.existeItemRendimientoPorFecha(itemRendimiento.getFecha())) {
+            itemRendimiento.setFecha(LocalDate.now());
+            itemRendimiento.setDiaNombre();
+            repositorioCalendario.guardar(itemRendimiento);
+        } else {
+            throw new ItemRendimientoDuplicadoException("No se puede guardar tu rendimiento más de una vez el mismo día.");
         }
-        this.repositorioCalendario.guardar(itemRendimiento);
     }
 
     @Override
@@ -45,35 +52,5 @@ public class ServicioCalendarioImpl implements ServicioCalendario {
         ItemRendimiento itemRendimiento = repositorioCalendario.obtenerItemMasSeleccionado();
         return itemRendimiento != null ? new DatosItemRendimiento(itemRendimiento) : null;
     }
-
-
-    @Override
-    public List<DatosItemRendimiento> obtenerItemsPorTipoRendimiento(TipoRendimiento tipoRendimiento) {
-        return convertirADatosItemRendimiento(this.repositorioCalendario.obtenerItemsPorTipoRendimiento(tipoRendimiento));
-    }
-
-
-    @Override
-    public ItemRendimiento actualizarItemRendimiento(ItemRendimiento itemRendimiento) {
-        repositorioCalendario.guardar(itemRendimiento);
-        return itemRendimiento;
-    }
-
-    @Override
-    public void eliminarItemRendimiento(ItemRendimiento dia) {
-        repositorioCalendario.eliminar(dia);
-    }
-
-    @Override
-    public List<TipoRendimiento> obtenerOpcionesRendimiento() {
-        return List.of(TipoRendimiento.ALTO, TipoRendimiento.NORMAL, TipoRendimiento.BAJO, TipoRendimiento.DESCANSO);
-    }
-
-    @Override
-    public void vaciarCalendario() {
-        repositorioCalendario.vaciarCalendario();
-    }
-
-
 
 }

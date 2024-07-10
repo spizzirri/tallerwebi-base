@@ -19,7 +19,7 @@ public class ItemRendimiento {
     @Column(name = "tipoRendimiento", nullable = false)
     private TipoRendimiento tipoRendimiento;
 
-    @Column(name = "nombreDia", nullable = false)
+    @Column(name = "diaNombre", nullable = false)
     private String diaNombre;
 
     public ItemRendimiento() {

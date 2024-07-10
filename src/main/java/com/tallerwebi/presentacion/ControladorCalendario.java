@@ -17,7 +17,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Controller
-public class ControladorCalendario {
+public class  ControladorCalendario {
 
     private final ServicioCalendario servicioCalendario;
 
@@ -27,56 +27,56 @@ public class ControladorCalendario {
     }
 
     @RequestMapping(path = "/calendario", method = RequestMethod.GET)
-    public ModelAndView irCalendario(HttpSession session) {
+    public ModelAndView mostrarCalendario(HttpSession session) {
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         if (usuario == null) {
             return new ModelAndView("redirect:/login");
         }
 
-        String viewName = "calendario"; // Nombre correcto de la vista
-        ModelMap model = new ModelMap();
-        // Agregar el primer objeto al modelo
-        model.put("message", "¿Cómo fue tu entrenamiento hoy?");
-        // Crear un nuevo objeto ItemRendimiento y agregarlo al modelo
+        ModelAndView model = new ModelAndView("calendario");
         ItemRendimiento itemRendimiento = new ItemRendimiento();
-        model.put("itemRendimiento", itemRendimiento);
-        // Agregar el usuario al modelo
-        model.put("usuario", usuario);
-        // Retornar el ModelAndView con el nombre de la vista y el modelo
-        return new ModelAndView(viewName, model);
+        model.addObject("itemRendimiento", itemRendimiento);
+        model.addObject("usuario", usuario);
+        return model;
     }
 
     @RequestMapping(path = "/calendario", method = RequestMethod.POST)
-    public ModelAndView verProgreso(@ModelAttribute("itemRendimiento") ItemRendimiento itemRendimiento, HttpSession session) {
+    public ModelAndView guardarItemRendimiento(@ModelAttribute("itemRendimiento") ItemRendimiento itemRendimiento, HttpSession session) {
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         if (usuario == null) {
             return new ModelAndView("redirect:/login");
         }
 
-        ModelMap model = new ModelMap();
-
+        ModelAndView model = new ModelAndView("calendario");
         try {
             servicioCalendario.guardarItemRendimiento(itemRendimiento);
             return new ModelAndView("redirect:/verProgreso");
         } catch (ItemRendimientoDuplicadoException e) {
-            model.addAttribute("error", e.getMessage());
-            model.put("usuario", usuario); // Agregar el usuario al modelo en caso de error
-            return new ModelAndView("calendario", model);
+            model.addObject("error", e.getMessage());
+            model.addObject("usuario", usuario);
+            return model;
         }
     }
 
+
     @RequestMapping(path = "/verProgreso", method = {RequestMethod.POST, RequestMethod.GET})
-    public ModelAndView irVerProgreso(HttpSession session) {
+    public ModelAndView verProgreso(HttpSession session) {
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         if (usuario == null) {
             return new ModelAndView("redirect:/login");
         }
 
-        List<DatosItemRendimiento> datosItemRendimiento = servicioCalendario.obtenerItemsRendimiento();
-        ModelMap model = new ModelMap();
-        model.put("datosItemRendimiento", datosItemRendimiento);
-        model.put("usuario", usuario); // Agregar el usuario al modelo
-        return new ModelAndView("verProgreso", model);
+        ModelAndView model = new ModelAndView("verProgreso");
+        List<DatosItemRendimiento> itemsRendimiento = servicioCalendario.obtenerItemsRendimiento();
+        if (itemsRendimiento.isEmpty()) {
+            model.addObject("mensaje", "Contanos como fue tu rendimiento hoy.");
+            model.addObject("sinRendimiento", true); // Atributo para indicar que no hay items de rendimiento
+        } else {
+            model.addObject("datosItemRendimiento", itemsRendimiento);
+            model.addObject("sinRendimiento", false); // Atributo para indicar que sí hay items de rendimiento
+        }
+        model.addObject("usuario", usuario); // Agregar el usuario al modelo
+        return model;
     }
 
 
