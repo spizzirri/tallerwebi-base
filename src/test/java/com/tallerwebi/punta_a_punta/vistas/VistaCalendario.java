@@ -2,14 +2,13 @@ package com.tallerwebi.punta_a_punta.vistas;
 
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Locator;
+import com.microsoft.playwright.options.AriaRole;
 
 public class VistaCalendario extends VistaWeb {
 
     public VistaCalendario(Page page) {
         super(page);
-        System.out.println("Navegando a la página del calendario...");
-        page.navigate("http://localhost:8081/spring/calendario");
-        System.out.println("Navegación completada.");
+        page.navigate("localhost:8081/spring/calendario");
     }
 
     public String obtenerTextoDeLaPagina() {
@@ -29,11 +28,16 @@ public class VistaCalendario extends VistaWeb {
     }
 
     public void darClickEnGuardar() {
-        Locator locator = page.locator("button.boton-guardar");
+        Locator locator = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Guardar"));
         locator.waitFor();
         System.out.println("Haciendo click en guardar");
         locator.click();
+
+        // Esperar hasta que la URL cambie
+        page.waitForURL(url -> url.toString().contains("/verProgreso"), new Page.WaitForURLOptions().setTimeout(10000)); // Esperar hasta 10 segundos
     }
+
+
 
     public String obtenerMensajeDeError() {
         Locator locator = page.locator(".alert.alert-danger p");
