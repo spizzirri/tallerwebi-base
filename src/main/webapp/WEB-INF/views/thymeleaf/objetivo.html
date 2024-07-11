@@ -64,7 +64,7 @@
     <h2 class="text-center text-2xl md:text-3xl lg:text-4xl mb-8">Definir Objetivos de Entrenamiento</h2>
     <div class="custom-row">
         <div class="custom-col custom-col-sm-6 custom-col-md-4">
-            <div class="custom-card custom-objetivo-card" data-value="PERDIDA_DE_PESO" onclick="seleccionarObjetivo(this)">
+            <div class="custom-card custom-objetivo-card" data-value="PERDIDA_DE_PESO">
                 <img th:src="@{/img/objetivo/perdidaPeso.png}" alt="Pérdida de Peso" class="custom-card-img-top">
                 <div class="custom-card-body">
                     <h3 class="custom-card-title">Pérdida de Peso</h3>
@@ -73,7 +73,7 @@
             </div>
         </div>
         <div class="custom-col custom-col-sm-6 custom-col-md-4">
-            <div class="custom-card custom-objetivo-card" data-value="GANANCIA_MUSCULAR" onclick="seleccionarObjetivo(this)">
+            <div class="custom-card custom-objetivo-card" data-value="GANANCIA_MUSCULAR">
                 <img th:src="@{/img/objetivo/gananciaMuscular.png}" alt="Ganancia Muscular" class="custom-card-img-top">
                 <div class="custom-card-body">
                     <h3 class="custom-card-title">Ganancia Muscular</h3>
@@ -82,7 +82,7 @@
             </div>
         </div>
         <div class="custom-col custom-col-sm-6 custom-col-md-4">
-            <div class="custom-card custom-objetivo-card" data-value="DEFINICION" onclick="seleccionarObjetivo(this)">
+            <div class="custom-card custom-objetivo-card" data-value="DEFINICION">
                 <img th:src="@{/img/objetivo/definicion.png}" alt="Definición" class="custom-card-img-top">
                 <div class="custom-card-body">
                     <h3 class="custom-card-title">Definición</h3>
@@ -91,7 +91,7 @@
             </div>
         </div>
     </div>
-    <form th:action="@{/rutinas}" method="GET" onsubmit="return validarFormulario()">
+    <form th:action="@{/rutinas}" method="GET">
         <input type="hidden" id="objetivo" name="objetivo">
         <button type="submit" class="custom-btn-primary">Guardar</button>
     </form>
