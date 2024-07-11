@@ -1,5 +1,5 @@
-INSERT INTO Usuario (id, email, password, rol, activo, objetivo)
-SELECT null, 'test@unlam.edu.ar', 'test', 'ADMIN', true, 'PERDIDA_DE_PESO'
+INSERT INTO Usuario (id, email, password, rol, activo)
+SELECT null, 'test@unlam.edu.ar', 'test', 'ADMIN', true
     WHERE NOT EXISTS (
     SELECT 1
     FROM Usuario

@@ -57,7 +57,7 @@
         <a th:action="@{/irAHome}" href="home" class="hover:bg-blue-500 p-2 rounded text-white">Inicio</a>
         <a th:action="@{/irAMiRutina}" href="mi-rutina" class="hover:bg-blue-500 p-2 rounded text-white">Rutina</a>
         <a th:action="@{/irAlimentacion}" href="alimentacion" class="hover:bg-blue-500 p-2 rounded text-white">Alimentación</a>
-        <a th:action="@{/irCalendario}" href="calendario" class="hover:bg-blue-500 p-2 rounded text-white">Calendario</a>
+        <a th:action="@{/irCalendario}" href="verProgreso" class="hover:bg-blue-500 p-2 rounded text-white">Calendario</a>
     </nav>
 </div>
 <div class="container mt-5 pt-5">
@@ -102,12 +102,11 @@
                                                 <p>Estado actual:
                                                     <span th:text="${estado.estado.toString().replace('_',' ')}"
                                                           th:class="${estado.estado.toString() == 'COMPLETO' ? 'estado-completo' :
-                                                                     (estado.estado.toString() == 'INCOMPLETO' ? 'estado-incompleto' :
-                                                                     'estado-no-empezado')}">
-                                                    </span>
+                                                                 (estado.estado.toString() == 'INCOMPLETO' ? 'estado-incompleto' :
+                                                                 'estado-no-empezado')}">
+                                                </span>
                                                 </p>
                                             </th:block>
-
 
                                             <th:block th:if="${estado.ejercicio.idEjercicio == ejercicio.idEjercicio}">
                                                 <select name="estado">
@@ -129,13 +128,15 @@
                         </li>
                     </ul>
                     <div class="text-center mt-3">
-                        <button type="button" class="btn btn-success">Cargar rendimiento</button>
+                        <form th:action="@{/calcular-rendimiento}" method="post">
+                            <input type="hidden" name="rutina" th:value="${rutina.getId()}">
+                            <button type="submit" class="btn btn-success">Cargar rendimiento</button>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script th:src="@{/js/hamburguesa.js}"></script>

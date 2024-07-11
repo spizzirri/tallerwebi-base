@@ -1,5 +1,6 @@
 package com.tallerwebi.dominio.calendario;
 
+import com.tallerwebi.dominio.usuario.Usuario;
 import com.tallerwebi.presentacion.DatosItemRendimiento;
 
 import java.time.LocalDate;
@@ -12,8 +13,16 @@ public interface RepositorioCalendario {
 
         void guardar(ItemRendimiento dia);
 
+        public Usuario getUsuarioById(Long id);
+
+        void guardarRendimientoEnUsuario(ItemRendimiento rendimiento, Usuario usuario);
+
+        List<ItemRendimiento> getItemsRendimientoDeUsuario(Usuario usuario);
+
         boolean existeItemRendimientoPorFecha(LocalDate fecha);
 
         ItemRendimiento obtenerItemMasSeleccionado();
+
+        ItemRendimiento getItemRendimientoDeUsuarioHoyPorId(Long id);
 
 }

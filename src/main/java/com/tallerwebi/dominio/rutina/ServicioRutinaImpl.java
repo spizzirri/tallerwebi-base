@@ -274,14 +274,16 @@ public class ServicioRutinaImpl implements ServicioRutina {
         int totalEjercicios = completos + incompletos + noEmpezados;
 
         if (totalEjercicios == 0) {
-            return Rendimiento.BAJO;
+            return Rendimiento.DESCANSO;
         }
 
         double porcentajeCompletos = (double) completos / totalEjercicios;
         double porcentajeIncompletos = (double) incompletos / totalEjercicios;
         double porcentajeNoEmpezados = (double) noEmpezados / totalEjercicios;
 
-        if (porcentajeNoEmpezados >= 0.75) {
+        if (porcentajeNoEmpezados >= 1) {
+            return Rendimiento.DESCANSO;
+        }else if (porcentajeNoEmpezados >= 0.75) {
             return Rendimiento.BAJO;
         }else if (porcentajeCompletos >= 0.75) {
             return Rendimiento.ALTO;

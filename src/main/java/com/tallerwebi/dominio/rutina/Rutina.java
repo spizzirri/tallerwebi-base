@@ -2,6 +2,7 @@ package com.tallerwebi.dominio.rutina;
 
 import com.tallerwebi.dominio.usuario.UsuarioRutina;
 import com.tallerwebi.dominio.objetivo.Objetivo;
+import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -19,7 +20,8 @@ public class Rutina {
     @Enumerated(EnumType.STRING)
     private Objetivo objetivo;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @BatchSize(size = 10)
     private List<Ejercicio> ejercicios;
     public Rutina() {
         this.ejercicios = new ArrayList<>();

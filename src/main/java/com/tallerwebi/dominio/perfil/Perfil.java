@@ -20,6 +20,7 @@ public class Perfil {
     private String condicionesAlternas;
     private String experienciaEjercicio;
     private String suplementos;
+    @Column(columnDefinition = "TEXT")
     private String recomendacion;
     @OneToOne(mappedBy = "perfil")
     private Usuario usuario;

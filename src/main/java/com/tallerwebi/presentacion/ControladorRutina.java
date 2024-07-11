@@ -1,7 +1,12 @@
 package com.tallerwebi.presentacion;
 
+import com.tallerwebi.dominio.calendario.ItemRendimiento;
+import com.tallerwebi.dominio.calendario.ServicioCalendario;
 import com.tallerwebi.dominio.excepcion.ListaDeRutinasVaciaException;
+import com.tallerwebi.dominio.excepcion.RutinaNoEncontradaException;
+import com.tallerwebi.dominio.excepcion.UsuarioYaCargoSuRendimientoDelDiaException;
 import com.tallerwebi.dominio.rutina.EstadoEjercicio;
+import com.tallerwebi.dominio.rutina.Rendimiento;
 import com.tallerwebi.dominio.usuario.ServicioLogin;
 import com.tallerwebi.dominio.usuario.Usuario;
 import com.tallerwebi.dominio.objetivo.Objetivo;
@@ -9,6 +14,7 @@ import com.tallerwebi.dominio.rutina.Rutina;
 import com.tallerwebi.dominio.rutina.ServicioRutina;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpSession;
@@ -20,11 +26,13 @@ public class ControladorRutina {
 
     private final ServicioRutina servicioRutina;
     private final ServicioLogin servicioLogin;
+    private final ServicioCalendario servicioCalendario;
 
     @Autowired
-    public ControladorRutina(ServicioRutina servicioRutina, ServicioLogin servicioLogin) {
+    public ControladorRutina(ServicioRutina servicioRutina, ServicioLogin servicioLogin, ServicioCalendario servicioCalendario) {
         this.servicioRutina = servicioRutina;
         this.servicioLogin = servicioLogin;
+        this.servicioCalendario = servicioCalendario;
     }
 
     @RequestMapping(path = "/rutinas", method = RequestMethod.GET)
@@ -78,6 +86,12 @@ public class ControladorRutina {
 
         if (usuario.getObjetivo() == null) {
             return new ModelAndView("redirect:/objetivo");
+        }
+
+        if(!servicioCalendario.validarSiElUsuarioPuedeCargarRutinaHoy(usuario)){
+            modelAndView.addObject("info", "El usuario ya cargo el resultado de su rutina hoy.");
+            modelAndView.setViewName("redirect:/verProgreso");
+            return modelAndView;
         }
 
         try {
@@ -192,6 +206,28 @@ public class ControladorRutina {
         }
 
         return new ModelAndView("redirect:/rutinas");
+    }
+
+    @PostMapping("/calcular-rendimiento")
+    public ModelAndView calcularRendimiento(@RequestParam("rutina") Long idRutina, HttpSession session) throws RutinaNoEncontradaException, UsuarioYaCargoSuRendimientoDelDiaException {
+
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+
+        if (usuario == null) {
+            return new ModelAndView("redirect:/login");
+        }
+
+        DatosRutina rutina = servicioRutina.getDatosRutinaById(idRutina);
+
+        List<EstadoEjercicio> estados = servicioRutina.getEstadosEjercicios(usuario,rutina);
+
+        Rendimiento rendimiento = servicioRutina.calcularRendimiento(estados);
+
+        ItemRendimiento itemRendimiento = servicioCalendario.convertirRendimientoAItemRendimiento(rendimiento);
+
+        servicioCalendario.guardarItemRendimientoEnUsuario(itemRendimiento,usuario);
+
+        return new ModelAndView("redirect:/verProgreso");
     }
 
 

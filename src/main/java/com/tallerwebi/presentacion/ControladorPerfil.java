@@ -4,6 +4,7 @@ import com.tallerwebi.dominio.excepcion.NoCargaPerfilExeption;
 import com.tallerwebi.dominio.excepcion.NoPudoGuardarPerfilException;
 import com.tallerwebi.dominio.perfil.Perfil;
 import com.tallerwebi.dominio.perfil.ServicioPerfil;
+import com.tallerwebi.dominio.rutina.ServicioRutina;
 import com.tallerwebi.dominio.usuario.ServicioLogin;
 import com.tallerwebi.dominio.usuario.ServicioLoginImpl;
 import com.tallerwebi.dominio.usuario.Usuario;
@@ -30,9 +31,13 @@ public class ControladorPerfil {
     private ServicioLogin servicioLogin;
 
     @Autowired
-    public ControladorPerfil(ServicioPerfil servicioPerfil, ServicioLogin servicioLogin) {
+    private ServicioRutina servicioRutina;
+
+    @Autowired
+    public ControladorPerfil(ServicioPerfil servicioPerfil, ServicioLogin servicioLogin, ServicioRutina servicioRutina) {
         this.servicioPerfil = servicioPerfil;
         this.servicioLogin = servicioLogin;
+        this.servicioRutina = servicioRutina;
     }
 
     @RequestMapping(path = "/perfil", method = RequestMethod.GET)
@@ -41,6 +46,11 @@ public class ControladorPerfil {
         if (usuario == null) {
             return new ModelAndView("redirect:/login");
         }
+
+        if (usuario.getObjetivo() == null) {
+            return new ModelAndView("redirect:/objetivo");
+        }
+
 
         Perfil perfil = usuario.getPerfil();
         ModelAndView modelAndView = new ModelAndView("perfil");

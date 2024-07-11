@@ -17,7 +17,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Controller
-public class  ControladorCalendario {
+public class ControladorCalendario {
 
     private final ServicioCalendario servicioCalendario;
 
@@ -33,7 +33,7 @@ public class  ControladorCalendario {
             return new ModelAndView("redirect:/login");
         }
 
-        ModelAndView model = new ModelAndView("calendario");
+        ModelAndView model = new ModelAndView("verProgreso");
         model.addObject("message", "¿Cómo fue tu entrenamiento hoy?");
         ItemRendimiento itemRendimiento = new ItemRendimiento();
         model.addObject("itemRendimiento", itemRendimiento);
@@ -50,9 +50,9 @@ public class  ControladorCalendario {
 
         ModelAndView model = new ModelAndView("calendario");
         try {
-            servicioCalendario.guardarItemRendimiento(itemRendimiento);
+            servicioCalendario.guardarItemRendimientoEnUsuario(itemRendimiento,usuario);
             return new ModelAndView("redirect:/verProgreso");
-        } catch (ItemRendimientoDuplicadoException e) {
+        } catch (Exception e) {
             model.addObject("error", e.getMessage());
             model.addObject("usuario", usuario);
             return model;
@@ -67,7 +67,7 @@ public class  ControladorCalendario {
         }
 
         ModelAndView model = new ModelAndView("verProgreso");
-        List<DatosItemRendimiento> itemsRendimiento = servicioCalendario.obtenerItemsRendimiento();
+        List<DatosItemRendimiento> itemsRendimiento = servicioCalendario.getItemsRendimientoDeUsuario(usuario);
         if (itemsRendimiento.isEmpty()) {
             model.addObject("mensaje", "¿Cómo fue tu entrenamiento hoy?");
             model.addObject("sinRendimiento", true); // Atributo para indicar que no hay items de rendimiento

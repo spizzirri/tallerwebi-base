@@ -3,18 +3,18 @@ package com.tallerwebi.infraestructura;
 import com.tallerwebi.dominio.calendario.ItemRendimiento;
 import com.tallerwebi.dominio.calendario.RepositorioCalendario;
 import com.tallerwebi.dominio.calendario.TipoRendimiento;
-import com.tallerwebi.dominio.excepcion.ItemRendimientoDuplicadoException;
+import com.tallerwebi.dominio.usuario.Usuario;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-
 import java.time.LocalDate;
 import java.util.List;
 
-@Repository("repositorioCalendario")
+@Repository
 public class RepositorioCalendarioImpl implements RepositorioCalendario {
 
-    private SessionFactory sessionFactory;
+    private final SessionFactory sessionFactory;
 
     @Autowired
     public RepositorioCalendarioImpl(SessionFactory sessionFactory) {
@@ -30,7 +30,7 @@ public class RepositorioCalendarioImpl implements RepositorioCalendario {
 
     @Override
     public void guardar(ItemRendimiento itemRendimiento) {
-        this.sessionFactory.getCurrentSession().save(itemRendimiento);
+        this.sessionFactory.getCurrentSession().saveOrUpdate(itemRendimiento);
     }
 
     @Override
@@ -71,5 +71,48 @@ public class RepositorioCalendarioImpl implements RepositorioCalendario {
         return items.isEmpty() ? null : items.get(0);
     }
 
+    @Override
+    public ItemRendimiento getItemRendimientoDeUsuarioHoyPorId(Long usuarioId) {
+        String hql = "SELECT u FROM Usuario u JOIN FETCH u.itemsRendimiento WHERE u.id = :usuarioId";
+        Query<Usuario> query = sessionFactory.getCurrentSession().createQuery(hql, Usuario.class);
+        query.setParameter("usuarioId", usuarioId);
+
+        Usuario usuario = query.uniqueResult();
+
+        if (usuario != null) {
+            LocalDate today = LocalDate.now();
+            for (ItemRendimiento item : usuario.getItemsRendimiento()) {
+                if (item.getFecha().equals(today)) {
+                    return item;
+                }
+            }
+        }
+
+        return null;
+    }
+
+
+    @Override
+    public Usuario getUsuarioById(Long id) {
+        String hql = "SELECT u FROM Usuario u LEFT JOIN FETCH u.itemsRendimiento WHERE u.id = :id";
+        return this.sessionFactory.getCurrentSession()
+                .createQuery(hql, Usuario.class)
+                .setParameter("id", id)
+                .uniqueResult();
+    }
+
+    @Override
+    public void guardarRendimientoEnUsuario(ItemRendimiento rendimiento, Usuario usuario) {
+        Usuario usuarioBuscado = this.getUsuarioById(usuario.getId());
+        usuarioBuscado.getItemsRendimiento().add(rendimiento);
+        this.sessionFactory.getCurrentSession().saveOrUpdate(usuarioBuscado);
+    }
+
+    @Override
+    public List<ItemRendimiento> getItemsRendimientoDeUsuario(Usuario usuario) {
+        Usuario usuarioConItems = this.getUsuarioById(usuario.getId());
+        return usuarioConItems.getItemsRendimiento();
+    }
 }
+
 

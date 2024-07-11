@@ -7,7 +7,6 @@ import java.util.Locale;
 import java.util.Objects;
 
 @Entity
-@Table(name = "itemrendimiento")
 public class ItemRendimiento {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,7 +15,7 @@ public class ItemRendimiento {
     @Column(name = "fecha", nullable = false)
     private LocalDate fecha;
 
-    @Column(name = "tipoRendimiento", nullable = false)
+    @Enumerated(EnumType.STRING)
     private TipoRendimiento tipoRendimiento;
 
     @Column(name = "diaNombre", nullable = false)

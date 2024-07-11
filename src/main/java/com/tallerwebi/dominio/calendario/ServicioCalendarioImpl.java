@@ -1,5 +1,8 @@
 package com.tallerwebi.dominio.calendario;
 import com.tallerwebi.dominio.excepcion.ItemRendimientoDuplicadoException;
+import com.tallerwebi.dominio.excepcion.UsuarioYaCargoSuRendimientoDelDiaException;
+import com.tallerwebi.dominio.rutina.Rendimiento;
+import com.tallerwebi.dominio.usuario.Usuario;
 import com.tallerwebi.presentacion.DatosItemRendimiento;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,7 +15,7 @@ import java.util.*;
 public class ServicioCalendarioImpl implements ServicioCalendario {
 
 
-    private RepositorioCalendario repositorioCalendario;
+    private final RepositorioCalendario repositorioCalendario;
 
     @Autowired
     public ServicioCalendarioImpl(RepositorioCalendario repositorioCalendario){
@@ -52,5 +55,39 @@ public class ServicioCalendarioImpl implements ServicioCalendario {
         ItemRendimiento itemRendimiento = repositorioCalendario.obtenerItemMasSeleccionado();
         return itemRendimiento != null ? new DatosItemRendimiento(itemRendimiento) : null;
     }
+
+    @Override
+    public void guardarItemRendimientoEnUsuario(ItemRendimiento itemRendimiento, Usuario usuario) throws UsuarioYaCargoSuRendimientoDelDiaException {
+        if(this.validarSiElUsuarioPuedeCargarRutinaHoy(usuario)){
+            this.repositorioCalendario.guardarRendimientoEnUsuario(itemRendimiento,usuario);
+        }else {
+            throw new UsuarioYaCargoSuRendimientoDelDiaException();
+        }
+    }
+
+    @Override
+    public List<DatosItemRendimiento> getItemsRendimientoDeUsuario(Usuario usuario) {
+        return convertirADatosItemRendimiento(this.repositorioCalendario.getItemsRendimientoDeUsuario(usuario));
+    }
+
+    @Override
+    public ItemRendimiento convertirRendimientoAItemRendimiento(Rendimiento rendimiento) {
+        switch (rendimiento) {
+            case ALTO:
+                return new ItemRendimiento(TipoRendimiento.ALTO);
+            case MEDIO:
+                return new ItemRendimiento(TipoRendimiento.NORMAL);
+            case BAJO:
+                return new ItemRendimiento(TipoRendimiento.BAJO);
+            default:
+                return new ItemRendimiento(TipoRendimiento.DESCANSO);
+        }
+    }
+
+    @Override
+    public boolean validarSiElUsuarioPuedeCargarRutinaHoy(Usuario usuario) {
+        return repositorioCalendario.getItemRendimientoDeUsuarioHoyPorId(usuario.getId()) == null;
+    }
+
 
 }
