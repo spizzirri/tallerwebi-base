@@ -152,7 +152,7 @@ public class ServicioLoginTest {
     }
 
     @Test
-    public void queConsultarUsuarioFuncionaCorrectamente() {
+    public void queConsultarUsuarioConEmailYPasswordCorrectosDevuelveUsuario() {
         // preparación
         String email = "test@example.com";
         String password = "password";
@@ -171,7 +171,7 @@ public class ServicioLoginTest {
     }
 
     @Test
-    public void queRegistrarUsuarioFuncionaCorrectamente() throws UsuarioExistente {
+    public void queRegistrarNuevoUsuarioSinConflictosFuncionaCorrectamente() throws UsuarioExistente {
         // preparación
         Usuario usuario = new Usuario();
         usuario.setEmail("test@example.com");
@@ -186,7 +186,7 @@ public class ServicioLoginTest {
     }
 
     @Test
-    public void queRegistrarUsuarioLanzaExcepcionSiElUsuarioYaExiste() {
+    public void queRegistrarUsuarioExistenteLanzaUsuarioExistenteException() {
         // preparación
         Usuario usuario = new Usuario();
         usuario.setEmail("test@example.com");
@@ -202,7 +202,7 @@ public class ServicioLoginTest {
     }
 
     @Test
-    public void queObtenerItemMasSeleccionadoFuncionaCorrectamente() {
+    public void queObtenerItemMasSeleccionadoDesdeServicioCalendarioDevuelveCorrectamente() {
         // preparación
         DatosItemRendimiento datosItemRendimiento = new DatosItemRendimiento();
         when(servicioCalendario.obtenerItemMasSeleccionado()).thenReturn(datosItemRendimiento);
@@ -215,7 +215,7 @@ public class ServicioLoginTest {
     }
 
     @Test
-    public void queObtenerRetoDisponibleFuncionaCorrectamente() {
+    public void queObtenerRetoDisponibleDesdeServicioRetoDevuelveCorrectamente() {
         // preparación
         Reto reto = new Reto();
         when(servicioReto.obtenerRetoDisponible()).thenReturn(reto);
@@ -228,7 +228,7 @@ public class ServicioLoginTest {
     }
 
     @Test
-    public void queObtenerRetoEnProcesoFuncionaCorrectamente() {
+    public void queObtenerRetoEnProcesoDesdeServicioRetoDevuelveCorrectamente() {
         // preparación
         Reto reto = new Reto();
         when(servicioReto.obtenerRetoEnProceso()).thenReturn(reto);
@@ -241,7 +241,7 @@ public class ServicioLoginTest {
     }
 
     @Test
-    public void queCalcularTiempoRestanteFuncionaCorrectamente() {
+    public void queCalcularTiempoRestanteDeRetoDevuelveCorrectamente() {
         // preparación
         Long retoId = 1L;
         long tiempoRestante = 1000L;
@@ -255,7 +255,7 @@ public class ServicioLoginTest {
     }
 
     @Test
-    public void queGuardarPerfilFuncionaCorrectamente() {
+    public void queGuardarPerfilDeUsuarioFuncionaCorrectamente() {
         // preparación
         Usuario usuario = new Usuario();
         Perfil perfil = new Perfil();
@@ -271,7 +271,7 @@ public class ServicioLoginTest {
     }
 
     @Test
-    public void queGuardarObjetivoFuncionaCorrectamente() {
+    public void queGuardarObjetivoDeUsuarioFuncionaCorrectamente() {
         // preparación
         Usuario usuario = new Usuario();
         usuario.setObjetivo(Objetivo.PERDIDA_DE_PESO);

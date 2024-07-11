@@ -1,5 +1,6 @@
 package com.tallerwebi.presentacion;
 
+import com.tallerwebi.dominio.reto.Reto;
 import com.tallerwebi.dominio.usuario.ServicioLogin;
 import com.tallerwebi.dominio.usuario.Usuario;
 import com.tallerwebi.dominio.calendario.ItemRendimiento;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpSession;
 import static javax.swing.UIManager.get;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
@@ -110,21 +112,59 @@ public class ControladorLoginTest {
 		assertThat(modelAndView.getModel().get("error").toString(), equalToIgnoringCase("Error al registrar el nuevo usuario"));
 	}
 
-//	@Test
-//	public void queSePuedaObtenerElItemRendimientoMasSeleccionado() throws Exception {
-//		DatosItemRendimiento itemMasSeleccionado = new DatosItemRendimiento(LocalDate.now().minusDays(10), TipoRendimiento.ALTO);
-//
-//		when(servicioLoginMock.obtenerItemMasSeleccionado()).thenReturn(itemMasSeleccionado);
-//
-//		// Llamar directamente al método del controlador
-//		ModelAndView modelAndView = controladorLogin.irAHome();
-//
-//		// Verificaciones
-//		assertThat(modelAndView.getViewName(), equalToIgnoringCase("home"));
-//		assertThat(modelAndView.getModel().containsKey("itemMasSeleccionado"), equalTo(true));
-//		assertThat(modelAndView.getModel().get("itemMasSeleccionado"), equalTo(itemMasSeleccionado));
-//	}
+	@Test
+	public void nuevoUsuarioDeberiaRetornarVistaNuevoUsuario() {
+		// ejecución
+		ModelAndView modelAndView = controladorLogin.nuevoUsuario();
 
+		// validación
+		assertThat(modelAndView.getViewName(), equalToIgnoringCase("nuevo-usuario"));
+		assertNotNull(modelAndView.getModel().get("usuario"));
+	}
+
+	@Test
+	public void inicioDeberiaRedirigirALogin() {
+		// ejecución
+		ModelAndView modelAndView = controladorLogin.inicio();
+
+		// validación
+		assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/login"));
+	}
+
+	@Test
+	public void irAHomeConUsuarioEnSesionDeberiaMostrarHome() {
+		// preparación
+		when(requestMock.getSession()).thenReturn(sessionMock);
+		when(sessionMock.getAttribute("usuario")).thenReturn(usuarioMock);
+		DatosItemRendimiento itemMock = mock(DatosItemRendimiento.class);
+		when(servicioLoginMock.obtenerItemMasSeleccionado()).thenReturn(itemMock);
+		Reto retoMock = mock(Reto.class);
+		when(servicioLoginMock.obtenerRetoEnProceso()).thenReturn(retoMock);
+		when(servicioLoginMock.calcularTiempoRestante(anyLong())).thenReturn(100L);
+
+		// ejecución
+		ModelAndView modelAndView = controladorLogin.irAHome(sessionMock);
+
+		// validación
+		assertThat(modelAndView.getViewName(), equalToIgnoringCase("home"));
+		assertNotNull(modelAndView.getModel().get("usuario"));
+		assertNotNull(modelAndView.getModel().get("itemMasSeleccionado"));
+		assertNotNull(modelAndView.getModel().get("retoDisponible"));
+		assertNotNull(modelAndView.getModel().get("minutosRestantes"));
+	}
+
+	@Test
+	public void irAHomeSinUsuarioEnSesionDeberiaRedirigirALogin() {
+		// preparación
+		when(requestMock.getSession()).thenReturn(sessionMock);
+		when(sessionMock.getAttribute("usuario")).thenReturn(null);
+
+		// ejecución
+		ModelAndView modelAndView = controladorLogin.irAHome(sessionMock);
+
+		// validación
+		assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/login"));
+	}
 
 
 
