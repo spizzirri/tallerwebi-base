@@ -9,10 +9,7 @@ import com.tallerwebi.dominio.rutina.Rutina;
 import com.tallerwebi.dominio.rutina.ServicioRutina;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpSession;
 import java.util.List;
@@ -160,6 +157,41 @@ public class ControladorRutina {
 
         servicioRutina.actualizarEstadoEjercicio(usuario, idEjercicio, estado);
         return "redirect:/mi-rutina";
+    }
+
+    @GetMapping("/objetivo")
+    public ModelAndView mostrarVistaObjetivos(HttpSession session) {
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        if (usuario == null) {
+            return new ModelAndView("redirect:/login");
+        }
+        ModelAndView modelAndView = new ModelAndView("objetivo");
+        modelAndView.addObject("usuario", usuario);
+
+        return modelAndView;
+    }
+
+    @RequestMapping(path = "/guardar-objetivo", method = RequestMethod.GET)
+    public ModelAndView guardarObjetivo(@RequestParam("objetivo") String objetivo, HttpSession session) {
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+
+        if (usuario == null) {
+            return new ModelAndView("redirect:/login");
+        }
+
+        ModelAndView modelAndView = new ModelAndView("objetivo");
+
+        try {
+            Objetivo objetivoEnum = Objetivo.valueOf(objetivo);
+            servicioRutina.guardarObjetivoEnUsuario(objetivoEnum,usuario);
+
+        } catch (Exception e) {
+            modelAndView.setViewName("objetivo");
+            modelAndView.addObject("Excepcion:", e.getMessage());
+            return modelAndView;
+        }
+
+        return new ModelAndView("redirect:/rutinas");
     }
 
 

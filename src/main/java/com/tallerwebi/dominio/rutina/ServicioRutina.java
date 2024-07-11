@@ -52,4 +52,6 @@ public interface ServicioRutina {
     List<EstadoEjercicio> getEstadosEjercicios(Usuario usuario, DatosRutina rutina);
 
     Rendimiento calcularRendimiento(List<EstadoEjercicio> estadosEjercicios);
+
+    void guardarObjetivoEnUsuario(Objetivo objetivo, Usuario usuario) throws UsuarioNoExisteException, ObjetivoNoExisteException;
 }

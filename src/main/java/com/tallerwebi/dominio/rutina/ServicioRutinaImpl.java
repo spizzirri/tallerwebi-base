@@ -298,6 +298,18 @@ public class ServicioRutinaImpl implements ServicioRutina {
         }
     }
 
+    @Override
+    public void guardarObjetivoEnUsuario(Objetivo objetivo ,Usuario usuario) throws UsuarioNoExisteException, ObjetivoNoExisteException {
+
+        if(usuario == null){
+            throw new UsuarioNoExisteException();
+        }else if (objetivo == null){
+            throw new ObjetivoNoExisteException();
+        }else{
+            this.repositorioRutina.setObjetivoUsuario(objetivo,usuario);
+        }
+    }
+
     private List<DatosRutina> convertToDatosRutina(List<Rutina> rutinas) {
 
         List<DatosRutina> datosRutinas = new ArrayList<>();

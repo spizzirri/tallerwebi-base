@@ -472,5 +472,11 @@ public class RepositorioRutinaImpl implements RepositorioRutina {
         return (EstadoEjercicio) query.uniqueResult();
     }
 
+    @Override
+    public void setObjetivoUsuario(Objetivo objetivo, Usuario usuario) {
+        usuario.setObjetivo(objetivo);
+        this.sessionFactory.getCurrentSession().saveOrUpdate(usuario);
+    }
+
 
 }

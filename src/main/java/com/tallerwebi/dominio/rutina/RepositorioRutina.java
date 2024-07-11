@@ -85,4 +85,6 @@ public interface RepositorioRutina {
     void guardarEstadoEjercicio(EstadoEjercicio estadoEjercicio);
 
     EstadoEjercicio buscarEstadoEjercicioPorUsuarioYEjercicio(Usuario usuario, Ejercicio ejercicio);
+
+    void setObjetivoUsuario(Objetivo objetivo, Usuario usuario);
 }

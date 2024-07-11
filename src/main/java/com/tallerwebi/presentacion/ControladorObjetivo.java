@@ -25,7 +25,7 @@ public class ControladorObjetivo {
         this.dataSource = dataSource;
     }
 
-    @PostMapping("/guardar-objetivo")
+    @PostMapping("/guardar-objetivox")
     public String guardarObjetivo(@RequestParam("objetivo") String objetivo, @RequestParam("email") String email) {
         Usuario usuario = obtenerUsuarioPorEmail(email);
         if (usuario == null) {
@@ -65,7 +65,7 @@ public class ControladorObjetivo {
         }
     }
 
-    @GetMapping("/objetivo")
+    @GetMapping("/objetivox")
     public ModelAndView mostrarVistaObjetivos(HttpSession session) {
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         if (usuario == null) {
