@@ -13,8 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.ModelAndView;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
@@ -43,6 +42,54 @@ public class ControladorRetoTest {
         this.servicioReto = mock(ServicioReto.class);
         MockitoAnnotations.initMocks(this);
         MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controladorReto).build();
+    }
+
+    @Test
+    public void dadoQueElUsuarioEstaEnLaVistHomeQueAlEmpezarRetoExitosamenteRecargueVistaHome() {
+        // Preparación
+        Usuario usuarioMock = new Usuario();
+        when(session.getAttribute("usuario")).thenReturn(usuarioMock);
+
+        // Ejecución
+        ModelAndView mav = controladorReto.empezarReto(1L, "test@example.com", "password", session);
+
+        // Verificación
+        verify(servicioReto).empezarRetoActualizado(anyLong()); // Verificar que el método empezarRetoActualizado fue llamado
+        assertThat(mav.getViewName(), equalTo("home")); // Verificar la vista correcta
+    }
+
+    @Test
+    public void dadoQueElUsuarioEstaEnLaVistaHomeQueAlTerminarRetoExitosamenteRedirijaAHome() {
+        // Preparación
+        Usuario usuarioMock = new Usuario();
+        when(session.getAttribute("usuario")).thenReturn(usuarioMock);
+        when(servicioLogin.consultarUsuario(anyString(), anyString())).thenReturn(usuarioMock);
+
+        // Ejecución
+        ModelAndView mav = controladorReto.terminarReto(1L, "test@example.com", "password", session);
+
+        // Verificación
+        assertThat(mav.getViewName(), equalToIgnoringCase("redirect:/home")); // Verificar redirección a home
+        assertFalse(mav.getModel().containsKey("error")); // Verificar que no hay errores en el modelo
+        verify(servicioLogin).consultarUsuario("test@example.com", "password");
+        verify(servicioLogin).modificarRachaRetoTerminado(usuarioMock, 1L);
+    }
+
+    @Test
+    public void dadoQueElUsuarioEstaEnLaVistaHomeQueAlCambiarRetoExitosamenteRedirijaAHome() {
+        // Preparación
+        Usuario usuarioMock = new Usuario();
+        when(session.getAttribute("usuario")).thenReturn(usuarioMock);
+        when(servicioLogin.consultarUsuario(anyString(), anyString())).thenReturn(usuarioMock);
+
+        // Ejecución
+        RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
+        ModelAndView mav = controladorReto.cambiarReto(1L, "test@example.com", "password", session, redirectAttributes);
+
+        // Verificación
+        assertThat(mav.getViewName(), equalToIgnoringCase("redirect:/home")); // Verificar redirección a home
+        assertFalse(redirectAttributes.getFlashAttributes().isEmpty()); // Verificar que hay atributos flash
+        verify(servicioLogin).cambiarReto(1L, usuarioMock);
     }
 
     @Test

@@ -1,5 +1,7 @@
 package com.tallerwebi.presentacion;
 
+import com.tallerwebi.dominio.excepcion.NoCargaPerfilExeption;
+import com.tallerwebi.dominio.excepcion.NoPudoGuardarPerfilException;
 import com.tallerwebi.dominio.perfil.Perfil;
 import com.tallerwebi.dominio.perfil.ServicioPerfil;
 import com.tallerwebi.dominio.usuario.ServicioLogin;
@@ -19,7 +21,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import javax.servlet.http.HttpSession;
 
 @Controller
-public class ControladorPerfil{
+public class ControladorPerfil {
 
     @Autowired
     private ServicioPerfil servicioPerfil;
@@ -43,17 +45,23 @@ public class ControladorPerfil{
         Perfil perfil = usuario.getPerfil();
         ModelAndView modelAndView = new ModelAndView("perfil");
 
-        // Si no existe perfil, crear uno nuevo
-        if (perfil == null) {
-            perfil = new Perfil();
-        } else {
-            // Generar la recomendación
-            String recomendacion = servicioPerfil.generarRecomendacion(perfil);
-            perfil.setRecomendacion(recomendacion);
-        }
+        try {
+            // Si no existe perfil, crear uno nuevo
+            if (perfil == null) {
+                perfil = new Perfil();
+            } else {
+                // Generar la recomendación
+                String recomendacion = servicioPerfil.generarRecomendacion(perfil);
+                perfil.setRecomendacion(recomendacion);
+            }
 
-        modelAndView.addObject("usuario", usuario);
-        modelAndView.addObject("perfil", perfil);
+            modelAndView.addObject("usuario", usuario);
+            modelAndView.addObject("perfil", perfil);
+
+        } catch (NoCargaPerfilExeption e) {
+            modelAndView = new ModelAndView("error");
+            modelAndView.addObject("mensaje", "Error al cargar el perfil: " + e.getMessage());
+        }
 
         return modelAndView;
     }
@@ -65,17 +73,29 @@ public class ControladorPerfil{
             return new ModelAndView("redirect:/login");
         }
 
-        // Generar la recomendación
-        String recomendacion = servicioPerfil.generarRecomendacion(perfil);
-        perfil.setRecomendacion(recomendacion);
-
         ModelAndView modelAndView = new ModelAndView("redirect:/perfil");
-        modelAndView.addObject("usuario", usuario);
 
-        servicioLogin.guardarPerfil(usuario, perfil);
+        try {
+            // Generar la recomendación
+            String recomendacion = servicioPerfil.generarRecomendacion(perfil);
+            perfil.setRecomendacion(recomendacion);
+
+            modelAndView.addObject("usuario", usuario);
+
+            servicioLogin.guardarPerfil(usuario, perfil);
+
+        } catch (NoPudoGuardarPerfilException e) {
+            modelAndView = new ModelAndView("error");
+            modelAndView.addObject("mensaje", "Error al guardar el perfil: " + e.getMessage());
+        }
 
         return modelAndView;
     }
 
+    @RequestMapping(path = "/cerrar-sesion", method = RequestMethod.POST)
+    public String cerrarSesion(HttpSession session) {
+        session.invalidate();
+        return "redirect:/login";
+    }
 
 }

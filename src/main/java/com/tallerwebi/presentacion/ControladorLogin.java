@@ -84,11 +84,14 @@ public class ControladorLogin {
         }
         modelAndView.addObject("usuario", usuario);
         session.setAttribute("usuario", usuario);
-        // Obtener el ItemRendimiento más seleccionado
-        DatosItemRendimiento itemMasSeleccionado = servicioLogin.obtenerItemMasSeleccionado();
 
-        // Añadir el ItemRendimiento más seleccionado al modelo
-        modelAndView.addObject("itemMasSeleccionado", itemMasSeleccionado);
+        // Añadir itemMasSeleccionado al modelo
+        DatosItemRendimiento itemMasSeleccionado = servicioLogin.obtenerItemMasSeleccionado();
+        if (itemMasSeleccionado == null) {
+            modelAndView.addObject("mensaje", "Contanos cómo fue tu rendimiento hoy.");
+        } else {
+            modelAndView.addObject("itemMasSeleccionado", itemMasSeleccionado);
+        }
 
         // Verificar si hay un reto en proceso desde el servicio
         Reto retoEnProceso = servicioLogin.obtenerRetoEnProceso();

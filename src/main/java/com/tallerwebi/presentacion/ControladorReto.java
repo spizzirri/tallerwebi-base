@@ -45,7 +45,12 @@ public class ControladorReto {
 
             // Añadir itemMasSeleccionado al modelo
             DatosItemRendimiento itemMasSeleccionado = servicioLogin.obtenerItemMasSeleccionado();
-            modelAndView.addObject("itemMasSeleccionado", itemMasSeleccionado);
+            if (itemMasSeleccionado == null) {
+                modelAndView.addObject("mensaje", "Contanos cómo fue tu rendimiento hoy.");
+            } else {
+                modelAndView.addObject("itemMasSeleccionado", itemMasSeleccionado);
+            }
+
 
             // Añadir retoDisponible al modelo
             Reto retoDisponible = servicioReto.obtenerRetoPorId(retoId);
@@ -81,8 +86,13 @@ public class ControladorReto {
         modelAndView.addObject("retoId", retoId);
         modelAndView.addObject("usuario", usuario); // Asegúrate de agregar el usuario al modelo
         try {
+            // Añadir itemMasSeleccionado al modelo
             DatosItemRendimiento itemMasSeleccionado = servicioLogin.obtenerItemMasSeleccionado();
-            modelAndView.addObject("itemMasSeleccionado", itemMasSeleccionado);
+            if (itemMasSeleccionado == null) {
+                modelAndView.addObject("mensaje", "Contanos cómo fue tu rendimiento hoy.");
+            } else {
+                modelAndView.addObject("itemMasSeleccionado", itemMasSeleccionado);
+            }
 
             session.removeAttribute("retoDisponible");
 

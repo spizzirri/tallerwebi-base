@@ -31,12 +31,9 @@ public class RepositorioCalendarioImpl implements RepositorioCalendario {
 
     @Override
     public void guardar(ItemRendimiento itemRendimiento) {
-        if (!existeItemRendimientoPorFecha(itemRendimiento.getFecha())) {
             this.sessionFactory.getCurrentSession().save(itemRendimiento);
-        } else {
-            throw new ItemRendimientoDuplicadoException("No se puede guardar tu rendimiento más de una vez el mismo día.");
-        }
     }
+
 
     @Override
     public boolean existeItemRendimientoPorFecha(LocalDate fecha) {
@@ -62,7 +59,7 @@ public class RepositorioCalendarioImpl implements RepositorioCalendario {
                 .getResultList();
 
         if (results.isEmpty()) {
-            return null;
+            return null; //este null esta cubierto en el servicio
         }
         TipoRendimiento tipoRendimientoMasSeleccionado = (TipoRendimiento) results.get(0)[0];
 
@@ -77,27 +74,6 @@ public class RepositorioCalendarioImpl implements RepositorioCalendario {
     }
 
 
-    @Override
-    public void vaciarCalendario() {
-        Session session = this.sessionFactory.getCurrentSession();
-        session.createQuery("DELETE FROM ItemRendimiento").executeUpdate();
-    }
-
-    @Override
-    public List<ItemRendimiento> obtenerItemsPorTipoRendimiento(TipoRendimiento tipoRendimiento) {
-        return List.of();
-    }
-
-    @Override
-    public void eliminar(ItemRendimiento dia) {
-        this.sessionFactory.getCurrentSession().delete(dia);
-    }
-
-
-    @Override
-    public void actualizar(ItemRendimiento itemRendimiento) {
-        this.sessionFactory.getCurrentSession().merge(itemRendimiento);
-    }
 
 
 }

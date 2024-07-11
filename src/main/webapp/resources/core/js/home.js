@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 if (tipoRendimiento === "ALTO") {
                     barraProgreso.style.backgroundColor = "#2ecc71"; // Verde
                 } else if (tipoRendimiento === "NORMAL") {
-                    barraProgreso.style.backgroundColor = "#f1c40f"; // Amarillo
+                    barraProgreso.style.backgroundColor = "#e1b80d"; // Amarillo
                 } else if (tipoRendimiento === "BAJO") {
                     barraProgreso.style.backgroundColor = "#e74c3c"; // Rojo
                 }
@@ -110,3 +110,4 @@ document.getElementById("cambiarRetoForm").addEventListener("submit", function(e
            document.getElementById("cambiarRetoForm").submit();
        }, 1500); // 3 segundos
     });
+
