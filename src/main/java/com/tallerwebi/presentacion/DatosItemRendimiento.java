@@ -18,7 +18,6 @@ public class DatosItemRendimiento {
     }
 
     public DatosItemRendimiento() {
-
     }
 
     public LocalDate getFecha() {

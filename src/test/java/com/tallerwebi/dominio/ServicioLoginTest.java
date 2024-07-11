@@ -2,6 +2,9 @@ package com.tallerwebi.dominio;
 
 import com.tallerwebi.dominio.calendario.ServicioCalendario;
 import com.tallerwebi.dominio.excepcion.NoCambiosRestantesException;
+import com.tallerwebi.dominio.excepcion.UsuarioExistente;
+import com.tallerwebi.dominio.objetivo.Objetivo;
+import com.tallerwebi.dominio.perfil.Perfil;
 import com.tallerwebi.dominio.perfil.ServicioPerfil;
 import com.tallerwebi.dominio.reto.RepositorioReto;
 import com.tallerwebi.dominio.reto.Reto;
@@ -10,6 +13,7 @@ import com.tallerwebi.dominio.usuario.RepositorioUsuario;
 import com.tallerwebi.dominio.usuario.ServicioLogin;
 import com.tallerwebi.dominio.usuario.ServicioLoginImpl;
 import com.tallerwebi.dominio.usuario.Usuario;
+import com.tallerwebi.presentacion.DatosItemRendimiento;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -44,6 +48,7 @@ public class ServicioLoginTest {
 
     @Test
     public void queAlModificarRachaRetoTerminadoSeSumeUnaRachaPorTerminarloEnTiempo() {
+        // preparación
         Usuario usuario = new Usuario();
         usuario.setEmail("hola@sasss.com");
         usuario.setNombre("javier");
@@ -52,14 +57,17 @@ public class ServicioLoginTest {
         long retoId = 1L;
         when(servicioReto.terminarReto(retoId)).thenReturn(1L); // Simula que ha pasado 1 día
 
+        // ejecución
         Usuario resultado = servicioLogin.modificarRachaRetoTerminado(usuario, retoId);
 
+        // verificación
         assertNotNull(resultado);
         assertEquals(6, resultado.getRachaDeRetos()); // La racha debe incrementarse en 1
     }
 
     @Test
     public void queAlModificarRachaRetoTerminadoLaRachaDelUsuarioSeReseteePorPasarseDeDosDias() {
+        // preparación
         long retoId = 1L;
         Usuario usuario = new Usuario();
         usuario.setEmail("hola@sasss.com");
@@ -68,43 +76,44 @@ public class ServicioLoginTest {
         usuario.setRachaDeRetos(2);
         when(servicioReto.terminarReto(retoId)).thenReturn(2L); // Simula que han pasado 2 días
 
+        // ejecución
         Usuario resultado = servicioLogin.modificarRachaRetoTerminado(usuario, retoId);
 
+        // verificación
         assertNotNull(resultado);
         assertEquals(0, resultado.getRachaDeRetos()); // La racha debe resetearse a 0
-
     }
 
     @Test
-        public void queCambiarRetoFuncionaCorrectamente() {
-            // Arrange
-            Long retoId = 1L;
-            Usuario usuario = new Usuario();
-            usuario.setCambioReto(3);
+    public void queCambiarRetoFuncionaCorrectamente() {
+        // preparación
+        Long retoId = 1L;
+        Usuario usuario = new Usuario();
+        usuario.setCambioReto(3);
 
-            Reto retoActual = new Reto();
-            retoActual.setId(retoId);
-            retoActual.setSeleccionado(false);
+        Reto retoActual = new Reto();
+        retoActual.setId(retoId);
+        retoActual.setSeleccionado(false);
 
-            Reto nuevoReto = new Reto();
-            nuevoReto.setId(2L);
-            retoActual.setSeleccionado(false);
+        Reto nuevoReto = new Reto();
+        nuevoReto.setId(2L);
+        nuevoReto.setSeleccionado(false);
 
-            when(servicioReto.obtenerRetoPorId(retoId)).thenReturn(retoActual);
-            when(servicioReto.obtenerRetoDisponible()).thenReturn(nuevoReto);
+        when(servicioReto.obtenerRetoPorId(retoId)).thenReturn(retoActual);
+        when(servicioReto.obtenerRetoDisponible()).thenReturn(nuevoReto);
 
-            // Act
-            Reto resultado = servicioLogin.cambiarReto(retoId, usuario);
+        // ejecución
+        Reto resultado = servicioLogin.cambiarReto(retoId, usuario);
 
-            // Assert
-            assertNotNull(resultado, "El nuevo reto no debería ser nulo");
-            assertEquals(nuevoReto.getId(), resultado.getId(), "El ID del nuevo reto debería coincidir");
-            assertEquals(2, usuario.getCambioReto(), "El número de cambios restantes del usuario debería ser 2");
+        // verificación
+        assertNotNull(resultado, "El nuevo reto no debería ser nulo");
+        assertEquals(nuevoReto.getId(), resultado.getId(), "El ID del nuevo reto debería coincidir");
+        assertEquals(2, usuario.getCambioReto(), "El número de cambios restantes del usuario debería ser 2");
     }
 
     @Test
     public void queAlCambiarRetoUsuarioConCambiosDisponiblesSeLogreCorrectamente() {
-        // Configuración de prueba
+        // preparación
         Long retoId = 1L;
         Usuario usuario = new Usuario();
         usuario.setCambioReto(1);
@@ -115,10 +124,10 @@ public class ServicioLoginTest {
         when(servicioReto.obtenerRetoPorId(retoId)).thenReturn(retoActual);
         when(servicioReto.obtenerRetoDisponible()).thenReturn(nuevoReto);
 
-        // Ejecución del método
+        // ejecución
         Reto resultado = servicioLogin.cambiarReto(retoId, usuario);
 
-        // Verificación
+        // verificación
         assertNotNull(resultado);
         assertEquals(nuevoReto, resultado);
         assertEquals(0, usuario.getCambioReto());
@@ -126,12 +135,12 @@ public class ServicioLoginTest {
 
     @Test
     public void alCambiarRetoElUsuarioSinCambiosDisponibles() {
-        // Configuración de prueba
+        // preparación
         Long retoId = 1L;
         Usuario usuario = new Usuario();
         usuario.setCambioReto(0);
 
-        // Ejecución y verificación
+        // ejecución y verificación
         NoCambiosRestantesException exception = assertThrows(NoCambiosRestantesException.class, () -> {
             servicioLogin.cambiarReto(retoId, usuario);
         });
@@ -140,6 +149,138 @@ public class ServicioLoginTest {
         verify(servicioReto, never()).obtenerRetoPorId(anyLong());
         verify(servicioReto, never()).obtenerRetoDisponible();
         verify(repositorioUsuario, never()).modificar(usuario);
+    }
+
+    @Test
+    public void queConsultarUsuarioFuncionaCorrectamente() {
+        // preparación
+        String email = "test@example.com";
+        String password = "password";
+        Usuario usuario = new Usuario();
+        usuario.setEmail(email);
+        usuario.setPassword(password);
+        when(repositorioUsuario.buscarUsuario(email, password)).thenReturn(usuario);
+
+        // ejecución
+        Usuario resultado = servicioLogin.consultarUsuario(email, password);
+
+        // verificación
+        assertNotNull(resultado);
+        assertEquals(email, resultado.getEmail());
+        assertEquals(password, resultado.getPassword());
+    }
+
+    @Test
+    public void queRegistrarUsuarioFuncionaCorrectamente() throws UsuarioExistente {
+        // preparación
+        Usuario usuario = new Usuario();
+        usuario.setEmail("test@example.com");
+        usuario.setPassword("password");
+        when(repositorioUsuario.buscarUsuario(anyString(), anyString())).thenReturn(null);
+
+        // ejecución
+        servicioLogin.registrar(usuario);
+
+        // verificación
+        verify(repositorioUsuario).guardar(usuario);
+    }
+
+    @Test
+    public void queRegistrarUsuarioLanzaExcepcionSiElUsuarioYaExiste() {
+        // preparación
+        Usuario usuario = new Usuario();
+        usuario.setEmail("test@example.com");
+        usuario.setPassword("password");
+        when(repositorioUsuario.buscarUsuario(anyString(), anyString())).thenReturn(usuario);
+
+        // ejecución y verificación
+        UsuarioExistente exception = assertThrows(UsuarioExistente.class, () -> {
+            servicioLogin.registrar(usuario);
+        });
+        assertNotNull(exception);
+        verify(repositorioUsuario, never()).guardar(any(Usuario.class));
+    }
+
+    @Test
+    public void queObtenerItemMasSeleccionadoFuncionaCorrectamente() {
+        // preparación
+        DatosItemRendimiento datosItemRendimiento = new DatosItemRendimiento();
+        when(servicioCalendario.obtenerItemMasSeleccionado()).thenReturn(datosItemRendimiento);
+
+        // ejecución
+        DatosItemRendimiento resultado = servicioLogin.obtenerItemMasSeleccionado();
+
+        // verificación
+        assertNotNull(resultado);
+    }
+
+    @Test
+    public void queObtenerRetoDisponibleFuncionaCorrectamente() {
+        // preparación
+        Reto reto = new Reto();
+        when(servicioReto.obtenerRetoDisponible()).thenReturn(reto);
+
+        // ejecución
+        Reto resultado = servicioLogin.obtenerRetoDisponible();
+
+        // verificación
+        assertNotNull(resultado);
+    }
+
+    @Test
+    public void queObtenerRetoEnProcesoFuncionaCorrectamente() {
+        // preparación
+        Reto reto = new Reto();
+        when(servicioReto.obtenerRetoEnProceso()).thenReturn(reto);
+
+        // ejecución
+        Reto resultado = servicioLogin.obtenerRetoEnProceso();
+
+        // verificación
+        assertNotNull(resultado);
+    }
+
+    @Test
+    public void queCalcularTiempoRestanteFuncionaCorrectamente() {
+        // preparación
+        Long retoId = 1L;
+        long tiempoRestante = 1000L;
+        when(servicioReto.calcularTiempoRestante(retoId)).thenReturn(tiempoRestante);
+
+        // ejecución
+        long resultado = servicioLogin.calcularTiempoRestante(retoId);
+
+        // verificación
+        assertEquals(tiempoRestante, resultado);
+    }
+
+    @Test
+    public void queGuardarPerfilFuncionaCorrectamente() {
+        // preparación
+        Usuario usuario = new Usuario();
+        Perfil perfil = new Perfil();
+        perfil.setUsuario(usuario);
+        usuario.setPerfil(perfil);
+
+        // ejecución
+        servicioLogin.guardarPerfil(usuario, perfil);
+
+        // verificación
+        verify(repositorioUsuario).modificar(usuario);
+        verify(servicioPerfil).guardarPerfil(perfil);
+    }
+
+    @Test
+    public void queGuardarObjetivoFuncionaCorrectamente() {
+        // preparación
+        Usuario usuario = new Usuario();
+        usuario.setObjetivo(Objetivo.PERDIDA_DE_PESO);
+
+        // ejecución
+        servicioLogin.guardarObjetivo(usuario, Objetivo.PERDIDA_DE_PESO);
+
+        // verificación
+        verify(repositorioUsuario).modificar(usuario);
     }
 
 }

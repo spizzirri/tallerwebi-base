@@ -1,5 +1,3 @@
---/* Aisgnacion de ejercicios a rutinas */
-
 INSERT INTO `Rutina_Ejercicio` (`rutina_idRutina`, `ejercicios_idEjercicio`) VALUES
 (1, 1),
 (1, 2),

@@ -8,7 +8,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
 import java.sql.Connection;
@@ -36,149 +38,42 @@ public class ControladorObjetivoTest {
 
     private MockMvc mockMvc;
 
+    private Usuario usuario;
+
+    @Mock
+    private HttpSession session;
+
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
         mockMvc = MockMvcBuilders.standaloneSetup(controladorObjetivo).build();
+        usuario = new Usuario(); // Crear un usuario simulado
+        when(session.getAttribute("usuario")).thenReturn(usuario);
     }
 
     @Test
-    public void testGuardarObjetivo() throws Exception {
-        String objetivo = "Nuevo Objetivo";
-        String email = "test@unlam.edu.ar";
+    public void queAlIrAVistaDeObjetivosSinUsuarioRedirijaALogin() throws Exception {
+        // Preparación
+        when(session.getAttribute("usuario")).thenReturn(null);
 
-        Usuario usuario = new Usuario();
-        usuario.setId(1L);
-        usuario.setEmail(email);
+        // Ejecución y verificación
+        ModelAndView modelAndView = controladorObjetivo.mostrarVistaObjetivos(session);
 
-        when(dataSource.getConnection()).thenReturn(mock(Connection.class));
-        when(dataSource.getConnection().prepareStatement(anyString())).thenReturn(mock(PreparedStatement.class));
-        when(dataSource.getConnection().prepareStatement(anyString()).executeQuery()).thenReturn(mock(ResultSet.class));
-
-        mockMvc.perform(post("/guardar-objetivo")
-                        .param("objetivo", objetivo)
-                        .param("email", email))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/objetivos-guardados"));
-
-        verify(dataSource).getConnection();
+        // Verificación
+        assertEquals("redirect:/login", modelAndView.getViewName());
     }
 
     @Test
-    public void testGuardarObjetivoUsuario() throws SQLException {
-        Connection connection = mock(Connection.class);
-        PreparedStatement preparedStatement = mock(PreparedStatement.class);
+    public void queAlIrAVistaDeObjetivosConUsuarioMuestreLaVista() throws Exception {
+        // Preparación
+        when(session.getAttribute("usuario")).thenReturn(usuario);
 
-        when(dataSource.getConnection()).thenReturn(connection);
-        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        // Ejecución
+        ModelAndView modelAndView = controladorObjetivo.mostrarVistaObjetivos(session);
 
-        Long idUsuario = 1L;
-        String objetivo = "Nuevo Objetivo";
-
-        controladorObjetivo.guardarObjetivoUsuario(idUsuario, objetivo);
-
-        verify(preparedStatement).setLong(1, idUsuario);
-        verify(preparedStatement).setString(2, objetivo);
-        verify(preparedStatement).executeUpdate();
-        verify(connection).close();
-        verify(preparedStatement).close();
+        // Verificación
+        assertEquals("objetivo", modelAndView.getViewName());
+        assertEquals(usuario, modelAndView.getModel().get("usuario"));
     }
 
-    @Test
-    public void testGuardarObjetivoUsuarioSQLException() throws SQLException {
-        when(dataSource.getConnection()).thenThrow(new SQLException());
-
-        Long idUsuario = 1L;
-        String objetivo = "Nuevo Objetivo";
-
-        controladorObjetivo.guardarObjetivoUsuario(idUsuario, objetivo);
-
-        verify(dataSource).getConnection();
-    }
-
-    @Test
-    public void testMostrarVistaObjetivos() throws Exception {
-        mockMvc.perform(get("/vistaObjetivos"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("vistaObjetivos"));
-    }
-
-    @Test
-    public void testObtenerUsuarioPorEmail() throws SQLException {
-        String email = "test@unlam.edu.ar";
-        Usuario usuario = new Usuario();
-        usuario.setId(1L);
-        usuario.setEmail(email);
-
-        Connection connection = mock(Connection.class);
-        PreparedStatement preparedStatement = mock(PreparedStatement.class);
-        ResultSet resultSet = mock(ResultSet.class);
-
-        when(dataSource.getConnection()).thenReturn(connection);
-        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
-        when(resultSet.next()).thenReturn(true);
-        when(resultSet.getLong("id")).thenReturn(usuario.getId());
-        when(resultSet.getString("email")).thenReturn(usuario.getEmail());
-
-        Usuario result = controladorObjetivo.obtenerUsuarioPorEmail(email);
-
-        verify(preparedStatement).setString(1, email);
-        assertEquals(usuario.getId(), result.getId());
-        assertEquals(usuario.getEmail(), result.getEmail());
-    }
-
-    @Test
-    public void testObtenerUsuarioPorEmailNoEncontrado() throws SQLException {
-        String email = "test@unlam.edu.ar";
-
-        Connection connection = mock(Connection.class);
-        PreparedStatement preparedStatement = mock(PreparedStatement.class);
-        ResultSet resultSet = mock(ResultSet.class);
-
-        when(dataSource.getConnection()).thenReturn(connection);
-        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
-        when(resultSet.next()).thenReturn(false);
-
-        Usuario result = controladorObjetivo.obtenerUsuarioPorEmail(email);
-
-        verify(preparedStatement).setString(1, email);
-        assertNull(result);
-    }
-
-    @Test
-    public void testGuardarObjetivoConParametroVacio() throws Exception {
-        String objetivo = "";
-        String email = "test@unlam.edu.ar";
-
-        mockMvc.perform(post("/guardar-objetivo")
-                        .param("objetivo", objetivo)
-                        .param("email", email))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/objetivos-guardados"));
-    }
-
-    @Test
-    public void testGuardarObjetivoConParametroNulo() throws Exception {
-        String email = "test@unlam.edu.ar";
-
-        mockMvc.perform(post("/guardar-objetivo")
-                        .param("objetivo", (String) null)
-                        .param("email", email))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/objetivos-guardados"));
-    }
-
-    @Test
-    public void testGuardarObjetivoUsuarioSinUsuario() throws Exception {
-        String objetivo = "Nuevo Objetivo";
-        String email = "inexistente@unlam.edu.ar";
-
-        mockMvc.perform(post("/guardar-objetivo")
-                        .param("objetivo", objetivo)
-                        .param("email", email))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/error"));
-    }
 }

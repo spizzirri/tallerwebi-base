@@ -88,7 +88,7 @@ public class ControladorLogin {
         // Añadir itemMasSeleccionado al modelo
         DatosItemRendimiento itemMasSeleccionado = servicioLogin.obtenerItemMasSeleccionado();
         if (itemMasSeleccionado == null) {
-            modelAndView.addObject("mensaje", "Contanos cómo fue tu rendimiento hoy.");
+            modelAndView.addObject("mensaje", "¿Cómo fue tu entrenamiento hoy?");
         } else {
             modelAndView.addObject("itemMasSeleccionado", itemMasSeleccionado);
         }
