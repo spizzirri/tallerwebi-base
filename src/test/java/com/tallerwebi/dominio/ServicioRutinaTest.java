@@ -10,6 +10,7 @@ import com.tallerwebi.dominio.usuario.UsuarioRutina;
 import com.tallerwebi.presentacion.DatosRutina;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import javax.transaction.Transactional;
 
@@ -827,7 +828,7 @@ public class ServicioRutinaTest {
 
     @Test
     @Transactional
-    public void queRendimientoSeaBajoCuandoListaDeEjerciciosEsVacia() {
+    public void queRendimientoSeaDescansoCuandoListaDeEjerciciosEsVacia() {
         // Preparación
         List<EstadoEjercicio> estadosEjercicios = Collections.emptyList();
 
@@ -835,7 +836,7 @@ public class ServicioRutinaTest {
         Rendimiento rendimiento = servicioRutina.calcularRendimiento(estadosEjercicios);
 
         // Verificación
-        assertEquals(Rendimiento.BAJO, rendimiento);
+        assertEquals(Rendimiento.DESCANSO, rendimiento);
     }
 
     @Test
@@ -874,7 +875,7 @@ public class ServicioRutinaTest {
 
     @Test
     @Transactional
-    public void queRendimientoSeaBajoCuandoTodosEjerciciosEstanNoEmpezados() {
+    public void queRendimientoSeaDescansoCuandoTodosEjerciciosEstanNoEmpezados() {
         // Preparación
         List<EstadoEjercicio> estadosEjercicios = Arrays.asList(
                 new EstadoEjercicio(EstadoEjercicio.Estado.NO_EMPEZADO),
@@ -886,7 +887,7 @@ public class ServicioRutinaTest {
         Rendimiento rendimiento = servicioRutina.calcularRendimiento(estadosEjercicios);
 
         // Verificación
-        assertEquals(Rendimiento.BAJO, rendimiento);
+        assertEquals(Rendimiento.DESCANSO, rendimiento);
     }
 
     @Test
@@ -958,5 +959,154 @@ public class ServicioRutinaTest {
         // Verificación
         assertEquals(Rendimiento.MEDIO, rendimiento);
     }
+
+    @Test
+    @Transactional
+    public void queRendimientoSeaBajoCuandoMasDel75PorCientoDeEjerciciosNoEstanEmpezados() {
+        // Preparación
+        List<EstadoEjercicio> estadosEjercicios = Arrays.asList(
+                new EstadoEjercicio(EstadoEjercicio.Estado.NO_EMPEZADO),
+                new EstadoEjercicio(EstadoEjercicio.Estado.NO_EMPEZADO),
+                new EstadoEjercicio(EstadoEjercicio.Estado.NO_EMPEZADO),
+                new EstadoEjercicio(EstadoEjercicio.Estado.INCOMPLETO)
+        );
+
+        // Ejecución
+        Rendimiento rendimiento = servicioRutina.calcularRendimiento(estadosEjercicios);
+
+        // Verificación
+        assertEquals(Rendimiento.BAJO, rendimiento);
+    }
+
+    @Test
+    @Transactional
+    public void queRendimientoSeaMedioCuandoExactamente33PorCientoDeCadaEstado() {
+        // Preparación
+        List<EstadoEjercicio> estadosEjercicios = Arrays.asList(
+                new EstadoEjercicio(EstadoEjercicio.Estado.COMPLETO),
+                new EstadoEjercicio(EstadoEjercicio.Estado.INCOMPLETO),
+                new EstadoEjercicio(EstadoEjercicio.Estado.NO_EMPEZADO)
+        );
+
+        // Ejecución
+        Rendimiento rendimiento = servicioRutina.calcularRendimiento(estadosEjercicios);
+
+        // Verificación
+        assertEquals(Rendimiento.MEDIO, rendimiento);
+    }
+
+    @Test
+    @Transactional
+    public void queRendimientoSeaMedioCuandoMasDel50PorCientoDeEjerciciosEstanCompletosYMasDel50PorCientoDeEjerciciosEstanIncompletos() {
+        // Preparación
+        List<EstadoEjercicio> estadosEjercicios = Arrays.asList(
+                new EstadoEjercicio(EstadoEjercicio.Estado.COMPLETO),
+                new EstadoEjercicio(EstadoEjercicio.Estado.COMPLETO),
+                new EstadoEjercicio(EstadoEjercicio.Estado.COMPLETO),
+                new EstadoEjercicio(EstadoEjercicio.Estado.INCOMPLETO),
+                new EstadoEjercicio(EstadoEjercicio.Estado.INCOMPLETO),
+                new EstadoEjercicio(EstadoEjercicio.Estado.INCOMPLETO)
+        );
+
+        // Ejecución
+        Rendimiento rendimiento = servicioRutina.calcularRendimiento(estadosEjercicios);
+
+        // Verificación
+        assertEquals(Rendimiento.MEDIO, rendimiento);
+    }
+
+    @Test
+    @Transactional
+    public void queRendimientoSeaMedioCuandoExactamente50PorCientoDeEjerciciosEstanCompletosY50PorCientoIncompletos() {
+        // Preparación
+        List<EstadoEjercicio> estadosEjercicios = Arrays.asList(
+                new EstadoEjercicio(EstadoEjercicio.Estado.COMPLETO),
+                new EstadoEjercicio(EstadoEjercicio.Estado.COMPLETO),
+                new EstadoEjercicio(EstadoEjercicio.Estado.INCOMPLETO),
+                new EstadoEjercicio(EstadoEjercicio.Estado.INCOMPLETO)
+        );
+
+        // Ejecución
+        Rendimiento rendimiento = servicioRutina.calcularRendimiento(estadosEjercicios);
+
+        // Verificación
+        assertEquals(Rendimiento.MEDIO, rendimiento);
+    }
+
+    @Test
+    @Transactional
+    public void queRendimientoSeaMedioCuandoMenosDel50PorCientoDeEjerciciosEstanCompletos() {
+        // Preparación
+        List<EstadoEjercicio> estadosEjercicios = Arrays.asList(
+                new EstadoEjercicio(EstadoEjercicio.Estado.COMPLETO),
+                new EstadoEjercicio(EstadoEjercicio.Estado.COMPLETO),
+                new EstadoEjercicio(EstadoEjercicio.Estado.INCOMPLETO),
+                new EstadoEjercicio(EstadoEjercicio.Estado.NO_EMPEZADO)
+        );
+
+        // Ejecución
+        Rendimiento rendimiento = servicioRutina.calcularRendimiento(estadosEjercicios);
+
+        // Verificación
+        assertEquals(Rendimiento.MEDIO, rendimiento);
+    }
+
+    @Test
+    @Transactional
+    public void queRendimientoSeaBajoCuandoMenosDel75PorCientoDeEjerciciosNoEstanEmpezadosYElRestosIncompletos() {
+        // Preparación
+        List<EstadoEjercicio> estadosEjercicios = Arrays.asList(
+                new EstadoEjercicio(EstadoEjercicio.Estado.NO_EMPEZADO),
+                new EstadoEjercicio(EstadoEjercicio.Estado.NO_EMPEZADO),
+                new EstadoEjercicio(EstadoEjercicio.Estado.INCOMPLETO),
+                new EstadoEjercicio(EstadoEjercicio.Estado.INCOMPLETO)
+        );
+
+        // Ejecución
+        Rendimiento rendimiento = servicioRutina.calcularRendimiento(estadosEjercicios);
+
+        // Verificación
+        assertEquals(Rendimiento.BAJO, rendimiento);
+    }
+
+    @Test
+    public void queLanceUsuarioNoExisteExceptionCuandoUsuarioEsNull() {
+        // Preparación
+        Objetivo objetivo = Objetivo.DEFINICION; // Usando un valor del enum
+
+        // Ejecución y Verificación
+        assertThrows(UsuarioNoExisteException.class, () -> {
+            servicioRutina.guardarObjetivoEnUsuario(objetivo, null);
+        });
+    }
+
+    @Test
+    public void queLanceObjetivoNoExisteExceptionCuandoObjetivoEsNull() {
+        // Preparación
+        Usuario usuario = new Usuario(); // Suponiendo que tienes un constructor sin parámetros
+
+        // Ejecución y Verificación
+        assertThrows(ObjetivoNoExisteException.class, () -> {
+            servicioRutina.guardarObjetivoEnUsuario(null, usuario);
+        });
+    }
+
+    @Test
+    public void queLlameARepositorioRutinaSetObjetivoUsuarioCuandoObjetivoYUsuarioNoSonNull() {
+        // Preparación
+        Objetivo objetivo = Objetivo.GANANCIA_MUSCULAR;
+        Usuario usuario = new Usuario();
+
+        // Ejecución
+        try {
+            servicioRutina.guardarObjetivoEnUsuario(objetivo, usuario);
+        } catch (Exception e) {
+            fail("No debería lanzar excepción");
+        }
+
+        // Verificación
+        Mockito.verify(repositorioRutina, Mockito.times(1)).setObjetivoUsuario(objetivo, usuario);
+    }
+
 
 }

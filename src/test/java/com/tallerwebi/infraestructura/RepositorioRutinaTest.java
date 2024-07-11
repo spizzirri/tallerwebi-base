@@ -162,6 +162,21 @@ public class RepositorioRutinaTest {
 
         assertThat(rutinaObtenida.getNombre(),equalTo(nombreEsperado));
     }
+    @Test
+    @Transactional
+    @Rollback
+    public void queSePuedaEstablecerObjetivoDeUsuario() {
+        // Preparación
+        Usuario usuarioMock = new Usuario();
+        usuarioMock.setId(1L);
+        Objetivo nuevoObjetivo = Objetivo.GANANCIA_MUSCULAR;
+
+        // Ejecución
+        repositorioRutina.setObjetivoUsuario(nuevoObjetivo, usuarioMock);
+
+        // Verificación
+        assertEquals(nuevoObjetivo, usuarioMock.getObjetivo());
+    }
 
     @Test
     @Transactional
@@ -603,10 +618,10 @@ public class RepositorioRutinaTest {
 
         // Refrescar la sesión para asegurarse de obtener los datos actualizados
         sessionFactory.getCurrentSession().flush();
-        sessionFactory.getCurrentSession().clear();
 
         // Verificación: Obtener el estado actualizado
         EstadoEjercicio estadoEjercicioActualizado = repositorioRutina.buscarEstadoEjercicioPorUsuarioYEjercicio(usuarioMock, ejercicioMock);
+
         assertNotNull(estadoEjercicioActualizado);
         assertThat(estadoEjercicioActualizado.getEstado(), equalTo(EstadoEjercicio.Estado.COMPLETO));
     }

@@ -434,13 +434,9 @@ public class RepositorioRutinaImpl implements RepositorioRutina {
 
     @Override
     public void actualizarEstadoEjercicio(Usuario usuario, Long idEjercicio, EstadoEjercicio.Estado estado) {
-        String hql = "UPDATE EstadoEjercicio ee SET ee.estado = :estado WHERE ee.usuario = :usuario AND ee.ejercicio.idEjercicio = :idEjercicio";
-        sessionFactory.getCurrentSession()
-                .createQuery(hql)
-                .setParameter("estado", estado)
-                .setParameter("usuario", usuario)
-                .setParameter("idEjercicio", idEjercicio)
-                .executeUpdate();
+        EstadoEjercicio estadoEjercicio = this.buscarEstadoEjercicioPorUsuarioYEjercicio(usuario,this.getEjercicioById(idEjercicio));
+        estadoEjercicio.setEstado(estado);
+        sessionFactory.getCurrentSession().saveOrUpdate(estadoEjercicio);
     }
 
     @Override
