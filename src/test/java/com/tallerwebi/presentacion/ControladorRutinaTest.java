@@ -134,8 +134,7 @@ public class ControladorRutinaTest {
         MvcResult result = mockMvc.perform(get("/asignar-rutina")
                         .param("id", rutinaId.toString())
                         .session(session))
-                .andExpect(status().isOk())
-                .andExpect(view().name("rutina"))
+                .andExpect(view().name("redirect:/mi-rutina"))
                 .andReturn();
 
         // Verificación
