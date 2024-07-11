@@ -1,5 +1,6 @@
 package com.tallerwebi.presentacion;
 
+import com.tallerwebi.dominio.excepcion.ListaDeRutinasVaciaException;
 import com.tallerwebi.dominio.rutina.EstadoEjercicio;
 import com.tallerwebi.dominio.usuario.ServicioLogin;
 import com.tallerwebi.dominio.usuario.Usuario;
@@ -30,18 +31,32 @@ public class ControladorRutina {
     }
 
     @RequestMapping(path = "/rutinas", method = RequestMethod.GET)
-    public ModelAndView verRutinasQueLeInteresanAlUsuario(@RequestParam("objetivo") String objetivo, HttpSession session) {
+    public ModelAndView verRutinasQueLeInteresanAlUsuario( HttpSession session) throws ListaDeRutinasVaciaException {
+
         Usuario usuario = (Usuario) session.getAttribute("usuario");
+
         if (usuario == null) {
             return new ModelAndView("redirect:/login");
         }
 
+        String objetivo = usuario.getObjetivo().toString();
+
+
+        if (objetivo == null || objetivo.isEmpty()) {
+            ModelAndView modelAndView = new ModelAndView("objetivo");
+            modelAndView.addObject("error", "Objetivo no válido");
+            modelAndView.setViewName("objetivo");
+            return modelAndView;
+        }
+
         ModelAndView modelAndView = new ModelAndView("rutinas");
         modelAndView.addObject("usuario", usuario);
+
         Objetivo objetivoEnum;
         try {
             objetivoEnum = Objetivo.valueOf(objetivo);
         } catch (IllegalArgumentException e) {
+            modelAndView.setViewName("objetivo");
             modelAndView.addObject("error", "Objetivo no válido");
             return modelAndView;
         }
@@ -52,6 +67,7 @@ public class ControladorRutina {
         servicioLogin.guardarObjetivo(usuario, objetivoEnum);
         return modelAndView;
     }
+
 
     @RequestMapping(path = "/mi-rutina", method = RequestMethod.GET)
     public ModelAndView irAMiRutina(HttpSession session) {
@@ -74,8 +90,7 @@ public class ControladorRutina {
             modelAndView.addObject("estadosEjercicios", estadosEjercicios);
             modelAndView.setViewName("rutina");
         } catch (Exception e) {
-            String objetivoFormateado = usuario.getObjetivo().formatear();
-            modelAndView.setViewName("redirect:/rutinas?objetivo=" + usuario.getObjetivo().toString() + "&objetivoFormateado=" + objetivoFormateado);
+            modelAndView.setViewName("redirect:/rutinas");
         }
 
         return modelAndView;
@@ -109,22 +124,20 @@ public class ControladorRutina {
     }
 
     @PostMapping("/liberar-rutina")
-    public ModelAndView liberarRutina(@RequestParam("id") Long id, HttpSession session) {
+    public ModelAndView liberarRutina(HttpSession session) {
         ModelAndView modelAndView = new ModelAndView();
 
         try {
             Usuario usuario = (Usuario) session.getAttribute("usuario");
+            DatosRutina rutinaActualDelUsuario = servicioRutina.getRutinaActualDelUsuario(usuario);
             modelAndView.addObject("usuario", usuario);
-            Rutina rutina = servicioRutina.getRutinaById(id);
-            DatosRutina datosRutina = servicioRutina.getDatosRutinaById(id);
-            modelAndView.addObject("rutina", datosRutina);
+            modelAndView.addObject("rutina", rutinaActualDelUsuario);
 
-            if (usuario != null && rutina != null) {
+            if (usuario != null && rutinaActualDelUsuario != null) {
                 servicioRutina.liberarRutinaActivaDelUsuario(usuario);
 
-                modelAndView.setViewName("redirect:/rutinas?objetivo=" + usuario.getObjetivo().toString());
+                modelAndView.setViewName("redirect:/rutinas");
                 modelAndView.addObject("info", "Rutina liberada.");
-                modelAndView.addObject("objetivoFormateado", usuario.getObjetivo().formatear());
             } else {
                 modelAndView.addObject("error", "Error al liberar la rutina.");
                 modelAndView.setViewName("rutina");

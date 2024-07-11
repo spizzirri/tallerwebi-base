@@ -39,9 +39,9 @@ public interface ServicioRutina {
     boolean existeRutinaEnUsuario(Rutina rutina, Usuario usuario);
     boolean existeEjercicioEnRutina(Ejercicio ejercicio, Rutina rutina);
 
-    List<DatosRutina> getRutinasPorObjetivo(Objetivo objetivo);
+    List<DatosRutina> getRutinasPorObjetivo(Objetivo objetivo) throws ListaDeRutinasVaciaException;
 
-    DatosRutina getRutinaActualDelUsuario(Usuario usuario) throws UsuarioNoExisteException;
+    DatosRutina getRutinaActualDelUsuario(Usuario usuario) throws UsuarioNoExisteException, RutinaNoEncontradaException;
 
     void asignarRutinaAUsuario(Rutina rutina, Usuario usuario) throws RutinaYaExisteException;
 

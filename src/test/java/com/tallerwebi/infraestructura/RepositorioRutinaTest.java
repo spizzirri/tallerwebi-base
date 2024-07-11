@@ -1,5 +1,6 @@
 package com.tallerwebi.infraestructura;
 
+import com.tallerwebi.dominio.rutina.EstadoEjercicio;
 import com.tallerwebi.dominio.usuario.Usuario;
 import com.tallerwebi.dominio.usuario.UsuarioRutina;
 import com.tallerwebi.dominio.excepcion.EjercicioNoExisteEnRutinaException;
@@ -11,6 +12,7 @@ import com.tallerwebi.dominio.rutina.Ejercicio;
 import com.tallerwebi.dominio.rutina.RepositorioRutina;
 import com.tallerwebi.dominio.rutina.Rutina;
 import com.tallerwebi.infraestructura.config.HibernateTestInfraestructuraConfig;
+import com.tallerwebi.presentacion.DatosRutina;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,7 +29,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -503,6 +505,181 @@ public class RepositorioRutinaTest {
     @Test
     @Transactional
     @Rollback
+    public void queSePuedaGuardarUnaRelacionUsuarioRutinaTeniendoUnUsuarioYUnaRutina(){
+        // Preparación
+        Usuario usuarioMock = new Usuario("Juan", Objetivo.GANANCIA_MUSCULAR);
+        Rutina rutinaMock = crearRutina("Volumen", Objetivo.GANANCIA_MUSCULAR);
+
+        repositorioRutina.guardarUsuario(usuarioMock);
+        repositorioRutina.guardarRutina(rutinaMock);
+
+        // Crear una relación UsuarioRutina
+        UsuarioRutina usuarioRutina = new UsuarioRutina();
+        usuarioRutina.setUsuario(usuarioMock);
+        usuarioRutina.setRutina(rutinaMock);
+        usuarioRutina.setFechaInicio(new Date());
+        usuarioRutina.setActivo(true);
+
+        // Ejecución
+        repositorioRutina.guardarUsuarioRutina(usuarioRutina);
+
+        // Verificación
+        UsuarioRutina usuarioRutinaObtenida = repositorioRutina.buscarUsuarioRutinaPorUsuarioYRutina(usuarioMock, rutinaMock);
+        assertNotNull(usuarioRutinaObtenida);
+        assertThat(usuarioRutinaObtenida.getUsuario(), equalTo(usuarioMock));
+        assertThat(usuarioRutinaObtenida.getRutina(), equalTo(rutinaMock));
+        assertTrue(usuarioRutinaObtenida.isActivo());
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void queSePuedaLiberarLaRutinaActivaDelUsuario() {
+        // Preparación
+        Usuario usuarioMock = new Usuario("Juan", Objetivo.GANANCIA_MUSCULAR);
+        Rutina rutinaMock = crearRutina("Volumen", Objetivo.GANANCIA_MUSCULAR);
+
+        repositorioRutina.guardarUsuario(usuarioMock);
+        repositorioRutina.guardarRutina(rutinaMock);
+        repositorioRutina.asignarRutinaAUsuario(rutinaMock, usuarioMock);
+
+        // Verificación inicial: la rutina debe estar activa
+        Rutina rutinaActivaInicial = repositorioRutina.getRutinaActualDelUsuario(usuarioMock);
+        assertNotNull(rutinaActivaInicial);
+        assertThat(rutinaActivaInicial, equalTo(rutinaMock));
+
+        // Ejecución
+        repositorioRutina.liberarRutinaActivaDelUsuario(usuarioMock);
+
+        // Verificación: la rutina ya no debe estar activa
+        Rutina rutinaActivaPosterior = repositorioRutina.getRutinaActualDelUsuario(usuarioMock);
+        assertNull(rutinaActivaPosterior);
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void queSePuedaBuscarUnaRelacionUsuarioRutinaPorUsuarioYRutina() {
+        // Preparación
+        Usuario usuarioMock = new Usuario("Juan", Objetivo.GANANCIA_MUSCULAR);
+        Rutina rutinaMock = crearRutina("Volumen", Objetivo.GANANCIA_MUSCULAR);
+
+        repositorioRutina.guardarUsuario(usuarioMock);
+        repositorioRutina.guardarRutina(rutinaMock);
+        repositorioRutina.asignarRutinaAUsuario(rutinaMock, usuarioMock);
+
+        // Ejecución
+        UsuarioRutina usuarioRutinaObtenida = repositorioRutina.buscarUsuarioRutinaPorUsuarioYRutina(usuarioMock, rutinaMock);
+
+        // Verificación
+        assertNotNull(usuarioRutinaObtenida);
+        assertThat(usuarioRutinaObtenida.getUsuario(), equalTo(usuarioMock));
+        assertThat(usuarioRutinaObtenida.getRutina(), equalTo(rutinaMock));
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void queSePuedaActualizarElEstadoDeUnEjercicioDeUnaRutinaRelacionadaConUnUsuario() {
+        // Preparación
+        Usuario usuarioMock = new Usuario("Juan", Objetivo.GANANCIA_MUSCULAR);
+        Ejercicio ejercicioMock = new Ejercicio("Curl de biceps", Objetivo.GANANCIA_MUSCULAR, GrupoMuscularObjetivo.BRAZOS, 4, 12);
+
+        // Guardar usuario y ejercicio
+        repositorioRutina.guardarUsuario(usuarioMock);
+        repositorioRutina.guardarEjercicio(ejercicioMock);
+
+        // Crear estado inicial del ejercicio para el usuario
+        EstadoEjercicio estadoInicial = new EstadoEjercicio(usuarioMock, ejercicioMock, EstadoEjercicio.Estado.NO_EMPEZADO);
+        repositorioRutina.guardarEstadoEjercicio(estadoInicial);
+
+        // Verificar el estado inicial
+        EstadoEjercicio estadoEjercicioObtenido = repositorioRutina.buscarEstadoEjercicioPorUsuarioYEjercicio(usuarioMock, ejercicioMock);
+        assertNotNull(estadoEjercicioObtenido);
+        assertThat(estadoEjercicioObtenido.getEstado(), equalTo(EstadoEjercicio.Estado.NO_EMPEZADO));
+
+        // Ejecución: Actualizar estado del ejercicio
+        repositorioRutina.actualizarEstadoEjercicio(usuarioMock, ejercicioMock.getIdEjercicio(), EstadoEjercicio.Estado.COMPLETO);
+
+        // Refrescar la sesión para asegurarse de obtener los datos actualizados
+        sessionFactory.getCurrentSession().flush();
+        sessionFactory.getCurrentSession().clear();
+
+        // Verificación: Obtener el estado actualizado
+        EstadoEjercicio estadoEjercicioActualizado = repositorioRutina.buscarEstadoEjercicioPorUsuarioYEjercicio(usuarioMock, ejercicioMock);
+        assertNotNull(estadoEjercicioActualizado);
+        assertThat(estadoEjercicioActualizado.getEstado(), equalTo(EstadoEjercicio.Estado.COMPLETO));
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void queSePuedaObtenerUnaListaDeRelacionesUsuarioRutinaEntreUnUsuarioYUnaRutina() {
+        // Preparación
+        Usuario usuarioMock = new Usuario("Juan", Objetivo.GANANCIA_MUSCULAR);
+        Rutina rutinaMock = crearRutina("Volumen", Objetivo.GANANCIA_MUSCULAR);
+
+        repositorioRutina.guardarUsuario(usuarioMock);
+        repositorioRutina.guardarRutina(rutinaMock);
+        repositorioRutina.asignarRutinaAUsuario(rutinaMock, usuarioMock);
+
+        // Crear una segunda relación con otra fecha de inicio para simular múltiples relaciones
+        UsuarioRutina segundaRelacion = new UsuarioRutina();
+        segundaRelacion.setUsuario(usuarioMock);
+        segundaRelacion.setRutina(rutinaMock);
+        segundaRelacion.setFechaInicio(new Date());
+        segundaRelacion.setActivo(true);
+        sessionFactory.getCurrentSession().save(segundaRelacion);
+
+        // Ejecución
+        List<UsuarioRutina> listaUsuarioRutinaObtenida = repositorioRutina.buscarListaDeUsuarioRutinaPorUsuarioYRutina(usuarioMock, rutinaMock);
+
+        // Verificación
+        assertNotNull(listaUsuarioRutinaObtenida);
+        assertFalse(listaUsuarioRutinaObtenida.isEmpty());
+        assertEquals(2, listaUsuarioRutinaObtenida.size());
+        assertThat(listaUsuarioRutinaObtenida, hasItems(
+                allOf(
+                        hasProperty("usuario", equalTo(usuarioMock)),
+                        hasProperty("rutina", equalTo(rutinaMock))
+                )
+        ));
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void queSePuedaBuscarLaRelacionUsuarioRutinaActivaPasandoPorParametroUnUsuarioYUnaRutina() {
+        // Preparación
+        Usuario usuarioMock = new Usuario("Juan", Objetivo.GANANCIA_MUSCULAR);
+        Rutina rutinaMock = crearRutina("Volumen", Objetivo.GANANCIA_MUSCULAR);
+
+        repositorioRutina.guardarUsuario(usuarioMock);
+        repositorioRutina.guardarRutina(rutinaMock);
+        repositorioRutina.asignarRutinaAUsuario(rutinaMock, usuarioMock);
+
+        // Crear una segunda relación y marcarla como inactiva
+        UsuarioRutina segundaRelacion = new UsuarioRutina();
+        segundaRelacion.setUsuario(usuarioMock);
+        segundaRelacion.setRutina(rutinaMock);
+        segundaRelacion.setFechaInicio(new Date());
+        segundaRelacion.setActivo(false);
+        sessionFactory.getCurrentSession().save(segundaRelacion);
+
+        // Ejecución
+        UsuarioRutina usuarioRutinaActivaObtenida = repositorioRutina.buscarUsuarioRutinaActivoPorUsuarioYRutina(usuarioMock, rutinaMock);
+
+        // Verificación
+        assertNotNull(usuarioRutinaActivaObtenida);
+        assertThat(usuarioRutinaActivaObtenida.getUsuario(), equalTo(usuarioMock));
+        assertThat(usuarioRutinaActivaObtenida.getRutina(), equalTo(rutinaMock));
+        assertTrue(usuarioRutinaActivaObtenida.isActivo());
+    }
+
+
+    @Test
+    @Transactional
+    @Rollback
     public void queSePuedaActualizarUnaRelacionUsuarioRutina() {
         // Preparación
         Usuario usuario = new Usuario("Lautaro", Objetivo.GANANCIA_MUSCULAR);
@@ -534,11 +711,48 @@ public class RepositorioRutinaTest {
         assertNotNull(usuarioRutinaActualizada);
         assertFalse(usuarioRutinaActualizada.isActivo());
     }
+    @Test
+    @Transactional
+    @Rollback
+    public void queSePuedaObtenerListaDeEstadosDeEjercicioPorUsuarioYRutina() {
+        // Preparación
+        Usuario usuarioMock = new Usuario("Juan", Objetivo.GANANCIA_MUSCULAR);
+        Ejercicio ejercicioMock1 = new Ejercicio("Curl de biceps", Objetivo.GANANCIA_MUSCULAR, GrupoMuscularObjetivo.BRAZOS, 4, 12);
+        Ejercicio ejercicioMock2 = new Ejercicio("Press de banca", Objetivo.GANANCIA_MUSCULAR, GrupoMuscularObjetivo.PECHO, 3, 10);
+
+        // Guardar usuario y ejercicios
+        repositorioRutina.guardarUsuario(usuarioMock);
+        repositorioRutina.guardarEjercicio(ejercicioMock1);
+        repositorioRutina.guardarEjercicio(ejercicioMock2);
+
+        // Crear y guardar rutina
+        Rutina rutinaMock = new Rutina("Volumen", Objetivo.GANANCIA_MUSCULAR);
+        repositorioRutina.guardarRutina(rutinaMock);
+
+        // Asignar ejercicios a la rutina
+        repositorioRutina.guardarEjercicioEnRutina(ejercicioMock1, rutinaMock);
+        repositorioRutina.guardarEjercicioEnRutina(ejercicioMock2, rutinaMock);
+
+        // Asignar rutina al usuario
+        repositorioRutina.asignarRutinaAUsuario(rutinaMock, usuarioMock);
+
+        // Verificación de que los estados de ejercicios se inicializaron
+        List<EstadoEjercicio> estadosEjercicios = repositorioRutina.getEstadoEjercicioList(usuarioMock, new DatosRutina(rutinaMock.getIdRutina(), rutinaMock.getNombre(), rutinaMock.getObjetivo(), rutinaMock.getEjercicios()));
+
+        // Verificación
+        assertNotNull(estadosEjercicios);
+        assertEquals(2, estadosEjercicios.size());
+
+        // Verificar que los estados de los ejercicios se inicializaron correctamente
+        assertTrue(estadosEjercicios.stream().anyMatch(estado -> estado.getEjercicio().equals(ejercicioMock1) && estado.getEstado().equals(EstadoEjercicio.Estado.NO_EMPEZADO)));
+        assertTrue(estadosEjercicios.stream().anyMatch(estado -> estado.getEjercicio().equals(ejercicioMock2) && estado.getEstado().equals(EstadoEjercicio.Estado.NO_EMPEZADO)));
+    }
+
 
     @Test
     @Transactional
     @Rollback
-    public void queSePuedaSaberCualFueLaUltimaRutinaQueRealizoElUsuario() {
+    public void queSePuedaSaberCualFueLaUltimaRelacionUsuarioRutinaQueRealizoElUsuario() {
         // Preparación
         Usuario usuario = new Usuario("Lautaro", Objetivo.GANANCIA_MUSCULAR);
         Rutina rutina1 = new Rutina("Rutina de volumen - PECHO", Objetivo.GANANCIA_MUSCULAR);
@@ -577,6 +791,37 @@ public class RepositorioRutinaTest {
         // Verificación
         assertNotNull(usuarioRutinaInactiva);
         assertThat(usuarioRutinaInactiva.getRutina(), equalTo(rutina3));
+    }
+
+    @Test
+    @Transactional
+    public void queSePuedaObtenerUltimaRutinaRealizadaPorUsuario() {
+        // Preparación
+        Usuario usuarioMock = new Usuario("Juan", Objetivo.GANANCIA_MUSCULAR);
+        repositorioRutina.guardarUsuario(usuarioMock);
+
+        Rutina rutina1 = new Rutina("Rutina 1", Objetivo.GANANCIA_MUSCULAR);
+        Rutina rutina2 = new Rutina("Rutina 2", Objetivo.GANANCIA_MUSCULAR);
+        Rutina rutina3 = new Rutina("Rutina 3", Objetivo.GANANCIA_MUSCULAR);
+
+        repositorioRutina.guardarRutina(rutina1);
+        repositorioRutina.guardarRutina(rutina2);
+        repositorioRutina.guardarRutina(rutina3);
+
+        UsuarioRutina usuarioRutina1 = new UsuarioRutina(usuarioMock, rutina1, new Date(1000000000000L), false);
+        UsuarioRutina usuarioRutina2 = new UsuarioRutina(usuarioMock, rutina2, new Date(2000000000000L), false);
+        UsuarioRutina usuarioRutina3 = new UsuarioRutina(usuarioMock, rutina3, new Date(3000000000000L), false);
+
+        sessionFactory.getCurrentSession().save(usuarioRutina1);
+        sessionFactory.getCurrentSession().save(usuarioRutina2);
+        sessionFactory.getCurrentSession().save(usuarioRutina3);
+
+        // Ejecución
+        Rutina ultimaRutina = repositorioRutina.getUltimaRutinaRealizadaPorUsuario(usuarioMock);
+
+        // Verificación
+        assertNotNull(ultimaRutina);
+        assertEquals("Rutina 3", ultimaRutina.getNombre());
     }
 
 

@@ -20,6 +20,18 @@ public class EstadoEjercicio {
     @Enumerated(EnumType.STRING)
     private Estado estado;
 
+    public EstadoEjercicio(Usuario usuario, Ejercicio ejercicio, Estado estado) {
+        this.usuario = usuario;
+        this.ejercicio = ejercicio;
+        this.estado = estado;
+    }
+    public EstadoEjercicio() {
+    }
+
+    public EstadoEjercicio(Estado estado) {
+        this.estado = estado;
+    }
+
     public enum Estado {
         COMPLETO,
         INCOMPLETO,

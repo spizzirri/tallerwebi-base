@@ -195,7 +195,7 @@ public class ServicioRutinaImpl implements ServicioRutina {
     }
 
     @Override
-    public List<DatosRutina> getRutinasPorObjetivo(Objetivo objetivo) {
+    public List<DatosRutina> getRutinasPorObjetivo(Objetivo objetivo) throws ListaDeRutinasVaciaException {
 
         if (objetivo == null) {
             throw new IllegalArgumentException("El objetivo no puede ser nulo");
@@ -203,23 +203,35 @@ public class ServicioRutinaImpl implements ServicioRutina {
 
         List<Rutina> rutinas = repositorioRutina.getRutinasByObjetivo(objetivo);
         if (rutinas == null || rutinas.isEmpty()) {
-            return Collections.emptyList();
+            throw new ListaDeRutinasVaciaException();
         }
 
         return convertToDatosRutina(rutinas);
     }
 
     @Override
-    public DatosRutina getRutinaActualDelUsuario(Usuario usuario) throws UsuarioNoExisteException {
+    public DatosRutina getRutinaActualDelUsuario(Usuario usuario) throws UsuarioNoExisteException, RutinaNoEncontradaException {
         Usuario usuarioBuscado = this.getUsuarioById(usuario.getId());
-        return convertRutinaADatosRutina(this.repositorioRutina.getRutinaActivaDelUsuario(usuarioBuscado));
+        if (usuarioBuscado == null) {
+            throw new UsuarioNoExisteException("El usuario con ID " + usuario.getId() + " no existe.");
+        }
+
+        Rutina rutinaActiva = this.repositorioRutina.getRutinaActivaDelUsuario(usuarioBuscado);
+        if (rutinaActiva == null) {
+            throw new RutinaNoEncontradaException("No se encontró una rutina activa.");
+        }
+
+        return convertRutinaADatosRutina(rutinaActiva);
     }
 
+
     @Override
-    public void asignarRutinaAUsuario(Rutina rutina, Usuario usuario) {
+    public void asignarRutinaAUsuario(Rutina rutina, Usuario usuario) throws RutinaYaExisteException {
         Rutina rutinaActivaBuscada = this.repositorioRutina.getRutinaActivaDelUsuario(usuario);
         if(rutinaActivaBuscada == null){
             this.repositorioRutina.asignarRutinaAUsuario(rutina,usuario);
+        }else{
+            throw new RutinaYaExisteException("La rutina ya se encuentra activa y asignada al usuario");
         }
     }
 
@@ -236,7 +248,7 @@ public class ServicioRutinaImpl implements ServicioRutina {
 
     @Override
     public List<EstadoEjercicio> getEstadosEjercicios(Usuario usuario, DatosRutina rutina) {
-        return repositorioRutina.findEstadosEjercicios(usuario, rutina);
+        return repositorioRutina.getEstadoEjercicioList(usuario, rutina);
     }
 
     @Override
@@ -262,15 +274,24 @@ public class ServicioRutinaImpl implements ServicioRutina {
         int totalEjercicios = completos + incompletos + noEmpezados;
 
         if (totalEjercicios == 0) {
-            return Rendimiento.BAJO; // Si no se encuentran ejercicios, devolver BAJO por defecto
+            return Rendimiento.BAJO;
         }
 
         double porcentajeCompletos = (double) completos / totalEjercicios;
         double porcentajeIncompletos = (double) incompletos / totalEjercicios;
+        double porcentajeNoEmpezados = (double) noEmpezados / totalEjercicios;
 
-        if (porcentajeCompletos > 0.75) {
+        if (porcentajeNoEmpezados >= 0.75) {
+            return Rendimiento.BAJO;
+        }else if (porcentajeCompletos >= 0.75) {
             return Rendimiento.ALTO;
-        } else if (porcentajeCompletos > 0.5 || porcentajeIncompletos < 0.5) {
+        }else if (porcentajeCompletos >= 0.5 && porcentajeIncompletos >= 0.5) {
+            return Rendimiento.MEDIO;
+        }else if (porcentajeCompletos >= 0.33 && porcentajeIncompletos >= 0.33 && porcentajeNoEmpezados >= 0.33) {
+            return Rendimiento.MEDIO;
+        }else if (porcentajeCompletos >= 0.50 && porcentajeIncompletos >= 0.25 ) {
+            return Rendimiento.MEDIO;
+        }else if (porcentajeIncompletos >= 0.50 && porcentajeCompletos >= 0.25 ) {
             return Rendimiento.MEDIO;
         } else {
             return Rendimiento.BAJO;
