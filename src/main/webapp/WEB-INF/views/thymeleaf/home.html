@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Taller Web I</title>
+    <title>MagnusFit</title>
 
     <!-- custom style -->
     <link rel="stylesheet" th:href="@{/css/main.css}"/>
@@ -92,7 +92,7 @@
             <div class="reto-preview">
                 <div class="container-cambiarReto">
                     <div th:if="${error}" class="alert alert-danger">
-                        <p th:text="${error}"></p>
+                        <p th:text="${error}" style="margin: 0rem;"></p>
                     </div>
                     <form th:action="@{/cambiar-reto}" method="POST" id="cambiarRetoForm">
                         <input type="hidden" name="retoId" th:value="${retoDisponible.id}"/>

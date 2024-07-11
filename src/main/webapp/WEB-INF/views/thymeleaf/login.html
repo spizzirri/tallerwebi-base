@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Taller Web I</title>
+    <title>MagnusFit</title>
     <link rel="stylesheet" th:href="@{/css/login.css}"/>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
@@ -54,7 +54,9 @@
                 </div>
             </div>
             <button id="btn-login" class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-400" type="submit">Login</button>
-            <p th:if="${error != null}" class="alert alert-danger mt-4" th:text="'Error ' + ${error}"></p>
+            <p th:if="${error != null}" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-4" role="alert">
+                <span class="block sm:inline" th:text="'Error ' + ${error}"></span>
+            </p>
         </form>
         <a id="ir-a-registrarme" href="nuevo-usuario" class="block text-center text-blue-500 hover:underline mt-4">Registrarme</a>
     </main>

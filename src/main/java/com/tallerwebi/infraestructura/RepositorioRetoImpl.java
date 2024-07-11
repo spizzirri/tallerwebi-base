@@ -15,8 +15,6 @@ public class RepositorioRetoImpl implements RepositorioReto {
 
     private SessionFactory sessionFactory;
 
-
-
     @Autowired
     public RepositorioRetoImpl(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
