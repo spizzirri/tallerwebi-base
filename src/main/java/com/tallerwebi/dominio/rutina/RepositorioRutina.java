@@ -1,5 +1,6 @@
 package com.tallerwebi.dominio.rutina;
 
+import com.tallerwebi.dominio.excepcion.UsuarioRutinaNoEncontradoException;
 import com.tallerwebi.dominio.usuario.Usuario;
 import com.tallerwebi.dominio.usuario.UsuarioRutina;
 import com.tallerwebi.dominio.objetivo.Objetivo;
@@ -54,7 +55,7 @@ public interface RepositorioRutina {
 
     List<Ejercicio> getEjerciciosDeRutina(Rutina rutina);
 
-    Rutina getRutinaActualDeLUsuario(Usuario usuario);
+    Rutina getRutinaActualDelUsuario(Usuario usuario);
 
     Ejercicio getEjercicioById(Long idEjercicio);
 
@@ -79,5 +80,9 @@ public interface RepositorioRutina {
 
     void actualizarEstadoEjercicio(Usuario usuario, Long ejercicioId, EstadoEjercicio.Estado estado);
 
-    List<EstadoEjercicio> findEstadosEjercicios(Usuario usuario, DatosRutina rutina);
+    List<EstadoEjercicio> getEstadoEjercicioList(Usuario usuario, DatosRutina rutina);
+
+    void guardarEstadoEjercicio(EstadoEjercicio estadoEjercicio);
+
+    EstadoEjercicio buscarEstadoEjercicioPorUsuarioYEjercicio(Usuario usuario, Ejercicio ejercicio);
 }

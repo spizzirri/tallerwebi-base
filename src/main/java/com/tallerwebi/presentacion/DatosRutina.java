@@ -30,6 +30,14 @@ public class DatosRutina {
         this.ejercicios = new ArrayList<>();
     }
 
+    public DatosRutina(Long id,String nombre, Objetivo objetivo, List<Ejercicio> ejercicios){
+        this.id = id;
+        this.nombre = nombre;
+        this.objetivo = objetivo;
+        this.descripcion = "Rutina para lograr " + this.objetivo.formatear();
+        this.ejercicios = ejercicios;
+    }
+
     public DatosRutina(String nombre,List<Ejercicio> ejercicios, Objetivo objetivo){
         this.nombre = nombre;
         this.ejercicios = ejercicios;

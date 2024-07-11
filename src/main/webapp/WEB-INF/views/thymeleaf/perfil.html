@@ -27,7 +27,7 @@
     <!-- Menú de navegación (oculto por defecto en móviles) -->
     <nav class="hidden md:flex space-x-4 flex-1 justify-center">
         <ul class="nav-links">
-            <li><a th:action="@{/irAHome}" href="home" class="font-semibold">Inicio</a></li>
+            <li><a th:action="@{/irAHome}" id="inicio-link" href="home" class="font-semibold">Inicio</a></li>
             <li><a th:action="@{/irAMiRutina}" href="mi-rutina" class="font-semibold">Rutina</a></li>
             <li><a th:action="@{/irAlimentacion}" href="alimentacion" class="font-semibold">Alimentación</a></li>
             <li><a th:action="@{/irCalendario}" href="calendario" class="font-semibold">Calendario</a></li>
@@ -64,7 +64,7 @@
     margin: 3rem 2rem;
     flex-direction: column;">
     <div class="perfil-form-container">
-        <h2>Mis Características</h2>
+        <h2 id="caracteristicas">Mis Características</h2>
         <form th:action="@{/guardar}" method="POST" accept-charset="UTF-8" id="perfilForm">
             <div class="perfil-section" id="sectionDatosPersonales">
                 <h3 style="color: #333333;">Datos Personales</h3>
@@ -92,7 +92,7 @@
                     </div>
                 </div>
                 <div class="container-btn" style="justify-content: flex-end !important;">
-                <button type="button" class="perfil-btn-next" onclick="mostrarSeccion('sectionObjetivo')">Siguiente</button>
+                <button type="button" class="perfil-btn-next" id="pefil-btn-next" onclick="mostrarSeccion('sectionObjetivo')">Siguiente</button>
                 </div>
             </div>
 
@@ -152,9 +152,8 @@
         </div>
     </div>
     <form th:action="@{/cerrar-sesion}" method="POST" class="mt-6">
-        <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-300 ease-in-out">
-            Cerrar Sesión
-        </button>
+        <button type="submit" id="btn-cerrar" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600
+         transition duration-300 ease-in-out">Cerrar Sesión</button>
     </form>
 </main>
 <script th:src="@{/js/main.js}"></script>

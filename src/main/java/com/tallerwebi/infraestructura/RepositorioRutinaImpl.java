@@ -1,5 +1,6 @@
 package com.tallerwebi.infraestructura;
 
+import com.tallerwebi.dominio.excepcion.UsuarioRutinaNoEncontradoException;
 import com.tallerwebi.dominio.usuario.Usuario;
 import com.tallerwebi.dominio.usuario.UsuarioRutina;
 import com.tallerwebi.dominio.objetivo.Objetivo;
@@ -90,7 +91,7 @@ public class RepositorioRutinaImpl implements RepositorioRutina {
         Ejercicio ejercicioAAsignar = this.getEjercicioById(ejercicio.getIdEjercicio());
 
         rutinaAAsignar.getEjercicios().add(ejercicioAAsignar);
-        this.sessionFactory.getCurrentSession().save(rutinaAAsignar);
+        this.sessionFactory.getCurrentSession().saveOrUpdate(rutinaAAsignar);
     }
 
     @Override
@@ -129,15 +130,13 @@ public class RepositorioRutinaImpl implements RepositorioRutina {
 
     @Override
     public void asignarRutinaAUsuario(Rutina rutina, Usuario usuario) {
-        Rutina rutinaAAsignar = this.buscarRutinaPorId(rutina.getIdRutina());
-        Usuario usuarioAAsignar = this.getUsuarioPorId(usuario.getId());
 
         // Buscar si ya existe una relación entre el usuario y la rutina
         String hql = "FROM UsuarioRutina ur WHERE ur.usuario = :usuario AND ur.rutina = :rutina";
         UsuarioRutina usuarioRutinaExistente = this.sessionFactory.getCurrentSession()
                 .createQuery(hql, UsuarioRutina.class)
-                .setParameter("usuario", usuarioAAsignar)
-                .setParameter("rutina", rutinaAAsignar)
+                .setParameter("usuario", usuario)
+                .setParameter("rutina", rutina)
                 .uniqueResult();
 
         if (usuarioRutinaExistente != null) {
@@ -145,18 +144,20 @@ public class RepositorioRutinaImpl implements RepositorioRutina {
             usuarioRutinaExistente.setFechaInicio(new Date());
             usuarioRutinaExistente.setActivo(true);
             this.sessionFactory.getCurrentSession().update(usuarioRutinaExistente);
+
         } else {
             // Si no existe, crear una nueva relación
             UsuarioRutina usuarioRutina = new UsuarioRutina();
-            usuarioRutina.setUsuario(usuarioAAsignar);
-            usuarioRutina.setRutina(rutinaAAsignar);
+            usuarioRutina.setUsuario(usuario);
+            usuarioRutina.setRutina(rutina);
             usuarioRutina.setFechaInicio(new Date());
             usuarioRutina.setActivo(true);
             this.sessionFactory.getCurrentSession().save(usuarioRutina);
+
         }
 
         // Inicializar los estados de los ejercicios
-        inicializarEstadosEjercicios(rutinaAAsignar, usuarioAAsignar);
+        this.inicializarEstadosEjercicios(rutina, usuario);
     }
 
 
@@ -182,6 +183,7 @@ public class RepositorioRutinaImpl implements RepositorioRutina {
     }
 
     private void inicializarEstadosEjercicios(Rutina rutina, Usuario usuario) {
+
         String sql = "SELECT e.* FROM ejercicio e " +
                 "JOIN rutina_ejercicio re ON e.idEjercicio = re.ejercicios_idEjercicio " +
                 "WHERE re.Rutina_idRutina = :rutinaId";
@@ -192,7 +194,8 @@ public class RepositorioRutinaImpl implements RepositorioRutina {
                 .list();
 
         for (Ejercicio ejercicio : ejercicios) {
-            // Verificar si el estado del ejercicio ya existe
+
+            // Verificar si el estado del ejercicio ya existe para este usuario
             String hql = "FROM EstadoEjercicio ee WHERE ee.usuario = :usuario AND ee.ejercicio = :ejercicio";
             EstadoEjercicio estadoExistente = this.sessionFactory.getCurrentSession()
                     .createQuery(hql, EstadoEjercicio.class)
@@ -201,21 +204,19 @@ public class RepositorioRutinaImpl implements RepositorioRutina {
                     .uniqueResult();
 
             if (estadoExistente != null) {
-                // Si existe, actualizar el estado a NO_EMPEZADO
-                estadoExistente.setEstado(EstadoEjercicio.Estado.NO_EMPEZADO);
-                this.sessionFactory.getCurrentSession().update(estadoExistente);
+                // Si existe, actualizar el estado a NO_EMPEZADO solo si estaba COMPLETO o INCOMPLETO
+                if (estadoExistente.getEstado() == EstadoEjercicio.Estado.COMPLETO ||
+                        estadoExistente.getEstado() == EstadoEjercicio.Estado.INCOMPLETO) {
+                    estadoExistente.setEstado(EstadoEjercicio.Estado.NO_EMPEZADO);
+                    this.sessionFactory.getCurrentSession().update(estadoExistente);
+                }
             } else {
-                // Si no existe, crear un nuevo registro
-                EstadoEjercicio nuevoEstadoEjercicio = new EstadoEjercicio();
-                nuevoEstadoEjercicio.setUsuario(usuario);
-                nuevoEstadoEjercicio.setEjercicio(ejercicio);
-                nuevoEstadoEjercicio.setEstado(EstadoEjercicio.Estado.NO_EMPEZADO);
-
+                // Si no existe, crear un nuevo registro con estado NO_EMPEZADO
+                EstadoEjercicio nuevoEstadoEjercicio = new EstadoEjercicio(usuario, ejercicio, EstadoEjercicio.Estado.NO_EMPEZADO);
                 this.sessionFactory.getCurrentSession().save(nuevoEstadoEjercicio);
             }
         }
     }
-
 
 
     @Override
@@ -317,8 +318,13 @@ public class RepositorioRutinaImpl implements RepositorioRutina {
     }
 
     @Override
-    public Rutina getRutinaActualDeLUsuario(Usuario usuario) {
-        return null;
+    @Transactional
+    public Rutina getRutinaActualDelUsuario(Usuario usuario) {
+        String hql = "SELECT ur.rutina FROM UsuarioRutina ur WHERE ur.usuario = :usuario AND ur.activo = true";
+        return sessionFactory.getCurrentSession()
+                .createQuery(hql, Rutina.class)
+                .setParameter("usuario", usuario)
+                .uniqueResult();
     }
 
     @Override
@@ -347,18 +353,22 @@ public class RepositorioRutinaImpl implements RepositorioRutina {
 
     @Override
     public void liberarRutinaActivaDelUsuario(Usuario usuario) {
-        Usuario usuarioBuscado = this.getUsuarioPorId(usuario.getId());
-        Rutina rutinaActiva = this.getRutinaActivaDelUsuario(usuarioBuscado);
+        System.out.println("entro al metodo del repo");
+        String hql = "FROM UsuarioRutina ur WHERE ur.usuario.id = :usuarioId AND ur.activo = true ";
+        Query<UsuarioRutina> query = sessionFactory.getCurrentSession().createQuery(hql, UsuarioRutina.class);
+        query.setParameter("usuarioId", usuario.getId());
+        UsuarioRutina usuarioRutinaBuscado = query.uniqueResult();
 
-        UsuarioRutina usuarioRutinaBuscado = this.buscarUsuarioRutinaActivoPorUsuarioYRutina(usuarioBuscado, rutinaActiva);
 
         if (usuarioRutinaBuscado != null) {
-
             usuarioRutinaBuscado.setActivo(false);
-
-            this.actualizarUsuarioRutina(usuarioRutinaBuscado);
+            this.sessionFactory.getCurrentSession().saveOrUpdate(usuarioRutinaBuscado);
+            System.out.println("Encontro el usuarioRutina");
+        }else {
+            System.out.println("no hace nada");
         }
     }
+
 
     @Override
     public UsuarioRutina buscarUsuarioRutinaPorUsuarioYRutina(Usuario usuario, Rutina rutina) {
@@ -433,22 +443,8 @@ public class RepositorioRutinaImpl implements RepositorioRutina {
                 .executeUpdate();
     }
 
-
-    public void actualizarEstadoEjercicio(Long usuarioId, Long ejercicioId, EstadoEjercicio.Estado estado) {
-        String hql = "FROM EstadoEjercicio ee WHERE ee.usuario.id = :usuarioId AND ee.ejercicio.id = :ejercicioId";
-        EstadoEjercicio estadoEjercicio = (EstadoEjercicio) sessionFactory.getCurrentSession()
-                .createQuery(hql, EstadoEjercicio.class)
-                .setParameter("usuarioId", usuarioId)
-                .setParameter("ejercicioId", ejercicioId)
-                .uniqueResult();
-
-        if (estadoEjercicio != null) {
-            estadoEjercicio.setEstado(estado);
-            sessionFactory.getCurrentSession().update(estadoEjercicio);
-        }
-    }
-@Override
-    public List<EstadoEjercicio> findEstadosEjercicios(Usuario usuario, DatosRutina rutina) {
+    @Override
+    public List<EstadoEjercicio> getEstadoEjercicioList(Usuario usuario, DatosRutina rutina) {
         String sql = "SELECT ee.* FROM estadoEjercicio ee " +
                 "JOIN rutina_ejercicio re ON ee.ejercicio_idEjercicio = re.ejercicios_idEjercicio " +
                 "WHERE re.Rutina_idRutina = :rutinaId AND ee.usuario_id = :usuarioId";
@@ -460,6 +456,21 @@ public class RepositorioRutinaImpl implements RepositorioRutina {
                 .list();
     }
 
+
+    @Override
+    public void guardarEstadoEjercicio(EstadoEjercicio estadoEjercicio) {
+        sessionFactory.getCurrentSession().saveOrUpdate(estadoEjercicio);
+    }
+
+    @Override
+    public EstadoEjercicio buscarEstadoEjercicioPorUsuarioYEjercicio(Usuario usuario, Ejercicio ejercicio) {
+        String hql = "FROM EstadoEjercicio ee WHERE ee.usuario = :usuario AND ee.ejercicio = :ejercicio";
+        Query query = sessionFactory.getCurrentSession().createQuery(hql, EstadoEjercicio.class);
+        query.setParameter("usuario", usuario);
+        query.setParameter("ejercicio", ejercicio);
+
+        return (EstadoEjercicio) query.uniqueResult();
+    }
 
 
 }

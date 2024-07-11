@@ -6,10 +6,10 @@ import com.tallerwebi.dominio.objetivo.Objetivo;
 import com.tallerwebi.dominio.reto.ServicioReto;
 import com.tallerwebi.dominio.rutina.*;
 import com.tallerwebi.dominio.usuario.Usuario;
+import com.tallerwebi.dominio.usuario.UsuarioRutina;
 import com.tallerwebi.presentacion.DatosRutina;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.annotation.Rollback;
 
 import javax.transaction.Transactional;
 
@@ -17,8 +17,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -34,9 +33,8 @@ public class ServicioRutinaTest {
     }
 
     @Transactional
-    @Rollback
     @Test
-    public void QueSePuedanObtenerTodasLasRutinas(){
+    public void queSePuedanObtenerTodasLasRutinasCargadas(){
         //p
         List<Rutina> rutinasMock = new ArrayList<>();
         rutinasMock.add(new Rutina("Rutina volumen 1",Objetivo.GANANCIA_MUSCULAR));
@@ -53,9 +51,8 @@ public class ServicioRutinaTest {
     }
 
     @Transactional
-    @Rollback
     @Test
-    public void QueSeObtengaUnaRutinaSegunObjetivoDeUsuario(){
+    public void queSeObtengaUnaRutinaCorrespondienteSegunElObjetivoDelUsuario(){
         //p
         Usuario usuarioMock = new Usuario("Lautaro", Objetivo.PERDIDA_DE_PESO);
         Rutina rutinaMock = new Rutina("ADELGAZAR",Objetivo.PERDIDA_DE_PESO);
@@ -71,9 +68,9 @@ public class ServicioRutinaTest {
     }
 
     @Transactional
-    @Rollback
+
     @Test
-    public void QueArrojeExcepcionSiElUsuarioNoTieneNingunaRutinaAsignada() throws UsuarioSinRutinasException {
+    public void queAlQuererObtenerLasRutinasDelusuarioArrojeExcepcionSiElUsuarioNoTieneNingunaRutinaAsignada() throws UsuarioSinRutinasException {
         //p
         Usuario usuario = new Usuario("Lautaro", Objetivo.GANANCIA_MUSCULAR);
 
@@ -92,9 +89,8 @@ public class ServicioRutinaTest {
     }
 
     @Transactional
-    @Rollback
     @Test
-    public void QueSePuedaValidarElObjetivoDeLaRutinaYLaDelUsuarioAlAgregarUnaRutina() throws UsuarioNoTieneLaRutinaBuscadaException, DiferenciaDeObjetivosExcepcion, UsuarioNoExisteException, RutinaNoEncontradaException {
+    public void queSePuedaValidarElObjetivoDeLaRutinaYLaDelUsuarioAlAgregarUnaRutina() throws UsuarioNoTieneLaRutinaBuscadaException, DiferenciaDeObjetivosExcepcion, UsuarioNoExisteException, RutinaNoEncontradaException {
         //p
         Usuario usuario = new Usuario("Lautaro", Objetivo.GANANCIA_MUSCULAR);
         Rutina rutina = new Rutina("Rutina de volumen",Objetivo.GANANCIA_MUSCULAR);
@@ -112,12 +108,9 @@ public class ServicioRutinaTest {
 
     }
 
-
-
     @Transactional
-    @Rollback
     @Test
-    public void QueSePuedaPedirYValidarRutinaConElObjetivoQueTieneElUsuario() throws DiferenciaDeObjetivosExcepcion, UsuarioNoExisteException, RutinaNoEncontradaException {
+    public void queSePuedaPedirYValidarRutinaConElObjetivoQueTieneElUsuario() throws DiferenciaDeObjetivosExcepcion, UsuarioNoExisteException, RutinaNoEncontradaException {
         //p
         Usuario usuario = new Usuario("Lautaro", Objetivo.GANANCIA_MUSCULAR);
         Rutina rutina = new Rutina("Rutina de volumen",Objetivo.GANANCIA_MUSCULAR);
@@ -135,8 +128,7 @@ public class ServicioRutinaTest {
 
     @Test
     @Transactional
-    @Rollback
-    public void QueSePuedaBuscarUnaRutinaPorSuId() throws RutinaNoEncontradaException {
+    public void queSePuedaBuscarUnaRutinaPorSuId() throws RutinaNoEncontradaException {
         // Preparación
         Rutina rutinaMock = new Rutina("Volumen", Objetivo.GANANCIA_MUSCULAR);
         rutinaMock.setIdRutina(1L);
@@ -152,8 +144,7 @@ public class ServicioRutinaTest {
 
     @Test
     @Transactional
-    @Rollback
-    public void QueAlBuscarUnaRutinaPorSuIdArrojeExcepcionSiNoSeEncuentra() throws RutinaNoEncontradaException {
+    public void queAlBuscarUnaRutinaPorSuIdArrojeExcepcionSiNoSeEncuentra() throws RutinaNoEncontradaException {
         // Preparación
         Long idRutinaInexistente = 1L;
 
@@ -168,8 +159,39 @@ public class ServicioRutinaTest {
 
     @Test
     @Transactional
-    @Rollback
-    public void QueSePuedaBuscarUnEjercicioPorSuId() throws EjercicioNoEncontradoException {
+    public void queSeObtenganDatosRutinaCuandoRutinaExiste() throws RutinaNoEncontradaException {
+        // Preparación
+        Long idRutina = 1L;
+        Rutina rutinaMock = new Rutina("Rutina de Prueba", Objetivo.GANANCIA_MUSCULAR);
+        when(repositorioRutina.buscarRutinaPorId(idRutina)).thenReturn(rutinaMock);
+
+        // Ejecución
+        DatosRutina datosRutinaObtenidos = servicioRutina.getDatosRutinaById(idRutina);
+
+        // Verificación
+        assertNotNull(datosRutinaObtenidos);
+        assertEquals("Rutina de Prueba", datosRutinaObtenidos.getNombre());
+        assertEquals(Objetivo.GANANCIA_MUSCULAR, datosRutinaObtenidos.getObjetivo());
+    }
+
+    @Test
+    @Transactional
+    public void queAlQuererObtenerLosDatosRutinaDeUnaRutinaPorSuIdSeLanceExcepcionSiLaRutinaNoExiste() {
+        // Preparación
+        Long idRutina = 1L;
+        when(repositorioRutina.buscarRutinaPorId(idRutina)).thenReturn(null);
+
+        // Ejecución y Verificación
+        assertThrows(RutinaNoEncontradaException.class, () -> {
+            servicioRutina.getDatosRutinaById(idRutina);
+        });
+    }
+
+
+
+    @Test
+    @Transactional
+    public void queSePuedaBuscarUnEjercicioPorSuId() throws EjercicioNoEncontradoException {
         //p
         Ejercicio ejercicioMock = new Ejercicio("Press banca",Objetivo.GANANCIA_MUSCULAR,GrupoMuscularObjetivo.PECHO,4,12);
         when(this.repositorioRutina.buscarEjercicioPorId(ejercicioMock.getIdEjercicio())).thenReturn(ejercicioMock);
@@ -183,8 +205,7 @@ public class ServicioRutinaTest {
 
     @Test
     @Transactional
-    @Rollback
-    public void QueAlBuscarUnEjercicioPorSuIdArrojeExcepcionSiNoSeEncuentra() throws EjercicioNoEncontradoException {
+    public void queAlBuscarUnEjercicioPorSuIdArrojeExcepcionSiNoSeEncuentra() throws EjercicioNoEncontradoException {
         //p
 
         Ejercicio ejercicioMock = new Ejercicio("Press banca",Objetivo.GANANCIA_MUSCULAR,GrupoMuscularObjetivo.PECHO,4,12);
@@ -198,8 +219,7 @@ public class ServicioRutinaTest {
 
     @Test
     @Transactional
-    @Rollback
-    public void QueAlEliminarUnaRutinaSeObtengaTrue() throws RutinaNoEncontradaException{
+    public void queAlIntentarEliminarUnaRutinaSeObtengaTrue() throws RutinaNoEncontradaException{
         // Preparación
         Rutina rutinaHombros = new Rutina("Rutina de definición de hombros", Objetivo.DEFINICION);
         rutinaHombros.setIdRutina(1L); // Simulando que ya tiene un ID asignado
@@ -216,8 +236,7 @@ public class ServicioRutinaTest {
     }
     @Test
     @Transactional
-    @Rollback
-    public void QueAlQuererEliminarUnaRutinaArrojeRutinaNoEncontradaExcepcion() throws RutinaNoEncontradaException{
+    public void queAlQuererEliminarUnaRutinaArrojeRutinaNoEncontradaExcepcion() throws RutinaNoEncontradaException{
         // Preparación
         Rutina rutinaInexistente = new Rutina();
         rutinaInexistente.setIdRutina(999L); // ID que seguramente no existe
@@ -235,8 +254,7 @@ public class ServicioRutinaTest {
 
     @Test
     @Transactional
-    @Rollback
-    public void QueAlEliminarUnEjercicioSeObtengaTrue() throws EjercicioNoEncontradoException{
+    public void queAlIntentarEliminarUnEjercicioSeObtengaTrue() throws EjercicioNoEncontradoException{
         // Preparación
         Ejercicio ejercicioMock = new Ejercicio("Press banca",Objetivo.GANANCIA_MUSCULAR,GrupoMuscularObjetivo.PECHO,4,12);
         ejercicioMock.setIdEjercicio(1L);// Simulando que ya tiene un ID asignado
@@ -253,8 +271,7 @@ public class ServicioRutinaTest {
     }
     @Test
     @Transactional
-    @Rollback
-    public void QueAlQuererEliminarUnEjercicioArrojeEjercicioNoEncontradoExcepcion() throws EjercicioNoEncontradoException{
+    public void queAlQuererEliminarUnEjercicioArrojeEjercicioNoEncontradoExcepcion() throws EjercicioNoEncontradoException{
         // Preparación
         Ejercicio ejercicioMock = new Ejercicio("Press banca",Objetivo.GANANCIA_MUSCULAR,GrupoMuscularObjetivo.PECHO,4,12);
         ejercicioMock.setIdEjercicio(999L); // ID que seguramente no existe
@@ -272,8 +289,7 @@ public class ServicioRutinaTest {
 
     @Test
     @Transactional
-    @Rollback
-    public void QueSePuedaAgregarUnaRutina() throws RutinaYaExisteException, RutinaInvalidaException {
+    public void queSePuedaAgregarUnaRutina() throws RutinaYaExisteException, RutinaInvalidaException {
         // Preparación
         Rutina rutinaMock = new Rutina("Rutina de pecho",Objetivo.GANANCIA_MUSCULAR);
         rutinaMock.setIdRutina(2L);
@@ -291,8 +307,7 @@ public class ServicioRutinaTest {
 
     @Test
     @Transactional
-    @Rollback
-    public void QueNoSePuedaAgregarRutinaPorqueYaExisteUnaConElMismoId() throws RutinaYaExisteException {
+    public void queNoSePuedaAgregarUnaRutinaPorqueYaExisteUnaConElMismoId() throws RutinaYaExisteException {
         // Preparación
         Rutina rutinaMock = new Rutina("Rutina de espalda",Objetivo.GANANCIA_MUSCULAR);
         rutinaMock.setIdRutina(1L);
@@ -313,8 +328,7 @@ public class ServicioRutinaTest {
 
     @Test
     @Transactional
-    @Rollback
-    public void QueSePuedaAgregarUnEjercicio() throws EjercicioYaExisteException, EjercicioInvalidoException {
+    public void queSePuedaAgregarUnEjercicio() throws EjercicioYaExisteException, EjercicioInvalidoException {
         // Preparación
         Ejercicio ejercicioMock = new Ejercicio("Press banca",Objetivo.GANANCIA_MUSCULAR,GrupoMuscularObjetivo.PECHO,4,12);
         ejercicioMock.setIdEjercicio(1L);
@@ -332,8 +346,7 @@ public class ServicioRutinaTest {
 
     @Test
     @Transactional
-    @Rollback
-    public void QueNoSePuedaAgregarEjercicioPorqueYaExisteUnoConElMismoId() throws EjercicioYaExisteException {
+    public void queNoSePuedaAgregarEjercicioPorqueYaExisteUnoConElMismoId() throws EjercicioYaExisteException {
         // Preparación
         Ejercicio ejercicioMock = new Ejercicio("Press banca",Objetivo.GANANCIA_MUSCULAR,GrupoMuscularObjetivo.PECHO,4,12);
         ejercicioMock.setIdEjercicio(1L);
@@ -354,65 +367,85 @@ public class ServicioRutinaTest {
 
     @Test
     @Transactional
-    @Rollback
-    public void QueNoSePuedaAgregarEjercicioPorqueNoTieneObjetivoDefinido() throws EjercicioYaExisteException, EjercicioInvalidoException {
+    public void queNoSePuedaAgregarEjercicioPorqueNoTieneUnObjetivoDefinido() throws EjercicioInvalidoException {
         // Preparación
         Ejercicio ejercicioMock = new Ejercicio("Curl de biceps", null, GrupoMuscularObjetivo.BRAZOS, 4, 12);
 
 
-        //Ejecución y Verificación
-        assertFalse(this.servicioRutina.agregarEjercicio(ejercicioMock));
+        // Ejecución y Verificación
+        EjercicioInvalidoException exception = assertThrows(
+                EjercicioInvalidoException.class,
+                () -> servicioRutina.agregarEjercicio(ejercicioMock)
+        );
+
+        assertThat(exception.getMessage(), equalTo("Los datos del ejercicio son invalidos."));
 
     }
 
     @Test
     @Transactional
-    @Rollback
-    public void QueNoSePuedaAgregarEjercicioPorqueNoTieneNombre() throws EjercicioYaExisteException, EjercicioInvalidoException {
+    public void queNoSePuedaAgregarUnEjercicioPorqueNoTieneNombre() throws EjercicioInvalidoException {
         // Preparación
         Ejercicio ejercicioMock = new Ejercicio(null, Objetivo.GANANCIA_MUSCULAR, GrupoMuscularObjetivo.BRAZOS, 4, 12);
 
         // Ejecución y Verificación
-        assertFalse(this.servicioRutina.agregarEjercicio(ejercicioMock));
+        EjercicioInvalidoException exception = assertThrows(
+                EjercicioInvalidoException.class,
+                () -> servicioRutina.agregarEjercicio(ejercicioMock)
+        );
+
+        assertThat(exception.getMessage(), equalTo("Los datos del ejercicio son invalidos."));
+
     }
 
     @Test
     @Transactional
-    @Rollback
-    public void QueNoSePuedaAgregarEjercicioPorqueNoTieneGrupoMuscularObjetivo() throws EjercicioYaExisteException, EjercicioInvalidoException {
+    public void queNoSePuedaAgregarUnEjercicioPorqueNoTieneGrupoMuscularObjetivo() throws EjercicioYaExisteException, EjercicioInvalidoException {
         // Preparación
         Ejercicio ejercicioMock = new Ejercicio("Curl de biceps", Objetivo.GANANCIA_MUSCULAR, null, 4, 12);
 
         // Ejecución y Verificación
-        assertFalse(this.servicioRutina.agregarEjercicio(ejercicioMock));
+        EjercicioInvalidoException exception = assertThrows(
+                EjercicioInvalidoException.class,
+                () -> servicioRutina.agregarEjercicio(ejercicioMock)
+        );
+
+        assertThat(exception.getMessage(), equalTo("Los datos del ejercicio son invalidos."));
     }
 
     @Test
     @Transactional
-    @Rollback
-    public void QueNoSePuedaAgregarEjercicioPorqueNoTieneSeriesDefinidas() throws EjercicioYaExisteException, EjercicioInvalidoException {
+    public void queNoSePuedaAgregarUnEjercicioPorqueNoTieneSeriesDefinidas() throws EjercicioYaExisteException, EjercicioInvalidoException {
         // Preparación
         Ejercicio ejercicioMock = new Ejercicio("Curl de biceps", Objetivo.GANANCIA_MUSCULAR, GrupoMuscularObjetivo.BRAZOS, 0, 12);
 
         // Ejecución y Verificación
-        assertFalse(this.servicioRutina.agregarEjercicio(ejercicioMock));
+        EjercicioInvalidoException exception = assertThrows(
+                EjercicioInvalidoException.class,
+                () -> servicioRutina.agregarEjercicio(ejercicioMock)
+        );
+
+        assertThat(exception.getMessage(), equalTo("Los datos del ejercicio son invalidos."));
     }
 
     @Test
     @Transactional
-    @Rollback
-    public void QueNoSePuedaAgregarEjercicioPorqueNoTieneRepeticionesDefinidas() throws EjercicioYaExisteException, EjercicioInvalidoException {
+    public void queNoSePuedaAgregarUnEjercicioPorqueNoTieneRepeticionesDefinidas() throws EjercicioYaExisteException, EjercicioInvalidoException {
         // Preparación
         Ejercicio ejercicioMock = new Ejercicio("Curl de biceps", Objetivo.GANANCIA_MUSCULAR, GrupoMuscularObjetivo.BRAZOS, 4, 0);
 
         // Ejecución y Verificación
-        assertFalse(this.servicioRutina.agregarEjercicio(ejercicioMock));
+        EjercicioInvalidoException exception = assertThrows(
+                EjercicioInvalidoException.class,
+                () -> servicioRutina.agregarEjercicio(ejercicioMock)
+        );
+
+        assertThat(exception.getMessage(), equalTo("Los datos del ejercicio son invalidos."));
     }
 
     @Test
     @Transactional
-    @Rollback
-    public void QueSePuedaObtenerLosDatosRutinaDeUnaRutinaConUnObjetivoEspecifico() {
+    public void queSePuedaObtenerLosDatosRutinaDeUnaRutinaConUnObjetivoEspecifico() {
         // Preparación
         Rutina rutinaMock = new Rutina("Rutina de definicion de piernas",Objetivo.DEFINICION);
         rutinaMock.setIdRutina(1L);
@@ -429,8 +462,7 @@ public class ServicioRutinaTest {
 
     @Test
     @Transactional
-    @Rollback
-    public void QueSePuedaObtenerUnaListaDeDatosRutinaConLasRutinasDeUnUsuario() throws UsuarioSinRutinasException {
+    public void queSePuedaObtenerUnaListaDeDatosRutinaConLasRutinasDeUnUsuario() throws UsuarioSinRutinasException {
         // Preparación
         Usuario usuarioMock = new Usuario("Lautaro",Objetivo.DEFINICION);
         Rutina rutinaMock = new Rutina("Rutina de definicion de piernas",Objetivo.DEFINICION);
@@ -458,8 +490,7 @@ public class ServicioRutinaTest {
 
     @Test
     @Transactional
-    @Rollback
-    public void QueAlQuererObtenerUnaListaDeDatosRutinaDeLasRutinasDelUsuarioArrojeExcepcionPorNoTenerRutinasAsociadas() throws UsuarioSinRutinasException {
+    public void queAlQuererObtenerUnaListaDeDatosRutinaDeLasRutinasDelUsuarioArrojeExcepcionPorNoTenerRutinasAsociadas() throws UsuarioSinRutinasException {
         // Preparación
         Usuario usuarioMock = new Usuario("Lautaro",Objetivo.DEFINICION);
         List<Rutina> listaDeRutinas = new ArrayList<>();
@@ -478,8 +509,7 @@ public class ServicioRutinaTest {
 
     @Test
     @Transactional
-    @Rollback
-    public void QueSePuedaObtenerUnUsuarioConSuId() throws UsuarioNoExisteException {
+    public void queSePuedaObtenerUnUsuarioConSuId() throws UsuarioNoExisteException {
         // Preparación
         Usuario usuarioMock = new Usuario("Lautaro",Objetivo.DEFINICION);
         usuarioMock.setId(1L);
@@ -495,8 +525,7 @@ public class ServicioRutinaTest {
 
     @Test
     @Transactional
-    @Rollback
-    public void QueAlBuscarUnUsuarioPorSuIdArrojeUsuarioNoExisteException() throws UsuarioNoExisteException {
+    public void queAlBuscarUnUsuarioPorSuIdArrojeUsuarioNoExisteException() throws UsuarioNoExisteException {
         // Preparación
         Usuario usuarioMock = new Usuario("Lautaro",Objetivo.DEFINICION);
         usuarioMock.setId(512L);
@@ -514,8 +543,7 @@ public class ServicioRutinaTest {
 
     @Test
     @Transactional
-    @Rollback
-    public void QueSePuedaSaberSiUnUsuarioTieneUnaRutinaEspecifica(){
+    public void queSePuedaSaberSiUnUsuarioTieneUnaRutinaEspecifica(){
         // Preparación
         Usuario usuarioMock = new Usuario("Lautaro",Objetivo.DEFINICION);
         usuarioMock.setId(1L);
@@ -536,8 +564,7 @@ public class ServicioRutinaTest {
 
     @Test
     @Transactional
-    @Rollback
-    public void QueAlQuererSaberSiUnUsuarioTieneUnaRutinaEspecificaArrojeFalse() {
+    public void queAlQuererSaberSiUnUsuarioTieneUnaRutinaEspecificaArrojeFalse() {
         // Preparación
         Usuario usuarioMock = new Usuario("Lautaro",Objetivo.DEFINICION);
         Rutina rutinaMock = new Rutina("Rutina de definicion de piernas",Objetivo.DEFINICION);
@@ -553,8 +580,7 @@ public class ServicioRutinaTest {
 
     @Test
     @Transactional
-    @Rollback
-    public void QueSePuedaSaberSiUnaRutinaTieneUnEjercicioEspecifico() {
+    public void queSePuedaSaberSiUnaRutinaTieneUnEjercicioEspecifico() {
         // Preparación
         Ejercicio ejercicioMock = new Ejercicio("Press banca",Objetivo.GANANCIA_MUSCULAR,GrupoMuscularObjetivo.PECHO,4,12);
         Rutina rutinaMock = new Rutina("Rutina de definicion de piernas",Objetivo.DEFINICION);
@@ -571,8 +597,7 @@ public class ServicioRutinaTest {
 
     @Test
     @Transactional
-    @Rollback
-    public void QueAlQuererSaberSiUnaRutinaTieneUnEjercicioEspecificoArrojeFalse() {
+    public void queAlQuererSaberSiUnaRutinaTieneUnEjercicioEspecificoArrojeFalse() {
         // Preparación
         Ejercicio ejercicioMock = new Ejercicio("Press banca",Objetivo.GANANCIA_MUSCULAR,GrupoMuscularObjetivo.PECHO,4,12);
         Rutina rutinaMock = new Rutina("Rutina de definicion de piernas",Objetivo.DEFINICION);
@@ -588,8 +613,7 @@ public class ServicioRutinaTest {
 
     @Test
     @Transactional
-    @Rollback
-    public void queSePuedaObtenerUnaListaDeDatosRutinaDeRutinasConObjetivoPerdidaDePeso() {
+    public void queSePuedaObtenerUnaListaDeDatosRutinaDeRutinasConObjetivoPerdidaDePeso() throws ListaDeRutinasVaciaException {
         // Preparación
         Rutina rutinaMock = new Rutina("Rutina def 1",Objetivo.DEFINICION);
         Rutina rutinaMock2 = new Rutina("Rutina def 2",Objetivo.DEFINICION);
@@ -605,6 +629,334 @@ public class ServicioRutinaTest {
         List<DatosRutina> rutinasObtenidas = this.servicioRutina.getRutinasPorObjetivo(objetivoMock);
 
         assertEquals(rutinasObtenidas.size(),2);
+    }
+
+    @Test
+    public void queSeLanceExcepcionCuandoNoHayRutinasConElObjetivoEspecificado() throws ListaDeRutinasVaciaException {
+        // Ejecución y Verificación
+        assertThrows(ListaDeRutinasVaciaException.class, () -> {
+            servicioRutina.getRutinasPorObjetivo(Objetivo.DEFINICION);
+        });
+    }
+
+
+    @Test
+    public void queAlQuererObtenerUnaListaDeDatosRutinasSeLanceExcepcionCuandoObjetivoEsNulo() {
+        // Ejecución y Verificación
+        assertThrows(IllegalArgumentException.class, () -> {
+            servicioRutina.getRutinasPorObjetivo(null);
+        });
+    }
+
+
+    @Test
+    @Transactional
+    public void queNoSeObtenganRutinasCuandoLosObjetivosDelUsuarioYLosDeLasRutinasCargadasNoCoinciden() {
+        // Preparación
+        Usuario usuarioMock = new Usuario("Juan", Objetivo.GANANCIA_MUSCULAR);
+        repositorioRutina.guardarUsuario(usuarioMock);
+
+        Rutina rutina1 = new Rutina("Rutina 1", Objetivo.DEFINICION);
+        Rutina rutina2 = new Rutina("Rutina 2", Objetivo.DEFINICION);
+        List<Rutina> rutinasEsperadas = Arrays.asList(rutina1, rutina2);
+
+        when(this.repositorioRutina.getRutinasPorObjetivoDeUsuario(usuarioMock)).thenReturn(rutinasEsperadas);
+
+        // Ejecución
+        List<DatosRutina> rutinasObtenidas = this.servicioRutina.getRutinasPorObjetivoDeUsuario(usuarioMock);
+
+        // Verificación
+        assertTrue(rutinasObtenidas.isEmpty());
+    }
+
+    @Test
+    @Transactional
+    public void queSePuedaObtenerRutinaActualDelUsuarioCuandoUsuarioExisteYTieneRutinaActiva() throws UsuarioNoExisteException, RutinaNoEncontradaException {
+        // Preparación
+        Usuario usuarioMock = new Usuario();
+        usuarioMock.setId(1L);
+
+        Usuario usuarioBuscadoMock = new Usuario();
+        usuarioBuscadoMock.setId(1L);
+
+        Rutina rutinaMock = new Rutina("Rutina Activa", Objetivo.GANANCIA_MUSCULAR);
+
+        when(repositorioRutina.getUsuarioPorId(1L)).thenReturn(usuarioBuscadoMock);
+        when(repositorioRutina.getRutinaActivaDelUsuario(usuarioBuscadoMock)).thenReturn(rutinaMock);
+
+        // Ejecución
+        DatosRutina datosRutina = servicioRutina.getRutinaActualDelUsuario(usuarioMock);
+
+        // Verificación
+        assertNotNull(datosRutina);
+        assertEquals("Rutina Activa", datosRutina.getNombre());
+        assertEquals(Objetivo.GANANCIA_MUSCULAR, datosRutina.getObjetivo());
+    }
+
+    @Test
+    @Transactional
+    public void queSeLanceExcepcionCuandoUsuarioNoExisteAlQuererObtenerLaRutinaActualDelUsuario() {
+        // Ejecución y Verificación
+        assertThrows(UsuarioNoExisteException.class, () -> {
+            servicioRutina.getRutinaActualDelUsuario(new Usuario());
+        });
+    }
+
+    @Test
+    @Transactional
+    public void queSeRetorneNullCuandoUsuarioExistePeroNoTieneRutinaActiva() throws UsuarioNoExisteException, RutinaNoEncontradaException {
+        // Preparación
+        Usuario usuarioMock = new Usuario();
+        usuarioMock.setId(1L);
+
+        Usuario usuarioBuscadoMock = new Usuario();
+        usuarioBuscadoMock.setId(1L);
+
+        when(repositorioRutina.getUsuarioPorId(1L)).thenReturn(usuarioBuscadoMock);
+        when(repositorioRutina.getRutinaActivaDelUsuario(usuarioBuscadoMock)).thenReturn(null);
+
+        // Ejecución y verificación
+        assertThrows(RutinaNoEncontradaException.class, () -> {
+            servicioRutina.getRutinaActualDelUsuario(usuarioMock);
+        });
+    }
+
+    @Test
+    @Transactional
+    public void queSePuedaAsignarUnaRutinaAUsuarioCuandoLaRutinaNoSeEncuentraActivaEnElUsuario() throws RutinaYaExisteException {
+        // Preparación
+        Usuario usuarioMock = new Usuario();
+        usuarioMock.setId(1L);
+
+        Rutina rutinaMock = new Rutina("Nueva Rutina", Objetivo.GANANCIA_MUSCULAR);
+
+        when(repositorioRutina.getRutinaActivaDelUsuario(usuarioMock)).thenReturn(null);
+
+        // Ejecución
+        servicioRutina.asignarRutinaAUsuario(rutinaMock, usuarioMock);
+
+        // Verificación
+        verify(repositorioRutina, times(1)).asignarRutinaAUsuario(rutinaMock, usuarioMock);
+    }
+
+    @Test
+    @Transactional
+    public void queSeLanceExcepcionCuandoLaRutinaYaEstaActivaYAsignadaAlUsuario() {
+        // Preparación
+        Usuario usuarioMock = new Usuario();
+        usuarioMock.setId(1L);
+
+        Rutina rutinaMock = new Rutina("Rutina Activa", Objetivo.GANANCIA_MUSCULAR); // Misma rutina
+
+        // Simula que la rutinaMock ya está activa y asignada al usuario
+        when(repositorioRutina.getRutinaActivaDelUsuario(usuarioMock)).thenReturn(rutinaMock);
+
+        // Ejecución y Verificación
+        assertThrows(RutinaYaExisteException.class, () -> {
+            servicioRutina.asignarRutinaAUsuario(rutinaMock, usuarioMock);
+        });
+
+    }
+
+    @Test
+    @Transactional
+    public void queSePuedaLiberarLaRutinaActivaDelUsuario() {
+        // Preparación
+        Usuario usuarioMock = new Usuario();
+        usuarioMock.setId(1L);
+
+        Rutina rutinaMock = new Rutina("Rutina Activa", Objetivo.GANANCIA_MUSCULAR);
+        UsuarioRutina usuarioRutinaMock = new UsuarioRutina(usuarioMock, rutinaMock, new Date(), true);
+
+        // Configuración del mock para cambiar el estado activo a false
+        doAnswer(invocation -> {
+            Usuario usuario = invocation.getArgument(0);
+            // Simulamos que encontramos el UsuarioRutina activo y lo desactivamos
+            usuarioRutinaMock.setActivo(false);
+            return null;
+        }).when(repositorioRutina).liberarRutinaActivaDelUsuario(usuarioMock);
+
+        // Ejecución
+        servicioRutina.liberarRutinaActivaDelUsuario(usuarioMock);
+
+        // Verificación
+        verify(repositorioRutina, times(1)).liberarRutinaActivaDelUsuario(usuarioMock);
+        assertFalse(usuarioRutinaMock.isActivo());
+    }
+
+    @Test
+    @Transactional
+    public void queSePuedaActualizarElEstadoDelEjercicio() {
+        // Preparación
+        Usuario usuarioMock = new Usuario();
+        usuarioMock.setId(1L);
+        Long ejercicioIdMock = 1L;
+        EstadoEjercicio.Estado estadoMock = EstadoEjercicio.Estado.COMPLETO;
+
+        // Ejecución
+        servicioRutina.actualizarEstadoEjercicio(usuarioMock, ejercicioIdMock, estadoMock);
+
+        // Verificación
+        verify(repositorioRutina, times(1)).actualizarEstadoEjercicio(usuarioMock, ejercicioIdMock, estadoMock);
+    }
+
+    @Test
+    @Transactional
+    public void queSePuedanObtenerLosEstadosDeLosEjerciciosBrindandoUnUsuarioYDatosDeRutina() {
+        // Preparación
+        Usuario usuarioMock = new Usuario();
+        usuarioMock.setId(1L);
+        DatosRutina rutinaMock = new DatosRutina();
+        rutinaMock.setId(1L);
+
+        List<EstadoEjercicio> estadosEsperados = new ArrayList<>();
+        estadosEsperados.add(new EstadoEjercicio());
+        estadosEsperados.add(new EstadoEjercicio());
+
+        when(repositorioRutina.getEstadoEjercicioList(usuarioMock, rutinaMock)).thenReturn(estadosEsperados);
+
+        // Ejecución
+        List<EstadoEjercicio> estadosObtenidos = servicioRutina.getEstadosEjercicios(usuarioMock, rutinaMock);
+
+        // Verificación
+        assertNotNull(estadosObtenidos);
+        assertEquals(estadosEsperados.size(), estadosObtenidos.size());
+        assertEquals(estadosEsperados, estadosObtenidos);
+    }
+
+
+    @Test
+    @Transactional
+    public void queRendimientoSeaBajoCuandoListaDeEjerciciosEsVacia() {
+        // Preparación
+        List<EstadoEjercicio> estadosEjercicios = Collections.emptyList();
+
+        // Ejecución
+        Rendimiento rendimiento = servicioRutina.calcularRendimiento(estadosEjercicios);
+
+        // Verificación
+        assertEquals(Rendimiento.BAJO, rendimiento);
+    }
+
+    @Test
+    @Transactional
+    public void queRendimientoSeaAltoCuandoTodosEjerciciosEstanCompletos() {
+        // Preparación
+        List<EstadoEjercicio> estadosEjercicios = Arrays.asList(
+                new EstadoEjercicio(EstadoEjercicio.Estado.COMPLETO),
+                new EstadoEjercicio(EstadoEjercicio.Estado.COMPLETO),
+                new EstadoEjercicio(EstadoEjercicio.Estado.COMPLETO)
+        );
+
+        // Ejecución
+        Rendimiento rendimiento = servicioRutina.calcularRendimiento(estadosEjercicios);
+
+        // Verificación
+        assertEquals(Rendimiento.ALTO, rendimiento);
+    }
+
+    @Test
+    @Transactional
+    public void queRendimientoSeaBajoCuandoTodosEjerciciosEstanIncompletos() {
+        // Preparación
+        List<EstadoEjercicio> estadosEjercicios = Arrays.asList(
+                new EstadoEjercicio(EstadoEjercicio.Estado.INCOMPLETO),
+                new EstadoEjercicio(EstadoEjercicio.Estado.INCOMPLETO),
+                new EstadoEjercicio(EstadoEjercicio.Estado.INCOMPLETO)
+        );
+
+        // Ejecución
+        Rendimiento rendimiento = servicioRutina.calcularRendimiento(estadosEjercicios);
+
+        // Verificación
+        assertEquals(Rendimiento.BAJO, rendimiento);
+    }
+
+    @Test
+    @Transactional
+    public void queRendimientoSeaBajoCuandoTodosEjerciciosEstanNoEmpezados() {
+        // Preparación
+        List<EstadoEjercicio> estadosEjercicios = Arrays.asList(
+                new EstadoEjercicio(EstadoEjercicio.Estado.NO_EMPEZADO),
+                new EstadoEjercicio(EstadoEjercicio.Estado.NO_EMPEZADO),
+                new EstadoEjercicio(EstadoEjercicio.Estado.NO_EMPEZADO)
+        );
+
+        // Ejecución
+        Rendimiento rendimiento = servicioRutina.calcularRendimiento(estadosEjercicios);
+
+        // Verificación
+        assertEquals(Rendimiento.BAJO, rendimiento);
+    }
+
+    @Test
+    @Transactional
+    public void queRendimientoSeaAltoCuandoMasDel75PorCientoDeEjerciciosEstanCompletos() {
+        // Preparación
+        List<EstadoEjercicio> estadosEjercicios = Arrays.asList(
+                new EstadoEjercicio(EstadoEjercicio.Estado.COMPLETO),
+                new EstadoEjercicio(EstadoEjercicio.Estado.COMPLETO),
+                new EstadoEjercicio(EstadoEjercicio.Estado.COMPLETO),
+                new EstadoEjercicio(EstadoEjercicio.Estado.INCOMPLETO)
+        );
+
+        // Ejecución
+        Rendimiento rendimiento = servicioRutina.calcularRendimiento(estadosEjercicios);
+
+        // Verificación
+        assertEquals(Rendimiento.ALTO, rendimiento);
+    }
+
+    @Test
+    @Transactional
+    public void queRendimientoSeaMedioCuandoMasDel50PorCientoPeroNoMasDel75PorCientoDeEjerciciosEstanCompletos() {
+        // Preparación
+        List<EstadoEjercicio> estadosEjercicios = Arrays.asList(
+                new EstadoEjercicio(EstadoEjercicio.Estado.COMPLETO),
+                new EstadoEjercicio(EstadoEjercicio.Estado.COMPLETO),
+                new EstadoEjercicio(EstadoEjercicio.Estado.INCOMPLETO),
+                new EstadoEjercicio(EstadoEjercicio.Estado.INCOMPLETO)
+        );
+
+        // Ejecución
+        Rendimiento rendimiento = servicioRutina.calcularRendimiento(estadosEjercicios);
+
+        // Verificación
+        assertEquals(Rendimiento.MEDIO, rendimiento);
+    }
+
+    @Test
+    @Transactional
+    public void queRendimientoSeaMedioCuandoMenosDel50PorCientoDeEjerciciosEstanCompletosPeroMenosDel50PorCientoDeEjerciciosEstanIncompletos() {
+        // Preparación
+        List<EstadoEjercicio> estadosEjercicios = Arrays.asList(
+                new EstadoEjercicio(EstadoEjercicio.Estado.COMPLETO),
+                new EstadoEjercicio(EstadoEjercicio.Estado.INCOMPLETO),
+                new EstadoEjercicio(EstadoEjercicio.Estado.NO_EMPEZADO)
+        );
+
+        // Ejecución
+        Rendimiento rendimiento = servicioRutina.calcularRendimiento(estadosEjercicios);
+
+        // Verificación
+        assertEquals(Rendimiento.MEDIO, rendimiento);
+    }
+
+    @Test
+    @Transactional
+    public void queElRendimientoDeLaRutinaSeaMedioCuandoMenosDel50PorCientoDeEjerciciosEstanCompletosYMasDel50PorCientoDeEjerciciosEstanIncompletos() {
+        // Preparación
+        List<EstadoEjercicio> estadosEjercicios = Arrays.asList(
+                new EstadoEjercicio(EstadoEjercicio.Estado.COMPLETO),
+                new EstadoEjercicio(EstadoEjercicio.Estado.INCOMPLETO),
+                new EstadoEjercicio(EstadoEjercicio.Estado.INCOMPLETO)
+        );
+
+        // Ejecución
+        Rendimiento rendimiento = servicioRutina.calcularRendimiento(estadosEjercicios);
+
+        // Verificación
+        assertEquals(Rendimiento.MEDIO, rendimiento);
     }
 
 }
