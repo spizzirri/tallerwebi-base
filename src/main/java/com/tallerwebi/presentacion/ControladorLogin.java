@@ -61,7 +61,7 @@ public class ControladorLogin {
             model.put("error", "El usuario ya existe");
             return new ModelAndView("nuevo-usuario", model);
         } catch (Exception e){
-            model.put("error", "al registrar el nuevo usuario");
+            model.put("error", "Error al registrar el nuevo usuario");
             return new ModelAndView("nuevo-usuario", model);
         }
         return new ModelAndView("redirect:/login");
@@ -88,7 +88,7 @@ public class ControladorLogin {
         // Añadir itemMasSeleccionado al modelo
         DatosItemRendimiento itemMasSeleccionado = servicioLogin.obtenerItemMasSeleccionado();
         if (itemMasSeleccionado == null) {
-            modelAndView.addObject("mensaje", "Contanos cómo fue tu rendimiento hoy.");
+            modelAndView.addObject("mensaje", "¿Cómo fue tu entrenamiento hoy?");
         } else {
             modelAndView.addObject("itemMasSeleccionado", itemMasSeleccionado);
         }

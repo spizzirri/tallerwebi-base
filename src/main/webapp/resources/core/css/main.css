@@ -856,8 +856,7 @@ position: relative;
     }
 }
 
-
-.hidden {
+.hidden-item {
     display: none;
 }
 

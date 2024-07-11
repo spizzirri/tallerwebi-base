@@ -68,7 +68,7 @@
     <h1 class="text-2xl md:text-3xl font-bold mb-4 md:mb-8 text-gray-100">Progreso</h1>
     <div class="w-full max-w-7xl">
         <div th:if="${sinRendimiento}" class="bg-white border rounded-lg p-4 flex flex-col items-center text-center shadow-sm">
-            <p class="text-xl md:text-sm font-semibold text-gray-600" th:text="${mensaje}"></p>
+            <p class="text-sm md:text-xl font-semibold text-gray-600" th:text="${mensaje}"></p>
             <form th:action="@{/calendario}" method="GET" class="mt-2 md:mt-4">
                 <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-200">Ir a Calendario</button>
             </form>

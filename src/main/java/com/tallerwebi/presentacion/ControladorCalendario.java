@@ -34,6 +34,7 @@ public class  ControladorCalendario {
         }
 
         ModelAndView model = new ModelAndView("calendario");
+        model.addObject("message", "¿Cómo fue tu entrenamiento hoy?");
         ItemRendimiento itemRendimiento = new ItemRendimiento();
         model.addObject("itemRendimiento", itemRendimiento);
         model.addObject("usuario", usuario);
@@ -58,7 +59,6 @@ public class  ControladorCalendario {
         }
     }
 
-
     @RequestMapping(path = "/verProgreso", method = {RequestMethod.POST, RequestMethod.GET})
     public ModelAndView verProgreso(HttpSession session) {
         Usuario usuario = (Usuario) session.getAttribute("usuario");
@@ -69,7 +69,7 @@ public class  ControladorCalendario {
         ModelAndView model = new ModelAndView("verProgreso");
         List<DatosItemRendimiento> itemsRendimiento = servicioCalendario.obtenerItemsRendimiento();
         if (itemsRendimiento.isEmpty()) {
-            model.addObject("mensaje", "Contanos como fue tu rendimiento hoy.");
+            model.addObject("mensaje", "¿Cómo fue tu entrenamiento hoy?");
             model.addObject("sinRendimiento", true); // Atributo para indicar que no hay items de rendimiento
         } else {
             model.addObject("datosItemRendimiento", itemsRendimiento);

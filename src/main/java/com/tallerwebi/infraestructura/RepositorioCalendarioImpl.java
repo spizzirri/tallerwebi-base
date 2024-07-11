@@ -4,7 +4,6 @@ import com.tallerwebi.dominio.calendario.ItemRendimiento;
 import com.tallerwebi.dominio.calendario.RepositorioCalendario;
 import com.tallerwebi.dominio.calendario.TipoRendimiento;
 import com.tallerwebi.dominio.excepcion.ItemRendimientoDuplicadoException;
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -31,9 +30,8 @@ public class RepositorioCalendarioImpl implements RepositorioCalendario {
 
     @Override
     public void guardar(ItemRendimiento itemRendimiento) {
-            this.sessionFactory.getCurrentSession().save(itemRendimiento);
+        this.sessionFactory.getCurrentSession().save(itemRendimiento);
     }
-
 
     @Override
     public boolean existeItemRendimientoPorFecha(LocalDate fecha) {
@@ -59,7 +57,7 @@ public class RepositorioCalendarioImpl implements RepositorioCalendario {
                 .getResultList();
 
         if (results.isEmpty()) {
-            return null; //este null esta cubierto en el servicio
+            return null;
         }
         TipoRendimiento tipoRendimientoMasSeleccionado = (TipoRendimiento) results.get(0)[0];
 
@@ -72,9 +70,6 @@ public class RepositorioCalendarioImpl implements RepositorioCalendario {
 
         return items.isEmpty() ? null : items.get(0);
     }
-
-
-
 
 }
 
