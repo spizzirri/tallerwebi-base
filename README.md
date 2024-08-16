@@ -29,7 +29,16 @@ $ mvn clean jetty:run
 $ mvn test -Dtest="VistaLoginE2E"
 ```
 
-## 6. Tecnologías:
+## 7. Como correr las pruebas unitarias de javascript
+```shell
+$ cd src/main/webapp/resources/core/js
+// Si es la primera vez debo descargar las dependencias
+$ npm install
+// Ejecuto las pruebas
+$ npm test
+```
+
+## 8. Tecnologías:
 * Java 11
 * Spring 5.2.22.RELEASE
 * Thymeleaf 3.0.15.RELEASE
@@ -44,5 +53,6 @@ $ mvn test -Dtest="VistaLoginE2E"
 * Hibernate 5.4.24.Final
 * Mockito 5.3.1
 * Playwright 1.36.0
+* Node 18.16.1 o superior <- Instalación manual desde la [página de node](https://nodejs.org/en) 
 
 *_Proyecto modificado en base a: [Spring MVC hello world example (Maven and Thymeleaf)](https://mkyong.com/spring-mvc/spring-mvc-hello-world-example/) _*

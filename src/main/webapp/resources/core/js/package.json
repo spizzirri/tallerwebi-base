@@ -1,0 +1,14 @@
+{
+  "name": "tallerwebi",
+  "version": "1.0.0",
+  "description": "Pruebas unitarias en javascript",
+  "main": "main.js",
+  "scripts": {
+    "test": "vitest"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "vitest": "^2.0.5"
+  }
+}
