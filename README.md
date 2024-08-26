@@ -9,16 +9,19 @@ $ mvn clean jetty:run
 ## 2. Thymeleaf
 * [Documentacion](https://www.thymeleaf.org/doc/tutorials/3.0/usingthymeleaf.html)
 
-## 3. GitHub Actions
+## 3. Hamcrest
+* [Documentacion](https://hamcrest.org/JavaHamcrest/javadoc/2.2/)
+
+## 4. GitHub Actions
 * [Documentacion](https://docs.github.com/es/actions/quickstart)
 
-## 4. Playwright
+## 5. Playwright
 * [Documentacion](https://playwright.dev/java/docs/intro)
 
-## 5. Jetty
+## 6. Jetty
 * [Documentacion](https://eclipse.dev/jetty/documentation/jetty-9/index.html#maven-and-jetty)
 
-## 6. Como correr las pruebas de punta a punta
+## 7. Como correr las pruebas de punta a punta
 
 ### Iniciar el servidor
 ```shell
@@ -29,7 +32,7 @@ $ mvn clean jetty:run
 $ mvn test -Dtest="VistaLoginE2E"
 ```
 
-## 7. Como correr las pruebas unitarias de javascript
+## 8. Como correr las pruebas unitarias de javascript
 ```shell
 $ cd src/main/webapp/resources/core/js
 // Si es la primera vez debo descargar las dependencias
@@ -38,7 +41,7 @@ $ npm install
 $ npm test
 ```
 
-## 8. Tecnologías:
+## 9. Tecnologías:
 * Java 11
 * Spring 5.2.22.RELEASE
 * Thymeleaf 3.0.15.RELEASE
