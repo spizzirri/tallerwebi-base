@@ -41,6 +41,18 @@ $ npm install
 $ npm test
 ```
 
+## 9. Docker: Comandos básicos
+```shell
+docker build -t tallerwebi . 
+docker run -p 8080:8080 tallerwebi
+docker run -it --entrypoint /bin/bash tallerwebi
+docker logs <containerId>
+docker ps -a 
+docker images
+docker rm <containerId>
+docker rmi <imageId>
+```
+
 ## 9. Tecnologías:
 * Java 11
 * Spring 5.2.22.RELEASE
