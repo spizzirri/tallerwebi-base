@@ -51,6 +51,8 @@ docker ps -a
 docker images
 docker rm <containerId>
 docker rmi <imageId>
+docker build -f DockerfileSQL -t mysql .
+docker run --name mysql-container -d -p 3306:3306 mysql # sudo apt install mysql-client
 ```
 
 ## 9. Tecnologías:
