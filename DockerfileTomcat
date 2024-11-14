@@ -1,0 +1,32 @@
+# Usa la imagen base de OpenJDK 11
+FROM openjdk:11
+
+# Define variables de entorno para Tomcat
+ENV TOMCAT_VERSION=9.0.97
+ENV TOMCAT_HOME=/opt/tomcat
+
+# Descarga y extrae Tomcat
+RUN apt-get update && apt-get install -y wget && \
+    mkdir -p $TOMCAT_HOME && \
+    wget https://dlcdn.apache.org/tomcat/tomcat-9/v${TOMCAT_VERSION}/bin/apache-tomcat-${TOMCAT_VERSION}.tar.gz && \
+    tar -xzvf apache-tomcat-${TOMCAT_VERSION}.tar.gz -C $TOMCAT_HOME --strip-components=1 && \
+    rm apache-tomcat-${TOMCAT_VERSION}.tar.gz
+
+# Copia el archivo WAR al directorio webapps de Tomcat
+COPY target/tallerwebi-base-1.0-SNAPSHOT.war $TOMCAT_HOME/webapps/
+
+# Expone el puerto en el que Tomcat corre (por defecto 8080)
+EXPOSE 8080
+
+# Asigna permisos de ejecucion
+RUN chmod +x /opt/tomcat/bin/catalina.sh
+
+# Inicia el webserver
+CMD ["/opt/tomcat/bin/catalina.sh", "run"]
+
+# En Windows
+# Instalar Docker Desktop
+# Desde PowerShell o el terminal de IntelliJ ejecutar: docker images -> nos muestra los cotenedores. Copiar el primer IMAGE ID
+# (opcional) Desde Docker Desktop: Ir a containers -> seleccionar el dato "image" del contenedor -> copiar el IMAGE ID (es el mismo que el paso anterior pero desde la app)
+# Ejecutar e PowerShell o el terminarl de IntelliJ: docker run -d -p 8080:8080 -it <IMAGE ID> -> vincula el puerto 8080 del contenedor con el puerto 8080 de nuestra maquina.
+# En el navegador: http://localhost:8080/tallerwebi-base-1.0-SNAPSHOT/login

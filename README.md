@@ -41,6 +41,62 @@ $ npm install
 $ npm test
 ```
 
+## 9. Docker:
+Los archivos de docker de este proyecto estan preparados para desplegar un archivo WAR usando el servido Jetty o Tomcat
+El archivo de docker para Jetty y Tomcat esperan que el archivo WAR se debe llamar "tallerwebi-base-1.0-SNAPSHOT" para eso debemos modificar los atributos <artifactId> y <version> del archivo pom.xml 
+
+Para generar un archivo WAR debemos ejecutar maven
+```shell
+mvn clean package
+```
+
+Una vez que tenemos el archivo WAR, debemos generar la imagen de docker
+```shell
+docker build -f DockerfileJetty -t tallerwebi .
+docker build -f DockerfileTomcat -t tallerwebi .
+```
+
+Una vez que tenemos la imagen generada, podemos instanciar un contenedor y ejecutarlo.
+```shell
+docker run -p 8080:8080 tallerwebi
+```
+
+### 9. Comandos básicod:
+```shell
+# Crear una imagen con el nombre "tallerwebi".
+docker build -f DockerfileJetty -t tallerwebi .
+
+# Instancia y ejecuta un contendor en base a la imagen "tallerwebi". 
+docker run -p 8080:8080 tallerwebi 
+
+# Ejecuta un contendor ya instanciado.
+docker start <containerId> 
+
+# Instancia un contendor en base a la imagen tallerwebi para ejecutar bash.
+docker run -it --entrypoint /bin/bash tallerwebi
+
+# Muestra los logs.
+docker logs <containerId>
+
+# Muestra todos los contenedores creados.
+docker ps -a 
+
+# Muestra todas las imagenes creadas.
+docker images
+
+# Elimina un contenedor.
+docker rm <containerId>
+
+# Elimina una imagen.
+docker rmi <imageId>
+
+# Crear una imagen con el nombre "mysql".
+docker build -f DockerfileSQL -t mysql .
+
+# Instancia un contendor en base a la imagen mysql.
+docker run --name mysql-container -d -p 3306:3306 mysql # sudo apt install mysql-client
+```
+
 ## 9. Tecnologías:
 * Java 11
 * Spring 5.2.22.RELEASE
