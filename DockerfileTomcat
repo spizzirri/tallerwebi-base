@@ -26,7 +26,7 @@ CMD ["/opt/tomcat/bin/catalina.sh", "run"]
 
 # En Windows
 # Instalar Docker Desktop
-# Desde PowerShell ejecutar: docker images -> nos muestra los cotenedores. Tomar el primer IMAGE ID
+# Desde PowerShell o el terminal de IntelliJ ejecutar: docker images -> nos muestra los cotenedores. Copiar el primer IMAGE ID
 # (opcional) Desde Docker Desktop: Ir a containers -> seleccionar el dato "image" del contenedor -> copiar el IMAGE ID (es el mismo que el paso anterior pero desde la app)
-# Ejecutar: docker run -d -p 8080:8080 -it <IMAGE ID> -> vincula el puerto 8080 del contenedor con el puerto 8080 de nuestra maquina.
+# Ejecutar e PowerShell o el terminarl de IntelliJ: docker run -d -p 8080:8080 -it <IMAGE ID> -> vincula el puerto 8080 del contenedor con el puerto 8080 de nuestra maquina.
 # En el navegador: http://localhost:8080/tallerwebi-base-1.0-SNAPSHOT/login
