@@ -1,6 +1,5 @@
-import { expect, test } from 'vitest'
-import { sum } from './main.js'
-
-test('adds 1 + 2 to equal 3', () => {
-  expect(sum(1, 2)).toBe(3)
-})
+describe("Main", function() {
+  it("debe devoler 2 cuando envio 1 y 1", function() {
+    expect(suma(1, 1)).toBe(2);
+  });
+});
