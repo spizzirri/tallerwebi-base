@@ -11,16 +11,16 @@ import static org.hamcrest.Matchers.*;
 
 public class CarritoDeComprasTest {
 
-    public ProductoController productoController;
+    public CarritoController carritoController;
 
     @BeforeEach
     public void init(){
-        productoController = new ProductoController();
+        carritoController = new CarritoController();
     }
 
     @Test
     public void dadoQueExisteUnProductoControllerCuandoQuieroVerLaVistaDelCarritoDeComprasObtengoLaVistaDelCarrito(){
-        ModelAndView modelAndView =  productoController.mostrarVistaCarritoDeCompras();
+        ModelAndView modelAndView =  carritoController.mostrarVistaCarritoDeCompras();
 
         assertThat(modelAndView.getViewName(), equalTo("carritoDeCompras"));
     }
@@ -29,7 +29,7 @@ public class CarritoDeComprasTest {
     public void dadoQueExisteUnProductoControllerCuandoAgregoUnProductoYMuestroLaVistaDelCarritoDeComprasObtengoLaVistaDelCarritoConUnProducto(){
         ProductoDto procesador = new ProductoDto("Procesador Intel Celeron G4900 3.10GHz Socket 1151 OEM Coffe Lake", 53.650);
 
-        ModelAndView modelAndView =  productoController.agregarProductoAlCarrito(procesador);
+        ModelAndView modelAndView =  carritoController.agregarProductoAlCarrito(procesador);
         String mensajeEsperado = "El producto fue agregado al carrito correctamente!";
 
         assertThat(modelAndView.getViewName(), equalTo("carritoDeCompras"));
@@ -39,14 +39,14 @@ public class CarritoDeComprasTest {
 
     @Test
     public void dadoQueExisteUnProductoControllerEliminoUnProductoYMuestroLaVistaDelCarritoDeComprasObtengoLaVistaDelCarritoConUnProducto(){
-        ProductoDto mouse = productoController.getProductos().stream()
+        ProductoDto mouse = carritoController.getProductos().stream()
                 .filter(producto -> producto.getNombre().equals("Mouse inalámbrico"))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Mouse no encontrado"));
 
-        ModelAndView modelAndView =  productoController.eliminarProductoDelCarrito(mouse.getId());
+        ModelAndView modelAndView =  carritoController.eliminarProductoDelCarrito(mouse.getId());
 
-        List<ProductoDto> productosEsperados = productoController.getProductos();
+        List<ProductoDto> productosEsperados = carritoController.getProductos();
 
         String mensajeEsperado = "El producto fue eliminado!";
 

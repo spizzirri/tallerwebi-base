@@ -1,6 +1,5 @@
 package com.tallerwebi.presentacion;
 
-import org.dom4j.rule.Mode;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,11 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Controller
-public class ProductoController {
+public class CarritoController {
 
     private List<ProductoDto> productos;
 
-    public ProductoController() {
+    public CarritoController() {
         this.productos = new ArrayList<ProductoDto>();
         this.productos.add(new ProductoDto("Mouse inalámbrico", 29.99));
         this.productos.add(new ProductoDto("Teclado mecánico", 79.99));
