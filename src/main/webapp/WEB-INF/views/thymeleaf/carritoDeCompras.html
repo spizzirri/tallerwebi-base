@@ -18,8 +18,9 @@
                     <th scope="col">Precio</th>
                 </tr>
                 </thead>
-                <tbody th:if="${productos != null and !productos.isEmpty()}" th:each="producto : ${productos}">
-                <tr>
+                <tbody th:if="${productos != null and !productos.isEmpty()}">
+                <tr th:each="producto : ${productos}"
+                >
                     <td th:text="${producto.nombre}"></td>
                     <td th:text="${producto.precio}"></td>
                 </tr>
