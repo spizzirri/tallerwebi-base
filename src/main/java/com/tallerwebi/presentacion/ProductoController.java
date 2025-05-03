@@ -1,5 +1,6 @@
 package com.tallerwebi.presentacion;
 
+import org.dom4j.rule.Mode;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,10 +27,19 @@ public class ProductoController {
         return productos;
     }
 
+    public ProductoDto buscarPorId(Long id){
+        for(ProductoDto productoDto : this.productos){
+            if(productoDto.getId().equals(id)){
+                return productoDto;
+            }
+        }
+        return null;
+    }
+
     @GetMapping(path = "/carritoDeCompras")
     public ModelAndView mostrarVistaCarritoDeCompras() {
         ModelMap model = new ModelMap();
-        model.put("productos", productos);
+        model.put("productos", this.productos);
         return new ModelAndView("carritoDeCompras", model);
 
     }
@@ -39,8 +49,21 @@ public class ProductoController {
         ModelMap model = new ModelMap();
         model.put("mensaje", "El producto fue agregado al carrito correctamente!");
         model.put("productoDto", producto);
-        model.put("productos", productos);
+        model.put("productos", this.productos);
 
+        return new ModelAndView("carritoDeCompras", model);
+    }
+
+    @PostMapping(path = "/carritoDeCompras")
+    public ModelAndView eliminarProductoDelCarrito(Long idAEliminar) {
+        ModelMap model = new ModelMap();
+        ProductoDto productoBuscado = buscarPorId(idAEliminar);
+        if(productoBuscado != null){
+            this.productos.remove(productoBuscado);
+            model.put("mensaje", "El producto fue eliminado!");
+        } else {
+            model.put("mensaje", "El producto no pudo ser eliminado!");
+        }
         return new ModelAndView("carritoDeCompras", model);
     }
 }

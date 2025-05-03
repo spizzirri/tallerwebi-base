@@ -4,8 +4,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.List;
+
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.*;
 
 public class CarritoDeComprasTest {
 
@@ -17,14 +19,14 @@ public class CarritoDeComprasTest {
     }
 
     @Test
-    public void dadoQueexisteUnProductoControllerCuandoQuieroVerLaVistaDelCarritoDeComprasObtengoLaVistaDelCarrito(){
+    public void dadoQueExisteUnProductoControllerCuandoQuieroVerLaVistaDelCarritoDeComprasObtengoLaVistaDelCarrito(){
         ModelAndView modelAndView =  productoController.mostrarVistaCarritoDeCompras();
 
         assertThat(modelAndView.getViewName(), equalTo("carritoDeCompras"));
     }
 
     @Test
-    public void dadoQueexisteUnProductoControllerCuandoAgregoUnProductoYMuestroLaVistaDelCarritoDeComprasObtengoLaVistaDelCarritoConUnProducto(){
+    public void dadoQueExisteUnProductoControllerCuandoAgregoUnProductoYMuestroLaVistaDelCarritoDeComprasObtengoLaVistaDelCarritoConUnProducto(){
         ProductoDto procesador = new ProductoDto("Procesador Intel Celeron G4900 3.10GHz Socket 1151 OEM Coffe Lake", 53.650);
 
         ModelAndView modelAndView =  productoController.agregarProductoAlCarrito(procesador);
@@ -33,5 +35,23 @@ public class CarritoDeComprasTest {
         assertThat(modelAndView.getViewName(), equalTo("carritoDeCompras"));
         assertThat(modelAndView.getModel().get("mensaje"), equalTo(mensajeEsperado));
         assertThat(modelAndView.getModel().get("productoDto"), equalTo(procesador));
+    }
+
+    @Test
+    public void dadoQueExisteUnProductoControllerEliminoUnProductoYMuestroLaVistaDelCarritoDeComprasObtengoLaVistaDelCarritoConUnProducto(){
+        ProductoDto mouse = productoController.getProductos().stream()
+                .filter(producto -> producto.getNombre().equals("Mouse inalámbrico"))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Mouse no encontrado"));
+
+        ModelAndView modelAndView =  productoController.eliminarProductoDelCarrito(mouse.getId());
+
+        List<ProductoDto> productosEsperados = productoController.getProductos();
+
+        String mensajeEsperado = "El producto fue eliminado!";
+
+        assertThat(modelAndView.getViewName(), equalTo("carritoDeCompras"));
+        assertThat(modelAndView.getModel().get("mensaje"), equalTo(mensajeEsperado));
+        assertThat(productosEsperados, not(hasItem(mouse)));
     }
 }
