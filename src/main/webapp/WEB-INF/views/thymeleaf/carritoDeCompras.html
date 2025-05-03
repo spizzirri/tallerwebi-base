@@ -2,20 +2,21 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
     <title>Carrito de compras</title>
 </head>
 <body>
-
 <div class="container">
-    <div class="card" style="width: 18rem;">
-        <h5 class="card-title">Productos</h5>
+    <div class="card d-flex align-content-center m-2" style="width: 800px;">
+        <h3 class="card-title m-2">Productos</h3>
         <div class="card-body">
             <table class="table">
                 <thead>
-                <tr>
+                <tr class="text-center">
                     <th scope="col">Nombre</th>
                     <th scope="col">Precio</th>
+                    <th scope="col">Acciones</th>
                 </tr>
                 </thead>
                 <tbody th:if="${productos != null and !productos.isEmpty()}">
@@ -23,6 +24,9 @@
                 >
                     <td th:text="${producto.nombre}"></td>
                     <td th:text="${producto.precio}"></td>
+                    <td class="text-center">
+                        <button><i class="fa-solid fa-trash"></i></button>
+                    </td>
                 </tr>
                 </tbody>
                 <tbody th:if="${productos == null or productos.isEmpty()}">
@@ -30,13 +34,58 @@
                     <td colspan="2">No hay productos en el carrito.</td>
                 </tr>
                 </tbody>
-
             </table>
-            <p class="card-text"></p>
-            <a href="#" class="btn btn-primary">Go somewhere</a>
         </div>
     </div>
 </div>
+<div class="container">
+    <div class="card d-flex align-content-center m-2" style="width: 800px;">
+        <h3 class="card-title m-2">Envío</h3>
+        <form method="post" class="card-body">
+            <input type="text" class="form-control" id="codigoPostal" placeholder="Código postal">
+        </form>
+    </div>
+</div>
+<div class="container">
+    <div class="card d-flex align-content-center m-2" style="width: 800px;">
+        <h3 class="card-title m-2">Código de descuento</h3>
+        <form method="post" class="card-body">
+            <div class="d-flex m-1">
+                <input type="text" class="form-control" id="codigoDeDescuento" placeholder="¿Tenés un código?">
+                <button class="m-2"><i class="fa-solid fa-check"></i></button>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="container">
+    <div class="card d-flex align-content-center m-2" style="width: 800px;">
+        <h3 class="card-title m-2">Metodo de pago</h3>
+        <form method="post" class="card-body">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="" id="transferencia" checked>
+                <label class="form-check-label" for="transferencia">
+                    Transferencia desde CBU/CVU o Depósito bancario
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="" id="mercadoPago">
+                <label class="form-check-label" for="mercadoPago">
+                    Mercadopago – Usás tu cuenta de MP
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="" id="doceCuotas">
+                <label class="form-check-label" for="doceCuotas">
+                    Super pago - Hasta 12 cuotas a precio de lista
+                </label>
+            </div>
+        </form>
+    </div>
+    <div class="text-end">
+        <button class="btn btn-dark">Comprar</button>
+    </div>
+</div>
 <script type="text/javascript" th:src="@{webjars/bootstrap/5.2.0/js/bootstrap.min.js}"></script>
+<script src="https://kit.fontawesome.com/36c2602d92.js" crossorigin="anonymous"></script>
 </body>
 </html>
