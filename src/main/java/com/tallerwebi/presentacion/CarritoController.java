@@ -1,12 +1,15 @@
 package com.tallerwebi.presentacion;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +17,7 @@ import java.util.List;
 public class CarritoController {
 
     private List<ProductoDto> productos;
+    private Double valorTotal = 0.0;
 
     public CarritoController() {
         this.productos = new ArrayList<ProductoDto>();
@@ -38,6 +42,8 @@ public class CarritoController {
     public ModelAndView mostrarVistaCarritoDeCompras() {
         ModelMap model = new ModelMap();
         model.put("productos", this.productos);
+        Double total = calcularValorTotalDeLosProductos();
+        model.put("valorTotal", total);
         return new ModelAndView("carritoDeCompras", model);
 
     }
@@ -48,6 +54,9 @@ public class CarritoController {
         model.put("mensaje", "El producto fue agregado al carrito correctamente!");
         model.put("productoDto", producto);
         model.put("productos", this.productos);
+
+        Double total = calcularValorTotalDeLosProductos();
+        model.put("valorTotal", total);
 
         return new ModelAndView("carritoDeCompras", model);
     }
@@ -64,7 +73,22 @@ public class CarritoController {
             model.put("mensaje", "El producto no pudo ser eliminado!");
         }
         model.put("productos", this.productos);
-        System.out.println(this.productos);
+
+        Double total = calcularValorTotalDeLosProductos();
+        model.put("valorTotal", total);
+
         return new ModelAndView("carritoDeCompras", model);
+    }
+
+    public Double calcularValorTotalDeLosProductos() {
+        Double total = 0.0;
+        for(ProductoDto productoDto : this.productos){
+            total += productoDto.getPrecio();
+        }
+        BigDecimal valorTotalConDosDecimales = new BigDecimal(total);
+
+        valorTotalConDosDecimales = valorTotalConDosDecimales.setScale(2, RoundingMode.UP);
+        this.valorTotal = valorTotalConDosDecimales.doubleValue();
+        return this.valorTotal;
     }
 }

@@ -4,6 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -53,5 +55,15 @@ public class CarritoDeComprasTest {
         assertThat(modelAndView.getViewName(), equalTo("carritoDeCompras"));
         assertThat(modelAndView.getModel().get("mensaje"), equalTo(mensajeEsperado));
         assertThat(productosEsperados, not(hasItem(mouse)));
+    }
+
+    @Test
+    public void dadoQueExisteUnProductoControllerCuandoQuieroVerElValorTotalDelosProductosEnElCarritoObtengoElValorTotalDeLosProductos(){
+        Double valorTotal = carritoController.calcularValorTotalDeLosProductos();
+
+        Double valorEsperado = 109.98;
+
+
+        assertThat(valorTotal, equalTo(valorEsperado));
     }
 }

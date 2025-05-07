@@ -29,7 +29,6 @@
                             <button type="submit"><i class="fa-solid fa-trash"></i></button>
                         </form>
                     </td>
-
                 </tr>
                 </tbody>
                 <tbody th:if="${productos == null or productos.isEmpty()}">
@@ -40,8 +39,8 @@
             </table>
         </div>
         <div class="card-footer">
-            <h3 class="card-title m-2">
-                Total:
+            <h3 class="card-title m-2 text-end">
+                Total: <span th:text="${valorTotal}"></span>
             </h3>
         </div>
     </div>
