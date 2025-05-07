@@ -19,7 +19,6 @@ public class CarritoController {
         this.productos = new ArrayList<ProductoDto>();
         this.productos.add(new ProductoDto("Mouse inalámbrico", 29.99));
         this.productos.add(new ProductoDto("Teclado mecánico", 79.99));
-
     }
 
     public List<ProductoDto> getProductos() {
@@ -43,7 +42,7 @@ public class CarritoController {
 
     }
 
-    @PostMapping(path = "/carritoDeCompras")
+    @PostMapping(path = "/home")
     public ModelAndView agregarProductoAlCarrito(@ModelAttribute("productoDto") ProductoDto producto) {
         ModelMap model = new ModelMap();
         model.put("mensaje", "El producto fue agregado al carrito correctamente!");
@@ -53,16 +52,19 @@ public class CarritoController {
         return new ModelAndView("carritoDeCompras", model);
     }
 
+
     @PostMapping(path = "/carritoDeCompras")
-    public ModelAndView eliminarProductoDelCarrito(Long idAEliminar) {
+    public ModelAndView eliminarProductoDelCarrito(Long id) {
         ModelMap model = new ModelMap();
-        ProductoDto productoBuscado = buscarPorId(idAEliminar);
+        ProductoDto productoBuscado = buscarPorId(id);
         if(productoBuscado != null){
             this.productos.remove(productoBuscado);
             model.put("mensaje", "El producto fue eliminado!");
         } else {
             model.put("mensaje", "El producto no pudo ser eliminado!");
         }
+        model.put("productos", this.productos);
+        System.out.println(this.productos);
         return new ModelAndView("carritoDeCompras", model);
     }
 }

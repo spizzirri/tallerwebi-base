@@ -20,13 +20,15 @@
                 </tr>
                 </thead>
                 <tbody th:if="${productos != null and !productos.isEmpty()}">
-                <tr th:each="producto : ${productos}"
-                >
+                <tr th:each="producto : ${productos}">
                     <td th:text="${producto.nombre}"></td>
                     <td th:text="${producto.precio}"></td>
                     <td class="text-center">
-                        <button><i class="fa-solid fa-trash"></i></button>
+                        <form method="post" th:action="@{/carritoDeCompras(id=${producto.id})}">
+                            <button type="submit"><i class="fa-solid fa-trash"></i></button>
+                        </form>
                     </td>
+
                 </tr>
                 </tbody>
                 <tbody th:if="${productos == null or productos.isEmpty()}">
@@ -62,19 +64,19 @@
         <h3 class="card-title m-2">Metodo de pago</h3>
         <form method="post" class="card-body">
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="transferencia" checked>
+                <input class="form-check-input" type="radio" id="transferencia" checked>
                 <label class="form-check-label" for="transferencia">
                     Transferencia desde CBU/CVU o Depósito bancario
                 </label>
             </div>
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="mercadoPago">
+                <input class="form-check-input" type="radio" id="mercadoPago">
                 <label class="form-check-label" for="mercadoPago">
-                    Mercadopago – Usás tu cuenta de MP
+                    Mercadopago - Usás tu cuenta de MP
                 </label>
             </div>
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="doceCuotas">
+                <input class="form-check-input" type="radio" id="doceCuotas">
                 <label class="form-check-label" for="doceCuotas">
                     Super pago - Hasta 12 cuotas a precio de lista
                 </label>
