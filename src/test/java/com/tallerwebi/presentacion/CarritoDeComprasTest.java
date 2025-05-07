@@ -67,6 +67,16 @@ public class CarritoDeComprasTest {
     }
 
     @Test
+    public void dadoQueExisteUnProductoControllerCuandoQuieroVerElValorTotalDelosProductosEnElCarritoAplicandoUnCodigoDeDescuentoDel1PorcientoObtengoUnMensajeDeCodigoDeDescuentoInvalido(){
+        String codigoDescuento = "PromoBarato1";
+        ModelAndView valorTotalConDescuento = carritoController.calcularValorTotalDeLosProductosConDescuento(codigoDescuento);
+
+        String mensajeEsperado = "Codigo de descuento invalido!";
+
+        assertThat(valorTotalConDescuento.getModel().get("mensajeDescuento"), equalTo(mensajeEsperado));
+    }
+
+    @Test
     public void dadoQueExisteUnProductoControllerCuandoQuieroVerElValorTotalDelosProductosEnElCarritoAplicandoUnCodigoDeDescuentoDel10PorcientoObtengoElValorTotalDeLosProductosConElDescuento(){
         String codigoDescuento = "CompraComponentes10";
         ModelAndView valorTotalConDescuento = carritoController.calcularValorTotalDeLosProductosConDescuento(codigoDescuento);

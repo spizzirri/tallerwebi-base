@@ -102,9 +102,9 @@ public class CarritoController {
         String numeroExtraido = codigoDescuento.replaceAll("^.*?(\\d+)$", "$1"); //reemplaza el texto que coincide con un patrón. En este caso se queda con los numeros que hay despues de un string
 
         try {
-          return Integer.parseInt(numeroExtraido);
+          return Integer.parseInt(numeroExtraido); //convierte el numero extraido a entero
         } catch (NumberFormatException e) {
-            return null;
+            return null; //si el final del string no es un numero lanza una exepcion
         }
     }
 
@@ -115,14 +115,15 @@ public class CarritoController {
         Double total = calcularValorTotalDeLosProductos();
         Integer codigoDescuentoExtraido = extraerPorcentajeDesdeCodigoDeDescuento(codigoDescuento);
 
-        if(codigoDescuentoExtraido == null){
-            model.put("mensajeDescuento", "Codigo de descuento invalido!"); // muestro un mensaje cuando el codigo no tenrmina en numero
+        if(codigoDescuentoExtraido == null || !(codigoDescuentoExtraido == 5 || codigoDescuentoExtraido == 10 || codigoDescuentoExtraido == 15)){
+            model.put("mensajeDescuento", "Codigo de descuento invalido!"); // muestro un mensaje cuando el codigo no tenrmina en numero o es distinto de los validos para aplicar el descuento
             return new ModelAndView("carritoDeCompras", model);
         }
 
         switch (codigoDescuentoExtraido) {
-            case 1:
-                total = total * 0.01;
+            case 5:
+                total = total * 0.05;
+                break;
             case 10:
                  total = total - (total * 0.10);
                 break;
