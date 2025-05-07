@@ -75,6 +75,9 @@
                         <input type="text" class="form-control" id="codigoDeDescuento" placeholder="¿Tenés un código?">
                         <button class="btn btn-success ms-2"><i class="fa-solid fa-check"></i></button>
                     </div>
+                    <div th:if="${mensajeDescuento != null}" class="alert alert-info mt-2 py-1 px-2" style="max-height: 40px; font-size: 0.9rem;">
+                        <p th:text="${mensajeDescuento}"></p>
+                    </div>
                 </form>
             </div>
 

@@ -1,7 +1,6 @@
 package com.tallerwebi.presentacion;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -18,6 +17,7 @@ public class CarritoController {
 
     private List<ProductoDto> productos;
     private Double valorTotal = 0.0;
+    private Double valorTotalConDescuento = 0.0;
 
     public CarritoController() {
         this.productos = new ArrayList<ProductoDto>();
@@ -44,6 +44,7 @@ public class CarritoController {
         model.put("productos", this.productos);
         Double total = calcularValorTotalDeLosProductos();
         model.put("valorTotal", total);
+//        model.put("mensajeDescuento", "Descuento aplicado correctamente: $" + total ); //mensaje de prueba para el codigo de descuento
         return new ModelAndView("carritoDeCompras", model);
 
     }
@@ -85,10 +86,58 @@ public class CarritoController {
         for(ProductoDto productoDto : this.productos){
             total += productoDto.getPrecio();
         }
-        BigDecimal valorTotalConDosDecimales = new BigDecimal(total);
 
-        valorTotalConDosDecimales = valorTotalConDosDecimales.setScale(2, RoundingMode.UP);
+        BigDecimal valorTotalConDosDecimales = new BigDecimal(total);
+        valorTotalConDosDecimales = valorTotalConDosDecimales.setScale(2, RoundingMode.UP); //convierto el numero para que tenga dos decimales y redondee para arriba
         this.valorTotal = valorTotalConDosDecimales.doubleValue();
+
         return this.valorTotal;
+    }
+
+    private Integer extraerPorcentajeDesdeCodigoDeDescuento(String codigoDescuento){
+        if(codigoDescuento == null || codigoDescuento.isEmpty()){
+            return null;
+        }
+
+        String numeroExtraido = codigoDescuento.replaceAll("^.*?(\\d+)$", "$1"); //reemplaza el texto que coincide con un patrón. En este caso se queda con los numeros que hay despues de un string
+
+        try {
+          return Integer.parseInt(numeroExtraido);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    @GetMapping(path = "/carritoDeCompras/descuento")
+    public ModelAndView calcularValorTotalDeLosProductosConDescuento(String codigoDescuento) {
+        ModelMap model = new ModelMap();
+
+        Double total = calcularValorTotalDeLosProductos();
+        Integer codigoDescuentoExtraido = extraerPorcentajeDesdeCodigoDeDescuento(codigoDescuento);
+
+        if(codigoDescuentoExtraido == null){
+            model.put("mensajeDescuento", "Codigo de descuento invalido!"); // muestro un mensaje cuando el codigo no tenrmina en numero
+            return new ModelAndView("carritoDeCompras", model);
+        }
+
+        switch (codigoDescuentoExtraido) {
+            case 1:
+                total = total * 0.01;
+            case 10:
+                 total = total - (total * 0.10);
+                break;
+            case 15:
+                total = total - (total * 0.15);
+                break;
+        }
+
+        BigDecimal valorTotalConDosDecimales = new BigDecimal(total);
+        valorTotalConDosDecimales = valorTotalConDosDecimales.setScale(2, RoundingMode.UP);
+        this.valorTotalConDescuento = valorTotalConDosDecimales.doubleValue();
+
+        model.put("valorTotalConDescuento", this.valorTotalConDescuento);
+        model.put("mensajeDescuento", "Descuento aplicado correctamente: $" + total );
+
+        return new ModelAndView("carritoDeCompras", model);
     }
 }

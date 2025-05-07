@@ -63,7 +63,39 @@ public class CarritoDeComprasTest {
 
         Double valorEsperado = 109.98;
 
-
         assertThat(valorTotal, equalTo(valorEsperado));
+    }
+
+    @Test
+    public void dadoQueExisteUnProductoControllerCuandoQuieroVerElValorTotalDelosProductosEnElCarritoAplicandoUnCodigoDeDescuentoDel10PorcientoObtengoElValorTotalDeLosProductosConElDescuento(){
+        String codigoDescuento = "CompraComponentes10";
+        ModelAndView valorTotalConDescuento = carritoController.calcularValorTotalDeLosProductosConDescuento(codigoDescuento);
+
+        Double valorEsperadoConDescuento = 98.99;
+        Double valorObtenidoConDescuento = (Double) valorTotalConDescuento.getModel().get("valorTotalConDescuento");
+
+        assertThat(valorObtenidoConDescuento, equalTo(valorEsperadoConDescuento));
+    }
+
+    @Test
+    public void dadoQueExisteUnProductoControllerCuandoQuieroVerElValorTotalDelosProductosEnElCarritoAplicandoUnCodigoDeDescuentoDel15PorcientoObtengoElValorTotalDeLosProductosConElDescuento(){
+        String codigoDescuento = "baratija15";
+        ModelAndView valorTotalConDescuento = carritoController.calcularValorTotalDeLosProductosConDescuento(codigoDescuento);
+
+        Double valorEsperadoConDescuento = 93.49;
+
+        Double valorObtenidoConDescuento = (Double) valorTotalConDescuento.getModel().get("valorTotalConDescuento");
+
+        assertThat(valorObtenidoConDescuento, equalTo(valorEsperadoConDescuento));
+    }
+
+    @Test
+    public void dadoQueExisteUnProductoControllerCuandoQuieroVerElValorTotalDelosProductosEnElCarritoAplicandoUnCodigoDeDescuentoDeSoloLetrasObtengoUnMensajeDeCodigoDeDescuentoInvalido(){
+        String codigoDescuento = "descuentoABC";
+        ModelAndView valorTotalConDescuento = carritoController.calcularValorTotalDeLosProductosConDescuento(codigoDescuento);
+
+        String mensajeEsperado = "Codigo de descuento invalido!";
+
+        assertThat(valorTotalConDescuento.getModel().get("mensajeDescuento"), equalTo(mensajeEsperado));
     }
 }
