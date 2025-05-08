@@ -153,4 +153,35 @@ public class CarritoController {
         }
         return new ModelAndView("formularioPagoModal");
     }
+
+    @PostMapping("/comprar")
+    public ModelAndView procesarCompra() {
+        ModelAndView modelAndView = new ModelAndView("carritoDeCompras");
+        modelAndView.addObject("mostrarModal", true);
+        return modelAndView;
+    }
+
+    @PostMapping(path = "/carritoDeCompras/agregarMasCantidadDeUnProducto")
+    public Integer agregarMasCantidadDeUnProducto(Long id) {
+        ProductoDto productoBuscado = buscarPorId(id);
+        if(productoBuscado != null){
+            productoBuscado.setCantidad(productoBuscado.getCantidad() + 1);
+        }
+
+        assert productoBuscado != null;
+        return productoBuscado.getCantidad();
+    }
+
+    @PostMapping(path = "/carritoDeCompras/restarCantidadDeUnProducto")
+    public Integer restarCantidadDeUnProducto(Long id) {
+        ProductoDto productoBuscado = buscarPorId(id);
+        if(productoBuscado != null && productoBuscado.getCantidad() > 1){
+            productoBuscado.setCantidad(productoBuscado.getCantidad() - 1);
+        } else {
+            this.productos.remove(productoBuscado);
+        }
+
+        assert productoBuscado != null;
+        return productoBuscado.getCantidad();
+    }
 }

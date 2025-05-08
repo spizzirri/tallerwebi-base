@@ -1,5 +1,6 @@
 package com.tallerwebi.presentacion;
 
+import org.dom4j.rule.Mode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.ui.Model;
@@ -11,6 +12,8 @@ import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CarritoDeComprasTest {
 
@@ -22,14 +25,14 @@ public class CarritoDeComprasTest {
     }
 
     @Test
-    public void dadoQueExisteUnProductoControllerCuandoQuieroVerLaVistaDelCarritoDeComprasObtengoLaVistaDelCarrito(){
+    public void dadoQueExisteUnCarritoControllerCuandoQuieroVerLaVistaDelCarritoDeComprasObtengoLaVistaDelCarrito(){
         ModelAndView modelAndView =  carritoController.mostrarVistaCarritoDeCompras();
 
         assertThat(modelAndView.getViewName(), equalTo("carritoDeCompras"));
     }
 
     @Test
-    public void dadoQueExisteUnProductoControllerCuandoAgregoUnProductoYMuestroLaVistaDelCarritoDeComprasObtengoLaVistaDelCarritoConUnProducto(){
+    public void dadoQueExisteUnCarritoControllerCuandoAgregoUnProductoYMuestroLaVistaDelCarritoDeComprasObtengoLaVistaDelCarritoConUnProducto(){
         ProductoDto procesador = new ProductoDto("Procesador Intel Celeron G4900 3.10GHz Socket 1151 OEM Coffe Lake", 53.650);
 
         ModelAndView modelAndView =  carritoController.agregarProductoAlCarrito(procesador);
@@ -41,7 +44,7 @@ public class CarritoDeComprasTest {
     }
 
     @Test
-    public void dadoQueExisteUnProductoControllerEliminoUnProductoYMuestroLaVistaDelCarritoDeComprasObtengoLaVistaDelCarritoConUnProducto(){
+    public void dadoQueExisteUnCarritoControllerEliminoUnProductoYMuestroLaVistaDelCarritoDeComprasObtengoLaVistaDelCarritoConUnProducto(){
         ProductoDto mouse = carritoController.getProductos().stream()
                 .filter(producto -> producto.getNombre().equals("Mouse inalámbrico"))
                 .findFirst()
@@ -59,7 +62,7 @@ public class CarritoDeComprasTest {
     }
 
     @Test
-    public void dadoQueExisteUnProductoControllerCuandoQuieroVerElValorTotalDelosProductosEnElCarritoObtengoElValorTotalDeLosProductos(){
+    public void dadoQueExisteUnCarritoControllerCuandoQuieroVerElValorTotalDelosProductosEnElCarritoObtengoElValorTotalDeLosProductos(){
         Double valorTotal = carritoController.calcularValorTotalDeLosProductos();
 
         Double valorEsperado = 109.98;
@@ -68,7 +71,7 @@ public class CarritoDeComprasTest {
     }
 
     @Test
-    public void dadoQueExisteUnProductoControllerCuandoQuieroVerElValorTotalDelosProductosEnElCarritoAplicandoUnCodigoDeDescuentoDel1PorcientoObtengoUnMensajeDeCodigoDeDescuentoInvalido(){
+    public void dadoQueExisteUnCarritoControllerCuandoQuieroVerElValorTotalDelosProductosEnElCarritoAplicandoUnCodigoDeDescuentoDel1PorcientoObtengoUnMensajeDeCodigoDeDescuentoInvalido(){
         String codigoDescuento = "PromoBarato1";
         ModelAndView valorTotalConDescuento = carritoController.calcularValorTotalDeLosProductosConDescuento(codigoDescuento);
 
@@ -78,7 +81,7 @@ public class CarritoDeComprasTest {
     }
 
     @Test
-    public void dadoQueExisteUnProductoControllerCuandoQuieroVerElValorTotalDelosProductosEnElCarritoAplicandoUnCodigoDeDescuentoDel10PorcientoObtengoElValorTotalDeLosProductosConElDescuento(){
+    public void dadoQueExisteUnCarritoControllerCuandoQuieroVerElValorTotalDelosProductosEnElCarritoAplicandoUnCodigoDeDescuentoDel10PorcientoObtengoElValorTotalDeLosProductosConElDescuento(){
         String codigoDescuento = "CompraComponentes10";
         ModelAndView valorTotalConDescuento = carritoController.calcularValorTotalDeLosProductosConDescuento(codigoDescuento);
 
@@ -89,7 +92,7 @@ public class CarritoDeComprasTest {
     }
 
     @Test
-    public void dadoQueExisteUnProductoControllerCuandoQuieroVerElValorTotalDelosProductosEnElCarritoAplicandoUnCodigoDeDescuentoDel15PorcientoObtengoElValorTotalDeLosProductosConElDescuento(){
+    public void dadoQueExisteUnCarritoControllerCuandoQuieroVerElValorTotalDelosProductosEnElCarritoAplicandoUnCodigoDeDescuentoDel15PorcientoObtengoElValorTotalDeLosProductosConElDescuento(){
         String codigoDescuento = "baratija15";
         ModelAndView valorTotalConDescuento = carritoController.calcularValorTotalDeLosProductosConDescuento(codigoDescuento);
 
@@ -101,7 +104,7 @@ public class CarritoDeComprasTest {
     }
 
     @Test
-    public void dadoQueExisteUnProductoControllerCuandoQuieroVerElValorTotalDelosProductosEnElCarritoAplicandoUnCodigoDeDescuentoDeSoloLetrasObtengoUnMensajeDeCodigoDeDescuentoInvalido(){
+    public void dadoQueExisteUnCarritoControllerCuandoQuieroVerElValorTotalDelosProductosEnElCarritoAplicandoUnCodigoDeDescuentoDeSoloLetrasObtengoUnMensajeDeCodigoDeDescuentoInvalido(){
         String codigoDescuento = "descuentoABC";
         ModelAndView valorTotalConDescuento = carritoController.calcularValorTotalDeLosProductosConDescuento(codigoDescuento);
 
@@ -110,11 +113,41 @@ public class CarritoDeComprasTest {
         assertThat(valorTotalConDescuento.getModel().get("mensajeDescuento"), equalTo(mensajeEsperado));
     }
 
-//    @Test
-//    public void dadoQueExisteUnProductoControllerCuandoAgregoUnCodigoPostalObtengoElCostoEstimadoDelEnvio(){
-//        Integer codigoPostal = 1704;
-//        ModelAndView costoEstimadoDelEnvio = carritoController.calcularCostoEstimadoDeEnvio(codigoPostal);
-//
-//
-//    }
+    @Test
+    public void dadoQueExisteUnCarritoControllerCuandoPresionoComprarSeActivaElModal() {
+        ModelAndView mv = carritoController.procesarCompra();
+        assertTrue(mv.getModel().containsKey("mostrarModal"));
+        assertEquals(true, mv.getModel().get("mostrarModal"));
+    }
+
+    @Test
+    public void dadoQueExisteUnCarritoControllerCuandoPresionoElBotonMasDeUnoDeLosProductosObtengoUnoMasEnLaCantidadDeEseProducto() {
+        ProductoDto mouse = carritoController.getProductos().stream()
+                .filter(producto -> producto.getNombre().equals("Mouse inalámbrico"))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Mouse no encontrado"));
+
+        Integer sumarCantidadProducto = carritoController.agregarMasCantidadDeUnProducto(mouse.getId());
+
+        Integer cantidadEsperada = 3;
+
+        assertThat(sumarCantidadProducto, equalTo(cantidadEsperada));
+    }
+
+    @Test
+    public void dadoQueExisteUnCarritoControllerCuandoPresionoElBotonMenosDeUnoDeLosProductosObtengoUnoMenosEnLaCantidadDeEseProducto() {
+        ProductoDto mouse = carritoController.getProductos().stream()
+                .filter(producto -> producto.getNombre().equals("Mouse inalámbrico"))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Mouse no encontrado"));
+
+        Integer sumarCantidadProducto = carritoController.restarCantidadDeUnProducto(mouse.getId());
+
+        Integer cantidadEsperada = 1;
+
+        assertThat(sumarCantidadProducto, equalTo(cantidadEsperada));
+    }
+
+
+
 }

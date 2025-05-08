@@ -7,11 +7,13 @@ public class ProductoDto {
     private String nombre;
     private String descripcion;
     private Double precio;
+    private Integer cantidad;
 
     public ProductoDto(String nombre, Double precio) {
         this.id = contador++;
         this.nombre = nombre;
         this.precio = precio;
+        this.cantidad = 2;
     }
 
     public Long getId() {
@@ -40,5 +42,13 @@ public class ProductoDto {
 
     public void setPrecio(Double precio) {
         this.precio = precio;
+    }
+
+    public Integer getCantidad() {
+        return cantidad;
+    }
+
+    public void setCantidad(Integer cantidad) {
+        this.cantidad = cantidad;
     }
 }

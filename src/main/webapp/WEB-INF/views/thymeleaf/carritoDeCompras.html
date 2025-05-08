@@ -25,9 +25,27 @@
                     <td th:text="${producto.nombre}"></td>
                     <td th:text="${producto.precio}"></td>
                     <td class="text-center">
-                        <form method="post" th:action="@{/carritoDeCompras(id=${producto.id})}">
-                            <button type="submit"><i class="fa-solid fa-trash"></i></button>
-                        </form>
+                        <div class="d-flex justify-content-center align-items-center gap-2">
+                            <!-- Botón menos -->
+                            <form method="post" th:action="@{/carritoDeCompras/restar(id=${producto.id})}">
+                                <button type="submit" class="btn btn-outline-secondary btn-sm">−</button>
+                            </form>
+
+                            <!-- Número de productos -->
+                            <span th:text="${producto.cantidad}" class="mx-2"></span>
+
+                            <!-- Botón más -->
+                            <form method="post" th:action="@{/carritoDeCompras/sumar(id=${producto.id})}">
+                                <button type="submit" class="btn btn-outline-secondary btn-sm">+</button>
+                            </form>
+
+                            <!-- Botón eliminar -->
+                            <form method="post" th:action="@{/carritoDeCompras(id=${producto.id})}">
+                                <button type="submit" class="btn btn-outline-danger btn-sm ms-2">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
                 </tbody>
