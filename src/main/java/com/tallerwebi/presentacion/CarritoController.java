@@ -1,10 +1,12 @@
 package com.tallerwebi.presentacion;
 
+import org.dom4j.rule.Mode;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.math.BigDecimal;
@@ -122,7 +124,7 @@ public class CarritoController {
 
         switch (codigoDescuentoExtraido) {
             case 5:
-                total = total * 0.05;
+                total = total - (total * 0.05);
                 break;
             case 10:
                  total = total - (total * 0.10);
@@ -140,5 +142,15 @@ public class CarritoController {
         model.put("mensajeDescuento", "Descuento aplicado correctamente: $" + total );
 
         return new ModelAndView("carritoDeCompras", model);
+    }
+
+    @PostMapping(path = "/formularioPagoModal")
+    public ModelAndView procesarCompra(@RequestParam(value = "metodoPago", required = false) String metodoDePago) {
+        ModelMap model = new ModelMap();
+        if(metodoDePago == null || metodoDePago.isEmpty()){
+            model.put("error", "Debes seleccionar un metodo de pago");
+            return new ModelAndView("carritoDeCompras", model);
+        }
+        return new ModelAndView("formularioPagoModal");
     }
 }

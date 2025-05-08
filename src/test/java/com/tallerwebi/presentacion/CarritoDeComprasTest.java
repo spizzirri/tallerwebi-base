@@ -2,6 +2,7 @@ package com.tallerwebi.presentacion;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.ui.Model;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.math.BigDecimal;
@@ -108,4 +109,12 @@ public class CarritoDeComprasTest {
 
         assertThat(valorTotalConDescuento.getModel().get("mensajeDescuento"), equalTo(mensajeEsperado));
     }
+
+//    @Test
+//    public void dadoQueExisteUnProductoControllerCuandoAgregoUnCodigoPostalObtengoElCostoEstimadoDelEnvio(){
+//        Integer codigoPostal = 1704;
+//        ModelAndView costoEstimadoDelEnvio = carritoController.calcularCostoEstimadoDeEnvio(codigoPostal);
+//
+//
+//    }
 }

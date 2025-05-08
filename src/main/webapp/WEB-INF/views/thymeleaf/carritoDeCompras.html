@@ -48,41 +48,6 @@
 
 <div class="container">
     <div class="card d-flex flex-column m-2 p-3" style="width: 800px;">
-        <div class="d-flex flex-row justify-content-between">
-            <!-- MÉTODO DE PAGO -->
-            <div class="w-50 pe-3 border-end">
-                <h3 class="card-title">Método de pago</h3>
-                <form method="post" class="card-body p-0">
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" id="transferencia" name="metodoPago" checked>
-                        <label class="form-check-label" for="transferencia">Transferencia o Depósito bancario</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" id="mercadoPago" name="metodoPago">
-                        <label class="form-check-label" for="mercadoPago">Mercadopago - Usás tu cuenta de MP</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" id="doceCuotas" name="metodoPago">
-                        <label class="form-check-label" for="doceCuotas">Super pago - Hasta 12 cuotas a precio de lista</label>
-                    </div>
-                </form>
-            </div>
-            <!-- CÓDIGO DE DESCUENTO -->
-            <div class="w-50 ps-3">
-                <h3 class="card-title">Código de descuento</h3>
-                <form method="post" class="card-body p-0">
-                    <div class="d-flex align-items-center">
-                        <input type="text" class="form-control" id="codigoDeDescuento" placeholder="¿Tenés un código?">
-                        <button class="btn btn-success ms-2"><i class="fa-solid fa-check"></i></button>
-                    </div>
-                    <div th:if="${mensajeDescuento != null}" class="alert alert-info mt-2 py-1 px-2" style="max-height: 40px; font-size: 0.9rem;">
-                        <p th:text="${mensajeDescuento}"></p>
-                    </div>
-                </form>
-            </div>
-
-        </div>
-        <hr class="my-4">
         <!-- SECCIÓN: ENVÍO -->
         <div>
             <h3 class="card-title">Envío</h3>
@@ -101,11 +66,88 @@
                 </div>
             </form>
         </div>
+        <hr class="my-4">
+        <div class="container py-4">
+            <div class="row">
+                <!-- FORMULARIO DE DESCUENTO -->
+                <div class="col-md-6 px-4">
+                    <h3 class="card-title mb-3">Código de descuento</h3>
+                    <form method="post" th:action="@{/aplicarDescuento}" class="mb-2">
+                        <div class="d-flex align-items-center">
+                            <input type="text" class="form-control" name="codigo" id="codigoDeDescuento" placeholder="¿Tenés un código?">
+                            <button type="submit" class="btn btn-success ms-2"><i class="fa-solid fa-check"></i></button>
+                        </div>
+                        <div th:if="${mensajeDescuento != null}" class="alert alert-info py-1 px-2 mt-2" style="font-size: 0.9rem;">
+                            <p class="m-0" th:text="${mensajeDescuento}"></p>
+                        </div>
+                    </form>
+                </div>
 
+                <!-- FORMULARIO DE MÉTODO DE PAGO -->
+                <div class="col-md-6 px-4 border-start">
+                    <h3 class="card-title mb-3">Método de pago</h3>
+                    <form method="post" >
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" id="transferencia" name="metodoPago" value="transferencia">
+                            <label class="form-check-label" for="transferencia">Transferencia o Depósito bancario</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" id="mercadoPago" name="metodoPago" value="mercadoPago">
+                            <label class="form-check-label" for="mercadoPago">Mercadopago - Usás tu cuenta de MP</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" id="doceCuotas" name="metodoPago" value="doceCuotas">
+                            <label class="form-check-label" for="doceCuotas">Super pago - Hasta 12 cuotas a precio de lista</label>
+                        </div>
+
+                        <!-- ALERTA Y BOTÓN DE COMPRAR -->
+                        <div class="mt-3 d-flex flex-column align-items-end" style="max-width: 320px; margin-left: auto;">
+                            <div th:if="${error}" class="alert alert-danger w-100" role="alert">
+                                <span th:text="${error}"></span>
+                            </div>
+                            <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#miModal">Comprar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-    <div class="text-end">
-        <button class="btn btn-dark">Comprar</button>
+
+
+
+<div class="modal fade" id="miModal" tabindex="-1" aria-labelledby="miModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="miModalLabel">Datos de la tarjeta</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <!-- formulario dentro del modal -->
+                <form method="post" th:action="@{/formularioPagoModal}">
+                    <div class="mb-2">
+                        <label for="nombreApellido">Nombre - apellido:</label>
+                        <input type="text" id="nombreApellido" name="nombreApellido" class="form-control" placeholder="Nombre - apellido como figura en la tarjeta" />
+                    </div>
+                    <div class="mb-2">
+                        <label for="numeroTarjeta">Número:</label>
+                        <input type="text" id="numeroTarjeta" name="numeroTarjeta" class="form-control" placeholder="xxxx-xxxx-xxxx-xxxx" />
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-6">
+                            <label for="vencimiento">Vencimiento:</label>
+                            <input type="text" id="vencimiento" name="vencimiento" class="form-control" placeholder="12/30" />
+                        </div>
+                        <div class="col-6">
+                            <label for="codigoSeguridad">Código CCV:</label>
+                            <input type="text" id="codigoSeguridad" name="codigoSeguridad" class="form-control" placeholder="341" />
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100 mt-2">Confirmar pago</button>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 <script type="text/javascript" th:src="@{webjars/bootstrap/5.2.0/js/bootstrap.min.js}"></script>
