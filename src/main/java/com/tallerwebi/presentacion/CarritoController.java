@@ -1,12 +1,8 @@
 package com.tallerwebi.presentacion;
 
-import org.dom4j.rule.Mode;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.math.BigDecimal;
@@ -154,26 +150,21 @@ public class CarritoController {
         return new ModelAndView("formularioPagoModal");
     }
 
-    @PostMapping("/comprar")
-    public ModelAndView procesarCompra() {
-        ModelAndView modelAndView = new ModelAndView("carritoDeCompras");
-        modelAndView.addObject("mostrarModal", true);
-        return modelAndView;
-    }
 
-    @PostMapping(path = "/carritoDeCompras/agregarMasCantidadDeUnProducto")
-    public Integer agregarMasCantidadDeUnProducto(Long id) {
+    @PostMapping(path = "/carritoDeCompras/agregarMasCantidadDeUnProducto/{id}")
+    public String agregarMasCantidadDeUnProducto(@PathVariable Long id) {
         ProductoDto productoBuscado = buscarPorId(id);
         if(productoBuscado != null){
             productoBuscado.setCantidad(productoBuscado.getCantidad() + 1);
         }
 
         assert productoBuscado != null;
-        return productoBuscado.getCantidad();
+        return "redirect:/carritoDeCompras";
+
     }
 
-    @PostMapping(path = "/carritoDeCompras/restarCantidadDeUnProducto")
-    public Integer restarCantidadDeUnProducto(Long id) {
+    @PostMapping("/carritoDeCompras/restarCantidadDeUnProducto/{id}")
+    public String restarCantidadDeUnProducto(@PathVariable Long id) {
         ProductoDto productoBuscado = buscarPorId(id);
         if(productoBuscado != null && productoBuscado.getCantidad() > 1){
             productoBuscado.setCantidad(productoBuscado.getCantidad() - 1);
@@ -182,6 +173,6 @@ public class CarritoController {
         }
 
         assert productoBuscado != null;
-        return productoBuscado.getCantidad();
+        return "redirect:/carritoDeCompras";
     }
 }
