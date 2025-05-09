@@ -23,7 +23,7 @@
                 <tbody th:if="${productos != null and !productos.isEmpty()}">
                 <tr class="text-center" th:each="producto : ${productos}">
                     <td th:text="${producto.nombre}"></td>
-                    <td th:text="${producto.precio}"></td>
+                    <td th:text="${producto.precio * producto.getCantidad()} "></td>
                     <td class="text-center">
                         <div class="d-flex justify-content-center align-items-center gap-2">
                             <!-- Botón para restar cantidad -->

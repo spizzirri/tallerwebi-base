@@ -82,7 +82,7 @@ public class CarritoController {
     public Double calcularValorTotalDeLosProductos() {
         Double total = 0.0;
         for(ProductoDto productoDto : this.productos){
-            total += productoDto.getPrecio();
+            total += productoDto.getPrecio() * productoDto.getCantidad();
         }
 
         BigDecimal valorTotalConDosDecimales = new BigDecimal(total);
@@ -156,6 +156,7 @@ public class CarritoController {
         ProductoDto productoBuscado = buscarPorId(id);
         if(productoBuscado != null){
             productoBuscado.setCantidad(productoBuscado.getCantidad() + 1);
+            calcularValorTotalDeLosProductos();
         }
 
         assert productoBuscado != null;
