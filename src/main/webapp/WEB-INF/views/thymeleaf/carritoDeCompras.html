@@ -89,13 +89,16 @@
                 <!-- FORMULARIO DE DESCUENTO -->
                 <div class="col-md-6 px-4">
                     <h3 class="card-title mb-3">Código de descuento</h3>
-                    <form method="post" th:action="@{/aplicarDescuento}" class="mb-2">
+                    <form method="post" th:action="@{carritoDeCompras/aplicarDescuento}" class="mb-2">
                         <div class="d-flex align-items-center">
                             <input type="text" class="form-control" name="codigo" id="codigoDeDescuento" placeholder="¿Tenés un código?">
                             <button type="submit" class="btn btn-success ms-2"><i class="fa-solid fa-check"></i></button>
                         </div>
-                        <div th:if="${mensajeDescuento != null}" class="alert alert-info py-1 px-2 mt-2" style="font-size: 0.9rem;">
-                            <p class="m-0" th:text="${mensajeDescuento}"></p>
+                        <div th:if="${valorTotalConDescuento != null}" class="alert alert-info py-1 px-2 mt-2" style="font-size: 0.9rem;">
+                            <p class="m-0">
+                                Total original: <s>$<span th:text="${valorTotalOriginal}"></span></s><br>
+                                Total con descuento: <strong>$<span th:text="${valorTotalConDescuento}"></span></strong>
+                            </p>
                         </div>
                     </form>
                 </div>

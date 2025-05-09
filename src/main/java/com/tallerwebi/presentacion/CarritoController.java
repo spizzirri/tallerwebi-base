@@ -106,11 +106,11 @@ public class CarritoController {
         }
     }
 
-    @GetMapping(path = "/carritoDeCompras/descuento")
-    public ModelAndView calcularValorTotalDeLosProductosConDescuento(String codigoDescuento) {
+    @PostMapping(path = "/carritoDeCompras/aplicarDescuento")
+    public ModelAndView calcularValorTotalDeLosProductosConDescuento(@RequestParam("codigo") String codigoDescuento) {
         ModelMap model = new ModelMap();
-
         Double total = calcularValorTotalDeLosProductos();
+        this.valorTotalConDescuento = calcularValorTotalDeLosProductos();
         Integer codigoDescuentoExtraido = extraerPorcentajeDesdeCodigoDeDescuento(codigoDescuento);
 
         if(codigoDescuentoExtraido == null || !(codigoDescuentoExtraido == 5 || codigoDescuentoExtraido == 10 || codigoDescuentoExtraido == 15)){
@@ -120,22 +120,24 @@ public class CarritoController {
 
         switch (codigoDescuentoExtraido) {
             case 5:
-                total = total - (total * 0.05);
+                this.valorTotalConDescuento = total - (total * 0.05);
                 break;
             case 10:
-                 total = total - (total * 0.10);
+                this.valorTotalConDescuento = total - (total * 0.10);
                 break;
             case 15:
-                total = total - (total * 0.15);
+                this.valorTotalConDescuento = total - (total * 0.15);
                 break;
         }
 
-        BigDecimal valorTotalConDosDecimales = new BigDecimal(total);
+        BigDecimal valorTotalConDosDecimales = new BigDecimal(this.valorTotalConDescuento);
         valorTotalConDosDecimales = valorTotalConDosDecimales.setScale(2, RoundingMode.UP);
         this.valorTotalConDescuento = valorTotalConDosDecimales.doubleValue();
 
+        model.put("productos", this.productos); // vuelve a mostrar el carrito
+        model.put("valorTotal", this.valorTotal);
+        model.put("valorTotalOriginal", total);
         model.put("valorTotalConDescuento", this.valorTotalConDescuento);
-        model.put("mensajeDescuento", "Descuento aplicado correctamente: $" + total );
 
         return new ModelAndView("carritoDeCompras", model);
     }
