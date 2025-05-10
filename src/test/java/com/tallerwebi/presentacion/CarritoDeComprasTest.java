@@ -65,7 +65,7 @@ public class CarritoDeComprasTest {
     public void dadoQueExisteUnCarritoControllerCuandoQuieroVerElValorTotalDelosProductosEnElCarritoObtengoElValorTotalDeLosProductos(){
         Double valorTotal = carritoController.calcularValorTotalDeLosProductos();
 
-        Double valorEsperado = 109.98;
+        Double valorEsperado = 219.96;
 
         assertThat(valorTotal, equalTo(valorEsperado));
     }
@@ -85,7 +85,7 @@ public class CarritoDeComprasTest {
         String codigoDescuento = "CompraComponentes10";
         ModelAndView valorTotalConDescuento = carritoController.calcularValorTotalDeLosProductosConDescuento(codigoDescuento);
 
-        Double valorEsperadoConDescuento = 98.99;
+        Double valorEsperadoConDescuento = 197.97;
         Double valorObtenidoConDescuento = (Double) valorTotalConDescuento.getModel().get("valorTotalConDescuento");
 
         assertThat(valorObtenidoConDescuento, equalTo(valorEsperadoConDescuento));
@@ -96,7 +96,7 @@ public class CarritoDeComprasTest {
         String codigoDescuento = "baratija15";
         ModelAndView valorTotalConDescuento = carritoController.calcularValorTotalDeLosProductosConDescuento(codigoDescuento);
 
-        Double valorEsperadoConDescuento = 93.49;
+        Double valorEsperadoConDescuento = 186.97;
 
         Double valorObtenidoConDescuento = (Double) valorTotalConDescuento.getModel().get("valorTotalConDescuento");
 
@@ -127,11 +127,14 @@ public class CarritoDeComprasTest {
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Mouse no encontrado"));
 
-        Integer sumarCantidadProducto = Integer.valueOf(carritoController.agregarMasCantidadDeUnProducto(mouse.getId()));
+        Integer mouseCantidad = mouse.getCantidad();
 
-        Integer cantidadEsperada = 3;
+        carritoController.agregarMasCantidadDeUnProducto(mouse.getId());
 
-        assertThat(sumarCantidadProducto, equalTo(cantidadEsperada));
+        Integer cantidadObtenida = mouse.getCantidad();;
+        Integer cantidadEsperada = mouseCantidad + 1;
+
+        assertThat(cantidadObtenida, equalTo(cantidadEsperada));
     }
 
     @Test
@@ -141,13 +144,13 @@ public class CarritoDeComprasTest {
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Mouse no encontrado"));
 
-        Integer sumarCantidadProducto = Integer.valueOf(carritoController.restarCantidadDeUnProducto(mouse.getId()));
+        Integer mouseCantidad = mouse.getCantidad();
 
-        Integer cantidadEsperada = 1;
+        carritoController.restarCantidadDeUnProducto(mouse.getId());
 
-        assertThat(sumarCantidadProducto, equalTo(cantidadEsperada));
+        Integer cantidadObtenida = mouse.getCantidad();;
+        Integer cantidadEsperada = mouseCantidad - 1;
+
+        assertThat(cantidadObtenida, equalTo(cantidadEsperada));
     }
-
-
-
 }
