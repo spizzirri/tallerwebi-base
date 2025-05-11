@@ -1,5 +1,7 @@
 package com.tallerwebi.presentacion;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
@@ -8,7 +10,9 @@ import org.springframework.web.servlet.ModelAndView;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class CarritoController {
@@ -107,15 +111,19 @@ public class CarritoController {
     }
 
     @PostMapping(path = "/carritoDeCompras/aplicarDescuento")
-    public ModelAndView calcularValorTotalDeLosProductosConDescuento(@RequestParam("codigo") String codigoDescuento) {
-        ModelMap model = new ModelMap();
+    @ResponseBody //este metodo no retorna nada, solo se usa para enviar un mensaje de respuesta al cliente cuando se aplica un descuento
+    public Map<String, String> calcularValorTotalDeLosProductosConDescuento(@RequestBody Map<String, String> codigoDescuentoMap) {
+        String codigoDescuento = codigoDescuentoMap.get("codigoInput");
+
         Double total = calcularValorTotalDeLosProductos();
-        this.valorTotalConDescuento = calcularValorTotalDeLosProductos();
+        this.valorTotalConDescuento = total;
         Integer codigoDescuentoExtraido = extraerPorcentajeDesdeCodigoDeDescuento(codigoDescuento);
 
+        Map<String, String> response = new HashMap<>();
+
         if(codigoDescuentoExtraido == null || !(codigoDescuentoExtraido == 5 || codigoDescuentoExtraido == 10 || codigoDescuentoExtraido == 15)){
-            model.put("mensajeDescuento", "Codigo de descuento invalido!"); // muestro un mensaje cuando el codigo no tenrmina en numero o es distinto de los validos para aplicar el descuento
-            return new ModelAndView("carritoDeCompras", model);
+            response.put("mensajeDescuento", "Codigo de descuento invalido!"); // muestro un mensaje cuando el codigo no tenrmina en numero o es distinto de los validos para aplicar el descuento
+            return response;
         }
 
         switch (codigoDescuentoExtraido) {
@@ -133,14 +141,10 @@ public class CarritoController {
         BigDecimal valorTotalConDosDecimales = new BigDecimal(this.valorTotalConDescuento);
         valorTotalConDosDecimales = valorTotalConDosDecimales.setScale(2, RoundingMode.UP);
         this.valorTotalConDescuento = valorTotalConDosDecimales.doubleValue();
-
-        model.put("productos", this.productos); // vuelve a mostrar el carrito
-        model.put("valorTotal", this.valorTotal);
-        model.put("valorTotalOriginal", total);
-        model.put("valorTotalConDescuento", this.valorTotalConDescuento);
-
-        return new ModelAndView("carritoDeCompras", model);
+        response.put("mensaje", "Valor con descuento: " + this.valorTotalConDescuento);
+        return response;
     }
+
 
     @PostMapping(path = "/formularioPagoModal")
     public ModelAndView procesarCompra(@RequestParam(value = "metodoPago", required = false) String metodoDePago) {

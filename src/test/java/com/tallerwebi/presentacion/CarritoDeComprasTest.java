@@ -8,12 +8,13 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CarritoDeComprasTest {
 
@@ -72,45 +73,66 @@ public class CarritoDeComprasTest {
 
     @Test
     public void dadoQueExisteUnCarritoControllerCuandoQuieroVerElValorTotalDelosProductosEnElCarritoAplicandoUnCodigoDeDescuentoDel1PorcientoObtengoUnMensajeDeCodigoDeDescuentoInvalido(){
-        String codigoDescuento = "PromoBarato1";
-        ModelAndView valorTotalConDescuento = carritoController.calcularValorTotalDeLosProductosConDescuento(codigoDescuento);
+        Map<String, String> requestBody = new HashMap<>();
+
+        String codigoDescuento = "CompraComponentes10";
+        requestBody.put("codigoDescuento", codigoDescuento);
+
+        Map<String, String> valorTotalConDescuento = carritoController.calcularValorTotalDeLosProductosConDescuento(requestBody);
 
         String mensajeEsperado = "Codigo de descuento invalido!";
 
-        assertThat(valorTotalConDescuento.getModel().get("mensajeDescuento"), equalTo(mensajeEsperado));
+        assertThat(valorTotalConDescuento.get("mensajeDescuento"), equalTo(mensajeEsperado));
     }
 
     @Test
     public void dadoQueExisteUnCarritoControllerCuandoQuieroVerElValorTotalDelosProductosEnElCarritoAplicandoUnCodigoDeDescuentoDel10PorcientoObtengoElValorTotalDeLosProductosConElDescuento(){
+        Map<String, String> requestBody = new HashMap<>();
+
         String codigoDescuento = "CompraComponentes10";
-        ModelAndView valorTotalConDescuento = carritoController.calcularValorTotalDeLosProductosConDescuento(codigoDescuento);
+        requestBody.put("codigoInput", codigoDescuento);
+
+        Map<String, String> valorTotalConDescuento = carritoController.calcularValorTotalDeLosProductosConDescuento(requestBody);
+
+        String mensajeEsperado = valorTotalConDescuento.get("mensaje");
+        String[] separarMensaje = mensajeEsperado.split(": ");
 
         Double valorEsperadoConDescuento = 197.97;
-        Double valorObtenidoConDescuento = (Double) valorTotalConDescuento.getModel().get("valorTotalConDescuento");
+        Double valorObtenidoConDescuento = Double.parseDouble(separarMensaje[1]);
 
         assertThat(valorObtenidoConDescuento, equalTo(valorEsperadoConDescuento));
     }
 
     @Test
     public void dadoQueExisteUnCarritoControllerCuandoQuieroVerElValorTotalDelosProductosEnElCarritoAplicandoUnCodigoDeDescuentoDel15PorcientoObtengoElValorTotalDeLosProductosConElDescuento(){
+        Map<String, String> requestBody = new HashMap<>();
+
         String codigoDescuento = "baratija15";
-        ModelAndView valorTotalConDescuento = carritoController.calcularValorTotalDeLosProductosConDescuento(codigoDescuento);
+        requestBody.put("codigoInput", codigoDescuento);
+
+        Map<String, String> valorTotalConDescuento = carritoController.calcularValorTotalDeLosProductosConDescuento(requestBody);
+
+        String mensajeEsperado = valorTotalConDescuento.get("mensaje");
+        String[] separarMensaje = mensajeEsperado.split(": ");
 
         Double valorEsperadoConDescuento = 186.97;
-
-        Double valorObtenidoConDescuento = (Double) valorTotalConDescuento.getModel().get("valorTotalConDescuento");
+        Double valorObtenidoConDescuento = Double.parseDouble(separarMensaje[1]);
 
         assertThat(valorObtenidoConDescuento, equalTo(valorEsperadoConDescuento));
     }
 
     @Test
     public void dadoQueExisteUnCarritoControllerCuandoQuieroVerElValorTotalDelosProductosEnElCarritoAplicandoUnCodigoDeDescuentoDeSoloLetrasObtengoUnMensajeDeCodigoDeDescuentoInvalido(){
+        Map<String, String> requestBody = new HashMap<>();
+
         String codigoDescuento = "descuentoABC";
-        ModelAndView valorTotalConDescuento = carritoController.calcularValorTotalDeLosProductosConDescuento(codigoDescuento);
+        requestBody.put("codigoDescuento", codigoDescuento);
+
+        Map<String, String> valorTotalConDescuento = carritoController.calcularValorTotalDeLosProductosConDescuento(requestBody);
 
         String mensajeEsperado = "Codigo de descuento invalido!";
 
-        assertThat(valorTotalConDescuento.getModel().get("mensajeDescuento"), equalTo(mensajeEsperado));
+        assertThat(valorTotalConDescuento.get("mensajeDescuento"), equalTo(mensajeEsperado));
     }
 
 //    @Test
