@@ -9,6 +9,8 @@ document.addEventListener("DOMContentLoaded", function() {
             let idProducto = this.closest('td').dataset.id;
             let fila = this.closest('tr');
             let precioTotalDelProducto = fila.querySelector(".precioTotalDelProducto");
+            let valorTotalDelCarrito = document.querySelector(".valorTotalDelCarrito");
+
             fetch(`/spring/carritoDeCompras/agregarMasCantidadDeUnProducto/${idProducto}`, {
                 method: 'POST'
             })
@@ -17,6 +19,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     // Actualizar solo el valor de la cantidad
                     spanCantidad.textContent = data.cantidad;
                     precioTotalDelProducto.textContent = data.precioTotalDelProducto.toFixed(2);
+                    valorTotalDelCarrito.textContent = data.valorTotal.toFixed(2);
                 })
                 .catch(error => {
                     console.error('Error:', error);
@@ -36,6 +39,7 @@ document.addEventListener("DOMContentLoaded", function() {
             let idProducto = this.closest('td').dataset.id;
             let fila = this.closest('tr');
             let precioTotalDelProducto = fila.querySelector(".precioTotalDelProducto");
+            let valorTotalDelCarrito = document.querySelector(".valorTotalDelCarrito");
 
             fetch(`/spring/carritoDeCompras/restarCantidadDeUnProducto/${idProducto}`, {
                 method: 'POST'
@@ -48,13 +52,36 @@ document.addEventListener("DOMContentLoaded", function() {
                         // Actualizar solo el valor de la cantidad
                         spanCantidad.textContent = data.cantidad;
                         precioTotalDelProducto.textContent = data.precioTotalDelProducto.toFixed(2);
-
-                        console.log("Nuevo valor total después de la actualización:", data.valorTotal);
+                        valorTotalDelCarrito.textContent = data.valorTotal.toFixed(2);
                     }})
                 .catch(error => {
                     console.error('Error:', error);
                 });
         })
+    })
+})
+
+// Boton para eliminar un producto del carrito
+
+document.addEventListener("DOMContentLoaded", function() {
+    const boton = document.querySelectorAll(".btnEliminarProducto");
+
+    boton.forEach(element => {
+        element.addEventListener('click', function(){
+            let idProductoAEliminar = this.dataset.id;
+
+            fetch(`/spring/carritoDeCompras/eliminarProducto/${idProductoAEliminar}`, {
+                method: 'POST'
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.eliminado) {
+                        this.closest('tr').remove();
+                        document.querySelector(".valorTotalDelCarrito").textContent = data.valorTotal.toFixed(2);
+                    }
+                })
+            }
+        )
     })
 })
 

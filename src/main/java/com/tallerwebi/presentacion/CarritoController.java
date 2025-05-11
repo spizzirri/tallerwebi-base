@@ -65,22 +65,24 @@ public class CarritoController {
     }
 
 
-    @PostMapping(path = "/carritoDeCompras")
-    public ModelAndView eliminarProductoDelCarrito(Long id) {
-        ModelMap model = new ModelMap();
+    @PostMapping(path = "/carritoDeCompras/eliminarProducto/{id}")
+    @ResponseBody
+    public Map<String, Object> eliminarProductoDelCarrito(@PathVariable Long id) {
+        Map<String, Object> response = new HashMap<>();
         ProductoDto productoBuscado = buscarPorId(id);
+
         if(productoBuscado != null){
             this.productos.remove(productoBuscado);
-            model.put("mensaje", "El producto fue eliminado!");
+            response.put("eliminado", true);
         } else {
-            model.put("mensaje", "El producto no pudo ser eliminado!");
+            response.put("eliminado", false);
         }
-        model.put("productos", this.productos);
+        response.put("productos", this.productos);
 
         Double total = calcularValorTotalDeLosProductos();
-        model.put("valorTotal", total);
+        response.put("valorTotal", total);
 
-        return new ModelAndView("carritoDeCompras", model);
+        return response;
     }
 
     public Double calcularValorTotalDeLosProductos() {
@@ -173,7 +175,7 @@ public class CarritoController {
         assert productoBuscado != null;
         response.put("cantidad", productoBuscado.getCantidad());
         response.put("precioTotalDelProducto", valorTotalDelProductoBuscado);
-//        response.put("valorTotal", this.valorTotal);
+        response.put("valorTotal", this.valorTotal);
         return response;
 
     }
@@ -190,6 +192,7 @@ public class CarritoController {
             Double valorTotalDelProductoBuscado = productoBuscado.getCantidad() * productoBuscado.getPrecio();
             response.put("cantidad", productoBuscado.getCantidad());
             response.put("precioTotalDelProducto", valorTotalDelProductoBuscado);
+            response.put("valorTotal", this.valorTotal);
             return response;
         } else {
             this.productos.remove(productoBuscado);

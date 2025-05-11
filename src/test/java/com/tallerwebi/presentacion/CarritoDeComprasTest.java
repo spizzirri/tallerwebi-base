@@ -51,15 +51,13 @@ public class CarritoDeComprasTest {
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Mouse no encontrado"));
 
-        ModelAndView modelAndView =  carritoController.eliminarProductoDelCarrito(mouse.getId());
+        Map<String, Object> modelAndView =  carritoController.eliminarProductoDelCarrito(mouse.getId());
 
         List<ProductoDto> productosEsperados = carritoController.getProductos();
 
-        String mensajeEsperado = "El producto fue eliminado!";
-
-        assertThat(modelAndView.getViewName(), equalTo("carritoDeCompras"));
-        assertThat(modelAndView.getModel().get("mensaje"), equalTo(mensajeEsperado));
         assertThat(productosEsperados, not(hasItem(mouse)));
+
+
     }
 
     @Test
