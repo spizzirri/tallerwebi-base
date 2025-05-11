@@ -84,12 +84,12 @@ public class CarritoController {
     }
 
     public Double calcularValorTotalDeLosProductos() {
-        Double total = 0.0;
+        this.valorTotal = 0.0;
         for(ProductoDto productoDto : this.productos){
-            total += productoDto.getPrecio() * productoDto.getCantidad();
+            this.valorTotal += productoDto.getPrecio() * productoDto.getCantidad();
         }
 
-        BigDecimal valorTotalConDosDecimales = new BigDecimal(total);
+        BigDecimal valorTotalConDosDecimales = new BigDecimal( this.valorTotal);
         valorTotalConDosDecimales = valorTotalConDosDecimales.setScale(2, RoundingMode.UP); //convierto el numero para que tenga dos decimales y redondee para arriba
         this.valorTotal = valorTotalConDosDecimales.doubleValue();
 
@@ -158,15 +158,20 @@ public class CarritoController {
 
 
     @PostMapping(path = "/carritoDeCompras/agregarMasCantidadDeUnProducto/{id}")
-    public String agregarMasCantidadDeUnProducto(@PathVariable Long id) {
+    @ResponseBody
+    public Map<String, Object> agregarMasCantidadDeUnProducto(@PathVariable Long id) {
         ProductoDto productoBuscado = buscarPorId(id);
-        if(productoBuscado != null){
+
+        if (productoBuscado != null) {
             productoBuscado.setCantidad(productoBuscado.getCantidad() + 1);
             calcularValorTotalDeLosProductos();
         }
 
+        Map<String, Object> response = new HashMap<>();
         assert productoBuscado != null;
-        return "redirect:/carritoDeCompras";
+        response.put("cantidad", productoBuscado.getCantidad());
+        response.put("valorTotal", this.valorTotal);
+        return response;
 
     }
 

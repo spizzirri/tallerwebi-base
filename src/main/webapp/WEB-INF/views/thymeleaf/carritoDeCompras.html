@@ -42,21 +42,21 @@
                 <tbody th:if="${productos != null and !productos.isEmpty()}">
                 <tr class="text-center" th:each="producto : ${productos}">
                     <td th:text="${producto.nombre}"></td>
-                    <td th:text="${producto.precio * producto.getCantidad()} "></td>
-                    <td class="text-center">
+                    <td class="precioTotalDelProducto" th:text="${producto.precio * producto.getCantidad()} "></td>
+                    <td class="text-center" th:data-id="${producto.id}">
                         <div class="d-flex justify-content-center align-items-center gap-2">
                             <!-- Botón para restar cantidad -->
                             <form method="post" th:action="@{/carritoDeCompras/restarCantidadDeUnProducto/{id}(id=${producto.id})}">
-                                <button type="submit" class="btn btn-outline-secondary btn-sm">-</button>
+                                <button type="button" id="" class="btn btn-outline-secondary btn-sm">-</button>
                             </form>
 
                             <!-- Número de  cantidad producto -->
-                            <span th:text="${producto.cantidad}" class="mx-2"></span>
+                            <span th:text="${producto.cantidad}" class="mx-2 productoCantidad"></span>
 
                             <!-- Botón para agregar cantidad -->
-                            <form method="post" th:action="@{/carritoDeCompras/agregarMasCantidadDeUnProducto/{id}(id=${producto.id})}">
-                                <button type="submit" class="btn btn-outline-secondary btn-sm">+</button>
-                            </form>
+<!--                            <form method="post" th:action="@{/carritoDeCompras/agregarMasCantidadDeUnProducto/{id}(id=${producto.id})}">-->
+                                <button type="button" class="btn btn-outline-secondary btn-sm btnSumarCantidad">+</button>
+<!--                            </form>-->
                             <!-- Botón para eliminar -->
                             <form method="post" th:action="@{/carritoDeCompras(id=${producto.id})}">
                                 <button type="submit" class="btn btn-outline-danger btn-sm ms-2">
