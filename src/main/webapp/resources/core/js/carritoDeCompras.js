@@ -9,8 +9,6 @@ document.addEventListener("DOMContentLoaded", function() {
             let idProducto = this.closest('td').dataset.id;
             let fila = this.closest('tr');
             let precioTotalDelProducto = fila.querySelector(".precioTotalDelProducto");
-            console.log("Precio total actual del producto: ", precioTotalDelProducto);
-
             fetch(`/spring/carritoDeCompras/agregarMasCantidadDeUnProducto/${idProducto}`, {
                 method: 'POST'
             })
@@ -19,8 +17,6 @@ document.addEventListener("DOMContentLoaded", function() {
                     // Actualizar solo el valor de la cantidad
                     spanCantidad.textContent = data.cantidad;
                     precioTotalDelProducto.textContent = data.precioTotalDelProducto.toFixed(2);
-
-                    console.log("Nuevo valor total después de la actualización:", data.valorTotal);
                 })
                 .catch(error => {
                     console.error('Error:', error);
@@ -40,7 +36,6 @@ document.addEventListener("DOMContentLoaded", function() {
             let idProducto = this.closest('td').dataset.id;
             let fila = this.closest('tr');
             let precioTotalDelProducto = fila.querySelector(".precioTotalDelProducto");
-            console.log("Precio total actual del producto: ", precioTotalDelProducto);
 
             fetch(`/spring/carritoDeCompras/restarCantidadDeUnProducto/${idProducto}`, {
                 method: 'POST'

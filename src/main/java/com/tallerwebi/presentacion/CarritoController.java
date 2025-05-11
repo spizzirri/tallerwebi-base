@@ -171,7 +171,7 @@ public class CarritoController {
 
         Map<String, Object> response = new HashMap<>();
         assert productoBuscado != null;
-        response.put("cantidad", valorTotalDelProductoBuscado);
+        response.put("cantidad", productoBuscado.getCantidad());
         response.put("precioTotalDelProducto", valorTotalDelProductoBuscado);
 //        response.put("valorTotal", this.valorTotal);
         return response;
@@ -190,7 +190,6 @@ public class CarritoController {
             Double valorTotalDelProductoBuscado = productoBuscado.getCantidad() * productoBuscado.getPrecio();
             response.put("cantidad", productoBuscado.getCantidad());
             response.put("precioTotalDelProducto", valorTotalDelProductoBuscado);
-//            response.put("valorTotal", this.valorTotal);
             return response;
         } else {
             this.productos.remove(productoBuscado);

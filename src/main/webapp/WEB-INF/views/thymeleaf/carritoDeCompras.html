@@ -27,7 +27,7 @@
 <!--    </div>-->
 <!--</nav>-->
 <div class="container">
-<!-- TABLA DE PRODUCTOS AGREGADOS AL CARRITO  -->
+    <!-- TABLA DE PRODUCTOS AGREGADOS AL CARRITO  -->
     <div class="card d-flex align-content-center m-2" style="width: 800px;">
         <h3 class="card-title m-2">Productos</h3>
         <div class="card-body">
@@ -46,12 +46,12 @@
                     <td class="text-center" th:data-id="${producto.id}">
                         <div class="d-flex justify-content-center align-items-center gap-2">
                             <!-- Botón para restar cantidad -->
-                                <button type="button" class="btn btn-outline-secondary btn-sm btnRestarCantidad">-</button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm btnRestarCantidad">-</button>
                             <!-- Número de  cantidad producto -->
                             <span th:text="${producto.cantidad}" class="mx-2 productoCantidad"></span>
 
                             <!-- Botón para agregar cantidad -->
-                                <button type="button" class="btn btn-outline-secondary btn-sm btnSumarCantidad">+</button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm btnSumarCantidad">+</button>
 
                             <!-- Botón para eliminar -->
                             <form method="post" th:action="@{/carritoDeCompras(id=${producto.id})}">
@@ -114,12 +114,13 @@
                         <div id="mensajeDescuento" class="alert alert-info py-1 px-2 mt-2 d-none" style="font-size: 0.9rem;">
                             <p class="m-0" id="contenidoMensaje"></p>
                         </div>
-                </div>
+                    </div> <!-- 🔴 Esta línea faltaba -->
+                </div> <!-- 🔴 También cerramos la columna del descuento -->
 
                 <!-- FORMULARIO DE MÉTODO DE PAGO -->
                 <div class="col-md-6 px-4 border-start">
                     <h3 class="card-title mb-3">Método de pago</h3>
-                    <form method="post" >
+                    <form method="post">
                         <div class="form-check mb-2">
                             <input class="form-check-input" type="radio" id="transferencia" name="metodoPago" value="transferencia">
                             <label class="form-check-label" for="transferencia">Transferencia o Depósito bancario</label>
@@ -146,7 +147,7 @@
         </div>
     </div>
 </div>
-
+</div>
 
 
 <div class="modal fade" id="miModal" tabindex="-1" aria-labelledby="miModalLabel" aria-hidden="true">
@@ -161,20 +162,24 @@
                 <form method="post" th:action="@{/formularioPagoModal}">
                     <div class="mb-2">
                         <label for="nombreApellido">Nombre - apellido:</label>
-                        <input type="text" id="nombreApellido" name="nombreApellido" class="form-control" placeholder="Nombre - apellido como figura en la tarjeta" />
+                        <input type="text" id="nombreApellido" name="nombreApellido" class="form-control"
+                               placeholder="Nombre - apellido como figura en la tarjeta"/>
                     </div>
                     <div class="mb-2">
                         <label for="numeroTarjeta">Número:</label>
-                        <input type="text" id="numeroTarjeta" name="numeroTarjeta" class="form-control" placeholder="xxxx-xxxx-xxxx-xxxx" />
+                        <input type="text" id="numeroTarjeta" name="numeroTarjeta" class="form-control"
+                               placeholder="xxxx-xxxx-xxxx-xxxx"/>
                     </div>
                     <div class="row mb-2">
                         <div class="col-6">
                             <label for="vencimiento">Vencimiento:</label>
-                            <input type="text" id="vencimiento" name="vencimiento" class="form-control" placeholder="12/30" />
+                            <input type="text" id="vencimiento" name="vencimiento" class="form-control"
+                                   placeholder="12/30"/>
                         </div>
                         <div class="col-6">
                             <label for="codigoSeguridad">Código CCV:</label>
-                            <input type="text" id="codigoSeguridad" name="codigoSeguridad" class="form-control" placeholder="341" />
+                            <input type="text" id="codigoSeguridad" name="codigoSeguridad" class="form-control"
+                                   placeholder="341"/>
                         </div>
                     </div>
                     <button type="submit" class="btn btn-success w-100 mt-2">Confirmar pago</button>
@@ -183,7 +188,7 @@
         </div>
     </div>
 </div>
-    <script th:src="@{js/carritoDeCompras.js}"></script>
+<script th:src="@{js/carritoDeCompras.js}"></script>
 <script type="text/javascript" th:src="@{webjars/bootstrap/5.2.0/js/bootstrap.min.js}"></script>
 <script src="https://kit.fontawesome.com/36c2602d92.js" crossorigin="anonymous"></script>
 </body>
