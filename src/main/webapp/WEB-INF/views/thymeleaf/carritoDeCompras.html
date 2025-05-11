@@ -46,17 +46,13 @@
                     <td class="text-center" th:data-id="${producto.id}">
                         <div class="d-flex justify-content-center align-items-center gap-2">
                             <!-- Botón para restar cantidad -->
-                            <form method="post" th:action="@{/carritoDeCompras/restarCantidadDeUnProducto/{id}(id=${producto.id})}">
-                                <button type="button" id="" class="btn btn-outline-secondary btn-sm">-</button>
-                            </form>
-
+                                <button type="button" class="btn btn-outline-secondary btn-sm btnRestarCantidad">-</button>
                             <!-- Número de  cantidad producto -->
                             <span th:text="${producto.cantidad}" class="mx-2 productoCantidad"></span>
 
                             <!-- Botón para agregar cantidad -->
-<!--                            <form method="post" th:action="@{/carritoDeCompras/agregarMasCantidadDeUnProducto/{id}(id=${producto.id})}">-->
                                 <button type="button" class="btn btn-outline-secondary btn-sm btnSumarCantidad">+</button>
-<!--                            </form>-->
+
                             <!-- Botón para eliminar -->
                             <form method="post" th:action="@{/carritoDeCompras(id=${producto.id})}">
                                 <button type="submit" class="btn btn-outline-danger btn-sm ms-2">

@@ -84,12 +84,12 @@ public class CarritoController {
     }
 
     public Double calcularValorTotalDeLosProductos() {
-        this.valorTotal = 0.0;
+        Double total = 0.0;
         for(ProductoDto productoDto : this.productos){
-            this.valorTotal += productoDto.getPrecio() * productoDto.getCantidad();
+            total += productoDto.getPrecio() * productoDto.getCantidad();
         }
 
-        BigDecimal valorTotalConDosDecimales = new BigDecimal( this.valorTotal);
+        BigDecimal valorTotalConDosDecimales = new BigDecimal(total);
         valorTotalConDosDecimales = valorTotalConDosDecimales.setScale(2, RoundingMode.UP); //convierto el numero para que tenga dos decimales y redondee para arriba
         this.valorTotal = valorTotalConDosDecimales.doubleValue();
 
@@ -167,24 +167,37 @@ public class CarritoController {
             calcularValorTotalDeLosProductos();
         }
 
+        Double valorTotalDelProductoBuscado = productoBuscado.getCantidad() * productoBuscado.getPrecio();
+
         Map<String, Object> response = new HashMap<>();
         assert productoBuscado != null;
-        response.put("cantidad", productoBuscado.getCantidad());
-        response.put("valorTotal", this.valorTotal);
+        response.put("cantidad", valorTotalDelProductoBuscado);
+        response.put("precioTotalDelProducto", valorTotalDelProductoBuscado);
+//        response.put("valorTotal", this.valorTotal);
         return response;
 
     }
 
     @PostMapping("/carritoDeCompras/restarCantidadDeUnProducto/{id}")
-    public String restarCantidadDeUnProducto(@PathVariable Long id) {
+    @ResponseBody
+    public Map<String, Object> restarCantidadDeUnProducto(@PathVariable Long id) {
         ProductoDto productoBuscado = buscarPorId(id);
+        Map<String, Object> response = new HashMap<>();
+
         if(productoBuscado != null && productoBuscado.getCantidad() > 1){
             productoBuscado.setCantidad(productoBuscado.getCantidad() - 1);
+            calcularValorTotalDeLosProductos();
+            Double valorTotalDelProductoBuscado = productoBuscado.getCantidad() * productoBuscado.getPrecio();
+            response.put("cantidad", productoBuscado.getCantidad());
+            response.put("precioTotalDelProducto", valorTotalDelProductoBuscado);
+//            response.put("valorTotal", this.valorTotal);
+            return response;
         } else {
             this.productos.remove(productoBuscado);
+            calcularValorTotalDeLosProductos();
         }
 
         assert productoBuscado != null;
-        return "redirect:/carritoDeCompras";
+        return response;
     }
 }
