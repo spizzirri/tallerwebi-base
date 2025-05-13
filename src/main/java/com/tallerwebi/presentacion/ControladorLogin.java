@@ -76,5 +76,16 @@ public class ControladorLogin {
     public ModelAndView inicio() {
         return new ModelAndView("redirect:/login");
     }
+
+
+    @RequestMapping(path = "/ajustes", method = RequestMethod.GET)
+    public ModelAndView verAjustes() {
+        return new ModelAndView("ajustes");
+    }
+
+    @RequestMapping(path = "/seleccion-nivel", method = RequestMethod.GET)
+    public ModelAndView verSeleccionNivel() {
+        return new ModelAndView("seleccion-nivel");
+    }
 }
 
