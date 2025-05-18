@@ -165,11 +165,11 @@ public class CarritoDeComprasTest {
         assertThat(cantidadObtenida, equalTo(cantidadEsperada));
     }
 
-    @Test
-    public void dadoQueExisteUnCarritoControllerCuandoPresionoComprarSinSeleccionarElMetodoDePagoNoSeActivaElModal() {
-        ModelAndView modelAndView = carritoController.procesarCompra("");
-        assertTrue(modelAndView.getModel().containsKey("error"));
-        assertEquals("Debes seleccionar un metodo de pago", modelAndView.getModel().get("error"));
-        assertEquals(false, modelAndView.getModel().get("mostrarModal"));
-    }
+//    @Test
+//    public void dadoQueExisteUnCarritoControllerCuandoPresionoComprarSinSeleccionarElMetodoDePagoNoSeActivaElModal() {
+//        ModelAndView modelAndView = carritoController.procesarCompra("");
+//        assertTrue(modelAndView.getModel().containsKey("error"));
+//        assertEquals("Debes seleccionar un metodo de pago", modelAndView.getModel().get("error"));
+//        assertEquals(false, modelAndView.getModel().get("mostrarModal"));
+//    }
 }

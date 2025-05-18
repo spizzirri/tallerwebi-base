@@ -1,5 +1,7 @@
 package com.tallerwebi.presentacion;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +16,7 @@ import java.util.Map;
 
 @Controller
 public class CarritoController {
+    private static final Logger logger = LoggerFactory.getLogger(CarritoController.class);
 
     private List<ProductoDto> productos;
     private Double valorTotal = 0.0;
@@ -147,16 +150,23 @@ public class CarritoController {
 
 
     @PostMapping(path = "/carritoDeCompras/formularioDePago")
-    public ModelAndView procesarCompra(@RequestParam(value = "metodoPago", required = false) String metodoDePago) {
-        ModelMap model = new ModelMap();
+    @ResponseBody
+    public Map<String, Object> procesarCompra(@RequestParam(value = "metodoPago") String metodoDePago) {
+        Map<String, Object> response = new HashMap<>();
+        logger.info("Procesando compra con método de pago: {}", metodoDePago);
+
         if(metodoDePago == null || metodoDePago.isEmpty()){
-            model.put("error", "Debes seleccionar un metodo de pago");
-            model.put("mostrarModal", false);
-            return new ModelAndView("carritoDeCompras", model);
+            response.put("success", false);
+            response.put("error", "Debes seleccionar un metodo de pago");
+            response.put("mostrarModal", false);
+            logger.warn("Error en procesamiento de compra: método de pago no seleccionado");
         } else {
-            model.put("mostrarModal", true);
+            response.put("success", true);
+            response.put("mostrarModal", true);
+            response.put("metodoPago", metodoDePago);
+            logger.info("Método de pago seleccionado correctamente: {}", metodoDePago);
         }
-        return new ModelAndView("carritoDeCompras", model);
+        return response;
     }
 
 
