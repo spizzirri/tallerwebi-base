@@ -1,35 +1,91 @@
 <!DOCTYPE HTML>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-  <title>Taller Web I</title>
+    <title>Taller Web I</title>
 
-  <!-- Boostrap core css -->
-  <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.2.0/css/bootstrap.min.css}"/>
+    <!-- Boostrap core css -->
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.2.0/css/bootstrap.min.css}"/>
 
-  <!-- custom style -->
-  <link rel="stylesheet" th:href="@{/css/main.css}"/>
+    <!-- custom style -->
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+    <link rel="stylesheet" th:href="@{/css/home.css}"/>
 
-</head>
+  </head>
+  <body>
+    <main role="main" class="container d-flex flex-column gap-5 h-100">
+      <div class="row flex-grow-1">
+        <div class="col-4">
+          <div class="container panel-anuncios h-100 py-5">
+            <div class="row mb-3">
+              <div class="col-12">
+                <h1>Anuncios</h1>
+              </div>
+            </div>
+            <div class="row mb-3" th:each="anuncio: ${anuncios}">
+              <div class="col-12">
+                <h3 th:text="${anuncio.title}"></h3>
+                <div th:text="${anuncio.content}"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-4"></div>
+        <div class="col-4">
+          <div class="container panel-estadisticas d-flex flex-column h-100 py-5">
+            <div>
+              <h4 th:text="${jugador.nombre}"></h4>
+            </div>
+            <div>
+              <strong>Nivel:</strong>
+              <span th:text="${jugador.nivel}"></span>
+            </div>
+            <div>
+              <strong>Vida:</strong>
+              <span th:text="${jugador.vida}"></span>
+            </div>
+            <div>
+              <strong>Energia:</strong>
+              <span th:text="${jugador.energia}"></span>
+            </div>
+            <div>
+              <strong>Magia:</strong>
+              <span th:text="${jugador.magia}"></span>
+            </div>
+            <div>
+              <strong>Fuerza:</strong>
+              <span th:text="${jugador.fuerza}"></span>
+            </div>
+            <div>
+              <strong>Agilidad:</strong>
+              <span th:text="${jugador.agilidad}"></span>
+            </div>
+            <div>
+              <strong>Inteligencia:</strong>
+              <span th:text="${jugador.inteligencia}"></span>
+            </div>
+          </div>
+        </div>
+      </div>
 
-<body>
+      <div class="row justify-content-around">
+        <div class="col-auto">
+          <a th:href="@{/seleccion-nivel}" class="btn btn-primary px-4 py-3 fs-2">Campaña</a>
+        </div>
+        <div class="col-auto">
+          <a th:href="@{/inventario}" class="btn btn-primary px-4 py-3 fs-2">Inventario</a>
+        </div>
+        <div class="col-auto">
+          <a th:href="@{/tienda}" class="btn btn-primary px-4 py-3 fs-2">Tienda</a>
+        </div>
+        <div class="col-auto">
+          <a th:href="@{/ajustes}" class="btn btn-primary px-4 py-3 fs-2">Opciones</a>
+        </div>
+      </div>
+    </main>
 
-<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-  <a class="navbar-brand" href="#">UNLAM</a>
-</nav>
-
-<main role="main" class="container">
-  <div class = "container">
-    <h1>Bienvenidos a Taller Web 1</h1>
-
-    <a href="login.html" class="btn btn-lg btn-primary btn-block">Volver</a>
-  </div>
-</main>
-<!-- /.container -->
-
-<!-- Boostrap core js -->
-<script type="text/javascript" th:src="@{webjars/bootstrap/5.2.0/js/bootstrap.min.js}"></script>
-</body>
+    <script type="text/javascript" th:src="@{webjars/bootstrap/5.2.0/js/bootstrap.min.js}"></script>
+  </body>
 </html>

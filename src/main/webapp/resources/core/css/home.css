@@ -1,0 +1,19 @@
+html,
+body {
+    height: 100vh;
+    padding: 0;
+}
+
+main {
+    height: 100%;
+    padding-top: 10rem;
+    padding-bottom: 10rem;
+}
+
+.panel-anuncios {
+    background: rgba(0, 0, 0, 0.25);
+}
+
+.panel-estadisticas {
+    background: rgba(0, 0, 0, 0.25);
+}

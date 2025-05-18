@@ -1,0 +1,68 @@
+html,
+body {
+    height: 100vh;
+    padding: 0;
+}
+
+main {
+    height: 100%;
+    padding-top: 10rem;
+    padding-bottom: 10rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    grid-template-areas:
+        "equipo inventario"
+        "equipo inventario"
+        "stats inventario";
+}
+
+.panel-equipo {
+    grid-area: equipo;
+    background: red;
+    margin: 1rem;
+}
+
+.panel-inventario {
+    grid-area: inventario;
+    background: green;
+    margin: 1rem;
+}
+
+.panel-stats {
+    grid-area: stats;
+    background: yellow;
+    margin: 1rem;
+}
+
+.slot {
+    height: 56px;
+    width: 56px;
+    border: 2px solid black;
+    box-sizing: content-box;
+    position: relative;
+    cursor: pointer;
+    user-select: none;
+}
+
+.slot-qty {
+    position: absolute;
+    bottom: 0;
+    right: 5px;
+    color: white;
+    font-size: 20px;
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+    font-weight: bold;
+}
+
+.rango-1 {
+    border-color: green;
+}
+
+.rango-2 {
+    border-color: blue;
+}
+
+.rango-3 {
+    border-color: yellow;
+}

@@ -13,7 +13,8 @@
         <spring.version>5.2.22.RELEASE</spring.version>
         <servletapi.version>4.0.4</servletapi.version>
         <thymeleaf.spring.version>3.0.15.RELEASE</thymeleaf.spring.version>
-        <webjars.version>5.2.0</webjars.version>
+        <bootstrap.version>5.2.0</bootstrap.version>
+        <popperjs.version>2.11.7</popperjs.version>
         <hamcrest.version>2.2</hamcrest.version>
         <junit.version>5.9.0</junit.version>
         <mockito.version>5.3.1</mockito.version>
@@ -57,7 +58,13 @@
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>bootstrap</artifactId>
-            <version>${webjars.version}</version>
+            <version>${bootstrap.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>popper.js</artifactId>
+            <version>${popperjs.version}</version>
         </dependency>
 
         <dependency>
