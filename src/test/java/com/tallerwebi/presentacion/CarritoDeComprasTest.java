@@ -56,8 +56,6 @@ public class CarritoDeComprasTest {
         List<ProductoDto> productosEsperados = carritoController.getProductos();
 
         assertThat(productosEsperados, not(hasItem(mouse)));
-
-
     }
 
     @Test
@@ -133,13 +131,6 @@ public class CarritoDeComprasTest {
         assertThat(valorTotalConDescuento.get("mensajeDescuento"), equalTo(mensajeEsperado));
     }
 
-//    @Test
-//    public void dadoQueExisteUnCarritoControllerCuandoPresionoComprarSeActivaElModal() {
-//        ModelAndView mv = carritoController.procesarCompra();
-//        assertTrue(mv.getModel().containsKey("mostrarModal"));
-//        assertEquals(true, mv.getModel().get("mostrarModal"));
-//    }
-
     @Test
     public void dadoQueExisteUnCarritoControllerCuandoPresionoElBotonMasDeUnoDeLosProductosObtengoUnoMasEnLaCantidadDeEseProducto() {
         ProductoDto mouse = carritoController.getProductos().stream()
@@ -172,5 +163,13 @@ public class CarritoDeComprasTest {
         Integer cantidadEsperada = mouseCantidad - 1;
 
         assertThat(cantidadObtenida, equalTo(cantidadEsperada));
+    }
+
+    @Test
+    public void dadoQueExisteUnCarritoControllerCuandoPresionoComprarSinSeleccionarElMetodoDePagoNoSeActivaElModal() {
+        ModelAndView modelAndView = carritoController.procesarCompra("");
+        assertTrue(modelAndView.getModel().containsKey("error"));
+        assertEquals("Debes seleccionar un metodo de pago", modelAndView.getModel().get("error"));
+        assertEquals(false, modelAndView.getModel().get("mostrarModal"));
     }
 }

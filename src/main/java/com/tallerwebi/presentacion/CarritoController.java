@@ -1,7 +1,5 @@
 package com.tallerwebi.presentacion;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
@@ -148,14 +146,17 @@ public class CarritoController {
     }
 
 
-    @PostMapping(path = "/formularioPagoModal")
+    @PostMapping(path = "/carritoDeCompras/formularioDePago")
     public ModelAndView procesarCompra(@RequestParam(value = "metodoPago", required = false) String metodoDePago) {
         ModelMap model = new ModelMap();
         if(metodoDePago == null || metodoDePago.isEmpty()){
             model.put("error", "Debes seleccionar un metodo de pago");
+            model.put("mostrarModal", false);
             return new ModelAndView("carritoDeCompras", model);
+        } else {
+            model.put("mostrarModal", true);
         }
-        return new ModelAndView("formularioPagoModal");
+        return new ModelAndView("carritoDeCompras", model);
     }
 
 
@@ -185,7 +186,6 @@ public class CarritoController {
     public Map<String, Object> restarCantidadDeUnProducto(@PathVariable Long id) {
         ProductoDto productoBuscado = buscarPorId(id);
         Map<String, Object> response = new HashMap<>();
-
         if(productoBuscado != null && productoBuscado.getCantidad() > 1){
             productoBuscado.setCantidad(productoBuscado.getCantidad() - 1);
             calcularValorTotalDeLosProductos();
@@ -196,9 +196,8 @@ public class CarritoController {
             return response;
         } else {
             this.productos.remove(productoBuscado);
-            calcularValorTotalDeLosProductos();
+            response.put("eliminado", true);
         }
-
         assert productoBuscado != null;
         return response;
     }
