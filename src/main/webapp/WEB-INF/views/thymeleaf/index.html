@@ -17,29 +17,38 @@
 
 </head>
 
-<body class="bg-dark text-white">
+<body class="bg-dark text-white" style="margin: 0px;padding: 0px;">
 
+<div class="page-container">
+<nav class="navbar  bg-black text-white">
+  <div class="container">
 
-<nav class="navbar navbar-expand-lg bg-secondary text-white">
-  <div class="container-fluid">
-
-    <a class="navbar-brand" href="index.html">
-      <img th:src="@{/uploads/dragon-logo.png}" alt="Logo" width="50" height="40" >
-      Compra Gamer 2
+    <a class="navbar-brand " href="index.html">
+      <img th:src="@{/uploads/dragon-logo.png}" alt="Logo" width="50" height="40">
+      <span class="text-secondary h3 m-0">Compra Gamer 2</span>
     </a>
     <form class="d-flex" role="search" >
     <input class="form-control me-2 align-content-center" type="search" placeholder="Search" aria-label="Search">
     <button class="btn btn-outline-success align-content-center" type="submit">Search</button>
   </form>
-    <a class="navbar-brand" th:class="link-light" href="index.html">
+    <a class="navbar-brand text-decoration-none" th:class="link-light" href="index.html">
       <i class="bi bi-person">Ingresa</i>
     </a>
-    <a class="navbar-brand" href="index.html">
+    <a class="navbar-brand" th:class="link-light" href="index.html">
       <i class="bi bi-cart3"></i>
     </a>
   </div>
 </nav>
 
+<nav class="bg-secondary-subtle py-3">
+  <div class="container d-flex justify-content-center gap-4">
+    <a class="text-secondary text-decoration-none px-3" href="#">Productos</a>
+    <a class="text-secondary text-decoration-none px-3" href="#">Notebooks</a>
+    <a class="text-secondary text-decoration-none px-3" href="#">Arma tu PC</a>
+    <a class="text-secondary text-decoration-none px-3" href="#">Rastrea tu pedido</a>
+    <a class="text-secondary text-decoration-none px-3" href="#">Ayuda</a>
+  </div>
+</nav>
               <!--  //Carrousel-->
   <div id="carouselExampleIndicators" class="carousel slide">
     <div class="carousel-indicators">
@@ -131,6 +140,61 @@
   </div>
 </div>
 
+<div class="container py-4">
+
+  <div class="position-relative mb-4">
+    <img th:src="@{/uploads/arma-tu-pc2.jpg}" class="img-fluid w-100 rounded-4" style="height: 500px; object-fit: cover;">
+    <div class="position-absolute top-50 end-0 translate-middle-y me-5 p-4 text-white"
+         style="background-color: rgba(0, 0, 0, 0.6); max-width: 30%; border-radius: 10px;">
+      <h3 class="mb-3">Arma tu PC</h3>
+      <p class="mb-4">Configura tu nueva PC sin errores de compatibilidad,
+        seleccionando todos los componentes que deseas.</p>
+      <a href="#" class="btn btn-warning">Ver mas</a>
+    </div>
+  </div>
+
+
+
+  <div class="position-relative mb-4">
+    <img th:src="@{/uploads/arma-tu-pc4.jpg}" class="img-fluid w-100 rounded-4" style="height: 500px; object-fit: cover;">
+    <div class="position-absolute top-50 end-0 translate-middle-y me-5 p-4 text-white"
+         style="background-color: rgba(0, 0, 0, 0.6); max-width: 30%; border-radius: 10px;">
+      <h3 class="mb-3">Arma tu PC</h3>
+      <p class="mb-4">Configura tu nueva PC sin errores de compatibilidad,
+        seleccionando todos los componentes que deseas.</p>
+      <a href="#" class="btn btn-warning">Ver mas</a>
+    </div>
+  </div>
+
+  <div class="container py-4">
+
+    <div class="position-relative mb-4">
+      <img th:src="@{/uploads/arma-tu-pc5.jpg}" class="img-fluid w-100 rounded-4" style="height: 500px; object-fit: cover;">
+      <div class="position-absolute top-50 end-0 translate-middle-y me-5 p-4 text-white"
+           style="background-color: rgba(0, 0, 0, 0.6); max-width: 30%; border-radius: 10px;">
+        <h3 class="mb-3">Arma tu PC</h3>
+        <p class="mb-4">Configura tu nueva PC sin errores de compatibilidad,
+          seleccionando todos los componentes que deseas.</p>
+        <a href="#" class="btn btn-warning">Ver mas</a>
+      </div>
+    </div>
+
+
+
+    <div class="position-relative mb-4">
+      <img th:src="@{/uploads/arma-tu-pcai.jpg}" class="img-fluid w-100 rounded-4" style="height: 500px; object-fit: cover;">
+      <div class="position-absolute top-50 end-0 translate-middle-y me-5 p-4 text-white"
+           style="background-color: rgba(0, 0, 0, 0.6); max-width: 30%; border-radius: 10px;">
+        <h3 class="mb-3">Arma tu PC</h3>
+        <p class="mb-4">Configura tu nueva PC sin errores de compatibilidad,
+          seleccionando todos los componentes que deseas.</p>
+        <a href="#" class="btn btn-warning">Ver mas</a>
+      </div>
+    </div>
+  </div>
+
+
+</div>
 <!-- /.container -->
 
 <!-- Boostrap core js -->
