@@ -19,8 +19,32 @@ public class ArmadoPcDto {
     private ComponenteDto monitor;
     private List<ComponenteDto> perifericos;
 
-    public ArmadoPcDto() {
+    public ArmadoPcDto(ComponenteDto procesador,
+                       ComponenteDto motherboard,
+                       ComponenteDto cooler,
+                       List<ComponenteDto> rams,
+                       ComponenteDto gpu,
+                       List<ComponenteDto> almacenamiento,
+                       ComponenteDto fuente,
+                       ComponenteDto gabinete,
+                       ComponenteDto monitor,
+                       List<ComponenteDto> perifericos) {
+        this.procesador = procesador;
+        this.motherboard = motherboard;
+        this.cooler = cooler;
+        this.rams = rams;
+        this.gpu = gpu;
+        this.almacenamiento = almacenamiento;
+        this.fuente = fuente;
+        this.gabinete = gabinete;
+        this.monitor = monitor;
+        this.perifericos = perifericos;
+    }
 
+    public ArmadoPcDto() {
+        this.rams = new ArrayList<>();
+        this.almacenamiento = new ArrayList<>();
+        this.perifericos = new ArrayList<>();
     }
 
     public ComponenteDto getProcesador() {
