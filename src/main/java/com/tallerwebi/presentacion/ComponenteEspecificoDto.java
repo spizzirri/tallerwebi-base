@@ -1,30 +1,31 @@
 package com.tallerwebi.presentacion;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ComponenteEspecificoDto {
 
     private Long id;
     private String nombre;
     private Double precio;
-    private String imagen;
+    private List<String> imagenes;
 
-    private List<String> caracteristicasGenerales;
-    private List<String> especificacionesCPU;
-    private List<String> coolersYDisipadores;
-    private List<String> memoria;
+    private Map<String, String> caracteristicasGenerales;
+    private Map<String, String> especificacionesCPU;
+    private Map<String, String> coolersYDisipadores;
+    private Map<String, String> memoria;
 
     public ComponenteEspecificoDto() {}
-    public ComponenteEspecificoDto(Long id, String nombre, Double precio, String imagen,
-                                   List<String> caracteristicasGenerales,
-                                   List<String> especificacionesCPU,
-                                   List<String> coolersYDisipadores,
-                                   List<String> memoria) {
+    public ComponenteEspecificoDto(Long id, String nombre, Double precio,
+                                   List<String> imagenes,
+                                   Map<String, String> caracteristicasGenerales,
+                                   Map<String, String> especificacionesCPU,
+                                   Map<String, String> coolersYDisipadores,
+                                   Map<String, String> memoria) {
         this.id = id;
         this.nombre = nombre;
         this.precio = precio;
-        this.imagen = imagen;
+        this.imagenes = imagenes;
         this.caracteristicasGenerales = caracteristicasGenerales;
         this.especificacionesCPU = especificacionesCPU;
         this.coolersYDisipadores = coolersYDisipadores;
@@ -55,43 +56,43 @@ public class ComponenteEspecificoDto {
         this.precio = precio;
     }
 
-    public String getImagen() {
-        return imagen;
+    public List<String> getImagenes() {
+        return imagenes;
     }
 
-    public void setImagen(String imagen) {
-        this.imagen = imagen;
+    public void setImagenes(List<String> imagenes) {
+        this.imagenes = imagenes;
     }
 
-    public List<String> getCaracteristicasGenerales() {
+    public Map<String, String> getCaracteristicasGenerales() {
         return caracteristicasGenerales;
     }
 
-    public void setCaracteristicasGenerales(List<String> caracteristicasGenerales) {
+    public void setCaracteristicasGenerales(Map<String, String> caracteristicasGenerales) {
         this.caracteristicasGenerales = caracteristicasGenerales;
     }
 
-    public List<String> getEspecificacionesCPU() {
+    public Map<String, String> getEspecificacionesCPU() {
         return especificacionesCPU;
     }
 
-    public void setEspecificacionesCPU(List<String> especificacionesCPU) {
+    public void setEspecificacionesCPU(Map<String, String> especificacionesCPU) {
         this.especificacionesCPU = especificacionesCPU;
     }
 
-    public List<String> getCoolersYDisipadores() {
+    public Map<String, String> getCoolersYDisipadores() {
         return coolersYDisipadores;
     }
 
-    public void setCoolersYDisipadores(List<String> coolersYDisipadores) {
+    public void setCoolersYDisipadores(Map<String, String> coolersYDisipadores) {
         this.coolersYDisipadores = coolersYDisipadores;
     }
 
-    public List<String> getMemoria() {
+    public Map<String, String> getMemoria() {
         return memoria;
     }
 
-    public void setMemoria(List<String> memoria) {
+    public void setMemoria(Map<String, String> memoria) {
         this.memoria = memoria;
     }
 
