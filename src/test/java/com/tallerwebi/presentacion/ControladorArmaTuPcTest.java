@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,7 +24,7 @@ import static org.mockito.Mockito.*;
 public class ControladorArmaTuPcTest {
 
     ControladorArmaTuPc controlador;
-    MockHttpSession session;
+    HttpSession session;
     ServicioArmaTuPc servicioMock;
 
 
@@ -747,71 +748,103 @@ public class ControladorArmaTuPcTest {
         assertThat(modelAndView.getViewName(), equalTo(vistaEsperada));
     }
 
-// verificar como testear resumen
-//    @Test
-//    public void dadoQueExisteUnControladorArmaTuPcCuandoObtengoElResumenObtengoLaVistaDeResumenConElArmadoPcDtoDeLaSession(){
-//        // Preparacion
-//
-//        // Ejecucion
-//        ModelAndView modelAndView = this.controlador.obtenerResumen(session);
-//
-//        // Validacion
-//        String vistaEsperada = "arma-tu-pc/resumen";
-//
-//        ComponenteDto procesadorEsperado = new ComponenteDto(1L, "Procesador", "Procesador1", 1000D);
-//        ComponenteDto motherboardEsperada = new ComponenteDto(2L, "Motherboard", "Motherboard2", 2000D);
-//        ComponenteDto coolerEsperado = new ComponenteDto(3L, "Cooler", "Cooler3", 3000D);
-//        List<ComponenteDto> memoriasEsperadas = Arrays.asList(
-//                new ComponenteDto(1L, "Memoria", "Memoria1", 1000D),
-//                new ComponenteDto(1L, "Memoria", "Memoria1", 1000D));
-//        ComponenteDto gpuEsperada = new ComponenteDto(2L, "Gpu", "Gpu2", 2000D);
-//        List<ComponenteDto> almacenamientoEsperado = Arrays.asList(
-//                new ComponenteDto(3L, "Almacenamiento", "Almacenamiento3", 3000D),
-//                new ComponenteDto(3L, "Almacenamiento", "Almacenamiento3", 3000D),
-//                new ComponenteDto(3L, "Almacenamiento", "Almacenamiento3", 3000D));
-//        ComponenteDto fuenteEsperada = new ComponenteDto(1L, "Fuente", "Fuente1", 1000D);
-//        ComponenteDto gabineteEsperado = new ComponenteDto(2L, "Gabinete", "Gabinete2", 2000D);
-//        ComponenteDto monitorEsperado = new ComponenteDto(3L, "Monitor", "Monitor3", 3000D);
-//        List<ComponenteDto> perifericosEsperados = Arrays.asList(
-//                new ComponenteDto(1L, "Periferico", "Periferico1", 1000D),
-//                new ComponenteDto(2L, "Periferico", "Periferico2", 2000D));
-//
-//
-//        assertThat(modelAndView.getViewName(), equalTo(vistaEsperada));
-//        assertEquals(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getProcesador(), procesadorEsperado);
-//        assertEquals(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getMotherboard(), motherboardEsperada);
-//        assertEquals(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getCooler(), coolerEsperado);
-//        assertEquals(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getRams(), memoriasEsperadas);
-//        assertEquals(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getGpu(), gpuEsperada);
-//        assertEquals(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getAlmacenamiento(), almacenamientoEsperado);
-//        assertEquals(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getFuente(), fuenteEsperada);
-//        assertEquals(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getGabinete(), gabineteEsperado);
-//        assertEquals(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getMonitor(), monitorEsperado);
-//        assertEquals(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getPerifericos(), perifericosEsperados);
-//
-//    }
-//
-//    @Test
-//    public void dadoQueExisteUnControladorArmaTuPcCuandoQuieroObtenerElResumenDeUnArmadoSinProcesadorMotherboardCoolerOGabineteObtengoLaVistaDeResumenConUnMensajeDeError(){
-//        // Preparacion
-//
-//        this.controlador.seleccionarMemoria(1L,2, session);
-//        this.controlador.seleccionarGpu(2L, session);
-//        this.controlador.seleccionarAlmacenamiento(3L, 3, session);
-//        this.controlador.seleccionarFuente(1L, session);
-//        this.controlador.seleccionarMonitor(3L, session);
-//        this.controlador.seleccionarPeriferico(1L, session);
-//        this.controlador.seleccionarPeriferico(2L, session);
-//
-//
-//        // Ejecucion
-//        ModelAndView modelAndView = this.controlador.obtenerResumen(session);
-//
-//        // Validacion
-//        String vistaEsperada = "arma-tu-pc/resumen";
-//        String errorEsperado = "Seleccione almenos un motherboard, cpu, cooler y gabinete para obtener su armado";
-//
-//        assertThat(modelAndView.getViewName(), equalTo(vistaEsperada));
-//        assertThat(modelAndView.getModel().get("error"), equalTo(errorEsperado));
-//    }
+
+    @Test
+    public void dadoQueExisteUnControladorArmaTuPcCuandoObtengoElResumenObtengoLaVistaDeResumenConElArmadoPcDtoDeLaSession(){
+        // Preparacion
+
+        ArmadoPcDto armadoTerminado = new ArmadoPcDto();
+        armadoTerminado.setProcesador(new ComponenteDto(1L, "Procesador", "Procesador1", 1000D));
+        armadoTerminado.setMotherboard(new ComponenteDto(2L, "Motherboard", "Motherboard2", 2000D));
+        armadoTerminado.setCooler(new ComponenteDto(3L, "Cooler", "Cooler3", 3000D));
+        armadoTerminado.setRams(Arrays.asList(new ComponenteDto(1L, "Memoria", "Memoria1", 1000D), new ComponenteDto(1L, "Memoria", "Memoria1", 1000D)));
+        armadoTerminado.setGpu(new ComponenteDto(2L, "Gpu", "Gpu2", 2000D));
+        armadoTerminado.setAlmacenamiento(Arrays.asList(
+                new ComponenteDto(3L, "Almacenamiento", "Almacenamiento3", 3000D),
+                new ComponenteDto(3L, "Almacenamiento", "Almacenamiento3", 3000D),
+                new ComponenteDto(3L, "Almacenamiento", "Almacenamiento3", 3000D)
+        ));
+        armadoTerminado.setFuente(new ComponenteDto(1L, "Fuente", "Fuente1", 1000D));
+        armadoTerminado.setGabinete(new ComponenteDto(2L, "Gabinete", "Gabinete2", 2000D));
+        armadoTerminado.setMonitor(new ComponenteDto(3L, "Monitor", "Monitor3", 3000D));
+        armadoTerminado.setPerifericos(Arrays.asList(
+                new ComponenteDto(1L, "Periferico", "Periferico1", 1000D),
+                new ComponenteDto(2L, "Periferico", "Periferico2", 2000D)
+        ));
+
+        session.setAttribute("armadoPcDto", armadoTerminado);
+        when(this.servicioMock.armadoCompleto(armadoTerminado)).thenReturn(true);
+
+        // Ejecucion
+        ModelAndView modelAndView = this.controlador.obtenerResumen(session);
+
+        // Validacion
+        String vistaEsperada = "arma-tu-pc/tradicional/resumen";
+
+        ComponenteDto procesadorEsperado = new ComponenteDto(1L, "Procesador", "Procesador1", 1000D);
+        ComponenteDto motherboardEsperada = new ComponenteDto(2L, "Motherboard", "Motherboard2", 2000D);
+        ComponenteDto coolerEsperado = new ComponenteDto(3L, "Cooler", "Cooler3", 3000D);
+        List<ComponenteDto> memoriasEsperadas = Arrays.asList(
+                new ComponenteDto(1L, "Memoria", "Memoria1", 1000D),
+                new ComponenteDto(1L, "Memoria", "Memoria1", 1000D));
+        ComponenteDto gpuEsperada = new ComponenteDto(2L, "Gpu", "Gpu2", 2000D);
+        List<ComponenteDto> almacenamientoEsperado = Arrays.asList(
+                new ComponenteDto(3L, "Almacenamiento", "Almacenamiento3", 3000D),
+                new ComponenteDto(3L, "Almacenamiento", "Almacenamiento3", 3000D),
+                new ComponenteDto(3L, "Almacenamiento", "Almacenamiento3", 3000D));
+        ComponenteDto fuenteEsperada = new ComponenteDto(1L, "Fuente", "Fuente1", 1000D);
+        ComponenteDto gabineteEsperado = new ComponenteDto(2L, "Gabinete", "Gabinete2", 2000D);
+        ComponenteDto monitorEsperado = new ComponenteDto(3L, "Monitor", "Monitor3", 3000D);
+        List<ComponenteDto> perifericosEsperados = Arrays.asList(
+                new ComponenteDto(1L, "Periferico", "Periferico1", 1000D),
+                new ComponenteDto(2L, "Periferico", "Periferico2", 2000D));
+
+
+        assertThat(modelAndView.getViewName(), equalTo(vistaEsperada));
+        assertEquals(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getProcesador(), procesadorEsperado);
+        assertEquals(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getMotherboard(), motherboardEsperada);
+        assertEquals(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getCooler(), coolerEsperado);
+        assertEquals(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getRams(), memoriasEsperadas);
+        assertEquals(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getGpu(), gpuEsperada);
+        assertEquals(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getAlmacenamiento(), almacenamientoEsperado);
+        assertEquals(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getFuente(), fuenteEsperada);
+        assertEquals(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getGabinete(), gabineteEsperado);
+        assertEquals(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getMonitor(), monitorEsperado);
+        assertEquals(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getPerifericos(), perifericosEsperados);
+
+    }
+
+    @Test
+    public void dadoQueExisteUnControladorArmaTuPcCuandoQuieroObtenerElResumenDeUnArmadoSinProcesadorMotherboardCoolerOGabineteObtengoLaVistaDeResumenConUnMensajeDeError(){
+        // Preparacion
+
+        ArmadoPcDto armadoIncompleto = new ArmadoPcDto();
+        armadoIncompleto.setRams(Arrays.asList(new ComponenteDto(1L, "Memoria", "Memoria1", 1000D), new ComponenteDto(1L, "Memoria", "Memoria1", 1000D)));
+        armadoIncompleto.setGpu(new ComponenteDto(2L, "Gpu", "Gpu2", 2000D));
+        armadoIncompleto.setAlmacenamiento(Arrays.asList(
+                new ComponenteDto(3L, "Almacenamiento", "Almacenamiento3", 3000D),
+                new ComponenteDto(3L, "Almacenamiento", "Almacenamiento3", 3000D),
+                new ComponenteDto(3L, "Almacenamiento", "Almacenamiento3", 3000D)
+        ));
+        armadoIncompleto.setFuente(new ComponenteDto(1L, "Fuente", "Fuente1", 1000D));
+        armadoIncompleto.setGabinete(new ComponenteDto(2L, "Gabinete", "Gabinete2", 2000D));
+        armadoIncompleto.setMonitor(new ComponenteDto(3L, "Monitor", "Monitor3", 3000D));
+        armadoIncompleto.setPerifericos(Arrays.asList(
+                new ComponenteDto(1L, "Periferico", "Periferico1", 1000D),
+                new ComponenteDto(2L, "Periferico", "Periferico2", 2000D)
+        ));
+
+        session.setAttribute("armadoPcDto", armadoIncompleto);
+        when(this.servicioMock.armadoCompleto(armadoIncompleto)).thenReturn(false);
+
+        // Ejecucion
+        ModelAndView modelAndView = this.controlador.obtenerResumen(session);
+
+        // Validacion
+        String vistaEsperada = "arma-tu-pc/tradicional/resumen";
+        String errorEsperado = "Seleccione almenos un motherboard, cpu, cooler y gabinete para obtener su armado";
+
+        assertThat(modelAndView.getViewName(), equalTo(vistaEsperada));
+        assertThat(modelAndView.getModel().get("error"), equalTo(errorEsperado));
+    }
 }

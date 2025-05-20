@@ -14,4 +14,6 @@ public interface ServicioArmaTuPc {
     ArmadoPcDto agregarComponenteAlArmado(Long idComponente, String tipoComponente, Integer cantidad, ArmadoPcDto armadoPcDto) throws LimiteDeComponenteSobrepasadoEnElArmadoException;
 
     Boolean sePuedeAgregarMasUnidades(String tipoComponente, ArmadoPcDto armadoPcDto);
+
+    Boolean armadoCompleto(ArmadoPcDto armadoPcDto);
 }

@@ -58,10 +58,9 @@ public class ControladorArmaTuPc {
             return new ModelAndView("arma-tu-pc/tradicional/" + tipoComponente, model);
         }
 
-        String siguienteVista = determinarSiguienteVista(tipoComponente, armadoPcDtoConComponenteAgregado);
-
         session.setAttribute("armadoPcDto", armadoPcDtoConComponenteAgregado);
 
+        String siguienteVista = determinarSiguienteVista(tipoComponente, armadoPcDtoConComponenteAgregado);
         return new ModelAndView("redirect:/arma-tu-pc/tradicional/" + siguienteVista);
     }
 
@@ -75,7 +74,12 @@ public class ControladorArmaTuPc {
     @RequestMapping(path = "arma-tu-pc/tradicional/resumen", method = RequestMethod.GET)
     public ModelAndView obtenerResumen(HttpSession session) {
         ModelMap model = new ModelMap();
-        model.put("armadoPcDto", obtenerArmadoPcDtoCorrespondiente(session));
+
+        ArmadoPcDto armadoPcDto = obtenerArmadoPcDtoCorrespondiente(session);
+
+        if(this.servicioArmaTuPc.armadoCompleto(armadoPcDto)) model.put("armadoPcDto", armadoPcDto);
+        else model.put("error", "Seleccione almenos un motherboard, cpu, cooler y gabinete para obtener su armado");
+
         return new ModelAndView("arma-tu-pc/tradicional/resumen", model);
     }
 }
