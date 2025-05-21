@@ -60,8 +60,8 @@ public class ControladorComponenteEspecifico {
         ModelMap model = new ModelMap();
 
         model.put("componenteEspecificoDto", componenteEspecifico);
-        model.put("terminos", "Estos son los términos y condiciones para este producto...");
-        model.put("cuotas", "12 cuotas fijas sin interés con tarjetas seleccionadas.");
+        model.put("terminos", "Estos son los terminos y condiciones para este producto...");
+        model.put("cuotas", "12 cuotas fijas sin interes con tarjetas seleccionadas.");
 
         return new ModelAndView("productoEspecifico", model);
     }

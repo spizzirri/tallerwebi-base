@@ -2,6 +2,7 @@ package com.tallerwebi.presentacion;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class ComponenteEspecificoDto {
 
@@ -96,4 +97,17 @@ public class ComponenteEspecificoDto {
         this.memoria = memoria;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        ComponenteEspecificoDto that = (ComponenteEspecificoDto) o;
+        return Objects.equals(id, that.id) &&
+                Objects.equals(nombre, that.nombre);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, nombre);
+    }
 }
