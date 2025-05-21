@@ -1,5 +1,9 @@
 package com.tallerwebi.config;
 
+import com.tallerwebi.dominio.RepositorioComponente;
+import com.tallerwebi.dominio.ServicioArmaTuPc;
+import com.tallerwebi.dominio.ServicioArmaTuPcImpl;
+import com.tallerwebi.infraestructura.RepositorioComponenteImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -70,5 +74,16 @@ public class SpringWebConfig implements WebMvcConfigurer {
         viewResolver.setTemplateEngine(templateEngine());
         return viewResolver;
     }
+
+    @Bean
+    public ServicioArmaTuPc servicioArmaTuPc() {
+        return new ServicioArmaTuPcImpl(repositorioComponente());
+    }
+
+    @Bean
+    public RepositorioComponente repositorioComponente() {
+        return new RepositorioComponenteImpl();
+    }
+
 
 }

@@ -1,27 +1,56 @@
 
 
 <div th:fragment="cargarPaso (armado, componentes, producto, descripcion, paginaPost)">
-    <div class="container py-4">
+    <div class="container-fluid py-4">
         <h4 th:text=" 'Elegi tu ' + ${producto}"></h4>
         <p class="text-muted" th:text="${descripcion}">
         </p>
-
         <div class="row">
             <!-- Sidebar -->
             <div class="col-lg-4 mb-3">
                 <div class="border rounded p-3 bg-white mb-3">
                     <div class="row g-2 text-center">
                         <!-- Placeholder icons -->
-                        <div class="col-6"><div class="border rounded bg-light py-3 h-100 d-flex flex-column justify-content-center" th:text="${armado.procesador != null ? armado.procesador.modelo : 'Procesador'}"></div></div>
-                        <div class="col-6"><div class="border rounded bg-light py-3 h-100 d-flex flex-column justify-content-center" th:text="${armado.motherboard != null ? armado.motherboard.modelo : 'Motherboard'}"></div></div>
-                        <div class="col-6"><div class="border rounded bg-light py-3 h-100 d-flex flex-column justify-content-center" th:text="${armado.cooler != null ? armado.cooler.modelo : 'Cooler'}"></div></div>
-                        <div class="col-6"><div class="border rounded bg-light py-3 h-100 d-flex flex-column justify-content-center" th:text="${armado.rams != null ? armado.rams : 'Memorias'}"></div></div>
-                        <div class="col-6"><div class="border rounded bg-light py-3 h-100 d-flex flex-column justify-content-center" th:text="${armado.gpu != null ? armado.gpu.modelo : 'Placa de video'}"></div></div>
-                        <div class="col-6"><div class="border rounded bg-light py-3 h-100 d-flex flex-column justify-content-center" th:text="${armado.almacenamiento != null ? armado.almacenamiento : 'Almacenamiento'}"></div></div>
-                        <div class="col-6"><div class="border rounded bg-light py-3 h-100 d-flex flex-column justify-content-center" th:text="${armado.fuente != null ? armado.fuente.modelo : 'Fuente'}"></div></div>
-                        <div class="col-6"><div class="border rounded bg-light py-3 h-100 d-flex flex-column justify-content-center" th:text="${armado.gabinete != null ? armado.gabinete.modelo : 'Gabinete'}"></div></div>
-                        <div class="col-6"><div class="border rounded bg-light py-3 h-100 d-flex flex-column justify-content-center" th:text="${armado.monitor != null ? armado.monitor : 'Monitor'}"></div></div>
-                        <div class="col-6"><div class="border rounded bg-light py-3 h-100 d-flex flex-column justify-content-center" th:text="${armado.perifericos != null ? armado.perifericos : 'Perifericos'}"></div></div>
+                        <div class="col-6">
+                            <div th:if="${armado.procesador != null}">
+                                <div class="border rounded bg-light py-3 h-100 d-flex flex-column justify-content-center">
+                                    <img th:src="${armado.procesador.imagen}" th:alt="${armado.procesador.modelo}">
+                                    <p th:text="'x1 '+ ${armado.procesador.modelo}"></p>
+                                </div>
+                            </div>
+                            <div th:unless="${armado.procesador != null}">
+                                <div class="border rounded bg-light py-3 h-100 d-flex flex-column justify-content-center">
+                                    <img src="imagenProcesadorVacio.jpg" alt="procesadorVacio">
+                                    <p>Procesador</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="border rounded bg-light py-3 h-100 d-flex flex-column justify-content-center" th:text="${armado.motherboard != null ? 'x1 '+armado.motherboard.modelo : 'Motherboard'}"></div>
+                        </div>
+                        <div class="col-6">
+                            <div class="border rounded bg-light py-3 h-100 d-flex flex-column justify-content-center" th:text="${armado.cooler != null ? 'x1 '+armado.cooler.modelo : 'Cooler'}"></div>
+                        </div>
+                        <div class="col-6">
+                            <div class="border rounded bg-light py-3 h-100 d-flex flex-column justify-content-center" th:text="${armado.rams != null ? armado.rams : 'Memorias'}"></div></div>
+                        <div class="col-6">
+                            <div class="border rounded bg-light py-3 h-100 d-flex flex-column justify-content-center" th:text="${armado.gpu != null ? 'x1 '+ armado.gpu.modelo : 'Placa de video'}"></div>
+                        </div>
+                        <div class="col-6">
+                            <div class="border rounded bg-light py-3 h-100 d-flex flex-column justify-content-center" th:text="${armado.almacenamiento != null ? armado.almacenamiento : 'Almacenamiento'}"></div>
+                        </div>
+                        <div class="col-6">
+                            <div class="border rounded bg-light py-3 h-100 d-flex flex-column justify-content-center" th:text="${armado.fuente != null ? 'x1 '+ armado.fuente.modelo : 'Fuente'}"></div>
+                        </div>
+                        <div class="col-6">
+                            <div class="border rounded bg-light py-3 h-100 d-flex flex-column justify-content-center" th:text="${armado.gabinete != null ? 'x1 '+ armado.gabinete.modelo : 'Gabinete'}"></div>
+                        </div>
+                        <div class="col-6">
+                            <div class="border rounded bg-light py-3 h-100 d-flex flex-column justify-content-center" th:text="${armado.monitor != null ? 'x1 '+ armado.monitor : 'Monitor'}"></div>
+                        </div>
+                        <div class="col-6">
+                            <div class="border rounded bg-light py-3 h-100 d-flex flex-column justify-content-center" th:text="${armado.perifericos != null ? armado.perifericos : 'Perifericos'}"></div>
+                        </div>
                     </div>
                 </div>
                 <div class="border rounded p-3 bg-white text-center">
@@ -45,7 +74,7 @@
             <!-- Main content -->
             <div class="col-lg-8">
                 <!-- Filtros -->
-                <div th:if="${producto == 'Procesador'}" class="mb-3"> <!--Si no es un procesador no mostramos AMD y INTEL-->
+                <div th:if="${producto == 'procesador'}" class="mb-3"> <!--Si no es un procesador no mostramos AMD y INTEL-->
                     <button class="btn btn-outline-dark me-2">AMD</button>
                     <button class="btn btn-outline-dark">Intel</button>
                 </div>
@@ -54,7 +83,7 @@
                 <div class="row g-3">
                     <!-- Card ejemplo -->
                     <div class="col-md-6 col-lg-4 mt-2" th:each ="componente : ${componentes}">
-                        <form method="POST" th:action="@{'/arma-tu-pc/' + ${paginaPost}}">
+                        <form method="POST" th:action="@{'/arma-tu-pc/tradicional/' + ${paginaPost}}">
                             <div class="card h-100">
                                 <img th:src="${componente.imagen}" class="card-img-top" th:alt="${componente.tipoComponente}">
                                 <div class="card-body">
@@ -62,12 +91,18 @@
                                     <p class="card-text text-muted" th:text="'$'+${componente.precio}"></p>
                                     <span class="badge bg-success">Compatible</span>
                                     <input type="hidden" name="id" th:value="${componente.id}">
+                                    <input  th:if="${producto != 'memoria' && producto != 'almacenamiento'}" type="hidden" name="cantidad" value="1">
+                                    <select th:if="${producto == 'memoria' || producto == 'almacenamiento'}" name="cantidad">
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                    </select>
                                     <input type="submit" value="Seleccionar">
                                 </div>
                             </div>
                         </form>
                     </div>
-
 
                     <!-- Repetir otras cards similares -->
                     <!-- ... -->

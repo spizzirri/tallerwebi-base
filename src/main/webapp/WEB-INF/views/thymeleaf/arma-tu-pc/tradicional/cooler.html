@@ -15,7 +15,7 @@
 
 <body class="bg-light">
 
-<div th:replace="fragments/carga-componentes-arma-tu-pc :: cargarPaso (${armadoPcDto}, ${motherboards}, 'Mother', 'Es donde se conectaran todos los componentes de tu PC. Segun el modelo que elijas tendras diferentes beneficios de conectividad y expansion', 'motherboard')"></div>
+<div th:replace="fragments/carga-componentes-arma-tu-pc :: cargarPaso (${armadoPcDto}, ${coolerLista}, 'Cooler', 'El cooler mantiene la temperatura de tu equipo, evitando el danio en los componentes y permitiendo que este funcione correctamente.', 'cooler')"></div>
 
 <!-- Boostrap core js -->
 <script type="text/javascript" th:src="@{webjars/bootstrap/5.2.0/js/bootstrap.min.js}"></script>

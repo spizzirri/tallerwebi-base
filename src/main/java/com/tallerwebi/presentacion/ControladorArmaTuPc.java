@@ -5,6 +5,7 @@ import com.tallerwebi.dominio.excepcion.LimiteDeComponenteSobrepasadoEnElArmadoE
 import com.tallerwebi.presentacion.dto.ArmadoPcDto;
 import com.tallerwebi.presentacion.dto.ComponenteDto;
 import org.dom4j.rule.Mode;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -20,6 +21,7 @@ public class ControladorArmaTuPc {
     private ServicioArmaTuPc servicioArmaTuPc;
     private List<String> pasos = Arrays.asList("procesador", "motherboard", "cooler", "memoria", "gpu", "almacenamiento", "fuente", "gabinete", "monitor", "periferico", "resumen");
 
+    @Autowired
     public ControladorArmaTuPc(ServicioArmaTuPc servicioArmaTuPc) { this.servicioArmaTuPc =  servicioArmaTuPc; }
     public ControladorArmaTuPc() {}
 
@@ -44,8 +46,8 @@ public class ControladorArmaTuPc {
 
     @RequestMapping(path = "arma-tu-pc/tradicional/{tipoComponente}", method = RequestMethod.POST)
     public ModelAndView agregarComponenteAlArmado(@PathVariable("tipoComponente")String tipoComponente,
-                                                  Long idComponente,
-                                                  Integer cantidad,
+                                                  @RequestParam("id") Long idComponente,
+                                                  @RequestParam("cantidad") Integer cantidad,
                                                   HttpSession session) {
 
         ArmadoPcDto armadoPcDtoConComponenteAgregado = null;

@@ -15,7 +15,7 @@
 
 <body class="bg-light">
 
-<div th:replace="fragments/carga-componentes-arma-tu-pc :: cargarPaso (${armadoPcDto}, ${procesadores}, 'Procesador', 'Tu procesador es la pieza central del rendimiento de los programas. Para saber si un procesador es potente, lo que tenes que medir es la frecuencia, el ancho de bus, la memoria cache y los nucleos e hilos de procesamiento.', 'index')"></div>
+<div th:replace="fragments/carga-componentes-arma-tu-pc :: cargarPaso (${armadoPcDto}, ${procesadorLista}, 'procesador', 'Tu procesador es la pieza central del rendimiento de los programas. Para saber si un procesador es potente, lo que tenes que medir es la frecuencia, el ancho de bus, la memoria cache y los nucleos e hilos de procesamiento.', 'procesador')"></div>
 
 <!-- Boostrap core js -->
 <script type="text/javascript" th:src="@{webjars/bootstrap/5.2.0/js/bootstrap.min.js}"></script>

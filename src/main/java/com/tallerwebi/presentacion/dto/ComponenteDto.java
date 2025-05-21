@@ -4,18 +4,22 @@ import java.util.Objects;
 
 public class ComponenteDto {
 
+
     private Long id;
     private String modelo;
     private Double precio;
     private String tipoComponente;
     private String imagen;
+    private Integer stock;
 
     public ComponenteDto() {}
-    public ComponenteDto(Long id, String tipoComponente, String modelo, Double precio) {
+    public ComponenteDto(Long id, String tipoComponente, String modelo, Double precio, String imagen, Integer stock) {
         this.id = id;
         this.tipoComponente = tipoComponente;
         this.modelo = modelo;
         this.precio = precio;
+        this.imagen = imagen;
+        this.stock = stock;
     }
 
     public Long getId() {
@@ -55,7 +59,13 @@ public class ComponenteDto {
         return this.imagen;
     }
 
+    public void setStock(Integer stock) {
+        this.stock = stock;
+    }
 
+    public Integer getStock() {
+        return this.stock;
+    }
 
     @Override
     public boolean equals(Object o) {
