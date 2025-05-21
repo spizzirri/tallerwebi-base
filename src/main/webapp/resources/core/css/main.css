@@ -27,3 +27,7 @@ h2{
 .navbar-brand{
     margin:0 2rem;
 }
+.small-card {
+    transform: scale(0.5);
+    transform-origin: top left; /* para que no se descuadre */
+}

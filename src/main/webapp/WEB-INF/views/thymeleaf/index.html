@@ -17,6 +17,7 @@
 
 </head>
 
+
 <body class="bg-dark text-white" style="margin: 0px;padding: 0px;">
 
 <div class="page-container">
@@ -77,68 +78,42 @@
     </button>
   </div>
 <div><h3>Conoce nuestros productos destacados</h3>
+
   <div>
 
-  <a class="btn btn-warning" href="#">Equipos y Notebook</a>
-  <a class="btn btn-warning" href="#">Monitores</a>
-  <a class="btn btn-warning" href="#">Televisores</a>
-  <a class="btn btn-warning" href="#">Placas de Video</a>
-  <a class="btn btn-warning" href="#">Sillas Gamers</a>
-  <a class="btn btn-warning" href="#">Perificos</a>
-  <a class="btn btn-warning" href="#">Mothers</a>
-  <a class="btn btn-warning" href="#">Procesadores</a>
-</div>
-  <div class="container text-center">
-    <div class="row row-cols-2">
-      <div class="col-md-4">
-        <div class="product-card d-flex flex-column">
-          <img th:src="@{/uploads/teclado.jpg}" class="card-img-top" alt="...">
-          <p class="mb-1">Procesador Intel Core Ultra 7 265K 5.5Ghz Turbo Socket 1851 Arrow Lake</p>
-          <div class="d-flex justify-content-between align-items-center mt-auto">
-            <span class="product-price">$543.850</span>
-            <button class="btn-cart">
-              <i class="bi bi-cart3"></i>
-            </button>
+    <a  class="btn btn-warning" th:href="@{/productos/categoria/1}" onclick="event.preventDefault(); cargarProductos(1)" >Equipos y Notebook</a>
+    <a  class="btn btn-warning" th:href="@{/productos/categoria/2}" onclick="event.preventDefault(); cargarProductos(2)">Monitores</a>
+    <a  class="btn btn-warning" th:href="@{/productos/categoria/3}" onclick="event.preventDefault(); cargarProductos(3)" >Televisores</a>
+    <a class="btn btn-warning" th:href="@{/productos/categoria/4}" onclick="event.preventDefault(); cargarProductos(4)" >Placas de Video</a>
+    <a class="btn btn-warning" th:href="@{/productos/categoria/5}" onclick="event.preventDefault(); cargarProductos(5)">Sillas Gamers</a>
+    <a class="btn btn-warning" th:href="@{/productos/categoria/6}" onclick="event.preventDefault(); cargarProductos(6)" >Perificos</a>
+    <a class="btn btn-warning" th:href="@{/productos/categoria/7}" onclick="event.preventDefault(); cargarProductos(7)" >Mothers</a>
+    <a class="btn btn-warning" th:href="@{/productos/categoria/8}" onclick="event.preventDefault(); cargarProductos(8)" >Procesadores</a>
+  </div>
+
+  <div id="productos-container">
+
+    <div class="row row-cols-1 row-cols-md-3 g-4  ">
+      <div class="col" th:each="producto : ${productosDestacados}">
+        <div class="card h-100 border-0 bg-transparent small-card">
+                      <img th:src="@{'/uploads/' + ${producto.imagen}}" class="card-img-top" alt="...">
+          <div class="card-body text-start">
+            <p th:text="${producto.nombre}"></p>
+            <div class="d-flex align-items-center gap-2">
+              <span class="fw-bold" th:text="'$ ' + ${producto.precio}"></span>
+              <button class="btn btn-warning"><i class="bi bi-cart3"></i></button>
+            </div>
           </div>
         </div>
-      </div><div class="col-md-4">
-      <div class="product-card d-flex flex-column">
-        <img th:src="@{/uploads/teclado.jpg}" class="card-img-top" alt="...">
-        <p class="mb-1">Procesador Intel Core Ultra 7 265K 5.5Ghz Turbo Socket 1851 Arrow Lake</p>
-        <div class="d-flex justify-content-between align-items-center mt-auto">
-          <span class="product-price">$543.850</span>
-          <button class="btn-cart">
-            <i class="bi bi-cart3"></i>
-          </button>
-        </div>
       </div>
-    </div><div class="col-md-4">
-      <div class="product-card d-flex flex-column">
-        <img th:src="@{/uploads/teclado.jpg}" class="card-img-top" alt="...">
-        <p class="mb-1">Procesador Intel Core Ultra 7 265K 5.5Ghz Turbo Socket 1851 Arrow Lake</p>
-        <div class="d-flex justify-content-between align-items-center mt-auto">
-          <span class="product-price">$543.850</span>
-          <button class="btn-cart">
-            <i class="bi bi-cart3"></i>
-          </button>
-        </div>
-      </div>
-    </div><div class="col-md-4">
-      <div class="product-card d-flex flex-column">
-        <img th:src="@{/uploads/teclado.jpg}" class="card-img-top" alt="...">
-        <p class="mb-1">Procesador Intel Core Ultra 7 265K 5.5Ghz Turbo Socket 1851 Arrow Lake</p>
-        <div class="d-flex justify-content-between align-items-center mt-auto">
-          <span class="product-price">$543.850</span>
-          <button class="btn-cart">
-            <i class="bi bi-cart3"></i>
-          </button>
-        </div>
-      </div>
-    </div>
-      </div></div>
     </div>
   </div>
+
 </div>
+
+
+
+
 
 <div class="container py-4">
 
@@ -193,7 +168,7 @@
     </div>
   </div>
 
-
+</div>
 </div>
 <!-- /.container -->
 
