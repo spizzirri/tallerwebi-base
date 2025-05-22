@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Arma tu PC</title>
+
+  <!-- Boostrap core css -->
+  <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.2.0/css/bootstrap.min.css}"/>
+
+  <!-- custom style -->
+  <link rel="stylesheet" th:href="@{/css/main.css}"/>
+
+</head>
+<body>
+
+<div class="container py-4">
+  <h3 class="mb-4">Resumen Armado</h3>
+    <div th:if="${errorResumen == null}">
+        <!--FALTA PODER MOSTRAR LOS COMPONENTES QUE SON LISTAS-->
+        <div th:replace="fragments/tarjetaResumen :: cargarTarjetaDeResumen (${armadoPcDto.procesador}, 'Procesador', 'procesadores', 'procesadorVacio.png')"></div>
+        <div th:replace="fragments/tarjetaResumen :: cargarTarjetaDeResumen (${armadoPcDto.motherboard}, 'Motherboard', 'motherboards', 'motherboardVacia.png')"></div>
+        <div th:replace="fragments/tarjetaResumen :: cargarTarjetaDeResumen (${armadoPcDto.cooler}, 'Cooler', 'coolers', 'coolerVacio.png')"></div>
+        <div th:replace="fragments/tarjetaResumen :: cargarTarjetaDeResumen (${armadoPcDto.gpu}, 'Placa de Video', 'gpus', 'gpuVacia.png')"></div>
+        <div th:replace="fragments/tarjetaResumen :: cargarTarjetaDeResumen (${armadoPcDto.fuente}, 'Fuente', 'fuentes', 'fuenteVacia.png')"></div>
+        <div th:replace="fragments/tarjetaResumen :: cargarTarjetaDeResumen (${armadoPcDto.gabinete}, 'Gabinete', 'gabinetes', 'gabineteVacio.png')"></div>
+        <div th:replace="fragments/tarjetaResumen :: cargarTarjetaDeResumen (${armadoPcDto.monitor}, 'Monitor', 'monitores', 'monitorVacio.png')"></div>
+
+        <div class="m-auto col-3 border rounded bg-white p-1 pt-2 mb-3 d-flex justify-content-center">
+            <h3 class="d-inline">Total:  <span th:text="${'$'+armadoPcDto.precioTotal}" class="text-success"></span></h3>
+        </div>
+
+        <div class="m-auto d-flex justify-content-center gap-2">
+            <a th:href="@{/arma-tu-pc/tradicional/procesador}" class="btn btn-outline-secondary">Volver al armado</a>
+            <a href="#" class="btn btn-outline-primary">Sumar al carrito</a>
+            <a href="#" class="btn btn-outline-primary">Guardar Armado</a>
+        </div>
+    </div>
+
+
+    <div th:if="${errorResumen != null}">
+        <h2 class="alert alert-danger" th:text="${errorResumen}"></h2>
+        <div class="m-auto d-flex justify-content-center">
+            <a th:href="@{/arma-tu-pc/tradicional/procesador}" class="btn btn-outline-secondary">Volver al armado</a>
+        </div>
+    </div>
+
+</div>
+
+<!-- Boostrap core js -->
+<script type="text/javascript" th:src="@{webjars/bootstrap/5.2.0/js/bootstrap.min.js}"></script>
+</body>
+</html>

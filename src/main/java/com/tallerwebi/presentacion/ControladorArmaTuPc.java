@@ -81,7 +81,7 @@ public class ControladorArmaTuPc {
         ArmadoPcDto armadoPcDto = obtenerArmadoPcDtoCorrespondiente(session);
 
         if(this.servicioArmaTuPc.armadoCompleto(armadoPcDto)) model.put("armadoPcDto", armadoPcDto);
-        else model.put("error", "Seleccione almenos un motherboard, cpu, cooler y gabinete para obtener su armado");
+        else model.put("errorResumen", "Seleccione almenos un motherboard, cpu, cooler y gabinete para obtener su armado");
 
         return new ModelAndView("arma-tu-pc/tradicional/resumen", model);
     }

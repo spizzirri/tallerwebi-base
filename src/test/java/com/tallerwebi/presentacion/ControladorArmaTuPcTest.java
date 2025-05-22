@@ -845,7 +845,7 @@ public class ControladorArmaTuPcTest {
         String errorEsperado = "Seleccione almenos un motherboard, cpu, cooler y gabinete para obtener su armado";
 
         assertThat(modelAndView.getViewName(), equalTo(vistaEsperada));
-        assertThat(modelAndView.getModel().get("error"), equalTo(errorEsperado));
+        assertThat(modelAndView.getModel().get("errorResumen"), equalTo(errorEsperado));
     }
 
 
