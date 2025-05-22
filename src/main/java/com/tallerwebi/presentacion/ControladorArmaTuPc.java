@@ -56,8 +56,8 @@ public class ControladorArmaTuPc {
         } catch (LimiteDeComponenteSobrepasadoEnElArmadoException e) {
 
             ModelMap model = new ModelMap();
-            model.put("error", "Supero el limite de "+tipoComponente+" de su armado");
-            return new ModelAndView("arma-tu-pc/tradicional/" + tipoComponente, model);
+            model.put("errorLimite", "Supero el limite de "+tipoComponente+" de su armado");
+            return new ModelAndView("redirect:/arma-tu-pc/tradicional/" + tipoComponente, model);
         }
 
         session.setAttribute("armadoPcDto", armadoPcDtoConComponenteAgregado);

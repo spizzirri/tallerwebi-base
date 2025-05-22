@@ -1,7 +1,9 @@
 package com.tallerwebi.presentacion.dto;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ArmadoPcDto {
 
@@ -123,5 +125,28 @@ public class ArmadoPcDto {
 
     public void setMotherboard(ComponenteDto motherboard) {
         this.motherboard = motherboard;
+    }
+
+    public Map<String, Integer> getRamsDetalladas(){
+        return obtenerListaComponenteDetallado(this.rams);
+    }
+    public Map<String, Integer> getAlmacenamientoDetallado(){
+        return obtenerListaComponenteDetallado(this.almacenamiento);
+    }
+    public Map<String, Integer> getPerifericosDetallados(){
+        return obtenerListaComponenteDetallado(this.perifericos);
+    }
+
+    private Map<String, Integer> obtenerListaComponenteDetallado(List<ComponenteDto> componentes) {
+
+        Map<String, Integer> componentesDetallados = new HashMap<>();
+
+        for(ComponenteDto componente : componentes){
+            if (componentesDetallados.containsKey(componente.getModelo()))
+                componentesDetallados.put(componente.getModelo(), componentesDetallados.get(componente.getModelo()) + 1);
+             else
+                componentesDetallados.put(componente.getModelo(), 1);
+        }
+    return componentesDetallados;
     }
 }

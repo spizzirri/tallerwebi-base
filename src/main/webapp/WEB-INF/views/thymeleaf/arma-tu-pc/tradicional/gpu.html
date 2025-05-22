@@ -14,11 +14,11 @@
 </head>
 
 <body class="bg-light container">
-<h4>Elegi tus Memorias</h4>
+<h4>Elegi tu Placa de Video</h4>
 <p class="text-muted">
-    Las memorias sirven para cargar y almacenar todas las instrucciones que se ejecutan en el procesador. Lo que se debe tener en cuenta en esta seccion es el tamanio, la frecuencia y la cantidad de modulos.
+    El procesador grafico de una tarjeta es muchisimo mas potente que el que tienen los procesadores, por esta razon es necesaria para el buen funcionamiento del equipo y muy recomendada para gamers y profesionales de los graficos.
 </p>
-<div th:replace="fragments/carga-componentes-arma-tu-pc :: cargarPaso (${armadoPcDto}, ${memoriaLista}, 'memoria', 'memorias', 'cooler', 'gpu')"></div>
+<div th:replace="fragments/carga-componentes-arma-tu-pc :: cargarPaso (${armadoPcDto}, ${gpuLista}, 'gpu', 'gpus', 'memoria', 'almacenamiento')"></div>
 
 <!-- Boostrap core js -->
 <script type="text/javascript" th:src="@{webjars/bootstrap/5.2.0/js/bootstrap.min.js}"></script>

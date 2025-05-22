@@ -83,7 +83,10 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
                 armadoPcDto.setGpu(transformarADto(componenteSolicitado));
                 break;
             case "almacenamiento":
-                for(int i = 0; i<cantidad;i++) armadoPcDto.getRams().add(transformarADto(componenteSolicitado));
+                for(int i = 0; i<cantidad;i++) armadoPcDto.getAlmacenamiento().add(transformarADto(componenteSolicitado));
+                break;
+            case "fuente":
+                armadoPcDto.setFuente(transformarADto(componenteSolicitado));
                 break;
             case "gabinete":
                 armadoPcDto.setGabinete(transformarADto(componenteSolicitado));

@@ -300,7 +300,7 @@ public class ControladorArmaTuPcTest {
         ModelAndView modelAndView = this.controlador.agregarComponenteAlArmado("memoria", 2L, 2, session);
 
         // Validacion
-        String vistaEsperada = "arma-tu-pc/tradicional/memoria";
+        String vistaEsperada = "redirect:/arma-tu-pc/tradicional/memoria";
         String errorEsperado = "Supero el limite de memoria de su armado";
 
         List<ComponenteDto> memoriasEsperadas =
@@ -310,8 +310,8 @@ public class ControladorArmaTuPcTest {
 
         assertThat(modelAndView.getViewName(), equalTo(vistaEsperada));
         assertEquals(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getRams(), memoriasEsperadas);
-        assertNotNull(modelAndView.getModel().get("error"));
-        assertThat(modelAndView.getModel().get("error"), equalTo(errorEsperado));
+        assertNotNull(modelAndView.getModel().get("errorLimite"));
+        assertThat(modelAndView.getModel().get("errorLimite"), equalTo(errorEsperado));
     }
 
     @Test
@@ -491,7 +491,7 @@ public class ControladorArmaTuPcTest {
 
 
         // Validacion
-        String vistaEsperada = "arma-tu-pc/tradicional/almacenamiento";
+        String vistaEsperada = "redirect:/arma-tu-pc/tradicional/almacenamiento";
         String errorEsperado = "Supero el limite de almacenamiento de su armado";
 
         List<ComponenteDto> almacenamientoEsperado =
@@ -502,8 +502,8 @@ public class ControladorArmaTuPcTest {
 
         assertThat(modelAndView.getViewName(), equalTo(vistaEsperada));
         assertEquals(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getAlmacenamiento(), almacenamientoEsperado);
-        assertNotNull(modelAndView.getModel().get("error"));
-        assertThat(modelAndView.getModel().get("error"), equalTo(errorEsperado));
+        assertNotNull(modelAndView.getModel().get("errorLimite"));
+        assertThat(modelAndView.getModel().get("errorLimite"), equalTo(errorEsperado));
     }
 
     @Test
