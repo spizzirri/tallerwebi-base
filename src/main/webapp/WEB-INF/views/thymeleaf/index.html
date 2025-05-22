@@ -50,7 +50,7 @@
   <div class="container d-flex justify-content-center gap-4">
     <a class="text-dark text-decoration-none px-3 fs-5" href="#">Productos</a>
     <a class="text-dark text-decoration-none px-3 fs-5"  href="#">Notebooks</a>
-    <a class="text-dark text-decoration-none px-3 fs-5" href="#">Arma tu PC</a>
+    <a class="text-dark text-decoration-none px-3 fs-5" th:href="@{/arma-tu-pc/tradicional/procesador}">Arma tu PC</a>
     <a class="text-dark text-decoration-none px-3 fs-5" href="#">Rastrea tu pedido</a>
     <a class="text-dark text-decoration-none px-3 fs-5" href="#">Ayuda</a>
   </div>
@@ -137,7 +137,7 @@
       <h3 class="mb-3">Arma tu PC</h3>
       <p class="mb-4">Configura tu nueva PC sin errores de compatibilidad,
         seleccionando todos los componentes que deseas.</p>
-      <a href="#" class="btn btn-warning">Ver mas</a>
+      <a th:href="@{/arma-tu-pc/tradicional/procesador}" class="btn btn-warning">Ver mas</a>
     </div>
   </div>
  </div>
@@ -204,7 +204,7 @@
 <div th:replace="fragments/fragments :: footer"></div>
 
 
-<!-- /.container -->
+<!-- /container -->
 
 <!-- Boostrap core js -->
 <script type="text/javascript" th:src="@{webjars/bootstrap/5.2.0/js/bootstrap.min.js}"></script>

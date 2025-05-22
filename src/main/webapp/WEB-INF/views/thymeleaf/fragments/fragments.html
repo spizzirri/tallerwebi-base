@@ -4,7 +4,7 @@
   <header class="sticky-top bg-dark " style="height: 80px; z-index: 1030;">
     <div class="container-fluid d-flex align-items-center justify-content-between h-100 px-4" style="max-width: 1300px;">
       <!-- Logo -->
-      <a href="index.html" class="d-flex align-items-center text-decoration-none">
+      <a th:href="@{/index.html}" class="d-flex align-items-center text-decoration-none">
         <img th:src="@{/uploads/dragon-logo.png}" alt="Logo" width="100" height="80">
         <span class="ms-2 fw-bold fs-4 text-light">Compra Gamer 2</span>
       </a>
@@ -23,11 +23,11 @@
 
 
 
-  <nav class="bg-secondary-subtle text-dark py-3 ">
+  <nav class="bg-secondary-subtle text-dark py-3 mb-3">
     <div class="container d-flex justify-content-center gap-4">
       <a class="text-dark text-decoration-none px-3 fs-5" href="#">Productos</a>
       <a class="text-dark text-decoration-none px-3 fs-5"  href="#">Notebooks</a>
-      <a class="text-dark text-decoration-none px-3 fs-5" href="#">Arma tu PC</a>
+      <a class="text-dark text-decoration-none px-3 fs-5" th:href="@{/arma-tu-pc/tradicional/procesador}">Arma tu PC</a>
       <a class="text-dark text-decoration-none px-3 fs-5" href="#">Rastrea tu pedido</a>
       <a class="text-dark text-decoration-none px-3 fs-5" href="#">Ayuda</a>
     </div>

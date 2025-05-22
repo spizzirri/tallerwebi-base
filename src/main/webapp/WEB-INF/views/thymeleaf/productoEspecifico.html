@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>Title</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
+    </head>
+    <body style="margin: 0px;padding: 0px;">
+        <header th:replace="fragments/fragments :: header"></header>
+        <div class="container">
+            <div class="row"> <!-- Esto contiene las imagines y los detalles de la derecha de la misma -->
+                <div class="col-md-6"> <!-- Este es para el sector de las imágenes -->
+                    <!-- Imagen grande -->
+                    <div class="text-center mb-3">
+                        <img id="mainImage"
+                             th:src="@{/fotos-producto/{img}(img=${componenteEspecificoDto.imagenes[0]})}"
+                             class="img-fluid img-thumbnail"
+                             alt="Imagen principal"
+                             style="max-height: 400px;">
+                    </div>
+                    <!-- Miniaturas -->
+                    <div class="d-flex gap-2 flex-wrap justify-content-center">
+                        <img th:each="imagen : ${componenteEspecificoDto.imagenes}"
+                             th:src="@{/fotos-producto/{img}(img=${imagen})}"
+                             class="img-thumbnail thumb-img"
+                             style="width: 100px; height: auto; cursor: pointer;"
+                             th:alt="${imagen}">
+                    </div>
+                </div>
+                <div class="col-md-6"> <!-- Este es para el sector que tiene el nombre, precio, etc -->
+                    <!-- Nombre del producto -->
+                    <h1 class="mb-2" th:text=" ${componenteEspecificoDto.nombre} "></h1>
+                    <hr>
+                    <!-- Precio principal -->
+                    <div class="d-flex align-items-baseline mb-2">
+                        <p class="me-2 mb-0 fw-semibold">Precio especial</p>
+                        <h2 class="text-primary mb-0" th:text=" ${componenteEspecificoDto.precio} "></h2>
+                    </div>
+                    <hr>
+                    <!-- Precio en cuotas -->
+                    <div class="d-flex align-items-baseline mb-2">
+                        <p class="me-2 mb-0 fw-semibold">12 cuotas fijas de</p>
+                        <h4 class="mb-0 me-2">$1.200</h4>
+                        <a class="small align-self-center" data-bs-toggle="offcanvas" href="#cuotasCanvas" role="button" aria-controls="cuotasCanvas">
+                            Ver cuotas
+                        </a>
+                    </div>
+                    <br>
+                    <!-- Precio de lista -->
+                    <div class="d-flex align-items-baseline mb-2">
+                        <p class="me-2 mb-0 fw-semibold">Precio de lista</p>
+                        <h4 class="mb-0 me-2">$14.400</h4>
+                    </div>
+                    <hr>
+                    <!-- Lista con iconos -->
+                    <ul class="list-unstyled">
+                        <li class="d-flex align-items-center mb-2">
+                            <i class="fas fa-shield-alt text-success me-2"></i>
+                            Garantia - 12 meses <a href="#terminosCanvas"
+                                                   class="ms-2 small"
+                                                   data-bs-toggle="offcanvas"
+                                                   role="button"
+                                                   aria-controls="terminosCanvas">Ver terminos</a>
+                        </li>
+                        <li class="d-flex align-items-center mb-2">
+                            <i class="fas fa-box text-success me-2"></i>
+                            Stock disponible
+                        </li>
+                        <li class="d-flex align-items-center mb-2">
+                            <i class="fas fa-truck text-success me-2"></i>
+                            Envios a todo el pais
+                        </li>
+                    </ul>
+                    <form method="POST" th:action="@{'/productoEspecifico/' + ${componenteEspecificoDto.id}}">
+                        <button class="btn btn-danger mt-3">Sumar al carrito</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <br><br>
+        <div class="container">
+            <div class="row">
+                <!-- Caracteristicas Generales -->
+                <div class="col-md-6" style="margin-bottom: 25px">
+                    <table class="row">
+                        <tr class="row" th:each="caracteristicaGeneral : ${componenteEspecificoDto.caracteristicasGenerales}">
+                            <td class="col-md-6" th:text="${caracteristicaGeneral.getKey()}"></td>
+                            <td class="col-md-6 text-end" th:text="${caracteristicaGeneral.getValue()}"></td>
+                        </tr>
+                    </table>
+                </div>
+                <!-- Especificaciones CPU -->
+                <div class="col-md-6" style="margin-bottom: 25px">
+                    <table class="row">
+                        <tr class="row" th:each="especificacionCPU : ${componenteEspecificoDto.especificacionesCPU}">
+                            <td class="col-md-6" th:text="${especificacionCPU.getKey()}"></td>
+                            <td class="col-md-6 text-end" th:text="${especificacionCPU.getValue()}"></td>
+                        </tr>
+                    </table>
+                </div>
+                <br>
+                <!-- Coolers y Disipadores -->
+                <div class="col-md-6" style="margin-bottom: 25px">
+                    <table class="row">
+                        <tr class="row" th:each="coolerYDisipador : ${componenteEspecificoDto.coolersYDisipadores}">
+                            <td class="col-md-6" th:text="${coolerYDisipador.getKey()}"></td>
+                            <td class="col-md-6 text-end" th:text="${coolerYDisipador.getValue()}"></td>
+                        </tr>
+                    </table>
+                </div>
+                <!-- Memoria -->
+                <div class="col-md-6" style="margin-bottom: 25px">
+                    <table class="row">
+                        <tr class="row" th:each="memoria : ${componenteEspecificoDto.memoria}">
+                            <td class="col-md-6" th:text="${memoria.getKey()}"></td>
+                            <td class="col-md-6 text-end" th:text="${memoria.getValue()}"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <footer th:replace="fragments/fragments :: footer"></footer>
+        <!-- OFFCANVAS para las Cuotas -->
+        <div class="offcanvas offcanvas-end" tabindex="-1" id="cuotasCanvas" aria-labelledby="cuotasLabel">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title" id="cuotasLabel">Informacion de Cuotas</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
+            </div>
+            <div class="offcanvas-body">
+                <p th:text="${cuotas}">Aqui se muestran las cuotas disponibles.</p>
+            </div>
+        </div>
+        <!-- OFFCANVAS para los Terminos -->
+        <div class="offcanvas offcanvas-end" tabindex="-1" id="terminosCanvas" aria-labelledby="terminosLabel">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title" id="terminosLabel">Terminos y Condiciones</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
+            </div>
+            <div class="offcanvas-body">
+                <p th:text="${terminos}">Aqui se muestran los terminos</p>
+            </div>
+        </div>
+        <script th:src="@{/js/productoEspecifico.js}"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
+        <script type="text/javascript" th:src="@{webjars/bootstrap/5.2.0/js/bootstrap.min.js}"></script>
+        <script type="text/javascript" th:src="@{js/main.js}"></script>
+        <script th:src="@{/webjars/bootstrap/5.2.0/js/bootstrap.bundle.min.js}"></script>
+        <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
+</html>
