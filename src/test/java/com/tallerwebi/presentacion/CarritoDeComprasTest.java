@@ -1,20 +1,15 @@
 package com.tallerwebi.presentacion;
 
-import org.dom4j.rule.Mode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.ui.Model;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 public class CarritoDeComprasTest {
 
@@ -34,7 +29,7 @@ public class CarritoDeComprasTest {
 
     @Test
     public void dadoQueExisteUnCarritoControllerCuandoAgregoUnProductoYMuestroLaVistaDelCarritoDeComprasObtengoLaVistaDelCarritoConUnProducto(){
-        ProductoDto procesador = new ProductoDto("Procesador Intel Celeron G4900 3.10GHz Socket 1151 OEM Coffe Lake", 53.650);
+        ProductoCarritoDto procesador = new ProductoCarritoDto("Procesador Intel Celeron G4900 3.10GHz Socket 1151 OEM Coffe Lake", 53.650);
 
         ModelAndView modelAndView =  carritoController.agregarProductoAlCarrito(procesador);
         String mensajeEsperado = "El producto fue agregado al carrito correctamente!";
@@ -46,14 +41,14 @@ public class CarritoDeComprasTest {
 
     @Test
     public void dadoQueExisteUnCarritoControllerEliminoUnProductoYMuestroLaVistaDelCarritoDeComprasObtengoLaVistaDelCarritoConUnProducto(){
-        ProductoDto mouse = carritoController.getProductos().stream()
+        ProductoCarritoDto mouse = carritoController.getProductos().stream()
                 .filter(producto -> producto.getNombre().equals("Mouse inalámbrico"))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Mouse no encontrado"));
 
         Map<String, Object> modelAndView =  carritoController.eliminarProductoDelCarrito(mouse.getId());
 
-        List<ProductoDto> productosEsperados = carritoController.getProductos();
+        List<ProductoCarritoDto> productosEsperados = carritoController.getProductos();
 
         assertThat(productosEsperados, not(hasItem(mouse)));
     }
@@ -133,7 +128,7 @@ public class CarritoDeComprasTest {
 
     @Test
     public void dadoQueExisteUnCarritoControllerCuandoPresionoElBotonMasDeUnoDeLosProductosObtengoUnoMasEnLaCantidadDeEseProducto() {
-        ProductoDto mouse = carritoController.getProductos().stream()
+        ProductoCarritoDto mouse = carritoController.getProductos().stream()
                 .filter(producto -> producto.getNombre().equals("Mouse inalámbrico"))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Mouse no encontrado"));
@@ -150,7 +145,7 @@ public class CarritoDeComprasTest {
 
     @Test
     public void dadoQueExisteUnCarritoControllerCuandoPresionoElBotonMenosDeUnoDeLosProductosObtengoUnoMenosEnLaCantidadDeEseProducto() {
-        ProductoDto mouse = carritoController.getProductos().stream()
+        ProductoCarritoDto mouse = carritoController.getProductos().stream()
                 .filter(producto -> producto.getNombre().equals("Mouse inalámbrico"))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Mouse no encontrado"));

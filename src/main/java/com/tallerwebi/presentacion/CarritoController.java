@@ -18,22 +18,22 @@ import java.util.Map;
 public class CarritoController {
     private static final Logger logger = LoggerFactory.getLogger(CarritoController.class);
 
-    private List<ProductoDto> productos;
+    private List<ProductoCarritoDto> productos;
     private Double valorTotal = 0.0;
     private Double valorTotalConDescuento = 0.0;
 
     public CarritoController() {
-        this.productos = new ArrayList<ProductoDto>();
-        this.productos.add(new ProductoDto("Mouse inalámbrico", 29.99));
-        this.productos.add(new ProductoDto("Teclado mecánico", 79.99));
+        this.productos = new ArrayList<ProductoCarritoDto>();
+        this.productos.add(new ProductoCarritoDto("Mouse inalámbrico", 29.99));
+        this.productos.add(new ProductoCarritoDto("Teclado mecánico", 79.99));
     }
 
-    public List<ProductoDto> getProductos() {
+    public List<ProductoCarritoDto> getProductos() {
         return productos;
     }
 
-    public ProductoDto buscarPorId(Long id){
-        for(ProductoDto productoDto : this.productos){
+    public ProductoCarritoDto buscarPorId(Long id){
+        for(ProductoCarritoDto productoDto : this.productos){
             if(productoDto.getId().equals(id)){
                 return productoDto;
             }
@@ -53,7 +53,7 @@ public class CarritoController {
     }
 
     @PostMapping(path = "/home")
-    public ModelAndView agregarProductoAlCarrito(@ModelAttribute("productoDto") ProductoDto producto) {
+    public ModelAndView agregarProductoAlCarrito(@ModelAttribute("productoDto") ProductoCarritoDto producto) {
         ModelMap model = new ModelMap();
         model.put("mensaje", "El producto fue agregado al carrito correctamente!");
         model.put("productoDto", producto);
@@ -70,7 +70,7 @@ public class CarritoController {
     @ResponseBody
     public Map<String, Object> eliminarProductoDelCarrito(@PathVariable Long id) {
         Map<String, Object> response = new HashMap<>();
-        ProductoDto productoBuscado = buscarPorId(id);
+        ProductoCarritoDto productoBuscado = buscarPorId(id);
 
         if(productoBuscado != null){
             this.productos.remove(productoBuscado);
@@ -88,7 +88,7 @@ public class CarritoController {
 
     public Double calcularValorTotalDeLosProductos() {
         Double total = 0.0;
-        for(ProductoDto productoDto : this.productos){
+        for(ProductoCarritoDto productoDto : this.productos){
             total += productoDto.getPrecio() * productoDto.getCantidad();
         }
 
@@ -173,7 +173,7 @@ public class CarritoController {
     @PostMapping(path = "/carritoDeCompras/agregarMasCantidadDeUnProducto/{id}")
     @ResponseBody
     public Map<String, Object> agregarMasCantidadDeUnProducto(@PathVariable Long id) {
-        ProductoDto productoBuscado = buscarPorId(id);
+        ProductoCarritoDto productoBuscado = buscarPorId(id);
 
         if (productoBuscado != null) {
             productoBuscado.setCantidad(productoBuscado.getCantidad() + 1);
@@ -194,7 +194,7 @@ public class CarritoController {
     @PostMapping("/carritoDeCompras/restarCantidadDeUnProducto/{id}")
     @ResponseBody
     public Map<String, Object> restarCantidadDeUnProducto(@PathVariable Long id) {
-        ProductoDto productoBuscado = buscarPorId(id);
+        ProductoCarritoDto productoBuscado = buscarPorId(id);
         Map<String, Object> response = new HashMap<>();
         if(productoBuscado != null && productoBuscado.getCantidad() > 1){
             productoBuscado.setCantidad(productoBuscado.getCantidad() - 1);

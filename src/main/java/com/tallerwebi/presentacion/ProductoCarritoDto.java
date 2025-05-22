@@ -1,6 +1,6 @@
 package com.tallerwebi.presentacion;
 
-public class ProductoDto {
+public class ProductoCarritoDto {
 
     private static Long contador = 1L;
     private final Long id;
@@ -9,7 +9,7 @@ public class ProductoDto {
     private Double precio;
     private Integer cantidad;
 
-    public ProductoDto(String nombre, Double precio) {
+    public ProductoCarritoDto(String nombre, Double precio) {
         this.id = contador++;
         this.nombre = nombre;
         this.precio = precio;
