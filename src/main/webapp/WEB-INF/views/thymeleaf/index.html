@@ -38,7 +38,7 @@
     </form>
     <!-- Botones / iconos -->
     <div>
-      <button class="btn btn-warning me-2"><i class="bi bi-cart3"></i></button>
+      <a class="btn btn-warning me-2" th:href="@{/carritoDeCompras}"> <i class="bi bi-cart3"></i></a>
       <button class="btn btn-outline-secondary text-light"><i class="bi bi-person">Ingresa</i></button>
     </div>
   </div>
@@ -113,8 +113,8 @@
   <div id="productos-container" class="container py-5" >
     <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center">
       <div class="col" th:each="producto : ${productosDestacados}">
-        <div class="card h-100 border border-secondary-subtle  bg-transparent">
-          <img th:src="@{'/uploads/' + ${producto.imagen}}" class="card-img-top" alt="...">
+        <a th:href="@{/productoEspecifico/1}" class="card h-100 border border-secondary-subtle  bg-transparent">
+          <img  th:src="@{'/uploads/' + ${producto.imagen}}" class="card-img-top" alt="..."></a>
           <div class="card-body text-center">
             <p th:text="${producto.nombre}"></p>
             <div class="d-flex justify-content-center align-items-center gap-2">
@@ -122,7 +122,7 @@
               <button class="btn btn-warning"><i class="bi bi-cart3"></i></button>
             </div>
           </div>
-        </div>
+
       </div>
     </div>
   </div>
