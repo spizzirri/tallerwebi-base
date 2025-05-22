@@ -1,0 +1,31 @@
+<div th:fragment="cargarTarjetaDeResumen (componente, producto, carpetaComponenteFoto, imagenComponenteVacia)">
+
+  <div th:if="${componente != null}" class="row border rounded bg-white p-1 mb-3 align-items-center">
+    <div class="col-md-3 text-center">
+      <img th:src="@{'/fotos-armado/'+ ${carpetaComponenteFoto} +'/'+ ${componente.imagen}}" th:alt="${componente.modelo}" class="img-fluid w-50 m-auto my-3">
+    </div>
+    <div class="col-md-6">
+      <h5 class="mb-1" th:text="${producto}"></h5>
+      <small class="text-muted" th:text="'x1 '+ ${componente.modelo}"></small>
+    </div>
+    <div class="col-md-3">
+      <h5 class="d-inline me-3">Precio: </h5>
+      <span class="fs-5 text-primary" th:text="${'$' + componente.precio}"></span>
+    </div>
+  </div>
+
+  <div th:if="${componente == null}"class="row border rounded bg-white p-1 mb-3 align-items-center">
+    <div class="col-md-3 text-center">
+      <img th:src="@{'/fotos-armado/'+ ${carpetaComponenteFoto} +'/'+ ${imagenComponenteVacia}}" th:alt="${producto}" class="img-fluid w-50 m-auto my-3">
+    </div>
+    <div class="col-md-6">
+      <h5 class="mb-1" th:text="${producto}"></h5>
+      <small class="text-muted">No se eligio ningun producto en este paso.</small>
+    </div>
+    <div class="col-md-3">
+      <h5 class="d-inline me-3">Precio: </h5>
+      <span class="fs-5 text-primary">$0.0</span>
+    </div>
+  </div>
+
+</div>
