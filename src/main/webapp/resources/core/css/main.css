@@ -1,10 +1,20 @@
 body {
-  padding-top: 5rem;
+    margin: 0;
+    padding: 0;
 }
+
 .starter-template {
   padding: 3rem 1.5rem;
   text-align: center;
 }
+
+
+/*.page-container {*/
+/*    max-width: 1200px;*/
+/*    margin: 0 auto;*/
+/*    padding: 0 15px;*/
+/*}*/
+
 
 h1{
 	color:#0000FF;
@@ -16,4 +26,69 @@ h2{
 
 .navbar-brand{
     margin:0 2rem;
+}
+
+
+
+
+.category-card:hover img {
+    transform: scale(1.05);
+}
+.category-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px;
+    aspect-ratio: 1 / 1;
+}
+
+.large-category {
+    aspect-ratio: 2 / 1;
+}
+
+.category-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.category-title {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 6px 12px;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.swiper-slide .card {
+    height: 100%;
+    max-width: 180px;
+    margin: auto;
+}
+
+.swiper-slide img {
+    height: 140px;
+    object-fit: cover;
+}
+
+.swiper-slide .card-body {
+    padding: 10px;
+}
+
+.swiper-slide h5 {
+    font-size: 1rem;
+}
+
+.swiper-slide p {
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.swiper-slide small {
+    font-size: 0.75rem;
 }
