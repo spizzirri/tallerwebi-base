@@ -1,13 +1,15 @@
 <!DOCTYPE HTML>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
   <title>Compra Gamer 2</title>
 
   <!-- Boostrap core css -->
   <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.2.0/css/bootstrap.min.css}"/>
+
+
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
@@ -19,9 +21,9 @@
 </head>
 
 <!--bg-opacity-25-->
-<body class="bg-secondary-subtle text-dark " style="margin: 0px;padding: 0px;">
+<body class="bg-light text-dark " style="margin: 0px;padding: 0px;">
 
-<!-- Header -->
+
 <header class="sticky-top bg-dark " style="height: 80px; z-index: 1030;">
   <div class="container-fluid d-flex align-items-center justify-content-between h-100 px-4" style="max-width: 1300px;">
     <!-- Logo -->
@@ -31,13 +33,13 @@
     </a>
 
     <form class="d-flex" role="search" >
-      <input class="bg-dark border border-light-subtle form-control me-2 align-content-center " type="search" placeholder="Buscar productos" aria-label="Search" style="width:400px;">
+      <input class="bg-dark border border-light-subtle form-control me-2 align-content-center text-light " type="search" placeholder="Buscar productos" aria-label="Search" style="width:400px;">
       <button class="btn btn-warning align-content-center me-1" type="submit"><i class="bi bi-search"></i></button>
     </form>
     <!-- Botones / iconos -->
     <div>
       <button class="btn btn-warning me-2"><i class="bi bi-cart3"></i></button>
-      <button class="btn btn-outline-secondary"><i class="bi bi-person">Ingresa</i></button>
+      <button class="btn btn-outline-secondary text-light"><i class="bi bi-person">Ingresa</i></button>
     </div>
   </div>
 </header>
@@ -53,22 +55,34 @@
     <a class="text-dark text-decoration-none px-3 fs-5" href="#">Ayuda</a>
   </div>
 </nav>
+
+
               <!--  //Carrousel-->
+<div class="container-fluid p-0">
   <div id="carouselExampleIndicators" class="carousel slide">
     <div class="carousel-indicators">
       <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
       <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
       <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+      <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="3" aria-label="Slide 4"></button>
+      <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="4" aria-label="Slide 5"></button>
     </div>
+
     <div class="carousel-inner">
       <div class="carousel-item active">
+        <img th:src="@{/uploads/carrousel4.jpg}" class="d-block w-100" alt="...">
+      </div>
+      <div class="carousel-item">
+        <img th:src="@{/uploads/carrousel5.jpg}" class="d-block w-100" alt="...">
+      </div>
+      <div class="carousel-item">
+        <img th:src="@{/uploads/carrousel3.jpg}" class="d-block w-100" alt="...">
+      </div>
+      <div class="carousel-item">
         <img th:src="@{/uploads/carrousel1.jpg}" class="d-block w-100" alt="...">
       </div>
       <div class="carousel-item">
         <img th:src="@{/uploads/carrousel2.jpg}" class="d-block w-100" alt="...">
-      </div>
-      <div class="carousel-item">
-        <img th:src="@{/uploads/carrousel3.jpg}" class="d-block w-100" alt="...">
       </div>
     </div>
     <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
@@ -80,9 +94,11 @@
       <span class="visually-hidden">Next</span>
     </button>
   </div>
-<div class="mx-4 mt-4 mb-3" style="max-width: 1200px;"><h3>Conoce nuestros productos destacados</h3>
+</div>
+<div class="container" style="max-width: 1250px;">
+<div class="mt-4 mb-3" ><h3>Conoce nuestros productos destacados</h3>
 
-  <div class="mb-2 mx-4" style="max-width: 1200px;">
+  <div class="mb-2">
 
     <a  class="btn btn-warning mx-1" th:href="@{/productos/categoria/1}" onclick="event.preventDefault(); cargarProductos(1)" >Equipos y Notebook</a>
     <a  class="btn btn-warning mx-1" th:href="@{/productos/categoria/2}" onclick="event.preventDefault(); cargarProductos(2)">Monitores</a>
@@ -94,10 +110,10 @@
     <a class="btn btn-warning mx-1" th:href="@{/productos/categoria/8}" onclick="event.preventDefault(); cargarProductos(8)" >Procesadores</a>
   </div>
 
-  <div id="productos-container" class="container py-5" style="max-width: 1200px;">
+  <div id="productos-container" class="container py-5" >
     <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center">
       <div class="col" th:each="producto : ${productosDestacados}">
-        <div class="card h-100 border-0 bg-transparent">
+        <div class="card h-100 border border-secondary-subtle  bg-transparent">
           <img th:src="@{'/uploads/' + ${producto.imagen}}" class="card-img-top" alt="...">
           <div class="card-body text-center">
             <p th:text="${producto.nombre}"></p>
@@ -111,66 +127,24 @@
     </div>
   </div>
 
-  <!-- Sección arma tu PC -->
-  <div class="container py-5">
-    <div class="position-relative mb-4">
-      <img th:src="@{/uploads/arma-tu-pc2.jpg}" class="img-fluid w-100 rounded-4" style="height: 500px; object-fit: cover;">
-      <div class="position-absolute top-50 end-0 translate-middle-y me-5 p-4 text-white"
-           style="background-color: rgba(0, 0, 0, 0.6); max-width: 30%; border-radius: 10px;">
-        <h3 class="mb-3">Arma tu PC</h3>
-        <p class="mb-4">Configura tu nueva PC sin errores de compatibilidad,
-          seleccionando todos los componentes que deseas.</p>
-        <a href="#" class="btn btn-warning">Ver mas</a>
-      </div>
-    </div>
-  </div>
-
-
+ </div>
+</div>
+ <div class="container-fluid p-0">
   <div class="position-relative mb-4">
-    <img th:src="@{/uploads/arma-tu-pc4.jpg}" class="img-fluid d-block w-100 rounded-4" style="height: 500px; object-fit: cover;">
+    <img th:src="@{/uploads/arma-tu-pc2.jpg}" class="img-fluid d-block w-100 " style="height: 500px; object-fit: cover;">
     <div class="position-absolute top-50 end-0 translate-middle-y me-5 p-4 text-white"
-         style="background-color: rgba(0, 0, 0, 0.6); max-width: 30%; border-radius: 10px;">
+         style="background-color: rgba(0, 0, 0, 0.6); max-width: 30%; border-radius: 10px">
       <h3 class="mb-3">Arma tu PC</h3>
       <p class="mb-4">Configura tu nueva PC sin errores de compatibilidad,
         seleccionando todos los componentes que deseas.</p>
       <a href="#" class="btn btn-warning">Ver mas</a>
     </div>
   </div>
-
-  <div class="container py-4">
-
-    <div class="position-relative mb-4">
-      <img th:src="@{/uploads/arma-tu-pc5.jpg}" class="img-fluid w-100 rounded-4" style="height: 500px; object-fit: cover;">
-      <div class="position-absolute top-50 end-0 translate-middle-y me-5 p-4 text-white"
-           style="background-color: rgba(0, 0, 0, 0.6); max-width: 30%; border-radius: 10px;">
-        <h3 class="mb-3">Arma tu PC</h3>
-        <p class="mb-4">Configura tu nueva PC sin errores de compatibilidad,
-          seleccionando todos los componentes que deseas.</p>
-        <a href="#" class="btn btn-warning">Ver mas</a>
-      </div>
-    </div>
+ </div>
 
 
-
-    <div class="position-relative mb-4">
-      <img th:src="@{/uploads/arma-tu-pcai.jpg}" class="img-fluid w-100 rounded-4" style="height: 500px; object-fit: cover;">
-      <div class="position-absolute top-50 end-0 translate-middle-y me-5 p-4 text-white"
-           style="background-color: rgba(0, 0, 0, 0.6); max-width: 30%; border-radius: 10px;">
-        <h3 class="mb-3">Arma tu PC</h3>
-        <p class="mb-4">Configura tu nueva PC sin errores de compatibilidad,
-          seleccionando todos los componentes que deseas.</p>
-        <a href="#" class="btn btn-warning">Ver mas</a>
-      </div>
-    </div>
-  </div>
-
-</div>
-</div>
-
-<!--Bloque de categorias por huesos-->
-
-
-<div class="container py-1" style="max-width: 1400px;">
+<div class="container" style="max-width: 1250px;">
+<div class=" py-1" >
   <h2 class="mb-4 text-dark">Explora nuestras <strong>categorias</strong></h2>
   <div class="row g-4">
 
@@ -197,7 +171,7 @@
   </div>
 </div>
 
-<div class="container py-5" style="max-width: 1400px;">
+<div class=" py-5" >
   <h2 class="mb-4 text-dark">Productos en <strong>descuento</strong></h2>
 
   <div class="swiper mySwiper">
@@ -219,10 +193,15 @@
           </div>
         </div>
       </div>
+    </div>
   </div>
 </div>
-</div>
 
+
+</div>
+</div>
+<!-- Footer -->
+<div th:replace="fragments/fragments :: footer"></div>
 
 
 <!-- /.container -->
