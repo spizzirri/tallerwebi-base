@@ -1,0 +1,74 @@
+
+<!-- Header Fragment -->
+<div th:fragment="header">
+  <header class="sticky-top bg-dark " style="height: 80px; z-index: 1030;">
+    <div class="container-fluid d-flex align-items-center justify-content-between h-100 px-4" style="max-width: 1300px;">
+      <!-- Logo -->
+      <a href="index.html" class="d-flex align-items-center text-decoration-none">
+        <img th:src="@{/uploads/dragon-logo.png}" alt="Logo" width="100" height="80">
+        <span class="ms-2 fw-bold fs-4 text-light">Compra Gamer 2</span>
+      </a>
+
+      <form class="d-flex" role="search" >
+        <input class="bg-dark border border-light-subtle form-control me-2 align-content-center " type="search" placeholder="Buscar productos" aria-label="Search" style="width:400px;">
+        <button class="btn btn-warning align-content-center me-1" type="submit"><i class="bi bi-search"></i></button>
+      </form>
+      <!-- Botones / iconos -->
+      <div>
+        <button class="btn btn-warning me-2"><i class="bi bi-cart3"></i></button>
+        <button class="btn btn-outline-secondary text-light"><i class="bi bi-person">Ingresa</i></button>
+      </div>
+    </div>
+  </header>
+
+
+
+  <nav class="bg-secondary-subtle text-dark py-3 mb-3">
+    <div class="container d-flex justify-content-center gap-4">
+      <a class="text-dark text-decoration-none px-3 fs-5" href="#">Productos</a>
+      <a class="text-dark text-decoration-none px-3 fs-5"  href="#">Notebooks</a>
+      <a class="text-dark text-decoration-none px-3 fs-5" href="#">Arma tu PC</a>
+      <a class="text-dark text-decoration-none px-3 fs-5" href="#">Rastrea tu pedido</a>
+      <a class="text-dark text-decoration-none px-3 fs-5" href="#">Ayuda</a>
+    </div>
+  </nav>
+
+
+</div>
+<!-- Footer Fragment -->
+<div th:fragment="footer">
+  <footer class="bg-dark text-light pt-5 pb-3 mt-5">
+    <div class="container" style="max-width: 1300px;">
+      <div class="row">
+        <div class="col-md-4 mb-4">
+          <h5 class="text-uppercase fw-bold mb-3">Seguinos</h5>
+          <div class="d-flex gap-3">
+            <a href="#" class="text-light fs-4"><i class="bi bi-facebook"></i></a>
+            <a href="#" class="text-light fs-4"><i class="bi bi-instagram"></i></a>
+            <a href="#" class="text-light fs-4"><i class="bi bi-twitter-x"></i></a>
+            <a href="#" class="text-light fs-4"><i class="bi bi-youtube"></i></a>
+            <a href="#" class="text-light fs-4"><i class="bi bi-whatsapp"></i></a>
+          </div>
+        </div>
+        <div class="col-md-4 mb-4">
+          <h5 class="text-uppercase fw-bold mb-3">Enlaces utiles</h5>
+          <ul class="list-unstyled">
+            <li><a href="#" class="text-light text-decoration-none">Terminos y condiciones</a></li>
+            <li><a href="#" class="text-light text-decoration-none">Politica de privacidad</a></li>
+            <li><a href="#" class="text-light text-decoration-none">Preguntas frecuentes</a></li>
+            <li><a href="#" class="text-light text-decoration-none">Contacto</a></li>
+          </ul>
+        </div>
+        <div class="col-md-4 mb-4">
+          <h5 class="text-uppercase fw-bold mb-3">Contacto</h5>
+          <p class="mb-1"><i class="bi bi-geo-alt-fill me-2"></i>Av. Gamer 123, Buenos Aires</p>
+          <p class="mb-1"><i class="bi bi-telephone-fill me-2"></i>+54 11 1234-5678</p>
+          <p class="mb-1"><i class="bi bi-envelope-fill me-2"></i>contacto@compragamer2.com</p>
+        </div>
+      </div>
+      <div class="border-top border-secondary pt-3 text-center">
+        <small>&copy; 2025 Compra Gamer 2. Todos los derechos reservados.</small>
+      </div>
+    </div>
+  </footer>
+</div>
