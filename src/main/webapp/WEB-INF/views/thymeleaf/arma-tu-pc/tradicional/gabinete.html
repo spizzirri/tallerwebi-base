@@ -11,15 +11,31 @@
     <!-- custom style -->
     <link rel="stylesheet" th:href="@{/css/main.css}"/>
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
+
 </head>
 
-<body class="bg-light container">
-<h4>Elegi tu Gabinete</h4>
-<p class="text-muted">
-    Es fundamental para el armado de la pc ya que contendra todos los componentes funcionales de la misma.
-</p>
-<h6 class="alert-info text-warning border rounded bg-white p-2 d-inline">Este componente es necesario para completar el armado</h6>
-<div th:replace="fragments/carga-componentes-arma-tu-pc :: cargarPaso (${armadoPcDto}, ${gabineteLista}, 'gabinete', 'gabinetes', 'fuente', 'monitor')"></div>
+<body class="bg-light">
+
+<div th:replace="fragments/fragments :: header"></div>
+
+
+<div class="container">
+    <h4>Elegi tu Gabinete</h4>
+    <p class="text-muted">
+        Es fundamental para el armado de la pc ya que contendra todos los componentes funcionales de la misma.
+    </p>
+    <h6 class="alert-info text-warning border rounded bg-white p-2 d-inline">Este componente es necesario para completar el armado</h6>
+    <div th:replace="fragments/carga-componentes-arma-tu-pc :: cargarPaso (${armadoPcDto}, ${gabineteLista}, 'gabinete', 'gabinetes', 'fuente', 'monitor')"></div>
+
+</div>
 
 <!-- Boostrap core js -->
 <script type="text/javascript" th:src="@{webjars/bootstrap/5.2.0/js/bootstrap.min.js}"></script>
+<script type="text/javascript" th:src="@{js/main.js}"></script>
+<script th:src="@{/webjars/bootstrap/5.2.0/js/bootstrap.bundle.min.js}"></script>
+<script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
