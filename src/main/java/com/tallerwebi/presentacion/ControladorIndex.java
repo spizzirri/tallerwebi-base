@@ -1,5 +1,6 @@
 package com.tallerwebi.presentacion;
 
+import com.tallerwebi.dominio.ServiceCategorias;
 import com.tallerwebi.dominio.ServicioBuscarProducto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -17,9 +18,13 @@ import java.util.List;
 
 @Controller
 public class ControladorIndex {
-    private List<ProductoDto> productos;
+
+    @Autowired
+    private ServiceCategorias categoriasService;
     @Autowired
     private ServicioBuscarProducto productoService;
+
+
 
 //    #1 Equipos y Notebook
 //    #2 Monitores
@@ -32,16 +37,29 @@ public class ControladorIndex {
 
     public ControladorIndex(ServicioBuscarProducto productoService) {
         this.productoService = productoService;
+
     }
 
 
     @GetMapping("/index")
-    public ModelAndView irAHome() {
-        return new ModelAndView("index");
+    public ModelAndView irAlIndex() {
+        List<CategoriaDto> categoriasAMostrar = categoriasService.getCategorias();
+
+        ModelMap model = new ModelMap();
+        CategoriaDto categoriaDestacada = categoriasAMostrar.get(0);
+        List<CategoriaDto> otrasCategorias = categoriasAMostrar.subList(1, categoriasAMostrar.size());
+
+        model.addAttribute("categoriaDestacada", categoriaDestacada);
+        model.addAttribute("otrasCategorias", otrasCategorias);
+
+        List<ProductoDto> productosDescuento = productoService.getProductos();
+        model.addAttribute("productosDescuento", productosDescuento);
+
+        return new ModelAndView("index", model);
     }
 
     @GetMapping("/productos/categoria/{id}")
-    public ModelAndView cargarCategorias(@PathVariable Integer id) {
+    public ModelAndView cargarProductosPorCategoria(@PathVariable Integer id) {
 
         ModelMap model = new ModelMap();
         List<ProductoDto> productosDestacados = productoService.buscarPorCategoria(id);

@@ -1,8 +1,8 @@
 <!-- Esto NO es un fragmento. Es una vista parcial -->
 
-<div class="row row-cols-1 row-cols-md-3 g-4 ">
+<div class="row row-cols-1 row-cols-md-3 g-4 mx-auto ">
     <div class="col" th:each="producto : ${productosDestacados}">
-        <div class="card h-100 border-0 bg-transparent small-card">
+        <div class="card h-100 border-0 bg-transparent">
             <img th:src="@{'/uploads/' + ${producto.imagen}}" class="card-img-top" alt="...">
             <div class="card-body text-start">
                 <p th:text="${producto.nombre}"></p>

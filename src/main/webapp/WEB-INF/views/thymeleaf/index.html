@@ -11,43 +11,46 @@
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
 
   <!-- custom style -->
   <link rel="stylesheet" th:href="@{/css/main.css}"/>
 
 </head>
 
+<!--bg-opacity-25-->
+<body class="bg-secondary-subtle text-dark " style="margin: 0px;padding: 0px;">
 
-<body class="bg-dark text-white" style="margin: 0px;padding: 0px;">
-
-<div class="page-container">
-<nav class="navbar  bg-black text-white">
-  <div class="container">
-
-    <a class="navbar-brand " href="index.html">
-      <img th:src="@{/uploads/dragon-logo.png}" alt="Logo" width="50" height="40">
-      <span class="text-secondary h3 m-0">Compra Gamer 2</span>
+<!-- Header -->
+<header class="sticky-top bg-dark " style="height: 80px; z-index: 1030;">
+  <div class="container-fluid d-flex align-items-center justify-content-between h-100 px-4" style="max-width: 1300px;">
+    <!-- Logo -->
+    <a href="index.html" class="d-flex align-items-center text-decoration-none">
+      <img th:src="@{/uploads/dragon-logo.png}" alt="Logo" width="100" height="80">
+      <span class="ms-2 fw-bold fs-4 text-light">Compra Gamer 2</span>
     </a>
+
     <form class="d-flex" role="search" >
-    <input class="form-control me-2 align-content-center" type="search" placeholder="Search" aria-label="Search">
-    <button class="btn btn-outline-success align-content-center" type="submit">Search</button>
-  </form>
-    <a class="navbar-brand text-decoration-none" th:class="link-light" href="index.html">
-      <i class="bi bi-person">Ingresa</i>
-    </a>
-    <a class="navbar-brand" th:class="link-light" href="index.html">
-      <i class="bi bi-cart3"></i>
-    </a>
+      <input class="bg-dark border border-light-subtle form-control me-2 align-content-center " type="search" placeholder="Buscar productos" aria-label="Search" style="width:400px;">
+      <button class="btn btn-warning align-content-center me-1" type="submit"><i class="bi bi-search"></i></button>
+    </form>
+    <!-- Botones / iconos -->
+    <div>
+      <button class="btn btn-warning me-2"><i class="bi bi-cart3"></i></button>
+      <button class="btn btn-outline-secondary"><i class="bi bi-person">Ingresa</i></button>
+    </div>
   </div>
-</nav>
+</header>
 
-<nav class="bg-secondary-subtle py-3">
+
+
+<nav class="bg-secondary-subtle text-dark py-3 ">
   <div class="container d-flex justify-content-center gap-4">
-    <a class="text-secondary text-decoration-none px-3" href="#">Productos</a>
-    <a class="text-secondary text-decoration-none px-3" href="#">Notebooks</a>
-    <a class="text-secondary text-decoration-none px-3" href="#">Arma tu PC</a>
-    <a class="text-secondary text-decoration-none px-3" href="#">Rastrea tu pedido</a>
-    <a class="text-secondary text-decoration-none px-3" href="#">Ayuda</a>
+    <a class="text-dark text-decoration-none px-3 fs-5" href="#">Productos</a>
+    <a class="text-dark text-decoration-none px-3 fs-5"  href="#">Notebooks</a>
+    <a class="text-dark text-decoration-none px-3 fs-5" href="#">Arma tu PC</a>
+    <a class="text-dark text-decoration-none px-3 fs-5" href="#">Rastrea tu pedido</a>
+    <a class="text-dark text-decoration-none px-3 fs-5" href="#">Ayuda</a>
   </div>
 </nav>
               <!--  //Carrousel-->
@@ -77,29 +80,28 @@
       <span class="visually-hidden">Next</span>
     </button>
   </div>
-<div><h3>Conoce nuestros productos destacados</h3>
+<div class="mx-4 mt-4 mb-3" style="max-width: 1200px;"><h3>Conoce nuestros productos destacados</h3>
 
-  <div>
+  <div class="mb-2 mx-4" style="max-width: 1200px;">
 
-    <a  class="btn btn-warning" th:href="@{/productos/categoria/1}" onclick="event.preventDefault(); cargarProductos(1)" >Equipos y Notebook</a>
-    <a  class="btn btn-warning" th:href="@{/productos/categoria/2}" onclick="event.preventDefault(); cargarProductos(2)">Monitores</a>
-    <a  class="btn btn-warning" th:href="@{/productos/categoria/3}" onclick="event.preventDefault(); cargarProductos(3)" >Televisores</a>
-    <a class="btn btn-warning" th:href="@{/productos/categoria/4}" onclick="event.preventDefault(); cargarProductos(4)" >Placas de Video</a>
-    <a class="btn btn-warning" th:href="@{/productos/categoria/5}" onclick="event.preventDefault(); cargarProductos(5)">Sillas Gamers</a>
-    <a class="btn btn-warning" th:href="@{/productos/categoria/6}" onclick="event.preventDefault(); cargarProductos(6)" >Perificos</a>
-    <a class="btn btn-warning" th:href="@{/productos/categoria/7}" onclick="event.preventDefault(); cargarProductos(7)" >Mothers</a>
-    <a class="btn btn-warning" th:href="@{/productos/categoria/8}" onclick="event.preventDefault(); cargarProductos(8)" >Procesadores</a>
+    <a  class="btn btn-warning mx-1" th:href="@{/productos/categoria/1}" onclick="event.preventDefault(); cargarProductos(1)" >Equipos y Notebook</a>
+    <a  class="btn btn-warning mx-1" th:href="@{/productos/categoria/2}" onclick="event.preventDefault(); cargarProductos(2)">Monitores</a>
+    <a class="btn btn-warning mx-1" th:href="@{/productos/categoria/4}" onclick="event.preventDefault(); cargarProductos(4)" >Placas de Video</a>
+    <a class="btn btn-warning mx-1" th:href="@{/productos/categoria/5}" onclick="event.preventDefault(); cargarProductos(5)">Sillas Gamers</a>
+    <a  class="btn btn-warning mx-1" th:href="@{/productos/categoria/3}" onclick="event.preventDefault(); cargarProductos(3)" >Televisores</a>
+    <a class="btn btn-warning mx-1" th:href="@{/productos/categoria/6}" onclick="event.preventDefault(); cargarProductos(6)" >Perificos</a>
+    <a class="btn btn-warning mx-1" th:href="@{/productos/categoria/7}" onclick="event.preventDefault(); cargarProductos(7)" >Mothers</a>
+    <a class="btn btn-warning mx-1" th:href="@{/productos/categoria/8}" onclick="event.preventDefault(); cargarProductos(8)" >Procesadores</a>
   </div>
 
-  <div id="productos-container">
-
-    <div class="row row-cols-1 row-cols-md-3 g-4  ">
+  <div id="productos-container" class="container py-5" style="max-width: 1200px;">
+    <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center">
       <div class="col" th:each="producto : ${productosDestacados}">
-        <div class="card h-100 border-0 bg-transparent small-card">
-                      <img th:src="@{'/uploads/' + ${producto.imagen}}" class="card-img-top" alt="...">
-          <div class="card-body text-start">
+        <div class="card h-100 border-0 bg-transparent">
+          <img th:src="@{'/uploads/' + ${producto.imagen}}" class="card-img-top" alt="...">
+          <div class="card-body text-center">
             <p th:text="${producto.nombre}"></p>
-            <div class="d-flex align-items-center gap-2">
+            <div class="d-flex justify-content-center align-items-center gap-2">
               <span class="fw-bold" th:text="'$ ' + ${producto.precio}"></span>
               <button class="btn btn-warning"><i class="bi bi-cart3"></i></button>
             </div>
@@ -109,29 +111,23 @@
     </div>
   </div>
 
-</div>
-
-
-
-
-
-<div class="container py-4">
-
-  <div class="position-relative mb-4">
-    <img th:src="@{/uploads/arma-tu-pc2.jpg}" class="img-fluid w-100 rounded-4" style="height: 500px; object-fit: cover;">
-    <div class="position-absolute top-50 end-0 translate-middle-y me-5 p-4 text-white"
-         style="background-color: rgba(0, 0, 0, 0.6); max-width: 30%; border-radius: 10px;">
-      <h3 class="mb-3">Arma tu PC</h3>
-      <p class="mb-4">Configura tu nueva PC sin errores de compatibilidad,
-        seleccionando todos los componentes que deseas.</p>
-      <a href="#" class="btn btn-warning">Ver mas</a>
+  <!-- Sección arma tu PC -->
+  <div class="container py-5">
+    <div class="position-relative mb-4">
+      <img th:src="@{/uploads/arma-tu-pc2.jpg}" class="img-fluid w-100 rounded-4" style="height: 500px; object-fit: cover;">
+      <div class="position-absolute top-50 end-0 translate-middle-y me-5 p-4 text-white"
+           style="background-color: rgba(0, 0, 0, 0.6); max-width: 30%; border-radius: 10px;">
+        <h3 class="mb-3">Arma tu PC</h3>
+        <p class="mb-4">Configura tu nueva PC sin errores de compatibilidad,
+          seleccionando todos los componentes que deseas.</p>
+        <a href="#" class="btn btn-warning">Ver mas</a>
+      </div>
     </div>
   </div>
 
 
-
   <div class="position-relative mb-4">
-    <img th:src="@{/uploads/arma-tu-pc4.jpg}" class="img-fluid w-100 rounded-4" style="height: 500px; object-fit: cover;">
+    <img th:src="@{/uploads/arma-tu-pc4.jpg}" class="img-fluid d-block w-100 rounded-4" style="height: 500px; object-fit: cover;">
     <div class="position-absolute top-50 end-0 translate-middle-y me-5 p-4 text-white"
          style="background-color: rgba(0, 0, 0, 0.6); max-width: 30%; border-radius: 10px;">
       <h3 class="mb-3">Arma tu PC</h3>
@@ -170,12 +166,72 @@
 
 </div>
 </div>
+
+<!--Bloque de categorias por huesos-->
+
+
+<div class="container py-1" style="max-width: 1400px;">
+  <h2 class="mb-4 text-dark">Explora nuestras <strong>categorias</strong></h2>
+  <div class="row g-4">
+
+    <!-- Categoría destacada -->
+    <div class="col-12 col-md-6" >
+      <a href="#" class="text-decoration-none">
+        <div class="category-card large-category">
+          <img th:src="@{/uploads/categoria/procesador.jpg}" alt="Procesadores" class="category-img">
+          <div class="category-title">PROCESADORES</div>
+        </div>
+      </a>
+    </div>
+
+    <!-- Resto de categorías -->
+    <div class="col-6 col-md-3" th:each="categoria : ${otrasCategorias}">
+      <a href="#" class="text-decoration-none">
+        <div class="category-card">
+          <img th:src="@{'/uploads/categoria/' + ${categoria.imagen}}" th:alt="${categoria.nombre}" class="category-img">
+          <div class="category-title" th:text="${categoria.nombre}"></div>
+        </div>
+      </a>
+    </div>
+
+  </div>
+</div>
+
+<div class="container py-5" style="max-width: 1400px;">
+  <h2 class="mb-4 text-dark">Productos en <strong>descuento</strong></h2>
+
+  <div class="swiper mySwiper">
+    <div class="swiper-button-next"></div>
+    <div class="swiper-button-prev"></div>
+    <div class="swiper-wrapper">
+
+      <!-- th:each para iterar los productos en descuento -->
+      <div class="swiper-slide" th:each="producto : ${productosDescuento}">
+        <div class="card h-100">
+          <img th:src="@{'/uploads/' + ${producto.imagen}}" class="card-img-top" th:alt="${producto.nombre}">
+          <div class="card-body text-start">
+            <p th:text="${producto.nombre}"></p>
+            <div class="d-flex align-items-center gap-2">
+              <p class="card-text text-danger fw-bold" th:text="'$' + ${producto.precio}"></p>
+              <small class="text-muted text-decoration-line-through" th:text="'$' + ${producto.precio}"></small>
+              <button class="btn btn-warning"><i class="bi bi-cart3"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+</div>
+</div>
+
+
+
 <!-- /.container -->
 
 <!-- Boostrap core js -->
 <script type="text/javascript" th:src="@{webjars/bootstrap/5.2.0/js/bootstrap.min.js}"></script>
 <script type="text/javascript" th:src="@{js/main.js}"></script>
 <script th:src="@{/webjars/bootstrap/5.2.0/js/bootstrap.bundle.min.js}"></script>
+<script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

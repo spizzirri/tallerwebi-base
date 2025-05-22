@@ -17,11 +17,11 @@ public class ServicioBuscarProducto {
         this.productos.add(new ProductoDto("Mouse inalámbrico", 29.99, 6 , "mouse.png"));
         this.productos.add(new ProductoDto("Notebook cheta", 79.99, 1, "notebook.png"));
         this.productos.add(new ProductoDto("Notebook media pelo", 29.99, 1 , "notebook.png"));
-        this.productos.add(new ProductoDto("Silla gamer", 79.99, 5, "silla.png"));
+        this.productos.add(new ProductoDto("Silla gamer", 79.99, 5, "silla.jpg"));
         this.productos.add(new ProductoDto("Plaquita de video", 29.99, 4 ,"auriculares.png"));
         this.productos.add(new ProductoDto("Mother earr", 79.99, 7,"auriculares.png"));
         this.productos.add(new ProductoDto("Procesadoromon", 29.99, 8 ,"auriculares.png"));
-        this.productos.add(new ProductoDto("Monitor", 79.99, 2,"auriculares.png"));
+        this.productos.add(new ProductoDto("Monitor", 79.99, 2,"monitor.jpg"));
         this.productos.add(new ProductoDto("Mouse inalámbrico", 29.99, 6, "mouse.png" ));
         this.productos.add(new ProductoDto("Mouse inalámbrico", 29.99, 6 , "mouse.png"));
         this.productos.add(new ProductoDto("Notebook cheta", 79.99, 1, "notebook.png"));
@@ -57,5 +57,9 @@ public class ServicioBuscarProducto {
             }
         }
         return productosDestacados;
+    }
+
+    public List<ProductoDto> getProductos() {
+        return productos;
     }
 }
