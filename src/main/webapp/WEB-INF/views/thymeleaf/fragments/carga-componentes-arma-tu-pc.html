@@ -159,11 +159,12 @@
                     </div>
                 </div>
                 <div class="border rounded p-3 bg-white text-center">
-                    <p class="mb-1">(0 watts)</p> <!-- aca deberia entrar la sumatoria del armadoPcDto-->
-                    <p class="fw-bold">Total: $0</p> <!-- aca deberia entrar la sumatoria del armadoPcDto-->
+                    <p class="fw-bold" th:text="${'$ ' + armado.precioTotal}"></p> <!-- aca deberia entrar la sumatoria del armadoPcDto-->
                     <div class="d-flex justify-content-between">
                         <a th:if="${producto != 'procesador'}" th:href="${pasoAnterior}" class="btn btn-outline-secondary btn-sm">Anterior paso</a>
-                        <a href="#" class="btn btn-outline-dark btn-sm">Reiniciar armado</a>
+                        <form th:action="@{/arma-tu-pc/tradicional/reiniciar-armado}" method="POST">
+                            <input type="submit" class="btn btn-outline-dark btn-sm" value="Reiniciar Armado">
+                        </form>
                         <a th:if="${producto != 'periferico'}" th:href="${pasoSiguiente}" class="btn btn-outline-danger btn-sm">Siguiente paso</a>
                         <a th:if="${producto == 'periferico'}" th:href="@{/arma-tu-pc/tradicional/resumen}" class="btn btn-outline-danger btn-sm">Finalizar Armado</a>
                     </div>
@@ -207,7 +208,7 @@
                                         <option value="5">5</option>
                                         <option value="6">6</option>
                                     </select>
-                                    <input type="submit" value="Seleccionar">
+                                    <input type="submit" class="btn btn-outline-primary" value="Seleccionar">
                                 </div>
                             </div>
                         </form>

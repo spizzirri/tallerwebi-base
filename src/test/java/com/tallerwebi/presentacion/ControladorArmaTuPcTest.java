@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -845,5 +846,43 @@ public class ControladorArmaTuPcTest {
 
         assertThat(modelAndView.getViewName(), equalTo(vistaEsperada));
         assertThat(modelAndView.getModel().get("error"), equalTo(errorEsperado));
+    }
+
+
+    @Test
+    public void dadoQueExisteUnControladorArmaTuPcCuandoQuieroReiniciarElArmadoPcDtoAnteriorEntoncesElArmadoDeLaSesionSeBorraYMeDevuelveLaVistaDeProcesadores(){
+        // Preparacion
+
+        ArmadoPcDto armado = new ArmadoPcDto();
+        armado.setProcesador(new ComponenteDto(1L, "Procesador", "Procesador1", 1000D, "imagen.jpg", 5));
+        armado.setMotherboard(new ComponenteDto(2L, "Motherboard", "Motherboard2", 2000D, "imagen.jpg", 5));
+        armado.setCooler(new ComponenteDto(3L, "Cooler", "Cooler3", 3000D, "imagen.jpg", 5));
+        armado.setRams(Arrays.asList(new ComponenteDto(1L, "Memoria", "Memoria1", 1000D, "imagen.jpg", 5), new ComponenteDto(1L, "Memoria", "Memoria1", 1000D, "imagen.jpg", 5)));
+        armado.setGpu(new ComponenteDto(2L, "Gpu", "Gpu2", 2000D, "imagen.jpg", 5));
+        armado.setAlmacenamiento(Arrays.asList(
+                new ComponenteDto(3L, "Almacenamiento", "Almacenamiento3", 3000D, "imagen.jpg", 5),
+                new ComponenteDto(3L, "Almacenamiento", "Almacenamiento3", 3000D, "imagen.jpg", 5),
+                new ComponenteDto(3L, "Almacenamiento", "Almacenamiento3", 3000D, "imagen.jpg", 5)
+        ));
+        armado.setFuente(new ComponenteDto(1L, "Fuente", "Fuente1", 1000D, "imagen.jpg", 5));
+        armado.setGabinete(new ComponenteDto(2L, "Gabinete", "Gabinete2", 2000D, "imagen.jpg", 5));
+        armado.setMonitor(new ComponenteDto(3L, "Monitor", "Monitor3", 3000D, "imagen.jpg", 5));
+        armado.setPerifericos(Arrays.asList(
+                new ComponenteDto(1L, "Periferico", "Periferico1", 1000D, "imagen.jpg", 5),
+                new ComponenteDto(2L, "Periferico", "Periferico2", 2000D, "imagen.jpg", 5)
+        ));
+
+        session.setAttribute("armadoPcDto", armado);
+
+        HttpServletRequest request = mock(HttpServletRequest.class);
+
+        // Ejecucion
+
+        ModelAndView modelAndView = this.controlador.reiniciarArmado(session, request);
+
+        // Validacion
+        String vistaEsperada = "redirect:/arma-tu-pc/tradicional/procesador";
+        assertThat(modelAndView.getViewName(), equalTo(vistaEsperada));
+        assertThat(session.getAttribute("armadoPcDto"), nullValue());
     }
 }

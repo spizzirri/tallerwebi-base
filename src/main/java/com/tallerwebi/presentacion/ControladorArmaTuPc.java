@@ -12,6 +12,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.Arrays;
 import java.util.List;
@@ -83,5 +84,13 @@ public class ControladorArmaTuPc {
         else model.put("error", "Seleccione almenos un motherboard, cpu, cooler y gabinete para obtener su armado");
 
         return new ModelAndView("arma-tu-pc/tradicional/resumen", model);
+    }
+
+    @RequestMapping(path = "arma-tu-pc/tradicional/reiniciar-armado", method = RequestMethod.POST)
+    public ModelAndView reiniciarArmado(HttpSession session, HttpServletRequest request) {
+
+        session.removeAttribute("armadoPcDto");
+
+        return new ModelAndView("redirect:/arma-tu-pc/tradicional/procesador");
     }
 }
