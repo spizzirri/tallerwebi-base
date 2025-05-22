@@ -14,7 +14,7 @@ import java.util.List;
 
 // agregar transaccional
 // agregar service
-@Service
+@Service("servicioArmaTuPc")
 @Transactional
 public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
 

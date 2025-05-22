@@ -2,15 +2,18 @@ package com.tallerwebi.infraestructura;
 
 import com.tallerwebi.dominio.RepositorioComponente;
 import com.tallerwebi.dominio.entidades.Componente;
+import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Repository("repositorioComponente")
 public class RepositorioComponenteImpl implements RepositorioComponente {
 
     private List<Componente> componentes;
+
 
     public RepositorioComponenteImpl() {
 

@@ -85,6 +85,4 @@ public class SpringWebConfig implements WebMvcConfigurer {
     public RepositorioComponente repositorioComponente() {
         return new RepositorioComponenteImpl();
     }
-
-
 }
