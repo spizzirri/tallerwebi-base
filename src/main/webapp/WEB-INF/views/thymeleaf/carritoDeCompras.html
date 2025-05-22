@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <title>Carrito de compras</title>
+</head>
+<body>
+<div th:replace="fragments/fragments :: header"></div>
+
+<div class="container">
+    <!-- TABLA DE PRODUCTOS AGREGADOS AL CARRITO  -->
+    <div class="card d-flex align-content-center m-2" style="width: 800px;">
+        <h3 class="card-title m-2">Productos</h3>
+        <div class="card-body">
+            <table class="table">
+                <thead>
+                <tr class="text-center">
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Precio</th>
+                    <th scope="col">Acciones</th>
+                </tr>
+                </thead>
+                <tbody th:if="${productos != null and !productos.isEmpty()}">
+                <tr class="text-center" th:each="producto : ${productos}">
+                    <td th:text="${producto.nombre}"></td>
+                    <td class="precioTotalDelProducto" th:text="${producto.precio * producto.getCantidad()} "></td>
+                    <td class="text-center" th:data-id="${producto.id}">
+                        <div class="d-flex justify-content-center align-items-center gap-2">
+                            <!-- Botón para restar cantidad -->
+                            <button type="button" class="btn btn-outline-secondary btn-sm btnRestarCantidad">-</button>
+                            <!-- Número de  cantidad producto -->
+                            <span th:text="${producto.cantidad}" class="mx-2 productoCantidad"></span>
+
+                            <!-- Botón para agregar cantidad -->
+                            <button type="button" class="btn btn-outline-secondary btn-sm btnSumarCantidad">+</button>
+
+                            <!-- Botón para eliminar -->
+                            <button type="button" th:data-id="${producto.id}"
+                                    class="btn btn-outline-danger btn-sm ms-2 btnEliminarProducto">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+                <tbody th:if="${productos == null or productos.isEmpty()}">
+                <tr>
+                    <td colspan="2">No hay productos en el carrito.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer">
+            <h3 class="card-title m-2 text-end ">
+                Total: <span class="valorTotalDelCarrito" th:text="${valorTotal}"></span>
+            </h3>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="card d-flex flex-column m-2 p-3" style="width: 800px;">
+        <!-- SECCIÓN: ENVÍO -->
+        <div>
+            <h3 class="card-title">Envío</h3>
+            <form method="post" class="card-body p-0">
+                <div class="d-flex justify-content-between mb-3">
+                    <input type="text" class="form-control me-3 w-50" id="codigoPostal" placeholder="Código postal">
+                    <div class="form-check me-5">
+                        <input class="form-check-input" type="checkbox" id="retiroEnLocal">
+                        <label class="form-check-label" for="retiroEnLocal">Retiro en el local</label>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <div class="border rounded p-2 text-center w-25">Costo estimado</div>
+                    <div class="border rounded p-2 text-center w-25">Tiempo estimado</div>
+                    <div class="border rounded p-2 text-center w-25">Zona de entrega</div>
+                </div>
+            </form>
+        </div>
+        <hr class="my-4">
+        <div class="container py-4">
+            <div class="row">
+                <!-- FORMULARIO DE DESCUENTO -->
+                <div class="col-md-6 px-4">
+                    <h3 class="card-title mb-3">Código de descuento</h3>
+                    <div class="mb-2">
+                        <div class="d-flex align-items-center">
+                            <input type="text" class="form-control" name="codigoInput" id="codigoInput"
+                                   placeholder="¿Tenés un código?">
+                            <button type="button" class="btn btn-success ms-2" id="btnAplicarDescuento">
+                                <i class="fa-solid fa-check"></i>
+                            </button>
+                        </div>
+                        <div id="mensajeDescuento" class="alert alert-info py-1 px-2 mt-2 d-none"
+                             style="font-size: 0.9rem;">
+                            <p class="m-0" id="contenidoMensaje"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FORMULARIO DE MÉTODO DE PAGO -->
+                <div class="col-md-6 px-4 border-start">
+                    <h3 class="card-title mb-3">Método de pago</h3>
+                    <form method="post">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" id="transferencia" name="metodoPago"
+                                   value="transferencia" required="required" >
+                            <label class="form-check-label" for="transferencia">Transferencia o Depósito
+                                bancario</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" id="mercadoPago" name="metodoPago"
+                                   value="mercadoPago">
+                            <label class="form-check-label" for="mercadoPago">Mercadopago - Usás tu cuenta de MP</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" id="doceCuotas" name="metodoPago"
+                                   value="doceCuotas">
+                            <label class="form-check-label" for="doceCuotas">Super pago - Hasta 12 cuotas a precio de
+                                lista</label>
+                        </div>
+
+                        <!-- ALERTA Y BOTÓN DE COMPRAR -->
+                        <div class="mt-3 d-flex flex-column align-items-end"
+                             style="max-width: 320px; margin-left: auto;">
+                            <div id="errorMetodoPago" class="alert alert-danger w-100 d-none" role="alert"></div>
+
+                            <div th:if="${error}" class="alert alert-danger w-100" role="alert">
+                                <span th:text="${error}"></span>
+                            </div>
+                                <button type="button" id="btnComprar" class="btn btn-dark">
+                                    Comprar
+                                </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<div class="modal fade" id="miModal" tabindex="-1" aria-labelledby="miModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="miModalLabel">Datos de la tarjeta</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <!-- formulario dentro del modal -->
+                <form method="post" th:action="@{/home}">
+                    <div class="mb-2">
+                        <label for="nombreApellido">Nombre - apellido:</label>
+                        <input type="text" id="nombreApellido" name="nombreApellido" class="form-control"
+                               placeholder="Nombre - apellido como figura en la tarjeta"/>
+                    </div>
+                    <div class="mb-2">
+                        <label for="numeroTarjeta">Número:</label>
+                        <input type="text" id="numeroTarjeta" name="numeroTarjeta" class="form-control"
+                               placeholder="xxxx-xxxx-xxxx-xxxx"/>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-6">
+                            <label for="vencimiento">Vencimiento:</label>
+                            <input type="text" id="vencimiento" name="vencimiento" class="form-control"
+                                   placeholder="12/30"/>
+                        </div>
+                        <div class="col-6">
+                            <label for="codigoSeguridad">Código CVV:</label>
+                            <input type="text" id="codigoSeguridad" name="codigoSeguridad" class="form-control"
+                                   placeholder="341"/>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100 mt-2">Confirmar pago</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:replace="fragments/fragments :: footer"></div>
+<script type="text/javascript" th:src="@{webjars/bootstrap/5.2.0/js/bootstrap.min.js}"></script>
+<script type="text/javascript" th:src="@{js/main.js}"></script>
+<script th:src="@{/webjars/bootstrap/5.2.0/js/bootstrap.bundle.min.js}"></script>
+<script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{js/carritoDeCompras.js}"></script>
+<!--<script type="text/javascript" th:src="@{webjars/bootstrap/5.2.0/js/bootstrap.min.js}"></script>-->
+<script src="https://kit.fontawesome.com/36c2602d92.js" crossorigin="anonymous"></script>
+</body>
+</html>
