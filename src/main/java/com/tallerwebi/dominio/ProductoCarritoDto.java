@@ -1,5 +1,10 @@
-package com.tallerwebi.presentacion;
+package com.tallerwebi.dominio;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ProductoCarritoDto {
 
     private static Long contador = 1L;
@@ -9,11 +14,19 @@ public class ProductoCarritoDto {
     private Double precio;
     private Integer cantidad;
 
-    public ProductoCarritoDto(String nombre, Double precio) {
-        this.id = contador++;
+
+    @JsonCreator
+    public ProductoCarritoDto(
+            @JsonProperty("id") String id,
+            @JsonProperty("nombre") String nombre,
+            @JsonProperty("precio") Double precio,
+            @JsonProperty("cantidad") Integer cantidad,
+            @JsonProperty("descripcion") String descripcion) {
+        this.id = Long.parseLong(id);
         this.nombre = nombre;
         this.precio = precio;
-        this.cantidad = 2;
+        this.cantidad = cantidad;
+        this.descripcion = descripcion;
     }
 
     public Long getId() {

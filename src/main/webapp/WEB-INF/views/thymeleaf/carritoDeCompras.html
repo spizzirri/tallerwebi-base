@@ -11,6 +11,7 @@
 <body>
 <div th:replace="fragments/fragments :: header"></div>
 
+
 <div class="container">
     <!-- TABLA DE PRODUCTOS AGREGADOS AL CARRITO  -->
     <div class="card d-flex align-content-center m-2" style="width: 800px;">
@@ -67,7 +68,7 @@
         <!-- SECCIÓN: ENVÍO -->
         <div>
             <h3 class="card-title">Envío</h3>
-            <form method="post" class="card-body p-0">
+            <form method="post" class="card-body p-0" id="formulario-hidden">
                 <div class="d-flex justify-content-between mb-3">
                     <input type="text" class="form-control me-3 w-50" id="codigoPostal" placeholder="Código postal">
                     <div class="form-check me-5">
@@ -106,10 +107,23 @@
                 <!-- FORMULARIO DE MÉTODO DE PAGO -->
                 <div class="col-md-6 px-4 border-start">
                     <h3 class="card-title mb-3">Método de pago</h3>
-                    <form method="post">
+                    <form method="POST" action="/spring/checkout/create-payment" id="formulario-pago">
+
+                        <!-- Campos ocultos para datos del usuario CAMBIARLO POR DATOS QUE SE CARGUEN DINAMICAMENTE CON THYMELEAF DEL USUARIO LOGUEADO-->
+                        <input type="hidden" name="formularioPagoDTO.nombre" value="Sarlnaga">
+                        <input type="hidden" name="formularioPagoDTO.apellido" value="Lunazeo">
+                        <input type="hidden" name="formularioPagoDTO.email" value="test_user_123456@testuser.com">
+                        <input type="hidden" name="formularioPagoDTO.emailRepetido" value="test_user_123456@testuser.com">
+                        <input type="hidden" name="formularioPagoDTO.telefono" value="15666666666">
+                        <input type="hidden" name="formularioPagoDTO.dni" value="234234223">
+
+                        <!-- Campos dinámicos para productos (se generarán vía JavaScript) -->
+                        <div id="campos-productos"></div>
+
+
                         <div class="form-check mb-2">
                             <input class="form-check-input" type="radio" id="transferencia" name="metodoPago"
-                                   value="transferencia" required="required" >
+                                   value="transferencia" required="required">
                             <label class="form-check-label" for="transferencia">Transferencia o Depósito
                                 bancario</label>
                         </div>
@@ -133,9 +147,9 @@
                             <div th:if="${error}" class="alert alert-danger w-100" role="alert">
                                 <span th:text="${error}"></span>
                             </div>
-                                <button type="button" id="btnComprar" class="btn btn-dark">
-                                    Comprar
-                                </button>
+                            <button type="submit" id="btnComprar" class="btn btn-dark">
+                                Comprar
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -145,52 +159,12 @@
 </div>
 </div>
 
-<div class="modal fade" id="miModal" tabindex="-1" aria-labelledby="miModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="miModalLabel">Datos de la tarjeta</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-            </div>
-            <div class="modal-body">
-                <!-- formulario dentro del modal -->
-                <form method="post" th:action="@{/home}">
-                    <div class="mb-2">
-                        <label for="nombreApellido">Nombre - apellido:</label>
-                        <input type="text" id="nombreApellido" name="nombreApellido" class="form-control"
-                               placeholder="Nombre - apellido como figura en la tarjeta"/>
-                    </div>
-                    <div class="mb-2">
-                        <label for="numeroTarjeta">Número:</label>
-                        <input type="text" id="numeroTarjeta" name="numeroTarjeta" class="form-control"
-                               placeholder="xxxx-xxxx-xxxx-xxxx"/>
-                    </div>
-                    <div class="row mb-2">
-                        <div class="col-6">
-                            <label for="vencimiento">Vencimiento:</label>
-                            <input type="text" id="vencimiento" name="vencimiento" class="form-control"
-                                   placeholder="12/30"/>
-                        </div>
-                        <div class="col-6">
-                            <label for="codigoSeguridad">Código CVV:</label>
-                            <input type="text" id="codigoSeguridad" name="codigoSeguridad" class="form-control"
-                                   placeholder="341"/>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-success w-100 mt-2">Confirmar pago</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
 <div th:replace="fragments/fragments :: footer"></div>
-<script type="text/javascript" th:src="@{webjars/bootstrap/5.2.0/js/bootstrap.min.js}"></script>
-<script type="text/javascript" th:src="@{js/main.js}"></script>
+<script type="text/javascript" th:src="@{/webjars/bootstrap/5.2.0/js/bootstrap.min.js}"></script>
 <script th:src="@{/webjars/bootstrap/5.2.0/js/bootstrap.bundle.min.js}"></script>
 <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
-<script th:src="@{js/carritoDeCompras.js}"></script>
-<!--<script type="text/javascript" th:src="@{webjars/bootstrap/5.2.0/js/bootstrap.min.js}"></script>-->
+<script th:src="@{/js/carritoDeCompras.js}"></script>
 <script src="https://kit.fontawesome.com/36c2602d92.js" crossorigin="anonymous"></script>
 </body>
 </html>

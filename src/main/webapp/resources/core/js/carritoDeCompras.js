@@ -113,47 +113,89 @@ document.addEventListener("DOMContentLoaded", function () {
     })
 })
 
+function extraerProductosDelCarrito() {
+    // Seleccionar todas las filas de productos
+    const filasProductos = document.querySelectorAll("tbody tr");
+
+    // Array para almacenar la información de los productos
+    const productos = [];
+
+    // Recorrer cada fila y extraer la información
+    filasProductos.forEach(fila => {
+        // Extraer el nombre del producto (primer td de la fila)
+        const nombre = fila.querySelector("td:nth-child(1)").textContent.trim();
+
+        // Extraer el precio (elemento con la clase precioTotalDelProducto)
+        const precio = parseFloat(fila.querySelector(".precioTotalDelProducto").textContent.trim());
+
+        // Extraer la cantidad (elemento con la clase productoCantidad)
+        const cantidad = parseInt(fila.querySelector(".productoCantidad").textContent.trim());
+
+        // Extraer el ID del producto del atributo data-id
+        const id = fila.querySelector("td[data-id]").getAttribute("data-id");
+
+        // Agregar el producto al array
+        productos.push({
+            id: id,
+            nombre: nombre,
+            precio: precio,
+            cantidad: cantidad,
+            precioUnitario: precio / cantidad // Calcular el precio unitario
+        });
+    });
+
+    return productos;
+}
+
 // Boton para confirmar compra, verificando metodo de pago
 document.addEventListener("DOMContentLoaded", function () {
     const botonComprar = document.getElementById("btnComprar");
+    const formularioPago = document.getElementById("formulario-pago");
+    const camposProductos = document.getElementById("campos-productos");
+    const codigoDescuentoInput = document.getElementById("codigoInput");
+    const codigoDescuentoHidden = document.getElementById("codigoDescuentoHidden");
 
-    botonComprar.addEventListener("click", function (e) {
-        const metodoSeleccionado = document.querySelector('input[name="metodoPago"]:checked');
-        const errorDiv = document.getElementById("errorMetodoPago");
-        const modal = new bootstrap.Modal(document.getElementById('miModal'));
+    // Preparar el formulario antes de enviarlo
+    formularioPago.addEventListener("submit", function(e) {
+        e.preventDefault(); // Prevenir envío por defecto
 
-        if (!metodoSeleccionado) {
-            e.preventDefault();
-            errorDiv.innerText = "Debes seleccionar un metodo de pago";
+        // Verificar si se seleccionó un método de pago
+        let metodoSeleccionado = document.querySelector('input[name="metodoPago"]:checked');
+        if (metodoSeleccionado === null) {
+            const errorDiv = document.getElementById("errorMetodoPago");
+            errorDiv.innerText = "Debes seleccionar un método de pago";
             errorDiv.classList.remove("d-none");
-            return;
+            return false;
         }
 
-        const formData = new URLSearchParams();
-        formData.append('metodoPago', metodoSeleccionado.value);
+        // Limpiar cualquier mensaje de error previo
+        const errorDiv = document.getElementById("errorMetodoPago");
+        errorDiv.classList.add("d-none");
 
-        // aca hago el ajax a la ruta para guardar el pedido
-        fetch('/spring/carritoDeCompras/formularioDePago', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: formData
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (!data.success) {
-                    e.preventDefault();
-                    errorDiv.innerText = data.error;
-                    errorDiv.classList.remove("d-none");
-                } else {
-                    errorDiv.classList.add("d-none");
-                    data.mostrarModal;
-                    modal.show();
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+        // Actualizar el campo de código de descuento
+        if (codigoDescuentoInput && codigoDescuentoInput.value) {
+            codigoDescuentoHidden.value = codigoDescuentoInput.value;
+        }
+
+        // Obtener productos del carrito
+        const productos = extraerProductosDelCarrito();
+
+        // Limpiar campos de productos anteriores
+        camposProductos.innerHTML = '';
+
+        // Crear campos ocultos para cada producto
+        productos.forEach((producto, index) => {
+            // Crear campos para cada propiedad del producto
+            camposProductos.innerHTML += `
+                <input type="hidden" name="productoDtoList[${index}].id" value="${producto.id}">
+                <input type="hidden" name="productoDtoList[${index}].nombre" value="${producto.nombre}">
+                <input type="hidden" name="productoDtoList[${index}].precio" value="${producto.precio}">
+                <input type="hidden" name="productoDtoList[${index}].cantidad" value="${producto.cantidad}">
+                <input type="hidden" name="productoDtoList[${index}].precioUnitario" value="${producto.precioUnitario}">
+            `;
+        });
+
+        // Enviar el formulario
+        formularioPago.submit();
     });
 });
