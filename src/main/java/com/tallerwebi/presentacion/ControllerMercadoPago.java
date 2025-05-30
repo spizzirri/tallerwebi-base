@@ -132,7 +132,6 @@ public class ControllerMercadoPago {
 
         String codigoTransaccion = UUID.randomUUID().toString();
 
-
         PreferenceBackUrlsRequest backUrls = PreferenceBackUrlsRequest.builder()
                 //modificar para que lleve a la vista correcta (todavia no esta creada)
                 .success("http://localhost:8080/spring/checkout/carritoDeCompras/compraFinalizada")
@@ -150,27 +149,9 @@ public class ControllerMercadoPago {
 
         Preference preference = client.create(preferenceRequest);
 
-        guardarDatosCompra(cantidades, idsProductos, formularioPagoDTO.getEmail(), codigoTransaccion);
-
-
         response.sendRedirect(preference.getSandboxInitPoint());
         return null;
     }
-
-    public void guardarDatosCompra(List<Integer> cantidades, List<Long> idsEntradas, String emailUsuario, String codigoTransaccion) {
-        if (cantidades.size() != idsEntradas.size()) {
-            throw new IllegalArgumentException("Las listas de cantidades e IDs de entradas deben tener el mismo tamaño");
-        }
-
-        DatosDeCompra datosCompraPendiente = new DatosDeCompra(codigoTransaccion, emailUsuario);
-        for (int i = 0; i < idsEntradas.size(); i++) {
-          //  ProductoCarritoDto producto = new ProductoCarritoDto("Mouse inalámbrico", 29.99);
-           // datosCompraPendiente.agregarProducto(producto);
-//            this.servicioProductoCompra.guardar(producto);
-        }
-//        this.servicioProductoCompra.guardar(datosCompraPendiente);
-    }
-
 
     @GetMapping("/carritoDeCompras/compraFinalizada")
     public ModelAndView mostrarVistaCompraFinalizada(
@@ -184,7 +165,6 @@ public class ControllerMercadoPago {
         if ("approved".equals(status)) {
             return new ModelAndView("compraRealizada", modelo);
         }
-
         return new ModelAndView("compraRealizada", modelo);
     }
 

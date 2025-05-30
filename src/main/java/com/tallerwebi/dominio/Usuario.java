@@ -7,12 +7,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
-@Entity
+@Entity //genera una entidad en la bd
 public class Usuario {
     private static final String ROL_DEFAULT = "USUARIO";
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY) //identidad y se incrementa de uno en uno (como el autoincrement)
     @JsonProperty("id")
     private Long id;
     @JsonProperty("email")
@@ -31,9 +31,11 @@ public class Usuario {
     private String telefono;
     @JsonProperty("dni")
     private String dni;
+
     public Usuario() {
         // Constructor vacío requerido por JPA
     }
+
     public Usuario(String email, String password, String nombre, String apellido, String telefono, String dni) {
         this.email = email;
         this.password = password;
