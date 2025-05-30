@@ -1,28 +1,24 @@
 package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.ProductoCarritoDto;
-import com.tallerwebi.dominio.ProductoService;
+import com.tallerwebi.dominio.ServicioProductoCarrito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RestController
 public class CarritoController {
     private static final Logger logger = LoggerFactory.getLogger(CarritoController.class);
 
-    private final ProductoService productoService;
+    private final ServicioProductoCarrito productoService;
 
-    public CarritoController(ProductoService productoService) {
-        this.productoService = productoService;
+    public CarritoController(ServicioProductoCarrito servicioProductoCarrito) {
+        this.productoService = servicioProductoCarrito;
     }
 
     public ProductoCarritoDto buscarPorId(Long id){

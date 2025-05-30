@@ -6,23 +6,19 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
-public class ProductoService {
+public class ServicioProductoCarrito {
 
-    private final List<ProductoCarritoDto> productos;
+    private List<ProductoCarritoDto> productos;
     public Double valorTotal = 0.0;
     public Double valorTotalConDescuento = 0.0;
 
-    @Autowired
-    public ProductoService(RepositorioUsuario repositorioUsuario){
+    public ServicioProductoCarrito(){
         this.productos = new ArrayList<ProductoCarritoDto>();
         this.productos.add(new ProductoCarritoDto("1","Mouse inalambrico", 29.99,2,"teclado mecanico"));
         this.productos.add(new ProductoCarritoDto("2","Teclado mecanico", 79.99,2,"teclado mecanico"));
-
     }
 
     public Double calcularValorTotalDeLosProductos() {
@@ -65,4 +61,7 @@ public class ProductoService {
         return this.valorTotalConDescuento;
     }
 
+    public void setProductos(List<ProductoCarritoDto> productos) {
+        this.productos = productos;
+    }
 }

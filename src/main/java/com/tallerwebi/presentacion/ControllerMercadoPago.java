@@ -30,13 +30,13 @@ import java.util.*;
 public class ControllerMercadoPago {
     private static final Logger logger = LoggerFactory.getLogger(ControllerMercadoPago.class);
 
-    private final ProductoService productoService;
+    private final ServicioProductoCarrito servicioProductoCarrito;
 
     @Value("${mercadoPago.accessToken}")
     private String mercadoPagoAccessToken = "TEST-6775356251432010-052721-6aa60902aaef96aebd58e3b7112d3432-477764900";
 
-    public ControllerMercadoPago(ProductoService productoService) {
-        this.productoService = productoService;
+    public ControllerMercadoPago(ServicioProductoCarrito servicioProductoCarrito) {
+        this.servicioProductoCarrito = servicioProductoCarrito;
     }
 
     @PostMapping(value = "/create-payment",consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
@@ -59,7 +59,7 @@ public class ControllerMercadoPago {
         formularioPagoDTO.setCodigoDescuento(allParams.get("formularioPagoDTO.codigoDescuento"));
         pagoRequest.setFormularioPagoDTO(formularioPagoDTO);
         // Usa los productos del carrito en lugar de intentar obtenerlos del formulario
-         pagoRequest.setProductos(productoService.getProductos());
+         pagoRequest.setProductos(servicioProductoCarrito.getProductos());
 
         logger.info("PagoRequest recibido: {}", pagoRequest);
         logger.info("FormularioPagoDTO: {}", pagoRequest.getFormularioPagoDTO());
@@ -92,7 +92,7 @@ public class ControllerMercadoPago {
                 formularioPagoDTO.getApellido(),
                 formularioPagoDTO.getTelefono(),
                 formularioPagoDTO.getDni());
-        Double totalCarrito = productoService.calcularValorTotalDeLosProductos();
+        Double totalCarrito = servicioProductoCarrito.calcularValorTotalDeLosProductos();
 
         // Calcular el descuento si hay un código válido
 

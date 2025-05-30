@@ -104,7 +104,7 @@
                     </div>
                 </div>
 
-                <!-- FORMULARIO DE MÉTODO DE PAGO -->
+                <!-- FORMULARIO DE METODO DE PAGO -->
                 <div class="col-md-6 px-4 border-start">
                     <h3 class="card-title mb-3">Método de pago</h3>
                     <form method="POST" action="/spring/checkout/create-payment" id="formulario-pago">
@@ -120,23 +120,10 @@
                         <!-- Campos dinámicos para productos (se generarán vía JavaScript) -->
                         <div id="campos-productos"></div>
 
-
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="radio" id="transferencia" name="metodoPago"
-                                   value="transferencia" required="required">
-                            <label class="form-check-label" for="transferencia">Transferencia o Depósito
-                                bancario</label>
-                        </div>
                         <div class="form-check mb-2">
                             <input class="form-check-input" type="radio" id="mercadoPago" name="metodoPago"
                                    value="mercadoPago">
-                            <label class="form-check-label" for="mercadoPago">Mercadopago - Usás tu cuenta de MP</label>
-                        </div>
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="radio" id="doceCuotas" name="metodoPago"
-                                   value="doceCuotas">
-                            <label class="form-check-label" for="doceCuotas">Super pago - Hasta 12 cuotas a precio de
-                                lista</label>
+                            <label class="form-check-label" for="mercadoPago">Mercado pago - Usás tu cuenta de MP</label>
                         </div>
 
                         <!-- ALERTA Y BOTÓN DE COMPRAR -->
@@ -148,7 +135,7 @@
                                 <span th:text="${error}"></span>
                             </div>
                             <button type="submit" id="btnComprar" class="btn btn-dark">
-                                Comprar
+                                Finalizar compra
                             </button>
                         </div>
                     </form>
