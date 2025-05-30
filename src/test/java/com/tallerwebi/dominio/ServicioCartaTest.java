@@ -9,7 +9,8 @@ import static org.mockito.Mockito.when;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.tallerwebi.presentacion.CartaDto;
+import com.tallerwebi.dominio.implementaciones.ServicioCartaImpl;
+import com.tallerwebi.presentacion.dtos.CartaDto;
 
 public class ServicioCartaTest {
 

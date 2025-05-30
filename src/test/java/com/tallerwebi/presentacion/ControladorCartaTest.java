@@ -1,7 +1,9 @@
 package com.tallerwebi.presentacion;
 
-import com.tallerwebi.dominio.Carta;
 import com.tallerwebi.dominio.ServicioCarta;
+import com.tallerwebi.dominio.entidades.Carta;
+import com.tallerwebi.presentacion.dtos.CartaDto;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.servlet.ModelAndView;

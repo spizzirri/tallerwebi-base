@@ -2,7 +2,7 @@ package com.tallerwebi.dominio;
 
 import javax.transaction.Transactional;
 
-import com.tallerwebi.presentacion.CartaDto;
+import com.tallerwebi.presentacion.dtos.CartaDto;
 
 @Transactional
 public interface ServicioCarta {

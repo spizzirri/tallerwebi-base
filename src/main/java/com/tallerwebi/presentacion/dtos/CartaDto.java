@@ -1,6 +1,6 @@
-package com.tallerwebi.presentacion;
+package com.tallerwebi.presentacion.dtos;
 
-import com.tallerwebi.dominio.Carta;
+import com.tallerwebi.dominio.entidades.Carta;
 
 public class CartaDto {
 
@@ -9,7 +9,7 @@ public class CartaDto {
 
     private CartaDto(){}
 
-    public CartaDto(Carta carta){
+    public CartaDto(com.tallerwebi.dominio.entidades.Carta carta){
         this.id = carta.getId();
         this.nombre = carta.getNombre();
     }

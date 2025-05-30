@@ -8,8 +8,8 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import com.tallerwebi.dominio.Carta;
 import com.tallerwebi.dominio.RepositorioCarta;
+import com.tallerwebi.dominio.entidades.Carta;
 
 @Repository
 public class RepositorioCartaImpl implements RepositorioCarta{

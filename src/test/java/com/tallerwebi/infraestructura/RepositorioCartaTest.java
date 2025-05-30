@@ -16,9 +16,9 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import com.tallerwebi.dominio.Carta;
 import com.tallerwebi.dominio.RepositorioCarta;
-import com.tallerwebi.dominio.Tipo;
+import com.tallerwebi.dominio.entidades.Carta;
+import com.tallerwebi.dominio.entidades.Tipo;
 import com.tallerwebi.infraestructura.config.HibernateInfraestructuraTestConfig;
 
 @ExtendWith(SpringExtension.class)
