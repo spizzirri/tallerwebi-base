@@ -35,12 +35,12 @@ public class ServicioArmaTuPcImplTest {
 
         when(repositorioComponenteMock.obtenerComponentesPorTipo(anyString()))
                 .thenReturn(Arrays.asList(
-                new Componente(1L,"Procesador","Procesador1", 1000D, "imagen.jpg", 5),
-                new Componente(2L,"Procesador","Procesador2", 2000D, "imagen.jpg", 5),
-                new Componente(3L,"Procesador","Procesador3", 3000D, "imagen.jpg", 5),
-                new Componente(4L,"Procesador","Procesador4", 4000D, "imagen.jpg", 5),
-                new Componente(5L,"Procesador","Procesador5", 5000D, "imagen.jpg", 5),
-                new Componente(7L,"Procesador","Procesador6", 6000D, "imagen.jpg", 5)
+                new Componente(1L,"Procesador1", 1000D, 5),
+                new Componente(2L,"Procesador2", 2000D, 5),
+                new Componente(3L,"Procesador3", 3000D, 5),
+                new Componente(4L,"Procesador4", 4000D, 5),
+                new Componente(5L,"Procesador5", 5000D, 5),
+                new Componente(7L,"Procesador6", 6000D, 5)
             )
            );
 
@@ -68,13 +68,13 @@ public class ServicioArmaTuPcImplTest {
 
         //Preparacion
         when(this.repositorioComponenteMock.obtenerComponentePorId(anyLong())).thenReturn(
-                new Componente(1L,"Procesador","Procesador1", 1000D, "imagen.jpg", 5)
+                new Componente(1L,"Procesador1", 1000D,5)
         );
         //Ejecucion
         Componente componenteObtenido = this.servicio.obtenerComponentePorId(1L);
 
         //Validacion
-        Componente componenteEsperado = new Componente(1L,"Procesador","Procesador1", 1000D, "imagen.jpg", 5);
+        Componente componenteEsperado = new Componente(1L,"Procesador1", 1000D, 5);
 
         assertEquals(componenteObtenido, componenteEsperado);
     };
@@ -86,7 +86,7 @@ public class ServicioArmaTuPcImplTest {
 
         ArmadoPcDto armadoPcDtoACargarComponente = new ArmadoPcDto();
 
-        when(this.repositorioComponenteMock.obtenerComponentePorId(anyLong())).thenReturn(new Componente(1L,"Procesador","Procesador1", 1000D, "imagen.jpg", 5));
+        when(this.repositorioComponenteMock.obtenerComponentePorId(anyLong())).thenReturn(new Componente(1L,"Procesador1", 1000D, 5));
 
         //Ejecucion
 
@@ -113,7 +113,7 @@ public class ServicioArmaTuPcImplTest {
                                                         )
         );
 
-        when(this.repositorioComponenteMock.obtenerComponentePorId(anyLong())).thenReturn(new Componente(1L,"Memoria","Memoria1", 1000D, "imagen.jpg", 5));
+        when(this.repositorioComponenteMock.obtenerComponentePorId(anyLong())).thenReturn(new Componente(1L,"Memoria1", 1000D, 5));
 
         //Ejecucion
 
