@@ -18,5 +18,6 @@ hs_err_pid*
 /.classpath
 /.idea/
 /.settings/
+/.vscode/
 
 src/main/webapp/resources/core/js/node_modules

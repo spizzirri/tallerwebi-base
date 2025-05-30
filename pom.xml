@@ -20,6 +20,7 @@
         <hibernate.version>5.4.24.Final</hibernate.version>
         <playwright.version>1.36.0</playwright.version>
         <hsqldb.version>2.3.2</hsqldb.version>
+        <mysql.version>8.0.33</mysql.version>
     </properties>
 
     <dependencies>
@@ -107,6 +108,15 @@
             <version>${playwright.version}</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- Conector para MySql -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>${mysql.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        
         <!-- compile only, deployed container will provide this -->
         <!--
         <dependency>
