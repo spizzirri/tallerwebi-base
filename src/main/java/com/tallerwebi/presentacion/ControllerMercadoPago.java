@@ -33,14 +33,14 @@ public class ControllerMercadoPago {
     private final ServicioProductoCarrito servicioProductoCarrito;
 
     @Value("${mercadoPago.accessToken}")
-    private String mercadoPagoAccessToken = "TEST-6775356251432010-052721-6aa60902aaef96aebd58e3b7112d3432-477764900";
+    private String mercadoPagoAccessToken = "APP_USR-3784718513902185-053117-353d2d4a3d09f6e4ff6bd5750e1b6878-2465514854";
 
     public ControllerMercadoPago(ServicioProductoCarrito servicioProductoCarrito) {
         this.servicioProductoCarrito = servicioProductoCarrito;
         this.servicioProductoCarrito.init();
     }
 
-    @PostMapping(value = "/create-payment",consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    @PostMapping(value = "/create-payment", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     @ResponseBody
     public ModelAndView crearPago(HttpServletResponse response,
                                   @RequestParam(value = "metodoDePago", required = false) String metodoDePago,
@@ -60,14 +60,14 @@ public class ControllerMercadoPago {
         formularioPagoDTO.setCodigoDescuento(allParams.get("formularioPagoDTO.codigoDescuento"));
         pagoRequest.setFormularioPagoDTO(formularioPagoDTO);
         // Usa los productos del carrito en lugar de intentar obtenerlos del formulario
-         pagoRequest.setProductos(servicioProductoCarrito.getProductos());
+        pagoRequest.setProductos(servicioProductoCarrito.getProductos());
 
         logger.info("PagoRequest recibido: {}", pagoRequest);
         logger.info("FormularioPagoDTO: {}", pagoRequest.getFormularioPagoDTO());
         logger.info("Método de pago: {}", pagoRequest.getMetodoDePago());
         logger.info("Productos: {}", pagoRequest.getProductos());
 
-        if(metodoDePago == null || metodoDePago.isEmpty()){
+        if (metodoDePago == null || metodoDePago.isEmpty()) {
             logger.warn("Error en procesamiento de compra: método de pago no seleccionado");
         } else {
 
@@ -84,7 +84,7 @@ public class ControllerMercadoPago {
             idsProductos.add(producto.getId());
         }
 
-        MercadoPagoConfig.setAccessToken("TEST-6775356251432010-052721-6aa60902aaef96aebd58e3b7112d3432-477764900");
+        MercadoPagoConfig.setAccessToken("APP_USR-3784718513902185-053117-353d2d4a3d09f6e4ff6bd5750e1b6878-2465514854");
 
         Usuario user = new Usuario(
                 formularioPagoDTO.getEmail(),
@@ -114,34 +114,34 @@ public class ControllerMercadoPago {
         // Crea un objeto de preferencia
         PreferenceClient client = new PreferenceClient();
 
+
         // Crea un ítem en la preferencia
         List<PreferenceItemRequest> items = new ArrayList<>();
         for (int i = 0; i < pagoRequest.getProductos().size(); i++) {
+            double precioFinal = getPrecioFinal(pagoRequest, i);
             PreferenceItemRequest item =
                     PreferenceItemRequest.builder()
                             .title(pagoRequest.getProductos().get(i).getNombre() + " - " + pagoRequest.getProductos().get(i).getDescripcion())
                             .description(pagoRequest.getProductos().get(i).getDescripcion())
                             .quantity(pagoRequest.getProductos().get(i).getCantidad())
                             .currencyId("ARS")
-                            .unitPrice(BigDecimal.valueOf(pagoRequest.getProductos().get(i).getPrecio() *
-                                    (servicioProductoCarrito.valorTotalConDescuento / servicioProductoCarrito.valorTotal)))                            .build();
-
+                            .unitPrice(BigDecimal.valueOf(precioFinal))
+                            .build();
             items.add(item);
         }
 
 
-
         PreferencePayerRequest payer = PreferencePayerRequest.builder()
-                .name(user.getNombre())
-                .surname(user.getApellido())
-                .email(user.getEmail()) // Correo de prueba de comprador
+                .name("Test")
+                .surname("User")
+                .email("test_user_1339781340@testuser.com") // Email ficticio para pruebas
                 .phone(PhoneRequest.builder()
-                        .areaCode(user.getTelefono().substring(0, 2))
-                        .number(user.getTelefono().substring(2, 8))
+                        .areaCode("11")
+                        .number("11112222")
                         .build())
                 .identification(IdentificationRequest.builder()
                         .type("DNI")
-                        .number(user.getDni())
+                        .number("12345678")
                         .build())
                 .build();
 
@@ -162,16 +162,43 @@ public class ControllerMercadoPago {
                         .payer(payer)
                         .build();
 
-        Preference preference = client.create(preferenceRequest);
+        try {
+            Preference preference = client.create(preferenceRequest);
+            response.sendRedirect(preference.getSandboxInitPoint());
+            return null;
+        } catch (MPApiException e) {
+            String errorMsg = e.getApiResponse() != null ? e.getApiResponse().getContent() : "Sin contenido de error";
+            logger.error("MPApiException: Código de estado HTTP = {}, Contenido = {}", e.getStatusCode(), errorMsg, e);
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error al crear la preferencia de pago. Detalle: " + errorMsg);
+            return null;
+        } catch (Exception ex) {
+            logger.error("Excepción inesperada: ", ex);
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error inesperado al procesar el pago.");
+            return null;
+        }
+    }
 
-        response.sendRedirect(preference.getSandboxInitPoint());
-        return null;
+    private double getPrecioFinal(PagoRequest pagoRequest, int i) {
+        double precioOriginal = pagoRequest.getProductos().get(i).getPrecio();
+        double factorDescuento = 1.0;
+
+        if (servicioProductoCarrito.valorTotal != null && servicioProductoCarrito.valorTotal > 0) {
+            factorDescuento = servicioProductoCarrito.valorTotalConDescuento / servicioProductoCarrito.valorTotal;
+        }
+
+        double precioFinal = precioOriginal * factorDescuento;
+
+// Asegurar que sea un número válido y positivo
+        if (Double.isNaN(precioFinal) || precioFinal <= 0) {
+            precioFinal = precioOriginal;
+        }
+        return precioFinal;
     }
 
     @GetMapping("/carritoDeCompras/compraFinalizada")
     public ModelAndView mostrarVistaCompraFinalizada(
             @RequestParam("codigoTransaccion") String codigoTransaccion,
-             @RequestParam("status") String status){
+            @RequestParam("status") String status) {
         ModelMap modelo = new ModelMap();
         // Agregar el código de transacción al modelo
         modelo.put("codigoTransaccion", codigoTransaccion);

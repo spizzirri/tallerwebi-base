@@ -17,8 +17,8 @@ public class ServicioProductoCarrito {
 
     public void init(){
         this.productos = new ArrayList<ProductoCarritoDto>();
-        this.productos.add(new ProductoCarritoDto(1L,"Mouse inalambrico", 29.99,2,"teclado mecanico"));
-        this.productos.add(new ProductoCarritoDto(2L,"Teclado mecanico", 79.99,2,"teclado mecanico"));
+        this.productos.add(new ProductoCarritoDto(1L,"Mouse inalambrico", 8000.000,2,"teclado mecanico"));
+        this.productos.add(new ProductoCarritoDto(2L,"Teclado mecanico", 15000.00,2,"teclado mecanico"));
     }
 
     public Double calcularValorTotalDeLosProductos() {
