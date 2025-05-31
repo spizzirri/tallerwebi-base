@@ -1,7 +1,5 @@
 package com.tallerwebi.presentacion;
 
-import com.tallerwebi.dominio.ProductoCarritoDto;
-
 import java.util.List;
 
 public class PagoRequest {

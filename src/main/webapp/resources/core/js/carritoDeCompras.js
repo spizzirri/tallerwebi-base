@@ -173,7 +173,7 @@ document.addEventListener("DOMContentLoaded", function () {
         errorDiv.classList.add("d-none");
 
         // Actualizar el campo de código de descuento
-        if (codigoDescuentoInput && codigoDescuentoInput.value) {
+        if (codigoDescuentoHidden) {
             codigoDescuentoHidden.value = codigoDescuentoInput.value;
         }
 

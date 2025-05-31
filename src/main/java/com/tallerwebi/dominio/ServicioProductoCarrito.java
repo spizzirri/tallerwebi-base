@@ -1,6 +1,6 @@
 package com.tallerwebi.dominio;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.tallerwebi.presentacion.ProductoCarritoDto;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -15,10 +15,10 @@ public class ServicioProductoCarrito {
     public Double valorTotal = 0.0;
     public Double valorTotalConDescuento = 0.0;
 
-    public ServicioProductoCarrito(){
+    public void init(){
         this.productos = new ArrayList<ProductoCarritoDto>();
-        this.productos.add(new ProductoCarritoDto("1","Mouse inalambrico", 29.99,2,"teclado mecanico"));
-        this.productos.add(new ProductoCarritoDto("2","Teclado mecanico", 79.99,2,"teclado mecanico"));
+        this.productos.add(new ProductoCarritoDto(1L,"Mouse inalambrico", 29.99,2,"teclado mecanico"));
+        this.productos.add(new ProductoCarritoDto(2L,"Teclado mecanico", 79.99,2,"teclado mecanico"));
     }
 
     public Double calcularValorTotalDeLosProductos() {

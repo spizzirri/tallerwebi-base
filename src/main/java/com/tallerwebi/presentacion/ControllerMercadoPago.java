@@ -37,6 +37,7 @@ public class ControllerMercadoPago {
 
     public ControllerMercadoPago(ServicioProductoCarrito servicioProductoCarrito) {
         this.servicioProductoCarrito = servicioProductoCarrito;
+        this.servicioProductoCarrito.init();
     }
 
     @PostMapping(value = "/create-payment",consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
@@ -94,8 +95,22 @@ public class ControllerMercadoPago {
                 formularioPagoDTO.getDni());
         Double totalCarrito = servicioProductoCarrito.calcularValorTotalDeLosProductos();
 
-        // Calcular el descuento si hay un código válido
-
+// Calcular total con descuento si hay código
+        String codigoDescuento = formularioPagoDTO.getCodigoDescuento();
+        if (codigoDescuento != null && !codigoDescuento.isEmpty()) {
+            // Usar tu metodo existente del CarritoController para extraer porcentaje
+            String numeroExtraido = codigoDescuento.replaceAll("^.*?(\\d+)$", "$1");
+            try {
+                Integer porcentaje = Integer.parseInt(numeroExtraido);
+                if (porcentaje == 5 || porcentaje == 10 || porcentaje == 15) {
+                    // Aplicar descuento usando tu servicio existente
+                    servicioProductoCarrito.calcularDescuento(porcentaje);
+                    logger.info("Descuento del {}% aplicado en MercadoPago", porcentaje);
+                }
+            } catch (NumberFormatException e) {
+                logger.warn("Error al procesar código de descuento: {}", codigoDescuento);
+            }
+        }
         // Crea un objeto de preferencia
         PreferenceClient client = new PreferenceClient();
 
@@ -108,8 +123,8 @@ public class ControllerMercadoPago {
                             .description(pagoRequest.getProductos().get(i).getDescripcion())
                             .quantity(pagoRequest.getProductos().get(i).getCantidad())
                             .currencyId("ARS")
-                            .unitPrice(BigDecimal.valueOf(pagoRequest.getProductos().get(i).getPrecio()))
-                            .build();
+                            .unitPrice(BigDecimal.valueOf(pagoRequest.getProductos().get(i).getPrecio() *
+                                    (servicioProductoCarrito.valorTotalConDescuento / servicioProductoCarrito.valorTotal)))                            .build();
 
             items.add(item);
         }

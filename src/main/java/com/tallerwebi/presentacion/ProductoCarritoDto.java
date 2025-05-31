@@ -1,4 +1,4 @@
-package com.tallerwebi.dominio;
+package com.tallerwebi.presentacion;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -12,17 +12,17 @@ public class ProductoCarritoDto {
     private String nombre;
     private String descripcion;
     private Double precio;
-    private Integer cantidad;
+    private Integer cantidad = 1;
 
 
     @JsonCreator
     public ProductoCarritoDto(
-            @JsonProperty("id") String id,
+            @JsonProperty("id") Long id,
             @JsonProperty("nombre") String nombre,
             @JsonProperty("precio") Double precio,
             @JsonProperty("cantidad") Integer cantidad,
             @JsonProperty("descripcion") String descripcion) {
-        this.id = Long.parseLong(id);
+        this.id = id;
         this.nombre = nombre;
         this.precio = precio;
         this.cantidad = cantidad;

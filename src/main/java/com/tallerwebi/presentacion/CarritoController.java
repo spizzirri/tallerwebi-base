@@ -1,6 +1,5 @@
 package com.tallerwebi.presentacion;
 
-import com.tallerwebi.dominio.ProductoCarritoDto;
 import com.tallerwebi.dominio.ServicioProductoCarrito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,11 +18,12 @@ public class CarritoController {
 
     public CarritoController(ServicioProductoCarrito servicioProductoCarrito) {
         this.productoService = servicioProductoCarrito;
+        servicioProductoCarrito.init();
     }
 
-    public ProductoCarritoDto buscarPorId(Long id){
-        for(ProductoCarritoDto productoCarritoDto : this.productoService.getProductos()){
-            if(productoCarritoDto.getId().equals(id)){
+    public ProductoCarritoDto buscarPorId(Long id) {
+        for (ProductoCarritoDto productoCarritoDto : this.productoService.getProductos()) {
+            if (productoCarritoDto.getId().equals(id)) {
                 return productoCarritoDto;
             }
         }
@@ -59,7 +59,7 @@ public class CarritoController {
         Map<String, Object> response = new HashMap<>();
         ProductoCarritoDto productoBuscado = buscarPorId(id);
 
-        if(productoBuscado != null){
+        if (productoBuscado != null) {
             this.productoService.getProductos().remove(productoBuscado);
             response.put("eliminado", true);
         } else {
@@ -74,8 +74,8 @@ public class CarritoController {
     }
 
 
-    private Integer extraerPorcentajeDesdeCodigoDeDescuento(String codigoDescuento){
-        if(codigoDescuento == null || codigoDescuento.isEmpty()){
+    private Integer extraerPorcentajeDesdeCodigoDeDescuento(String codigoDescuento) {
+        if (codigoDescuento == null || codigoDescuento.isEmpty()) {
             return null;
         }
 
@@ -89,13 +89,14 @@ public class CarritoController {
     }
 
     @PostMapping(path = "/carritoDeCompras/aplicarDescuento")
-    @ResponseBody //este metodo no retorna nada, solo se usa para enviar un mensaje de respuesta al cliente cuando se aplica un descuento
+    @ResponseBody
+    //este metodo no retorna nada, solo se usa para enviar un mensaje de respuesta al cliente cuando se aplica un descuento
     public Map<String, String> calcularValorTotalDeLosProductosConDescuento(@RequestBody Map<String, String> codigoDescuentoMap) {
         String codigoDescuento = codigoDescuentoMap.get("codigoInput");
 
         Integer codigoDescuentoExtraido = extraerPorcentajeDesdeCodigoDeDescuento(codigoDescuento);
         Map<String, String> response = new HashMap<>();
-        if(codigoDescuentoExtraido == null || !(codigoDescuentoExtraido == 5 || codigoDescuentoExtraido == 10 || codigoDescuentoExtraido == 15)){
+        if (codigoDescuentoExtraido == null || !(codigoDescuentoExtraido == 5 || codigoDescuentoExtraido == 10 || codigoDescuentoExtraido == 15)) {
             response.put("mensajeDescuento", "Codigo de descuento invalido!"); // muestro un mensaje cuando el codigo no tenrmina en numero o es distinto de los validos para aplicar el descuento
             return response;
         }
@@ -131,7 +132,7 @@ public class CarritoController {
     public Map<String, Object> restarCantidadDeUnProducto(@PathVariable Long id) {
         ProductoCarritoDto productoBuscado = buscarPorId(id);
         Map<String, Object> response = new HashMap<>();
-        if(productoBuscado != null && productoBuscado.getCantidad() > 1){
+        if (productoBuscado != null && productoBuscado.getCantidad() > 1) {
             productoBuscado.setCantidad(productoBuscado.getCantidad() - 1);
             this.productoService.calcularValorTotalDeLosProductos();
             Double valorTotalDelProductoBuscado = productoBuscado.getCantidad() * productoBuscado.getPrecio();
@@ -153,7 +154,7 @@ public class CarritoController {
         Map<String, Object> response = new HashMap<>();
         logger.info("Procesando compra con método de pago: {}", metodoDePago);
 
-        if(metodoDePago == null || metodoDePago.isEmpty()){
+        if (metodoDePago == null || metodoDePago.isEmpty()) {
             response.put("success", false);
             response.put("error", "Debes seleccionar un metodo de pago");
             response.put("mostrarModal", false);
@@ -168,6 +169,6 @@ public class CarritoController {
     }
 
     public void limpiarCarrito() {
-
+        this.productoService.setProductos(null);
     }
 }
