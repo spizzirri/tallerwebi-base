@@ -1,5 +1,6 @@
 package com.tallerwebi.presentacion;
 
+import com.tallerwebi.dominio.ServicioDeEnvios;
 import com.tallerwebi.dominio.ServicioProductoCarrito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,9 +16,11 @@ public class CarritoController {
     private static final Logger logger = LoggerFactory.getLogger(CarritoController.class);
 
     private final ServicioProductoCarrito productoService;
+    private final ServicioDeEnvios servicioDeEnvios;
 
-    public CarritoController(ServicioProductoCarrito servicioProductoCarrito) {
+    public CarritoController(ServicioProductoCarrito servicioProductoCarrito, ServicioDeEnvios servicioDeEnvios) {
         this.productoService = servicioProductoCarrito;
+        this.servicioDeEnvios = servicioDeEnvios;
         servicioProductoCarrito.init();
     }
 
@@ -168,7 +171,103 @@ public class CarritoController {
         return response;
     }
 
+    @GetMapping("/carritoDeCompras/compraFinalizada")
+    public ModelAndView mostrarVistaCompraFinalizada(
+            @RequestParam("codigoTransaccion") String codigoTransaccion,
+            @RequestParam("status") String status) {
+        ModelMap modelo = new ModelMap();
+        modelo.put("codigoTransaccion", codigoTransaccion);
+        modelo.put("status", status);
+
+        return new ModelAndView("compraRealizada", modelo);
+    }
+
     public void limpiarCarrito() {
         this.productoService.setProductos(null);
+    }
+
+
+    @PostMapping(path = "/carritoDeCompras/calcularEnvio")
+    public ModelAndView calcularEnvio(@RequestParam(value = "codigoPostal", required = false) String codigoPostal,
+                                      @RequestParam(value = "retiroEnLocal", required = false, defaultValue = "false") boolean retiroEnLocal) {
+        logger.info("Recibido calcularEnvio - CP: {}, Retiro: {}", codigoPostal, retiroEnLocal);
+
+        ModelMap model = new ModelMap();
+
+        model.put("productos", this.productoService.getProductos());
+        Double total = this.productoService.calcularValorTotalDeLosProductos();
+        model.put("valorTotal", total);
+
+        model.put("codigoPostal", codigoPostal);
+        model.put("retiroEnLocal", retiroEnLocal);
+
+        try {
+            if (retiroEnLocal) {
+                // Caso: Retiro en local
+                model.put("envioCalculado", false);
+                model.put("sinCobertura", false);
+                logger.info("Usuario seleccionó retiro en local");
+
+            } else if (codigoPostal != null && !codigoPostal.trim().isEmpty()) {
+                // Caso: Calcular envío
+                logger.info("Calculando envío para CP: {}", codigoPostal);
+
+                if (!codigoPostal.matches("\\d{4}")) {
+                    model.put("errorEnvio", "El código postal debe tener 4 dígitos");
+                    model.put("envioCalculado", false);
+                    model.put("sinCobertura", false);
+                } else {
+                    EnvioDto envio = servicioDeEnvios.calcularEnvio(codigoPostal);
+
+                    if (envio != null) {
+                        model.put("envio", envio);
+                        model.put("envioCalculado", true);
+                        model.put("sinCobertura", false);
+                        logger.info("Envío calculado: ${} - {}", envio.getCosto(), envio.getTiempo());
+                    } else {
+                        model.put("envioCalculado", false);
+                        model.put("sinCobertura", true);
+                        model.put("mensajeEnvio", "No disponemos de envío Andreani para este código postal");
+                        logger.warn("Sin cobertura para CP: {}", codigoPostal);
+                    }
+                }
+            } else {
+                model.put("errorEnvio", "Ingresa un código postal");
+                model.put("envioCalculado", false);
+                model.put("sinCobertura", false);
+            }
+
+        } catch (Exception e) {
+            logger.error("Error al calcular envío", e);
+            model.put("errorEnvio", "Error al calcular envío. Intenta nuevamente.");
+            model.put("envioCalculado", false);
+            model.put("sinCobertura", false);
+        }
+
+        return new ModelAndView("carritoDeCompras", model);
+    }
+
+    @GetMapping(path = "/carritoDeCompras/calcular")
+    @ResponseBody
+    public Map<String, Object> calcularEnvioAjax(@RequestParam String codigoPostal) {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            EnvioDto envio = servicioDeEnvios.calcularEnvio(codigoPostal);
+
+            if (envio != null) {
+                response.put("success", true);
+                response.put("costo", envio.getCosto());
+                response.put("tiempo", envio.getTiempo());
+                response.put("destino", envio.getDestino());
+            } else {
+                response.put("success", false);
+                response.put("mensaje", "Sin cobertura para este código postal");
+            }
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("mensaje", "Error al calcular envío");
+        }
+        return response;
     }
 }

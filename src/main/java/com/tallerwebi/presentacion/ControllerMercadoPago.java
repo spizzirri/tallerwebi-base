@@ -149,9 +149,9 @@ public class ControllerMercadoPago {
 
         PreferenceBackUrlsRequest backUrls = PreferenceBackUrlsRequest.builder()
                 //modificar para que lleve a la vista correcta (todavia no esta creada)
-                .success("http://localhost:8080/spring/checkout/carritoDeCompras/compraFinalizada")
-                .failure("http://localhost:8080/spring/checkout/carritoDeCompras/compraFinalizada?" + codigoTransaccion)
-                .pending("https://www.pending.com")
+                .success("http://localhost:8080/spring/checkout/carritoDeCompras/compraFinalizada" + codigoTransaccion + "&status=approved")
+                .failure("http://localhost:8080/spring/checkout/carritoDeCompras/compraFinalizada?" + codigoTransaccion + "&status=failure")
+                .pending("http://localhost:8080/spring/checkout/carritoDeCompras/compraFinalizada?codigoTransaccion=" + codigoTransaccion + "&status=pending")
                 .build();
 
         PreferenceRequest preferenceRequest =

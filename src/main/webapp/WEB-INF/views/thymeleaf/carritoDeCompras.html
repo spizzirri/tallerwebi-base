@@ -68,18 +68,71 @@
         <!-- SECCIÓN: ENVÍO -->
         <div>
             <h3 class="card-title">Envío</h3>
-            <form method="post" class="card-body p-0" id="formulario-hidden">
+
+            <form method="post"
+                  th:action="@{/carritoDeCompras/calcularEnvio}"
+                  class="card-body p-0"
+                  id="formulario-envio">
+
                 <div class="d-flex justify-content-between mb-3">
-                    <input type="text" class="form-control me-3 w-50" id="codigoPostal" placeholder="Código postal">
+                    <input type="text"
+                           class="form-control me-3 w-50"
+                           name="codigoPostal"
+                           id="codigoPostal"
+                           th:value="${codigoPostal}"
+                           placeholder="Código postal"
+                           maxlength="4">
+
+                    <button type="submit"
+                            class="btn btn-primary me-3"
+                            id="btnCalcular">
+                        Calcular Envío
+                    </button>
+
                     <div class="form-check me-5">
-                        <input class="form-check-input" type="checkbox" id="retiroEnLocal">
-                        <label class="form-check-label" for="retiroEnLocal">Retiro en el local</label>
+                        <input class="form-check-input"
+                               type="checkbox"
+                               name="retiroEnLocal"
+                               th:checked="${retiroEnLocal}"
+                               id="retiroEnLocal">
+                        <label class="form-check-label" for="retiroEnLocal">
+                            Retiro en el local
+                        </label>
                     </div>
                 </div>
+
+                <!-- Área de loading (solo para JavaScript) -->
+                <div id="loading" class="text-center mb-3 d-none">
+                    <div class="spinner-border spinner-border-sm" role="status"></div>
+                    <small class="ms-2">Calculando...</small>
+                </div>
+
+                <!-- Resultados (se llenan por Thymeleaf O por JavaScript) -->
                 <div class="d-flex justify-content-between">
-                    <div class="border rounded p-2 text-center w-25">Costo estimado</div>
-                    <div class="border rounded p-2 text-center w-25">Tiempo estimado</div>
-                    <div class="border rounded p-2 text-center w-25">Zona de entrega</div>
+                    <div class="border rounded p-2 text-center w-25">
+                        <small class="text-muted d-block">Costo estimado</small>
+                        <span id="costo" class="fw-bold"
+                              th:text="${envioCalculado} ? ('$' + ${envio.costo}) : '-'">-</span>
+                    </div>
+                    <div class="border rounded p-2 text-center w-25">
+                        <small class="text-muted d-block">Tiempo estimado</small>
+                        <span id="tiempo" class="fw-bold"
+                              th:text="${envioCalculado} ? ${envio.tiempo} : '-'">-</span>
+                    </div>
+                    <div class="border rounded p-2 text-center w-25">
+                        <small class="text-muted d-block">Zona de entrega</small>
+                        <span id="zona" class="fw-bold"
+                              th:text="${envioCalculado} ? ${envio.destino} : '-'">-</span>
+                    </div>
+                </div>
+
+                <!-- Mensajes de Thymeleaf -->
+                <div th:if="${errorEnvio}" class="alert alert-danger mt-3">
+                    <small th:text="${errorEnvio}"></small>
+                </div>
+
+                <div th:if="${sinCobertura}" class="alert alert-warning mt-3">
+                    <small th:text="${mensajeEnvio}"></small>
                 </div>
             </form>
         </div>

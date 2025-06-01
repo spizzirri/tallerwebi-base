@@ -1,5 +1,6 @@
 package com.tallerwebi.presentacion;
 
+import com.tallerwebi.dominio.ServicioDeEnvios;
 import com.tallerwebi.dominio.ServicioProductoCarrito;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -28,13 +29,16 @@ public class ControladorCarritoTest {
     private ProductoCarritoDto productoMock2;
     @Mock
     private ServicioProductoCarrito servicioProductoCarritoMock;
+    @Mock
+    private ServicioDeEnvios servicioEnviosMock;
+
     private CarritoController carritoController;
     private List<ProductoCarritoDto> productos;
 
     @BeforeEach
     public void init() {
         MockitoAnnotations.openMocks(this);
-        carritoController = new CarritoController(servicioProductoCarritoMock);
+        carritoController = new CarritoController(servicioProductoCarritoMock, servicioEnviosMock);
         productos = new ArrayList<>();
     }
 
@@ -182,13 +186,13 @@ public class ControladorCarritoTest {
         ServicioProductoCarrito servicioProductoCarritoReal = new ServicioProductoCarrito();
         // inicializo los productos por afuera con un metodo
         servicioProductoCarritoReal.init();
-        CarritoController carritoControllerReal = new CarritoController(servicioProductoCarritoReal);
+        CarritoController carritoControllerReal = new CarritoController(servicioProductoCarritoReal, servicioEnviosMock);
 
         Map<String, Object> response = carritoControllerReal.agregarMasCantidadDeUnProducto(1L);
 
         assertEquals(3, response.get("cantidad"));
-        assertEquals(249.95, response.get("valorTotal"));
-        assertEquals(89.97, response.get("precioTotalDelProducto"));
+        assertEquals(54000.0, response.get("valorTotal"));
+        assertEquals(24000.0, response.get("precioTotalDelProducto"));
     }
 
     @Test
@@ -196,13 +200,13 @@ public class ControladorCarritoTest {
 
         ServicioProductoCarrito servicioProductoCarritoReal = new ServicioProductoCarrito();
         servicioProductoCarritoReal.init();
-        CarritoController carritoControllerReal = new CarritoController(servicioProductoCarritoReal);
+        CarritoController carritoControllerReal = new CarritoController(servicioProductoCarritoReal, servicioEnviosMock);
 
         Map<String, Object> response = carritoControllerReal.restarCantidadDeUnProducto(1L);
 
         assertEquals(1, response.get("cantidad"));
-        assertEquals(189.97, response.get("valorTotal"));
-        assertEquals(29.99, response.get("precioTotalDelProducto"));
+        assertEquals(38000.0, response.get("valorTotal"));
+        assertEquals(8000.0, response.get("precioTotalDelProducto"));
     }
 
     @Test

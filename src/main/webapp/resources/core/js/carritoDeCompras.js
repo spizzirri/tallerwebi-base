@@ -199,3 +199,48 @@ document.addEventListener("DOMContentLoaded", function () {
         formularioPago.submit();
     });
 });
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('formulario-envio');
+    const loading = document.getElementById('loading');
+
+    // Interceptar el envío del formulario para hacerlo con AJAX
+    form.addEventListener('submit', function(e) {
+        const codigoPostal = document.getElementById('codigoPostal').value.trim();
+        const retiroEnLocal = document.getElementById('retiroEnLocal').checked;
+
+        // Si JavaScript está disponible, prevenir submit normal y usar AJAX
+        if (window.fetch && codigoPostal && !retiroEnLocal) {
+            e.preventDefault();
+            calcularConAjax(codigoPostal);
+        }
+        // Si no, deja que funcione normalmente con Thymeleaf
+    });
+
+    function calcularConAjax(codigoPostal) {
+        loading.classList.remove('d-none');
+
+        // Llamada AJAX a tu endpoint JSON
+        fetch(`/spring/carritoDeCompras/calcular?codigoPostal=${codigoPostal}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Actualizar los valores sin recargar la página
+                    document.getElementById('costo').textContent = '$' + data.costo;
+                    document.getElementById('tiempo').textContent = data.tiempo;
+                    document.getElementById('zona').textContent = data.destino;
+                } else {
+                    alert('Sin cobertura para este código postal');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Si falla AJAX, enviar formulario normalmente
+                form.submit();
+            })
+            .finally(() => {
+                loading.classList.add('d-none');
+            });
+    }
+});
