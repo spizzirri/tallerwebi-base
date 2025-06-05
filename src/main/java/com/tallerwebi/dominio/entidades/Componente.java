@@ -21,16 +21,20 @@ public class Componente {
 
     private Integer stock;
 
+    @Column(length = 100)
+    private String marca;
+
     @OneToMany(mappedBy = "componente", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Imagen> imagenes;
 
     public Componente() {}
 
-    public Componente(Long id, String nombre, Double precio, Integer stock) {
+    public Componente(Long id, String nombre, Double precio, Integer stock, String marca) {
         this.id = id;
         this.nombre = nombre;
         this.precio = precio;
         this.stock = stock;
+        this.marca = marca;
         this.imagenes = new ArrayList<>();
     }
 
@@ -64,6 +68,14 @@ public class Componente {
 
     public void setStock(Integer stock) {
         this.stock = stock;
+    }
+
+    public String getMarca() {
+        return marca;
+    }
+
+    public void setMarca(String marca) {
+        this.marca = marca;
     }
 
     public List<Imagen> getImagenes() {

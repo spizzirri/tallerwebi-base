@@ -42,12 +42,12 @@ public class Procesador extends Componente {
 
     public Procesador() {}
 
-    public Procesador(Long id, String nombre, Double precio, Integer stock,
+    public Procesador(Long id, String nombre, Double precio, Integer stock, String marca,
                       String modelo, String socket, String procesoDeFabricacion, Boolean incluyeGraficosIntegrados, String chipsetGPU, String familia,
                       Integer nucleos, Integer hilos, String frecuencia, String frecuenciaTurbo,
                       Boolean incluyeCooler, String tdpPredeterminado,
                       String l1Cache, String l2Cache, String l3Cache) {
-        super(id, nombre, precio, stock);
+        super(id, nombre, precio, stock, marca);
 
         this.modelo = modelo;
         this.socket = socket;
