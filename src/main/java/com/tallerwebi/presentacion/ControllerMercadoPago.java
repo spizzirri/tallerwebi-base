@@ -30,6 +30,7 @@ import java.util.*;
 public class ControllerMercadoPago {
     private static final Logger logger = LoggerFactory.getLogger(ControllerMercadoPago.class);
 
+    //ServicioProductoCarrito sabe los productos que estan en el carrito
     private final ServicioProductoCarrito servicioProductoCarrito;
 
     @Value("${mercadoPago.accessToken}")
@@ -40,17 +41,19 @@ public class ControllerMercadoPago {
         this.servicioProductoCarrito.init();
     }
 
+    //crearPago se activa cuando alguien hace submit en el formulario del carrito (procesar pago)
     @PostMapping(value = "/create-payment", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     @ResponseBody
     public ModelAndView crearPago(HttpServletResponse response,
                                   @RequestParam(value = "metodoDePago", required = false) String metodoDePago,
                                   @RequestParam Map<String, String> allParams,
                                   RedirectAttributes redirectAttributes)
-            throws MPException, MPApiException, IOException, UsuarioExistente, UsuarioExistente {
-        // Crea un objeto PagoRequest manualmente
+            throws IOException {
+
+        // Cre0 un objeto PagoRequest manualmente
         PagoRequest pagoRequest = new PagoRequest();
         pagoRequest.setMetodoDePago(metodoDePago);
-        // Crea y configura el objeto FormularioDePagoDTO
+        // Creo y configuro el objeto FormularioDePagoDTO
         FormularioDePagoDTO formularioPagoDTO = new FormularioDePagoDTO();
         formularioPagoDTO.setNombre(allParams.get("formularioPagoDTO.nombre"));
         formularioPagoDTO.setApellido(allParams.get("formularioPagoDTO.apellido"));
@@ -59,9 +62,11 @@ public class ControllerMercadoPago {
         formularioPagoDTO.setDni(allParams.get("formularioPagoDTO.dni"));
         formularioPagoDTO.setCodigoDescuento(allParams.get("formularioPagoDTO.codigoDescuento"));
         pagoRequest.setFormularioPagoDTO(formularioPagoDTO);
+
         // Usa los productos del carrito en lugar de intentar obtenerlos del formulario
         pagoRequest.setProductos(servicioProductoCarrito.getProductos());
 
+        // Logger para ver los errores
         logger.info("PagoRequest recibido: {}", pagoRequest);
         logger.info("FormularioPagoDTO: {}", pagoRequest.getFormularioPagoDTO());
         logger.info("Método de pago: {}", pagoRequest.getMetodoDePago());
@@ -70,7 +75,6 @@ public class ControllerMercadoPago {
         if (metodoDePago == null || metodoDePago.isEmpty()) {
             logger.warn("Error en procesamiento de compra: método de pago no seleccionado");
         } else {
-
             logger.info("Método de pago seleccionado correctamente: {}", metodoDePago);
         }
 
@@ -84,38 +88,30 @@ public class ControllerMercadoPago {
             idsProductos.add(producto.getId());
         }
 
+        //configuracion de mercado pago para usar la "app" de prueba creada con el usuario vendedorTest
         MercadoPagoConfig.setAccessToken("APP_USR-3784718513902185-053117-353d2d4a3d09f6e4ff6bd5750e1b6878-2465514854");
 
-        Usuario user = new Usuario(
-                formularioPagoDTO.getEmail(),
-                "",
-                formularioPagoDTO.getNombre(),
-                formularioPagoDTO.getApellido(),
-                formularioPagoDTO.getTelefono(),
-                formularioPagoDTO.getDni());
-        Double totalCarrito = servicioProductoCarrito.calcularValorTotalDeLosProductos();
+//        Usuario user = new Usuario(
+//                formularioPagoDTO.getEmail(),
+//                "",
+//                formularioPagoDTO.getNombre(),
+//                formularioPagoDTO.getApellido(),
+//                formularioPagoDTO.getTelefono(),
+//                formularioPagoDTO.getDni());
+//        Double totalCarrito = servicioProductoCarrito.calcularValorTotalDeLosProductos();
+//
+//        // Calcular total con descuento si hay código
+//        String codigoDescuento = formularioPagoDTO.getCodigoDescuento();
+//        if (codigoDescuento != null && !codigoDescuento.isEmpty()) {
+//            // Usar tu metodo existente del CarritoController para extraer porcentaje
+//             totalCarrito = servicioProductoCarrito.calcularDescuento(Integer.valueOf(codigoDescuento));
+//        }
 
-// Calcular total con descuento si hay código
-        String codigoDescuento = formularioPagoDTO.getCodigoDescuento();
-        if (codigoDescuento != null && !codigoDescuento.isEmpty()) {
-            // Usar tu metodo existente del CarritoController para extraer porcentaje
-            String numeroExtraido = codigoDescuento.replaceAll("^.*?(\\d+)$", "$1");
-            try {
-                Integer porcentaje = Integer.parseInt(numeroExtraido);
-                if (porcentaje == 5 || porcentaje == 10 || porcentaje == 15) {
-                    // Aplicar descuento usando tu servicio existente
-                    servicioProductoCarrito.calcularDescuento(porcentaje);
-                    logger.info("Descuento del {}% aplicado en MercadoPago", porcentaje);
-                }
-            } catch (NumberFormatException e) {
-                logger.warn("Error al procesar código de descuento: {}", codigoDescuento);
-            }
-        }
-        // Crea un objeto de preferencia
+        // Creo un objeto de preferencia
         PreferenceClient client = new PreferenceClient();
 
 
-        // Crea un ítem en la preferencia
+        // Creo un ítem con los productos en la preferencia de mercado pago (de forma que lo entienda su sistema)
         List<PreferenceItemRequest> items = new ArrayList<>();
         for (int i = 0; i < pagoRequest.getProductos().size(); i++) {
             double precioFinal = getPrecioFinal(pagoRequest, i);
@@ -130,7 +126,7 @@ public class ControllerMercadoPago {
             items.add(item);
         }
 
-
+        // Creo un comprador para mercado pago con los datos del compradorTest
         PreferencePayerRequest payer = PreferencePayerRequest.builder()
                 .name("Test")
                 .surname("User")
@@ -147,6 +143,7 @@ public class ControllerMercadoPago {
 
         String codigoTransaccion = UUID.randomUUID().toString();
 
+        //Donde redireccionar depues de hacer el pago (arreglarlo para que me devuelva a la vista de nuestra app)
         PreferenceBackUrlsRequest backUrls = PreferenceBackUrlsRequest.builder()
                 //modificar para que lleve a la vista correcta (todavia no esta creada)
                 .success("http://localhost:8080/spring/checkout/carritoDeCompras/compraFinalizada" + codigoTransaccion + "&status=approved")
@@ -154,6 +151,7 @@ public class ControllerMercadoPago {
                 .pending("http://localhost:8080/spring/checkout/carritoDeCompras/compraFinalizada?codigoTransaccion=" + codigoTransaccion + "&status=pending")
                 .build();
 
+        // creo la preferencia final que va a ser mandada a mercado pago para la redireccion a su pagina
         PreferenceRequest preferenceRequest =
                 PreferenceRequest.builder()
                         .items(items)
@@ -162,6 +160,7 @@ public class ControllerMercadoPago {
                         .payer(payer)
                         .build();
 
+        //envio el pedido a mercado pago y me devuelve un link de pago, donde redirige al usuario
         try {
             Preference preference = client.create(preferenceRequest);
             response.sendRedirect(preference.getSandboxInitPoint());
@@ -188,7 +187,7 @@ public class ControllerMercadoPago {
 
         double precioFinal = precioOriginal * factorDescuento;
 
-// Asegurar que sea un número válido y positivo
+        // Asegurar que sea un número válido y positivo
         if (Double.isNaN(precioFinal) || precioFinal <= 0) {
             precioFinal = precioOriginal;
         }
