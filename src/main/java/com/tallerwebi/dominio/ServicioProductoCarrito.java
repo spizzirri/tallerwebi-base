@@ -64,4 +64,8 @@ public class ServicioProductoCarrito {
     public void setProductos(List<ProductoCarritoDto> productos) {
         this.productos = productos;
     }
+
+    public void limpiarCarrito() {
+        this.setProductos(null);
+    }
 }

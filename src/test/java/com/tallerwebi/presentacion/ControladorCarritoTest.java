@@ -122,7 +122,7 @@ public class ControladorCarritoTest {
         Map<String, String> inputConDescuento = new HashMap<>();
         inputConDescuento.put("codigoInput", "baratija5");
 
-        Map<String, String> porcentajeDescuento = carritoController.calcularValorTotalDeLosProductosConDescuento(inputConDescuento);
+        Map<String, Object> porcentajeDescuento = carritoController.calcularValorTotalDeLosProductosConDescuento(inputConDescuento);
 
         assertEquals("Valor con descuento: 313.5", porcentajeDescuento.get("mensaje"));
     }
@@ -143,7 +143,7 @@ public class ControladorCarritoTest {
         Map<String, String> inputConDescuento = new HashMap<>();
         inputConDescuento.put("codigoInput", "baratija10");
 
-        Map<String, String> porcentajeDescuento = carritoController.calcularValorTotalDeLosProductosConDescuento(inputConDescuento);
+        Map<String, Object> porcentajeDescuento = carritoController.calcularValorTotalDeLosProductosConDescuento(inputConDescuento);
 
         assertEquals("Valor con descuento: 297.0", porcentajeDescuento.get("mensaje"));
     }
@@ -164,7 +164,7 @@ public class ControladorCarritoTest {
         Map<String, String> inputConDescuento = new HashMap<>();
         inputConDescuento.put("codigoInput", "baratija15");
 
-        Map<String, String> porcentajeDescuento = carritoController.calcularValorTotalDeLosProductosConDescuento(inputConDescuento);
+        Map<String, Object> porcentajeDescuento = carritoController.calcularValorTotalDeLosProductosConDescuento(inputConDescuento);
 
         assertEquals("Valor con descuento: 280.5", porcentajeDescuento.get("mensaje"));
     }
@@ -174,7 +174,7 @@ public class ControladorCarritoTest {
         Map<String, String> input = new HashMap<>();
         input.put("codigoInput", "descuento99");
 
-        Map<String, String> response = carritoController.calcularValorTotalDeLosProductosConDescuento(input);
+        Map<String, Object> response = carritoController.calcularValorTotalDeLosProductosConDescuento(input);
 
         assertTrue(response.containsKey("mensajeDescuento"));
         assertEquals("Codigo de descuento invalido!", response.get("mensajeDescuento"));

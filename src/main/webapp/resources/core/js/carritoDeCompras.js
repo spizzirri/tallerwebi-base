@@ -94,72 +94,55 @@ document.addEventListener("DOMContentLoaded", function () {
     const contenidoMensaje = document.getElementById("contenidoMensaje");
 
     boton.addEventListener("click", function () {
-        const codigo = input.value.trim()
+        const codigo = input.value.trim();
         if (!codigo) return;
 
         fetch('/spring/carritoDeCompras/aplicarDescuento', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({codigoInput: codigo}) // ¡clave y valor como JSON!
+            body: JSON.stringify({codigoInput: codigo})
         })
             .then(response => response.json())
             .then(data => {
-                contenidoMensaje.innerText = data.mensaje;
-                mensajeParaAlert.classList.remove("d-none");
+                // Mostrar mensaje (éxito o error)
+                if (data.mensaje || data.mensajeDescuento) {
+                    contenidoMensaje.innerText = data.mensaje || data.mensajeDescuento;
+                    mensajeParaAlert.classList.remove("d-none");
+                }
+
+                // Si hay descuento aplicado, actualizar totales
+                if (data.valorTotal) {
+                    // Actualizar total visible
+                    const valorTotalElement = document.querySelector('.valorTotalDelCarrito');
+                    if (valorTotalElement) {
+                        valorTotalElement.textContent = data.valorTotal.toFixed(2);
+                    }
+
+                    // Recalcular total con envío si existe
+                    if (window.datosEnvio && window.datosEnvio.costo) {
+                        const nuevoTotalConEnvio = data.valorTotal + window.datosEnvio.costo;
+                        const parrafoTotal = document.querySelector('.total-con-envio');
+                        if (parrafoTotal) {
+                            parrafoTotal.querySelector('.total-envio-valor').textContent = '$' + nuevoTotalConEnvio.toFixed(2);
+                        }
+                    }
+                }
             })
             .catch(error => {
+                console.error('Error:', error);
                 contenidoMensaje.textContent = 'Hubo un error al aplicar el descuento.';
-            })
-    })
-})
-
-function extraerProductosDelCarrito() {
-    // Seleccionar todas las filas de productos
-    const filasProductos = document.querySelectorAll("tbody tr");
-
-    // Array para almacenar la información de los productos
-    const productos = [];
-
-    // Recorrer cada fila y extraer la información
-    filasProductos.forEach(fila => {
-        // Extraer el nombre del producto (primer td de la fila)
-        const nombre = fila.querySelector("td:nth-child(1)").textContent.trim();
-
-        // Extraer el precio (elemento con la clase precioTotalDelProducto)
-        const precio = parseFloat(fila.querySelector(".precioTotalDelProducto").textContent.trim());
-
-        // Extraer la cantidad (elemento con la clase productoCantidad)
-        const cantidad = parseInt(fila.querySelector(".productoCantidad").textContent.trim());
-
-        // Extraer el ID del producto del atributo data-id
-        const id = fila.querySelector("td[data-id]").getAttribute("data-id");
-
-        // Agregar el producto al array
-        productos.push({
-            id: id,
-            nombre: nombre,
-            precio: precio,
-            cantidad: cantidad,
-            precioUnitario: precio / cantidad // Calcular el precio unitario
-        });
+                mensajeParaAlert.classList.remove("d-none");
+            });
     });
-
-    return productos;
-}
+});
 
 // Boton para confirmar compra, verificando metodo de pago
 document.addEventListener("DOMContentLoaded", function () {
-    const botonComprar = document.getElementById("btnComprar");
     const formularioPago = document.getElementById("formulario-pago");
-    const camposProductos = document.getElementById("campos-productos");
-    const codigoDescuentoInput = document.getElementById("codigoInput");
-    const codigoDescuentoHidden = document.getElementById("codigoDescuentoHidden");
 
-    // Preparar el formulario antes de enviarlo
     formularioPago.addEventListener("submit", function(e) {
-        e.preventDefault(); // Prevenir envío por defecto
+        e.preventDefault();
 
-        // Verificar si se seleccionó un método de pago
         let metodoSeleccionado = document.querySelector('input[name="metodoPago"]:checked');
         if (metodoSeleccionado === null) {
             const errorDiv = document.getElementById("errorMetodoPago");
@@ -168,75 +151,116 @@ document.addEventListener("DOMContentLoaded", function () {
             return false;
         }
 
-        // Limpiar cualquier mensaje de error previo
         const errorDiv = document.getElementById("errorMetodoPago");
         errorDiv.classList.add("d-none");
 
-        // Actualizar el campo de código de descuento
-        if (codigoDescuentoHidden) {
-            codigoDescuentoHidden.value = codigoDescuentoInput.value;
-        }
+        const params = new URLSearchParams();
+        params.append('metodoPago', metodoSeleccionado.value);
 
-        // Obtener productos del carrito
-        const productos = extraerProductosDelCarrito();
-
-        // Limpiar campos de productos anteriores
-        camposProductos.innerHTML = '';
-
-        // Crear campos ocultos para cada producto
-        productos.forEach((producto, index) => {
-            // Crear campos para cada propiedad del producto
-            camposProductos.innerHTML += `
-                <input type="hidden" name="productoDtoList[${index}].id" value="${producto.id}">
-                <input type="hidden" name="productoDtoList[${index}].nombre" value="${producto.nombre}">
-                <input type="hidden" name="productoDtoList[${index}].precio" value="${producto.precio}">
-                <input type="hidden" name="productoDtoList[${index}].cantidad" value="${producto.cantidad}">
-                <input type="hidden" name="productoDtoList[${index}].precioUnitario" value="${producto.precioUnitario}">
-            `;
-        });
-
-        // Enviar el formulario
-        formularioPago.submit();
+        fetch('/spring/carritoDeCompras/formularioPago', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: params
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    if (data.metodoPago === 'mercadoPago') {
+                        crearFormularioMercadoPago(data);
+                    } else {
+                        alert('Método de pago: ' + data.metodoPago + ' procesado correctamente');
+                    }
+                } else {
+                    errorDiv.innerText = data.error;
+                    errorDiv.classList.remove("d-none");
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                errorDiv.innerText = "Error al procesar el pago";
+                errorDiv.classList.remove("d-none");
+            });
     });
 });
 
+function crearFormularioMercadoPago(data) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/spring/checkout/create-payment';
+    form.innerHTML += `<input type="hidden" name="metodoDePago" value="mercadoPago">`;
+
+    let costoEnvio = data.costoEnvio;
+    if (!costoEnvio && window.datosEnvio) {
+        costoEnvio = window.datosEnvio.costo;
+    }
+
+    if (costoEnvio && costoEnvio > 0) {
+        form.innerHTML += `<input type="hidden" name="costoEnvio" value="${costoEnvio}">`;
+        console.log('Enviando costo de envío a MP:', costoEnvio); // Para debug
+    }
+
+    document.body.appendChild(form);
+    form.submit();
+}
 
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('formulario-envio');
     const loading = document.getElementById('loading');
 
-    // Interceptar el envío del formulario para hacerlo con AJAX
     form.addEventListener('submit', function(e) {
         const codigoPostal = document.getElementById('codigoPostal').value.trim();
-        const retiroEnLocal = document.getElementById('retiroEnLocal').checked;
-
-        // Si JavaScript está disponible, prevenir submit normal y usar AJAX
-        if (window.fetch && codigoPostal && !retiroEnLocal) {
+        if (window.fetch && codigoPostal) {
             e.preventDefault();
             calcularConAjax(codigoPostal);
         }
-        // Si no, deja que funcione normalmente con Thymeleaf
     });
 
     function calcularConAjax(codigoPostal) {
         loading.classList.remove('d-none');
 
-        // Llamada AJAX a tu endpoint JSON
         fetch(`/spring/carritoDeCompras/calcular?codigoPostal=${codigoPostal}`)
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Actualizar los valores sin recargar la página
                     document.getElementById('costo').textContent = '$' + data.costo;
                     document.getElementById('tiempo').textContent = data.tiempo;
                     document.getElementById('zona').textContent = data.destino;
+
+                    const totalActual = parseFloat(document.querySelector('.valorTotalDelCarrito').textContent);
+                    const totalConEnvio = totalActual + data.costo;
+                    let parrafoTotal = document.querySelector('.total-con-envio');
+                    if (!parrafoTotal) {
+                        parrafoTotal = document.createElement('p');
+                        parrafoTotal.className = 'total-con-envio';
+                        parrafoTotal.innerHTML = 'Total con envío: <span class="total-envio-valor"></span>';
+
+                        const botonComprar = document.getElementById('btnComprar');
+                        botonComprar.parentElement.insertBefore(parrafoTotal, botonComprar.parentElement.firstChild);
+                    }
+
+                    parrafoTotal.querySelector('.total-envio-valor').textContent = '$' + totalConEnvio.toFixed(2);
+                    parrafoTotal.style.display = 'block';
+
+                    window.datosEnvio = {
+                        costo: data.costo,
+                        destino: data.destino,
+                        codigoPostal: codigoPostal
+                    };
+
                 } else {
                     alert('Sin cobertura para este código postal');
+                    const parrafoTotal = document.querySelector('.total-con-envio');
+                    if (parrafoTotal) {
+                        parrafoTotal.style.display = 'none';
+                    }
+                    // Limpiar datos de envío
+                    window.datosEnvio = null;
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                // Si falla AJAX, enviar formulario normalmente
                 form.submit();
             })
             .finally(() => {

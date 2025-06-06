@@ -18,6 +18,9 @@ public class CarritoController {
     private final ServicioProductoCarrito productoService;
     private final ServicioDeEnvios servicioDeEnvios;
 
+    private String codigoPostalActual;
+    private EnvioDto envioActual;
+
     public CarritoController(ServicioProductoCarrito servicioProductoCarrito, ServicioDeEnvios servicioDeEnvios) {
         this.productoService = servicioProductoCarrito;
         this.servicioDeEnvios = servicioDeEnvios;
@@ -94,18 +97,21 @@ public class CarritoController {
     @PostMapping(path = "/carritoDeCompras/aplicarDescuento")
     @ResponseBody
     //este metodo no retorna nada, solo se usa para enviar un mensaje de respuesta al cliente cuando se aplica un descuento
-    public Map<String, String> calcularValorTotalDeLosProductosConDescuento(@RequestBody Map<String, String> codigoDescuentoMap) {
+    public Map<String, Object> calcularValorTotalDeLosProductosConDescuento(@RequestBody Map<String, String> codigoDescuentoMap) {
         String codigoDescuento = codigoDescuentoMap.get("codigoInput");
 
         Integer codigoDescuentoExtraido = extraerPorcentajeDesdeCodigoDeDescuento(codigoDescuento);
-        Map<String, String> response = new HashMap<>();
+        Map<String, Object> response = new HashMap<>();
+
         if (codigoDescuentoExtraido == null || !(codigoDescuentoExtraido == 5 || codigoDescuentoExtraido == 10 || codigoDescuentoExtraido == 15)) {
-            response.put("mensajeDescuento", "Codigo de descuento invalido!"); // muestro un mensaje cuando el codigo no tenrmina en numero o es distinto de los validos para aplicar el descuento
+            response.put("mensajeDescuento", "Codigo de descuento invalido!");
             return response;
         }
-
         Double valorTotalConDescuento = this.productoService.calcularDescuento(codigoDescuentoExtraido);
-        response.put("mensaje", "Valor con descuento: " + valorTotalConDescuento);
+
+        response.put("mensaje", "Descuento aplicado! Nuevo total: $" + valorTotalConDescuento.toString());
+        response.put("valorTotal", valorTotalConDescuento);
+
         return response;
     }
 
@@ -127,7 +133,6 @@ public class CarritoController {
         response.put("precioTotalDelProducto", valorTotalDelProductoBuscado);
         response.put("valorTotal", this.productoService.valorTotal);
         return response;
-
     }
 
     @PostMapping("/carritoDeCompras/restarCantidadDeUnProducto/{id}")
@@ -155,80 +160,68 @@ public class CarritoController {
     @ResponseBody
     public Map<String, Object> procesarCompra(@RequestParam(value = "metodoPago") String metodoDePago) {
         Map<String, Object> response = new HashMap<>();
-        logger.info("Procesando compra con método de pago: {}", metodoDePago);
 
         if (metodoDePago == null || metodoDePago.isEmpty()) {
             response.put("success", false);
             response.put("error", "Debes seleccionar un metodo de pago");
             response.put("mostrarModal", false);
-            logger.warn("Error en procesamiento de compra: método de pago no seleccionado");
-        } else {
-            response.put("success", true);
-            response.put("mostrarModal", true);
-            response.put("metodoPago", metodoDePago);
-            logger.info("Método de pago seleccionado correctamente: {}", metodoDePago);
+            return response;
         }
+
+        try {
+            if ("mercadopago".equalsIgnoreCase(metodoDePago)) {
+                response.put("success", true);
+                response.put("metodoPago", metodoDePago);
+                if (envioActual != null && codigoPostalActual != null) {
+                    response.put("costoEnvio", envioActual.getCosto());
+                } else {
+                    response.put("success", true);
+                    response.put("metodoPago", metodoDePago);
+                    response.put("mostrarModal", true);
+                }
+            }
+
+        } catch (Exception e) {
+            logger.error("Error al procesar compra: {}", e.getMessage());
+            response.put("success", false);
+            response.put("error", "Error al procesar el pago. Intenta nuevamente.");
+        }
+
         return response;
     }
 
-    @GetMapping("/carritoDeCompras/compraFinalizada")
-    public ModelAndView mostrarVistaCompraFinalizada(
-            @RequestParam("codigoTransaccion") String codigoTransaccion,
-            @RequestParam("status") String status) {
-        ModelMap modelo = new ModelMap();
-        modelo.put("codigoTransaccion", codigoTransaccion);
-        modelo.put("status", status);
-
-        return new ModelAndView("compraRealizada", modelo);
-    }
-
-    public void limpiarCarrito() {
-        this.productoService.setProductos(null);
-    }
-
-
     @PostMapping(path = "/carritoDeCompras/calcularEnvio")
-    public ModelAndView calcularEnvio(@RequestParam(value = "codigoPostal", required = false) String codigoPostal,
-                                      @RequestParam(value = "retiroEnLocal", required = false, defaultValue = "false") boolean retiroEnLocal) {
-        logger.info("Recibido calcularEnvio - CP: {}, Retiro: {}", codigoPostal, retiroEnLocal);
+    public ModelAndView calcularEnvio(@RequestParam(value = "codigoPostal", required = false) String codigoPostal) {
 
         ModelMap model = new ModelMap();
+
+        this.codigoPostalActual = codigoPostal;
 
         model.put("productos", this.productoService.getProductos());
         Double total = this.productoService.calcularValorTotalDeLosProductos();
         model.put("valorTotal", total);
-
         model.put("codigoPostal", codigoPostal);
-        model.put("retiroEnLocal", retiroEnLocal);
 
         try {
-            if (retiroEnLocal) {
-                // Caso: Retiro en local
-                model.put("envioCalculado", false);
-                model.put("sinCobertura", false);
-                logger.info("Usuario seleccionó retiro en local");
-
-            } else if (codigoPostal != null && !codigoPostal.trim().isEmpty()) {
-                // Caso: Calcular envío
-                logger.info("Calculando envío para CP: {}", codigoPostal);
-
+          if (codigoPostal != null && !codigoPostal.trim().isEmpty()) {
                 if (!codigoPostal.matches("\\d{4}")) {
                     model.put("errorEnvio", "El código postal debe tener 4 dígitos");
                     model.put("envioCalculado", false);
                     model.put("sinCobertura", false);
                 } else {
                     EnvioDto envio = servicioDeEnvios.calcularEnvio(codigoPostal);
+                    Double totalConEnvio = total + envio.getCosto();
 
                     if (envio != null) {
+                        this.envioActual = envio;
                         model.put("envio", envio);
+                        model.put("totalConEnvio", totalConEnvio);
                         model.put("envioCalculado", true);
                         model.put("sinCobertura", false);
-                        logger.info("Envío calculado: ${} - {}", envio.getCosto(), envio.getTiempo());
                     } else {
                         model.put("envioCalculado", false);
                         model.put("sinCobertura", true);
                         model.put("mensajeEnvio", "No disponemos de envío Andreani para este código postal");
-                        logger.warn("Sin cobertura para CP: {}", codigoPostal);
                     }
                 }
             } else {
@@ -238,7 +231,6 @@ public class CarritoController {
             }
 
         } catch (Exception e) {
-            logger.error("Error al calcular envío", e);
             model.put("errorEnvio", "Error al calcular envío. Intenta nuevamente.");
             model.put("envioCalculado", false);
             model.put("sinCobertura", false);
@@ -256,15 +248,20 @@ public class CarritoController {
             EnvioDto envio = servicioDeEnvios.calcularEnvio(codigoPostal);
 
             if (envio != null) {
+                this.envioActual = envio;
+                this.codigoPostalActual = codigoPostal;
+
                 response.put("success", true);
                 response.put("costo", envio.getCosto());
                 response.put("tiempo", envio.getTiempo());
                 response.put("destino", envio.getDestino());
             } else {
+                this.envioActual = null; // Limpiar si no hay cobertura
                 response.put("success", false);
                 response.put("mensaje", "Sin cobertura para este código postal");
             }
         } catch (Exception e) {
+            this.envioActual = null; // Limpiar en caso de error
             response.put("success", false);
             response.put("mensaje", "Error al calcular envío");
         }

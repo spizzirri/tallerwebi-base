@@ -3,15 +3,13 @@ package com.tallerwebi.presentacion;
 import java.util.List;
 
 public class PagoRequest {
-    private FormularioDePagoDTO formularioPagoDTO;
     private List<ProductoCarritoDto> productoDtoList;
     private String metodoDePago;
+    private Double costoEnvio = 0.0;
+
 
     // Constructor vacío necesario para el binding
-    public PagoRequest() {
-        this.formularioPagoDTO = new FormularioDePagoDTO();
-    }
-
+    public PagoRequest() {}
 
     public List<ProductoCarritoDto> getProductos() {
         return productoDtoList;
@@ -19,10 +17,6 @@ public class PagoRequest {
 
     public void setProductos(List<ProductoCarritoDto> productos) {
         this.productoDtoList = productos;
-    }
-
-    public FormularioDePagoDTO getFormularioPagoDTO() {
-        return formularioPagoDTO;
     }
 
     public String getMetodoDePago() {
@@ -33,7 +27,11 @@ public class PagoRequest {
         this.metodoDePago = metodoDePago;
     }
 
-    public void setFormularioPagoDTO(FormularioDePagoDTO formularioPagoDTO) {
-        this.formularioPagoDTO = formularioPagoDTO;
+    public Double getCostoEnvio() {
+        return costoEnvio;
+    }
+
+    public void setCostoEnvio(Double costoEnvio) {
+        this.costoEnvio = costoEnvio;
     }
 }
