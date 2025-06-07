@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.ArrayList;
@@ -124,7 +125,7 @@ public class ControladorCarritoTest {
 
         Map<String, Object> porcentajeDescuento = carritoController.calcularValorTotalDeLosProductosConDescuento(inputConDescuento);
 
-        assertEquals("Valor con descuento: 313.5", porcentajeDescuento.get("mensaje"));
+        assertEquals("Descuento aplicado! Nuevo total: $315.5", porcentajeDescuento.get("mensaje"));
     }
 
     @Test
@@ -145,7 +146,7 @@ public class ControladorCarritoTest {
 
         Map<String, Object> porcentajeDescuento = carritoController.calcularValorTotalDeLosProductosConDescuento(inputConDescuento);
 
-        assertEquals("Valor con descuento: 297.0", porcentajeDescuento.get("mensaje"));
+        assertEquals("Descuento aplicado! Nuevo total: $297.0", porcentajeDescuento.get("mensaje"));
     }
 
     @Test
@@ -166,7 +167,7 @@ public class ControladorCarritoTest {
 
         Map<String, Object> porcentajeDescuento = carritoController.calcularValorTotalDeLosProductosConDescuento(inputConDescuento);
 
-        assertEquals("Valor con descuento: 280.5", porcentajeDescuento.get("mensaje"));
+        assertEquals("Descuento aplicado! Nuevo total: $280.5", porcentajeDescuento.get("mensaje"));
     }
 
     @Test
@@ -231,5 +232,54 @@ public class ControladorCarritoTest {
         assertEquals(false, response.get("mostrarModal"));
         assertEquals("Debes seleccionar un metodo de pago", response.get("error"));
         assertNull(response.get("metodoPago"));
+    }
+
+    @Test
+    public void cuandoIngresoUnCodigoPostalValidoObtengoLaVistaDelCarritoConSusValores(){
+        String codigoPostalValido = "1704";
+        Double costoEnvio = 1500.0;
+        Double totalCarrito = 10000.0;
+
+        EnvioDto envioDto = new EnvioDto();
+        envioDto.setCosto(costoEnvio);
+
+        when(servicioEnviosMock.calcularEnvio(codigoPostalValido)).thenReturn(envioDto);
+        when(servicioProductoCarritoMock.getProductos()).thenReturn(List.of());
+        when(servicioProductoCarritoMock.calcularValorTotalDeLosProductos()).thenReturn(totalCarrito);
+
+        ModelAndView modelAndView = carritoController.calcularEnvio(codigoPostalValido);
+        ModelMap modelMap = (ModelMap) modelAndView.getModel();
+
+        assertThat(modelAndView.getViewName(), equalTo("carritoDeCompras"));
+        assertEquals(true, modelMap.get("envioCalculado"));
+        assertEquals(false, modelMap.get("sinCobertura"));
+        assertEquals(totalCarrito + costoEnvio, modelMap.get("totalConEnvio"));
+    }
+
+    @Test
+    public void cuandoIngresoUnCodigoPostalNoValidoObtengoErrorEnElEnvio(){
+        String codigoPostalValido = "12";
+
+        ModelAndView modelAndView = carritoController.calcularEnvio(codigoPostalValido);
+
+        ModelMap modelMap = (ModelMap) modelAndView.getModel();
+
+        assertThat(modelAndView.getViewName(), equalTo("carritoDeCompras"));
+        assertEquals("El código postal debe tener 4 dígitos", modelMap.get("errorEnvio"));
+        assertEquals(false, modelMap.get("envioCalculado"));
+        assertEquals(false, modelMap.get("sinCobertura"));
+    }
+
+    @Test
+    public void cuandoNoHayCoberturaParaElCodigoPostalMuestraMensaje() {
+        when(servicioEnviosMock.calcularEnvio("9999")).thenReturn(null);
+
+        ModelAndView modelAndView = carritoController.calcularEnvio("9999");
+
+        ModelMap model = modelAndView.getModelMap();
+
+        assertEquals(false, model.get("envioCalculado"));
+        assertEquals(true, model.get("sinCobertura"));
+        assertEquals("No disponemos de envío Andreani para este código postal", model.get("mensajeEnvio"));
     }
 }

@@ -198,7 +198,7 @@ function crearFormularioMercadoPago(data) {
 
     if (costoEnvio && costoEnvio > 0) {
         form.innerHTML += `<input type="hidden" name="costoEnvio" value="${costoEnvio}">`;
-        console.log('Enviando costo de envío a MP:', costoEnvio); // Para debug
+        console.log('Enviando costo de envío a MP:', costoEnvio);
     }
 
     document.body.appendChild(form);
@@ -234,7 +234,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (!parrafoTotal) {
                         parrafoTotal = document.createElement('p');
                         parrafoTotal.className = 'total-con-envio';
-                        parrafoTotal.innerHTML = 'Total con envío: <span class="total-envio-valor"></span>';
+                        parrafoTotal.innerHTML = 'Total con envio: <span class="total-envio-valor"></span>';
 
                         const botonComprar = document.getElementById('btnComprar');
                         botonComprar.parentElement.insertBefore(parrafoTotal, botonComprar.parentElement.firstChild);

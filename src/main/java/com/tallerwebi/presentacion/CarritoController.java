@@ -186,7 +186,6 @@ public class CarritoController {
             response.put("success", false);
             response.put("error", "Error al procesar el pago. Intenta nuevamente.");
         }
-
         return response;
     }
 
@@ -210,11 +209,12 @@ public class CarritoController {
                     model.put("sinCobertura", false);
                 } else {
                     EnvioDto envio = servicioDeEnvios.calcularEnvio(codigoPostal);
-                    Double totalConEnvio = total + envio.getCosto();
 
                     if (envio != null) {
                         this.envioActual = envio;
                         model.put("envio", envio);
+                        Double totalConEnvio = total + envio.getCosto();
+
                         model.put("totalConEnvio", totalConEnvio);
                         model.put("envioCalculado", true);
                         model.put("sinCobertura", false);
@@ -224,18 +224,12 @@ public class CarritoController {
                         model.put("mensajeEnvio", "No disponemos de envío Andreani para este código postal");
                     }
                 }
-            } else {
-                model.put("errorEnvio", "Ingresa un código postal");
-                model.put("envioCalculado", false);
-                model.put("sinCobertura", false);
             }
-
         } catch (Exception e) {
             model.put("errorEnvio", "Error al calcular envío. Intenta nuevamente.");
             model.put("envioCalculado", false);
             model.put("sinCobertura", false);
         }
-
         return new ModelAndView("carritoDeCompras", model);
     }
 
