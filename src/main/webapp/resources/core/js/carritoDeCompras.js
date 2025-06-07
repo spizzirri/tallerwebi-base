@@ -104,26 +104,29 @@ document.addEventListener("DOMContentLoaded", function () {
         })
             .then(response => response.json())
             .then(data => {
-                // Mostrar mensaje (éxito o error)
+
                 if (data.mensaje || data.mensajeDescuento) {
                     contenidoMensaje.innerText = data.mensaje || data.mensajeDescuento;
                     mensajeParaAlert.classList.remove("d-none");
                 }
 
-                // Si hay descuento aplicado, actualizar totales
                 if (data.valorTotal) {
-                    // Actualizar total visible
+
                     const valorTotalElement = document.querySelector('.valorTotalDelCarrito');
                     if (valorTotalElement) {
                         valorTotalElement.textContent = data.valorTotal.toFixed(2);
                     }
 
-                    // Recalcular total con envío si existe
                     if (window.datosEnvio && window.datosEnvio.costo) {
                         const nuevoTotalConEnvio = data.valorTotal + window.datosEnvio.costo;
-                        const parrafoTotal = document.querySelector('.total-con-envio');
+                        let parrafoTotal = document.querySelector('.total-con-envio');
+
                         if (parrafoTotal) {
+                            parrafoTotal.innerHTML = 'Total con envio y descuento: <span class="total-envio-valor"></span>';
                             parrafoTotal.querySelector('.total-envio-valor').textContent = '$' + nuevoTotalConEnvio.toFixed(2);
+                            parrafoTotal.style.display = 'block';
+
+                            console.log('Total recalculado con descuento y envío:', nuevoTotalConEnvio);
                         }
                     }
                 }
@@ -154,6 +157,11 @@ document.addEventListener("DOMContentLoaded", function () {
         const errorDiv = document.getElementById("errorMetodoPago");
         errorDiv.classList.add("d-none");
 
+        // mostrar spinner
+        const btnComprar = document.getElementById("btnComprar");
+        btnComprar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Redirigiendo a MercadoPago...';
+        btnComprar.disabled = true;
+
         const params = new URLSearchParams();
         params.append('metodoPago', metodoSeleccionado.value);
 
@@ -167,23 +175,24 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    if (data.metodoPago === 'mercadoPago') {
-                        crearFormularioMercadoPago(data);
-                    } else {
-                        alert('Método de pago: ' + data.metodoPago + ' procesado correctamente');
-                    }
+                    crearFormularioMercadoPago(data);
                 } else {
+                    btnComprar.innerHTML = 'Finalizar compra';
+                    btnComprar.disabled = false;
                     errorDiv.innerText = data.error;
                     errorDiv.classList.remove("d-none");
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
+                btnComprar.innerHTML = 'Finalizar compra';
+                btnComprar.disabled = false;
                 errorDiv.innerText = "Error al procesar el pago";
                 errorDiv.classList.remove("d-none");
             });
     });
 });
+
 
 function crearFormularioMercadoPago(data) {
     const form = document.createElement('form');
@@ -205,17 +214,18 @@ function crearFormularioMercadoPago(data) {
     form.submit();
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('formulario-envio');
     const loading = document.getElementById('loading');
 
-    form.addEventListener('submit', function(e) {
+    form.addEventListener('submit', function (e) {
         const codigoPostal = document.getElementById('codigoPostal').value.trim();
         if (window.fetch && codigoPostal) {
             e.preventDefault();
             calcularConAjax(codigoPostal);
         }
     });
+});
 
     function calcularConAjax(codigoPostal) {
         loading.classList.remove('d-none');
@@ -230,14 +240,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     const totalActual = parseFloat(document.querySelector('.valorTotalDelCarrito').textContent);
                     const totalConEnvio = totalActual + data.costo;
+
                     let parrafoTotal = document.querySelector('.total-con-envio');
+
                     if (!parrafoTotal) {
                         parrafoTotal = document.createElement('p');
                         parrafoTotal.className = 'total-con-envio';
-                        parrafoTotal.innerHTML = 'Total con envio: <span class="total-envio-valor"></span>';
 
                         const botonComprar = document.getElementById('btnComprar');
                         botonComprar.parentElement.insertBefore(parrafoTotal, botonComprar.parentElement.firstChild);
+                    }
+
+                    const hayDescuento = !document.getElementById('mensajeDescuento').classList.contains('d-none');
+
+                    if (hayDescuento) {
+                        parrafoTotal.innerHTML = 'Total con envio y descuento: <span class="total-envio-valor"></span>';
+                        console.log('Calculando envío CON descuento aplicado');
+                    } else {
+                        parrafoTotal.innerHTML = 'Total con envio: <span class="total-envio-valor"></span>';
+                        console.log('Calculando envío SIN descuento');
                     }
 
                     parrafoTotal.querySelector('.total-envio-valor').textContent = '$' + totalConEnvio.toFixed(2);
@@ -249,13 +270,14 @@ document.addEventListener('DOMContentLoaded', function() {
                         codigoPostal: codigoPostal
                     };
 
+                    console.log('Total final con envío:', totalConEnvio);
+
                 } else {
                     alert('Sin cobertura para este código postal');
                     const parrafoTotal = document.querySelector('.total-con-envio');
                     if (parrafoTotal) {
                         parrafoTotal.style.display = 'none';
                     }
-                    // Limpiar datos de envío
                     window.datosEnvio = null;
                 }
             })
@@ -267,4 +289,3 @@ document.addEventListener('DOMContentLoaded', function() {
                 loading.classList.add('d-none');
             });
     }
-});

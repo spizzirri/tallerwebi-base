@@ -12,167 +12,173 @@
 <div th:replace="fragments/fragments :: header"></div>
 
 
-<div class="container">
-    <!-- TABLA DE PRODUCTOS AGREGADOS AL CARRITO  -->
-    <div class="card d-flex align-content-center m-2" style="width: 800px;">
-        <h3 class="card-title m-2">Productos</h3>
-        <div class="card-body">
-            <table class="table">
-                <thead>
-                <tr class="text-center">
-                    <th scope="col">Nombre</th>
-                    <th scope="col">Precio</th>
-                    <th scope="col">Acciones</th>
-                </tr>
-                </thead>
-                <tbody th:if="${productos != null and !productos.isEmpty()}">
-                <tr class="text-center" th:each="producto : ${productos}">
-                    <td th:text="${producto.nombre}"></td>
-                    <td class="precioTotalDelProducto" th:text="${producto.precio * producto.getCantidad()} "></td>
-                    <td class="text-center" th:data-id="${producto.id}">
-                        <div class="d-flex justify-content-center align-items-center gap-2">
-                            <!-- Botón para restar cantidad -->
-                            <button type="button" class="btn btn-outline-secondary btn-sm btnRestarCantidad">-</button>
-                            <!-- Número de  cantidad producto -->
-                            <span th:text="${producto.cantidad}" class="mx-2 productoCantidad"></span>
+<div class="container d-flex justify-content-center py-4">
+    <div class="col-12 col-lg-10 col-xl-8">
 
-                            <!-- Botón para agregar cantidad -->
-                            <button type="button" class="btn btn-outline-secondary btn-sm btnSumarCantidad">+</button>
-
-                            <!-- Botón para eliminar -->
-                            <button type="button" th:data-id="${producto.id}"
-                                    class="btn btn-outline-danger btn-sm ms-2 btnEliminarProducto">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-                </tbody>
-                <tbody th:if="${productos == null or productos.isEmpty()}">
-                <tr>
-                    <td colspan="2">No hay productos en el carrito.</td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-        <div class="card-footer">
-            <h3 class="card-title m-2 text-end ">
-                Total: <span class="valorTotalDelCarrito" th:text="${valorTotal}"></span>
-            </h3>
-        </div>
-    </div>
-
-
-    <div class="container">
-        <div class="card d-flex flex-column m-2 p-3" style="width: 800px;">
-            <!-- SECCIÓN: ENVÍO -->
-            <div>
-                <h3 class="card-title">Envío</h3>
-
-                <form method="post"
-                      th:action="@{/carritoDeCompras/calcularEnvio}"
-                      class="card-body p-0"
-                      id="formulario-envio">
-
-                    <div class="d-flex justify-content-between mb-3">
-                        <input type="text"
-                               class="form-control me-3 w-50"
-                               name="codigoPostal"
-                               id="codigoPostal"
-                               th:value="${codigoPostal}"
-                               placeholder="Código postal"
-                               maxlength="4">
-
-                        <button type="submit"
-                                class="btn btn-primary me-3"
-                                id="btnCalcular">
-                            Calcular Envío
-                        </button>
-                    </div>
-
-                    <!-- Área de loading (solo para JavaScript) -->
-                    <div id="loading" class="text-center mb-3 d-none">
-                        <div class="spinner-border spinner-border-sm" role="status"></div>
-                        <small class="ms-2">Calculando...</small>
-                    </div>
-
-                    <!-- Resultados (se llenan por Thymeleaf O por JavaScript) -->
-                    <div class="d-flex justify-content-between">
-                        <div class="border rounded p-2 text-center w-25">
-                            <small class="text-muted d-block">Costo estimado</small>
-                            <span id="costo" class="fw-bold"
-                                  th:text="${envioCalculado} ? ('$' + ${envio.costo}) : '-'">-</span>
-                        </div>
-                        <div class="border rounded p-2 text-center w-25">
-                            <small class="text-muted d-block">Tiempo estimado</small>
-                            <span id="tiempo" class="fw-bold"
-                                  th:text="${envioCalculado} ? ${envio.tiempo} : '-'">-</span>
-                        </div>
-                        <div class="border rounded p-2 text-center w-25">
-                            <small class="text-muted d-block">Zona de entrega</small>
-                            <span id="zona" class="fw-bold"
-                                  th:text="${envioCalculado} ? ${envio.destino} : '-'">-</span>
-                        </div>
-                    </div>
-
-                    <!-- Mensajes de Thymeleaf -->
-                    <div th:if="${errorEnvio}" class="alert alert-danger mt-3">
-                        <small th:text="${errorEnvio}"></small>
-                    </div>
-
-                    <div th:if="${sinCobertura}" class="alert alert-warning mt-3">
-                        <small th:text="${mensajeEnvio}"></small>
-                    </div>
-                </form>
-            </div>
-            <hr class="my-4">
-            <div class="container py-4">
-                <div class="row">
-                    <!-- FORMULARIO DE DESCUENTO -->
-                    <div class="col-md-6 px-4">
-                        <h3 class="card-title mb-3">Código de descuento</h3>
-                        <div class="mb-2">
-                            <div class="d-flex align-items-center">
-                                <input type="text" class="form-control" name="codigoInput" id="codigoInput"
-                                       placeholder="¿Tenés un código?">
-                                <button type="button" class="btn btn-success ms-2" id="btnAplicarDescuento">
-                                    <i class="fa-solid fa-check"></i>
+        <!-- TABLA DE PRODUCTOS AGREGADOS AL CARRITO -->
+        <div class="card mb-4">
+            <h3 class="card-title m-3">Productos</h3>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                    <tr class="text-center">
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Precio</th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody th:if="${productos != null and !productos.isEmpty()}">
+                    <tr class="text-center" th:each="producto : ${productos}">
+                        <td th:text="${producto.nombre}"></td>
+                        <td class="precioTotalDelProducto" th:text="${producto.precio * producto.getCantidad()}"></td>
+                        <td class="text-center" th:data-id="${producto.id}">
+                            <div class="d-flex justify-content-center align-items-center gap-2">
+                                <!-- Botón para restar cantidad -->
+                                <button type="button" class="btn btn-outline-secondary btn-sm btnRestarCantidad">-</button>
+                                <!-- Número de cantidad producto -->
+                                <span th:text="${producto.cantidad}" class="mx-2 productoCantidad"></span>
+                                <!-- Botón para agregar cantidad -->
+                                <button type="button" class="btn btn-outline-secondary btn-sm btnSumarCantidad">+</button>
+                                <!-- Botón para eliminar -->
+                                <button type="button" th:data-id="${producto.id}"
+                                        class="btn btn-outline-danger btn-sm ms-2 btnEliminarProducto">
+                                    <i class="fa-solid fa-trash"></i>
                                 </button>
                             </div>
-                            <div id="mensajeDescuento" class="alert alert-info py-1 px-2 mt-2 d-none"
-                                 style="font-size: 0.9rem;">
-                                <p class="m-0" id="contenidoMensaje"></p>
+                        </td>
+                    </tr>
+                    </tbody>
+                    <tbody th:if="${productos == null or productos.isEmpty()}">
+                    <tr>
+                        <td colspan="3" class="text-center py-4">No hay productos en el carrito.</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-footer">
+                <h3 class="card-title m-2 text-end">
+                    Total: <span class="valorTotalDelCarrito" th:text="${valorTotal}"></span>
+                </h3>
+            </div>
+        </div>
+
+        <!-- SECCIÓN DE ENVÍO Y PAGO -->
+        <div class="card">
+            <div class="card-body p-4">
+
+                <!-- SECCIÓN: ENVÍO -->
+                <div class="mb-5">
+                    <h3 class="card-title mb-4">Envío</h3>
+                    <form method="post" th:action="@{/carritoDeCompras/calcularEnvio}" id="formulario-envio">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <input type="text"
+                                       class="form-control"
+                                       name="codigoPostal"
+                                       id="codigoPostal"
+                                       th:value="${codigoPostal}"
+                                       placeholder="Código postal"
+                                       maxlength="4">
                             </div>
+                            <div class="col-md-6">
+                                <button type="submit" class="btn btn-primary w-100" id="btnCalcular">
+                                    Calcular Envío
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Área de loading -->
+                        <div id="loading" class="text-center mb-3 d-none">
+                            <div class="spinner-border spinner-border-sm" role="status"></div>
+                            <small class="ms-2">Calculando...</small>
+                        </div>
+
+                        <!-- Resultados del envío -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-4">
+                                <div class="border rounded p-3 text-center">
+                                    <small class="text-muted d-block">Costo estimado</small>
+                                    <span id="costo" class="fw-bold"
+                                          th:text="${envioCalculado} ? ('$' + ${envio.costo}) : '-'">-</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="border rounded p-3 text-center">
+                                    <small class="text-muted d-block">Tiempo estimado</small>
+                                    <span id="tiempo" class="fw-bold"
+                                          th:text="${envioCalculado} ? ${envio.tiempo} : '-'">-</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="border rounded p-3 text-center">
+                                    <small class="text-muted d-block">Zona de entrega</small>
+                                    <span id="zona" class="fw-bold"
+                                          th:text="${envioCalculado} ? ${envio.destino} : '-'">-</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Mensajes de error del envío -->
+                        <div th:if="${errorEnvio}" class="alert alert-danger">
+                            <small th:text="${errorEnvio}"></small>
+                        </div>
+                        <div th:if="${sinCobertura}" class="alert alert-warning">
+                            <small th:text="${mensajeEnvio}"></small>
+                        </div>
+                    </form>
+                </div>
+
+                <hr class="my-5">
+
+                <!-- SECCIÓN DE DESCUENTO Y PAGO -->
+                <div class="row">
+                    <!-- FORMULARIO DE DESCUENTO -->
+                    <div class="col-md-6 mb-4">
+                        <h3 class="card-title mb-3">Código de descuento</h3>
+                        <div class="d-flex align-items-center mb-3">
+                            <input type="text" class="form-control me-2" name="codigoInput" id="codigoInput"
+                                   placeholder="¿Tenés un código?">
+                            <button type="button" class="btn btn-success" id="btnAplicarDescuento">
+                                <i class="fa-solid fa-check"></i>
+                            </button>
+                        </div>
+                        <div id="mensajeDescuento" class="alert alert-info py-2 px-3 d-none"
+                             style="font-size: 0.9rem;">
+                            <p class="m-0" id="contenidoMensaje"></p>
                         </div>
                     </div>
 
-                    <!-- FORMULARIO DE METODO DE PAGO -->
-                    <div class="col-md-6 px-4 border-start">
+                    <!-- FORMULARIO DE MÉTODO DE PAGO -->
+                    <div class="col-md-6">
                         <h3 class="card-title mb-3">Método de pago</h3>
                         <form method="POST" action="/spring/checkout/create-payment" id="formulario-pago">
-
-                            <!-- Campos dinámicos para productos (se generarán vía JavaScript) -->
                             <div id="campos-productos"></div>
 
-                            <div class="form-check mb-2">
+                            <div class="form-check mb-3">
                                 <input class="form-check-input" type="radio" id="mercadoPago" name="metodoPago"
                                        value="mercadoPago">
-                                <label class="form-check-label" for="mercadoPago">Mercado pago - Usás tu cuenta de MP</label>
+                                <label class="form-check-label" for="mercadoPago">
+                                    Mercado pago - Usás tu cuenta de MP
+                                </label>
                             </div>
 
-                            <!-- ALERTA Y BOTÓN DE COMPRAR -->
-                            <div id="errorMetodoPago" class="alert alert-danger w-100 d-none" role="alert"></div>
-                            <div th:if="${error}" class="alert alert-danger w-100" role="alert">
+                            <!-- Alertas y botón -->
+                            <div id="errorMetodoPago" class="alert alert-danger d-none" role="alert"></div>
+                            <div th:if="${error}" class="alert alert-danger" role="alert">
                                 <span th:text="${error}"></span>
                             </div>
-                            <button type="submit" id="btnComprar" class="btn btn-dark">
-                                Finalizar compra
-                            </button>
+
+                            <div class="d-grid">
+                                <button type="submit" id="btnComprar" class="btn btn-dark btn-lg">
+                                    Finalizar compra
+                                </button>
+                            </div>
                         </form>
                     </div>
                 </div>
             </div>
         </div>
+
     </div>
 </div>
 

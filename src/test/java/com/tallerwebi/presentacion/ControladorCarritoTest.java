@@ -217,8 +217,6 @@ public class ControladorCarritoTest {
         Map<String, Object> response = carritoController.procesarCompra(metodoPagoValido);
 
         assertEquals(true, response.get("success"));
-        assertEquals(true, response.get("mostrarModal"));
-        assertEquals(true, response.get("mostrarModal"));
         assertNull(null, response.get("error"));
     }
 
@@ -229,7 +227,6 @@ public class ControladorCarritoTest {
         Map<String, Object> response = carritoController.procesarCompra(metodoPagoNull);
 
         assertEquals(false, response.get("success"));
-        assertEquals(false, response.get("mostrarModal"));
         assertEquals("Debes seleccionar un metodo de pago", response.get("error"));
         assertNull(response.get("metodoPago"));
     }

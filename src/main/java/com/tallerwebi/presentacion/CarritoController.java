@@ -141,12 +141,16 @@ public class CarritoController {
         ProductoCarritoDto productoBuscado = buscarPorId(id);
         Map<String, Object> response = new HashMap<>();
         if (productoBuscado != null && productoBuscado.getCantidad() > 1) {
+
             productoBuscado.setCantidad(productoBuscado.getCantidad() - 1);
             this.productoService.calcularValorTotalDeLosProductos();
+
             Double valorTotalDelProductoBuscado = productoBuscado.getCantidad() * productoBuscado.getPrecio();
+
             response.put("cantidad", productoBuscado.getCantidad());
             response.put("precioTotalDelProducto", valorTotalDelProductoBuscado);
             response.put("valorTotal", this.productoService.valorTotal);
+
             return response;
         } else {
             this.productoService.getProductos().remove(productoBuscado);
@@ -164,25 +168,23 @@ public class CarritoController {
         if (metodoDePago == null || metodoDePago.isEmpty()) {
             response.put("success", false);
             response.put("error", "Debes seleccionar un metodo de pago");
-            response.put("mostrarModal", false);
             return response;
         }
 
         try {
-            if ("mercadopago".equalsIgnoreCase(metodoDePago)) {
+            if ("mercadoPago".equalsIgnoreCase(metodoDePago)) {
                 response.put("success", true);
-                response.put("metodoPago", metodoDePago);
+                response.put("metodoPago", "mercadoPago");
+
                 if (envioActual != null && codigoPostalActual != null) {
                     response.put("costoEnvio", envioActual.getCosto());
-                } else {
-                    response.put("success", true);
-                    response.put("metodoPago", metodoDePago);
-                    response.put("mostrarModal", true);
                 }
+            } else {
+                response.put("success", true);
+                response.put("metodoPago", metodoDePago);
             }
 
         } catch (Exception e) {
-            logger.error("Error al procesar compra: {}", e.getMessage());
             response.put("success", false);
             response.put("error", "Error al procesar el pago. Intenta nuevamente.");
         }
@@ -197,7 +199,9 @@ public class CarritoController {
         this.codigoPostalActual = codigoPostal;
 
         model.put("productos", this.productoService.getProductos());
+
         Double total = this.productoService.calcularValorTotalDeLosProductos();
+
         model.put("valorTotal", total);
         model.put("codigoPostal", codigoPostal);
 
@@ -249,13 +253,14 @@ public class CarritoController {
                 response.put("costo", envio.getCosto());
                 response.put("tiempo", envio.getTiempo());
                 response.put("destino", envio.getDestino());
+                response.put("valorTotal", this.productoService.valorTotal);
             } else {
-                this.envioActual = null; // Limpiar si no hay cobertura
+                this.envioActual = null;
                 response.put("success", false);
                 response.put("mensaje", "Sin cobertura para este código postal");
             }
         } catch (Exception e) {
-            this.envioActual = null; // Limpiar en caso de error
+            this.envioActual = null;
             response.put("success", false);
             response.put("mensaje", "Error al calcular envío");
         }
