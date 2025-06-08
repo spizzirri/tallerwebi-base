@@ -10,10 +10,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNull;
@@ -43,6 +40,7 @@ public class ControladorCarritoTest {
         productos = new ArrayList<>();
     }
 
+    // buscarPorId
     @Test
     public void cuandoBuscoUnProductoPorIdObtengoEseProducto() {
         Long idBuscado = 1L;
@@ -80,12 +78,14 @@ public class ControladorCarritoTest {
         assertNull("El producto no existe!", productoEncontrado);
     }
 
+    // mostrarVistaCarritoDeCompras
     @Test
     public void cuandoQuieroVerElCarritoDeComprasObtengoLaVistaDelCarrito() {
         ModelAndView mostrarVistaCarrito = carritoController.mostrarVistaCarritoDeCompras();
         assertThat(mostrarVistaCarrito.getViewName(), equalTo("carritoDeCompras"));
     }
 
+    // eliminarProductoDelCarrito
     @Test
     public void cuandoQuieroEliminarUnProductoDelCarritoObtengoLaListaDeProductosDelCarritoSinEseProducto() {
         when(productoMock1.getPrecio()).thenReturn(100.0);
@@ -107,6 +107,7 @@ public class ControladorCarritoTest {
         assertEquals(130.0, response.get("valorTotal"));
     }
 
+    // calcularValorTotalDeLosProductosConDescuento
     @Test
     public void cuandoIntroduzcoUnCodigoDeDescuentoDelCincoPorcientoObtengoElPrecioTotalDelCarritoConSuDescuentoAplicado(){
         when(productoMock1.getPrecio()).thenReturn(100.0);
@@ -181,6 +182,7 @@ public class ControladorCarritoTest {
         assertEquals("Codigo de descuento invalido!", response.get("mensajeDescuento"));
     }
 
+    // agregarMasCantidadDeUnProducto
     @Test
     public void cuandoQuieroAgregarUnaUnidadDeUnMismoProductoAlCarritoObtengoEseProductoConLaCantidadSumadaYElValorTotalDelCarritoActualizado() {
 
@@ -196,6 +198,7 @@ public class ControladorCarritoTest {
         assertEquals(24000.0, response.get("precioTotalDelProducto"));
     }
 
+    // restarCantidadDeUnProducto
     @Test
     public void cuandoQuieroRestarUnaUnidadDeUnMismoProductoAlCarritoObtengoEseProductoConLaCantidadSumadaYElValorTotalDelCarritoActualizado() {
 
@@ -210,14 +213,35 @@ public class ControladorCarritoTest {
         assertEquals(8000.0, response.get("precioTotalDelProducto"));
     }
 
+    // procesarCompra
     @Test
-    public void cuandoSeleccionoElMetodoDePagoValidoObtengoUnMensajeDeExito(){
+    public void cuandoSeleccionoElMetodoDePagoValidoSinEnvioObtengoUnMensajeDeExito(){
         String metodoPagoValido = "mercadoPago";
 
         Map<String, Object> response = carritoController.procesarCompra(metodoPagoValido);
 
         assertEquals(true, response.get("success"));
+        assertEquals(metodoPagoValido, response.get("metodoPago"));
         assertNull(null, response.get("error"));
+        assertNull(null, response.get("costoEnvio"));
+    }
+
+    @Test
+    public void cuandoSeleccionoElMetodoDePagoValidoConEnvioIncluyeCostoDeEnvio() {
+        String metodoPagoValido = "mercadoPago";
+
+        EnvioDto envioDto = new EnvioDto();
+        envioDto.setCosto(1500.0);
+        envioDto.setDestino("Ramos Mejia");
+
+        carritoController.envioActual = envioDto;
+        carritoController.codigoPostalActual = "1704";
+
+        Map<String, Object> response = carritoController.procesarCompra(metodoPagoValido);
+
+        assertTrue((Boolean) response.get("success"));
+        assertEquals("mercadoPago", response.get("metodoPago"));
+        assertEquals(1500.0, (Double) response.get("costoEnvio"));
     }
 
     @Test
@@ -229,8 +253,21 @@ public class ControladorCarritoTest {
         assertEquals(false, response.get("success"));
         assertEquals("Debes seleccionar un metodo de pago", response.get("error"));
         assertNull(response.get("metodoPago"));
+        assertNull(response.get("costoEnvio"));
     }
 
+    @Test
+    public void cuandoElMetodoDePagoEsVacioDebeRetornarError(){
+        String metodoPagoVacio = "";
+
+        Map<String, Object> response = carritoController.procesarCompra(metodoPagoVacio);
+
+        assertEquals(false, response.get("success"));
+        assertEquals("Debes seleccionar un metodo de pago", response.get("error"));
+        assertNull(response.get("metodoPago"));
+    }
+
+    // calcularEnvio
     @Test
     public void cuandoIngresoUnCodigoPostalValidoObtengoLaVistaDelCarritoConSusValores(){
         String codigoPostalValido = "1704";
@@ -239,6 +276,8 @@ public class ControladorCarritoTest {
 
         EnvioDto envioDto = new EnvioDto();
         envioDto.setCosto(costoEnvio);
+        envioDto.setDestino("Ramos Mejia");
+        envioDto.setTiempo("1-2 dias habiles");
 
         when(servicioEnviosMock.calcularEnvio(codigoPostalValido)).thenReturn(envioDto);
         when(servicioProductoCarritoMock.getProductos()).thenReturn(List.of());
@@ -251,13 +290,14 @@ public class ControladorCarritoTest {
         assertEquals(true, modelMap.get("envioCalculado"));
         assertEquals(false, modelMap.get("sinCobertura"));
         assertEquals(totalCarrito + costoEnvio, modelMap.get("totalConEnvio"));
+        assertEquals(envioDto, modelMap.get("envio"));
     }
 
     @Test
     public void cuandoIngresoUnCodigoPostalNoValidoObtengoErrorEnElEnvio(){
-        String codigoPostalValido = "12";
+        String codigoPostalInvalido = "12";
 
-        ModelAndView modelAndView = carritoController.calcularEnvio(codigoPostalValido);
+        ModelAndView modelAndView = carritoController.calcularEnvio(codigoPostalInvalido);
 
         ModelMap modelMap = (ModelMap) modelAndView.getModel();
 
@@ -265,18 +305,158 @@ public class ControladorCarritoTest {
         assertEquals("El código postal debe tener 4 dígitos", modelMap.get("errorEnvio"));
         assertEquals(false, modelMap.get("envioCalculado"));
         assertEquals(false, modelMap.get("sinCobertura"));
+        assertEquals(codigoPostalInvalido, modelMap.get("codigoPostal"));
+    }
+
+    @Test
+    public void cuandoElCodigoPostalTieneMasDeCuatroNumerosDevuelveError(){
+        String codigoPostalInvalido = "12345";
+
+        when(servicioProductoCarritoMock.getProductos()).thenReturn(List.of());
+        when(servicioProductoCarritoMock.calcularValorTotalDeLosProductos()).thenReturn(0.0);
+
+        ModelAndView modelAndView = carritoController.calcularEnvio(codigoPostalInvalido);
+        ModelMap model = modelAndView.getModelMap();
+
+        assertEquals("El código postal debe tener 4 dígitos", model.get("errorEnvio"));
+        assertEquals(false, model.get("envioCalculado"));
+        assertEquals(false, model.get("sinCobertura"));
+    }
+
+    @Test
+    public void cuandoElCodigoPostalTieneLetrasDevuelveError(){
+        String codigoPostalInvalido = "aa15";
+        when(servicioProductoCarritoMock.getProductos()).thenReturn(List.of());
+        when(servicioProductoCarritoMock.calcularValorTotalDeLosProductos()).thenReturn(0.0);
+
+        ModelAndView modelAndView = carritoController.calcularEnvio(codigoPostalInvalido);
+        ModelMap model = modelAndView.getModelMap();
+
+        assertEquals("El código postal debe tener 4 dígitos", model.get("errorEnvio"));
+        assertEquals(false, model.get("envioCalculado"));
+        assertEquals(false, model.get("sinCobertura"));
     }
 
     @Test
     public void cuandoNoHayCoberturaParaElCodigoPostalMuestraMensaje() {
-        when(servicioEnviosMock.calcularEnvio("9999")).thenReturn(null);
+        String codigoPostalSinCobertura = "9999";
+        when(servicioEnviosMock.calcularEnvio(codigoPostalSinCobertura)).thenReturn(null);
+        when(servicioProductoCarritoMock.getProductos()).thenReturn(List.of());
+        when(servicioProductoCarritoMock.calcularValorTotalDeLosProductos()).thenReturn(0.0);
 
-        ModelAndView modelAndView = carritoController.calcularEnvio("9999");
-
+        ModelAndView modelAndView = carritoController.calcularEnvio(codigoPostalSinCobertura);
         ModelMap model = modelAndView.getModelMap();
 
         assertEquals(false, model.get("envioCalculado"));
         assertEquals(true, model.get("sinCobertura"));
         assertEquals("No disponemos de envío Andreani para este código postal", model.get("mensajeEnvio"));
+        assertEquals(codigoPostalSinCobertura, model.get("codigoPostal"));
+    }
+
+    @Test
+    public void cuandoElCodigoPostalEsNuloNoCalculaEnvio(){
+        when(servicioProductoCarritoMock.getProductos()).thenReturn(List.of());
+        when(servicioProductoCarritoMock.calcularValorTotalDeLosProductos()).thenReturn(0.0);
+
+        ModelAndView modelAndView = carritoController.calcularEnvio("");
+        ModelMap model = modelAndView.getModelMap();
+
+        assertThat(modelAndView.getViewName(), equalTo("carritoDeCompras"));
+        assertEquals(null, model.get("envioCalculado"));
+        assertEquals("", model.get("codigoPostal"));
+    }
+
+    @Test
+    public void cuandoElCodigoPostalSoloTieneEspaciosNoSeCalculaElEnvio(){
+        when(servicioProductoCarritoMock.getProductos()).thenReturn(List.of());
+        when(servicioProductoCarritoMock.calcularValorTotalDeLosProductos()).thenReturn(0.0);
+
+        ModelAndView modelAndView = carritoController.calcularEnvio(" ");
+        ModelMap model = modelAndView.getModelMap();
+
+        assertThat(modelAndView.getViewName(), equalTo("carritoDeCompras"));
+        assertEquals(null ,model.get("envioCalculado"));
+        assertEquals(" ", model.get("codigoPostal"));
+    }
+
+    @Test
+    public void cuandoElServicioDeEnviosLanzaExcepcionDevuelveError(){
+        String codigoPostal = "1704";
+
+        when(servicioEnviosMock.calcularEnvio(codigoPostal)).thenThrow(new RuntimeException("Error"));
+        when(servicioProductoCarritoMock.getProductos()).thenReturn(List.of());
+        when(servicioProductoCarritoMock.calcularValorTotalDeLosProductos()).thenReturn(0.0);
+
+        ModelAndView modelAndView = carritoController.calcularEnvio(codigoPostal);
+        ModelMap model = modelAndView.getModelMap();
+
+        assertEquals("Error al calcular envío. Intenta nuevamente.", model.get("errorEnvio"));
+        assertEquals(false, model.get("envioCalculado"));
+        assertEquals(false, model.get("sinCobertura"));
+    }
+
+    @Test
+    public void siempreDevuelveLaVistaCorrectaConProductosYTotal(){
+        String codigoPostal = "1704";
+        List<ProductoCarritoDto> productos = Arrays.asList(new ProductoCarritoDto(1L, "Motherboard", 50000.0, 1, "motherboard"));
+        Double total = productos.get(0).getPrecio();
+
+        when(servicioProductoCarritoMock.getProductos()).thenReturn(productos);
+        when(servicioProductoCarritoMock.calcularValorTotalDeLosProductos()).thenReturn(total);
+
+        ModelAndView modelAndView = carritoController.calcularEnvio(codigoPostal);
+        ModelMap model = modelAndView.getModelMap();
+
+        assertThat(modelAndView.getViewName(), equalTo("carritoDeCompras"));
+        assertEquals(total, model.get("valorTotal"));
+        assertEquals(productos,  model.get("productos"));
+        assertEquals(codigoPostal, model.get("codigoPostal"));
+    }
+
+    // calcularEnvioAjax
+    @Test
+    public void cuandoCalculoEnvioConCodigoValidoDevuelveEnvioExitoso(){
+        String codigoPostal = "1704";
+        Double valorTotalCarrito = 50000.0;
+
+        EnvioDto envioDto = new EnvioDto();
+        envioDto.setCosto(1500.0);
+        envioDto.setDestino("Ramos Mejia");
+        envioDto.setTiempo("2-3 dias habiles");
+
+        when(servicioEnviosMock.calcularEnvio(codigoPostal)).thenReturn(envioDto);
+        servicioProductoCarritoMock.valorTotal = valorTotalCarrito;
+
+        Map<String, Object> response = carritoController.calcularEnvioAjax(codigoPostal);
+
+        assertEquals(true, response.get("success"));
+        assertEquals(envioDto.getCosto(), response.get("costo"));
+        assertEquals(envioDto.getTiempo(), response.get("tiempo"));
+        assertEquals(envioDto.getDestino(), response.get("destino"));
+        assertEquals(valorTotalCarrito, response.get("valorTotal"));
+    }
+
+    @Test
+    public void cuandoCalculoEnvioSinCoberturaDevuelveError(){
+        String codigoPostal = "9999";
+
+        when(servicioEnviosMock.calcularEnvio(codigoPostal)).thenReturn(null);
+
+        Map<String, Object> response = carritoController.calcularEnvioAjax(codigoPostal);
+
+        assertEquals(false, response.get("success"));
+        assertEquals("Sin cobertura para este código postal", response.get("mensaje"));
+    }
+
+    @Test
+    public void cuandoElServicioLanzaUnaExepcionDevuelveError(){
+        String codigoPostal = "1704";
+
+        when(servicioEnviosMock.calcularEnvio(codigoPostal)).thenThrow(new RuntimeException("Error"));
+
+        Map<String, Object> response = carritoController.calcularEnvioAjax(codigoPostal);
+
+        assertEquals(false, response.get("success"));
+        assertEquals("Error al calcular envío", response.get("mensaje"));
     }
 }

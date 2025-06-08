@@ -14,7 +14,6 @@ public class ProductoCarritoDto {
     private Double precio;
     private Integer cantidad = 1;
 
-
     @JsonCreator
     public ProductoCarritoDto(
             @JsonProperty("id") Long id,

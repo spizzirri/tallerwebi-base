@@ -18,8 +18,8 @@ public class CarritoController {
     private final ServicioProductoCarrito productoService;
     private final ServicioDeEnvios servicioDeEnvios;
 
-    private String codigoPostalActual;
-    private EnvioDto envioActual;
+    public String codigoPostalActual;
+    public EnvioDto envioActual;
 
     public CarritoController(ServicioProductoCarrito servicioProductoCarrito, ServicioDeEnvios servicioDeEnvios) {
         this.productoService = servicioProductoCarrito;
@@ -96,7 +96,7 @@ public class CarritoController {
 
     @PostMapping(path = "/carritoDeCompras/aplicarDescuento")
     @ResponseBody
-    //este metodo no retorna nada, solo se usa para enviar un mensaje de respuesta al cliente cuando se aplica un descuento
+    //este metodo solo se usa para enviar un mensaje de respuesta al cliente cuando se aplica un descuento
     public Map<String, Object> calcularValorTotalDeLosProductosConDescuento(@RequestBody Map<String, String> codigoDescuentoMap) {
         String codigoDescuento = codigoDescuentoMap.get("codigoInput");
 
@@ -171,23 +171,18 @@ public class CarritoController {
             return response;
         }
 
-        try {
-            if ("mercadoPago".equalsIgnoreCase(metodoDePago)) {
-                response.put("success", true);
-                response.put("metodoPago", "mercadoPago");
+        if ("mercadoPago".equalsIgnoreCase(metodoDePago)) {
+            response.put("success", true);
+            response.put("metodoPago", "mercadoPago");
 
-                if (envioActual != null && codigoPostalActual != null) {
-                    response.put("costoEnvio", envioActual.getCosto());
-                }
-            } else {
-                response.put("success", true);
-                response.put("metodoPago", metodoDePago);
+            if (envioActual != null && codigoPostalActual != null) {
+                response.put("costoEnvio", envioActual.getCosto());
             }
-
-        } catch (Exception e) {
-            response.put("success", false);
-            response.put("error", "Error al procesar el pago. Intenta nuevamente.");
+        } else {
+            response.put("success", true);
+            response.put("metodoPago", metodoDePago);
         }
+
         return response;
     }
 
@@ -206,7 +201,7 @@ public class CarritoController {
         model.put("codigoPostal", codigoPostal);
 
         try {
-          if (codigoPostal != null && !codigoPostal.trim().isEmpty()) {
+            if (codigoPostal != null && !codigoPostal.trim().isEmpty()) {
                 if (!codigoPostal.matches("\\d{4}")) {
                     model.put("errorEnvio", "El código postal debe tener 4 dígitos");
                     model.put("envioCalculado", false);
@@ -266,4 +261,5 @@ public class CarritoController {
         }
         return response;
     }
+
 }
