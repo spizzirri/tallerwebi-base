@@ -26,41 +26,33 @@ public class ServicioDeEnvios {
         restTemplate = new RestTemplate();
     }
 
-    public EnvioDto calcularEnvio(String codigoPostal){
-
-        try{
-            logger.info("Calculando envio de postal: " + codigoPostal);
-            if(codigoPostal == null || !codigoPostal.matches("\\d{4}")){
-                throw new IllegalArgumentException("El codigo de postal no es valido");
+    public EnvioDto calcularEnvio(String codigoPostal) {
+        try {
+            if (codigoPostal == null || !codigoPostal.matches("\\d{4}")) {
+                throw new IllegalArgumentException("El codigo postal no es valido");
             }
 
             String url = enviosUrl + "?codigoPostal=" + codigoPostal;
-            //hacer que la api devuelva un json con los datos de la api
+
             OpcionEnvio[] opciones = restTemplate.getForObject(url, OpcionEnvio[].class);
 
-            if(opciones != null){
-                //convierto el array en un Stream (flujo de datos)
-                Optional<OpcionEnvio> streamEnvio = Arrays.stream(opciones)
-                        .filter(opcion -> EMPRESA_ENVIA.equals(opcion.getEmpresa()))
-                        .findFirst();
+            if (opciones != null && opciones.length > 0) {
+                OpcionEnvio envio = opciones[0];
 
-                if(streamEnvio.isPresent()){
-                    OpcionEnvio envio = streamEnvio.get();
-                    logger.info("Envio encontrado: " + envio.getCostoEnvio(), envio.getTiempoEstimado());
-
-                    return new EnvioDto(
-                            envio.getCostoEnvio(),
-                            envio.getTiempoEstimado(),
-                            envio.getLocalidad() + ", " + envio.getProvincia()
-                    );
-                }
+                return new EnvioDto(
+                        envio.getCostoEnvio(),
+                        envio.getTiempoEstimado(),
+                        envio.getLocalidad() + ", " + envio.getProvincia()
+                );
             }
             return null;
-//            return buscarEnZonaCercana(codigoPostal);
-        } catch (Exception e){
-            logger.error("Error al calcular envio de postal: " + codigoPostal, e.getMessage());
+
+        } catch (Exception e) {
             return null;
         }
     }
 }
+
+//            return buscarEnZonaCercana(codigoPostal);
+
 
