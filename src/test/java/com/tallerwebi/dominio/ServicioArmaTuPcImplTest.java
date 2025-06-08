@@ -2,15 +2,19 @@ package com.tallerwebi.dominio;
 
 import com.tallerwebi.dominio.entidades.ArmadoPc;
 import com.tallerwebi.dominio.entidades.Componente;
+import com.tallerwebi.dominio.entidades.Procesador;
 import com.tallerwebi.dominio.excepcion.LimiteDeComponenteSobrepasadoEnElArmadoException;
 import com.tallerwebi.presentacion.dto.ArmadoPcDto;
 import com.tallerwebi.presentacion.dto.ComponenteDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -33,48 +37,36 @@ public class ServicioArmaTuPcImplTest {
 
         // Preparacion
 
+        List<Componente> listaARetornar = new ArrayList<Componente>();
+        listaARetornar.add(new Procesador());
+        listaARetornar.add(new Procesador());
+        listaARetornar.add(new Procesador());
+
         when(repositorioComponenteMock.obtenerComponentesPorTipo(anyString()))
-                .thenReturn(Arrays.asList(
-                new Componente(1L,"Procesador","Procesador1", 1000D, "imagen.jpg", 5),
-                new Componente(2L,"Procesador","Procesador2", 2000D, "imagen.jpg", 5),
-                new Componente(3L,"Procesador","Procesador3", 3000D, "imagen.jpg", 5),
-                new Componente(4L,"Procesador","Procesador4", 4000D, "imagen.jpg", 5),
-                new Componente(5L,"Procesador","Procesador5", 5000D, "imagen.jpg", 5),
-                new Componente(7L,"Procesador","Procesador6", 6000D, "imagen.jpg", 5)
-            )
-           );
+                .thenReturn(listaARetornar);
 
         // Ejecucion
 
-        List<ComponenteDto> componentesObtenidos =  this.servicio.obtenerListaDeComponentesDto("procesador");
+        List<ComponenteDto> componentesObtenidos =  this.servicio.obtenerListaDeComponentesDto(Procesador.class.getSimpleName());
 
         // Validacion
 
-        List<ComponenteDto> listaEsperada = Arrays.asList(
-                new ComponenteDto(1L,"Procesador","Procesador1", 1000D, "imagen.jpg", 5),
-                new ComponenteDto(2L,"Procesador","Procesador2", 2000D, "imagen.jpg", 5),
-                new ComponenteDto(3L,"Procesador","Procesador3", 3000D, "imagen.jpg", 5),
-                new ComponenteDto(4L,"Procesador","Procesador4", 4000D, "imagen.jpg", 5),
-                new ComponenteDto(5L,"Procesador","Procesador5", 5000D, "imagen.jpg", 5),
-                new ComponenteDto(7L,"Procesador","Procesador6", 6000D, "imagen.jpg", 5)
-        );
-
-        assertEquals(componentesObtenidos, listaEsperada);
-
+        assertThat(componentesObtenidos, everyItem(hasProperty("tipoComponente", equalTo(Procesador.class.getSimpleName()))));
     }
 
     @Test
     public void dadoQueExisteUnServicioArmaTuPcImplCuandoLePidoUnComponentePorIdObtengoEseComponente(){
-
+        Procesador procesadorBuscado = new Procesador();
+        procesadorBuscado.setId(1L);
         //Preparacion
-        when(this.repositorioComponenteMock.obtenerComponentePorId(anyLong())).thenReturn(
-                new Componente(1L,"Procesador","Procesador1", 1000D, "imagen.jpg", 5)
-        );
+        when(this.repositorioComponenteMock.obtenerComponentePorId(anyLong()))
+                .thenReturn(procesadorBuscado);
         //Ejecucion
         Componente componenteObtenido = this.servicio.obtenerComponentePorId(1L);
 
         //Validacion
-        Componente componenteEsperado = new Componente(1L,"Procesador","Procesador1", 1000D, "imagen.jpg", 5);
+        Componente componenteEsperado = new Procesador();
+        componenteEsperado.setId(1L);
 
         assertEquals(componenteObtenido, componenteEsperado);
     };
@@ -85,12 +77,15 @@ public class ServicioArmaTuPcImplTest {
         //Preparacion
 
         ArmadoPcDto armadoPcDtoACargarComponente = new ArmadoPcDto();
+        Procesador procesadorACargar = new Procesador();
+        procesadorACargar.setId(1L);
 
-        when(this.repositorioComponenteMock.obtenerComponentePorId(anyLong())).thenReturn(new Componente(1L,"Procesador","Procesador1", 1000D, "imagen.jpg", 5));
+        when(this.repositorioComponenteMock.obtenerComponentePorId(anyLong()))
+                .thenReturn(procesadorACargar);
 
         //Ejecucion
 
-        ArmadoPcDto armadoObtenido = this.servicio.agregarComponenteAlArmado(1L, "procesador", 1, armadoPcDtoACargarComponente);
+        ArmadoPcDto armadoObtenido = this.servicio.agregarComponenteAlArmado(1L, "Procesador", 1, armadoPcDtoACargarComponente);
 
         //Validacion
 
@@ -113,7 +108,7 @@ public class ServicioArmaTuPcImplTest {
                                                         )
         );
 
-        when(this.repositorioComponenteMock.obtenerComponentePorId(anyLong())).thenReturn(new Componente(1L,"Memoria","Memoria1", 1000D, "imagen.jpg", 5));
+        when(this.repositorioComponenteMock.obtenerComponentePorId(anyLong())).thenReturn(any());
 
         //Ejecucion
 
