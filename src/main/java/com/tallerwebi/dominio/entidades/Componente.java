@@ -90,11 +90,11 @@ public class Componente {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Componente that = (Componente) o;
-        return Objects.equals(id, that.id) && Objects.equals(nombre, that.nombre) && Objects.equals(precio, that.precio) && Objects.equals(stock, that.stock);
+        return Objects.equals(id, that.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, nombre, precio, stock);
+        return Objects.hash(id);
     }
 }

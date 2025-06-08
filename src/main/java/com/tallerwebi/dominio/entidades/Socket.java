@@ -14,7 +14,10 @@ public class Socket {
     @Column(length = 100)
     private String nombre;
 
-    @ManyToMany(mappedBy = "sockets")
+    @OneToMany(mappedBy = "socket")
+    private List<Procesador> procesadores = new ArrayList<>();
+
+    @OneToMany(mappedBy = "socket")
     private List<Motherboard> motherboards = new ArrayList<>();
 
     @ManyToMany(mappedBy = "sockets")
@@ -22,11 +25,21 @@ public class Socket {
 
     public Socket() {}
 
-    public Socket(Long id, String nombre, List<Motherboard> motherboards, List<CoolerCPU> coolersCPU) {
+    public Socket(Long id, String nombre, List<Procesador> procesadores ,List<Motherboard> motherboards, List<CoolerCPU> coolersCPU) {
         this.id = id;
         this.nombre = nombre;
+        this.procesadores = procesadores;
         this.motherboards = motherboards;
         this.coolersCPU = coolersCPU;
+    }
+
+    public Socket(Long id, String nombre) {
+        this.id = id;
+        this.nombre = nombre;
+        this.procesadores = new ArrayList<>();
+        this.motherboards = new ArrayList<>();
+        // los many to many deberian ser Set segun el profe (corregir)
+        this.coolersCPU = new ArrayList<>();
     }
 
     public Long getId() {
@@ -44,6 +57,15 @@ public class Socket {
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
+
+    public List<Procesador> getProcesadores() {
+        return procesadores;
+    }
+
+    public void setProcesadores(List<Procesador> procesadores) {
+        this.procesadores = procesadores;
+    }
+
 
     public List<Motherboard> getMotherboards() {
         return motherboards;

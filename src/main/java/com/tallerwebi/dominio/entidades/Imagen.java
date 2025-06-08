@@ -13,7 +13,7 @@ public class Imagen {
     private String urlImagen;
 
     @ManyToOne
-    @JoinColumn(name = "idComponente", nullable = false)
+    @JoinColumn(name = "componente_id", nullable = false)
     private Componente componente;
 
     public Imagen() {}

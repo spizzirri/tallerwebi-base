@@ -17,6 +17,11 @@ public class CoolerCPU extends Componente {
 
     /*Compatibilidad*/
     @ManyToMany
+    @JoinTable(
+            name = "cooler_socket",
+            joinColumns = @JoinColumn(name = "cooler_id"),
+            inverseJoinColumns = @JoinColumn(name = "socket_id")
+    )
     private List<Socket> sockets = new ArrayList<>();
 
     /*Coolers y Disipadores*/

@@ -8,8 +8,9 @@ import java.util.List;
 public class Motherboard extends Componente {
 
     /*Caracteristicas generales*/
-    @ManyToMany
-    private List<Socket> sockets = new ArrayList<>();
+    @ManyToOne
+    @JoinColumn(name = "socket_id")
+    private Socket socket;
     @Column(length = 100)
     private String chipsetPrincipal;
     @Column(length = 100)
@@ -36,13 +37,13 @@ public class Motherboard extends Componente {
     public Motherboard() {}
 
     public Motherboard(Long id, String nombre, Double precio, Integer stock, String marca,
-                        List<Socket> sockets, String chipsetPrincipal, String plataforma, String factor,
+                        Socket socket, String chipsetPrincipal, String plataforma, String factor,
                         Integer cantSlotsM2, Integer cantPuertosSata, Integer cantPuertosUSB,
                         String tipoMemoria, Integer cantSlotsRAM,
                         String consumo, Integer cantConector24Pines, Integer cantConector4Pines) {
         super(id, nombre, precio, stock, marca);
 
-        this.sockets = sockets;
+        this.socket = socket;
         this.chipsetPrincipal = chipsetPrincipal;
         this.plataforma = plataforma;
         this.factor = factor;
@@ -59,12 +60,12 @@ public class Motherboard extends Componente {
         this.cantConector4Pines = cantConector4Pines;
     }
 
-    public List<Socket> getSockets() {
-        return sockets;
+    public Socket getSocket() {
+        return socket;
     }
 
-    public void setSockets(List<Socket> sockets) {
-        this.sockets = sockets;
+    public void setSocket(Socket socket) {
+        this.socket = socket;
     }
 
     public String getChipsetPrincipal() {

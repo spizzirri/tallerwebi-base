@@ -2,6 +2,8 @@ package com.tallerwebi.dominio.entidades;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 @Entity
 public class Procesador extends Componente {
@@ -9,8 +11,9 @@ public class Procesador extends Componente {
     /*Caracteristicas generales*/
     @Column(length = 100)
     private String modelo;
-    @Column(length = 100)
-    private String socket;
+    @ManyToOne
+    @JoinColumn(name = "socket_id")
+    private Socket socket;
     @Column(length = 100)
     private String procesoDeFabricacion;
     private Boolean incluyeGraficosIntegrados;
@@ -43,7 +46,7 @@ public class Procesador extends Componente {
     public Procesador() {}
 
     public Procesador(Long id, String nombre, Double precio, Integer stock, String marca,
-                      String modelo, String socket, String procesoDeFabricacion, Boolean incluyeGraficosIntegrados, String chipsetGPU, String familia,
+                      String modelo, Socket socket, String procesoDeFabricacion, Boolean incluyeGraficosIntegrados, String chipsetGPU, String familia,
                       Integer nucleos, Integer hilos, String frecuencia, String frecuenciaTurbo,
                       Boolean incluyeCooler, String tdpPredeterminado,
                       String l1Cache, String l2Cache, String l3Cache) {
@@ -77,11 +80,11 @@ public class Procesador extends Componente {
         this.modelo = modelo;
     }
 
-    public String getSocket() {
+    public Socket getSocket() {
         return socket;
     }
 
-    public void setSocket(String socket) {
+    public void setSocket(Socket socket) {
         this.socket = socket;
     }
 
