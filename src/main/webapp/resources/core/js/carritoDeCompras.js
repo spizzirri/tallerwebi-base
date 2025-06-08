@@ -143,7 +143,7 @@ document.addEventListener("DOMContentLoaded", function () {
 document.addEventListener("DOMContentLoaded", function () {
     const formularioPago = document.getElementById("formulario-pago");
 
-    formularioPago.addEventListener("submit", function(e) {
+    formularioPago.addEventListener("submit", function (e) {
         e.preventDefault();
 
         let metodoSeleccionado = document.querySelector('input[name="metodoPago"]:checked');
@@ -227,65 +227,56 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-    function calcularConAjax(codigoPostal) {
-        loading.classList.remove('d-none');
+function calcularConAjax(codigoPostal) {
+    loading.classList.remove('d-none');
 
-        fetch(`/spring/carritoDeCompras/calcular?codigoPostal=${codigoPostal}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById('costo').textContent = '$' + data.costo;
-                    document.getElementById('tiempo').textContent = data.tiempo;
-                    document.getElementById('zona').textContent = data.destino;
+    fetch(`/spring/carritoDeCompras/calcular?codigoPostal=${codigoPostal}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // envio
+                document.getElementById('alertaSinCobertura').classList.add('d-none');
+                document.getElementById('costo').textContent = '$' + data.costo;
+                document.getElementById('tiempo').textContent = data.tiempo;
+                document.getElementById('zona').textContent = data.destino;
 
-                    const totalActual = parseFloat(document.querySelector('.valorTotalDelCarrito').textContent);
-                    const totalConEnvio = totalActual + data.costo;
+                const totalActual = parseFloat(document.querySelector('.valorTotalDelCarrito').textContent);
+                const totalConEnvio = totalActual + data.costo;
 
-                    let parrafoTotal = document.querySelector('.total-con-envio');
-
-                    if (!parrafoTotal) {
-                        parrafoTotal = document.createElement('p');
-                        parrafoTotal.className = 'total-con-envio';
-
-                        const botonComprar = document.getElementById('btnComprar');
-                        botonComprar.parentElement.insertBefore(parrafoTotal, botonComprar.parentElement.firstChild);
-                    }
-
-                    const hayDescuento = !document.getElementById('mensajeDescuento').classList.contains('d-none');
-
-                    if (hayDescuento) {
-                        parrafoTotal.innerHTML = 'Total con envio y descuento: <span class="total-envio-valor"></span>';
-                        console.log('Calculando envío CON descuento aplicado');
-                    } else {
-                        parrafoTotal.innerHTML = 'Total con envio: <span class="total-envio-valor"></span>';
-                        console.log('Calculando envío SIN descuento');
-                    }
-
-                    parrafoTotal.querySelector('.total-envio-valor').textContent = '$' + totalConEnvio.toFixed(2);
-                    parrafoTotal.style.display = 'block';
-
-                    window.datosEnvio = {
-                        costo: data.costo,
-                        destino: data.destino,
-                        codigoPostal: codigoPostal
-                    };
-
-                    console.log('Total final con envío:', totalConEnvio);
-
-                } else {
-                    alert('Sin cobertura para este código postal');
-                    const parrafoTotal = document.querySelector('.total-con-envio');
-                    if (parrafoTotal) {
-                        parrafoTotal.style.display = 'none';
-                    }
-                    window.datosEnvio = null;
+                let parrafoTotal = document.querySelector('.total-con-envio');
+                if (!parrafoTotal) {
+                    parrafoTotal = document.createElement('p');
+                    parrafoTotal.className = 'total-con-envio';
+                    document.getElementById('btnComprar').parentElement.insertBefore(parrafoTotal, document.getElementById('btnComprar').parentElement.firstChild);
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                form.submit();
-            })
-            .finally(() => {
-                loading.classList.add('d-none');
-            });
-    }
+
+                //descuento
+                const hayDescuento = !document.getElementById('mensajeDescuento').classList.contains('d-none');
+                parrafoTotal.innerHTML = `Total con envío${hayDescuento ? ' y descuento' : ''}: <span class="total-envio-valor">$${totalConEnvio.toFixed(2)}</span>`;
+                parrafoTotal.style.display = 'block';
+
+                //mp
+                window.datosEnvio = {
+                    costo: data.costo,
+                    destino: data.destino,
+                    codigoPostal: codigoPostal
+                };
+
+            } else {
+                document.getElementById('alertaSinCobertura').classList.remove('d-none');
+
+                const parrafoTotal = document.querySelector('.total-con-envio');
+                if (parrafoTotal) {
+                    parrafoTotal.style.display = 'none';
+                }
+                window.datosEnvio = null;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            form.submit();
+        })
+        .finally(() => {
+            loading.classList.add('d-none');
+        });
+}
