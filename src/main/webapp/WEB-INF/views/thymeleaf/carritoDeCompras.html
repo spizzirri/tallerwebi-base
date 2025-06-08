@@ -33,13 +33,9 @@
                         <td class="precioTotalDelProducto" th:text="${producto.precio * producto.getCantidad()}"></td>
                         <td class="text-center" th:data-id="${producto.id}">
                             <div class="d-flex justify-content-center align-items-center gap-2">
-                                <!-- Botón para restar cantidad -->
                                 <button type="button" class="btn btn-outline-secondary btn-sm btnRestarCantidad">-</button>
-                                <!-- Número de cantidad producto -->
                                 <span th:text="${producto.cantidad}" class="mx-2 productoCantidad"></span>
-                                <!-- Botón para agregar cantidad -->
                                 <button type="button" class="btn btn-outline-secondary btn-sm btnSumarCantidad">+</button>
-                                <!-- Botón para eliminar -->
                                 <button type="button" th:data-id="${producto.id}"
                                         class="btn btn-outline-danger btn-sm ms-2 btnEliminarProducto">
                                     <i class="fa-solid fa-trash"></i>
@@ -66,7 +62,6 @@
         <div class="card">
             <div class="card-body p-4">
 
-                <!-- SECCIÓN: ENVÍO -->
                 <div class="mb-5">
                     <h3 class="card-title mb-4">Envío</h3>
                     <form method="post" th:action="@{/carritoDeCompras/calcularEnvio}" id="formulario-envio">
@@ -87,13 +82,11 @@
                             </div>
                         </div>
 
-                        <!-- Área de loading -->
                         <div id="loading" class="text-center mb-3 d-none">
                             <div class="spinner-border spinner-border-sm" role="status"></div>
                             <small class="ms-2">Calculando...</small>
                         </div>
 
-                        <!-- Resultados del envío -->
                         <div class="row g-3 mb-3">
                             <div class="col-md-4">
                                 <div class="border rounded p-3 text-center">
@@ -137,7 +130,6 @@
 
                 <!-- SECCIÓN DE DESCUENTO Y PAGO -->
                 <div class="row">
-                    <!-- FORMULARIO DE DESCUENTO -->
                     <div class="col-md-6 mb-4">
                         <h3 class="card-title mb-3">Código de descuento</h3>
                         <div class="d-flex align-items-center mb-3">
@@ -153,7 +145,7 @@
                         </div>
                     </div>
 
-                    <!-- FORMULARIO DE MÉTODO DE PAGO -->
+                    <!-- FORMULARIO DE METODO DE PAGO -->
                     <div class="col-md-6">
                         <h3 class="card-title mb-3">Método de pago</h3>
                         <form method="POST" action="/spring/checkout/create-payment" id="formulario-pago">
