@@ -3,24 +3,33 @@ package com.tallerwebi.presentacion;
 import com.tallerwebi.dominio.ServicioArmaTuPc;
 import com.tallerwebi.dominio.excepcion.LimiteDeComponenteSobrepasadoEnElArmadoException;
 import com.tallerwebi.presentacion.dto.ArmadoPcDto;
-import com.tallerwebi.presentacion.dto.ComponenteDto;
-import org.dom4j.rule.Mode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+
 @Controller
 public class ControladorArmaTuPc {
 
     private ServicioArmaTuPc servicioArmaTuPc;
-    private List<String> pasos = Arrays.asList("procesador", "motherboard", "cooler", "memoria", "gpu", "almacenamiento", "fuente", "gabinete", "monitor", "periferico", "resumen");
+    private static final Map<String, String> pasosYCorrespondenciaEnBD = new LinkedHashMap<>() {{
+        put("procesador", "Procesador");
+        put("motherboard", "Motherboard");
+        put("cooler", "CoolerCPU");
+        put("memoria", "MemoriaRAM");
+        put("gpu", "PlacaDeVideo");
+        put("almacenamiento", "Almacenamiento");
+        put("fuente", "FuenteDeAlimentacion");
+        put("gabinete", "Gabinete");
+        put("monitor", "Componente");
+        put("periferico", "Componente");
+        put("resumen", null); // ahora sí es válido
+    }};
 
     @Autowired
     public ControladorArmaTuPc(ServicioArmaTuPc servicioArmaTuPc) { this.servicioArmaTuPc =  servicioArmaTuPc; }
@@ -39,7 +48,7 @@ public class ControladorArmaTuPc {
     public ModelAndView cargarComponentes(@PathVariable("tipoComponente") String tipoComponente, HttpSession sesion) {
 
         ModelMap model = new ModelMap();
-        model.put(tipoComponente+"Lista", this.servicioArmaTuPc.obtenerListaDeComponentesDto(tipoComponente));
+        model.put(tipoComponente+"Lista", this.servicioArmaTuPc.obtenerListaDeComponentesDto(this.pasosYCorrespondenciaEnBD.get(tipoComponente)));
         model.put("armadoPcDto", obtenerArmadoPcDtoCorrespondiente(sesion));
 
         return new ModelAndView("arma-tu-pc/tradicional/" + tipoComponente, model);
@@ -71,7 +80,9 @@ public class ControladorArmaTuPc {
 
         if(this.servicioArmaTuPc.sePuedeAgregarMasUnidades(tipoComponente, armadoPcDto)) return tipoComponente;
 
-        return this.pasos.get(this.pasos.indexOf(tipoComponente)+1);
+        List<String> pasos = new ArrayList<>(this.pasosYCorrespondenciaEnBD.keySet());
+
+        return pasos.get(pasos.indexOf(tipoComponente)+1);
     }
 
     @RequestMapping(path = "arma-tu-pc/tradicional/resumen", method = RequestMethod.GET)

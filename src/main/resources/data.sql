@@ -70,17 +70,17 @@ VALUES (3, 'intel-core-i7.jpg', 3);
 
 -- Componente 4: ASUS Prime B550
 INSERT INTO Componente (id, nombre, precio, stock, marca) VALUES (4, 'ASUS Prime B550', 100000.0, 12, 'ASUS');
-INSERT INTO Motherboard (id, id_socket, chipsetPrincipal, plataforma, factor, cantSlotsM2, cantPuertosSata, cantPuertosUSB, tipoMemoria, cantSlotsRAM, consumo, cantConector24Pines, cantConector4Pines) VALUES (4, 3, 'B550', 'AMD', 'ATX', 2, 6, 8, 'DDR4', 4, '50W', 1, 1);
+INSERT INTO Motherboard (id, socket_id, chipsetPrincipal, plataforma, factor, cantSlotsM2, cantPuertosSata, cantPuertosUSB, tipoMemoria, cantSlotsRAM, consumo, cantConector24Pines, cantConector4Pines) VALUES (4, 3, 'B550', 'AMD', 'ATX', 2, 6, 8, 'DDR4', 4, '50W', 1, 1);
 INSERT INTO Imagen (id, urlImagen, componente_id) VALUES (4, 'asus-prime-b550.jpg', 4);
 
 -- Componente 5: Gigabyte B450
 INSERT INTO Componente (id, nombre, precio, stock, marca) VALUES (5, 'Gigabyte B450', 95000.0, 9, 'Gigabyte');
-INSERT INTO Motherboard (id, id_socket, chipsetPrincipal, plataforma, factor, cantSlotsM2, cantPuertosSata, cantPuertosUSB, tipoMemoria, cantSlotsRAM, consumo, cantConector24Pines, cantConector4Pines) VALUES (5, 3, 'B450', 'AMD', 'Micro-ATX', 1, 4, 6, 'DDR4', 2, '50W', 1, 1);
+INSERT INTO Motherboard (id, socket_id, chipsetPrincipal, plataforma, factor, cantSlotsM2, cantPuertosSata, cantPuertosUSB, tipoMemoria, cantSlotsRAM, consumo, cantConector24Pines, cantConector4Pines) VALUES (5, 3, 'B450', 'AMD', 'Micro-ATX', 1, 4, 6, 'DDR4', 2, '50W', 1, 1);
 INSERT INTO Imagen (id, urlImagen, componente_id) VALUES (5, 'gigabyte-b450.jpg', 5);
 
 -- Componente 6: MSI Z490
 INSERT INTO Componente (id, nombre, precio, stock, marca) VALUES (6, 'MSI Z490', 120000.0, 6, 'MSI');
-INSERT INTO Motherboard (id, id_socket, chipsetPrincipal, plataforma, factor, cantSlotsM2, cantPuertosSata, cantPuertosUSB, tipoMemoria, cantSlotsRAM, consumo, cantConector24Pines, cantConector4Pines) VALUES (6, 4, 'Z490', 'Intel', 'ATX', 2, 6, 7, 'DDR4', 4, '60W', 1, 1);
+INSERT INTO Motherboard (id, socket_id, chipsetPrincipal, plataforma, factor, cantSlotsM2, cantPuertosSata, cantPuertosUSB, tipoMemoria, cantSlotsRAM, consumo, cantConector24Pines, cantConector4Pines) VALUES (6, 4, 'Z490', 'Intel', 'ATX', 2, 6, 7, 'DDR4', 4, '60W', 1, 1);
 INSERT INTO Imagen (id, urlImagen, componente_id) VALUES (6, 'msi-z490.jpg', 6);
 
 
