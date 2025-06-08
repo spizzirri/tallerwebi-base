@@ -241,6 +241,7 @@ public class CarritoController {
             EnvioDto envio = servicioDeEnvios.calcularEnvio(codigoPostal);
 
             if (envio != null) {
+                //se guardan los valores para pasarselo a procesarCompra y usar en MP despues
                 this.envioActual = envio;
                 this.codigoPostalActual = codigoPostal;
 

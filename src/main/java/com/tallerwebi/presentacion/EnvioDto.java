@@ -1,7 +1,7 @@
 package com.tallerwebi.presentacion;
 
 public class EnvioDto {
-
+    // formato interno para pasarle al controllador con datos que va a recibir de la API a traves del servicio/OpcionEnvio
     private Double costo;
     private String tiempo;
     private String destino;

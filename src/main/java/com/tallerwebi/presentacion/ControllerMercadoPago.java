@@ -88,6 +88,7 @@ public class ControllerMercadoPago {
             items.add(item);
         }
 
+        // Creo un item para pasarle a MP el costo del envio por separado
         if (pagoRequest.getCostoEnvio() != null && pagoRequest.getCostoEnvio() > 0) {
             PreferenceItemRequest itemEnvio =
                     PreferenceItemRequest.builder()
@@ -154,14 +155,12 @@ public class ControllerMercadoPago {
         try {
             Preference preference = client.create(preferenceRequest);
             response.sendRedirect(preference.getSandboxInitPoint());
-            return null;
+            return null; //null porque ya redirigio
         } catch (MPApiException e) {
             String errorMsg = e.getApiResponse() != null ? e.getApiResponse().getContent() : "Sin contenido de error";
-            logger.error("MPApiException: Código de estado HTTP = {}, Contenido = {}", e.getStatusCode(), errorMsg, e);
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error al crear la preferencia de pago. Detalle: " + errorMsg);
             return null;
         } catch (Exception ex) {
-            logger.error("Excepción inesperada: ", ex);
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error inesperado al procesar el pago.");
             return null;
         }
@@ -177,7 +176,7 @@ public class ControllerMercadoPago {
 
         double precioFinal = precioOriginal * factorDescuento;
 
-        // Asegurar que sea un número válido y positivo
+        // número válido y positivo
         if (Double.isNaN(precioFinal) || precioFinal <= 0) {
             precioFinal = precioOriginal;
         }

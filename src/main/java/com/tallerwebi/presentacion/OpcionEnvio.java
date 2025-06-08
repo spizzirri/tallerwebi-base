@@ -1,7 +1,7 @@
 package com.tallerwebi.presentacion;
 
 public class OpcionEnvio {
-
+    //contiene la estructura de datos de la API
     private String id;
     private String codigoPostal;
     private String localidad;
