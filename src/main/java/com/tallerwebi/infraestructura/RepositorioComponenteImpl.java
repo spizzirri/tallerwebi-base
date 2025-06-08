@@ -1,4 +1,4 @@
-package com.tallerwebi.infraestructura;
+/*package com.tallerwebi.infraestructura;
 
 import com.tallerwebi.dominio.RepositorioComponente;
 import com.tallerwebi.dominio.entidades.Componente;
@@ -86,3 +86,4 @@ public class RepositorioComponenteImpl implements RepositorioComponente {
                 .orElse(null); // caso contrario devolveme un null (si no aclaro esto lanza excepcion);
     }
 }
+*/
