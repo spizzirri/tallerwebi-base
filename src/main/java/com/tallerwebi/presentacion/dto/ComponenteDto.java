@@ -1,5 +1,7 @@
 package com.tallerwebi.presentacion.dto;
 
+import com.tallerwebi.dominio.entidades.*;
+
 import java.util.Objects;
 
 public class ComponenteDto {
@@ -13,6 +15,20 @@ public class ComponenteDto {
     private Integer stock;
 
     public ComponenteDto() {}
+
+    public ComponenteDto(Componente entidad) {
+
+        this.id = entidad.getId();
+        this.modelo = entidad.getNombre();
+        this.precio = entidad.getPrecio();
+        this.tipoComponente = entidad.getClass().getSimpleName();
+        this.imagen = (entidad.getImagenes() != null && entidad.getImagenes().get(0) != null )
+                    ? entidad.getImagenes().get(0).getUrlImagen()
+                    : "imagen-generica.jpg";
+        this.stock = entidad.getStock();
+
+    }
+
     public ComponenteDto(Long id, String tipoComponente, String modelo, Double precio, String imagen, Integer stock) {
         this.id = id;
         this.tipoComponente = tipoComponente;
@@ -20,6 +36,47 @@ public class ComponenteDto {
         this.precio = precio;
         this.imagen = imagen;
         this.stock = stock;
+    }
+
+    public Componente obtenerEntidad() {
+
+        Componente entidad;
+
+        switch (this.tipoComponente) {
+            case "Procesador":
+                entidad = new Procesador();
+                break;
+            case "Motherboard":
+                entidad = new Motherboard();
+                break;
+            case "CoolerCPU":
+                entidad = new CoolerCPU();
+                break;
+            case "PlacaDeVideo":
+                entidad = new PlacaDeVideo();
+                break;
+            case "FuenteDeAlimentacion":
+                entidad = new FuenteDeAlimentacion();
+                break;
+            case "Gabinete":
+                entidad = new Gabinete();
+                break;
+            case "MemoriaRAM":
+                entidad = new MemoriaRAM();
+                break;
+            case "Almacenamiento":
+                entidad = new Almacenamiento();
+                break;
+            default:
+                entidad = new Componente();
+        }
+
+        entidad.setId(this.id);
+        entidad.setNombre(this.modelo);
+        entidad.setPrecio(this.precio);
+        entidad.setStock(this.stock);
+        // que hago con imagenes y tipoComponente?
+        return entidad;
     }
 
     public Long getId() {

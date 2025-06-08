@@ -1,5 +1,7 @@
 package com.tallerwebi.presentacion.dto;
 
+import com.tallerwebi.dominio.entidades.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +20,19 @@ public class ArmadoPcDto {
     private ComponenteDto gabinete;
     private ComponenteDto monitor;
     private List<ComponenteDto> perifericos;
+
+    public ArmadoPcDto(ArmadoPc entidad) {
+        this.procesador = new ComponenteDto(entidad.getProcesador());
+        this.motherboard = new ComponenteDto(entidad.getMotherboard());
+        this.cooler = new ComponenteDto(entidad.getCooler());
+        this.rams = this.convertirListaDeComponentesEntidadADtos(entidad.getMemoriaRAM());
+        this.gpu = new ComponenteDto(entidad.getPlacaDeVideo());
+        this.almacenamiento = this.convertirListaDeComponentesEntidadADtos(entidad.getAlmacenamiento());
+        this.fuente = new ComponenteDto(entidad.getFuenteDeAlimentacion());
+        this.gabinete = new ComponenteDto(entidad.getGabinete());
+        this.monitor = new ComponenteDto(entidad.getMonitor());
+        this.perifericos = this.convertirListaDeComponentesEntidadADtos(entidad.getPerifericos());
+    }
 
     public ArmadoPcDto(ComponenteDto procesador,
                        ComponenteDto motherboard,
@@ -47,9 +62,35 @@ public class ArmadoPcDto {
         this.perifericos = new ArrayList<>();
     }
 
-    public ComponenteDto getProcesador() {
-        return this.procesador;
+    private List<ComponenteDto> convertirListaDeComponentesEntidadADtos(List<? extends Componente> listaEntidades) {
+        List<ComponenteDto> componentesDto = new ArrayList<>();
+        for (Componente componenteEntidad : listaEntidades) componentesDto.add(new ComponenteDto(componenteEntidad));
+        return componentesDto;
     }
+
+    public ArmadoPc obtenerEntidad() {
+        ArmadoPc entidad = new ArmadoPc();
+        entidad.setProcesador((Procesador) this.procesador.obtenerEntidad());
+        entidad.setMotherboard((Motherboard) this.motherboard.obtenerEntidad());
+        entidad.setCoolerCPU((CoolerCPU) this.cooler.obtenerEntidad());
+        entidad.setMemoriaRAM(this.convertirListaDeDtosAEntidades(this.rams, MemoriaRAM.class));
+        entidad.setPlacaDeVideo((PlacaDeVideo) this.gpu.obtenerEntidad());
+        entidad.setAlmacenamiento(this.convertirListaDeDtosAEntidades(this.almacenamiento, Almacenamiento.class));
+        entidad.setFuenteDeAlimentacion((FuenteDeAlimentacion) this.fuente.obtenerEntidad());
+        entidad.setGabinete((Gabinete) this.gabinete.obtenerEntidad());
+        // recordar que estos ultimos 2 son considerados solamente como Componente por ahora.
+        entidad.setMonitor(this.monitor.obtenerEntidad());
+        entidad.setPerifericos(this.convertirListaDeDtosAEntidades(this.perifericos, Componente.class));
+        return entidad;
+    }
+
+    private <T extends Componente> List<T> convertirListaDeDtosAEntidades(List<ComponenteDto> listaDtos, Class<T> tipo) {
+        List<T> entidades = new ArrayList<>();
+        for (ComponenteDto dto : listaDtos) entidades.add(tipo.cast(dto.obtenerEntidad()));
+        return entidades;
+    }
+
+    public ComponenteDto getProcesador() { return this.procesador; }
 
     public void setProcesador(ComponenteDto procesador) {
         this.procesador = procesador;

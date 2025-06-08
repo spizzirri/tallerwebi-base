@@ -42,17 +42,11 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
         return listaDeComponentesDto;
     }
 
-    private ComponenteDto transformarADto(Componente componente) {
-        return new ComponenteDto(componente.getId(),componente.getTipo(),componente.getNombre(),componente.getPrecio(),componente.getImagen(),componente.getStock());
-    }
-
     private List<ComponenteDto> transformarComponentesADtos(List<Componente> componentesDeTipo) {
 
         List<ComponenteDto> listaDeComponentesDto = new ArrayList<ComponenteDto>();
 
-        for(Componente c : componentesDeTipo){
-            listaDeComponentesDto.add(transformarADto(c));
-        }
+        for(Componente c : componentesDeTipo) listaDeComponentesDto.add(new ComponenteDto(c));
 
         return listaDeComponentesDto;
     }
@@ -66,36 +60,36 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
 
         // determinar un metodo de componente que diga cuando un componente es compatible con el armado
 
-        switch(tipoComponente){
+        switch(tipoComponente.toLowerCase()){
             case "procesador":
-                armadoPcDto.setProcesador(transformarADto(componenteSolicitado));
+                armadoPcDto.setProcesador(new ComponenteDto(componenteSolicitado));
                 break;
             case "motherboard":
-                armadoPcDto.setMotherboard(transformarADto(componenteSolicitado));
+                armadoPcDto.setMotherboard(new ComponenteDto (componenteSolicitado));
                 break;
             case "cooler":
-                armadoPcDto.setCooler(transformarADto(componenteSolicitado));
+                armadoPcDto.setCooler(new ComponenteDto (componenteSolicitado));
                 break;
             case "memoria":
-                for(int i = 0; i<cantidad;i++) armadoPcDto.getRams().add(transformarADto(componenteSolicitado));
+                for(int i = 0; i<cantidad;i++) armadoPcDto.getRams().add(new ComponenteDto (componenteSolicitado));
                 break;
             case "gpu":
-                armadoPcDto.setGpu(transformarADto(componenteSolicitado));
+                armadoPcDto.setGpu(new ComponenteDto (componenteSolicitado));
                 break;
             case "almacenamiento":
-                for(int i = 0; i<cantidad;i++) armadoPcDto.getAlmacenamiento().add(transformarADto(componenteSolicitado));
+                for(int i = 0; i<cantidad;i++) armadoPcDto.getAlmacenamiento().add(new ComponenteDto (componenteSolicitado));
                 break;
             case "fuente":
-                armadoPcDto.setFuente(transformarADto(componenteSolicitado));
+                armadoPcDto.setFuente(new ComponenteDto(componenteSolicitado));
                 break;
             case "gabinete":
-                armadoPcDto.setGabinete(transformarADto(componenteSolicitado));
+                armadoPcDto.setGabinete(new ComponenteDto(componenteSolicitado));
                 break;
             case "monitor":
-                armadoPcDto.setMonitor(transformarADto(componenteSolicitado));
+                armadoPcDto.setMonitor(new ComponenteDto(componenteSolicitado));
                 break;
             case "periferico":
-                armadoPcDto.getPerifericos().add(transformarADto(componenteSolicitado));
+                armadoPcDto.getPerifericos().add(new ComponenteDto(componenteSolicitado));
                 break;
 
         }
