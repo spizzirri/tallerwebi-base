@@ -36,12 +36,12 @@ public class ComponenteEspecificoDto {
         this.precio = productoEspecifico.getPrecio();
         this.stock = productoEspecifico.getStock();
         this.marca = productoEspecifico.getMarca();
-        /*if (productoEspecifico.getImagenes() != null) {
+        if (productoEspecifico.getImagenes() != null) {
             this.imagenes = new ArrayList<>();
             for(int i = 0; i < productoEspecifico.getImagenes().size(); i++){
                 imagenes.add(productoEspecifico.getImagenes().get(i).getUrlImagen());
             }
-        }*/
+        }
         this.caracteristicas = new LinkedHashMap<>();
 
         if (productoEspecifico instanceof Procesador) {

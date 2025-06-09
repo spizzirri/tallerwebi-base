@@ -17,7 +17,7 @@
                     <!-- Imagen grande -->
                     <div class="text-center mb-3">
                         <img id="mainImage"
-                             th:src="@{/fotos-producto/{img}(img=${componenteEspecificoDto.imagenes[0]})}"
+                             th:src="@{/imagenes/{img}(img=${componenteEspecificoDto.imagenes[0]})}"
                              class="img-fluid img-thumbnail"
                              alt="Imagen principal"
                              style="max-height: 400px;">
@@ -25,7 +25,7 @@
                     <!-- Miniaturas -->
                     <div class="d-flex gap-2 flex-wrap justify-content-center">
                         <img th:each="imagen : ${componenteEspecificoDto.imagenes}"
-                             th:src="@{/fotos-producto/{img}(img=${imagen})}"
+                             th:src="@{/imagenes/{img}(img=${imagen})}"
                              class="img-thumbnail thumb-img"
                              style="width: 100px; height: auto; cursor: pointer;"
                              th:alt="${imagen}">
@@ -83,16 +83,14 @@
         </div>
         <br><br>
         <div class="container">
-            <div class="row">
-                <div class="col-md-6" style="margin-bottom: 25px">
-                    <table class="row" th:each="caracteristicas : ${componenteEspecificoDto.getCaracteristicas()}">
-                        <th th:text="${caracteristicas.getKey()}"></th>
-                        <tr class="row" th:each="subCaracteristicas : ${caracteristicas.getValue()}">
-                            <td class="col-md-6" th:text="${subCaracteristicas.getKey()}"></td>
-                            <td class="col-md-6 text-end" th:text="${subCaracteristicas.getValue()}"></td>
-                        </tr>
-                    </table>
-                </div>
+            <div class="col-md-12 row row-cols-2 justify-content-center p-0 m-0">
+                <table class="row p-0 m-0 pt-3" th:each="caracteristicas : ${componenteEspecificoDto.getCaracteristicas()}">
+                    <th th:text="${caracteristicas.getKey()}"></th>
+                    <tr class="row" th:each="subCaracteristicas : ${caracteristicas.getValue()}">
+                        <td class="col-md-6" th:text="${subCaracteristicas.getKey()}"></td>
+                        <td class="col-md-6 text-end" th:text="${subCaracteristicas.getValue()}"></td>
+                    </tr>
+                </table>
             </div>
         </div>
         <footer th:replace="fragments/fragments :: footer"></footer>
