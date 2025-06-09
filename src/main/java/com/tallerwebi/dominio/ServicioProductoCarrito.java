@@ -1,6 +1,8 @@
 package com.tallerwebi.dominio;
 
+import com.tallerwebi.dominio.entidades.Componente;
 import com.tallerwebi.presentacion.ProductoCarritoDto;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -15,10 +17,48 @@ public class ServicioProductoCarrito {
     public Double valorTotal = 0.0;
     public Double valorTotalConDescuento = 0.0;
 
+    @Autowired
+    private RepositorioComponente repositorioComponente;
+
     public void init(){
         this.productos = new ArrayList<ProductoCarritoDto>();
-        this.productos.add(new ProductoCarritoDto(1L,"Mouse inalambrico", 8000.000,2,"teclado mecanico"));
-        this.productos.add(new ProductoCarritoDto(2L,"Teclado mecanico", 15000.00,2,"teclado mecanico"));
+//        this.productos.add(new ProductoCarritoDto(1L,"Mouse inalambrico", 8000.000,2,"teclado mecanico"));
+//        this.productos.add(new ProductoCarritoDto(2L,"Teclado mecanico", 15000.00,2,"teclado mecanico"));
+    }
+
+    public void inicializarSiEsNecesario() {
+        if (this.productos == null) {
+            this.productos = new ArrayList<>();
+        }
+    }
+
+    public ProductoCarritoDto buscarPorId(Long id) {
+        for (ProductoCarritoDto productoCarritoDto : this.getProductos()) {
+            if (productoCarritoDto.getId().equals(id)) {
+                return productoCarritoDto;
+            }
+        }
+        return null;
+    }
+
+    public void agregarProducto(Long componenteId, Integer cantidad){
+        if(this.productos == null){
+            this.productos = new ArrayList<>();
+        }
+
+        ProductoCarritoDto existente = this.buscarPorId(componenteId);
+        if(existente != null){
+            existente.setCantidad(existente.getCantidad() + cantidad);
+        } else {
+            Componente componente = repositorioComponente.obtenerComponentePorId(componenteId);
+            ProductoCarritoDto nuevoProductoCarrito = new ProductoCarritoDto(componente, cantidad);
+            this.productos.add(nuevoProductoCarrito);
+        }
+    }
+
+    public boolean verificarStock(Long componenteId, Integer cantidadDeseada){
+        Componente componente = repositorioComponente.obtenerComponentePorId(componenteId);
+        return componente.getStock() >= cantidadDeseada;
     }
 
     public Double calcularValorTotalDeLosProductos() {
@@ -35,6 +75,7 @@ public class ServicioProductoCarrito {
     }
 
     public List<ProductoCarritoDto> getProductos() {
+        inicializarSiEsNecesario();
         return productos;
     }
 

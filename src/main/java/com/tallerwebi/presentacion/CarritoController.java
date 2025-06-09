@@ -27,15 +27,6 @@ public class CarritoController {
         servicioProductoCarrito.init();
     }
 
-    public ProductoCarritoDto buscarPorId(Long id) {
-        for (ProductoCarritoDto productoCarritoDto : this.productoService.getProductos()) {
-            if (productoCarritoDto.getId().equals(id)) {
-                return productoCarritoDto;
-            }
-        }
-        return null;
-    }
-
     @GetMapping(path = "/carritoDeCompras/index")
     public ModelAndView mostrarVistaCarritoDeCompras() {
         ModelMap model = new ModelMap();
@@ -63,7 +54,7 @@ public class CarritoController {
     @ResponseBody
     public Map<String, Object> eliminarProductoDelCarrito(@PathVariable Long id) {
         Map<String, Object> response = new HashMap<>();
-        ProductoCarritoDto productoBuscado = buscarPorId(id);
+        ProductoCarritoDto productoBuscado = this.productoService.buscarPorId(id);
 
         if (productoBuscado != null) {
             this.productoService.getProductos().remove(productoBuscado);
@@ -118,7 +109,7 @@ public class CarritoController {
     @PostMapping(path = "/carritoDeCompras/agregarMasCantidadDeUnProducto/{id}")
     @ResponseBody
     public Map<String, Object> agregarMasCantidadDeUnProducto(@PathVariable Long id) {
-        ProductoCarritoDto productoBuscado = buscarPorId(id);
+        ProductoCarritoDto productoBuscado = this.productoService.buscarPorId(id);
 
         if (productoBuscado != null) {
             productoBuscado.setCantidad(productoBuscado.getCantidad() + 1);
@@ -138,7 +129,7 @@ public class CarritoController {
     @PostMapping("/carritoDeCompras/restarCantidadDeUnProducto/{id}")
     @ResponseBody
     public Map<String, Object> restarCantidadDeUnProducto(@PathVariable Long id) {
-        ProductoCarritoDto productoBuscado = buscarPorId(id);
+        ProductoCarritoDto productoBuscado = this.productoService.buscarPorId(id);
         Map<String, Object> response = new HashMap<>();
         if (productoBuscado != null && productoBuscado.getCantidad() > 1) {
 

@@ -79,8 +79,8 @@ public class ControllerMercadoPago {
             double precioFinal = getPrecioFinal(pagoRequest, i);
             PreferenceItemRequest item =
                     PreferenceItemRequest.builder()
-                            .title(pagoRequest.getProductos().get(i).getNombre() + " - " + pagoRequest.getProductos().get(i).getDescripcion())
-                            .description(pagoRequest.getProductos().get(i).getDescripcion())
+                            .title(pagoRequest.getProductos().get(i).getNombre() + " - " + pagoRequest.getProductos().get(i).getMarca())
+                            .description(pagoRequest.getProductos().get(i).getMarca())
                             .quantity(pagoRequest.getProductos().get(i).getCantidad())
                             .currencyId("ARS")
                             .unitPrice(BigDecimal.valueOf(precioFinal))

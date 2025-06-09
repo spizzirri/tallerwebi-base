@@ -1,6 +1,7 @@
 package com.tallerwebi.dominio;
 
 import com.tallerwebi.presentacion.ProductoCarritoDto;
+import junit.framework.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -9,6 +10,7 @@ import org.mockito.MockitoAnnotations;
 import java.util.ArrayList;
 import java.util.List;
 
+import static junit.framework.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
@@ -27,6 +29,43 @@ public class ServicioProductoCarritoTest {
         MockitoAnnotations.openMocks(this);
         servicioProductoCarrito = new ServicioProductoCarrito();
         productos = new ArrayList<>();
+    }
+
+    // buscarPorId
+    @Test
+    public void cuandoBuscoUnProductoPorIdObtengoEseProducto() {
+        Long idBuscado = 1L;
+        servicioProductoCarrito.setProductos(productos);
+
+        when(productoMock1.getId()).thenReturn(1L);
+
+        productos.add(productoMock1);
+
+
+        ProductoCarritoDto productoEncontrado = servicioProductoCarrito.buscarPorId(idBuscado);
+        Assert.assertEquals(productoMock1, productoEncontrado);
+    }
+
+    @Test
+    public void cuandoBuscoUnProductoPorIdQueNoExisteObtengoNull() {
+        Long idProductoInexistente = 12L;
+        servicioProductoCarrito.setProductos(productos);
+
+        when(productoMock1.getId()).thenReturn(1L);
+
+        productos.add(productoMock1);
+
+        ProductoCarritoDto productoNoEncontrado = servicioProductoCarrito.buscarPorId(idProductoInexistente);
+        assertNull(productoNoEncontrado);
+    }
+
+    @Test
+    public void cuandoElCarritoEstaVacioObtengoNull() {
+        Long idBuscado = 1L;
+        servicioProductoCarrito.setProductos(productos);
+
+        ProductoCarritoDto productoEncontrado = servicioProductoCarrito.buscarPorId(idBuscado);
+        assertNull(productoEncontrado);
     }
 
     @Test

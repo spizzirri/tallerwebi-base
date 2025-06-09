@@ -3,29 +3,32 @@ package com.tallerwebi.presentacion;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.tallerwebi.dominio.entidades.Componente;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class ProductoCarritoDto {
 
     private static Long contador = 1L;
     private final Long id;
     private String nombre;
-    private String descripcion;
     private Double precio;
     private Integer cantidad = 1;
+    private String marca;
 
-    @JsonCreator
-    public ProductoCarritoDto(
-            @JsonProperty("id") Long id,
-            @JsonProperty("nombre") String nombre,
-            @JsonProperty("precio") Double precio,
-            @JsonProperty("cantidad") Integer cantidad,
-            @JsonProperty("descripcion") String descripcion) {
+
+    public ProductoCarritoDto(Componente componente, Integer cantidad) {
+        this.id = componente.getId();
+        this.nombre = componente.getNombre();
+        this.precio = componente.getPrecio();
+        this.cantidad = cantidad;
+        this.marca = componente.getMarca();
+    }
+
+    public ProductoCarritoDto(Long id, String nombre, Double precio, Integer cantidad, String marca) {
         this.id = id;
         this.nombre = nombre;
         this.precio = precio;
         this.cantidad = cantidad;
-        this.descripcion = descripcion;
+        this.marca = marca;
     }
 
     public Long getId() {
@@ -40,12 +43,12 @@ public class ProductoCarritoDto {
         this.nombre = nombre;
     }
 
-    public String getDescripcion() {
-        return descripcion;
+    public String getMarca() {
+        return marca;
     }
 
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
+    public void setMarca(String descripcion) {
+        this.marca = marca;
     }
 
     public Double getPrecio() {
