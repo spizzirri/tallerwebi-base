@@ -70,10 +70,7 @@ public class ControladorIndex {
         ModelMap model = new ModelMap();
 
             String tipoComponente = convertirIdATipoComponente(id);
-            List<Componente> componentes = repositorioComponente.obtenerComponentesPorTipo(tipoComponente);
-
-            List<ProductoDto> productosDestacados = componentes.stream()
-                    .map(ProductoDto::new).collect(Collectors.toList());
+            List<ProductoDto> productosDestacados = productoService.getProductosPorTipo(tipoComponente);
 
             model.addAttribute("productosDestacados", productosDestacados);
             return new ModelAndView("cargarProductosDinamicos", model);

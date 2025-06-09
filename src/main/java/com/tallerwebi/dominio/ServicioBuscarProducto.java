@@ -58,15 +58,17 @@ public class ServicioBuscarProducto {
 //        this.productos.add(new ProductoDto("aaaaaa", 79.99, 3,"monitor.jpg"));
     }
 
-    public List<ProductoDto> buscarPorTipoComponente(String tipoComponente) {
-        List<ProductoDto> productosDestacados = new ArrayList<>();
-        for (ProductoDto productoDto : this.productos) {
-            if (productoDto.getTipoComponente().equals(tipoComponente)) {
-                productosDestacados.add(productoDto);
-            }
+    public List<ProductoDto> getProductosPorTipo(String tipo) {
+        List<ProductoDto> productos = new ArrayList<>();
+
+        List<Componente> productosComponente = repositorioComponente.obtenerComponentesPorTipo(tipo);
+        for (Componente componente : productosComponente) {
+            productos.add(new ProductoDto(componente));
         }
-        return productosDestacados;
+
+        return productos;
     }
+
     public List<ProductoDto> getProductosMenoresAUnPrecio(Double precio) {
         List<ProductoDto> productos = new ArrayList<>();
         List<Componente> productosComponentes = repositorioComponente.obtenerComponentesMenoresDelPrecioPorParametro(precio);
@@ -75,6 +77,7 @@ public class ServicioBuscarProducto {
         }
        return productos;
     }
+
     public List<ProductoDto> getProductos() {
         return productos;
     }
