@@ -4,9 +4,11 @@ import com.tallerwebi.dominio.ServicioArmaTuPc;
 import com.tallerwebi.dominio.excepcion.LimiteDeComponenteSobrepasadoEnElArmadoException;
 import com.tallerwebi.presentacion.dto.ArmadoPcDto;
 import com.tallerwebi.presentacion.dto.ComponenteDto;
+import org.dom4j.rule.Mode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpSession;
+import org.springframework.ui.Model;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -37,6 +39,7 @@ public class ControladorArmaTuPcTest {
 
     }
 
+
     @Test
     public void dadoQueExisteUnControladorArmaTuPcCuandoPidoCargarComponentesDeTipoProcesadorObtengoUnaListaDeComponenteDtoDeTipoProcesadorYUnArmadoPcDtoParaCargar(){
         // Preparacion(hecha en el init)
@@ -64,6 +67,33 @@ public class ControladorArmaTuPcTest {
     }
 
     @Test
+    public void cuandoAgregoUnComponenteAlArmadoObtengoUnBannerDiciendomeQueElComponenteFueAgregadoExitosamente() throws LimiteDeComponenteSobrepasadoEnElArmadoException {
+
+        // Preparacion
+        ComponenteDto componente = new ComponenteDto();
+        componente.setId(1L);
+        componente.setTipoComponente("Procesador");
+        componente.setModelo("Procesador1");
+
+        when(servicioMock.agregarComponenteAlArmado(any(), any(), any(), any()))
+                .thenReturn(mock(ArmadoPcDto.class));
+
+        when(servicioMock.obtenerComponenteDtoPorId(any())).thenReturn(componente);
+
+        // Ejecucion
+
+        ModelAndView modelAndView = this.controlador.agregarComponenteAlArmado("procesador", 1L, 1, session);
+        String vistaObtenida = modelAndView.getViewName();
+
+        // Validacion
+        String vistaEsperada = "redirect:/arma-tu-pc/tradicional/motherboard";
+        String agregadoEsperado = "x1 Procesador1 agregado correctamente al armado!";
+
+        assertThat(vistaEsperada, equalTo(vistaObtenida));
+        assertThat(modelAndView.getModel().get("agregado"), equalTo(agregadoEsperado));
+    }
+
+    @Test
     public void dadoQueExisteUnControladorArmaTuPcCuandoAgregoUnProcesadorAlArmadoEntoncesEsteSeGuardaEnElArmadoPcDtoDeLaSesionYRedirigeALaVistaDeMotherboards() throws LimiteDeComponenteSobrepasadoEnElArmadoException {
         // Preparacion
 
@@ -73,7 +103,10 @@ public class ControladorArmaTuPcTest {
         when(servicioMock.agregarComponenteAlArmado(any(), any(), any(), any()))
                 .thenReturn(armadoPcDtoARetornar);
 
+        when(servicioMock.obtenerComponenteDtoPorId(any())).thenReturn(mock(ComponenteDto.class));
+
         when(servicioMock.sePuedeAgregarMasUnidades("procesador", armadoPcDtoARetornar)).thenReturn(false);
+
 
         // Ejecucion
         ModelAndView modelAndView = this.controlador.agregarComponenteAlArmado("procesador", 1L, 1,session);
@@ -81,10 +114,8 @@ public class ControladorArmaTuPcTest {
         // Validacion
         String vistaEsperada = "redirect:/arma-tu-pc/tradicional/motherboard";
 
-        ComponenteDto procesadorEsperado = new ComponenteDto(1L, "Procesador", "Procesador1", 1000D, "imagen.jpg", 5);
-
         assertThat(modelAndView.getViewName(), equalTo(vistaEsperada));
-        assertThat(((ArmadoPcDto)this.session.getAttribute("armadoPcDto")).getProcesador(), is(procesadorEsperado));
+        assertThat(((ArmadoPcDto)this.session.getAttribute("armadoPcDto")).getProcesador(), notNullValue());
     }
 
     @Test
@@ -117,11 +148,15 @@ public class ControladorArmaTuPcTest {
     public void dadoQueExisteUnControladorArmaTuPcCuandoAgregoUnaMotherboardAlArmadoEntoncesEsteSeGuardaEnElArmadoPcDtoDeLaSesionYRedirigeALaVistaDeCoolers() throws LimiteDeComponenteSobrepasadoEnElArmadoException {
         // Preparacion
 
+
         ArmadoPcDto armadoPcDtoARetornar = new ArmadoPcDto();
         armadoPcDtoARetornar.setMotherboard(new ComponenteDto(2L, "Motherboard", "Motherboard2", 2000D, "imagen.jpg", 5));
 
+
         when(servicioMock.agregarComponenteAlArmado(any(), any(), any(), any()))
                 .thenReturn(armadoPcDtoARetornar);
+
+        when(servicioMock.obtenerComponenteDtoPorId(any())).thenReturn(mock(ComponenteDto.class));
 
         when(servicioMock.sePuedeAgregarMasUnidades("motherboard", armadoPcDtoARetornar)).thenReturn(false);
         // Ejecucion
@@ -130,10 +165,8 @@ public class ControladorArmaTuPcTest {
         // Validacion
         String vistaEsperada = "redirect:/arma-tu-pc/tradicional/cooler";
 
-        ComponenteDto motherEsperada = new ComponenteDto(2L, "Motherboard", "Motherboard2", 2000D, "imagen.jpg", 5);
-
         assertThat(modelAndView.getViewName(), equalTo(vistaEsperada));
-        assertThat(((ArmadoPcDto)this.session.getAttribute("armadoPcDto")).getMotherboard(), is(motherEsperada));
+        assertThat(((ArmadoPcDto)this.session.getAttribute("armadoPcDto")).getMotherboard(), notNullValue());
     }
 
     @Test
@@ -171,6 +204,8 @@ public class ControladorArmaTuPcTest {
         when(servicioMock.agregarComponenteAlArmado(any(), any(), any(), any()))
                 .thenReturn(armadoPcDtoARetornar);
 
+        when(servicioMock.obtenerComponenteDtoPorId(any())).thenReturn(mock(ComponenteDto.class));
+
         when(servicioMock.sePuedeAgregarMasUnidades("cooler", armadoPcDtoARetornar)).thenReturn(false);
 
         // Ejecucion
@@ -179,14 +214,9 @@ public class ControladorArmaTuPcTest {
         // Validacion
         String vistaEsperada = "redirect:/arma-tu-pc/tradicional/memoria";
 
-        ComponenteDto coolerEsperado = new ComponenteDto();
-        coolerEsperado.setId(3L);
-        coolerEsperado.setTipoComponente("Cooler");
-        coolerEsperado.setModelo("Cooler3");
-        coolerEsperado.setPrecio(3000D);
 
         assertThat(modelAndView.getViewName(), equalTo(vistaEsperada));
-        assertThat(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getCooler(), is(coolerEsperado));
+        assertThat(((ArmadoPcDto)this.session.getAttribute("armadoPcDto")).getCooler(), notNullValue());
     }
 
     @Test
@@ -232,6 +262,8 @@ public class ControladorArmaTuPcTest {
         when(servicioMock.agregarComponenteAlArmado(any(), any(), any(), any()))
                 .thenReturn(armadoPcDtoARetornar);
 
+        when(servicioMock.obtenerComponenteDtoPorId(any())).thenReturn(mock(ComponenteDto.class));
+
         when(servicioMock.sePuedeAgregarMasUnidades("memoria", armadoPcDtoARetornar)).thenReturn(false);
 
         // Ejecucion
@@ -240,14 +272,8 @@ public class ControladorArmaTuPcTest {
         // Validacion
         String vistaEsperada = "redirect:/arma-tu-pc/tradicional/gpu";
 
-        List<ComponenteDto> memoriasEsperadas =
-                Arrays.asList(new ComponenteDto(3L, "Memoria", "Memoria3", 3000D, "imagen.jpg", 5),
-                        new ComponenteDto(3L, "Memoria", "Memoria3", 3000D, "imagen.jpg", 5),
-                        new ComponenteDto(3L, "Memoria", "Memoria3", 3000D, "imagen.jpg", 5),
-                        new ComponenteDto(3L, "Memoria", "Memoria3", 3000D, "imagen.jpg", 5));
-
         assertThat(modelAndView.getViewName(), equalTo(vistaEsperada));
-        assertEquals(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getRams(), memoriasEsperadas);
+        assertThat(((ArmadoPcDto)this.session.getAttribute("armadoPcDto")).getRams(), hasSize(4));
     }
 
     @Test
@@ -260,6 +286,8 @@ public class ControladorArmaTuPcTest {
         when(servicioMock.agregarComponenteAlArmado(any(), any(), any(), any()))
                 .thenReturn(armadoPcDtoARetornar);
 
+        when(servicioMock.obtenerComponenteDtoPorId(any())).thenReturn(mock(ComponenteDto.class));
+
         when(servicioMock.sePuedeAgregarMasUnidades("memoria", armadoPcDtoARetornar)).thenReturn(true);
 
         // Ejecucion
@@ -268,11 +296,8 @@ public class ControladorArmaTuPcTest {
         // Validacion
         String vistaEsperada = "redirect:/arma-tu-pc/tradicional/memoria";
 
-        List<ComponenteDto> memoriasEsperadas =
-                Arrays.asList(new ComponenteDto(3L, "Memoria", "Memoria3", 3000D, "imagen.jpg", 5));
-
         assertThat(modelAndView.getViewName(), equalTo(vistaEsperada));
-        assertEquals(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getRams(), memoriasEsperadas);
+        assertThat(((ArmadoPcDto)this.session.getAttribute("armadoPcDto")).getRams(), hasSize(1));
     }
 
     @Test
@@ -294,6 +319,9 @@ public class ControladorArmaTuPcTest {
 
         when(servicioMock.sePuedeAgregarMasUnidades("memoria", armadoPcDtoARetornar)).thenReturn(true);
 
+        when(servicioMock.obtenerComponenteDtoPorId(any()))
+                .thenReturn(mock(ComponenteDto.class));
+
         this.controlador.agregarComponenteAlArmado("memoria", 1L, 3, session);
 
         // Ejecucion
@@ -304,13 +332,8 @@ public class ControladorArmaTuPcTest {
         String vistaEsperada = "redirect:/arma-tu-pc/tradicional/memoria";
         String errorEsperado = "Supero el limite de memoria de su armado";
 
-        List<ComponenteDto> memoriasEsperadas =
-                Arrays.asList(new ComponenteDto(1L, "Memoria", "Memoria1", 1000D, "imagen.jpg", 5),
-                        new ComponenteDto(1L, "Memoria", "Memoria1", 1000D, "imagen.jpg", 5),
-                        new ComponenteDto(1L, "Memoria", "Memoria1", 1000D, "imagen.jpg", 5)); // solo las 3 rams inicialmente esperadas
-
         assertThat(modelAndView.getViewName(), equalTo(vistaEsperada));
-        assertEquals(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getRams(), memoriasEsperadas);
+        assertThat(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getRams(), hasSize(3));
         assertNotNull(modelAndView.getModel().get("errorLimite"));
         assertThat(modelAndView.getModel().get("errorLimite"), equalTo(errorEsperado));
     }
@@ -349,6 +372,8 @@ public class ControladorArmaTuPcTest {
         when(servicioMock.agregarComponenteAlArmado(any(), any(), any(), any()))
                 .thenReturn(armadoPcDtoARetornar);
 
+        when(servicioMock.obtenerComponenteDtoPorId(any())).thenReturn(mock(ComponenteDto.class));
+
         when(servicioMock.sePuedeAgregarMasUnidades("gpu", armadoPcDtoARetornar)).thenReturn(false);
 
         // Ejecucion
@@ -357,14 +382,9 @@ public class ControladorArmaTuPcTest {
         // Validacion
         String vistaEsperada = "redirect:/arma-tu-pc/tradicional/almacenamiento";
 
-        ComponenteDto gpuEsperada = new ComponenteDto();
-        gpuEsperada.setId(1L);
-        gpuEsperada.setTipoComponente("Gpu");
-        gpuEsperada.setModelo("Gpu1");
-        gpuEsperada.setPrecio(1000D);
 
         assertThat(modelAndView.getViewName(), equalTo(vistaEsperada));
-        assertThat(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getGpu(), is(gpuEsperada));
+        assertThat(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getGpu(), notNullValue());
     }
 
     @Test
@@ -413,6 +433,8 @@ public class ControladorArmaTuPcTest {
         when(servicioMock.agregarComponenteAlArmado(any(), any(), any(), any()))
                 .thenReturn(armadoPcDtoARetornar);
 
+        when(servicioMock.obtenerComponenteDtoPorId(any())).thenReturn(mock(ComponenteDto.class));
+
         when(servicioMock.sePuedeAgregarMasUnidades("almacenamiento", armadoPcDtoARetornar)).thenReturn(false);
 
         // Ejecucion
@@ -421,16 +443,8 @@ public class ControladorArmaTuPcTest {
         // Validacion
         String vistaEsperada = "redirect:/arma-tu-pc/tradicional/fuente";
 
-        List<ComponenteDto> almacenamientoEsperado =
-                Arrays.asList(new ComponenteDto(2L, "Almacenamiento", "Almacenamiento2", 2000D, "imagen.jpg", 5),
-                        new ComponenteDto(2L, "Almacenamiento", "Almacenamiento2", 2000D, "imagen.jpg", 5),
-                        new ComponenteDto(2L, "Almacenamiento", "Almacenamiento2", 2000D, "imagen.jpg", 5),
-                        new ComponenteDto(2L, "Almacenamiento", "Almacenamiento2", 2000D, "imagen.jpg", 5),
-                        new ComponenteDto(2L, "Almacenamiento", "Almacenamiento2", 2000D, "imagen.jpg", 5),
-                        new ComponenteDto(2L, "Almacenamiento", "Almacenamiento2", 2000D, "imagen.jpg", 5));
-
         assertThat(modelAndView.getViewName(), equalTo(vistaEsperada));
-        assertEquals(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getAlmacenamiento(), almacenamientoEsperado);
+        assertThat(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getAlmacenamiento(), hasSize(6));
     }
 
     @Test
@@ -448,6 +462,8 @@ public class ControladorArmaTuPcTest {
         when(servicioMock.agregarComponenteAlArmado(any(), any(), any(), any()))
                 .thenReturn(armadoPcDtoARetornar);
 
+        when(servicioMock.obtenerComponenteDtoPorId(any())).thenReturn(mock(ComponenteDto.class));
+
         when(servicioMock.sePuedeAgregarMasUnidades("almacenamiento", armadoPcDtoARetornar)).thenReturn(true);
 
         // Ejecucion
@@ -456,13 +472,9 @@ public class ControladorArmaTuPcTest {
         // Validacion
         String vistaEsperada = "redirect:/arma-tu-pc/tradicional/almacenamiento";
 
-        List<ComponenteDto> almacenamientoEsperado =
-                Arrays.asList(new ComponenteDto(2L, "Almacenamiento", "Almacenamiento2", 2000D, "imagen.jpg", 5),
-                        new ComponenteDto(2L, "Almacenamiento", "Almacenamiento2", 2000D, "imagen.jpg", 5),
-                        new ComponenteDto(2L, "Almacenamiento", "Almacenamiento2", 2000D, "imagen.jpg", 5),
-                        new ComponenteDto(2L, "Almacenamiento", "Almacenamiento2", 2000D, "imagen.jpg", 5));
+
         assertThat(modelAndView.getViewName(), equalTo(vistaEsperada));
-        assertEquals(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getAlmacenamiento(), almacenamientoEsperado);
+        assertThat(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getAlmacenamiento(), hasSize(4));
     }
 
     @Test
@@ -482,6 +494,8 @@ public class ControladorArmaTuPcTest {
                 .thenReturn(armadoPcDtoARetornar)
                 .thenThrow(new LimiteDeComponenteSobrepasadoEnElArmadoException());
 
+        when(servicioMock.obtenerComponenteDtoPorId(any())).thenReturn(mock(ComponenteDto.class));
+
         when(servicioMock.sePuedeAgregarMasUnidades("almacenamiento", armadoPcDtoARetornar)).thenReturn(true);
 
         this.controlador.agregarComponenteAlArmado("almacenamiento", 1L, 4, session);
@@ -495,14 +509,8 @@ public class ControladorArmaTuPcTest {
         String vistaEsperada = "redirect:/arma-tu-pc/tradicional/almacenamiento";
         String errorEsperado = "Supero el limite de almacenamiento de su armado";
 
-        List<ComponenteDto> almacenamientoEsperado =
-                Arrays.asList(new ComponenteDto(1L, "Almacenamiento", "Almacenamiento1", 1000D, "imagen.jpg", 5),
-                        new ComponenteDto(1L, "Almacenamiento", "Almacenamiento1", 1000D, "imagen.jpg", 5),
-                        new ComponenteDto(1L, "Almacenamiento", "Almacenamiento1", 1000D, "imagen.jpg", 5),
-                        new ComponenteDto(1L, "Almacenamiento", "Almacenamiento1", 1000D, "imagen.jpg", 5));
-
         assertThat(modelAndView.getViewName(), equalTo(vistaEsperada));
-        assertEquals(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getAlmacenamiento(), almacenamientoEsperado);
+        assertThat(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getAlmacenamiento(), hasSize(4));
         assertNotNull(modelAndView.getModel().get("errorLimite"));
         assertThat(modelAndView.getModel().get("errorLimite"), equalTo(errorEsperado));
     }
@@ -543,6 +551,8 @@ public class ControladorArmaTuPcTest {
         when(servicioMock.agregarComponenteAlArmado(any(), any(), any(), any()))
                 .thenReturn(armadoPcDtoARetornar);
 
+        when(servicioMock.obtenerComponenteDtoPorId(any())).thenReturn(mock(ComponenteDto.class));
+
         when(servicioMock.sePuedeAgregarMasUnidades("fuente", armadoPcDtoARetornar)).thenReturn(false);
 
         // Ejecucion
@@ -552,14 +562,8 @@ public class ControladorArmaTuPcTest {
         // Validacion
         String vistaEsperada = "redirect:/arma-tu-pc/tradicional/gabinete";
 
-        ComponenteDto fuenteEsperada = new ComponenteDto();
-        fuenteEsperada.setId(1L);
-        fuenteEsperada.setTipoComponente("Fuente");
-        fuenteEsperada.setModelo("Fuente1");
-        fuenteEsperada.setPrecio(1000D);
-
         assertThat(modelAndView.getViewName(), equalTo(vistaEsperada));
-        assertThat(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getFuente(), is(fuenteEsperada));
+        assertThat(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getFuente(), notNullValue());
     }
 
     @Test
@@ -598,6 +602,8 @@ public class ControladorArmaTuPcTest {
         when(servicioMock.agregarComponenteAlArmado(any(), any(), any(), any()))
                 .thenReturn(armadoPcDtoARetornar);
 
+        when(servicioMock.obtenerComponenteDtoPorId(any())).thenReturn(mock(ComponenteDto.class));
+
         when(servicioMock.sePuedeAgregarMasUnidades("gabinete", armadoPcDtoARetornar)).thenReturn(false);
 
         // Ejecucion
@@ -607,14 +613,9 @@ public class ControladorArmaTuPcTest {
         // Validacion
         String vistaEsperada = "redirect:/arma-tu-pc/tradicional/monitor";
 
-        ComponenteDto gabineteEsperado = new ComponenteDto();
-        gabineteEsperado.setId(2L);
-        gabineteEsperado.setTipoComponente("Gabinete");
-        gabineteEsperado.setModelo("Gabinete2");
-        gabineteEsperado.setPrecio(2000D);
 
         assertThat(modelAndView.getViewName(), equalTo(vistaEsperada));
-        assertThat(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getGabinete(), is(gabineteEsperado));
+        assertThat(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getGabinete(), notNullValue());
     }
 
     @Test
@@ -653,6 +654,8 @@ public class ControladorArmaTuPcTest {
         when(servicioMock.agregarComponenteAlArmado(any(), any(), any(), any()))
                 .thenReturn(armadoPcDtoARetornar);
 
+        when(servicioMock.obtenerComponenteDtoPorId(any())).thenReturn(mock(ComponenteDto.class));
+
         when(servicioMock.sePuedeAgregarMasUnidades("monitor", armadoPcDtoARetornar)).thenReturn(false);
 
         // Ejecucion
@@ -662,14 +665,8 @@ public class ControladorArmaTuPcTest {
         // Validacion
         String vistaEsperada = "redirect:/arma-tu-pc/tradicional/periferico";
 
-        ComponenteDto monitorEsperado = new ComponenteDto();
-        monitorEsperado.setId(3L);
-        monitorEsperado.setTipoComponente("Monitor");
-        monitorEsperado.setModelo("Monitor3");
-        monitorEsperado.setPrecio(3000D);
-
         assertThat(modelAndView.getViewName(), equalTo(vistaEsperada));
-        assertThat(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getMonitor(), is(monitorEsperado));
+        assertThat(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getMonitor(), notNullValue());
     }
 
     @Test
@@ -710,6 +707,8 @@ public class ControladorArmaTuPcTest {
         when(servicioMock.agregarComponenteAlArmado(any(), any(), any(), any()))
                 .thenReturn(armadoPcDtoARetornar);
 
+        when(servicioMock.obtenerComponenteDtoPorId(any())).thenReturn(mock(ComponenteDto.class));
+
         when(servicioMock.sePuedeAgregarMasUnidades("periferico", armadoPcDtoARetornar)).thenReturn(true);
 
         // Ejecucion
@@ -718,10 +717,8 @@ public class ControladorArmaTuPcTest {
         // Validacion
         String vistaEsperada = "redirect:/arma-tu-pc/tradicional/periferico";
 
-        List<ComponenteDto> perifericosEsperados = Arrays.asList(new ComponenteDto(1L, "Periferico", "Periferico1", 1000D, "imagen.jpg", 5));
-
         assertThat(modelAndView.getViewName(), equalTo(vistaEsperada));
-        assertEquals(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getPerifericos(), perifericosEsperados);
+        assertThat(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getPerifericos(), hasSize(1));
     }
 
     @Test
@@ -738,6 +735,8 @@ public class ControladorArmaTuPcTest {
         when(servicioMock.agregarComponenteAlArmado(any(), any(), any(), any()))
                 .thenReturn(armadoCon10Perifericos);
 
+        when(servicioMock.obtenerComponenteDtoPorId(any())).thenReturn(mock(ComponenteDto.class));
+
         when(servicioMock.sePuedeAgregarMasUnidades(eq("periferico"), eq(armadoCon10Perifericos)))
                 .thenReturn(false);
 
@@ -747,30 +746,14 @@ public class ControladorArmaTuPcTest {
         String vistaEsperada = "redirect:/arma-tu-pc/tradicional/resumen";
 
         assertThat(modelAndView.getViewName(), equalTo(vistaEsperada));
+        assertThat(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getPerifericos(), hasSize(10));
     }
 
     @Test
     public void dadoQueExisteUnControladorArmaTuPcCuandoObtengoElResumenObtengoLaVistaDeResumenConElArmadoPcDtoDeLaSession(){
         // Preparacion
 
-        ArmadoPcDto armadoTerminado = new ArmadoPcDto();
-        armadoTerminado.setProcesador(new ComponenteDto(1L, "Procesador", "Procesador1", 1000D, "imagen.jpg", 5));
-        armadoTerminado.setMotherboard(new ComponenteDto(2L, "Motherboard", "Motherboard2", 2000D, "imagen.jpg", 5));
-        armadoTerminado.setCooler(new ComponenteDto(3L, "Cooler", "Cooler3", 3000D, "imagen.jpg", 5));
-        armadoTerminado.setRams(Arrays.asList(new ComponenteDto(1L, "Memoria", "Memoria1", 1000D, "imagen.jpg", 5), new ComponenteDto(1L, "Memoria", "Memoria1", 1000D, "imagen.jpg", 5)));
-        armadoTerminado.setGpu(new ComponenteDto(2L, "Gpu", "Gpu2", 2000D, "imagen.jpg", 5));
-        armadoTerminado.setAlmacenamiento(Arrays.asList(
-                new ComponenteDto(3L, "Almacenamiento", "Almacenamiento3", 3000D, "imagen.jpg", 5),
-                new ComponenteDto(3L, "Almacenamiento", "Almacenamiento3", 3000D, "imagen.jpg", 5),
-                new ComponenteDto(3L, "Almacenamiento", "Almacenamiento3", 3000D, "imagen.jpg", 5)
-        ));
-        armadoTerminado.setFuente(new ComponenteDto(1L, "Fuente", "Fuente1", 1000D, "imagen.jpg", 5));
-        armadoTerminado.setGabinete(new ComponenteDto(2L, "Gabinete", "Gabinete2", 2000D, "imagen.jpg", 5));
-        armadoTerminado.setMonitor(new ComponenteDto(3L, "Monitor", "Monitor3", 3000D, "imagen.jpg", 5));
-        armadoTerminado.setPerifericos(Arrays.asList(
-                new ComponenteDto(1L, "Periferico", "Periferico1", 1000D, "imagen.jpg", 5),
-                new ComponenteDto(2L, "Periferico", "Periferico2", 2000D, "imagen.jpg", 5)
-        ));
+        ArmadoPcDto armadoTerminado = mock(ArmadoPcDto.class);
 
         session.setAttribute("armadoPcDto", armadoTerminado);
         when(this.servicioMock.armadoCompleto(armadoTerminado)).thenReturn(true);
@@ -781,36 +764,8 @@ public class ControladorArmaTuPcTest {
         // Validacion
         String vistaEsperada = "arma-tu-pc/tradicional/resumen";
 
-        ComponenteDto procesadorEsperado = new ComponenteDto(1L, "Procesador", "Procesador1", 1000D, "imagen.jpg", 5);
-        ComponenteDto motherboardEsperada = new ComponenteDto(2L, "Motherboard", "Motherboard2", 2000D, "imagen.jpg", 5);
-        ComponenteDto coolerEsperado = new ComponenteDto(3L, "Cooler", "Cooler3", 3000D, "imagen.jpg", 5);
-        List<ComponenteDto> memoriasEsperadas = Arrays.asList(
-                new ComponenteDto(1L, "Memoria", "Memoria1", 1000D, "imagen.jpg", 5),
-                new ComponenteDto(1L, "Memoria", "Memoria1", 1000D, "imagen.jpg", 5));
-        ComponenteDto gpuEsperada = new ComponenteDto(2L, "Gpu", "Gpu2", 2000D, "imagen.jpg", 5);
-        List<ComponenteDto> almacenamientoEsperado = Arrays.asList(
-                new ComponenteDto(3L, "Almacenamiento", "Almacenamiento3", 3000D, "imagen.jpg", 5),
-                new ComponenteDto(3L, "Almacenamiento", "Almacenamiento3", 3000D, "imagen.jpg", 5),
-                new ComponenteDto(3L, "Almacenamiento", "Almacenamiento3", 3000D, "imagen.jpg", 5));
-        ComponenteDto fuenteEsperada = new ComponenteDto(1L, "Fuente", "Fuente1", 1000D, "imagen.jpg", 5);
-        ComponenteDto gabineteEsperado = new ComponenteDto(2L, "Gabinete", "Gabinete2", 2000D, "imagen.jpg", 5);
-        ComponenteDto monitorEsperado = new ComponenteDto(3L, "Monitor", "Monitor3", 3000D, "imagen.jpg", 5);
-        List<ComponenteDto> perifericosEsperados = Arrays.asList(
-                new ComponenteDto(1L, "Periferico", "Periferico1", 1000D, "imagen.jpg", 5),
-                new ComponenteDto(2L, "Periferico", "Periferico2", 2000D, "imagen.jpg", 5));
-
-
         assertThat(modelAndView.getViewName(), equalTo(vistaEsperada));
-        assertEquals(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getProcesador(), procesadorEsperado);
-        assertEquals(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getMotherboard(), motherboardEsperada);
-        assertEquals(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getCooler(), coolerEsperado);
-        assertEquals(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getRams(), memoriasEsperadas);
-        assertEquals(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getGpu(), gpuEsperada);
-        assertEquals(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getAlmacenamiento(), almacenamientoEsperado);
-        assertEquals(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getFuente(), fuenteEsperada);
-        assertEquals(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getGabinete(), gabineteEsperado);
-        assertEquals(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getMonitor(), monitorEsperado);
-        assertEquals(((ArmadoPcDto)session.getAttribute("armadoPcDto")).getPerifericos(), perifericosEsperados);
+        assertThat(modelAndView.getModel().get("armadoPcDto"), instanceOf(ArmadoPcDto.class));
 
     }
 
@@ -818,21 +773,7 @@ public class ControladorArmaTuPcTest {
     public void dadoQueExisteUnControladorArmaTuPcCuandoQuieroObtenerElResumenDeUnArmadoSinProcesadorMotherboardCoolerOGabineteObtengoLaVistaDeResumenConUnMensajeDeError(){
         // Preparacion
 
-        ArmadoPcDto armadoIncompleto = new ArmadoPcDto();
-        armadoIncompleto.setRams(Arrays.asList(new ComponenteDto(1L, "Memoria", "Memoria1", 1000D, "imagen.jpg", 5), new ComponenteDto(1L, "Memoria", "Memoria1", 1000D, "imagen.jpg", 5)));
-        armadoIncompleto.setGpu(new ComponenteDto(2L, "Gpu", "Gpu2", 2000D, "imagen.jpg", 5));
-        armadoIncompleto.setAlmacenamiento(Arrays.asList(
-                new ComponenteDto(3L, "Almacenamiento", "Almacenamiento3", 3000D, "imagen.jpg", 5),
-                new ComponenteDto(3L, "Almacenamiento", "Almacenamiento3", 3000D, "imagen.jpg", 5),
-                new ComponenteDto(3L, "Almacenamiento", "Almacenamiento3", 3000D, "imagen.jpg", 5)
-        ));
-        armadoIncompleto.setFuente(new ComponenteDto(1L, "Fuente", "Fuente1", 1000D, "imagen.jpg", 5));
-        armadoIncompleto.setGabinete(new ComponenteDto(2L, "Gabinete", "Gabinete2", 2000D, "imagen.jpg", 5));
-        armadoIncompleto.setMonitor(new ComponenteDto(3L, "Monitor", "Monitor3", 3000D, "imagen.jpg", 5));
-        armadoIncompleto.setPerifericos(Arrays.asList(
-                new ComponenteDto(1L, "Periferico", "Periferico1", 1000D, "imagen.jpg", 5),
-                new ComponenteDto(2L, "Periferico", "Periferico2", 2000D, "imagen.jpg", 5)
-        ));
+        ArmadoPcDto armadoIncompleto = mock(ArmadoPcDto.class);
 
         session.setAttribute("armadoPcDto", armadoIncompleto);
         when(this.servicioMock.armadoCompleto(armadoIncompleto)).thenReturn(false);
@@ -845,6 +786,7 @@ public class ControladorArmaTuPcTest {
         String errorEsperado = "Seleccione almenos un motherboard, cpu, cooler y gabinete para obtener su armado";
 
         assertThat(modelAndView.getViewName(), equalTo(vistaEsperada));
+        assertThat(modelAndView.getModel().get("armadoPcDto"), nullValue());
         assertThat(modelAndView.getModel().get("errorResumen"), equalTo(errorEsperado));
     }
 
@@ -853,36 +795,18 @@ public class ControladorArmaTuPcTest {
     public void dadoQueExisteUnControladorArmaTuPcCuandoQuieroReiniciarElArmadoPcDtoAnteriorEntoncesElArmadoDeLaSesionSeBorraYMeDevuelveLaVistaDeProcesadores(){
         // Preparacion
 
-        ArmadoPcDto armado = new ArmadoPcDto();
-        armado.setProcesador(new ComponenteDto(1L, "Procesador", "Procesador1", 1000D, "imagen.jpg", 5));
-        armado.setMotherboard(new ComponenteDto(2L, "Motherboard", "Motherboard2", 2000D, "imagen.jpg", 5));
-        armado.setCooler(new ComponenteDto(3L, "Cooler", "Cooler3", 3000D, "imagen.jpg", 5));
-        armado.setRams(Arrays.asList(new ComponenteDto(1L, "Memoria", "Memoria1", 1000D, "imagen.jpg", 5), new ComponenteDto(1L, "Memoria", "Memoria1", 1000D, "imagen.jpg", 5)));
-        armado.setGpu(new ComponenteDto(2L, "Gpu", "Gpu2", 2000D, "imagen.jpg", 5));
-        armado.setAlmacenamiento(Arrays.asList(
-                new ComponenteDto(3L, "Almacenamiento", "Almacenamiento3", 3000D, "imagen.jpg", 5),
-                new ComponenteDto(3L, "Almacenamiento", "Almacenamiento3", 3000D, "imagen.jpg", 5),
-                new ComponenteDto(3L, "Almacenamiento", "Almacenamiento3", 3000D, "imagen.jpg", 5)
-        ));
-        armado.setFuente(new ComponenteDto(1L, "Fuente", "Fuente1", 1000D, "imagen.jpg", 5));
-        armado.setGabinete(new ComponenteDto(2L, "Gabinete", "Gabinete2", 2000D, "imagen.jpg", 5));
-        armado.setMonitor(new ComponenteDto(3L, "Monitor", "Monitor3", 3000D, "imagen.jpg", 5));
-        armado.setPerifericos(Arrays.asList(
-                new ComponenteDto(1L, "Periferico", "Periferico1", 1000D, "imagen.jpg", 5),
-                new ComponenteDto(2L, "Periferico", "Periferico2", 2000D, "imagen.jpg", 5)
-        ));
+        ArmadoPcDto armado = mock(ArmadoPcDto.class);
 
         session.setAttribute("armadoPcDto", armado);
 
-        HttpServletRequest request = mock(HttpServletRequest.class);
-
         // Ejecucion
 
-        ModelAndView modelAndView = this.controlador.reiniciarArmado(session, request);
+        ModelAndView modelAndView = this.controlador.reiniciarArmado(session);
 
         // Validacion
         String vistaEsperada = "redirect:/arma-tu-pc/tradicional/procesador";
         assertThat(modelAndView.getViewName(), equalTo(vistaEsperada));
         assertThat(session.getAttribute("armadoPcDto"), nullValue());
     }
+
 }

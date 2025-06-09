@@ -58,7 +58,7 @@ public class RepositorioComponenteImplTest {
                 6, 12, "2.5 GHz", "4.4 GHz", true, "65W",
                 "480KB", "7.5MB", "18MB"
         );
-        procesador1.getImagenes().add(new Imagen(null, "intel-core-i5.jpg", procesador1));
+        procesador1.getImagenes().add(new Imagen(null, "intel-core-i5-1.jpg", procesador1));
 
         Procesador procesador2 = new Procesador(
                 null, "AMD Ryzen 5", 140000.0, 8, "AMD",
@@ -66,7 +66,7 @@ public class RepositorioComponenteImplTest {
                 6, 12, "3.7 GHz", "4.6 GHz", true, "65W",
                 "384KB", "3MB", "32MB"
         );
-        procesador2.getImagenes().add(new Imagen(null, "amd-ryzen-5.jpg", procesador2));
+        procesador2.getImagenes().add(new Imagen(null, "amd-ryzen-5-1.jpg", procesador2));
 
         Motherboard mother1 = new Motherboard(
                 null, "ASUS TUF Gaming B550-PLUS", 100000.0, 12, "ASUS",
@@ -75,7 +75,7 @@ public class RepositorioComponenteImplTest {
                 "DDR4", 4,
                 "50W", 1, 2
         );
-        mother1.getImagenes().add(new Imagen(null, "asus-b550.jpg", mother1));
+        mother1.getImagenes().add(new Imagen(null, "asus-b550-1.jpg", mother1));
 
 
         // guardo luego los componentes
