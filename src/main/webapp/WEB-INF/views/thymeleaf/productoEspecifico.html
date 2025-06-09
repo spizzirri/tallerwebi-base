@@ -84,40 +84,12 @@
         <br><br>
         <div class="container">
             <div class="row">
-                <!-- Caracteristicas Generales -->
                 <div class="col-md-6" style="margin-bottom: 25px">
-                    <table class="row">
-                        <tr class="row" th:each="caracteristicaGeneral : ${componenteEspecificoDto.caracteristicasGenerales}">
-                            <td class="col-md-6" th:text="${caracteristicaGeneral.getKey()}"></td>
-                            <td class="col-md-6 text-end" th:text="${caracteristicaGeneral.getValue()}"></td>
-                        </tr>
-                    </table>
-                </div>
-                <!-- Especificaciones CPU -->
-                <div class="col-md-6" style="margin-bottom: 25px">
-                    <table class="row">
-                        <tr class="row" th:each="especificacionCPU : ${componenteEspecificoDto.especificacionesCPU}">
-                            <td class="col-md-6" th:text="${especificacionCPU.getKey()}"></td>
-                            <td class="col-md-6 text-end" th:text="${especificacionCPU.getValue()}"></td>
-                        </tr>
-                    </table>
-                </div>
-                <br>
-                <!-- Coolers y Disipadores -->
-                <div class="col-md-6" style="margin-bottom: 25px">
-                    <table class="row">
-                        <tr class="row" th:each="coolerYDisipador : ${componenteEspecificoDto.coolersYDisipadores}">
-                            <td class="col-md-6" th:text="${coolerYDisipador.getKey()}"></td>
-                            <td class="col-md-6 text-end" th:text="${coolerYDisipador.getValue()}"></td>
-                        </tr>
-                    </table>
-                </div>
-                <!-- Memoria -->
-                <div class="col-md-6" style="margin-bottom: 25px">
-                    <table class="row">
-                        <tr class="row" th:each="memoria : ${componenteEspecificoDto.memoria}">
-                            <td class="col-md-6" th:text="${memoria.getKey()}"></td>
-                            <td class="col-md-6 text-end" th:text="${memoria.getValue()}"></td>
+                    <table class="row" th:each="caracteristicas : ${componenteEspecificoDto.getCaracteristicas()}">
+                        <th th:text="${caracteristicas.getKey()}"></th>
+                        <tr class="row" th:each="subCaracteristicas : ${caracteristicas.getValue()}">
+                            <td class="col-md-6" th:text="${subCaracteristicas.getKey()}"></td>
+                            <td class="col-md-6 text-end" th:text="${subCaracteristicas.getValue()}"></td>
                         </tr>
                     </table>
                 </div>

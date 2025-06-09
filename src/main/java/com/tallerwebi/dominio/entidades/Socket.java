@@ -83,5 +83,8 @@ public class Socket {
         this.coolersCPU = coolersCPU;
     }
 
-
+    @Override
+    public String toString() {
+        return nombre;
+    }
 }
