@@ -20,8 +20,7 @@ import static junit.framework.Assert.assertNull;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class ControladorCarritoTest {
 
@@ -59,14 +58,22 @@ public class ControladorCarritoTest {
     // eliminarProductoDelCarrito
     @Test
     public void cuandoQuieroEliminarUnProductoDelCarritoObtengoLaListaDeProductosDelCarritoSinEseProducto() {
-        when(productoMock1.getPrecio()).thenReturn(100.0);
-        when(productoMock2.getPrecio()).thenReturn(130.0);
-
         productos.add(productoMock1);
         productos.add(productoMock2);
 
+        when(productoMock1.getPrecio()).thenReturn(100.0);
+        when(productoMock2.getPrecio()).thenReturn(130.0);
+
+        when(productoMock1.getId()).thenReturn(1L);
+        when(productoMock2.getId()).thenReturn(2L);
+
+        when(productoMock1.getCantidad()).thenReturn(1);
+        when(productoMock2.getCantidad()).thenReturn(1);
+
         List<ProductoCarritoDto> productosSinUno = new ArrayList<>();
         productosSinUno.add(productoMock2);
+
+        when(servicioProductoCarritoMock.buscarPorId(1L)).thenReturn(productoMock1);
 
         when(servicioProductoCarritoMock.getProductos()).thenReturn(productos).thenReturn(productosSinUno);
         when(servicioProductoCarritoMock.calcularValorTotalDeLosProductos()).thenReturn(130.0);
@@ -154,56 +161,53 @@ public class ControladorCarritoTest {
     }
 
     // agregarMasCantidadDeUnProducto
-//    @Test
-//    public void cuandoQuieroAgregarUnaUnidadDeUnMismoProductoAlCarritoObtengoEseProductoConLaCantidadSumadaYElValorTotalDelCarritoActualizado() {
-//        ProductoCarritoDto producto = new ProductoCarritoDto(1L, "Mouse", 8000.0, 2, "Logitech");
-//
-//        Componente componenteFalso = new Componente();
-//        componenteFalso.setId(1L);
-//        componenteFalso.setNombre("Mouse");
-//        componenteFalso.setPrecio(8000.0);
-//
-//        ServicioProductoCarrito servicioProductoCarritoReal = new ServicioProductoCarrito();
-//        servicioProductoCarritoReal.setProductos(List.of(producto));
-//
-//        when(repositorioMock.obtenerComponentePorId(1L)).thenReturn(componenteFalso);
-//
-//        CarritoController carritoControllerReal = new CarritoController(servicioProductoCarritoReal, servicioEnviosMock);
-//
-//        Map<String, Object> response = carritoControllerReal.agregarMasCantidadDeUnProducto(1L);
-//
-//        assertEquals(3, response.get("cantidad"));
-//        assertEquals(54000.0, response.get("valorTotal"));
-//        assertEquals(24000.0, response.get("precioTotalDelProducto"));
-//    }
+    @Test
+    public void cuandoQuieroAgregarUnaUnidadDeUnMismoProductoAlCarritoObtengoEseProductoConLaCantidadSumadaYElValorTotalDelCarritoActualizado() {
+        ProductoCarritoDto productoMock = mock(ProductoCarritoDto.class);
+
+        when(productoMock.getId()).thenReturn(1L);
+        when(productoMock.getCantidad()).thenReturn(2).thenReturn(3);
+        when(productoMock.getPrecio()).thenReturn(8000.0);
+
+        when(servicioProductoCarritoMock.buscarPorId(1L)).thenReturn(productoMock);
+
+        when(servicioProductoCarritoMock.calcularValorTotalDeLosProductos()).thenReturn(24000.0);
+        servicioProductoCarritoMock.valorTotal = 24000.0;
+
+        Map<String, Object> response = carritoController.agregarMasCantidadDeUnProducto(1L);
+
+        assertEquals(3, response.get("cantidad"));
+        assertEquals(24000.0, response.get("valorTotal"));
+        assertEquals(24000.0, response.get("precioTotalDelProducto"));
+
+        verify(productoMock).setCantidad(3);
+        verify(servicioProductoCarritoMock).buscarPorId(1L);
+        verify(servicioProductoCarritoMock).calcularValorTotalDeLosProductos();
+    }
 
     // restarCantidadDeUnProducto
-//    @Test
-//    public void cuandoQuieroRestarUnaUnidadDeUnMismoProductoAlCarritoObtengoEseProductoConLaCantidadSumadaYElValorTotalDelCarritoActualizado() {
-//        ProductoCarritoDto producto = new ProductoCarritoDto(1L, "Mouse", 8000.0, 2, "Logitech");
-//
-//        Componente componenteFalso = new Componente();
-//        componenteFalso.setId(1L);
-//        componenteFalso.setNombre("Mouse");
-//        componenteFalso.setPrecio(8000.0);
-//        componenteFalso.setStock(10);
-//
-//        ServicioProductoCarrito servicioProductoCarritoReal = new ServicioProductoCarrito();
-//
-//        ReflectionTestUtils.setField(servicioProductoCarritoReal, "repositorioComponente", repositorioMock);
-//
-//        servicioProductoCarritoReal.setProductos(new ArrayList<>(List.of(producto)));
-//
-//        when(repositorioMock.obtenerComponentePorId(1L)).thenReturn(componenteFalso);
-//
-//        CarritoController carritoControllerReal = new CarritoController(servicioProductoCarritoReal, servicioEnviosMock);
-//
-//        Map<String, Object> response = carritoControllerReal.restarCantidadDeUnProducto(1L);
-//
-//        assertEquals(1, response.get("cantidad"));
-//        assertEquals(38000.0, response.get("valorTotal"));
-//        assertEquals(8000.0, response.get("precioTotalDelProducto"));
-//    }
+    @Test
+    public void cuandoQuieroRestarUnaUnidadDeUnMismoProductoAlCarritoObtengoEseProductoConLaCantidadSumadaYElValorTotalDelCarritoActualizado() {
+        ProductoCarritoDto productoMock = mock(ProductoCarritoDto.class);
+
+        when(productoMock.getId()).thenReturn(1L);
+        when(productoMock.getCantidad()).thenReturn(2).thenReturn(1);
+        when(productoMock.getPrecio()).thenReturn(8000.0);
+
+        when(servicioProductoCarritoMock.buscarPorId(1L)).thenReturn(productoMock);
+
+        when(servicioProductoCarritoMock.calcularValorTotalDeLosProductos()).thenReturn(8000.0);
+        servicioProductoCarritoMock.valorTotal = 8000.0;
+
+        Map<String, Object> response = carritoController.restarCantidadDeUnProducto(1L);
+
+        assertEquals(1, response.get("cantidad"));
+        assertEquals(8000.0, response.get("valorTotal"));
+        assertEquals(8000.0, response.get("precioTotalDelProducto"));
+
+        verify(servicioProductoCarritoMock).buscarPorId(1L);
+        verify(servicioProductoCarritoMock).calcularValorTotalDeLosProductos();
+    }
 
     // procesarCompra
     @Test

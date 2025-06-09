@@ -280,3 +280,12 @@ function calcularConAjax(codigoPostal) {
             loading.classList.add('d-none');
         });
 }
+
+
+window.actualizarContadorCarrito = function (nuevaCantidad) {
+    console.log(" Actualizando contador a:", nuevaCantidad);
+    const contadorCarrito = document.getElementById("contadorCarrito");
+    if (contadorCarrito) {
+        contadorCarrito.textContent = nuevaCantidad;
+    }
+}

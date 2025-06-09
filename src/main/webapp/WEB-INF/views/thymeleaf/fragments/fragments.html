@@ -15,7 +15,9 @@
       </form>
       <!-- Botones / iconos -->
       <div>
-        <button class="btn btn-warning me-2"><a th:href="@{/carritoDeCompras/index}"><i class="bi bi-cart3"></i></a></button>
+          <a class="btn btn-warning me-2" th:href="@{/carritoDeCompras/index}">
+            <i class="bi bi-cart3"> (<span id="contadorCarrito">0</span>)</i>
+          </a>
         <button class="btn btn-outline-secondary text-light"><i class="bi bi-person">Ingresa</i></button>
       </div>
     </div>
