@@ -10,7 +10,9 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 // agregar transaccional
 // agregar service
@@ -19,6 +21,19 @@ import java.util.List;
 public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
 
     private RepositorioComponente repositorioComponente;
+
+    private final Map<String, String> correspondenciaDeVistaConTablasEnLaBD = new LinkedHashMap<>() {{
+        put("procesador", "Procesador");
+        put("motherboard", "Motherboard");
+        put("cooler", "CoolerCPU");
+        put("memoria", "MemoriaRAM");
+        put("gpu", "PlacaDeVideo");
+        put("almacenamiento", "Almacenamiento");
+        put("fuente", "FuenteDeAlimentacion");
+        put("gabinete", "Gabinete");
+        put("monitor", "Componente");
+        put("periferico", "Componente");
+    }};
 
     @Autowired
     public ServicioArmaTuPcImpl(RepositorioComponente repositorioComponente) {
@@ -31,9 +46,15 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
     }
 
     @Override
+    public ComponenteDto obtenerComponenteDtoPorId(Long idComponente) {
+        return new ComponenteDto(this.obtenerComponentePorId(idComponente));
+    }
+
+    @Override
     public List<ComponenteDto> obtenerListaDeComponentesDto(String tipoComponente) {
 
-        List<Componente> componentesDeTipo = this.repositorioComponente.obtenerComponentesPorTipo(tipoComponente);
+        String tablaDelTipoDeComponente = this.correspondenciaDeVistaConTablasEnLaBD.get(tipoComponente);
+        List<Componente> componentesDeTipo = this.repositorioComponente.obtenerComponentesPorTipo(tablaDelTipoDeComponente);
 
         // traer componentes compatibles
 

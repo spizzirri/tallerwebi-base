@@ -17,4 +17,6 @@ public interface ServicioArmaTuPc {
     Boolean armadoCompleto(ArmadoPcDto armadoPcDto);
 
     Componente obtenerComponentePorId(Long idComponente);
+
+    ComponenteDto obtenerComponenteDtoPorId(Long idComponente);
 }
