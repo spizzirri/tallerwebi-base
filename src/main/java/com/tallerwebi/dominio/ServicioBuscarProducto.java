@@ -1,17 +1,26 @@
 package com.tallerwebi.dominio;
 
+import com.tallerwebi.dominio.entidades.Componente;
+import com.tallerwebi.infraestructura.RepositorioComponenteImpl;
 import com.tallerwebi.presentacion.ProductoDto;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.Query;
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
-@Service
+@Service("servicioBuscarProducto")
+@Transactional
 public class ServicioBuscarProducto {
 
     private List<ProductoDto> productos;
 
-    public ServicioBuscarProducto() {
+    private RepositorioComponente repositorioComponente;
+   @Autowired
+    public ServicioBuscarProducto(RepositorioComponente repositorioComponente) {
+        this.repositorioComponente = repositorioComponente;
         this.productos = new ArrayList<ProductoDto>();
 //        this.productos.add(new ProductoDto("Mouse inalámbrico", 29.99, 6, "mouse.png"));
 //        this.productos.add(new ProductoDto("Mouse inalámbrico", 29.99, 6 , "mouse.png"));
@@ -58,7 +67,14 @@ public class ServicioBuscarProducto {
         }
         return productosDestacados;
     }
-
+    public List<ProductoDto> getProductosMenoresAUnPrecio(Double precio) {
+        List<ProductoDto> productos = new ArrayList<>();
+        List<Componente> productosComponentes = repositorioComponente.obtenerComponentesMenoresDelPrecioPorParametro(precio);
+        for(Componente componente : productosComponentes){
+            productos.add(new ProductoDto(componente));
+        }
+       return productos;
+    }
     public List<ProductoDto> getProductos() {
         return productos;
     }

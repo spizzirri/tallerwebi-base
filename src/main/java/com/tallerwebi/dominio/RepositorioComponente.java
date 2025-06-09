@@ -10,4 +10,6 @@ public interface RepositorioComponente {
     List<Componente> obtenerComponentesPorTipo(String tipo);
 
     Componente obtenerComponentePorId(Long idComponente);
+
+    List<Componente> obtenerComponentesMenoresDelPrecioPorParametro(Double precio);
 }

@@ -39,4 +39,14 @@ public class RepositorioComponenteImpl implements RepositorioComponente {
 
         return (Componente)query.getSingleResult();
     }
+
+    public List<Componente> obtenerComponentesMenoresDelPrecioPorParametro(Double precio) {
+
+        String hql = "FROM Componente WHERE precio < :precio";
+
+        Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
+        query.setParameter("precio", precio);
+
+        return query.getResultList();
+    }
 }

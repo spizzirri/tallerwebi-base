@@ -56,7 +56,8 @@ public class ControladorIndex {
         model.addAttribute("categoriaDestacada", categoriaDestacada);
         model.addAttribute("otrasCategorias", otrasCategorias);
 
-        List<ProductoDto> productosDescuento = productoService.getProductos();
+        List<ProductoDto> productosDescuento = productoService.getProductosMenoresAUnPrecio(150000D);
+
         model.addAttribute("productosDescuento", productosDescuento);
 
         return new ModelAndView("index", model);
