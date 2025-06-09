@@ -10,6 +10,11 @@ public interface RepositorioComponente {
     List<Componente> obtenerComponentesPorTipo(String tipo);
 
     Componente obtenerComponentePorId(Long idComponente);
+    List<Componente> obtenerComponentes();
+
+    List<Componente> obtenerComponentesEnStock();
 
     List<Componente> obtenerComponentesMenoresDelPrecioPorParametro(Double precio);
+
+    List<Componente> obtenerComponentesPorQuery(String query);
 }
