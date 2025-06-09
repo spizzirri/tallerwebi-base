@@ -3,6 +3,7 @@ package com.tallerwebi.presentacion;
 import com.tallerwebi.dominio.ServicioArmaTuPc;
 import com.tallerwebi.dominio.excepcion.LimiteDeComponenteSobrepasadoEnElArmadoException;
 import com.tallerwebi.presentacion.dto.ArmadoPcDto;
+import com.tallerwebi.presentacion.dto.ComponenteDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -17,25 +18,13 @@ import java.util.*;
 public class ControladorArmaTuPc {
 
     private ServicioArmaTuPc servicioArmaTuPc;
-    private static final Map<String, String> pasosYCorrespondenciaEnBD = new LinkedHashMap<>() {{
-        put("procesador", "Procesador");
-        put("motherboard", "Motherboard");
-        put("cooler", "CoolerCPU");
-        put("memoria", "MemoriaRAM");
-        put("gpu", "PlacaDeVideo");
-        put("almacenamiento", "Almacenamiento");
-        put("fuente", "FuenteDeAlimentacion");
-        put("gabinete", "Gabinete");
-        put("monitor", "Componente");
-        put("periferico", "Componente");
-        put("resumen", null); // ahora sí es válido
-    }};
+    private List<String> pasos = Arrays.asList("procesador", "motherboard", "cooler", "memoria", "gpu", "almacenamiento", "fuente", "gabinete", "monitor", "periferico", "resumen");
 
     @Autowired
     public ControladorArmaTuPc(ServicioArmaTuPc servicioArmaTuPc) { this.servicioArmaTuPc =  servicioArmaTuPc; }
     public ControladorArmaTuPc() {}
 
-     private ArmadoPcDto obtenerArmadoPcDtoCorrespondiente(HttpSession session) {
+     private ArmadoPcDto obtenerArmadoPcDtoDeLaSession(HttpSession session) {
         if(session.getAttribute("armadoPcDto") == null){ // si no existe el armado de pc en la session, se la creo
             ArmadoPcDto armadoPcDto = new ArmadoPcDto();
             session.setAttribute("armadoPcDto", armadoPcDto);
@@ -48,8 +37,8 @@ public class ControladorArmaTuPc {
     public ModelAndView cargarComponentes(@PathVariable("tipoComponente") String tipoComponente, HttpSession sesion) {
 
         ModelMap model = new ModelMap();
-        model.put(tipoComponente+"Lista", this.servicioArmaTuPc.obtenerListaDeComponentesDto(this.pasosYCorrespondenciaEnBD.get(tipoComponente)));
-        model.put("armadoPcDto", obtenerArmadoPcDtoCorrespondiente(sesion));
+        model.put(tipoComponente+"Lista", this.servicioArmaTuPc.obtenerListaDeComponentesDto(tipoComponente));
+        model.put("armadoPcDto", obtenerArmadoPcDtoDeLaSession(sesion));
 
         return new ModelAndView("arma-tu-pc/tradicional/" + tipoComponente, model);
     }
@@ -59,13 +48,12 @@ public class ControladorArmaTuPc {
                                                   @RequestParam("id") Long idComponente,
                                                   @RequestParam("cantidad") Integer cantidad,
                                                   HttpSession session) {
-
+        ModelMap model = new ModelMap();
         ArmadoPcDto armadoPcDtoConComponenteAgregado = null;
         try {
-            armadoPcDtoConComponenteAgregado = this.servicioArmaTuPc.agregarComponenteAlArmado(idComponente, tipoComponente, cantidad, obtenerArmadoPcDtoCorrespondiente(session));
+            armadoPcDtoConComponenteAgregado = this.servicioArmaTuPc.agregarComponenteAlArmado(idComponente, tipoComponente, cantidad, obtenerArmadoPcDtoDeLaSession(session));
         } catch (LimiteDeComponenteSobrepasadoEnElArmadoException e) {
 
-            ModelMap model = new ModelMap();
             model.put("errorLimite", "Supero el limite de "+tipoComponente+" de su armado");
             return new ModelAndView("redirect:/arma-tu-pc/tradicional/" + tipoComponente, model);
         }
@@ -73,23 +61,26 @@ public class ControladorArmaTuPc {
         session.setAttribute("armadoPcDto", armadoPcDtoConComponenteAgregado);
 
         String siguienteVista = determinarSiguienteVista(tipoComponente, armadoPcDtoConComponenteAgregado);
-        return new ModelAndView("redirect:/arma-tu-pc/tradicional/" + siguienteVista);
+
+        ComponenteDto componenteAgregado = this.servicioArmaTuPc.obtenerComponenteDtoPorId(idComponente);
+
+        model.put("agregado", "x"+cantidad +" "+ componenteAgregado.getModelo() + " agregado correctamente al armado!");
+
+        return new ModelAndView("redirect:/arma-tu-pc/tradicional/" + siguienteVista, model);
     }
 
     private String determinarSiguienteVista(String tipoComponente, ArmadoPcDto armadoPcDto) {
 
         if(this.servicioArmaTuPc.sePuedeAgregarMasUnidades(tipoComponente, armadoPcDto)) return tipoComponente;
 
-        List<String> pasos = new ArrayList<>(this.pasosYCorrespondenciaEnBD.keySet());
-
-        return pasos.get(pasos.indexOf(tipoComponente)+1);
+        return this.pasos.get(this.pasos.indexOf(tipoComponente)+1);
     }
 
     @RequestMapping(path = "arma-tu-pc/tradicional/resumen", method = RequestMethod.GET)
     public ModelAndView obtenerResumen(HttpSession session) {
         ModelMap model = new ModelMap();
 
-        ArmadoPcDto armadoPcDto = obtenerArmadoPcDtoCorrespondiente(session);
+        ArmadoPcDto armadoPcDto = obtenerArmadoPcDtoDeLaSession(session);
 
         if(this.servicioArmaTuPc.armadoCompleto(armadoPcDto)) model.put("armadoPcDto", armadoPcDto);
         else model.put("errorResumen", "Seleccione almenos un motherboard, cpu, cooler y gabinete para obtener su armado");
@@ -98,10 +89,8 @@ public class ControladorArmaTuPc {
     }
 
     @RequestMapping(path = "arma-tu-pc/tradicional/reiniciar-armado", method = RequestMethod.POST)
-    public ModelAndView reiniciarArmado(HttpSession session, HttpServletRequest request) {
-
+    public ModelAndView reiniciarArmado(HttpSession session) {
         session.removeAttribute("armadoPcDto");
-
         return new ModelAndView("redirect:/arma-tu-pc/tradicional/procesador");
     }
 }

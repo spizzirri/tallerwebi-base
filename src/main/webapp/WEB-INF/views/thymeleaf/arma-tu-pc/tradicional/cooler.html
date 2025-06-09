@@ -28,13 +28,13 @@
     <p class="text-muted">
         El cooler mantiene la temperatura de tu equipo, evitando el danio en los componentes y permitiendo que este funcione correctamente.
     </p>
-    <h6 class="alert-info text-warning border rounded bg-white p-2 d-inline">Este componente es necesario para completar el armado</h6>
+    <h6 th:if="${armadoPcDto.cooler == null}" class="alert-info text-warning border rounded bg-white p-2 d-inline">Este componente es necesario para completar el armado</h6>
     <div th:replace="fragments/carga-componentes-arma-tu-pc :: cargarPaso (${armadoPcDto}, ${coolerLista}, 'cooler', 'coolers', 'motherboard', 'memoria')"></div>
 </div>
 
 <!-- Boostrap core js -->
 <script type="text/javascript" th:src="@{webjars/bootstrap/5.2.0/js/bootstrap.min.js}"></script>
-<script type="text/javascript" th:src="@{js/main.js}"></script>
+<script type="text/javascript" th:src="@{/js/main.js}"></script>
 <script th:src="@{/webjars/bootstrap/5.2.0/js/bootstrap.bundle.min.js}"></script>
 <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
