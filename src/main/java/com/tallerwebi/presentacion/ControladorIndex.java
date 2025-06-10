@@ -25,10 +25,16 @@ public class ControladorIndex {
     private ServicioBuscarProducto productoService;
     @Autowired
     private ServicioProductoCarrito servicioProductoCarrito;
-    @Autowired
-    private RepositorioComponente repositorioComponente;
 
-    // Constructor original - NO LO CAMBIES
+//    #1 Equipos y Notebook
+//    #2 Monitores
+//    #3 Televisores
+//    #4 Placas de Video
+//    #5 Sillas Gamers
+//    #6 Perificos
+//    #7 Mothers
+//    #8 Procesadores
+
     public ControladorIndex(ServicioBuscarProducto productoService) {
         this.productoService = productoService;
     }
