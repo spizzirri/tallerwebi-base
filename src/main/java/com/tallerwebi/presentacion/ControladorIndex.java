@@ -15,8 +15,6 @@ import javax.transaction.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-
 
 @Controller
 public class ControladorIndex {
@@ -44,7 +42,6 @@ public class ControladorIndex {
         this.productoService = productoService;
     }
 
-
     @GetMapping("/index")
     public ModelAndView irAlIndex() {
         List<CategoriaDto> categoriasAMostrar = categoriasService.getCategorias();
@@ -57,7 +54,6 @@ public class ControladorIndex {
         model.addAttribute("otrasCategorias", otrasCategorias);
 
         List<ProductoDto> productosDescuento = productoService.getProductosMenoresAUnPrecio(150000D);
-
         model.addAttribute("productosDescuento", productosDescuento);
 
         return new ModelAndView("index", model);
@@ -66,7 +62,6 @@ public class ControladorIndex {
     @GetMapping("/productos/tipoComponente/{id}")
     @Transactional
     public ModelAndView cargarProductosPorCategoria(@PathVariable Integer id) {
-
         ModelMap model = new ModelMap();
 
         String tipoComponente = convertirIdATipoComponente(id);
@@ -74,31 +69,21 @@ public class ControladorIndex {
 
         model.addAttribute("productosDestacados", productosDestacados);
         return new ModelAndView("cargarProductosDinamicos", model);
-
     }
 
     private String convertirIdATipoComponente(Integer id) {
         switch (id) {
-            case 1:
-                return "Componente";
-            case 2:
-                return "Procesador";
-            case 3:
-                return "Motherboard";
-            case 4:
-                return "CoolerCPU";
-            case 5:
-                return "MemoriaRAM";
-            case 6:
-                return "PlacaDeVideo";
-            case 7:
-                return "Almacenamiento";
-            case 8:
-                return "FuenteDeAlimentacion";
-            case 9:
-                return "Gabinete";
+            case 1: return "Componente";
+            case 2: return "Procesador";
+            case 3: return "Motherboard";
+            case 4: return "CoolerCPU";
+            case 5: return "MemoriaRAM";
+            case 6: return "PlacaDeVideo";
+            case 7: return "Almacenamiento";
+            case 8: return "FuenteDeAlimentacion";
+            case 9: return "Gabinete";
+            default: return "Componente";
         }
-        return "Componente";
     }
 
     @PostMapping("/agregarAlCarrito")
@@ -111,20 +96,29 @@ public class ControladorIndex {
         try {
             if (!servicioProductoCarrito.verificarStock(componenteId, cantidad)) {
                 response.put("success", false);
-                response.put("error", "Stock insuficiente");
+                response.put("mensaje", "Stock insuficiente");
             } else {
                 servicioProductoCarrito.agregarProducto(componenteId, cantidad);
-
                 response.put("success", true);
                 response.put("mensaje", "Producto agregado al carrito!");
             }
+
+            // AGREGAR: Calcular cantidad total del carrito
+            try {
+                Integer cantidadTotal = servicioProductoCarrito.calcularCantidadTotalDeProductos();
+                response.put("cantidadEnCarrito", cantidadTotal != null ? cantidadTotal : 0);
+            } catch (Exception e) {
+                System.out.println("Error al calcular cantidad total: " + e.getMessage());
+                response.put("cantidadEnCarrito", 0);
+            }
+
         } catch (Exception e) {
             response.put("success", false);
             response.put("mensaje", "Error al agregar producto al carrito!");
+            response.put("cantidadEnCarrito", 0);
         }
         return response;
     }
 
 
 }
-
