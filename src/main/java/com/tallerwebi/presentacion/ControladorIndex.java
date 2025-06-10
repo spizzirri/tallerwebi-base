@@ -69,11 +69,11 @@ public class ControladorIndex {
 
         ModelMap model = new ModelMap();
 
-            String tipoComponente = convertirIdATipoComponente(id);
-            List<ProductoDto> productosDestacados = productoService.getProductosPorTipo(tipoComponente);
+        String tipoComponente = convertirIdATipoComponente(id);
+        List<ProductoDto> productosDestacados = productoService.getProductosPorTipo(tipoComponente);
 
-            model.addAttribute("productosDestacados", productosDestacados);
-            return new ModelAndView("cargarProductosDinamicos", model);
+        model.addAttribute("productosDestacados", productosDestacados);
+        return new ModelAndView("cargarProductosDinamicos", model);
 
     }
 
