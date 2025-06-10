@@ -46,205 +46,391 @@ public class ComponenteEspecificoDto {
 
         if (productoEspecifico instanceof Procesador) {
 
-            Map<String, String> caracteristicasGenerales = new LinkedHashMap<>();
-            caracteristicasGenerales.put("Modelo", ((Procesador) productoEspecifico).getModelo());
-            caracteristicasGenerales.put("Socket", String.valueOf(((Procesador) productoEspecifico).getSocket()));
-            caracteristicasGenerales.put("Proceso de Fabricacion", ((Procesador) productoEspecifico).getProcesoDeFabricacion());
-            //caracteristicasGenerales.put("Graficos Integrados", ((Procesador) productoEspecifico).getIncluyeGraficosIntegrados());
-            caracteristicasGenerales.put("Gráficos Integrados", ((Procesador) productoEspecifico).getIncluyeGraficosIntegrados() != null &&
-                                                                ((Procesador) productoEspecifico).getIncluyeGraficosIntegrados() ? "Si" : "No");
-            caracteristicasGenerales.put("Chipset GPU", ((Procesador) productoEspecifico).getChipsetGPU());
-            caracteristicasGenerales.put("Familia", ((Procesador) productoEspecifico).getFamilia());
+            Map<String, String> caracteristicasGenerales = this.obtenerCarcteristicasGeneralesProcesador((Procesador) productoEspecifico);
             caracteristicas.put("Caracteristicas generales", caracteristicasGenerales);
-
-            Map<String, String> especificacionesCPU = new LinkedHashMap<>();
-            especificacionesCPU.put("Nucleos", String.valueOf(((Procesador) productoEspecifico).getNucleos()));
-            especificacionesCPU.put("Hilos", String.valueOf(((Procesador) productoEspecifico).getHilos()));
-            especificacionesCPU.put("Frecuencia", ((Procesador) productoEspecifico).getFrecuencia());
-            especificacionesCPU.put("Frecuencia Turbo", ((Procesador) productoEspecifico).getFrecuenciaTurbo());
+            Map<String, String> especificacionesCPU = this.obtenerEspecificacionesCPUProcesador((Procesador) productoEspecifico);
             caracteristicas.put("Especificaciones CPU", especificacionesCPU);
-
-            Map<String, String> coolersYDisipadores = new LinkedHashMap<>();
-            //coolersYDisipadores.put("Incluye Cooler", ((Procesador) productoEspecifico).getIncluyeCooler());
-            coolersYDisipadores.put("Incluye Cooler", ((Procesador) productoEspecifico).getIncluyeCooler() != null &&
-                                                        ((Procesador) productoEspecifico).getIncluyeCooler() ? "Si" : "No");
-            coolersYDisipadores.put("TDP Predeterminado", ((Procesador) productoEspecifico).getTdpPredeterminado());
+            Map<String, String> coolersYDisipadores = this.obtenerCoolersYDisipadoresProcesador((Procesador) productoEspecifico);
             caracteristicas.put("Coolers y Disipadores", coolersYDisipadores);
-
-            Map<String, String> memoria = new LinkedHashMap<>();
-            memoria.put("L1", ((Procesador) productoEspecifico).getL1Cache());
-            memoria.put("L2", ((Procesador) productoEspecifico).getL2Cache());
-            memoria.put("L3", ((Procesador) productoEspecifico).getL3Cache());
+            Map<String, String> memoria = this.obtenerMemoriaProcesador((Procesador) productoEspecifico);
             caracteristicas.put("Memoria", memoria);
 
         } else if (productoEspecifico instanceof Motherboard) {
 
-            Map<String, String> caracteristicasGenerales = new LinkedHashMap<>();
-            caracteristicasGenerales.put("Socket", String.valueOf(((Motherboard) productoEspecifico).getSocket().getNombre()));
-            caracteristicasGenerales.put("Chipset Principal", ((Motherboard) productoEspecifico).getChipsetPrincipal());
-            caracteristicasGenerales.put("Plataforma", ((Motherboard) productoEspecifico).getPlataforma());
-            caracteristicasGenerales.put("Factor", ((Motherboard) productoEspecifico).getFactor());
+            Map<String, String> caracteristicasGenerales = this.obtenerCaracteristicasGeneralesMotherboard((Motherboard) productoEspecifico);
             caracteristicas.put("Caracteristicas Generales", caracteristicasGenerales);
-
-            Map<String, String> conectividad = new LinkedHashMap<>();
-            conectividad.put("Cantidad de Slots M2", String.valueOf(((Motherboard) productoEspecifico).getCantSlotsM2()));
-            conectividad.put("Cantidad de Puertos SATA", String.valueOf(((Motherboard) productoEspecifico).getCantPuertosSata()));
-            conectividad.put("Cantidad de Puertos USB", String.valueOf(((Motherboard) productoEspecifico).getCantPuertosUSB()));
+            Map<String, String> conectividad = this.obtenerConectividadMotherboard((Motherboard) productoEspecifico);
             caracteristicas.put("Conectividad", conectividad);
-
-            Map<String, String> memoria = new LinkedHashMap<>();
-            memoria.put("Tipo de Memoria", ((Motherboard) productoEspecifico).getTipoMemoria());
-            memoria.put("Cantidad Slots de Memoria RAM", String.valueOf(((Motherboard) productoEspecifico).getCantSlotsRAM()));
+            Map<String, String> memoria = this.obtenerMemoriaMotherboard((Motherboard) productoEspecifico);
             caracteristicas.put("Memoria", memoria);
-
-            Map<String, String> energia = new LinkedHashMap<>();
-            energia.put("Consumo", ((Motherboard) productoEspecifico).getConsumo());
-            energia.put("Cantidad de Conectores 24 Pines", String.valueOf(((Motherboard) productoEspecifico).getCantConector24Pines()));
-            energia.put("Cantidad de Conectores 4 Pines", String.valueOf(((Motherboard) productoEspecifico).getCantConector4Pines()));
+            Map<String, String> energia = this.obtenerEnergiaMotherboard((Motherboard) productoEspecifico);
             caracteristicas.put("Energia", energia);
 
         } else if (productoEspecifico instanceof CoolerCPU) {
 
-            Map<String, String> caracteristicasGenerales = new LinkedHashMap<>();
-            caracteristicasGenerales.put("Consumo", ((CoolerCPU) productoEspecifico).getConsumo());
-            caracteristicasGenerales.put("TDP Predeterminado", ((CoolerCPU) productoEspecifico).getTdpPredeterminado());
-            caracteristicasGenerales.put("Tipo de Disipacion", ((CoolerCPU) productoEspecifico).getTipoDeDisipacion());
+            Map<String, String> caracteristicasGenerales = this.obtenerCaracteristicasGeneralesCoolerCPU((CoolerCPU) productoEspecifico);
             caracteristicas.put("Caracteristicas Generales", caracteristicasGenerales);
-
-            Map<String, String> compatibilidad = new LinkedHashMap<>();
-            String socketsCompatibles = ((CoolerCPU) productoEspecifico).getSockets().stream()
-                                        .map(Socket::getNombre).collect(Collectors.joining(", "));
-            compatibilidad.put("Sockets Compatibles", socketsCompatibles);
+            Map<String, String> compatibilidad = this.obtenerCompatibilidadCoolerCPU((CoolerCPU) productoEspecifico);
             caracteristicas.put("Compatibilidad", compatibilidad);
-
-            Map<String, String> coolersYDisipadores = new LinkedHashMap<>();
-            coolersYDisipadores.put("Cantidad de Coolers Incluidos", String.valueOf(((CoolerCPU) productoEspecifico).getCantCoolersIncluidos()));
-            coolersYDisipadores.put("Tamaño Coolers", ((CoolerCPU) productoEspecifico).getTamanioCoolers());
-            coolersYDisipadores.put("Tipo de Iluminacion", ((CoolerCPU) productoEspecifico).getTipoDeIlumninacion());
-            coolersYDisipadores.put("Nivel Maximo de Ruido", ((CoolerCPU) productoEspecifico).getNivelMaximoDeRuido());
+            Map<String, String> coolersYDisipadores = this.obtenerCoolersYDisipadoresCoolerCPU((CoolerCPU) productoEspecifico);
             caracteristicas.put("Coolers y Disipadores", coolersYDisipadores);
 
         } else if (productoEspecifico instanceof MemoriaRAM) {
 
-            Map<String, String> caracteristicasGenerales = new LinkedHashMap<>();
-            caracteristicasGenerales.put("Capacidad", ((MemoriaRAM) productoEspecifico).getCapacidad());
-            caracteristicasGenerales.put("Velocidad", ((MemoriaRAM) productoEspecifico).getVelocidad());
-            caracteristicasGenerales.put("Tecnologia", ((MemoriaRAM) productoEspecifico).getTecnologiaRAM());
-            caracteristicasGenerales.put("Latencia", ((MemoriaRAM) productoEspecifico).getLatencia());
-            caracteristicasGenerales.put("Voltaje", ((MemoriaRAM) productoEspecifico).getVoltaje());
+            Map<String, String> caracteristicasGenerales = this.obtenerCaracteristicasGeneralesMemoriaRAM((MemoriaRAM) productoEspecifico);
             caracteristicas.put("Caracteristicas Generales", caracteristicasGenerales);
-
-            Map<String, String> coolersYDisipadores = new LinkedHashMap<>();
-            coolersYDisipadores.put("Disipador", ((MemoriaRAM) productoEspecifico).getDisipador() != null &&
-                                                    ((MemoriaRAM) productoEspecifico).getDisipador() ? "Si" : "No");
-            coolersYDisipadores.put("Disipador Alto", ((MemoriaRAM) productoEspecifico).getDisipadorAlto() != null &&
-                                                        ((MemoriaRAM) productoEspecifico).getDisipadorAlto() ? "Si" : "No");
+            Map<String, String> coolersYDisipadores = this.obtenerCoolersYDisipadoresMemoriaRAM((MemoriaRAM) productoEspecifico);
             caracteristicas.put("Coolers y Disipadores", coolersYDisipadores);
 
         } else if (productoEspecifico instanceof PlacaDeVideo) {
 
-            Map<String, String> caracteristicasGenerales = new LinkedHashMap<>();
-            caracteristicasGenerales.put("Chipset GPU", ((PlacaDeVideo) productoEspecifico).getChipsetGPU());
-            caracteristicasGenerales.put("Cantidad de Coolers", String.valueOf(((PlacaDeVideo) productoEspecifico).getCantidadDeCoolers()));
+            Map<String, String> caracteristicasGenerales = this.obtenerCaracteristicasGeneralesPlacaDeVideo((PlacaDeVideo) productoEspecifico);
             caracteristicas.put("Caracteristicas Generales", caracteristicasGenerales);
-
-            Map<String, String> conectividad = new LinkedHashMap<>();
-            conectividad.put("Cantidad de VGA", String.valueOf(((PlacaDeVideo) productoEspecifico).getCantidadDeVGA()));
-            conectividad.put("Cantidad de DVI Digital", String.valueOf(((PlacaDeVideo) productoEspecifico).getCantidadDeDVIDigital()));
-            conectividad.put("Cantidad de HDMI", String.valueOf(((PlacaDeVideo) productoEspecifico).getCantidadDeHDMI()));
-            conectividad.put("Cantidad de Displayport", String.valueOf(((PlacaDeVideo) productoEspecifico).getCantidadDeDisplayport()));
+            Map<String, String> conectividad = this.obtenerConectividadPlacaDeVideo((PlacaDeVideo) productoEspecifico);
             caracteristicas.put("Conectividad", conectividad);
-
-            Map<String, String> energia = new LinkedHashMap<>();
-            energia.put("Consumo", ((PlacaDeVideo) productoEspecifico).getConsumo());
-            energia.put("Cantidad de PCIE 6 Pines", String.valueOf(((PlacaDeVideo) productoEspecifico).getCantidadDePCIE6Pines()));
-            energia.put("Cantidad de PCIE 8 Pines", String.valueOf(((PlacaDeVideo) productoEspecifico).getCantidadDePCIE8Pines()));
-            energia.put("Cantidad de PCIE 16 Pines", String.valueOf(((PlacaDeVideo) productoEspecifico).getCantidadDePCIE16Pines()));
-            energia.put("Cantidad de Adaptadores 16 Pines", String.valueOf(((PlacaDeVideo) productoEspecifico).getCantidadDeAdaptadores16Pines()));
+            Map<String, String> energia = this.obtenerEnergiaPlacaDeVideo((PlacaDeVideo) productoEspecifico);
             caracteristicas.put("Energia", energia);
-
-            Map<String, String> extras = new LinkedHashMap<>();
-            extras.put("Velocidad del Core Base", ((PlacaDeVideo) productoEspecifico).getVelocidadDelCoreBase());
-            extras.put("Velocidad del Core Turbo", ((PlacaDeVideo) productoEspecifico).getVelocidadDelCoreTurbo());
-            extras.put("Tecnologia", ((PlacaDeVideo) productoEspecifico).getTecnologiaRAM());
-            extras.put("Capacidad de RAM", ((PlacaDeVideo) productoEspecifico).getCapacidadRAM());
+            Map<String, String> extras = this.obtenerExtrasPlacaDeVideo((PlacaDeVideo) productoEspecifico);
             caracteristicas.put("Extras", extras);
 
         } else if (productoEspecifico instanceof Almacenamiento) {
 
-            Map<String, String> caracteristicasGenerales = new LinkedHashMap<>();
-            caracteristicasGenerales.put("Capacidad", ((Almacenamiento) productoEspecifico).getCapacidad());
-            caracteristicasGenerales.put("Tipo de Conexion", ((Almacenamiento) productoEspecifico).getTipoDeConexion());
-            caracteristicasGenerales.put("Consumo", ((Almacenamiento) productoEspecifico).getConsumo());
-            caracteristicasGenerales.put("Tipo de Disco", ((Almacenamiento) productoEspecifico).getTipoDeDisco());
+            Map<String, String> caracteristicasGenerales = this.obtenerCaracteristicasGeneralesAlmacenamiento((Almacenamiento) productoEspecifico);
             caracteristicas.put("Caracteristicas Generales", caracteristicasGenerales);
-
-            Map<String, String> rendimiento = new LinkedHashMap<>();
-            rendimiento.put("Memoria Cache", ((Almacenamiento) productoEspecifico).getMemoriaCache());
-            rendimiento.put("Velocidad Lectura Secuencial", ((Almacenamiento) productoEspecifico).getVelocidadLecturaSecuencial());
-            rendimiento.put("Velocidad Escritura Secuencial", ((Almacenamiento) productoEspecifico).getVelocidadLecturaSecuencial());
+            Map<String, String> rendimiento = this.obtenerRendimientoAlmacenamiento((Almacenamiento) productoEspecifico);
             caracteristicas.put("Rendimiento", rendimiento);
 
         } else if (productoEspecifico instanceof FuenteDeAlimentacion) {
 
-            Map<String, String> caracteristicasGenerales = new LinkedHashMap<>();
-            caracteristicasGenerales.put("Formato", ((FuenteDeAlimentacion) productoEspecifico).getFormato());
-            caracteristicasGenerales.put("Watts Nominales", ((FuenteDeAlimentacion) productoEspecifico).getWattsNominales());
-            caracteristicasGenerales.put("Watts Reales", ((FuenteDeAlimentacion) productoEspecifico).getWattsReales());
-            caracteristicasGenerales.put("Certificacion 80 Plus", ((FuenteDeAlimentacion) productoEspecifico).getCertificacion80Plus());
-            caracteristicasGenerales.put("Tipo de Cableado", ((FuenteDeAlimentacion) productoEspecifico).getTipoDeCableado());
+            Map<String, String> caracteristicasGenerales = this.obtenerCaracteristicasGeneralesFuenteDeAlimentacion((FuenteDeAlimentacion) productoEspecifico);
             caracteristicas.put("Caracteristicas Generales", caracteristicasGenerales);
-
-            Map<String, String> cableado = new LinkedHashMap<>();
-            cableado.put("Conector 24 Pines", ((FuenteDeAlimentacion) productoEspecifico).getConector24Pines() != null &&
-                                                ((FuenteDeAlimentacion) productoEspecifico).getConector24Pines() ? "Si" : "No");
-            cableado.put("Cantidad de Conectores CPU 4 Pines", String.valueOf(((FuenteDeAlimentacion) productoEspecifico).getCantConectoresCpu4Pines()));
-            cableado.put("Cantidad de Conectores CPU 4 Pines Plus", String.valueOf(((FuenteDeAlimentacion) productoEspecifico).getCantConectoresCpu4PinesPlus()));
-            cableado.put("Cantidad de Conectores CPU 6 Pines", String.valueOf(((FuenteDeAlimentacion) productoEspecifico).getCantConectoresCpu6Pines()));
-            cableado.put("Cantidad de Conectores CPU 2 Pines Plus", String.valueOf(((FuenteDeAlimentacion) productoEspecifico).getCantConectoresCpu2PinesPlus()));
-            cableado.put("Cantidad de Conexiones SATA", String.valueOf(((FuenteDeAlimentacion) productoEspecifico).getCantConexionesSata()));
-            cableado.put("Cantidad de Conexiones Molex", String.valueOf(((FuenteDeAlimentacion) productoEspecifico).getCantConexionesMolex()));
-            cableado.put("Cantidad de Conexiones PCIE 16 Pines", String.valueOf(((FuenteDeAlimentacion) productoEspecifico).getCantConexionesPcie16Pines()));
+            Map<String, String> cableado = this.obtenerCableadoFuenteDeAlimentacion((FuenteDeAlimentacion) productoEspecifico);
             caracteristicas.put("Cableado", cableado);
 
         } else if (productoEspecifico instanceof Gabinete) {
 
-            Map<String, String> caracteristicasGenerales = new LinkedHashMap<>();
-            caracteristicasGenerales.put("Color", ((Gabinete) productoEspecifico).getColor());
-            caracteristicasGenerales.put("Con ventana", ((Gabinete) productoEspecifico).getConVentana() != null &&
-                                                        ((Gabinete) productoEspecifico).getConVentana() ? "Si" : "No");
-            caracteristicasGenerales.put("Tipo de Ventana", ((Gabinete) productoEspecifico).getTipoDeVentana());
-            caracteristicasGenerales.put("Tamaño Gabinete", ((Gabinete) productoEspecifico).getTamanioGabinete());
+            Map<String, String> caracteristicasGenerales = this.obtenerCaracteristicasGeneralesGabinete((Gabinete) productoEspecifico);
             caracteristicas.put("Caracteristicas Generales", caracteristicasGenerales);
-
-            Map<String, String> conectividad = new LinkedHashMap<>();
-            conectividad.put("Cantidad de Puertos USB", String.valueOf(((Gabinete) productoEspecifico).getCantUSB()));
-            conectividad.put("Audio Frontal", ((Gabinete) productoEspecifico).getAudioFrontal() != null &&
-                                                ((Gabinete) productoEspecifico).getAudioFrontal() ? "Si" : "No");
+            Map<String, String> conectividad = this.obtenerConectividadGabinete((Gabinete) productoEspecifico);
             caracteristicas.put("Conectividad", conectividad);
-
-            Map<String, String> coolersYDisipadores = new LinkedHashMap<>();
-            coolersYDisipadores.put("Cantidad de Coolers de 80mm Soportados", String.valueOf(((Gabinete) productoEspecifico).getCantCoolerFanDe80mmSoportados()));
-            coolersYDisipadores.put("Cantidad de Coolers de 80mm Incluidos", String.valueOf(((Gabinete) productoEspecifico).getCantCoolerFanDe80mmIncluidos()));
-            coolersYDisipadores.put("Cantidad de Coolers de 120mm Soportados", String.valueOf(((Gabinete) productoEspecifico).getCantCoolerFanDe120mmSoportados()));
-            coolersYDisipadores.put("Cantidad de Coolers de 120mm Incluidos", String.valueOf(((Gabinete) productoEspecifico).getCantCoolerFanDe120mmIncluidos()));
-            coolersYDisipadores.put("Cantidad de Coolers de 140mm Soportados", String.valueOf(((Gabinete) productoEspecifico).getCantCoolerFanDe140mmSoportados()));
-            coolersYDisipadores.put("Cantidad de Coolers de 140mm Incluidos", String.valueOf(((Gabinete) productoEspecifico).getCantCoolerFanDe140mmIncluidos()));
-            coolersYDisipadores.put("Cantidad de Coolers de 200mm Soportados", String.valueOf(((Gabinete) productoEspecifico).getCantCoolerFanDe200mmSoportados()));
-            coolersYDisipadores.put("Cantidad de Coolers de 200mm Incluidos", String.valueOf(((Gabinete) productoEspecifico).getCantCoolerFanDe200mmIncluidos()));
-            coolersYDisipadores.put("Cantidad de Radiadores de 240mm Soportados", String.valueOf(((Gabinete) productoEspecifico).getCantRadiador240mmSoportados()));
-            coolersYDisipadores.put("Cantidad de Radiadores de 280mm Soportados", String.valueOf(((Gabinete) productoEspecifico).getCantRadiador280mmSoportados()));
-            coolersYDisipadores.put("Cantidad de Radiadores de 360mm Soportados", String.valueOf(((Gabinete) productoEspecifico).getCantRadiador360mmSoportados()));
-            coolersYDisipadores.put("Cantidad de Radiadores de 420mm Soportados", String.valueOf(((Gabinete) productoEspecifico).getCantRadiador420mmSoportados()));
+            Map<String, String> coolersYDisipadores = this.obtenerCoolersYDisipadoresGabinete((Gabinete) productoEspecifico);
             caracteristicas.put("Coolers y Disipadores", coolersYDisipadores);
 
         } else if (productoEspecifico instanceof Monitor) {
 
-
+            Map<String, String> caracteristicasGenerales = this.obtenerCaracteristicasGeneralesMonitor((Monitor) productoEspecifico);
+            caracteristicas.put("Caracteristicas Generales", caracteristicasGenerales);
+            Map<String, String> conectividad = this.obtenerConectividadMonitor((Monitor) productoEspecifico);
+            caracteristicas.put("Conectividad", conectividad);
+            Map<String, String> pantalla = this.obtenerPantallaMonitor((Monitor) productoEspecifico);
+            caracteristicas.put("Pantalla", pantalla);
+            Map<String, String> dimensiones = this.obtenerDimensionesMonitor((Monitor) productoEspecifico);
+            caracteristicas.put("Dimensiones", dimensiones);
 
         } else if (productoEspecifico instanceof Periferico) {
 
+            Map<String, String> caracteristicasGenerales = this.obtenerCaracteristicasGeneralesPeriferico((Periferico) productoEspecifico);
+            caracteristicas.put("Caracteristicas Generales", caracteristicasGenerales);
         }
+    }
+
+    /*Creacion del SubMapa de PROCESADOR*/
+    private Map<String, String> obtenerCarcteristicasGeneralesProcesador(Procesador productoEspecifico) {
+        Map<String, String> caracteristicasGenerales = new LinkedHashMap<>();
+        caracteristicasGenerales.put("Modelo", productoEspecifico.getModelo());
+        caracteristicasGenerales.put("Socket", String.valueOf(productoEspecifico.getSocket()));
+        caracteristicasGenerales.put("Proceso de Fabricacion", productoEspecifico.getProcesoDeFabricacion());
+        //caracteristicasGenerales.put("Graficos Integrados", ((Procesador) productoEspecifico).getIncluyeGraficosIntegrados());
+        caracteristicasGenerales.put("Gráficos Integrados", productoEspecifico.getIncluyeGraficosIntegrados() != null &&
+                productoEspecifico.getIncluyeGraficosIntegrados() ? "Si" : "No");
+        caracteristicasGenerales.put("Chipset GPU", productoEspecifico.getChipsetGPU());
+        caracteristicasGenerales.put("Familia", productoEspecifico.getFamilia());
+        return caracteristicasGenerales;
+    }
+
+    private Map<String, String> obtenerEspecificacionesCPUProcesador(Procesador productoEspecifico) {
+        Map<String, String> especificacionesCPU = new LinkedHashMap<>();
+        especificacionesCPU.put("Nucleos", String.valueOf(productoEspecifico.getNucleos()));
+        especificacionesCPU.put("Hilos", String.valueOf(productoEspecifico.getHilos()));
+        especificacionesCPU.put("Frecuencia", productoEspecifico.getFrecuencia());
+        especificacionesCPU.put("Frecuencia Turbo", productoEspecifico.getFrecuenciaTurbo());
+        return especificacionesCPU;
+    }
+
+    private Map<String, String> obtenerCoolersYDisipadoresProcesador(Procesador productoEspecifico) {
+        Map<String, String> coolersYDisipadores = new LinkedHashMap<>();
+        //coolersYDisipadores.put("Incluye Cooler", ((Procesador) productoEspecifico).getIncluyeCooler());
+        coolersYDisipadores.put("Incluye Cooler", productoEspecifico.getIncluyeCooler() != null &&
+                productoEspecifico.getIncluyeCooler() ? "Si" : "No");
+        coolersYDisipadores.put("TDP Predeterminado", productoEspecifico.getTdpPredeterminado());
+        return coolersYDisipadores;
+    }
+
+    private Map<String, String> obtenerMemoriaProcesador(Procesador productoEspecifico) {
+        Map<String, String> memoria = new LinkedHashMap<>();
+        memoria.put("L1", productoEspecifico.getL1Cache());
+        memoria.put("L2", productoEspecifico.getL2Cache());
+        memoria.put("L3", productoEspecifico.getL3Cache());
+        return memoria;
+    }
+
+    /*Creacion del SubMapa de MOTHERBOARD*/
+    private Map<String, String> obtenerCaracteristicasGeneralesMotherboard(Motherboard productoEspecifico) {
+        Map<String, String> caracteristicasGenerales = new LinkedHashMap<>();
+        caracteristicasGenerales.put("Socket", String.valueOf(productoEspecifico.getSocket().getNombre()));
+        caracteristicasGenerales.put("Chipset Principal", productoEspecifico.getChipsetPrincipal());
+        caracteristicasGenerales.put("Plataforma", productoEspecifico.getPlataforma());
+        caracteristicasGenerales.put("Factor", productoEspecifico.getFactor());
+        return caracteristicasGenerales;
+    }
+
+    private Map<String, String> obtenerConectividadMotherboard(Motherboard productoEspecifico) {
+        Map<String, String> conectividad = new LinkedHashMap<>();
+        conectividad.put("Cantidad de Slots M2", String.valueOf(productoEspecifico.getCantSlotsM2()));
+        conectividad.put("Cantidad de Puertos SATA", String.valueOf(productoEspecifico.getCantPuertosSata()));
+        conectividad.put("Cantidad de Puertos USB", String.valueOf(productoEspecifico.getCantPuertosUSB()));
+        return conectividad;
+    }
+
+    private Map<String, String> obtenerMemoriaMotherboard(Motherboard productoEspecifico) {
+        Map<String, String> memoria = new LinkedHashMap<>();
+        memoria.put("Tipo de Memoria", productoEspecifico.getTipoMemoria());
+        memoria.put("Cantidad Slots de Memoria RAM", String.valueOf(productoEspecifico.getCantSlotsRAM()));
+        return memoria;
+    }
+
+    private Map<String, String> obtenerEnergiaMotherboard(Motherboard productoEspecifico) {
+        Map<String, String> energia = new LinkedHashMap<>();
+        energia.put("Consumo", productoEspecifico.getConsumo());
+        energia.put("Cantidad de Conectores 24 Pines", String.valueOf(productoEspecifico.getCantConector24Pines()));
+        energia.put("Cantidad de Conectores 4 Pines", String.valueOf(productoEspecifico.getCantConector4Pines()));
+        return energia;
+    }
+
+    /*Creacion del SubMapa de COOLER CPU*/
+    private Map<String, String> obtenerCaracteristicasGeneralesCoolerCPU(CoolerCPU productoEspecifico) {
+        Map<String, String> caracteristicasGenerales = new LinkedHashMap<>();
+        caracteristicasGenerales.put("Consumo", productoEspecifico.getConsumo());
+        caracteristicasGenerales.put("TDP Predeterminado", productoEspecifico.getTdpPredeterminado());
+        caracteristicasGenerales.put("Tipo de Disipacion", productoEspecifico.getTipoDeDisipacion());
+        return caracteristicasGenerales;
+    }
+
+    private Map<String, String> obtenerCompatibilidadCoolerCPU(CoolerCPU productoEspecifico) {
+        Map<String, String> compatibilidad = new LinkedHashMap<>();
+        String socketsCompatibles = productoEspecifico.getSockets().stream()
+                .map(Socket::getNombre).collect(Collectors.joining(", "));
+        compatibilidad.put("Sockets Compatibles", socketsCompatibles);
+        return compatibilidad;
+    }
+
+    private Map<String, String> obtenerCoolersYDisipadoresCoolerCPU(CoolerCPU productoEspecifico) {
+        Map<String, String> coolersYDisipadores = new LinkedHashMap<>();
+        coolersYDisipadores.put("Cantidad de Coolers Incluidos", String.valueOf(productoEspecifico.getCantCoolersIncluidos()));
+        coolersYDisipadores.put("Tamaño Coolers", productoEspecifico.getTamanioCoolers());
+        coolersYDisipadores.put("Tipo de Iluminacion", productoEspecifico.getTipoDeIlumninacion());
+        coolersYDisipadores.put("Nivel Maximo de Ruido", productoEspecifico.getNivelMaximoDeRuido());
+        return coolersYDisipadores;
+    }
+
+    /*Creacion del SubMapa de MEMORIA RAM*/
+    private Map<String, String> obtenerCaracteristicasGeneralesMemoriaRAM(MemoriaRAM productoEspecifico) {
+        Map<String, String> caracteristicasGenerales = new LinkedHashMap<>();
+        caracteristicasGenerales.put("Capacidad", productoEspecifico.getCapacidad());
+        caracteristicasGenerales.put("Velocidad", productoEspecifico.getVelocidad());
+        caracteristicasGenerales.put("Tecnologia", productoEspecifico.getTecnologiaRAM());
+        caracteristicasGenerales.put("Latencia", productoEspecifico.getLatencia());
+        caracteristicasGenerales.put("Voltaje", productoEspecifico.getVoltaje());
+        return caracteristicasGenerales;
+    }
+
+    private Map<String, String> obtenerCoolersYDisipadoresMemoriaRAM(MemoriaRAM productoEspecifico) {
+        Map<String, String> coolersYDisipadores = new LinkedHashMap<>();
+        coolersYDisipadores.put("Disipador", productoEspecifico.getDisipador() != null &&
+                productoEspecifico.getDisipador() ? "Si" : "No");
+        coolersYDisipadores.put("Disipador Alto", productoEspecifico.getDisipadorAlto() != null &&
+                productoEspecifico.getDisipadorAlto() ? "Si" : "No");
+        return coolersYDisipadores;
+    }
+
+    /*Creacion del SubMapa de PLACA DE VIDEO*/
+    private Map<String, String> obtenerCaracteristicasGeneralesPlacaDeVideo(PlacaDeVideo productoEspecifico) {
+        Map<String, String> caracteristicasGenerales = new LinkedHashMap<>();
+        caracteristicasGenerales.put("Chipset GPU", productoEspecifico.getChipsetGPU());
+        caracteristicasGenerales.put("Cantidad de Coolers", String.valueOf(productoEspecifico.getCantidadDeCoolers()));
+        return caracteristicasGenerales;
+    }
+
+    private Map<String, String> obtenerConectividadPlacaDeVideo(PlacaDeVideo productoEspecifico) {
+        Map<String, String> conectividad = new LinkedHashMap<>();
+        conectividad.put("Cantidad de VGA", String.valueOf(productoEspecifico.getCantidadDeVGA()));
+        conectividad.put("Cantidad de DVI Digital", String.valueOf(productoEspecifico.getCantidadDeDVIDigital()));
+        conectividad.put("Cantidad de HDMI", String.valueOf(productoEspecifico.getCantidadDeHDMI()));
+        conectividad.put("Cantidad de Displayport", String.valueOf(productoEspecifico.getCantidadDeDisplayport()));
+        return conectividad;
+    }
+
+    private Map<String, String> obtenerEnergiaPlacaDeVideo(PlacaDeVideo productoEspecifico) {
+        Map<String, String> energia = new LinkedHashMap<>();
+        energia.put("Consumo", productoEspecifico.getConsumo());
+        energia.put("Cantidad de PCIE 6 Pines", String.valueOf(productoEspecifico.getCantidadDePCIE6Pines()));
+        energia.put("Cantidad de PCIE 8 Pines", String.valueOf(productoEspecifico.getCantidadDePCIE8Pines()));
+        energia.put("Cantidad de PCIE 16 Pines", String.valueOf(productoEspecifico.getCantidadDePCIE16Pines()));
+        energia.put("Cantidad de Adaptadores 16 Pines", String.valueOf(productoEspecifico.getCantidadDeAdaptadores16Pines()));
+        return energia;
+    }
+
+    private Map<String, String> obtenerExtrasPlacaDeVideo(PlacaDeVideo productoEspecifico) {
+        Map<String, String> extras = new LinkedHashMap<>();
+        extras.put("Velocidad del Core Base", productoEspecifico.getVelocidadDelCoreBase());
+        extras.put("Velocidad del Core Turbo", productoEspecifico.getVelocidadDelCoreTurbo());
+        extras.put("Tecnologia", productoEspecifico.getTecnologiaRAM());
+        extras.put("Capacidad de RAM", productoEspecifico.getCapacidadRAM());
+        return extras;
+    }
+
+    /*Creacion del SubMapa de ALMACENAMIENTO*/
+    private Map<String, String> obtenerCaracteristicasGeneralesAlmacenamiento(Almacenamiento productoEspecifico) {
+        Map<String, String> caracteristicasGenerales = new LinkedHashMap<>();
+        caracteristicasGenerales.put("Capacidad", productoEspecifico.getCapacidad());
+        caracteristicasGenerales.put("Tipo de Conexion", productoEspecifico.getTipoDeConexion());
+        caracteristicasGenerales.put("Consumo", productoEspecifico.getConsumo());
+        caracteristicasGenerales.put("Tipo de Disco", productoEspecifico.getTipoDeDisco());
+        return caracteristicasGenerales;
+    }
+
+    private Map<String, String> obtenerRendimientoAlmacenamiento(Almacenamiento productoEspecifico) {
+        Map<String, String> rendimiento = new LinkedHashMap<>();
+        rendimiento.put("Memoria Cache", productoEspecifico.getMemoriaCache());
+        rendimiento.put("Velocidad Lectura Secuencial", productoEspecifico.getVelocidadLecturaSecuencial());
+        rendimiento.put("Velocidad Escritura Secuencial", productoEspecifico.getVelocidadLecturaSecuencial());
+        return rendimiento;
+    }
+
+    /*Creacion del SubMapa de FUENTE DE ALIMENTACION*/
+    private Map<String, String> obtenerCaracteristicasGeneralesFuenteDeAlimentacion(FuenteDeAlimentacion productoEspecifico) {
+        Map<String, String> caracteristicasGenerales = new LinkedHashMap<>();
+        caracteristicasGenerales.put("Formato", productoEspecifico.getFormato());
+        caracteristicasGenerales.put("Watts Nominales", productoEspecifico.getWattsNominales());
+        caracteristicasGenerales.put("Watts Reales", productoEspecifico.getWattsReales());
+        caracteristicasGenerales.put("Certificacion 80 Plus", productoEspecifico.getCertificacion80Plus());
+        caracteristicasGenerales.put("Tipo de Cableado", productoEspecifico.getTipoDeCableado());
+        return caracteristicasGenerales;
+    }
+
+    private Map<String, String> obtenerCableadoFuenteDeAlimentacion(FuenteDeAlimentacion productoEspecifico) {
+        Map<String, String> cableado = new LinkedHashMap<>();
+        cableado.put("Conector 24 Pines", productoEspecifico.getConector24Pines() != null &&
+                productoEspecifico.getConector24Pines() ? "Si" : "No");
+        cableado.put("Cantidad de Conectores CPU 4 Pines", String.valueOf(productoEspecifico.getCantConectoresCpu4Pines()));
+        cableado.put("Cantidad de Conectores CPU 4 Pines Plus", String.valueOf(productoEspecifico.getCantConectoresCpu4PinesPlus()));
+        cableado.put("Cantidad de Conectores CPU 6 Pines", String.valueOf(productoEspecifico.getCantConectoresCpu6Pines()));
+        cableado.put("Cantidad de Conectores CPU 2 Pines Plus", String.valueOf(productoEspecifico.getCantConectoresCpu2PinesPlus()));
+        cableado.put("Cantidad de Conexiones SATA", String.valueOf(productoEspecifico.getCantConexionesSata()));
+        cableado.put("Cantidad de Conexiones Molex", String.valueOf(productoEspecifico.getCantConexionesMolex()));
+        cableado.put("Cantidad de Conexiones PCIE 16 Pines", String.valueOf(productoEspecifico.getCantConexionesPcie16Pines()));
+        return cableado;
+    }
+
+    /*Creacion del SubMapa de GABINETE*/
+    private Map<String, String> obtenerCaracteristicasGeneralesGabinete(Gabinete productoEspecifico) {
+        Map<String, String> caracteristicasGenerales = new LinkedHashMap<>();
+        caracteristicasGenerales.put("Color", productoEspecifico.getColor());
+        caracteristicasGenerales.put("Con ventana", productoEspecifico.getConVentana() != null &&
+                productoEspecifico.getConVentana() ? "Si" : "No");
+        caracteristicasGenerales.put("Tipo de Ventana", productoEspecifico.getTipoDeVentana());
+        caracteristicasGenerales.put("Tamaño Gabinete", productoEspecifico.getTamanioGabinete());
+        return caracteristicasGenerales;
+    }
+
+    private Map<String, String> obtenerConectividadGabinete(Gabinete productoEspecifico) {
+        Map<String, String> conectividad = new LinkedHashMap<>();
+        conectividad.put("Cantidad de Puertos USB", String.valueOf(productoEspecifico.getCantUSB()));
+        conectividad.put("Audio Frontal", productoEspecifico.getAudioFrontal() != null &&
+                productoEspecifico.getAudioFrontal() ? "Si" : "No");
+        return conectividad;
+    }
+
+    private Map<String, String> obtenerCoolersYDisipadoresGabinete(Gabinete productoEspecifico) {
+        Map<String, String> coolersYDisipadores = new LinkedHashMap<>();
+        coolersYDisipadores.put("Cantidad de Coolers de 80mm Soportados", String.valueOf(productoEspecifico.getCantCoolerFanDe80mmSoportados()));
+        coolersYDisipadores.put("Cantidad de Coolers de 80mm Incluidos", String.valueOf(productoEspecifico.getCantCoolerFanDe80mmIncluidos()));
+        coolersYDisipadores.put("Cantidad de Coolers de 120mm Soportados", String.valueOf(productoEspecifico.getCantCoolerFanDe120mmSoportados()));
+        coolersYDisipadores.put("Cantidad de Coolers de 120mm Incluidos", String.valueOf(productoEspecifico.getCantCoolerFanDe120mmIncluidos()));
+        coolersYDisipadores.put("Cantidad de Coolers de 140mm Soportados", String.valueOf(productoEspecifico.getCantCoolerFanDe140mmSoportados()));
+        coolersYDisipadores.put("Cantidad de Coolers de 140mm Incluidos", String.valueOf(productoEspecifico.getCantCoolerFanDe140mmIncluidos()));
+        coolersYDisipadores.put("Cantidad de Coolers de 200mm Soportados", String.valueOf(productoEspecifico.getCantCoolerFanDe200mmSoportados()));
+        coolersYDisipadores.put("Cantidad de Coolers de 200mm Incluidos", String.valueOf(productoEspecifico.getCantCoolerFanDe200mmIncluidos()));
+        coolersYDisipadores.put("Cantidad de Radiadores de 240mm Soportados", String.valueOf(productoEspecifico.getCantRadiador240mmSoportados()));
+        coolersYDisipadores.put("Cantidad de Radiadores de 280mm Soportados", String.valueOf(productoEspecifico.getCantRadiador280mmSoportados()));
+        coolersYDisipadores.put("Cantidad de Radiadores de 360mm Soportados", String.valueOf(productoEspecifico.getCantRadiador360mmSoportados()));
+        coolersYDisipadores.put("Cantidad de Radiadores de 420mm Soportados", String.valueOf(productoEspecifico.getCantRadiador420mmSoportados()));
+        return coolersYDisipadores;
+    }
+
+    /*Creacion del SubMapa de MONITOR*/
+    private Map<String, String> obtenerCaracteristicasGeneralesMonitor(Monitor productoEspecifico) {
+        Map<String, String> caracteristicasGenerales = new LinkedHashMap<>();
+        caracteristicasGenerales.put("Tipo de Iluminacion", productoEspecifico.getTipoDeIluminacion());
+        caracteristicasGenerales.put("Tipo de Panel", productoEspecifico.getTipoDePanel());
+        caracteristicasGenerales.put("Pantalla Curva", productoEspecifico.getPantallaCurva() != null &&
+                productoEspecifico.getPantallaCurva() ? "Si" : "No");
+        return caracteristicasGenerales;
+    }
+
+    private Map<String, String> obtenerConectividadMonitor(Monitor productoEspecifico) {
+        Map<String, String> conectividad = new LinkedHashMap<>();
+        conectividad.put("Puertos HDMI", String.valueOf(productoEspecifico.getPuertosHDMI()));
+        conectividad.put("Puertos Display Port", String.valueOf(productoEspecifico.getPuertosDisplayPort()));
+        conectividad.put("Puertos Mini Display Port", String.valueOf(productoEspecifico.getPuertosMiniDisplayPort()));
+        conectividad.put("Puertos VGA", String.valueOf(productoEspecifico.getPuertosVGA()));
+        conectividad.put("Puertos DVI", String.valueOf(productoEspecifico.getPuertosDVI()));
+        conectividad.put("Puertos USB", String.valueOf(productoEspecifico.getPuertosUSB()));
+        conectividad.put("Conector Auriculares", productoEspecifico.getConectorAuriculares() != null &&
+                productoEspecifico.getConectorAuriculares() ? "Si" : "No");
+        return conectividad;
+    }
+
+    private Map<String, String> obtenerPantallaMonitor(Monitor productoEspecifico) {
+        Map<String, String> pantalla = new LinkedHashMap<>();
+        pantalla.put("Pulgadas", productoEspecifico.getPulgadas());
+        pantalla.put("Resolucion Maxima", productoEspecifico.getResolucionMaxima());
+        pantalla.put("Frecuencia Maxima", productoEspecifico.getFrecuenciaMaxima());
+        pantalla.put("Tiempo de Respuesta", productoEspecifico.getTiempoDeRespuesta());
+        pantalla.put("Nvidia G-Sync", productoEspecifico.getNvidiaGSync() != null &&
+                productoEspecifico.getNvidiaGSync() ? "Si" : "No");
+        pantalla.put("AMD Freesync", productoEspecifico.getAmdFreesync() != null &&
+                productoEspecifico.getAmdFreesync() ? "Si" : "No");
+        return pantalla;
+    }
+
+    private Map<String, String> obtenerDimensionesMonitor(Monitor productoEspecifico) {
+        Map<String, String> dimensiones = new LinkedHashMap<>();
+        dimensiones.put("Ancho", productoEspecifico.getAncho());
+        dimensiones.put("Alto", productoEspecifico.getAlto());
+        dimensiones.put("Espesor", productoEspecifico.getEspesor());
+        dimensiones.put("Curvatura", productoEspecifico.getCurvatura());
+        return dimensiones;
+    }
+
+    /*Creacion del SubMapa de PERIFERICO*/
+    private Map<String, String> obtenerCaracteristicasGeneralesPeriferico(Periferico productoEspecifico) {
+        Map<String, String> caracteristicasGenerales = new LinkedHashMap<>();
+        caracteristicasGenerales.put("USB Requeridos", String.valueOf(productoEspecifico.getUsbRequeridos()));
+        caracteristicasGenerales.put("Tipo de Conexion", productoEspecifico.getTipoDeConexion());
+        caracteristicasGenerales.put("Conexion Bluetooth", productoEspecifico.getConexionBluetooth() != null &&
+                                                            productoEspecifico.getConexionBluetooth() ? "Si" : "No");
+        caracteristicasGenerales.put("Receptor Bluetooth Incluido", productoEspecifico.getReceptorBluetoothIncluido() != null &&
+                                                                    productoEspecifico.getReceptorBluetoothIncluido() ? "Si" : "No");
+        caracteristicasGenerales.put("Conexion Wireless", productoEspecifico.getConexionWireless() != null &&
+                                                            productoEspecifico.getConexionWireless() ? "Si" : "No");
+        caracteristicasGenerales.put("Receptor Wireless Incluido", productoEspecifico.getReceptorWirelessIncluido() != null &&
+                                                                    productoEspecifico.getReceptorWirelessIncluido() ? "Si" : "No");
+        caracteristicasGenerales.put("Tipo de Cable", productoEspecifico.getTipoDeCable());
+        caracteristicasGenerales.put("Cable Extraible", productoEspecifico.getCableExtraible() != null &&
+                                                        productoEspecifico.getCableExtraible() ? "Si" : "No");
+        caracteristicasGenerales.put("Largo del Cable", productoEspecifico.getLargoDelCable());
+        return caracteristicasGenerales;
     }
 
     public Long getId() {
