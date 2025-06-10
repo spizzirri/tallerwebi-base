@@ -31,8 +31,12 @@ public class CarritoController {
     public ModelAndView mostrarVistaCarritoDeCompras() {
         ModelMap model = new ModelMap();
         model.put("productos", this.productoService.getProductos());
+
         Double total = this.productoService.calcularValorTotalDeLosProductos();
         model.put("valorTotal", total);
+
+        Integer cantidadTotalEnCarrito = this.productoService.calcularCantidadTotalDeProductos();
+        model.put("cantidadEnCarrito", cantidadTotalEnCarrito);
         return new ModelAndView("carritoDeCompras", model);
     }
 
@@ -46,6 +50,8 @@ public class CarritoController {
         Double total = this.productoService.calcularValorTotalDeLosProductos();
         model.put("valorTotal", total);
 
+        Integer cantidadTotal = this.productoService.calcularCantidadTotalDeProductos();
+        model.put("cantidadEnCarrito", cantidadTotal);
         return new ModelAndView("carritoDeCompras", model);
     }
 
@@ -66,6 +72,9 @@ public class CarritoController {
 
         Double total = this.productoService.calcularValorTotalDeLosProductos();
         response.put("valorTotal", total);
+
+        Integer cantidadTotal = this.productoService.calcularCantidadTotalDeProductos();
+        response.put("cantidadEnCarrito", cantidadTotal);
 
         return response;
     }
@@ -124,6 +133,9 @@ public class CarritoController {
         response.put("precioTotalDelProducto", valorTotalDelProductoBuscado);
         response.put("valorTotal", this.productoService.valorTotal);
 
+        Integer cantidadTotal = this.productoService.calcularCantidadTotalDeProductos();
+        response.put("cantidadEnCarrito", cantidadTotal);
+
         return response;
     }
 
@@ -142,6 +154,9 @@ public class CarritoController {
             response.put("cantidad", productoBuscado.getCantidad());
             response.put("precioTotalDelProducto", valorTotalDelProductoBuscado);
             response.put("valorTotal", this.productoService.valorTotal);
+
+            Integer cantidadTotal = this.productoService.calcularCantidadTotalDeProductos();
+            response.put("cantidadEnCarrito", cantidadTotal);
 
             return response;
         } else {
@@ -252,6 +267,15 @@ public class CarritoController {
             response.put("success", false);
             response.put("mensaje", "Error al calcular envío");
         }
+        return response;
+    }
+
+    @GetMapping(path = "/carritoDeCompras/cantidad")
+    @ResponseBody
+    public Map<String, Object> obtenerCantidadCarrito() {
+        Map<String, Object> response = new HashMap<>();
+        Integer cantidadTotal = this.productoService.calcularCantidadTotalDeProductos();
+        response.put("cantidadEnCarrito", cantidadTotal);
         return response;
     }
 

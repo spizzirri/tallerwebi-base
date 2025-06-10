@@ -7,6 +7,17 @@ function multiplicar(a, b) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
+    console.log("DOM cargado");
+
+    // Inicializar contador solo si existe en window
+    if (typeof window.cantidadEnCarrito !== 'undefined') {
+        console.log("Inicializando contador con:", window.cantidadEnCarrito);
+        actualizarContadorCarrito(window.cantidadEnCarrito);
+    } else {
+        console.log("No hay cantidad inicial definida, contador en 0");
+        actualizarContadorCarrito(0);
+    }
+
     cargarProductos(1);
 
     const swiperInterval = setInterval(() => {
@@ -35,6 +46,9 @@ function cargarProductos(idCategoria) {
         .then(response => response.text())
         .then(html => {
             document.getElementById("productos-container").innerHTML = html;
+        })
+        .catch(error => {
+            console.error('Error al cargar productos:', error);
         });
 }
 
@@ -50,25 +64,30 @@ window.agregarAlCarrito = function(componenteId, cantidad = 1) {
     })
         .then(response => response.json())
         .then(data => {
-            console.log(" Respuesta:", data);
+            console.log("Respuesta:", data);
+
             if(data.success){
                 mostrarMensaje(data.mensaje, 'success', componenteId);
-                actualizarContadorCarrito(data.cantidadEnCarrito);
             } else {
                 mostrarMensaje(data.mensaje, 'error', componenteId);
             }
+
+            // Actualizar contador solo si viene en la respuesta
+            if(data.cantidadEnCarrito !== undefined) {
+                console.log("Actualizando contador a:", data.cantidadEnCarrito);
+                actualizarContadorCarrito(data.cantidadEnCarrito);
+            }
+
             return data;
         })
         .catch(error => {
-            console.error(' ERROR:', error);
+            console.error('ERROR:', error);
             mostrarMensaje("Error al conectar con el servidor", 'error', componenteId);
             throw error;
         });
 }
 
 window.mostrarMensaje = function(mensaje, tipo, productId) {
-    console.log("Mostrando mensaje:", mensaje, "para producto:", productId);
-
     const mensajeNotificacion = document.getElementById(`mensajeNotificacion-${productId}`);
 
     if(mensajeNotificacion){
@@ -80,15 +99,17 @@ window.mostrarMensaje = function(mensaje, tipo, productId) {
             mensajeNotificacion.style.display = 'none';
         }, 3000);
     } else {
-        console.log(" No se encontró elemento mensajeNotificacion-" + productId);
         alert(mensaje);
     }
 }
 
 window.actualizarContadorCarrito = function(nuevaCantidad){
-    console.log(" Actualizando contador a:", nuevaCantidad);
+    console.log("Actualizando contador a:", nuevaCantidad);
     const contadorCarrito = document.getElementById("contadorCarrito");
     if(contadorCarrito){
         contadorCarrito.textContent = nuevaCantidad;
+        console.log("Contador actualizado exitosamente");
+    } else {
+        console.error("Elemento contadorCarrito no encontrado");
     }
 }

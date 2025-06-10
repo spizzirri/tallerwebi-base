@@ -1,5 +1,76 @@
-// Boton para sumar cantidad de un mismo producto
+// Función para calcular la cantidad total desde los productos en la página
+function calcularCantidadDesdeDOM() {
+    let cantidadTotal = 0;
+    const elementos = document.querySelectorAll('.productoCantidad');
 
+    elementos.forEach(elemento => {
+        const cantidad = parseInt(elemento.textContent) || 0;
+        cantidadTotal += cantidad;
+    });
+
+    return cantidadTotal;
+}
+
+// Función para obtener la cantidad del carrito via AJAX
+function obtenerCantidadCarritoAjax() {
+    fetch('/spring/carritoDeCompras/cantidad')
+        .then(response => response.json())
+        .then(data => {
+            console.log("Cantidad obtenida via AJAX:", data.cantidadEnCarrito);
+            actualizarContadorCarrito(data.cantidadEnCarrito);
+        })
+        .catch(error => {
+            console.error('Error al obtener cantidad del carrito:', error);
+            // En caso de error, intentar calcular desde el DOM
+            const cantidad = calcularCantidadDesdeDOM();
+            actualizarContadorCarrito(cantidad);
+        });
+}
+
+// Función para inicializar el contador del carrito al cargar la página
+function inicializarContadorCarrito() {
+    let cantidadEnCarrito = 0;
+
+    // Método 1: Intentar obtener desde el modelo (si está disponible)
+    if (typeof window.cantidadEnCarrito !== 'undefined') {
+        cantidadEnCarrito = window.cantidadEnCarrito;
+        console.log("Cantidad obtenida desde window:", cantidadEnCarrito);
+    }
+    // Método 2: Calcular desde los elementos del DOM si estamos en la página del carrito
+    else if (document.querySelector('.productoCantidad')) {
+        cantidadEnCarrito = calcularCantidadDesdeDOM();
+        console.log("Cantidad calculada desde DOM:", cantidadEnCarrito);
+    }
+    // Método 3: Hacer una petición AJAX para obtener la cantidad
+    else {
+        console.log("Obteniendo cantidad via AJAX...");
+        obtenerCantidadCarritoAjax();
+        return; // Salir porque la petición AJAX actualizará el contador
+    }
+
+    console.log("Inicializando contador con cantidad:", cantidadEnCarrito);
+    actualizarContadorCarrito(cantidadEnCarrito);
+}
+
+// Función global para actualizar el contador del carrito
+window.actualizarContadorCarrito = function (nuevaCantidad) {
+    console.log("Actualizando contador a:", nuevaCantidad);
+    const contadorCarrito = document.getElementById("contadorCarrito");
+    if (contadorCarrito) {
+        contadorCarrito.textContent = nuevaCantidad;
+        console.log("Contador actualizado exitosamente");
+    } else {
+        console.error("Elemento contadorCarrito no encontrado");
+    }
+}
+
+// Inicializar contador cuando se carga la página
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("DOM cargado, inicializando contador...");
+    inicializarContadorCarrito();
+});
+
+// Boton para sumar cantidad de un mismo producto
 document.addEventListener("DOMContentLoaded", function () {
     const boton = document.querySelectorAll(".btnSumarCantidad");
 
@@ -49,6 +120,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     if (data.eliminado) {
                         fila.remove(); // Eliminar la fila si se eliminó el producto
                         actualizarContadorCarrito(data.cantidadEnCarrito);
+                        valorTotalDelCarrito.textContent = data.valorTotal.toFixed(2);
                     } else {
                         // Actualizar solo el valor de la cantidad
                         spanCantidad.textContent = data.cantidad;
@@ -65,7 +137,6 @@ document.addEventListener("DOMContentLoaded", function () {
 })
 
 // Boton para eliminar un producto del carrito
-
 document.addEventListener("DOMContentLoaded", function () {
     const boton = document.querySelectorAll(".btnEliminarProducto");
 
@@ -96,106 +167,109 @@ document.addEventListener("DOMContentLoaded", function () {
     const mensajeParaAlert = document.getElementById("mensajeDescuento");
     const contenidoMensaje = document.getElementById("contenidoMensaje");
 
-    boton.addEventListener("click", function () {
-        const codigo = input.value.trim();
-        if (!codigo) return;
+    if (boton) {
+        boton.addEventListener("click", function () {
+            const codigo = input.value.trim();
+            if (!codigo) return;
 
-        fetch('/spring/carritoDeCompras/aplicarDescuento', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({codigoInput: codigo})
-        })
-            .then(response => response.json())
-            .then(data => {
+            fetch('/spring/carritoDeCompras/aplicarDescuento', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({codigoInput: codigo})
+            })
+                .then(response => response.json())
+                .then(data => {
 
-                if (data.mensaje || data.mensajeDescuento) {
-                    contenidoMensaje.innerText = data.mensaje || data.mensajeDescuento;
-                    mensajeParaAlert.classList.remove("d-none");
-                }
-
-                if (data.valorTotal) {
-
-                    const valorTotalElement = document.querySelector('.valorTotalDelCarrito');
-                    if (valorTotalElement) {
-                        valorTotalElement.textContent = data.valorTotal.toFixed(2);
+                    if (data.mensaje || data.mensajeDescuento) {
+                        contenidoMensaje.innerText = data.mensaje || data.mensajeDescuento;
+                        mensajeParaAlert.classList.remove("d-none");
                     }
 
-                    if (window.datosEnvio && window.datosEnvio.costo) {
-                        const nuevoTotalConEnvio = data.valorTotal + window.datosEnvio.costo;
-                        let parrafoTotal = document.querySelector('.total-con-envio');
+                    if (data.valorTotal) {
 
-                        if (parrafoTotal) {
-                            parrafoTotal.innerHTML = 'Total con envio y descuento: <span class="total-envio-valor"></span>';
-                            parrafoTotal.querySelector('.total-envio-valor').textContent = '$' + nuevoTotalConEnvio.toFixed(2);
-                            parrafoTotal.style.display = 'block';
+                        const valorTotalElement = document.querySelector('.valorTotalDelCarrito');
+                        if (valorTotalElement) {
+                            valorTotalElement.textContent = data.valorTotal.toFixed(2);
+                        }
 
-                            console.log('Total recalculado con descuento y envío:', nuevoTotalConEnvio);
+                        if (window.datosEnvio && window.datosEnvio.costo) {
+                            const nuevoTotalConEnvio = data.valorTotal + window.datosEnvio.costo;
+                            let parrafoTotal = document.querySelector('.total-con-envio');
+
+                            if (parrafoTotal) {
+                                parrafoTotal.innerHTML = 'Total con envio y descuento: <span class="total-envio-valor"></span>';
+                                parrafoTotal.querySelector('.total-envio-valor').textContent = '$' + nuevoTotalConEnvio.toFixed(2);
+                                parrafoTotal.style.display = 'block';
+
+                                console.log('Total recalculado con descuento y envío:', nuevoTotalConEnvio);
+                            }
                         }
                     }
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                contenidoMensaje.textContent = 'Hubo un error al aplicar el descuento.';
-                mensajeParaAlert.classList.remove("d-none");
-            });
-    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    contenidoMensaje.textContent = 'Hubo un error al aplicar el descuento.';
+                    mensajeParaAlert.classList.remove("d-none");
+                });
+        });
+    }
 });
 
 // Boton para confirmar compra, verificando metodo de pago
 document.addEventListener("DOMContentLoaded", function () {
     const formularioPago = document.getElementById("formulario-pago");
 
-    formularioPago.addEventListener("submit", function (e) {
-        e.preventDefault();
+    if (formularioPago) {
+        formularioPago.addEventListener("submit", function (e) {
+            e.preventDefault();
 
-        let metodoSeleccionado = document.querySelector('input[name="metodoPago"]:checked');
-        if (metodoSeleccionado === null) {
+            let metodoSeleccionado = document.querySelector('input[name="metodoPago"]:checked');
+            if (metodoSeleccionado === null) {
+                const errorDiv = document.getElementById("errorMetodoPago");
+                errorDiv.innerText = "Debes seleccionar un método de pago";
+                errorDiv.classList.remove("d-none");
+                return false;
+            }
+
             const errorDiv = document.getElementById("errorMetodoPago");
-            errorDiv.innerText = "Debes seleccionar un método de pago";
-            errorDiv.classList.remove("d-none");
-            return false;
-        }
+            errorDiv.classList.add("d-none");
 
-        const errorDiv = document.getElementById("errorMetodoPago");
-        errorDiv.classList.add("d-none");
+            // mostrar spinner
+            const btnComprar = document.getElementById("btnComprar");
+            btnComprar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Redirigiendo a MercadoPago...';
+            btnComprar.disabled = true;
 
-        // mostrar spinner
-        const btnComprar = document.getElementById("btnComprar");
-        btnComprar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Redirigiendo a MercadoPago...';
-        btnComprar.disabled = true;
+            const params = new URLSearchParams();
+            params.append('metodoPago', metodoSeleccionado.value);
 
-        const params = new URLSearchParams();
-        params.append('metodoPago', metodoSeleccionado.value);
-
-        fetch('/spring/carritoDeCompras/formularioPago', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: params
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    crearFormularioMercadoPago(data);
-                } else {
+            fetch('/spring/carritoDeCompras/formularioPago', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: params
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        crearFormularioMercadoPago(data);
+                    } else {
+                        btnComprar.innerHTML = 'Finalizar compra';
+                        btnComprar.disabled = false;
+                        errorDiv.innerText = data.error;
+                        errorDiv.classList.remove("d-none");
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
                     btnComprar.innerHTML = 'Finalizar compra';
                     btnComprar.disabled = false;
-                    errorDiv.innerText = data.error;
+                    errorDiv.innerText = "Error al procesar el pago";
                     errorDiv.classList.remove("d-none");
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                btnComprar.innerHTML = 'Finalizar compra';
-                btnComprar.disabled = false;
-                errorDiv.innerText = "Error al procesar el pago";
-                errorDiv.classList.remove("d-none");
-            });
-    });
+                });
+        });
+    }
 });
-
 
 function crearFormularioMercadoPago(data) {
     const form = document.createElement('form');
@@ -217,21 +291,27 @@ function crearFormularioMercadoPago(data) {
     form.submit();
 }
 
+// Formulario de envío
 document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('formulario-envio');
     const loading = document.getElementById('loading');
 
-    form.addEventListener('submit', function (e) {
-        const codigoPostal = document.getElementById('codigoPostal').value.trim();
-        if (window.fetch && codigoPostal) {
-            e.preventDefault();
-            calcularConAjax(codigoPostal);
-        }
-    });
+    if (form) {
+        form.addEventListener('submit', function (e) {
+            const codigoPostal = document.getElementById('codigoPostal').value.trim();
+            if (window.fetch && codigoPostal) {
+                e.preventDefault();
+                calcularConAjax(codigoPostal);
+            }
+        });
+    }
 });
 
 function calcularConAjax(codigoPostal) {
-    loading.classList.remove('d-none');
+    const loading = document.getElementById('loading');
+    if (loading) {
+        loading.classList.remove('d-none');
+    }
 
     fetch(`/spring/carritoDeCompras/calcular?codigoPostal=${codigoPostal}`)
         .then(response => response.json())
@@ -277,18 +357,14 @@ function calcularConAjax(codigoPostal) {
         })
         .catch(error => {
             console.error('Error:', error);
-            form.submit();
+            const form = document.getElementById('formulario-envio');
+            if (form) {
+                form.submit();
+            }
         })
         .finally(() => {
-            loading.classList.add('d-none');
+            if (loading) {
+                loading.classList.add('d-none');
+            }
         });
-}
-
-
-window.actualizarContadorCarrito = function (nuevaCantidad) {
-    console.log(" Actualizando contador a:", nuevaCantidad);
-    const contadorCarrito = document.getElementById("contadorCarrito");
-    if (contadorCarrito) {
-        contadorCarrito.textContent = nuevaCantidad;
-    }
 }

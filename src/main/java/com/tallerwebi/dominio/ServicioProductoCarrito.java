@@ -111,4 +111,16 @@ public class ServicioProductoCarrito {
     public void limpiarCarrito() {
         this.setProductos(null);
     }
+
+    public Integer calcularCantidadTotalDeProductos() {
+        if (this.productos == null || this.productos.isEmpty()) {
+            return 0;
+        }
+
+        Integer cantidadTotal = 0;
+        for (ProductoCarritoDto producto : this.productos) {
+            cantidadTotal += producto.getCantidad();
+        }
+        return cantidadTotal;
+    }
 }
