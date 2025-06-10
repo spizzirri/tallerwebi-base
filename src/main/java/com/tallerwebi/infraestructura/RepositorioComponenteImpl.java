@@ -39,4 +39,43 @@ public class RepositorioComponenteImpl implements RepositorioComponente {
 
         return (Componente)query.getSingleResult();
     }
+
+    @Override
+    public List<Componente> obtenerComponentesEnStock() {
+        String hql = "FROM Componente where stock > 0 ";
+
+        Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
+
+
+        return query.getResultList();
+    }
+
+    @Override
+    public List<Componente> obtenerComponentes() {
+        String hql = "FROM Componente";
+
+        Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
+
+        return query.getResultList();
+    }
+
+    @Override
+    public List<Componente> obtenerComponentesPorQuery(String nombre) {
+        String hql = "FROM Componente WHERE lower(nombre) LIKE lower(:nombre)";
+
+        Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
+        query.setParameter("nombre", "%" + nombre + "%");
+        return query.getResultList();
+    }
+
+    @Override
+    public List<Componente> obtenerComponentesMenoresDelPrecioPorParametro(Double precio) {
+
+        String hql = "FROM Componente WHERE precio < :precio";
+
+        Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
+        query.setParameter("precio", precio);
+
+        return query.getResultList();
+    }
 }

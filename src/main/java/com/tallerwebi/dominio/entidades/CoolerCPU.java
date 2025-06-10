@@ -2,7 +2,9 @@ package com.tallerwebi.dominio.entidades;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 public class CoolerCPU extends Componente {
@@ -16,13 +18,13 @@ public class CoolerCPU extends Componente {
     private String tipoDeDisipacion;
 
     /*Compatibilidad*/
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "cooler_socket",
             joinColumns = @JoinColumn(name = "cooler_id"),
             inverseJoinColumns = @JoinColumn(name = "socket_id")
     )
-    private List<Socket> sockets = new ArrayList<>();
+    private Set<Socket> sockets = new HashSet<>();
 
     /*Coolers y Disipadores*/
     private Integer cantCoolersIncluidos;
@@ -37,7 +39,7 @@ public class CoolerCPU extends Componente {
 
     public CoolerCPU(Long id, String nombre, Double precio, Integer stock, String marca,
                         String consumo, String tdpPredeterminado, String tipoDeDisipacion,
-                        List<Socket> sockets,
+                        Set<Socket> sockets,
                         Integer cantCoolersIncluidos, String tamanioCoolers, String tipoDeIlumninacion, String nivelMaximoDeRuido) {
         super(id, nombre, precio, stock, marca);
 
@@ -77,11 +79,11 @@ public class CoolerCPU extends Componente {
         this.tipoDeDisipacion = tipoDeDisipacion;
     }
 
-    public List<Socket> getSockets() {
+    public Set<Socket> getSockets() {
         return sockets;
     }
 
-    public void setSockets(List<Socket> sockets) {
+    public void setSockets(Set<Socket> sockets) {
         this.sockets = sockets;
     }
 

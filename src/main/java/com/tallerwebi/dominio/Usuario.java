@@ -1,20 +1,49 @@
 package com.tallerwebi.dominio;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
-@Entity
+@Entity //genera una entidad en la bd
 public class Usuario {
+    private static final String ROL_DEFAULT = "USUARIO";
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY) //identidad y se incrementa de uno en uno (como el autoincrement)
+    @JsonProperty("id")
     private Long id;
+    @JsonProperty("email")
     private String email;
+    @JsonProperty("password")
     private String password;
-    private String rol;
+    @JsonProperty("rol")
+    private String rol = ROL_DEFAULT;
+    @JsonProperty("activo")
     private Boolean activo = false;
+    @JsonProperty("nombre")
+    private String nombre;
+    @JsonProperty("apellido")
+    private String apellido;
+    @JsonProperty("telefono")
+    private String telefono;
+    @JsonProperty("dni")
+    private String dni;
+
+    public Usuario() {
+        // Constructor vacío requerido por JPA
+    }
+
+    public Usuario(String email, String password, String nombre, String apellido, String telefono, String dni) {
+        this.email = email;
+        this.password = password;
+        this.nombre = nombre;
+        this.apellido = apellido;
+        this.telefono = telefono;
+        this.dni = dni;
+    }
 
     public Long getId() {
         return id;
@@ -46,12 +75,43 @@ public class Usuario {
     public void setActivo(Boolean activo) {
         this.activo = activo;
     }
-
-    public boolean activo() {
-        return activo;
+    public String getNombre() {
+        return nombre;
+    }
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+    public String getApellido() {
+        return apellido;
+    }
+    public void setApellido(String apellido) {
+        this.apellido = apellido;
+    }
+    public String getTelefono() {
+        return telefono;
+    }
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
     }
 
-    public void activar() {
-        activo = true;
+    public String getDni() {
+        return dni;
+    }
+    public void setDni(String dni) {
+        this.dni = dni;
+    }
+    @Override
+    public String toString() {
+        return "Usuario{" +
+                "id=" + id +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", rol='" + rol + '\'' +
+                ", activo=" + activo +
+                ", nombre='" + nombre + '\'' +
+                ", apellido='" + apellido + '\'' +
+                ", telefono='" + telefono + '\'' +
+                ", dni='" + dni + '\'' +
+                '}';
     }
 }

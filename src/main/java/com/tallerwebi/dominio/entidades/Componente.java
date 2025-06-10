@@ -24,7 +24,7 @@ public class Componente {
     @Column(length = 100)
     private String marca;
 
-    @OneToMany(mappedBy = "componente", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "componente", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Imagen> imagenes;
 
     public Componente() {}

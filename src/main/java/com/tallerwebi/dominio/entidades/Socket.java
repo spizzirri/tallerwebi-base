@@ -2,7 +2,9 @@ package com.tallerwebi.dominio.entidades;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 public class Socket {
@@ -21,11 +23,11 @@ public class Socket {
     private List<Motherboard> motherboards = new ArrayList<>();
 
     @ManyToMany(mappedBy = "sockets")
-    private List<CoolerCPU> coolersCPU = new ArrayList<>();
+    private Set<CoolerCPU> coolersCPU = new HashSet<>();
 
     public Socket() {}
 
-    public Socket(Long id, String nombre, List<Procesador> procesadores ,List<Motherboard> motherboards, List<CoolerCPU> coolersCPU) {
+    public Socket(Long id, String nombre, List<Procesador> procesadores ,List<Motherboard> motherboards, Set<CoolerCPU> coolersCPU) {
         this.id = id;
         this.nombre = nombre;
         this.procesadores = procesadores;
@@ -39,7 +41,7 @@ public class Socket {
         this.procesadores = new ArrayList<>();
         this.motherboards = new ArrayList<>();
         // los many to many deberian ser Set segun el profe (corregir)
-        this.coolersCPU = new ArrayList<>();
+        this.coolersCPU = new HashSet<>();
     }
 
     public Long getId() {
@@ -75,13 +77,16 @@ public class Socket {
         this.motherboards = motherboards;
     }
 
-    public List<CoolerCPU> getCoolersCPU() {
+    public Set<CoolerCPU> getCoolersCPU() {
         return coolersCPU;
     }
 
-    public void setCoolersCPU(List<CoolerCPU> coolersCPU) {
+    public void setCoolersCPU(Set<CoolerCPU> coolersCPU) {
         this.coolersCPU = coolersCPU;
     }
 
-
+    @Override
+    public String toString() {
+        return nombre;
+    }
 }
