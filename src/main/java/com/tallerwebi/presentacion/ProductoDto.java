@@ -1,22 +1,34 @@
 package com.tallerwebi.presentacion;
 
+import com.tallerwebi.dominio.entidades.Componente;
+
 public class ProductoDto {
 
-    private static Long contador = 1L;
-    private final Long id;
+    private Long id;
     private String nombre;
-    private String descripcion;
     private Double precio;
     private Integer cantidad;
-    private Integer categoria;
+    private String tipoComponente;
     private String imagen;
 
-    public ProductoDto(String nombre, Double precio, Integer categoria, String imagen) {
-        this.id = contador++;
+    public ProductoDto(Componente componente) {
+        this.id = componente.getId();
+        this.nombre = componente.getNombre();
+        this.precio = componente.getPrecio();
+        this.tipoComponente = componente.getClass().getSimpleName();
+        this.imagen =  (componente.getImagenes() != null &&
+                !componente.getImagenes().isEmpty() &&
+                componente.getImagenes().get(0) != null)
+                ? componente.getImagenes().get(0).getUrlImagen()
+                : "imagen-generica.jpg";
+    }
+
+    public ProductoDto(Long id, String nombre, Double precio, String tipoComponente, String imagen) {
+        this.id = id;
         this.nombre = nombre;
         this.precio = precio;
         this.cantidad = 2;
-        this.categoria = categoria;
+        this.tipoComponente = tipoComponente;
         this.imagen = imagen;
     }
 
@@ -26,8 +38,8 @@ public class ProductoDto {
     public String getImagen() {
         return imagen;
     }
-    public Integer getCategoria() {
-        return categoria;
+    public String getTipoComponente() {
+        return tipoComponente;
     }
 
     public String getNombre() {
@@ -36,14 +48,6 @@ public class ProductoDto {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
-    }
-
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
     }
 
     public Double getPrecio() {
