@@ -31,21 +31,18 @@ function obtenerCantidadCarritoAjax() {
 function inicializarContadorCarrito() {
     let cantidadEnCarrito = 0;
 
-    // Método 1: Intentar obtener desde el modelo (si está disponible)
     if (typeof window.cantidadEnCarrito !== 'undefined') {
         cantidadEnCarrito = window.cantidadEnCarrito;
         console.log("Cantidad obtenida desde window:", cantidadEnCarrito);
     }
-    // Método 2: Calcular desde los elementos del DOM si estamos en la página del carrito
     else if (document.querySelector('.productoCantidad')) {
         cantidadEnCarrito = calcularCantidadDesdeDOM();
         console.log("Cantidad calculada desde DOM:", cantidadEnCarrito);
     }
-    // Método 3: Hacer una petición AJAX para obtener la cantidad
     else {
         console.log("Obteniendo cantidad via AJAX...");
         obtenerCantidadCarritoAjax();
-        return; // Salir porque la petición AJAX actualizará el contador
+        return; 
     }
 
     console.log("Inicializando contador con cantidad:", cantidadEnCarrito);
