@@ -9,8 +9,8 @@
         <span class="ms-2 fw-bold fs-4 text-light">Compra Gamer 2</span>
       </a>
 
-      <form class="d-flex" role="search" >
-        <input class="bg-dark border border-light-subtle form-control me-2 align-content-center " type="search" placeholder="Buscar productos" aria-label="Search" style="width:400px;">
+      <form class="d-flex" role="search" th:action="@{/productos/search}" method="get" >
+        <input class="bg-dark text-white border border-light-subtle form-control me-2 align-content-center "  name="q" type="search" placeholder="Buscar productos" aria-label="Search" style="width:400px;">
         <button class="btn btn-warning align-content-center me-1" type="submit"><i class="bi bi-search"></i></button>
       </form>
       <!-- Botones / iconos -->
@@ -27,7 +27,7 @@
 
   <nav class="bg-secondary-subtle text-dark py-3 mb-3">
     <div class="container d-flex justify-content-center gap-4">
-      <a class="text-dark text-decoration-none px-3 fs-5" href="#">Productos</a>
+      <a class="text-dark text-decoration-none px-3 fs-5" th:href="@{/productos}">Productos</a>
       <a class="text-dark text-decoration-none px-3 fs-5"  href="#">Notebooks</a>
       <a class="text-dark text-decoration-none px-3 fs-5" th:href="@{/arma-tu-pc/tradicional/procesador}">Arma tu PC</a>
       <a class="text-dark text-decoration-none px-3 fs-5" href="#">Rastrea tu pedido</a>

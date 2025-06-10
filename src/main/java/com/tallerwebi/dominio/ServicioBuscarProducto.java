@@ -21,54 +21,18 @@ public class ServicioBuscarProducto {
    @Autowired
     public ServicioBuscarProducto(RepositorioComponente repositorioComponente) {
         this.repositorioComponente = repositorioComponente;
-        this.productos = new ArrayList<ProductoDto>();
-//        this.productos.add(new ProductoDto("Mouse inalámbrico", 29.99, 6, "mouse.png"));
-//        this.productos.add(new ProductoDto("Mouse inalámbrico", 29.99, 6 , "mouse.png"));
-//        this.productos.add(new ProductoDto("Notebook cheta", 79.99, 1, "notebook.png"));
-//        this.productos.add(new ProductoDto("Notebook media pelo", 29.99, 1 , "notebook.png"));
-//        this.productos.add(new ProductoDto("Silla gamer", 79.99, 5, "silla.jpg"));
-//        this.productos.add(new ProductoDto("Plaquita de video", 29.99, 4 ,"auriculares.png"));
-//        this.productos.add(new ProductoDto("Mother earr", 79.99, 7,"auriculares.png"));
-//        this.productos.add(new ProductoDto("Procesadoromon", 29.99, 8 ,"auriculares.png"));
-//        this.productos.add(new ProductoDto("Monitor", 79.99, 2,"monitor.jpg"));
-//        this.productos.add(new ProductoDto("Mouse inalámbrico", 29.99, 6, "mouse.png" ));
-//        this.productos.add(new ProductoDto("Mouse inalámbrico", 29.99, 6 , "mouse.png"));
-//        this.productos.add(new ProductoDto("Notebook cheta", 79.99, 1, "notebook.png"));
-//        this.productos.add(new ProductoDto("Notebook media pelo", 29.99, 1 , "notebook.png"));
-//        this.productos.add(new ProductoDto("Silla gamer", 79.99, 5, "silla.jpg"));
-//        this.productos.add(new ProductoDto("Plaquita de video", 29.99, 4 ,"auriculares.png"));
-//        this.productos.add(new ProductoDto("Mother earr", 79.99, 7,"auriculares.png"));
-//        this.productos.add(new ProductoDto("Procesadoromon", 29.99, 8 ,"auriculares.png"));
-//        this.productos.add(new ProductoDto("Monitor", 79.99, 2, "monitor.jpg"));
-//        this.productos.add(new ProductoDto("Mouse inalámbrico", 29.99, 6 , "mouse.png"));
-//        this.productos.add(new ProductoDto("Mouse inalámbrico", 29.99, 6, "mouse.png" ));
-//        this.productos.add(new ProductoDto("Notebook cheta", 79.99, 1, "notebook.png"));
-//        this.productos.add(new ProductoDto("Notebook media pelo", 29.99, 1 , "notebook.png"));
-//        this.productos.add(new ProductoDto("Silla gamer", 79.99, 5, "silla.jpg"));
-//        this.productos.add(new ProductoDto("Plaquita de video", 29.99, 4,"auriculares.png" ));
-//        this.productos.add(new ProductoDto("Mother earr", 79.99, 7,"auriculares.png"));
-//        this.productos.add(new ProductoDto("Procesadoromon", 29.99, 8 ,"auriculares.png"));
-//        this.productos.add(new ProductoDto("Monitor", 79.99, 2,"monitor.jpg"));
-//        this.productos.add(new ProductoDto("Monitor", 79.99, 2,"monitor.jpg"));
-//        this.productos.add(new ProductoDto("aaaaaa", 79.99, 3,"monitor.jpg"));
-//        this.productos.add(new ProductoDto("aaaaaa", 79.99, 3,"monitor.jpg"));
-//        this.productos.add(new ProductoDto("aaaaaa", 79.99, 3,"monitor.jpg"));
-//        this.productos.add(new ProductoDto("aaaaaa", 79.99, 3,"monitor.jpg"));
-//        this.productos.add(new ProductoDto("aaaaaa", 79.99, 3,"monitor.jpg"));
-//        this.productos.add(new ProductoDto("aaaaaa", 79.99, 3,"monitor.jpg"));
+        this.productos = getComponentes();
     }
 
-    public List<ProductoDto> getProductosPorTipo(String tipo) {
-        List<ProductoDto> productos = new ArrayList<>();
-
-        List<Componente> productosComponente = repositorioComponente.obtenerComponentesPorTipo(tipo);
-        for (Componente componente : productosComponente) {
-            productos.add(new ProductoDto(componente));
+    public List<ProductoDto> buscarPorTipoComponente(String tipoComponente) {
+        List<ProductoDto> productosDestacados = new ArrayList<>();
+        for (ProductoDto productoDto : this.productos) {
+            if (productoDto.getTipoComponente().equals(tipoComponente)) {
+                productosDestacados.add(productoDto);
+            }
         }
-
-        return productos;
+        return productosDestacados;
     }
-
     public List<ProductoDto> getProductosMenoresAUnPrecio(Double precio) {
         List<ProductoDto> productos = new ArrayList<>();
         List<Componente> productosComponentes = repositorioComponente.obtenerComponentesMenoresDelPrecioPorParametro(precio);
@@ -77,8 +41,33 @@ public class ServicioBuscarProducto {
         }
        return productos;
     }
-
+    private List<ProductoDto> getComponentes(){
+        List<Componente> componentes = repositorioComponente.obtenerComponentes();
+        List<ProductoDto> productos = new ArrayList<>();
+        for(Componente componente : componentes){
+            productos.add(new ProductoDto(componente));
+        }
+        return productos;
+    }
     public List<ProductoDto> getProductos() {
+        return productos;
+    }
+
+    public List<ProductoDto> getProductosEnStock(){
+        List<Componente> componentes = repositorioComponente.obtenerComponentesEnStock();
+        List<ProductoDto> productos = new ArrayList<>();
+        for(Componente componente : componentes){
+            productos.add(new ProductoDto(componente));
+        }
+        return productos;
+    }
+
+    public List<ProductoDto> getProductosPorQuery(String query){
+        List<Componente> componentes = repositorioComponente.obtenerComponentesPorQuery(query);
+        List<ProductoDto> productos = new ArrayList<>();
+        for(Componente componente : componentes){
+            productos.add(new ProductoDto(componente));
+        }
         return productos;
     }
 }
