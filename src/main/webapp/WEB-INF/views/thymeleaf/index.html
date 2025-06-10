@@ -1,22 +1,21 @@
 <!DOCTYPE HTML>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-  <title>Compra Gamer 2</title>
+    <title>Compra Gamer 2</title>
 
-  <!-- Boostrap core css -->
-  <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.2.0/css/bootstrap.min.css}"/>
+    <!-- Boostrap core css -->
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.2.0/css/bootstrap.min.css}"/>
 
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css"/>
 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
-
-  <!-- custom style -->
-  <link rel="stylesheet" th:href="@{/css/main.css}"/>
+    <!-- custom style -->
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
 
 </head>
 
@@ -25,192 +24,228 @@
 
 
 <header class="sticky-top bg-dark " style="height: 80px; z-index: 1030;">
-  <div class="container-fluid d-flex align-items-center justify-content-between h-100 px-4" style="max-width: 1300px;">
-    <!-- Logo -->
-    <a href="index.html" class="d-flex align-items-center text-decoration-none">
-      <img th:src="@{/uploads/dragon-logo.png}" alt="Logo" width="100" height="80">
-      <span class="ms-2 fw-bold fs-4 text-light">Compra Gamer 2</span>
-    </a>
+    <div class="container-fluid d-flex align-items-center justify-content-between h-100 px-4"
+         style="max-width: 1300px;">
+        <!-- Logo -->
+        <a href="index.html" class="d-flex align-items-center text-decoration-none">
+            <img th:src="@{/uploads/dragon-logo.png}" alt="Logo" width="100" height="80">
+            <span class="ms-2 fw-bold fs-4 text-light">Compra Gamer 2</span>
+        </a>
 
-    <form class="d-flex" role="search" >
-      <input class="bg-dark border border-light-subtle form-control me-2 align-content-center text-light " type="search" placeholder="Buscar productos" aria-label="Search" style="width:400px;">
-      <button class="btn btn-warning align-content-center me-1" type="submit"><i class="bi bi-search"></i></button>
-    </form>
-    <!-- Botones / iconos -->
-    <div>
-      <a class="btn btn-warning me-2" th:href="@{/carritoDeCompras}"> <i class="bi bi-cart3"></i></a>
-      <button class="btn btn-outline-secondary text-light"><i class="bi bi-person">Ingresa</i></button>
+        <form class="d-flex" role="search"  th:action="@{/productos/search}" method="get">
+            <input class="bg-dark border  border-light-subtle form-control me-2 align-content-center text-light "
+                   type="search" placeholder="Buscar productos" name="q" aria-label="Search" style="width:400px;">
+            <button class="btn btn-warning align-content-center me-1" type="submit"><i class="bi bi-search"></i>
+            </button>
+        </form>
+        <!-- Botones / iconos -->
+        <div>
+            <a class="btn btn-warning me-2" th:href="@{/carritoDeCompras/index}">
+                <i class="bi bi-cart3"> (<span id="contadorCarrito">0</span>)</i>
+            </a>
+            <button class="btn btn-outline-secondary text-light"><i class="bi bi-person">Ingresa</i></button>
+        </div>
     </div>
-  </div>
 </header>
 
 
-
 <nav class="bg-secondary-subtle text-dark py-3 ">
-  <div class="container d-flex justify-content-center gap-4">
-    <a class="text-dark text-decoration-none px-3 fs-5" href="#">Productos</a>
-    <a class="text-dark text-decoration-none px-3 fs-5"  href="#">Notebooks</a>
-    <a class="text-dark text-decoration-none px-3 fs-5" th:href="@{/arma-tu-pc/tradicional/procesador}">Arma tu PC</a>
-    <a class="text-dark text-decoration-none px-3 fs-5" href="#">Rastrea tu pedido</a>
-    <a class="text-dark text-decoration-none px-3 fs-5" href="#">Ayuda</a>
-  </div>
+    <div class="container d-flex justify-content-center gap-4">
+        <a class="text-dark text-decoration-none px-3 fs-5" th:href="@{/productos}">Productos</a>
+        <a class="text-dark text-decoration-none px-3 fs-5" href="#">Notebooks</a>
+        <a class="text-dark text-decoration-none px-3 fs-5" th:href="@{/arma-tu-pc/tradicional/procesador}">Arma tu
+            PC</a>
+        <a class="text-dark text-decoration-none px-3 fs-5" href="#">Rastrea tu pedido</a>
+        <a class="text-dark text-decoration-none px-3 fs-5" href="#">Ayuda</a>
+    </div>
 </nav>
 
 
-              <!--  //Carrousel-->
+<!--  //Carrousel-->
 <div class="container-fluid p-0">
-  <div id="carouselExampleIndicators" class="carousel slide">
-    <div class="carousel-indicators">
-      <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-      <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
-      <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
-      <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="3" aria-label="Slide 4"></button>
-      <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="4" aria-label="Slide 5"></button>
-    </div>
+    <div id="carouselExampleIndicators" class="carousel slide">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active"
+                    aria-current="true" aria-label="Slide 1"></button>
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1"
+                    aria-label="Slide 2"></button>
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2"
+                    aria-label="Slide 3"></button>
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="3"
+                    aria-label="Slide 4"></button>
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="4"
+                    aria-label="Slide 5"></button>
+        </div>
 
-    <div class="carousel-inner">
-      <div class="carousel-item active">
-        <img th:src="@{/uploads/carrousel4.jpg}" class="d-block w-100" alt="...">
-      </div>
-      <div class="carousel-item">
-        <img th:src="@{/uploads/carrousel5.jpg}" class="d-block w-100" alt="...">
-      </div>
-      <div class="carousel-item">
-        <img th:src="@{/uploads/carrousel3.jpg}" class="d-block w-100" alt="...">
-      </div>
-      <div class="carousel-item">
-        <img th:src="@{/uploads/carrousel1.jpg}" class="d-block w-100" alt="...">
-      </div>
-      <div class="carousel-item">
-        <img th:src="@{/uploads/carrousel2.jpg}" class="d-block w-100" alt="...">
-      </div>
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img th:src="@{/uploads/carrousel4.jpg}" class="d-block w-100" alt="...">
+            </div>
+            <div class="carousel-item">
+                <img th:src="@{/uploads/carrousel5.jpg}" class="d-block w-100" alt="...">
+            </div>
+            <div class="carousel-item">
+                <img th:src="@{/uploads/carrousel3.jpg}" class="d-block w-100" alt="...">
+            </div>
+            <div class="carousel-item">
+                <img th:src="@{/uploads/carrousel1.jpg}" class="d-block w-100" alt="...">
+            </div>
+            <div class="carousel-item">
+                <img th:src="@{/uploads/carrousel2.jpg}" class="d-block w-100" alt="...">
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators"
+                data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators"
+                data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
     </div>
-    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
-      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-      <span class="visually-hidden">Previous</span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
-      <span class="carousel-control-next-icon" aria-hidden="true"></span>
-      <span class="visually-hidden">Next</span>
-    </button>
-  </div>
 </div>
 <div class="container" style="max-width: 1250px;">
-<div class="mt-4 mb-3" ><h3>Conoce nuestros productos destacados</h3>
+    <div class="mt-4 mb-3"><h3>Conoce nuestros productos destacados</h3>
 
-  <div class="mb-2">
+        <div class="mb-2">
 
-    <a  class="btn btn-warning mx-1" th:href="@{/productos/categoria/1}" onclick="event.preventDefault(); cargarProductos(1)" >Equipos y Notebook</a>
-    <a  class="btn btn-warning mx-1" th:href="@{/productos/categoria/2}" onclick="event.preventDefault(); cargarProductos(2)">Monitores</a>
-    <a class="btn btn-warning mx-1" th:href="@{/productos/categoria/4}" onclick="event.preventDefault(); cargarProductos(4)" >Placas de Video</a>
-    <a class="btn btn-warning mx-1" th:href="@{/productos/categoria/5}" onclick="event.preventDefault(); cargarProductos(5)">Sillas Gamers</a>
-    <a  class="btn btn-warning mx-1" th:href="@{/productos/categoria/3}" onclick="event.preventDefault(); cargarProductos(3)" >Televisores</a>
-    <a class="btn btn-warning mx-1" th:href="@{/productos/categoria/6}" onclick="event.preventDefault(); cargarProductos(6)" >Perificos</a>
-    <a class="btn btn-warning mx-1" th:href="@{/productos/categoria/7}" onclick="event.preventDefault(); cargarProductos(7)" >Mothers</a>
-    <a class="btn btn-warning mx-1" th:href="@{/productos/categoria/8}" onclick="event.preventDefault(); cargarProductos(8)" >Procesadores</a>
-  </div>
+            <a class="btn btn-warning mx-1" th:href="@{/productos/tipoComponente/1}"
+               onclick="event.preventDefault(); cargarProductos(1)">Componente</a>
+            <a class="btn btn-warning mx-1" th:href="@{/productos/tipoComponente/2}"
+               onclick="event.preventDefault(); cargarProductos(2)">Procesador</a>
+            <a class="btn btn-warning mx-1" th:href="@{/productos/tipoComponente/4}"
+               onclick="event.preventDefault(); cargarProductos(3)">Motherboard</a>
+            <a class="btn btn-warning mx-1" th:href="@{/productos/tipoComponente/5}"
+               onclick="event.preventDefault(); cargarProductos(4)">Cooler CPU</a>
+            <a class="btn btn-warning mx-1" th:href="@{/productos/tipoComponente/3}"
+               onclick="event.preventDefault(); cargarProductos(5)">Memoria RAM</a>
+            <a class="btn btn-warning mx-1" th:href="@{/productos/tipoComponente/6}"
+               onclick="event.preventDefault(); cargarProductos(6)">Placa de video</a>
+            <a class="btn btn-warning mx-1" th:href="@{/productos/tipoComponente/7}"
+               onclick="event.preventDefault(); cargarProductos(7)">Almacenamiento</a>
+            <a class="btn btn-warning mx-1" th:href="@{/productos/tipoComponente/8}"
+               onclick="event.preventDefault(); cargarProductos(8)">Fuentes</a>
+            <a class="btn btn-warning mx-1" th:href="@{/productos/tipoComponente/9}"
+               onclick="event.preventDefault(); cargarProductos(9)">Gabinete</a>
 
-  <div id="productos-container" class="container py-5" >
-    <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center">
-      <div class="col" th:each="producto : ${productosDestacados}">
-        <a th:href="@{/productoEspecifico/1}" class="card h-100 border border-secondary-subtle  bg-transparent">
-          <img  th:src="@{'/uploads/' + ${producto.imagen}}" class="card-img-top" alt="..."></a>
-          <div class="card-body text-center">
-            <p th:text="${producto.nombre}"></p>
-            <div class="d-flex justify-content-center align-items-center gap-2">
-              <span class="fw-bold" th:text="'$ ' + ${producto.precio}"></span>
-              <button class="btn btn-warning"><i class="bi bi-cart3"></i></button>
+        </div>
+
+        <div id="productos-container" class="container py-5">
+            <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center">
+                <div class="col" th:each="producto : ${productosDestacados}">
+                    <div class="card h-100 border border-secondary-subtle bg-transparent">
+                        <a th:href="@{/productoEspecifico/1}">
+                            <img th:src="@{/imagenes/{imagen}(imagen=${producto.imagen})}"
+                                 class="card-img-top" th:alt="${producto.nombre}">
+                        </a>
+
+                        <div class="card-body text-center">
+                            <p th:text="${producto.nombre}"></p>
+                            <div class="d-flex justify-content-center align-items-center gap-2">
+                                <span class="fw-bold" th:text="'$ ' + ${producto.precio}"></span>
+                                <button th:onclick="|agregarAlCarrito(${producto.id}, 1)|" class="btn btn-warning">
+                                    <i class="bi bi-cart3"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div th:id="'mensajeNotificacion-' + ${producto.id}" class="mensaje-notificacion"
+                             style="display:none;"></div>
+                    </div>
+                </div>
             </div>
-          </div>
-
-      </div>
+        </div>
     </div>
-  </div>
 
- </div>
 </div>
- <div class="container-fluid p-0">
-  <div class="position-relative mb-4">
-    <img th:src="@{/uploads/arma-tu-pc2.jpg}" class="img-fluid d-block w-100 " style="height: 500px; object-fit: cover;">
-    <div class="position-absolute top-50 end-0 translate-middle-y me-5 p-4 text-white"
-         style="background-color: rgba(0, 0, 0, 0.6); max-width: 30%; border-radius: 10px">
-      <h3 class="mb-3">Arma tu PC</h3>
-      <p class="mb-4">Configura tu nueva PC sin errores de compatibilidad,
-        seleccionando todos los componentes que deseas.</p>
-      <a th:href="@{/arma-tu-pc/tradicional/procesador}" class="btn btn-warning">Ver mas</a>
+</div>
+<div class="container-fluid p-0">
+    <div class="position-relative mb-4">
+        <img th:src="@{/uploads/arma-tu-pc2.jpg}" class="img-fluid d-block w-100 "
+             style="height: 500px; object-fit: cover;">
+        <div class="position-absolute top-50 end-0 translate-middle-y me-5 p-4 text-white"
+             style="background-color: rgba(0, 0, 0, 0.6); max-width: 30%; border-radius: 10px">
+            <h3 class="mb-3">Arma tu PC</h3>
+            <p class="mb-4">Configura tu nueva PC sin errores de compatibilidad,
+                seleccionando todos los componentes que deseas.</p>
+            <a th:href="@{/arma-tu-pc/tradicional/procesador}" class="btn btn-warning">Ver mas</a>
+        </div>
     </div>
-  </div>
- </div>
+</div>
 
 
 <div class="container" style="max-width: 1250px;">
-<div class=" py-1" >
-  <h2 class="mb-4 text-dark">Explora nuestras <strong>categorias</strong></h2>
-  <div class="row g-4">
+    <div class=" py-1">
+        <h2 class="mb-4 text-dark">Explora nuestras <strong>categorias</strong></h2>
+        <div class="row g-4">
 
-    <!-- Categoría destacada -->
-    <div class="col-12 col-md-6" >
-      <a href="#" class="text-decoration-none">
-        <div class="category-card large-category">
-          <img th:src="@{/uploads/categoria/procesador.jpg}" alt="Procesadores" class="category-img">
-          <div class="category-title">PROCESADORES</div>
-        </div>
-      </a>
-    </div>
-
-    <!-- Resto de categorías -->
-    <div class="col-6 col-md-3" th:each="categoria : ${otrasCategorias}">
-      <a href="#" class="text-decoration-none">
-        <div class="category-card">
-          <img th:src="@{'/uploads/categoria/' + ${categoria.imagen}}" th:alt="${categoria.nombre}" class="category-img">
-          <div class="category-title" th:text="${categoria.nombre}"></div>
-        </div>
-      </a>
-    </div>
-
-  </div>
-</div>
-
-<div class=" py-5" >
-  <h2 class="mb-4 text-dark">Productos en <strong>descuento</strong></h2>
-
-  <div class="swiper mySwiper">
-    <div class="swiper-button-next"></div>
-    <div class="swiper-button-prev"></div>
-    <div class="swiper-wrapper">
-
-      <!-- th:each para iterar los productos en descuento -->
-      <div class="swiper-slide" th:each="producto : ${productosDescuento}">
-        <div class="card h-100">
-          <img th:src="@{'/uploads/' + ${producto.imagen}}" class="card-img-top" th:alt="${producto.nombre}">
-          <div class="card-body text-start">
-            <p th:text="${producto.nombre}"></p>
-            <div class="d-flex align-items-center gap-2">
-              <p class="card-text text-danger fw-bold" th:text="'$' + ${producto.precio}"></p>
-              <small class="text-muted text-decoration-line-through" th:text="'$' + ${producto.precio}"></small>
-              <button class="btn btn-warning"><i class="bi bi-cart3"></i></button>
+            <!-- Categoría destacada -->
+            <div class="col-12 col-md-6">
+                <a href="#" class="text-decoration-none">
+                    <div class="category-card large-category">
+                        <img th:src="@{/uploads/categoria/procesador.jpg}" alt="Procesadores" class="category-img">
+                        <div class="category-title">PROCESADORES</div>
+                    </div>
+                </a>
             </div>
-          </div>
+
+            <!-- Resto de categorías -->
+            <div class="col-6 col-md-3" th:each="categoria : ${otrasCategorias}">
+                <a href="#" class="text-decoration-none">
+                    <div class="category-card">
+                        <img th:src="@{'/uploads/categoria/' + ${categoria.imagen}}" th:alt="${categoria.nombre}"
+                             class="category-img">
+                        <div class="category-title" th:text="${categoria.nombre}"></div>
+                    </div>
+                </a>
+            </div>
+
         </div>
-      </div>
     </div>
-  </div>
-</div>
+
+    <div class=" py-5">
+        <h2 class="mb-4 text-dark">Productos en <strong>descuento</strong></h2>
+
+        <div class="swiper mySwiper">
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+            <div class="swiper-wrapper">
+
+                <!-- th:each para iterar los productos en descuento -->
+                <div class="swiper-slide" th:each="producto : ${productosDescuento}">
+                    <div class="card h-100">
+                        <img th:src="@{/imagenes/{imagen}(imagen=${producto.imagen})}"
+                             class="card-img-top" th:alt="${producto.nombre}">
+                        <div class="card-body text-start">
+                            <p th:text="${producto.nombre}"></p>
+                            <div class="d-flex align-items-center gap-2">
+                                <p class="card-text text-danger fw-bold" th:text="'$' + ${producto.precio}"></p>
+                                <small class="text-muted text-decoration-line-through"
+                                       th:text="'$' + ${producto.precio}"></small>
+                                <button th:onclick="'agregarAlCarrito(' + ${producto.id} + ', 1)'"
+                                        class="btn btn-warning"><i class="bi bi-cart3"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
 </div>
 </div>
+
 <!-- Footer -->
 <div th:replace="fragments/fragments :: footer"></div>
 
-
-<!-- /container -->
-
 <!-- Boostrap core js -->
 <script type="text/javascript" th:src="@{webjars/bootstrap/5.2.0/js/bootstrap.min.js}"></script>
-<script type="text/javascript" th:src="@{js/main.js}"></script>
+<script type="text/javascript" th:src="@{/js/main.js}"></script>
 <script th:src="@{/webjars/bootstrap/5.2.0/js/bootstrap.bundle.min.js}"></script>
 <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
-  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
+<script type="text/javascript"
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

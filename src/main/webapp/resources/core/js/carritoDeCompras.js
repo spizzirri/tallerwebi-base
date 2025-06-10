@@ -20,6 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     spanCantidad.textContent = data.cantidad;
                     precioTotalDelProducto.textContent = data.precioTotalDelProducto.toFixed(2);
                     valorTotalDelCarrito.textContent = data.valorTotal.toFixed(2);
+                    actualizarContadorCarrito(data.cantidadEnCarrito);
                 })
                 .catch(error => {
                     console.error('Error:', error);
@@ -29,7 +30,6 @@ document.addEventListener("DOMContentLoaded", function () {
 })
 
 // Boton para restar cantidad de un mismo producto
-
 document.addEventListener("DOMContentLoaded", function () {
     const boton = document.querySelectorAll(".btnRestarCantidad");
 
@@ -48,11 +48,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 .then(data => {
                     if (data.eliminado) {
                         fila.remove(); // Eliminar la fila si se eliminó el producto
+                        actualizarContadorCarrito(data.cantidadEnCarrito);
                     } else {
                         // Actualizar solo el valor de la cantidad
                         spanCantidad.textContent = data.cantidad;
                         precioTotalDelProducto.textContent = data.precioTotalDelProducto.toFixed(2);
                         valorTotalDelCarrito.textContent = data.valorTotal.toFixed(2);
+                        actualizarContadorCarrito(data.cantidadEnCarrito);
                     }
                 })
                 .catch(error => {
@@ -78,6 +80,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     .then(data => {
                         if (data.eliminado) {
                             this.closest('tr').remove();
+                            actualizarContadorCarrito(data.cantidadEnCarrito);
                             document.querySelector(".valorTotalDelCarrito").textContent = data.valorTotal.toFixed(2);
                         }
                     })
@@ -94,66 +97,198 @@ document.addEventListener("DOMContentLoaded", function () {
     const contenidoMensaje = document.getElementById("contenidoMensaje");
 
     boton.addEventListener("click", function () {
-        const codigo = input.value.trim()
+        const codigo = input.value.trim();
         if (!codigo) return;
 
         fetch('/spring/carritoDeCompras/aplicarDescuento', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({codigoInput: codigo}) // ¡clave y valor como JSON!
+            body: JSON.stringify({codigoInput: codigo})
         })
             .then(response => response.json())
             .then(data => {
-                contenidoMensaje.innerText = data.mensaje;
-                mensajeParaAlert.classList.remove("d-none");
-            })
-            .catch(error => {
-                contenidoMensaje.textContent = 'Hubo un error al aplicar el descuento.';
-            })
-    })
-})
 
-// Boton para confirmar compra, verificando metodo de pago
-document.addEventListener("DOMContentLoaded", function () {
-    const botonComprar = document.getElementById("btnComprar");
+                if (data.mensaje || data.mensajeDescuento) {
+                    contenidoMensaje.innerText = data.mensaje || data.mensajeDescuento;
+                    mensajeParaAlert.classList.remove("d-none");
+                }
 
-    botonComprar.addEventListener("click", function (e) {
-        const metodoSeleccionado = document.querySelector('input[name="metodoPago"]:checked');
-        const errorDiv = document.getElementById("errorMetodoPago");
-        const modal = new bootstrap.Modal(document.getElementById('miModal'));
+                if (data.valorTotal) {
 
-        if (!metodoSeleccionado) {
-            e.preventDefault();
-            errorDiv.innerText = "Debes seleccionar un metodo de pago";
-            errorDiv.classList.remove("d-none");
-            return;
-        }
+                    const valorTotalElement = document.querySelector('.valorTotalDelCarrito');
+                    if (valorTotalElement) {
+                        valorTotalElement.textContent = data.valorTotal.toFixed(2);
+                    }
 
-        const formData = new URLSearchParams();
-        formData.append('metodoPago', metodoSeleccionado.value);
+                    if (window.datosEnvio && window.datosEnvio.costo) {
+                        const nuevoTotalConEnvio = data.valorTotal + window.datosEnvio.costo;
+                        let parrafoTotal = document.querySelector('.total-con-envio');
 
-        // aca hago el ajax a la ruta para guardar el pedido
-        fetch('/spring/carritoDeCompras/formularioDePago', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: formData
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (!data.success) {
-                    e.preventDefault();
-                    errorDiv.innerText = data.error;
-                    errorDiv.classList.remove("d-none");
-                } else {
-                    errorDiv.classList.add("d-none");
-                    data.mostrarModal;
-                    modal.show();
+                        if (parrafoTotal) {
+                            parrafoTotal.innerHTML = 'Total con envio y descuento: <span class="total-envio-valor"></span>';
+                            parrafoTotal.querySelector('.total-envio-valor').textContent = '$' + nuevoTotalConEnvio.toFixed(2);
+                            parrafoTotal.style.display = 'block';
+
+                            console.log('Total recalculado con descuento y envío:', nuevoTotalConEnvio);
+                        }
+                    }
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
+                contenidoMensaje.textContent = 'Hubo un error al aplicar el descuento.';
+                mensajeParaAlert.classList.remove("d-none");
             });
     });
 });
+
+// Boton para confirmar compra, verificando metodo de pago
+document.addEventListener("DOMContentLoaded", function () {
+    const formularioPago = document.getElementById("formulario-pago");
+
+    formularioPago.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        let metodoSeleccionado = document.querySelector('input[name="metodoPago"]:checked');
+        if (metodoSeleccionado === null) {
+            const errorDiv = document.getElementById("errorMetodoPago");
+            errorDiv.innerText = "Debes seleccionar un método de pago";
+            errorDiv.classList.remove("d-none");
+            return false;
+        }
+
+        const errorDiv = document.getElementById("errorMetodoPago");
+        errorDiv.classList.add("d-none");
+
+        // mostrar spinner
+        const btnComprar = document.getElementById("btnComprar");
+        btnComprar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Redirigiendo a MercadoPago...';
+        btnComprar.disabled = true;
+
+        const params = new URLSearchParams();
+        params.append('metodoPago', metodoSeleccionado.value);
+
+        fetch('/spring/carritoDeCompras/formularioPago', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: params
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    crearFormularioMercadoPago(data);
+                } else {
+                    btnComprar.innerHTML = 'Finalizar compra';
+                    btnComprar.disabled = false;
+                    errorDiv.innerText = data.error;
+                    errorDiv.classList.remove("d-none");
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                btnComprar.innerHTML = 'Finalizar compra';
+                btnComprar.disabled = false;
+                errorDiv.innerText = "Error al procesar el pago";
+                errorDiv.classList.remove("d-none");
+            });
+    });
+});
+
+
+function crearFormularioMercadoPago(data) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/spring/checkout/create-payment';
+    form.innerHTML += `<input type="hidden" name="metodoDePago" value="mercadoPago">`;
+
+    let costoEnvio = data.costoEnvio;
+    if (!costoEnvio && window.datosEnvio) {
+        costoEnvio = window.datosEnvio.costo;
+    }
+
+    if (costoEnvio && costoEnvio > 0) {
+        form.innerHTML += `<input type="hidden" name="costoEnvio" value="${costoEnvio}">`;
+        console.log('Enviando costo de envío a MP:', costoEnvio);
+    }
+
+    document.body.appendChild(form);
+    form.submit();
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('formulario-envio');
+    const loading = document.getElementById('loading');
+
+    form.addEventListener('submit', function (e) {
+        const codigoPostal = document.getElementById('codigoPostal').value.trim();
+        if (window.fetch && codigoPostal) {
+            e.preventDefault();
+            calcularConAjax(codigoPostal);
+        }
+    });
+});
+
+function calcularConAjax(codigoPostal) {
+    loading.classList.remove('d-none');
+
+    fetch(`/spring/carritoDeCompras/calcular?codigoPostal=${codigoPostal}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // envio
+                document.getElementById('alertaSinCobertura').classList.add('d-none');
+                document.getElementById('costo').textContent = '$' + data.costo;
+                document.getElementById('tiempo').textContent = data.tiempo;
+                document.getElementById('zona').textContent = data.destino;
+
+                const totalActual = parseFloat(document.querySelector('.valorTotalDelCarrito').textContent);
+                const totalConEnvio = totalActual + data.costo;
+
+                let parrafoTotal = document.querySelector('.total-con-envio');
+                if (!parrafoTotal) {
+                    parrafoTotal = document.createElement('p');
+                    parrafoTotal.className = 'total-con-envio';
+                    document.getElementById('btnComprar').parentElement.insertBefore(parrafoTotal, document.getElementById('btnComprar').parentElement.firstChild);
+                }
+
+                //descuento
+                const hayDescuento = !document.getElementById('mensajeDescuento').classList.contains('d-none');
+                parrafoTotal.innerHTML = `Total con envío${hayDescuento ? ' y descuento' : ''}: <span class="total-envio-valor">$${totalConEnvio.toFixed(2)}</span>`;
+                parrafoTotal.style.display = 'block';
+
+                //mp
+                window.datosEnvio = {
+                    costo: data.costo,
+                    destino: data.destino,
+                    codigoPostal: codigoPostal
+                };
+
+            } else {
+                document.getElementById('alertaSinCobertura').classList.remove('d-none');
+
+                const parrafoTotal = document.querySelector('.total-con-envio');
+                if (parrafoTotal) {
+                    parrafoTotal.style.display = 'none';
+                }
+                window.datosEnvio = null;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            form.submit();
+        })
+        .finally(() => {
+            loading.classList.add('d-none');
+        });
+}
+
+
+window.actualizarContadorCarrito = function (nuevaCantidad) {
+    console.log(" Actualizando contador a:", nuevaCantidad);
+    const contadorCarrito = document.getElementById("contadorCarrito");
+    if (contadorCarrito) {
+        contadorCarrito.textContent = nuevaCantidad;
+    }
+}

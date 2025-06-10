@@ -6,6 +6,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Repository;
 
 @Repository("repositorioUsuario")
@@ -22,10 +23,14 @@ public class RepositorioUsuarioImpl implements RepositorioUsuario {
     public Usuario buscarUsuario(String email, String password) {
 
         final Session session = sessionFactory.getCurrentSession();
-        return (Usuario) session.createCriteria(Usuario.class)
+        Usuario usuario = (Usuario) session.createCriteria(Usuario.class)
                 .add(Restrictions.eq("email", email))
                 .add(Restrictions.eq("password", password))
                 .uniqueResult();
+        if(usuario != null && new BCryptPasswordEncoder().matches(password, usuario.getPassword())){
+            return usuario;
+        }
+        return null;
     }
 
     @Override
@@ -43,6 +48,11 @@ public class RepositorioUsuarioImpl implements RepositorioUsuario {
     @Override
     public void modificar(Usuario usuario) {
         sessionFactory.getCurrentSession().update(usuario);
+    }
+
+    @Override
+    public void eliminarUsuario(Long idUsuario) {
+        Session session = sessionFactory.getCurrentSession();
     }
 
 }

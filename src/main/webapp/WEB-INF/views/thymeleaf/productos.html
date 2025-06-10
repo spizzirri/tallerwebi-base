@@ -1,0 +1,80 @@
+<!DOCTYPE HTML>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>Compra Gamer 2</title>
+
+    <!-- Boostrap core css -->
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.2.0/css/bootstrap.min.css}"/>
+
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css"/>
+
+    <!-- custom style -->
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+
+</head>
+<body>
+<div th:replace="fragments/fragments :: header"></div>
+
+<div  class="container py-5" th:if="${productosBuscados}">
+    <h2>Resultados de busqueda</h2>
+    <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center">
+        <div class="col" th:each="producto : ${productosBuscados}">
+            <div class="card h-100 border border-secondary-subtle bg-transparent">
+                <a th:href="@{/productoEspecifico/1}">
+                    <img th:src="@{/imagenes/{imagen}(imagen=${producto.imagen})}"
+                         class="card-img-top" th:alt="${producto.nombre}">
+                </a>
+
+                <div class="card-body text-center">
+                    <p th:text="${producto.nombre}"></p>
+                    <div class="d-flex justify-content-center align-items-center gap-2">
+                        <span class="fw-bold" th:text="'$ ' + ${producto.precio}"></span>
+                        <button th:onclick="|agregarAlCarrito(${producto.id}, 1)|" class="btn btn-warning">
+                            <i class="bi bi-cart3"></i>
+                        </button>
+                    </div>
+                </div>
+                <div th:id="'mensajeNotificacion-' + ${producto.id}" class="mensaje-notificacion"
+                     style="display:none;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div  class="container py-5" th:unless="${productosBuscados}">
+    <div th:if="${mensaje}" class="alert alert-info text-center">
+        <p th:text="${mensaje}"></p>
+    </div>
+    <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center">
+        <div class="col" th:each="producto : ${productos}">
+            <div class="card h-100 border border-secondary-subtle bg-transparent">
+                <a th:href="@{/productoEspecifico/1}">
+                    <img th:src="@{/imagenes/{imagen}(imagen=${producto.imagen})}"
+                         class="card-img-top" th:alt="${producto.nombre}">
+                </a>
+
+                <div class="card-body text-center">
+                    <p th:text="${producto.nombre}"></p>
+                    <div class="d-flex justify-content-center align-items-center gap-2">
+                        <span class="fw-bold" th:text="'$ ' + ${producto.precio}"></span>
+                        <button th:onclick="|agregarAlCarrito(${producto.id}, 1)|" class="btn btn-warning">
+                            <i class="bi bi-cart3"></i>
+                        </button>
+                    </div>
+                </div>
+                <div th:id="'mensajeNotificacion-' + ${producto.id}" class="mensaje-notificacion"
+                     style="display:none;"></div>
+            </div>
+        </div>
+    </div>
+    <div th:replace="fragments/fragments :: footer"></div>
+</div>
+</body>
+</html>
