@@ -2,11 +2,13 @@ package com.tallerwebi.dominio;
 
 import com.tallerwebi.presentacion.CategoriaDto;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Service
+@Service("serviceCategorias")
+@Transactional
 public class ServiceCategorias {
     private List<CategoriaDto> categorias;
 

@@ -83,12 +83,12 @@
         </div>
         <br><br>
         <div class="container">
-            <div class="col-md-12 row row-cols-2 justify-content-center p-0 m-0">
+            <div class="col-md-12 row row-cols-2 p-0 m-0">
                 <table class="row p-0 m-0 pt-3" th:each="caracteristicas : ${componenteEspecificoDto.getCaracteristicas()}">
                     <th th:text="${caracteristicas.getKey()}"></th>
                     <tr class="row" th:each="subCaracteristicas : ${caracteristicas.getValue()}">
-                        <td class="col-md-6" th:text="${subCaracteristicas.getKey()}"></td>
-                        <td class="col-md-6 text-end" th:text="${subCaracteristicas.getValue()}"></td>
+                        <td class="col-md-7" th:text="${subCaracteristicas.getKey()}"></td>
+                        <td class="col-md-5 text-end" th:text="${subCaracteristicas.getValue()}"></td>
                     </tr>
                 </table>
             </div>

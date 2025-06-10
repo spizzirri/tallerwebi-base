@@ -353,18 +353,18 @@ public class ComponenteEspecificoDto {
 
     private Map<String, String> obtenerCoolersYDisipadoresGabinete(Gabinete productoEspecifico) {
         Map<String, String> coolersYDisipadores = new LinkedHashMap<>();
-        coolersYDisipadores.put("Cantidad de Coolers de 80mm Soportados", String.valueOf(productoEspecifico.getCantCoolerFanDe80mmSoportados()));
-        coolersYDisipadores.put("Cantidad de Coolers de 80mm Incluidos", String.valueOf(productoEspecifico.getCantCoolerFanDe80mmIncluidos()));
-        coolersYDisipadores.put("Cantidad de Coolers de 120mm Soportados", String.valueOf(productoEspecifico.getCantCoolerFanDe120mmSoportados()));
-        coolersYDisipadores.put("Cantidad de Coolers de 120mm Incluidos", String.valueOf(productoEspecifico.getCantCoolerFanDe120mmIncluidos()));
-        coolersYDisipadores.put("Cantidad de Coolers de 140mm Soportados", String.valueOf(productoEspecifico.getCantCoolerFanDe140mmSoportados()));
-        coolersYDisipadores.put("Cantidad de Coolers de 140mm Incluidos", String.valueOf(productoEspecifico.getCantCoolerFanDe140mmIncluidos()));
-        coolersYDisipadores.put("Cantidad de Coolers de 200mm Soportados", String.valueOf(productoEspecifico.getCantCoolerFanDe200mmSoportados()));
-        coolersYDisipadores.put("Cantidad de Coolers de 200mm Incluidos", String.valueOf(productoEspecifico.getCantCoolerFanDe200mmIncluidos()));
-        coolersYDisipadores.put("Cantidad de Radiadores de 240mm Soportados", String.valueOf(productoEspecifico.getCantRadiador240mmSoportados()));
-        coolersYDisipadores.put("Cantidad de Radiadores de 280mm Soportados", String.valueOf(productoEspecifico.getCantRadiador280mmSoportados()));
-        coolersYDisipadores.put("Cantidad de Radiadores de 360mm Soportados", String.valueOf(productoEspecifico.getCantRadiador360mmSoportados()));
-        coolersYDisipadores.put("Cantidad de Radiadores de 420mm Soportados", String.valueOf(productoEspecifico.getCantRadiador420mmSoportados()));
+        coolersYDisipadores.put("Cant de Coolers de 80mm Soportados", String.valueOf(productoEspecifico.getCantCoolerFanDe80mmSoportados()));
+        coolersYDisipadores.put("Cant de Coolers de 80mm Incluidos", String.valueOf(productoEspecifico.getCantCoolerFanDe80mmIncluidos()));
+        coolersYDisipadores.put("Cant de Coolers de 120mm Soportados", String.valueOf(productoEspecifico.getCantCoolerFanDe120mmSoportados()));
+        coolersYDisipadores.put("Cant de Coolers de 120mm Incluidos", String.valueOf(productoEspecifico.getCantCoolerFanDe120mmIncluidos()));
+        coolersYDisipadores.put("Cant de Coolers de 140mm Soportados", String.valueOf(productoEspecifico.getCantCoolerFanDe140mmSoportados()));
+        coolersYDisipadores.put("Cant de Coolers de 140mm Incluidos", String.valueOf(productoEspecifico.getCantCoolerFanDe140mmIncluidos()));
+        coolersYDisipadores.put("Cant de Coolers de 200mm Soportados", String.valueOf(productoEspecifico.getCantCoolerFanDe200mmSoportados()));
+        coolersYDisipadores.put("Cant de Coolers de 200mm Incluidos", String.valueOf(productoEspecifico.getCantCoolerFanDe200mmIncluidos()));
+        coolersYDisipadores.put("Cant de Radiadores de 240mm Soportados", String.valueOf(productoEspecifico.getCantRadiador240mmSoportados()));
+        coolersYDisipadores.put("Cant de Radiadores de 280mm Soportados", String.valueOf(productoEspecifico.getCantRadiador280mmSoportados()));
+        coolersYDisipadores.put("Cant de Radiadores de 360mm Soportados", String.valueOf(productoEspecifico.getCantRadiador360mmSoportados()));
+        coolersYDisipadores.put("Cant de Radiadores de 420mm Soportados", String.valueOf(productoEspecifico.getCantRadiador420mmSoportados()));
         return coolersYDisipadores;
     }
 
