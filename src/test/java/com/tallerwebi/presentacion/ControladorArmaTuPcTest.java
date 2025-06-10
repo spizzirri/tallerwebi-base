@@ -766,6 +766,7 @@ public class ControladorArmaTuPcTest {
 
         assertThat(modelAndView.getViewName(), equalTo(vistaEsperada));
         assertThat(modelAndView.getModel().get("armadoPcDto"), instanceOf(ArmadoPcDto.class));
+        verify(servicioMock, times(1)).armadoCompleto(any());
 
     }
 
@@ -788,6 +789,7 @@ public class ControladorArmaTuPcTest {
         assertThat(modelAndView.getViewName(), equalTo(vistaEsperada));
         assertThat(modelAndView.getModel().get("armadoPcDto"), nullValue());
         assertThat(modelAndView.getModel().get("errorResumen"), equalTo(errorEsperado));
+        verify(servicioMock, times(1)).armadoCompleto(any());
     }
 
 
