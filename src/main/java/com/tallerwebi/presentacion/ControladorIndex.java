@@ -27,6 +27,9 @@ public class ControladorIndex {
     private ServicioBuscarProducto productoService;
     @Autowired
     private ServicioProductoCarrito servicioProductoCarrito;
+    @Autowired
+    private RepositorioComponente repositorioComponente;
+
 
 //    #1 Equipos y Notebook
 //    #2 Monitores
