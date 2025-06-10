@@ -117,7 +117,6 @@ public class ControladorIndex {
 
                 response.put("success", true);
                 response.put("mensaje", "Producto agregado al carrito!");
-                response.put("cantidadEnCarrito", servicioProductoCarrito.getProductos().size());
             }
         } catch (Exception e) {
             response.put("success", false);

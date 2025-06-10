@@ -20,6 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     spanCantidad.textContent = data.cantidad;
                     precioTotalDelProducto.textContent = data.precioTotalDelProducto.toFixed(2);
                     valorTotalDelCarrito.textContent = data.valorTotal.toFixed(2);
+                    actualizarContadorCarrito(data.cantidadEnCarrito);
                 })
                 .catch(error => {
                     console.error('Error:', error);
@@ -29,7 +30,6 @@ document.addEventListener("DOMContentLoaded", function () {
 })
 
 // Boton para restar cantidad de un mismo producto
-
 document.addEventListener("DOMContentLoaded", function () {
     const boton = document.querySelectorAll(".btnRestarCantidad");
 
@@ -48,11 +48,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 .then(data => {
                     if (data.eliminado) {
                         fila.remove(); // Eliminar la fila si se eliminó el producto
+                        actualizarContadorCarrito(data.cantidadEnCarrito);
                     } else {
                         // Actualizar solo el valor de la cantidad
                         spanCantidad.textContent = data.cantidad;
                         precioTotalDelProducto.textContent = data.precioTotalDelProducto.toFixed(2);
                         valorTotalDelCarrito.textContent = data.valorTotal.toFixed(2);
+                        actualizarContadorCarrito(data.cantidadEnCarrito);
                     }
                 })
                 .catch(error => {
@@ -78,6 +80,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     .then(data => {
                         if (data.eliminado) {
                             this.closest('tr').remove();
+                            actualizarContadorCarrito(data.cantidadEnCarrito);
                             document.querySelector(".valorTotalDelCarrito").textContent = data.valorTotal.toFixed(2);
                         }
                     })

@@ -123,6 +123,7 @@ public class CarritoController {
         response.put("cantidad", productoBuscado.getCantidad());
         response.put("precioTotalDelProducto", valorTotalDelProductoBuscado);
         response.put("valorTotal", this.productoService.valorTotal);
+
         return response;
     }
 
