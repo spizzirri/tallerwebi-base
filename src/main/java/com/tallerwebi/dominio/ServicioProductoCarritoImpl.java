@@ -53,8 +53,11 @@ public class ServicioProductoCarritoImpl {
             existente.setCantidad(existente.getCantidad() + cantidad);
         } else {
             Componente componente = repositorioComponente.obtenerComponentePorId(componenteId);
-            ProductoCarritoDto nuevoProductoCarrito = new ProductoCarritoDto(componente, cantidad);
-            this.productos.add(nuevoProductoCarrito);
+
+            if (componente != null) {
+                ProductoCarritoDto nuevoProductoCarrito = new ProductoCarritoDto(componente, cantidad);
+                this.productos.add(nuevoProductoCarrito);
+            }
         }
     }
 

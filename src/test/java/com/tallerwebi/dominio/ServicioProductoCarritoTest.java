@@ -1,17 +1,20 @@
 package com.tallerwebi.dominio;
 
+import com.tallerwebi.dominio.entidades.Componente;
 import com.tallerwebi.presentacion.ProductoCarritoDto;
 import junit.framework.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static junit.framework.Assert.assertNull;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class ServicioProductoCarritoTest {
@@ -20,6 +23,8 @@ public class ServicioProductoCarritoTest {
     private ProductoCarritoDto productoMock1;
     @Mock
     private ProductoCarritoDto productoMock2;
+    @Mock
+    private RepositorioComponente repositorioComponente;
 
     private ServicioProductoCarritoImpl servicioProductoCarritoImpl;
     private List<ProductoCarritoDto> productos;
@@ -28,6 +33,7 @@ public class ServicioProductoCarritoTest {
     public void init() {
         MockitoAnnotations.openMocks(this);
         servicioProductoCarritoImpl = new ServicioProductoCarritoImpl();
+        ReflectionTestUtils.setField(servicioProductoCarritoImpl, "repositorioComponente", repositorioComponente);
         productos = new ArrayList<>();
     }
 
@@ -69,13 +75,86 @@ public class ServicioProductoCarritoTest {
     }
 
     // agregarProducto
+    @Test
     public void cuandoAgregoUnProductoAlCarritoEsteSeAgregaCorrectamente() {
-        Long idBuscado = 1L;
-        Integer cantidad = 1;
+        servicioProductoCarritoImpl.setProductos(productos);
+        when(productoMock1.getId()).thenReturn(1L);
 
+        Componente componenteMock = mock(Componente.class);
+        when(componenteMock.getId()).thenReturn(1L);
 
+        when(repositorioComponente.obtenerComponentePorId(1L)).thenReturn(componenteMock);
+
+        servicioProductoCarritoImpl.agregarProducto(componenteMock.getId(), 1);
+
+        assertEquals(1, productos.size());
+        assertEquals(1, servicioProductoCarritoImpl.getProductos().size());
     }
 
+    @Test
+    public void cuandoAgregoUnProductoExistenteSeSumaLaCantidadCorrectamente() {
+        Componente componenteMock = mock(Componente.class);
+        ProductoCarritoDto productoExistente = new ProductoCarritoDto(componenteMock, 2);
+        productos.add(productoExistente);
+        servicioProductoCarritoImpl.setProductos(productos);
+
+        when(productoMock1.getId()).thenReturn(1L);
+
+        servicioProductoCarritoImpl.agregarProducto(productoExistente.getId(), 2);
+
+        assertEquals(1, productos.size());
+        assertEquals(4, productos.get(0).getCantidad());
+    }
+
+    @Test
+    public void cuandoAgregoUnComponenteInexistenteNoSeAgregaNada(){
+        servicioProductoCarritoImpl.setProductos(productos);
+        Long componenteInexistenteId = 1995L;
+
+        when(repositorioComponente.obtenerComponentePorId(componenteInexistenteId)).thenReturn(null);
+
+        servicioProductoCarritoImpl.agregarProducto(1995L, 1);
+
+        assertEquals(0, productos.size());
+        assertEquals(0, servicioProductoCarritoImpl.getProductos().size());
+    }
+
+    // verificarStock
+    @Test
+    public void cuandoVerificoElStockYAlcanzaObtengoTrue(){
+        Long componenteId = 1L;
+        Integer cantidadDeseada = 2;
+        Integer stockDisponible = 10;
+
+
+        Componente componenteMock = mock(Componente.class);
+        when(componenteMock.getId()).thenReturn(componenteId);
+        when(componenteMock.getStock()).thenReturn(stockDisponible);
+
+        when(repositorioComponente.obtenerComponentePorId(componenteId)).thenReturn(componenteMock);
+
+        boolean stockSuficiente = servicioProductoCarritoImpl.verificarStock(componenteMock.getId(), cantidadDeseada);
+
+        assertTrue(stockSuficiente);
+    }
+
+    @Test
+    public void cuandoVerificoStockYNoAlcanzaObtengoFalse() {
+        Long componenteId = 1L;
+        Integer cantidadDeseada = 2;
+        Integer stockDisponible = 1;
+
+
+        Componente componenteMock = mock(Componente.class);
+        when(componenteMock.getId()).thenReturn(componenteId);
+        when(componenteMock.getStock()).thenReturn(stockDisponible);
+
+        when(repositorioComponente.obtenerComponentePorId(componenteId)).thenReturn(componenteMock);
+
+        boolean stockSuficiente = servicioProductoCarritoImpl.verificarStock(componenteMock.getId(), cantidadDeseada);
+
+        assertFalse(stockSuficiente);
+    }
 
     @Test
     public void cuandoQuieroCalcularElValorTotalDeLosProductosEnElCarritoObtengoElTotal() {
@@ -168,4 +247,7 @@ public class ServicioProductoCarritoTest {
 
         assertEquals(170.0, valorTotalConDescuento, 0.01);
     }
+
+    // calcularCantidadTotalDeProductos
+
 }
