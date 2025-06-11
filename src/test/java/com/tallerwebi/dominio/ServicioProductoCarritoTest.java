@@ -249,5 +249,19 @@ public class ServicioProductoCarritoTest {
     }
 
     // calcularCantidadTotalDeProductos
+    @Test
+    public void cuandoAgregoUnProductoAlCarritoConCantidadUnoLaCantidadTotalEsUno() {
+        Integer cantidadProducto = 1;
+        productos.add(productoMock1);
 
+        when(productoMock1.getCantidad()).thenReturn(cantidadProducto);
+
+        servicioProductoCarritoImpl.setProductos(productos);
+
+        productoMock1.setCantidad(1);
+
+        Integer cantidadDelCarrito = servicioProductoCarritoImpl.calcularCantidadTotalDeProductos();
+
+        assertEquals(cantidadDelCarrito, productos.size());
+    }
 }
