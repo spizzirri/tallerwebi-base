@@ -12,6 +12,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 public class ControladorIndex {
@@ -42,9 +44,9 @@ public class ControladorIndex {
         ModelMap model = new ModelMap();
         CategoriaDto categoriaDestacada = categoriasAMostrar.get(0);
         List<CategoriaDto> otrasCategorias = categoriasAMostrar.subList(1, categoriasAMostrar.size());
-
+        List<CategoriaDto> categoriasLimitada = otrasCategorias.stream().limit(7).collect(Collectors.toList());
         model.addAttribute("categoriaDestacada", categoriaDestacada);
-        model.addAttribute("otrasCategorias", otrasCategorias);
+        model.addAttribute("otrasCategorias",categoriasLimitada);
 
         List<ProductoDto> productosDescuento = productoService.getProductosMenoresAUnPrecio(150000D);
         model.addAttribute("productosDescuento", productosDescuento);
@@ -59,8 +61,8 @@ public class ControladorIndex {
 
         String tipoComponente = convertirIdATipoComponente(id);
         List<ProductoDto> productosDestacados = productoService.getProductosPorTipo(tipoComponente);
-
-        model.addAttribute("productosDestacados", productosDestacados);
+        List<ProductoDto> productosLimitados = productosDestacados.stream().limit(6).collect(Collectors.toList());
+        model.addAttribute("productosDestacados", productosLimitados);
         return new ModelAndView("cargarProductosDinamicos", model);
     }
 
