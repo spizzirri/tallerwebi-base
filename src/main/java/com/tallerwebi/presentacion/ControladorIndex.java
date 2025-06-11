@@ -5,6 +5,8 @@ import com.tallerwebi.dominio.ServiceCategorias;
 import com.tallerwebi.dominio.ServicioBuscarProducto;
 import com.tallerwebi.dominio.ServicioProductoCarrito;
 import com.tallerwebi.dominio.entidades.Componente;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -18,6 +20,7 @@ import java.util.Map;
 
 @Controller
 public class ControladorIndex {
+    private static final Logger logger = LoggerFactory.getLogger(CarritoController.class);
 
     @Autowired
     private ServiceCategorias categoriasService;
@@ -52,13 +55,6 @@ public class ControladorIndex {
 
         List<ProductoDto> productosDescuento = productoService.getProductosMenoresAUnPrecio(150000D);
         model.addAttribute("productosDescuento", productosDescuento);
-
-        try {
-            Integer cantidadTotalEnCarrito = servicioProductoCarrito.calcularCantidadTotalDeProductos();
-            model.addAttribute("cantidadEnCarrito", cantidadTotalEnCarrito);
-        } catch (Exception e) {
-            model.addAttribute("cantidadEnCarrito", 0);
-        }
 
         return new ModelAndView("index", model);
     }

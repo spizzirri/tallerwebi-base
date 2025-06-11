@@ -21,7 +21,7 @@
 <body>
 <div th:replace="fragments/fragments :: header"></div>
 
-<div  class="container py-5" th:if="${productosBuscados}">
+<div class="container py-5" th:if="${productosBuscados}">
     <h2>Resultados de busqueda</h2>
     <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center">
         <div class="col" th:each="producto : ${productosBuscados}">
@@ -48,14 +48,14 @@
 </div>
 
 
-<div  class="container py-5" th:unless="${productosBuscados}">
+<div class="container py-5" th:unless="${productosBuscados}">
     <div th:if="${mensaje}" class="alert alert-info text-center">
         <p th:text="${mensaje}"></p>
     </div>
     <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center">
         <div class="col" th:each="producto : ${productos}">
             <div class="card h-100 border border-secondary-subtle bg-transparent">
-                <a th:href="@{/productoEspecifico/1}">
+                <a th:href="@{/productoEspecifico/{id}(id=${producto.id})}">
                     <img th:src="@{/imagenes/{imagen}(imagen=${producto.imagen})}"
                          class="card-img-top" th:alt="${producto.nombre}">
                 </a>
@@ -70,7 +70,8 @@
                     </div>
                 </div>
                 <div th:id="'mensajeNotificacion-' + ${producto.id}" class="mensaje-notificacion"
-                     style="display:none;"></div>
+                     style="display:none;">
+                </div>
             </div>
         </div>
     </div>
@@ -79,6 +80,7 @@
 
 <script type="text/javascript" th:src="@{webjars/bootstrap/5.2.0/js/bootstrap.min.js}"></script>
 <script type="text/javascript" th:src="@{/js/main.js}"></script>
+<script type="text/javascript" th:src="@{/js/agregarAlCarrito.js}"></script>
 <script th:src="@{/webjars/bootstrap/5.2.0/js/bootstrap.bundle.min.js}"></script>
 <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
 <script type="text/javascript"

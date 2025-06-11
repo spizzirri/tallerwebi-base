@@ -304,12 +304,9 @@ public class CarritoController {
                 response.put("mensaje", "Producto agregado al carrito!");
             }
 
-            try {
-                Integer cantidadTotal = productoService.calcularCantidadTotalDeProductos();
-                response.put("cantidadEnCarrito", cantidadTotal != null ? cantidadTotal : 0);
-            } catch (Exception e) {
-                response.put("cantidadEnCarrito", 0);
-            }
+            Integer cantidadTotal = productoService.calcularCantidadTotalDeProductos();
+            response.put("cantidadEnCarrito", cantidadTotal != null ? cantidadTotal : 0);
+
 
         } catch (Exception e) {
             response.put("success", false);
