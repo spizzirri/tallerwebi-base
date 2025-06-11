@@ -7,16 +7,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 @Service
-public class ServicioDeEnvios {
-    // es quien se va a conectar y traer los datos de la API
-    private static final String EMPRESA_ENVIA = "Andreani";
+public class ServicioDeEnviosImpl {
 
     @Value("${mockapi.envios.url:https://683b8d5e28a0b0f2fdc4ead9.mockapi.io/envios}")
     private String enviosUrl;
 
     private RestTemplate restTemplate;
 
-    public ServicioDeEnvios() {
+    public ServicioDeEnviosImpl() {
         restTemplate = new RestTemplate();
     }
 

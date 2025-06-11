@@ -1,15 +1,13 @@
 package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.RepositorioComponente;
-import com.tallerwebi.dominio.ServicioDeEnvios;
-import com.tallerwebi.dominio.ServicioProductoCarrito;
+import com.tallerwebi.dominio.ServicioDeEnviosImpl;
+import com.tallerwebi.dominio.ServicioProductoCarritoImpl;
 
-import com.tallerwebi.dominio.entidades.Componente;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -29,9 +27,9 @@ public class ControladorCarritoTest {
     @Mock
     private ProductoCarritoDto productoMock2;
     @Mock
-    private ServicioProductoCarrito servicioProductoCarritoMock;
+    private ServicioProductoCarritoImpl servicioProductoCarritoImplMock;
     @Mock
-    private ServicioDeEnvios servicioEnviosMock;
+    private ServicioDeEnviosImpl servicioEnviosMock;
     @Mock
     private RepositorioComponente repositorioMock;
 
@@ -44,7 +42,7 @@ public class ControladorCarritoTest {
         repositorioMock = mock(RepositorioComponente.class);
         MockitoAnnotations.openMocks(this);
 
-        carritoController = new CarritoController(servicioProductoCarritoMock, servicioEnviosMock);
+        carritoController = new CarritoController(servicioProductoCarritoImplMock, servicioEnviosMock);
         productos = new ArrayList<>();
     }
 
@@ -73,10 +71,10 @@ public class ControladorCarritoTest {
         List<ProductoCarritoDto> productosSinUno = new ArrayList<>();
         productosSinUno.add(productoMock2);
 
-        when(servicioProductoCarritoMock.buscarPorId(1L)).thenReturn(productoMock1);
+        when(servicioProductoCarritoImplMock.buscarPorId(1L)).thenReturn(productoMock1);
 
-        when(servicioProductoCarritoMock.getProductos()).thenReturn(productos).thenReturn(productosSinUno);
-        when(servicioProductoCarritoMock.calcularValorTotalDeLosProductos()).thenReturn(130.0);
+        when(servicioProductoCarritoImplMock.getProductos()).thenReturn(productos).thenReturn(productosSinUno);
+        when(servicioProductoCarritoImplMock.calcularValorTotalDeLosProductos()).thenReturn(130.0);
 
         Map<String, Object> response = carritoController.eliminarProductoDelCarrito(productoMock1.getId());
 
@@ -96,8 +94,8 @@ public class ControladorCarritoTest {
         productos.add(productoMock1);
         productos.add(productoMock2);
 
-        when(servicioProductoCarritoMock.getProductos()).thenReturn(productos);
-        when(servicioProductoCarritoMock.calcularDescuento(5)).thenReturn(313.5);
+        when(servicioProductoCarritoImplMock.getProductos()).thenReturn(productos);
+        when(servicioProductoCarritoImplMock.calcularDescuento(5)).thenReturn(313.5);
 
         Map<String, String> inputConDescuento = new HashMap<>();
         inputConDescuento.put("codigoInput", "baratija5");
@@ -117,8 +115,8 @@ public class ControladorCarritoTest {
         productos.add(productoMock1);
         productos.add(productoMock2);
 
-        when(servicioProductoCarritoMock.getProductos()).thenReturn(productos);
-        when(servicioProductoCarritoMock.calcularDescuento(10)).thenReturn(297.0);
+        when(servicioProductoCarritoImplMock.getProductos()).thenReturn(productos);
+        when(servicioProductoCarritoImplMock.calcularDescuento(10)).thenReturn(297.0);
 
         Map<String, String> inputConDescuento = new HashMap<>();
         inputConDescuento.put("codigoInput", "baratija10");
@@ -138,8 +136,8 @@ public class ControladorCarritoTest {
         productos.add(productoMock1);
         productos.add(productoMock2);
 
-        when(servicioProductoCarritoMock.getProductos()).thenReturn(productos);
-        when(servicioProductoCarritoMock.calcularDescuento(15)).thenReturn(280.5);
+        when(servicioProductoCarritoImplMock.getProductos()).thenReturn(productos);
+        when(servicioProductoCarritoImplMock.calcularDescuento(15)).thenReturn(280.5);
 
         Map<String, String> inputConDescuento = new HashMap<>();
         inputConDescuento.put("codigoInput", "baratija15");
@@ -169,10 +167,10 @@ public class ControladorCarritoTest {
         when(productoMock.getCantidad()).thenReturn(2).thenReturn(3);
         when(productoMock.getPrecio()).thenReturn(8000.0);
 
-        when(servicioProductoCarritoMock.buscarPorId(1L)).thenReturn(productoMock);
+        when(servicioProductoCarritoImplMock.buscarPorId(1L)).thenReturn(productoMock);
 
-        when(servicioProductoCarritoMock.calcularValorTotalDeLosProductos()).thenReturn(24000.0);
-        servicioProductoCarritoMock.valorTotal = 24000.0;
+        when(servicioProductoCarritoImplMock.calcularValorTotalDeLosProductos()).thenReturn(24000.0);
+        servicioProductoCarritoImplMock.valorTotal = 24000.0;
 
         Map<String, Object> response = carritoController.agregarMasCantidadDeUnProducto(1L);
 
@@ -181,8 +179,8 @@ public class ControladorCarritoTest {
         assertEquals(24000.0, response.get("precioTotalDelProducto"));
 
         verify(productoMock).setCantidad(3);
-        verify(servicioProductoCarritoMock).buscarPorId(1L);
-        verify(servicioProductoCarritoMock).calcularValorTotalDeLosProductos();
+        verify(servicioProductoCarritoImplMock).buscarPorId(1L);
+        verify(servicioProductoCarritoImplMock).calcularValorTotalDeLosProductos();
     }
 
     // restarCantidadDeUnProducto
@@ -194,10 +192,10 @@ public class ControladorCarritoTest {
         when(productoMock.getCantidad()).thenReturn(2).thenReturn(1);
         when(productoMock.getPrecio()).thenReturn(8000.0);
 
-        when(servicioProductoCarritoMock.buscarPorId(1L)).thenReturn(productoMock);
+        when(servicioProductoCarritoImplMock.buscarPorId(1L)).thenReturn(productoMock);
 
-        when(servicioProductoCarritoMock.calcularValorTotalDeLosProductos()).thenReturn(8000.0);
-        servicioProductoCarritoMock.valorTotal = 8000.0;
+        when(servicioProductoCarritoImplMock.calcularValorTotalDeLosProductos()).thenReturn(8000.0);
+        servicioProductoCarritoImplMock.valorTotal = 8000.0;
 
         Map<String, Object> response = carritoController.restarCantidadDeUnProducto(1L);
 
@@ -205,8 +203,8 @@ public class ControladorCarritoTest {
         assertEquals(8000.0, response.get("valorTotal"));
         assertEquals(8000.0, response.get("precioTotalDelProducto"));
 
-        verify(servicioProductoCarritoMock).buscarPorId(1L);
-        verify(servicioProductoCarritoMock).calcularValorTotalDeLosProductos();
+        verify(servicioProductoCarritoImplMock).buscarPorId(1L);
+        verify(servicioProductoCarritoImplMock).calcularValorTotalDeLosProductos();
     }
 
     // procesarCompra
@@ -276,8 +274,8 @@ public class ControladorCarritoTest {
         envioDto.setTiempo("1-2 dias habiles");
 
         when(servicioEnviosMock.calcularEnvio(codigoPostalValido)).thenReturn(envioDto);
-        when(servicioProductoCarritoMock.getProductos()).thenReturn(List.of());
-        when(servicioProductoCarritoMock.calcularValorTotalDeLosProductos()).thenReturn(totalCarrito);
+        when(servicioProductoCarritoImplMock.getProductos()).thenReturn(List.of());
+        when(servicioProductoCarritoImplMock.calcularValorTotalDeLosProductos()).thenReturn(totalCarrito);
 
         ModelAndView modelAndView = carritoController.calcularEnvio(codigoPostalValido);
         ModelMap modelMap = (ModelMap) modelAndView.getModel();
@@ -308,8 +306,8 @@ public class ControladorCarritoTest {
     public void cuandoElCodigoPostalTieneMasDeCuatroNumerosDevuelveError(){
         String codigoPostalInvalido = "12345";
 
-        when(servicioProductoCarritoMock.getProductos()).thenReturn(List.of());
-        when(servicioProductoCarritoMock.calcularValorTotalDeLosProductos()).thenReturn(0.0);
+        when(servicioProductoCarritoImplMock.getProductos()).thenReturn(List.of());
+        when(servicioProductoCarritoImplMock.calcularValorTotalDeLosProductos()).thenReturn(0.0);
 
         ModelAndView modelAndView = carritoController.calcularEnvio(codigoPostalInvalido);
         ModelMap model = modelAndView.getModelMap();
@@ -322,8 +320,8 @@ public class ControladorCarritoTest {
     @Test
     public void cuandoElCodigoPostalTieneLetrasDevuelveError(){
         String codigoPostalInvalido = "aa15";
-        when(servicioProductoCarritoMock.getProductos()).thenReturn(List.of());
-        when(servicioProductoCarritoMock.calcularValorTotalDeLosProductos()).thenReturn(0.0);
+        when(servicioProductoCarritoImplMock.getProductos()).thenReturn(List.of());
+        when(servicioProductoCarritoImplMock.calcularValorTotalDeLosProductos()).thenReturn(0.0);
 
         ModelAndView modelAndView = carritoController.calcularEnvio(codigoPostalInvalido);
         ModelMap model = modelAndView.getModelMap();
@@ -337,8 +335,8 @@ public class ControladorCarritoTest {
     public void cuandoNoHayCoberturaParaElCodigoPostalMuestraMensaje() {
         String codigoPostalSinCobertura = "9999";
         when(servicioEnviosMock.calcularEnvio(codigoPostalSinCobertura)).thenReturn(null);
-        when(servicioProductoCarritoMock.getProductos()).thenReturn(List.of());
-        when(servicioProductoCarritoMock.calcularValorTotalDeLosProductos()).thenReturn(0.0);
+        when(servicioProductoCarritoImplMock.getProductos()).thenReturn(List.of());
+        when(servicioProductoCarritoImplMock.calcularValorTotalDeLosProductos()).thenReturn(0.0);
 
         ModelAndView modelAndView = carritoController.calcularEnvio(codigoPostalSinCobertura);
         ModelMap model = modelAndView.getModelMap();
@@ -351,8 +349,8 @@ public class ControladorCarritoTest {
 
     @Test
     public void cuandoElCodigoPostalEsNuloNoCalculaEnvio(){
-        when(servicioProductoCarritoMock.getProductos()).thenReturn(List.of());
-        when(servicioProductoCarritoMock.calcularValorTotalDeLosProductos()).thenReturn(0.0);
+        when(servicioProductoCarritoImplMock.getProductos()).thenReturn(List.of());
+        when(servicioProductoCarritoImplMock.calcularValorTotalDeLosProductos()).thenReturn(0.0);
 
         ModelAndView modelAndView = carritoController.calcularEnvio("");
         ModelMap model = modelAndView.getModelMap();
@@ -364,8 +362,8 @@ public class ControladorCarritoTest {
 
     @Test
     public void cuandoElCodigoPostalSoloTieneEspaciosNoSeCalculaElEnvio(){
-        when(servicioProductoCarritoMock.getProductos()).thenReturn(List.of());
-        when(servicioProductoCarritoMock.calcularValorTotalDeLosProductos()).thenReturn(0.0);
+        when(servicioProductoCarritoImplMock.getProductos()).thenReturn(List.of());
+        when(servicioProductoCarritoImplMock.calcularValorTotalDeLosProductos()).thenReturn(0.0);
 
         ModelAndView modelAndView = carritoController.calcularEnvio(" ");
         ModelMap model = modelAndView.getModelMap();
@@ -380,8 +378,8 @@ public class ControladorCarritoTest {
         String codigoPostal = "1704";
 
         when(servicioEnviosMock.calcularEnvio(codigoPostal)).thenThrow(new RuntimeException("Error"));
-        when(servicioProductoCarritoMock.getProductos()).thenReturn(List.of());
-        when(servicioProductoCarritoMock.calcularValorTotalDeLosProductos()).thenReturn(0.0);
+        when(servicioProductoCarritoImplMock.getProductos()).thenReturn(List.of());
+        when(servicioProductoCarritoImplMock.calcularValorTotalDeLosProductos()).thenReturn(0.0);
 
         ModelAndView modelAndView = carritoController.calcularEnvio(codigoPostal);
         ModelMap model = modelAndView.getModelMap();
@@ -397,8 +395,8 @@ public class ControladorCarritoTest {
         List<ProductoCarritoDto> productos = Arrays.asList(new ProductoCarritoDto(1L, "Motherboard", 50000.0, 1, "motherboard"));
         Double total = productos.get(0).getPrecio();
 
-        when(servicioProductoCarritoMock.getProductos()).thenReturn(productos);
-        when(servicioProductoCarritoMock.calcularValorTotalDeLosProductos()).thenReturn(total);
+        when(servicioProductoCarritoImplMock.getProductos()).thenReturn(productos);
+        when(servicioProductoCarritoImplMock.calcularValorTotalDeLosProductos()).thenReturn(total);
 
         ModelAndView modelAndView = carritoController.calcularEnvio(codigoPostal);
         ModelMap model = modelAndView.getModelMap();
@@ -421,7 +419,7 @@ public class ControladorCarritoTest {
         envioDto.setTiempo("2-3 dias habiles");
 
         when(servicioEnviosMock.calcularEnvio(codigoPostal)).thenReturn(envioDto);
-        servicioProductoCarritoMock.valorTotal = valorTotalCarrito;
+        servicioProductoCarritoImplMock.valorTotal = valorTotalCarrito;
 
         Map<String, Object> response = carritoController.calcularEnvioAjax(codigoPostal);
 

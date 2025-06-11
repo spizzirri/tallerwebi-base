@@ -1,7 +1,7 @@
 package com.tallerwebi.presentacion;
 
-import com.tallerwebi.dominio.ServicioDeEnvios;
-import com.tallerwebi.dominio.ServicioProductoCarrito;
+import com.tallerwebi.dominio.ServicioDeEnviosImpl;
+import com.tallerwebi.dominio.ServicioProductoCarritoImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ui.ModelMap;
@@ -15,16 +15,16 @@ import java.util.Map;
 public class CarritoController {
     private static final Logger logger = LoggerFactory.getLogger(CarritoController.class);
 
-    private final ServicioProductoCarrito productoService;
-    private final ServicioDeEnvios servicioDeEnvios;
+    private final ServicioProductoCarritoImpl productoService;
+    private final ServicioDeEnviosImpl servicioDeEnvios;
 
     public String codigoPostalActual;
     public EnvioDto envioActual;
 
-    public CarritoController(ServicioProductoCarrito servicioProductoCarrito, ServicioDeEnvios servicioDeEnvios) {
-        this.productoService = servicioProductoCarrito;
+    public CarritoController(ServicioProductoCarritoImpl servicioProductoCarritoImpl, ServicioDeEnviosImpl servicioDeEnvios) {
+        this.productoService = servicioProductoCarritoImpl;
         this.servicioDeEnvios = servicioDeEnvios;
-        servicioProductoCarrito.init();
+        servicioProductoCarritoImpl.init();
     }
 
     @GetMapping(path = "/carritoDeCompras/index")

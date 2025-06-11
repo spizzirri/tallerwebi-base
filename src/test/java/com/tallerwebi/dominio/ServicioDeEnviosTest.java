@@ -17,14 +17,14 @@ public class ServicioDeEnviosTest {
     @Mock
     private RestTemplate restTemplateMock;
 
-    private ServicioDeEnvios servicioDeEnvios;
+    private ServicioDeEnviosImpl servicioDeEnvios;
 
     private String enviosUrl = "https://683b8d5e28a0b0f2fdc4ead9.mockapi.io/envios";
 
     @BeforeEach
     public void init() {
         MockitoAnnotations.initMocks(this);
-        servicioDeEnvios = new ServicioDeEnvios();
+        servicioDeEnvios = new ServicioDeEnviosImpl();
         // acceder y modificar campos privados
         ReflectionTestUtils.setField(servicioDeEnvios, "enviosUrl", enviosUrl);
         ReflectionTestUtils.setField(servicioDeEnvios, "restTemplate", restTemplateMock);

@@ -21,13 +21,13 @@ public class ServicioProductoCarritoTest {
     @Mock
     private ProductoCarritoDto productoMock2;
 
-    private ServicioProductoCarrito servicioProductoCarrito;
+    private ServicioProductoCarritoImpl servicioProductoCarritoImpl;
     private List<ProductoCarritoDto> productos;
 
     @BeforeEach
     public void init() {
         MockitoAnnotations.openMocks(this);
-        servicioProductoCarrito = new ServicioProductoCarrito();
+        servicioProductoCarritoImpl = new ServicioProductoCarritoImpl();
         productos = new ArrayList<>();
     }
 
@@ -35,38 +35,47 @@ public class ServicioProductoCarritoTest {
     @Test
     public void cuandoBuscoUnProductoPorIdObtengoEseProducto() {
         Long idBuscado = 1L;
-        servicioProductoCarrito.setProductos(productos);
+        servicioProductoCarritoImpl.setProductos(productos);
 
         when(productoMock1.getId()).thenReturn(1L);
 
         productos.add(productoMock1);
 
 
-        ProductoCarritoDto productoEncontrado = servicioProductoCarrito.buscarPorId(idBuscado);
+        ProductoCarritoDto productoEncontrado = servicioProductoCarritoImpl.buscarPorId(idBuscado);
         Assert.assertEquals(productoMock1, productoEncontrado);
     }
 
     @Test
     public void cuandoBuscoUnProductoPorIdQueNoExisteObtengoNull() {
         Long idProductoInexistente = 12L;
-        servicioProductoCarrito.setProductos(productos);
+        servicioProductoCarritoImpl.setProductos(productos);
 
         when(productoMock1.getId()).thenReturn(1L);
 
         productos.add(productoMock1);
 
-        ProductoCarritoDto productoNoEncontrado = servicioProductoCarrito.buscarPorId(idProductoInexistente);
+        ProductoCarritoDto productoNoEncontrado = servicioProductoCarritoImpl.buscarPorId(idProductoInexistente);
         assertNull(productoNoEncontrado);
     }
 
     @Test
     public void cuandoElCarritoEstaVacioObtengoNull() {
         Long idBuscado = 1L;
-        servicioProductoCarrito.setProductos(productos);
+        servicioProductoCarritoImpl.setProductos(productos);
 
-        ProductoCarritoDto productoEncontrado = servicioProductoCarrito.buscarPorId(idBuscado);
+        ProductoCarritoDto productoEncontrado = servicioProductoCarritoImpl.buscarPorId(idBuscado);
         assertNull(productoEncontrado);
     }
+
+    // agregarProducto
+    public void cuandoAgregoUnProductoAlCarritoEsteSeAgregaCorrectamente() {
+        Long idBuscado = 1L;
+        Integer cantidad = 1;
+
+
+    }
+
 
     @Test
     public void cuandoQuieroCalcularElValorTotalDeLosProductosEnElCarritoObtengoElTotal() {
@@ -79,18 +88,18 @@ public class ServicioProductoCarritoTest {
         productos.add(productoMock1);
         productos.add(productoMock2);
 
-        servicioProductoCarrito.setProductos(productos);
+        servicioProductoCarritoImpl.setProductos(productos);
 
-        Double valorTotal = servicioProductoCarrito.calcularValorTotalDeLosProductos();
+        Double valorTotal = servicioProductoCarritoImpl.calcularValorTotalDeLosProductos();
         // Cálculo esperado: (100*2) + (50*1) = 200 + 50 = 250.0
         assertEquals(250.0, valorTotal);
     }
 
     @Test
     public void cuandoQuieroCalcularElValorTotalDeLosProductosEnElCarritoCuandoNoHayProductosObtengoCero() {
-        servicioProductoCarrito.setProductos(new ArrayList<>());
+        servicioProductoCarritoImpl.setProductos(new ArrayList<>());
 
-        Double valorTotal = servicioProductoCarrito.calcularValorTotalDeLosProductos();
+        Double valorTotal = servicioProductoCarritoImpl.calcularValorTotalDeLosProductos();
 
         assertEquals(0.0, valorTotal);
     }
@@ -106,9 +115,9 @@ public class ServicioProductoCarritoTest {
         productos.add(productoMock1);
         productos.add(productoMock2);
 
-        servicioProductoCarrito.setProductos(productos);
+        servicioProductoCarritoImpl.setProductos(productos);
 
-        Double valorTotal = servicioProductoCarrito.calcularValorTotalDeLosProductos();
+        Double valorTotal = servicioProductoCarritoImpl.calcularValorTotalDeLosProductos();
         assertEquals(296.83, valorTotal);
     }
 
@@ -121,9 +130,9 @@ public class ServicioProductoCarritoTest {
 
         productos.add(productoMock1);
 
-        servicioProductoCarrito.setProductos(productos);
+        servicioProductoCarritoImpl.setProductos(productos);
 
-        Double valorTotalConDescuento = servicioProductoCarrito.calcularDescuento(codigoDeDescuento);
+        Double valorTotalConDescuento = servicioProductoCarritoImpl.calcularDescuento(codigoDeDescuento);
 
         assertEquals(190.0, valorTotalConDescuento, 0.01);
     }
@@ -137,9 +146,9 @@ public class ServicioProductoCarritoTest {
 
         productos.add(productoMock1);
 
-        servicioProductoCarrito.setProductos(productos);
+        servicioProductoCarritoImpl.setProductos(productos);
 
-        Double valorTotalConDescuento = servicioProductoCarrito.calcularDescuento(codigoDeDescuento);
+        Double valorTotalConDescuento = servicioProductoCarritoImpl.calcularDescuento(codigoDeDescuento);
 
         assertEquals(180.0, valorTotalConDescuento, 0.01);
     }
@@ -153,9 +162,9 @@ public class ServicioProductoCarritoTest {
 
         productos.add(productoMock1);
 
-        servicioProductoCarrito.setProductos(productos);
+        servicioProductoCarritoImpl.setProductos(productos);
 
-        Double valorTotalConDescuento = servicioProductoCarrito.calcularDescuento(codigoDeDescuento);
+        Double valorTotalConDescuento = servicioProductoCarritoImpl.calcularDescuento(codigoDeDescuento);
 
         assertEquals(170.0, valorTotalConDescuento, 0.01);
     }

@@ -3,19 +3,14 @@ package com.tallerwebi.presentacion;
 import com.tallerwebi.dominio.RepositorioComponente;
 import com.tallerwebi.dominio.ServiceCategorias;
 import com.tallerwebi.dominio.ServicioBuscarProducto;
-import com.tallerwebi.dominio.ServicioProductoCarrito;
-import com.tallerwebi.dominio.entidades.Componente;
+import com.tallerwebi.dominio.ServicioProductoCarritoImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.transaction.Transactional;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 
 @Controller
@@ -26,7 +21,7 @@ public class ControladorMostrarProductos {
     @Autowired
     private ServicioBuscarProducto productoService;
     @Autowired
-    private ServicioProductoCarrito servicioProductoCarrito;
+    private ServicioProductoCarritoImpl servicioProductoCarritoImpl;
     @Autowired
     private RepositorioComponente repositorioComponente;
 

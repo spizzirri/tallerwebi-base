@@ -13,7 +13,7 @@ import java.util.List;
 
 @Service("servicioProductoCarrito")
 @Transactional
-public class ServicioProductoCarrito {
+public class ServicioProductoCarritoImpl {
 
     private List<ProductoCarritoDto> productos;
     public Double valorTotal = 0.0;
@@ -43,7 +43,7 @@ public class ServicioProductoCarrito {
         return null;
     }
 
-    public void agregarProducto(Long componenteId, Integer cantidad){
+    public void agregarProducto(Long componenteId, Integer cantidad) {
         if(this.productos == null){
             this.productos = new ArrayList<>();
         }
@@ -58,7 +58,7 @@ public class ServicioProductoCarrito {
         }
     }
 
-    public boolean verificarStock(Long componenteId, Integer cantidadDeseada){
+    public boolean verificarStock(Long componenteId, Integer cantidadDeseada) {
         Componente componente = repositorioComponente.obtenerComponentePorId(componenteId);
         return componente.getStock() >= cantidadDeseada;
     }
@@ -88,7 +88,7 @@ public class ServicioProductoCarrito {
         return productos;
     }
 
-    public Double calcularDescuento(Integer codigoDescuentoExtraido){
+    public Double calcularDescuento(Integer codigoDescuentoExtraido) {
         Double total = this.calcularValorTotalDeLosProductos();
         this.valorTotalConDescuento = total;
 
