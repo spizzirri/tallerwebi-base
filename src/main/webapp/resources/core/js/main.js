@@ -6,16 +6,25 @@ function multiplicar(a, b) {
     return a * b;
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-    console.log("DOM cargado");
+// Función para obtener cantidad vía AJAX como respaldo
+function obtenerCantidadCarritoAjax() {
 
-    // Inicializar contador solo si existe en window
+    fetch('/spring/carritoDeCompras/cantidadIndex')
+        .then(response => response.json())
+        .then(data => {
+            actualizarContadorCarrito(data.cantidadEnCarrito);
+        })
+        .catch(error => {
+            actualizarContadorCarrito(0);
+        });
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    // Inicializar contador del carrito
     if (typeof window.cantidadEnCarrito !== 'undefined') {
-        console.log("Inicializando contador con:", window.cantidadEnCarrito);
         actualizarContadorCarrito(window.cantidadEnCarrito);
     } else {
-        console.log("No hay cantidad inicial definida, contador en 0");
-        actualizarContadorCarrito(0);
+        obtenerCantidadCarritoAjax();
     }
 
     cargarProductos(1);
@@ -47,13 +56,9 @@ function cargarProductos(idCategoria) {
         .then(html => {
             document.getElementById("productos-container").innerHTML = html;
         })
-        .catch(error => {
-            console.error('Error al cargar productos:', error);
-        });
 }
 
 window.agregarAlCarrito = function(componenteId, cantidad = 1) {
-    console.log("agregarAlCarrito llamada con:", componenteId, cantidad);
 
     return fetch("/spring/agregarAlCarrito", {
         method: 'POST',
@@ -64,7 +69,6 @@ window.agregarAlCarrito = function(componenteId, cantidad = 1) {
     })
         .then(response => response.json())
         .then(data => {
-            console.log("Respuesta:", data);
 
             if(data.success){
                 mostrarMensaje(data.mensaje, 'success', componenteId);
@@ -72,16 +76,14 @@ window.agregarAlCarrito = function(componenteId, cantidad = 1) {
                 mostrarMensaje(data.mensaje, 'error', componenteId);
             }
 
-            // Actualizar contador solo si viene en la respuesta
+            // Actualizar contador si viene en la respuesta
             if(data.cantidadEnCarrito !== undefined) {
-                console.log("Actualizando contador a:", data.cantidadEnCarrito);
                 actualizarContadorCarrito(data.cantidadEnCarrito);
             }
 
             return data;
         })
         .catch(error => {
-            console.error('ERROR:', error);
             mostrarMensaje("Error al conectar con el servidor", 'error', componenteId);
             throw error;
         });
@@ -104,12 +106,9 @@ window.mostrarMensaje = function(mensaje, tipo, productId) {
 }
 
 window.actualizarContadorCarrito = function(nuevaCantidad){
-    console.log("Actualizando contador a:", nuevaCantidad);
     const contadorCarrito = document.getElementById("contadorCarrito");
+
     if(contadorCarrito){
         contadorCarrito.textContent = nuevaCantidad;
-        console.log("Contador actualizado exitosamente");
-    } else {
-        console.error("Elemento contadorCarrito no encontrado");
     }
 }

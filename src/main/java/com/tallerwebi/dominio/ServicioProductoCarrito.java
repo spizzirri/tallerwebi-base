@@ -64,13 +64,20 @@ public class ServicioProductoCarrito {
     }
 
     public Double calcularValorTotalDeLosProductos() {
+        if (this.productos == null || this.productos.isEmpty()) {
+            this.valorTotal = 0.0;
+            return this.valorTotal;
+        }
+
         Double total = 0.0;
-        for(ProductoCarritoDto productoCarritoDto : this.productos){
-            total += productoCarritoDto.getPrecio() * productoCarritoDto.getCantidad();
+        for(ProductoCarritoDto producto : this.productos){
+            if (producto.getPrecio() != null && producto.getCantidad() != null) {
+                total += producto.getPrecio() * producto.getCantidad();
+            }
         }
 
         BigDecimal valorTotalConDosDecimales = new BigDecimal(total);
-        valorTotalConDosDecimales = valorTotalConDosDecimales.setScale(2, RoundingMode.UP); //convierto el numero para que tenga dos decimales y redondee para arriba
+        valorTotalConDosDecimales = valorTotalConDosDecimales.setScale(2, RoundingMode.UP);
         this.valorTotal = valorTotalConDosDecimales.doubleValue();
 
         return this.valorTotal;

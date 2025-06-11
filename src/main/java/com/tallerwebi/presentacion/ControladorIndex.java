@@ -53,6 +53,13 @@ public class ControladorIndex {
         List<ProductoDto> productosDescuento = productoService.getProductosMenoresAUnPrecio(150000D);
         model.addAttribute("productosDescuento", productosDescuento);
 
+        try {
+            Integer cantidadTotalEnCarrito = servicioProductoCarrito.calcularCantidadTotalDeProductos();
+            model.addAttribute("cantidadEnCarrito", cantidadTotalEnCarrito);
+        } catch (Exception e) {
+            model.addAttribute("cantidadEnCarrito", 0);
+        }
+
         return new ModelAndView("index", model);
     }
 
@@ -82,40 +89,4 @@ public class ControladorIndex {
             default: return "Componente";
         }
     }
-
-    @PostMapping("/agregarAlCarrito")
-    @ResponseBody
-    public Map<String, Object> agregarProductoAlCarrito(
-            @RequestParam Long componenteId,
-            @RequestParam(defaultValue = "1") Integer cantidad) {
-
-        Map<String, Object> response = new HashMap<>();
-        try {
-            if (!servicioProductoCarrito.verificarStock(componenteId, cantidad)) {
-                response.put("success", false);
-                response.put("mensaje", "Stock insuficiente");
-            } else {
-                servicioProductoCarrito.agregarProducto(componenteId, cantidad);
-                response.put("success", true);
-                response.put("mensaje", "Producto agregado al carrito!");
-            }
-
-            // AGREGAR: Calcular cantidad total del carrito
-            try {
-                Integer cantidadTotal = servicioProductoCarrito.calcularCantidadTotalDeProductos();
-                response.put("cantidadEnCarrito", cantidadTotal != null ? cantidadTotal : 0);
-            } catch (Exception e) {
-                System.out.println("Error al calcular cantidad total: " + e.getMessage());
-                response.put("cantidadEnCarrito", 0);
-            }
-
-        } catch (Exception e) {
-            response.put("success", false);
-            response.put("mensaje", "Error al agregar producto al carrito!");
-            response.put("cantidadEnCarrito", 0);
-        }
-        return response;
-    }
-
-
 }
