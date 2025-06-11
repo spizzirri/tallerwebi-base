@@ -181,8 +181,8 @@
         <div class="row g-4">
 
             <!-- Categoría destacada -->
-            <div class="col-12 col-md-6">
-                <a href="#" class="text-decoration-none">
+            <div class="col-6 col-md-3">
+                <a th:href="@{/productos/search(cat=Procesador)}" class="text-decoration-none">
                     <div class="category-card large-category">
                         <img th:src="@{/uploads/categoria/procesador.jpg}" alt="Procesadores" class="category-img">
                         <div class="category-title">PROCESADORES</div>
@@ -192,11 +192,11 @@
 
             <!-- Resto de categorías -->
             <div class="col-6 col-md-3" th:each="categoria : ${otrasCategorias}">
-                <a href="#" class="text-decoration-none">
+                <a  th:href="@{/productos/search(cat=${categoria.nombre})}" class="text-decoration-none">
                     <div class="category-card">
                         <img th:src="@{'/uploads/categoria/' + ${categoria.imagen}}" th:alt="${categoria.nombre}"
                              class="category-img">
-                        <div class="category-title" th:text="${categoria.nombre}"></div>
+                        <div class="category-title" th:text="${categoria.descripcion}"></div>
                     </div>
                 </a>
             </div>
