@@ -1,9 +1,8 @@
 package com.tallerwebi.presentacion;
 
-import com.tallerwebi.dominio.ServiceCategorias;
+import com.tallerwebi.dominio.ServicioCategorias;
 import com.tallerwebi.dominio.ServicioBuscarProducto;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -11,18 +10,18 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.transaction.Transactional;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
 public class ControladorIndex {
 
     @Autowired
-    private ServiceCategorias categoriasService;
+    private ServicioCategorias categoriasService;
     @Autowired
     private ServicioBuscarProducto productoService;
-    @Autowired
+
 
 //    #1 Equipos y Notebook
 //    #2 Monitores
@@ -33,8 +32,9 @@ public class ControladorIndex {
 //    #7 Mothers
 //    #8 Procesadores
 
-    public ControladorIndex(ServicioBuscarProducto productoService) {
+    public ControladorIndex(ServicioBuscarProducto productoService, ServicioCategorias categoriasService) {
         this.productoService = productoService;
+        this.categoriasService = categoriasService;
     }
 
     @GetMapping("/index")
@@ -58,6 +58,7 @@ public class ControladorIndex {
 
         String tipoComponente = convertirIdATipoComponente(id);
         List<ProductoDto> productosDestacados = productoService.getProductosPorTipo(tipoComponente);
+        Collections.shuffle(productosDestacados);
         List<ProductoDto> productosLimitados = productosDestacados.stream().limit(8).collect(Collectors.toList());
         model.addAttribute("productosDestacados", productosLimitados);
         return new ModelAndView("cargarProductosDinamicos", model);
@@ -77,4 +78,7 @@ public class ControladorIndex {
             default: return "Componente";
         }
     }
+
+
+
 }
