@@ -78,9 +78,8 @@ public class ArmadoPcDto {
         entidad.setAlmacenamiento(this.convertirListaDeDtosAEntidades(this.almacenamiento, Almacenamiento.class));
         entidad.setFuenteDeAlimentacion((FuenteDeAlimentacion) this.fuente.obtenerEntidad());
         entidad.setGabinete((Gabinete) this.gabinete.obtenerEntidad());
-        // recordar que estos ultimos 2 son considerados solamente como Componente por ahora.
-        entidad.setMonitor(this.monitor.obtenerEntidad());
-        entidad.setPerifericos(this.convertirListaDeDtosAEntidades(this.perifericos, Componente.class));
+        entidad.setMonitor((Monitor) this.monitor.obtenerEntidad());
+        entidad.setPerifericos(this.convertirListaDeDtosAEntidades(this.perifericos, Periferico.class));
         return entidad;
     }
 
@@ -168,25 +167,25 @@ public class ArmadoPcDto {
         this.motherboard = motherboard;
     }
 
-    public Map<String, Integer> getRamsDetalladas(){
+    public Map<ComponenteDto, Integer> getRamsDetalladas(){
         return obtenerListaComponenteDetallado(this.rams);
     }
-    public Map<String, Integer> getAlmacenamientoDetallado(){
+    public Map<ComponenteDto, Integer> getAlmacenamientoDetallado(){
         return obtenerListaComponenteDetallado(this.almacenamiento);
     }
-    public Map<String, Integer> getPerifericosDetallados(){
+    public Map<ComponenteDto, Integer> getPerifericosDetallados(){
         return obtenerListaComponenteDetallado(this.perifericos);
     }
 
-    private Map<String, Integer> obtenerListaComponenteDetallado(List<ComponenteDto> componentes) {
+    private Map<ComponenteDto, Integer> obtenerListaComponenteDetallado(List<ComponenteDto> componentes) {
 
-        Map<String, Integer> componentesDetallados = new HashMap<>();
+        Map<ComponenteDto, Integer> componentesDetallados = new HashMap<>();
 
         for(ComponenteDto componente : componentes){
-            if (componentesDetallados.containsKey(componente.getModelo()))
-                componentesDetallados.put(componente.getModelo(), componentesDetallados.get(componente.getModelo()) + 1);
+            if (componentesDetallados.containsKey(componente))
+                componentesDetallados.put(componente, componentesDetallados.get(componente) + 1);
              else
-                componentesDetallados.put(componente.getModelo(), 1);
+                componentesDetallados.put(componente, 1);
         }
     return componentesDetallados;
     }
@@ -214,5 +213,22 @@ public class ArmadoPcDto {
             sumatoriaDeLista += componente.getPrecio();
         }
         return sumatoriaDeLista;
+    }
+
+
+    // deberia tener test esto?
+    public List<ComponenteDto> getComponentesDto() {
+        List<ComponenteDto> componentesDto = new ArrayList<>();
+        componentesDto.add(this.procesador);
+        componentesDto.add(this.motherboard);
+        componentesDto.add(this.cooler);
+        componentesDto.add(this.gpu);
+        componentesDto.add(this.fuente);
+        componentesDto.add(this.gabinete);
+        componentesDto.add(this.monitor);
+        componentesDto.addAll(this.rams);
+        componentesDto.addAll(this.almacenamiento);
+        componentesDto.addAll(this.perifericos);
+        return componentesDto;
     }
 }

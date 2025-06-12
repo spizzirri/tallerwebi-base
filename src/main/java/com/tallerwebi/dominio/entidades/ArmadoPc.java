@@ -14,10 +14,8 @@ public class ArmadoPc {
     private Gabinete gabinete;
     private List<MemoriaRAM> memoriaRAM;
     private List<Almacenamiento> almacenamiento;
-
-    // ver si quedan como componentes o hacerle un tipo de dato aparte
-    private Componente monitor;
-    private List<Componente> perifericos;
+    private Monitor monitor;
+    private List<Periferico> perifericos;
 
 
     public Procesador getProcesador() {
@@ -44,7 +42,7 @@ public class ArmadoPc {
         return this.gabinete;
     }
 
-    public Componente getMonitor() {
+    public Monitor getMonitor() {
         return this.monitor;
     }
 
@@ -56,7 +54,7 @@ public class ArmadoPc {
         return this.almacenamiento;
     }
 
-    public List<Componente> getPerifericos() {
+    public List<Periferico> getPerifericos() {
         return this.perifericos;
     }
 
@@ -92,11 +90,11 @@ public class ArmadoPc {
         this.almacenamiento = almacenamiento;
     }
 
-    public void setMonitor(Componente monitor) {
+    public void setMonitor(Monitor monitor) {
         this.monitor = monitor;
     }
 
-    public void setPerifericos(List<Componente> perifericos) {
+    public void setPerifericos(List<Periferico> perifericos) {
         this.perifericos = perifericos;
     }
 }

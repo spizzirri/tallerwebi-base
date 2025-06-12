@@ -67,6 +67,12 @@ public class ComponenteDto {
             case "Almacenamiento":
                 entidad = new Almacenamiento();
                 break;
+            case "Monitor":
+                entidad = new Monitor();
+                break;
+            case "Periferico":
+                entidad = new Periferico();
+                break;
             default:
                 entidad = new Componente();
         }

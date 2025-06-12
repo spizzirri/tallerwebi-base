@@ -1,7 +1,9 @@
 package com.tallerwebi.dominio;
 
 import com.tallerwebi.dominio.entidades.Componente;
+import com.tallerwebi.dominio.excepcion.QuitarComponenteInvalidoException;
 import com.tallerwebi.dominio.excepcion.LimiteDeComponenteSobrepasadoEnElArmadoException;
+import com.tallerwebi.dominio.excepcion.QuitarStockDemasDeComponenteException;
 import com.tallerwebi.presentacion.dto.ArmadoPcDto;
 import com.tallerwebi.presentacion.dto.ComponenteDto;
 
@@ -12,6 +14,8 @@ public interface ServicioArmaTuPc {
 
     ArmadoPcDto agregarComponenteAlArmado(Long idComponente, String tipoComponente, Integer cantidad, ArmadoPcDto armadoPcDto) throws LimiteDeComponenteSobrepasadoEnElArmadoException;
 
+    ArmadoPcDto quitarComponenteAlArmado(Long idComponente, String tipoComponente, Integer cantidad, ArmadoPcDto armadoPcDto) throws QuitarComponenteInvalidoException, QuitarStockDemasDeComponenteException;
+
     Boolean sePuedeAgregarMasUnidades(String tipoComponente, ArmadoPcDto armadoPcDto);
 
     Boolean armadoCompleto(ArmadoPcDto armadoPcDto);
@@ -19,4 +23,6 @@ public interface ServicioArmaTuPc {
     Componente obtenerComponentePorId(Long idComponente);
 
     ComponenteDto obtenerComponenteDtoPorId(Long idComponente);
+
+    ;
 }
