@@ -588,7 +588,7 @@ INSERT INTO Procesador (
          );
 
 INSERT INTO Imagen (urlImagen, componente_id)
-VALUES ('Procesador-IntelCorei5-14600k-1.jpg', 32);
+VALUES ('Procesador-IntelCorei5-14600K-1.jpg', 32);
 
 -- Componente 33: Procesador Intel Core i7 12700K (Socket LGA1700 → 3)
 INSERT INTO Componente (nombre, precio, stock, marca)
@@ -1219,7 +1219,7 @@ VALUES ('Motherboard-Intel-ASUS-ROG-STRIX-Z690-A-GAMING-WIFI-D4-1.jpg', 63),
 
 -- Componente 64: ASUS PRIME B760M-A CSM 1700 DDR5
 INSERT INTO Componente (nombre, precio, stock, marca)
-VALUES ('Motherboard ASUS PRIME B760M-A CSM 1700 DDR4', 167000.0, 10, 'ASUS');
+VALUES ('Motherboard ASUS PRIME B760M-A CSM 1700 DDR5', 167000.0, 10, 'ASUS');
 
 INSERT INTO Motherboard (
     id, socket_id, chipsetPrincipal, plataforma, factor,
@@ -1241,7 +1241,7 @@ VALUES ('Motherboard-Intel-ASUS-PRIME-B760M-A-CSM-1.jpg', 64),
 
 -- Componente 65: Gigabyte B760M AORUS ELITE AX WIFI 1700 DDR5
 INSERT INTO Componente (nombre, precio, stock, marca)
-VALUES ('Motherboard Gigabyte B760M AORUS ELITE AX WIFI 1700 DDR4', 254000.0, 10, 'Gigabyte');
+VALUES ('Motherboard Gigabyte B760M AORUS ELITE AX WIFI 1700 DDR5', 254000.0, 10, 'Gigabyte');
 
 INSERT INTO Motherboard (
     id, socket_id, chipsetPrincipal, plataforma, factor,
@@ -1263,7 +1263,7 @@ VALUES ('Motherboard-Intel-Gigabyte-B760M-AORUS-ELITE-AX-WIFI-1.jpg', 65),
 
 -- Componente 66: ASUS TUF GAMING B760M-PLUS WIFI II 1700 DDR5
 INSERT INTO Componente (nombre, precio, stock, marca)
-VALUES ('Motherboard ASUS TUF GAMING B760M-PLUS WIFI II 1700 DDR4', 299000.0, 10, 'ASUS');
+VALUES ('Motherboard ASUS TUF GAMING B760M-PLUS WIFI II 1700 DDR5', 299000.0, 10, 'ASUS');
 
 INSERT INTO Motherboard (
     id, socket_id, chipsetPrincipal, plataforma, factor,
@@ -1285,7 +1285,7 @@ VALUES ('Motherboard-Intel-ASUS-TUF-GAMING-B760M-PLUS-WIFI-II-1.jpg', 66),
 
 -- Componente 67: ASUS PRIME Z790-P 1700 DDR5
 INSERT INTO Componente (nombre, precio, stock, marca)
-VALUES ('Motherboard ASUS PRIME Z790-P 1700 DDR4', 314000.0, 10, 'ASUS');
+VALUES ('Motherboard ASUS PRIME Z790-P 1700 DDR5', 314000.0, 10, 'ASUS');
 
 INSERT INTO Motherboard (
     id, socket_id, chipsetPrincipal, plataforma, factor,
@@ -1307,7 +1307,7 @@ VALUES ('Motherboard-Intel-ASUS-PRIME-Z790-P-1.jpg', 67),
 
 -- Componente 68: MSI MAG Z790 TOMAHAWK WIFI MAX 1700 DDR5
 INSERT INTO Componente (nombre, precio, stock, marca)
-VALUES ('Motherboard MSI MAG Z790 TOMAHAWK WIFI MAX 1700 DDR4', 457000.0, 10, 'MSI');
+VALUES ('Motherboard MSI MAG Z790 TOMAHAWK WIFI MAX 1700 DDR5', 457000.0, 10, 'MSI');
 
 INSERT INTO Motherboard (
     id, socket_id, chipsetPrincipal, plataforma, factor,
@@ -1329,7 +1329,7 @@ VALUES ('Motherboard-Intel-MSI-MAG-Z790-TOMAHAWK-WIFI-MAX-1.jpg', 68),
 
 -- Componente 69: Asrock Z790 TAICHI CARRARA 1700 DDR5
 INSERT INTO Componente (nombre, precio, stock, marca)
-VALUES ('Motherboard Asrock Z790 TAICHI CARRARA 1700 DDR4', 690000.0, 10, 'Asrock');
+VALUES ('Motherboard Asrock Z790 TAICHI CARRARA 1700 DDR5', 690000.0, 10, 'Asrock');
 
 INSERT INTO Motherboard (
     id, socket_id, chipsetPrincipal, plataforma, factor,
@@ -1776,65 +1776,1086 @@ VALUES ('MemoriaRAM-Corsair-DDR5-32GB-6000-1.jpg', 97);
 -- Placas de Video (GPU)
 -- =================================================================
 
-/*INSERT INTO Componente (nombre, precio, stock, marca) VALUES ('NVIDIA RTX 3060', 300000.0, 5, 'NVIDIA');
-INSERT INTO PlacaDeVideo (id, chipsetGPU, cantidadDeCoolers, cantidadDeVGA, cantidadDeDVIDigital, cantidadDeHDMI, cantidadDeDisplayport, consumo, cantidadDePCIE8Pines, velocidadDelCoreBase, velocidadDelCoreTurbo, tecnologiaRAM, capacidadRAM, cantidadDePCIE6Pines, cantidadDePCIE16Pines, cantidadDeAdaptadores16Pines) VALUES (13, 'GeForce RTX 3060', 2, 0, 0, 1, 3, '170W', 1, '1320 MHz', '1777 MHz', 'GDDR6', '12GB', 0, 0, 0);
-INSERT INTO Imagen (urlImagen, componente_id) VALUES ('nvidia-rtx-3060-1.jpg', 13);
+-- Componente 98: Placa de Video Zotac GeForce RTX 3060 12GB GDDR6 Twin Edge
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Placa de Video Zotac GeForce RTX 3060 12GB GDDR6 Twin Edge', 424000.0, 10, 'Zotac');
+
+INSERT INTO PlacaDeVideo (id, chipsetGPU, cantidadDeCoolers, cantidadDeVGA, cantidadDeDVIDigital, cantidadDeHDMI, cantidadDeDisplayport, consumo, cantidadDePCIE6Pines, cantidadDePCIE8Pines, cantidadDePCIE16Pines, cantidadDeAdaptadores16Pines, velocidadDelCoreBase, velocidadDelCoreTurbo, tecnologiaRAM, capacidadRAM)
+VALUES (98, 'GeForce RTX 3060', 2, 0, 0, 1, 3, '170W', 0, 1, 0, 0, '1500 MHz', '1777 MHz', 'GDDR6', '12 GB');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('PlacaDeVideo-Zotac-RTX-3060-12GB-1.jpg', 98),
+       ('PlacaDeVideo-Zotac-RTX-3060-12GB-2.jpg', 98),
+       ('PlacaDeVideo-Zotac-RTX-3060-12GB-3.jpg', 98),
+       ('PlacaDeVideo-Zotac-RTX-3060-12GB-4.jpg', 98),
+       ('PlacaDeVideo-Zotac-RTX-3060-12GB-5.jpg', 98);
+
+-- Componente 99: Placa de Video MSI GeForce RTX 5060 TI 8GB GAMING TRIO OC
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Placa de Video MSI GeForce RTX 5060 TI 8GB GAMING TRIO OC', 725000.0, 10, 'MSI');
+
+INSERT INTO PlacaDeVideo (id, chipsetGPU, cantidadDeCoolers, cantidadDeVGA, cantidadDeDVIDigital, cantidadDeHDMI, cantidadDeDisplayport, consumo, cantidadDePCIE6Pines, cantidadDePCIE8Pines, cantidadDePCIE16Pines, cantidadDeAdaptadores16Pines, velocidadDelCoreBase, velocidadDelCoreTurbo, tecnologiaRAM, capacidadRAM)
+VALUES (99, 'GeForce RTX 5060 Ti', 3, 0, 0, 1, 3, '200W', 0, 0, 1, 1, '2450 MHz', '2715 MHz', 'GDDR7', '8 GB');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('PlacaDeVideo-MSI-RTX-5060-TI-8GB-1.jpg', 99),
+       ('PlacaDeVideo-MSI-RTX-5060-TI-8GB-2.jpg', 99),
+       ('PlacaDeVideo-MSI-RTX-5060-TI-8GB-3.jpg', 99),
+       ('PlacaDeVideo-MSI-RTX-5060-TI-8GB-4.jpg', 99),
+       ('PlacaDeVideo-MSI-RTX-5060-TI-8GB-5.jpg', 99);
+
+-- Componente 100: Placa de video Zotac GeForce RTX 5060 Ti 16GB GDDR7 Twin Edge OC
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Placa de video Zotac GeForce RTX 5060 Ti 16GB GDDR7 Twin Edge OC', 821000.0, 10, 'Zotac');
+
+INSERT INTO PlacaDeVideo (id, chipsetGPU, cantidadDeCoolers, cantidadDeVGA, cantidadDeDVIDigital, cantidadDeHDMI, cantidadDeDisplayport, consumo, cantidadDePCIE6Pines, cantidadDePCIE8Pines, cantidadDePCIE16Pines, cantidadDeAdaptadores16Pines, velocidadDelCoreBase, velocidadDelCoreTurbo, tecnologiaRAM, capacidadRAM)
+VALUES (100, 'GeForce RTX 5060 Ti', 2, 0, 0, 1, 3, '210W', 0, 0, 1, 1, '2450 MHz', '2730 MHz', 'GDDR7', '16 GB');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('PlacaDeVideo-Zotac-RTX-5060-TI-16GB-1.jpg', 100),
+       ('PlacaDeVideo-Zotac-RTX-5060-TI-16GB-2.jpg', 100),
+       ('PlacaDeVideo-Zotac-RTX-5060-TI-16GB-3.jpg', 100),
+       ('PlacaDeVideo-Zotac-RTX-5060-TI-16GB-4.jpg', 100);
+
+-- Componente 101: Placa de Video MSI GeForce RTX 5070 12GB GDDR7 VENTUS 3X
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Placa de Video MSI GeForce RTX 5070 12GB GDDR7 VENTUS 3X', 1030500.0, 10, 'MSI');
+
+INSERT INTO PlacaDeVideo (id, chipsetGPU, cantidadDeCoolers, cantidadDeVGA, cantidadDeDVIDigital, cantidadDeHDMI, cantidadDeDisplayport, consumo, cantidadDePCIE6Pines, cantidadDePCIE8Pines, cantidadDePCIE16Pines, cantidadDeAdaptadores16Pines, velocidadDelCoreBase, velocidadDelCoreTurbo, tecnologiaRAM, capacidadRAM)
+VALUES (101, 'GeForce RTX 5070', 3, 0, 0, 1, 3, '250W', 0, 0, 1, 1, '2500 MHz', '2800 MHz', 'GDDR7', '12 GB');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('PlacaDeVideo-MSI-RTX-5070-12GB-1.jpg', 101),
+       ('PlacaDeVideo-MSI-RTX-5070-12GB-2.jpg', 101),
+       ('PlacaDeVideo-MSI-RTX-5070-12GB-3.jpg', 101),
+       ('PlacaDeVideo-MSI-RTX-5070-12GB-4.jpg', 101);
+
+-- Componente 102: Placa de Video Zotac GeForce RTX 5070 Ti 16GB GDDR7 AMP EXTREME INFINITY
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Placa de Video Zotac GeForce RTX 5070 Ti 16GB GDDR7 AMP EXTREME INFINITY', 1400500.0, 10, 'Zotac');
+
+INSERT INTO PlacaDeVideo (id, chipsetGPU, cantidadDeCoolers, cantidadDeVGA, cantidadDeDVIDigital, cantidadDeHDMI, cantidadDeDisplayport, consumo, cantidadDePCIE6Pines, cantidadDePCIE8Pines, cantidadDePCIE16Pines, cantidadDeAdaptadores16Pines, velocidadDelCoreBase, velocidadDelCoreTurbo, tecnologiaRAM, capacidadRAM)
+VALUES (102, 'GeForce RTX 5070 Ti', 3, 0, 0, 1, 3, '300W', 0, 0, 1, 1, '2550 MHz', '2850 MHz', 'GDDR7', '16 GB');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('PlacaDeVideo-Zotac-RTX-5070-TI-16GB-1.jpg', 102),
+       ('PlacaDeVideo-Zotac-RTX-5070-TI-16GB-2.jpg', 102),
+       ('PlacaDeVideo-Zotac-RTX-5070-TI-16GB-3.jpg', 102),
+       ('PlacaDeVideo-Zotac-RTX-5070-TI-16GB-4.jpg', 102);
+
+-- Componente 103: Placa de Video ASUS ROG GeForce RTX 5080 16GB GDDR7 ASTRAL OC
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Placa de Video ASUS ROG GeForce RTX 5080 16GB GDDR7 ASTRAL OC', 2600000.0, 10, 'ASUS');
+
+INSERT INTO PlacaDeVideo (id, chipsetGPU, cantidadDeCoolers, cantidadDeVGA, cantidadDeDVIDigital, cantidadDeHDMI, cantidadDeDisplayport, consumo, cantidadDePCIE6Pines, cantidadDePCIE8Pines, cantidadDePCIE16Pines, cantidadDeAdaptadores16Pines, velocidadDelCoreBase, velocidadDelCoreTurbo, tecnologiaRAM, capacidadRAM)
+VALUES (103, 'GeForce RTX 5080', 3, 0, 0, 1, 3, '350W', 0, 0, 1, 1, '2600 MHz', '2900 MHz', 'GDDR7', '16 GB');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('PlacaDeVideo-ASUS-RTX-5080-16GB-1.jpg', 103),
+       ('PlacaDeVideo-ASUS-RTX-5080-16GB-2.jpg', 103),
+       ('PlacaDeVideo-ASUS-RTX-5080-16GB-3.jpg', 103),
+       ('PlacaDeVideo-ASUS-RTX-5080-16GB-4.jpg', 103),
+       ('PlacaDeVideo-ASUS-RTX-5080-16GB-5.jpg', 103);
+
+-- Componente 104: Placa de Video MSI GeForce RTX 5090 32GB GDDR7 GAMING TRIO OC
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Placa de Video MSI GeForce RTX 5090 32GB GDDR7 GAMING TRIO OC', 4200000.0, 10, 'MSI');
+
+INSERT INTO PlacaDeVideo (id, chipsetGPU, cantidadDeCoolers, cantidadDeVGA, cantidadDeDVIDigital, cantidadDeHDMI, cantidadDeDisplayport, consumo, cantidadDePCIE6Pines, cantidadDePCIE8Pines, cantidadDePCIE16Pines, cantidadDeAdaptadores16Pines, velocidadDelCoreBase, velocidadDelCoreTurbo, tecnologiaRAM, capacidadRAM)
+VALUES (104, 'GeForce RTX 5090', 3, 0, 0, 1, 3, '450W', 0, 0, 1, 1, '2700 MHz', '3100 MHz', 'GDDR7', '32 GB');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('PlacaDeVideo-MSI-RTX-5090-32GB-1.jpg', 104),
+       ('PlacaDeVideo-MSI-RTX-5090-32GB-2.jpg', 104),
+       ('PlacaDeVideo-MSI-RTX-5090-32GB-3.jpg', 104),
+       ('PlacaDeVideo-MSI-RTX-5090-32GB-4.jpg', 104),
+       ('PlacaDeVideo-MSI-RTX-5090-32GB-5.jpg', 104);
+
+--DESDE ACA
+
+-- Componente 105: Placa de Video Asrock Radeon RX 7600 8GB GDDR6 Steel Legend OC
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Placa de Video Asrock Radeon RX 7600 8GB GDDR6 Steel Legend OC', 436000.0, 10, 'Asrock');
+
+INSERT INTO PlacaDeVideo (id, chipsetGPU, cantidadDeCoolers, cantidadDeVGA, cantidadDeDVIDigital, cantidadDeHDMI, cantidadDeDisplayport, consumo, cantidadDePCIE6Pines, cantidadDePCIE8Pines, cantidadDePCIE16Pines, cantidadDeAdaptadores16Pines, velocidadDelCoreBase, velocidadDelCoreTurbo, tecnologiaRAM, capacidadRAM)
+VALUES (105, 'Radeon RX 7600', 3, 0, 0, 1, 3, '165W', 0, 1, 0, 0, '2250 MHz', '2655 MHz', 'GDDR6', '8 GB');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('PlacaDeVideo-Asrock-RX-7600-8GB-1.jpg', 105),
+       ('PlacaDeVideo-Asrock-RX-7600-8GB-2.jpg', 105),
+       ('PlacaDeVideo-Asrock-RX-7600-8GB-3.jpg', 105),
+       ('PlacaDeVideo-Asrock-RX-7600-8GB-4.jpg', 105);
+
+-- Componente 106: Placa de Video XFX Radeon RX 9060 XT 8GB GDDR6 SWIFT OC Gaming Edition
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Placa de Video XFX Radeon RX 9060 XT 8GB GDDR6 SWIFT OC Gaming Edition', 510000.0, 10, 'XFX');
+
+INSERT INTO PlacaDeVideo (id, chipsetGPU, cantidadDeCoolers, cantidadDeVGA, cantidadDeDVIDigital, cantidadDeHDMI, cantidadDeDisplayport, consumo, cantidadDePCIE6Pines, cantidadDePCIE8Pines, cantidadDePCIE16Pines, cantidadDeAdaptadores16Pines, velocidadDelCoreBase, velocidadDelCoreTurbo, tecnologiaRAM, capacidadRAM)
+VALUES (106, 'Radeon RX 9060 XT', 2, 0, 0, 1, 3, '200W', 0, 2, 0, 0, '2500 MHz', '2800 MHz', 'GDDR6', '8 GB');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('PlacaDeVideo-XFX-RX-7600-XT-8GB-1.jpg', 106),
+       ('PlacaDeVideo-XFX-RX-7600-XT-8GB-2.jpg', 106),
+       ('PlacaDeVideo-XFX-RX-7600-XT-8GB-3.jpg', 106),
+       ('PlacaDeVideo-XFX-RX-7600-XT-8GB-4.jpg', 106),
+       ('PlacaDeVideo-XFX-RX-7600-XT-8GB-5.jpg', 106);
+
+-- Componente 107: Placa de Video XFX Radeon RX 9060 XT 16GB GDDR6 SWIFT OC Triple Fan Gaming Edition
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Placa de Video XFX Radeon RX 9060 XT 16GB GDDR6 SWIFT OC Triple Fan Gaming Edition', 660000.0, 10, 'XFX');
+
+INSERT INTO PlacaDeVideo (id, chipsetGPU, cantidadDeCoolers, cantidadDeVGA, cantidadDeDVIDigital, cantidadDeHDMI, cantidadDeDisplayport, consumo, cantidadDePCIE6Pines, cantidadDePCIE8Pines, cantidadDePCIE16Pines, cantidadDeAdaptadores16Pines, velocidadDelCoreBase, velocidadDelCoreTurbo, tecnologiaRAM, capacidadRAM)
+VALUES (107, 'Radeon RX 9060 XT', 3, 0, 0, 1, 3, '210W', 0, 2, 0, 0, '2500 MHz', '2815 MHz', 'GDDR6', '16 GB');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('PlacaDeVideo-XFX-RX-9060-XT-16GB-1.jpg', 107),
+       ('PlacaDeVideo-XFX-RX-9060-XT-16GB-2.jpg', 107),
+       ('PlacaDeVideo-XFX-RX-9060-XT-16GB-3.jpg', 107),
+       ('PlacaDeVideo-XFX-RX-9060-XT-16GB-4.jpg', 107),
+       ('PlacaDeVideo-XFX-RX-9060-XT-16GB-5.jpg', 107);
+
+-- Componente 108: Placa de Video XFX Radeon RX 7800 XT Core 16GB GDDR6 SPEEDSTER QICK 319
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Placa de Video XFX Radeon RX 7800 XT Core 16GB GDDR6 SPEEDSTER QICK 319', 700000.0, 10, 'XFX');
+
+INSERT INTO PlacaDeVideo (id, chipsetGPU, cantidadDeCoolers, cantidadDeVGA, cantidadDeDVIDigital, cantidadDeHDMI, cantidadDeDisplayport, consumo, cantidadDePCIE6Pines, cantidadDePCIE8Pines, cantidadDePCIE16Pines, cantidadDeAdaptadores16Pines, velocidadDelCoreBase, velocidadDelCoreTurbo, tecnologiaRAM, capacidadRAM)
+VALUES (108, 'Radeon RX 7800 XT', 3, 0, 0, 1, 3, '263W', 0, 2, 0, 0, '1295 MHz', '2430 MHz', 'GDDR6', '16 GB');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('PlacaDeVideo-XFX-RX-7800-XT-16GB-1.jpg', 108),
+       ('PlacaDeVideo-XFX-RX-7800-XT-16GB-2.jpg', 108),
+       ('PlacaDeVideo-XFX-RX-7800-XT-16GB-3.jpg', 108),
+       ('PlacaDeVideo-XFX-RX-7800-XT-16GB-4.jpg', 108);
+
+-- Componente 109: Placa de Video XFX Radeon RX 7900 XT 20GB GDDR6 SPEEDSTER MERC 310 ULTRA
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Placa de Video XFX Radeon RX 7900 XT 20GB GDDR6 SPEEDSTER MERC 310 ULTRA', 1050000.0, 10, 'XFX');
+
+INSERT INTO PlacaDeVideo (id, chipsetGPU, cantidadDeCoolers, cantidadDeVGA, cantidadDeDVIDigital, cantidadDeHDMI, cantidadDeDisplayport, consumo, cantidadDePCIE6Pines, cantidadDePCIE8Pines, cantidadDePCIE16Pines, cantidadDeAdaptadores16Pines, velocidadDelCoreBase, velocidadDelCoreTurbo, tecnologiaRAM, capacidadRAM)
+VALUES (109, 'Radeon RX 7900 XT', 3, 0, 0, 1, 3, '315W', 0, 2, 0, 0, '1500 MHz', '2500 MHz', 'GDDR6', '20 GB');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('PlacaDeVideo-XFX-RX-7900-XT-20GB-1.jpg', 109),
+       ('PlacaDeVideo-XFX-RX-7900-XT-20GB-2.jpg', 109),
+       ('PlacaDeVideo-XFX-RX-7900-XT-20GB-3.jpg', 109);
+
+-- Componente 110: Placa de Video XFX Radeon RX 9070 XT 16GB GDDR6 Mercury OC Gaming Edition RGB
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Placa de Video XFX Radeon RX 9070 XT 16GB GDDR6 Mercury OC Gaming Edition RGB', 1117000.0, 10, 'XFX');
+
+INSERT INTO PlacaDeVideo (id, chipsetGPU, cantidadDeCoolers, cantidadDeVGA, cantidadDeDVIDigital, cantidadDeHDMI, cantidadDeDisplayport, consumo, cantidadDePCIE6Pines, cantidadDePCIE8Pines, cantidadDePCIE16Pines, cantidadDeAdaptadores16Pines, velocidadDelCoreBase, velocidadDelCoreTurbo, tecnologiaRAM, capacidadRAM)
+VALUES (110, 'Radeon RX 9070 XT', 3, 0, 0, 1, 3, '300W', 0, 2, 0, 0, '2600 MHz', '2950 MHz', 'GDDR6', '16 GB');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('PlacaDeVideo-XFX-RX-9070-XT-16GB-1.jpg', 110),
+       ('PlacaDeVideo-XFX-RX-9070-XT-16GB-2.jpg', 110),
+       ('PlacaDeVideo-XFX-RX-9070-XT-16GB-3.jpg', 110),
+       ('PlacaDeVideo-XFX-RX-9070-XT-16GB-4.jpg', 110);
+
+-- Componente 111: Placa de Video ASUS PRIME Radeon RX 9070 XT 16GB GDDR6 OC
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Placa de Video ASUS PRIME Radeon RX 9070 XT 16GB GDDR6 OC', 1150000.0, 10, 'ASUS');
+
+INSERT INTO PlacaDeVideo (id, chipsetGPU, cantidadDeCoolers, cantidadDeVGA, cantidadDeDVIDigital, cantidadDeHDMI, cantidadDeDisplayport, consumo, cantidadDePCIE6Pines, cantidadDePCIE8Pines, cantidadDePCIE16Pines, cantidadDeAdaptadores16Pines, velocidadDelCoreBase, velocidadDelCoreTurbo, tecnologiaRAM, capacidadRAM)
+VALUES (111, 'Radeon RX 9070 XT', 3, 0, 0, 1, 3, '290W', 0, 2, 0, 0, '2580 MHz', '2920 MHz', 'GDDR6', '16 GB');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('PlacaDeVideo-ASUS-RX-9070-XT-16GB-1.jpg', 111),
+       ('PlacaDeVideo-ASUS-RX-9070-XT-16GB-2.jpg', 111),
+       ('PlacaDeVideo-ASUS-RX-9070-XT-16GB-3.jpg', 111),
+       ('PlacaDeVideo-ASUS-RX-9070-XT-16GB-4.jpg', 111),
+       ('PlacaDeVideo-ASUS-RX-9070-XT-16GB-5.jpg', 111);
 
 -- =================================================================
 -- Almacenamiento
 -- =================================================================
 
--- Componente 16: Samsung SSD 500GB
-INSERT INTO Componente (id, nombre, precio, stock, marca) VALUES (16, 'Samsung SSD 500GB', 35000.0, 20, 'Samsung');
-INSERT INTO Almacenamiento (id, capacidad, tipoDeConexion, consumo, tipoDeDisco, memoriaCache, velocidadLecturaSecuencial, velocidadEscrituraSecuencial) VALUES (16, '500GB', 'SATA III', '3W', 'Solido', '512MB', '560 MB/s', '530 MB/s');
-INSERT INTO Imagen (id, urlImagen, componente_id) VALUES (16, 'samsung-ssd-500gb-1.jpg', 16);
+-- Componente 112: Disco Rígido Seagate 2TB Barracuda 6GB/s
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Disco Rígido Seagate 2TB Barracuda 6GB/s', 80170.0, 10, 'Seagate');
 
--- Componente 17: WD HDD 1TB
-INSERT INTO Componente (id, nombre, precio, stock, marca) VALUES (17, 'WD HDD 1TB', 25000.0, 18, 'Western Digital');
-INSERT INTO Almacenamiento (id, capacidad, tipoDeConexion, consumo, tipoDeDisco, memoriaCache, velocidadLecturaSecuencial, velocidadEscrituraSecuencial) VALUES (17, '1TB', 'SATA III', '6W', 'Mecanico', '64MB', '150 MB/s', '145 MB/s');
-INSERT INTO Imagen (id, urlImagen, componente_id) VALUES (17, 'wd-hdd-1tb-1.jpg', 17);
+INSERT INTO Almacenamiento (id, capacidad, tipoDeConexion, consumo, tipoDeDisco, memoriaCache, velocidadLecturaSecuencial, velocidadEscrituraSecuencial)
+VALUES (112, '2 TB', 'SATA', '5 W', 'Mecanico', '256 MB', '220 MB/s', NULL);
 
--- Componente 18: Crucial SSD 1TB
-INSERT INTO Componente (id, nombre, precio, stock, marca) VALUES (18, 'Crucial SSD 1TB', 60000.0, 10, 'Crucial');
-INSERT INTO Almacenamiento (id, capacidad, tipoDeConexion, consumo, tipoDeDisco, memoriaCache, velocidadLecturaSecuencial, velocidadEscrituraSecuencial) VALUES (18, '1TB', 'M.2 NVMe', '5W', 'Solido', '1GB', '2400 MB/s', '1900 MB/s');
-INSERT INTO Imagen (id, urlImagen, componente_id) VALUES (18, 'crucial-ssd-1tb-1.jpg', 18);
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Almacenamiento-Disco-Rigido-Seagate-2TB-1.jpg', 112);
+
+-- Componente 113: Disco Rígido Seagate 4TB Barracuda 256MB SATA 6GB/s
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Disco Rígido Seagate 4TB Barracuda 6GB/s', 123000.0, 10, 'Seagate');
+
+INSERT INTO Almacenamiento (id, capacidad, tipoDeConexion, consumo, tipoDeDisco, memoriaCache, velocidadLecturaSecuencial, velocidadEscrituraSecuencial)
+VALUES (113, '4 TB', 'SATA', '5 W', 'Mecanico', '256 MB', '190 MB/s', '130 MB/s');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Almacenamiento-Disco-Rigido-Seagate-4TB-1.jpg', 113);
+
+-- Componente 114: Disco Rigido WD 6TB Purple 5.6K RPM 256MB
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Disco Rigido WD 6TB Purple 6GB/s', 180000.0, 10, 'WD');
+
+INSERT INTO Almacenamiento (id, capacidad, tipoDeConexion, consumo, tipoDeDisco, memoriaCache, velocidadLecturaSecuencial, velocidadEscrituraSecuencial)
+VALUES (114, '6 TB', 'SATA', '5 W', 'Mecanico', '256 MB', '180 MB/s', NULL);
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Almacenamiento-Disco-Rigido-WD-6TB-1.jpg', 114);
+
+-- Componente 115: Disco Rigido Seagate 8TB Barracuda 256MB SATA 6GB/s
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Disco Rígido Seagate 8TB Barracuda 6GB/s', 188000.0, 10, 'Seagate');
+
+INSERT INTO Almacenamiento (id, capacidad, tipoDeConexion, consumo, tipoDeDisco, memoriaCache, velocidadLecturaSecuencial, velocidadEscrituraSecuencial)
+VALUES (115, '8 TB', 'SATA', '5 W', 'Mecanico', '256 MB', '190 MB/s', NULL);
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Almacenamiento-Disco-Rigido-Seagate-8TB-1.jpg', 115);
+
+-- Componente 116: Disco Solido SSD Team 256GB CX2 520MB/s
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Disco Solido SSD Team 256GB CX2 520MB/s', 23900.0, 10, 'Team Group');
+
+INSERT INTO Almacenamiento (id, capacidad, tipoDeConexion, consumo, tipoDeDisco, memoriaCache, velocidadLecturaSecuencial, velocidadEscrituraSecuencial)
+VALUES (116, '256 GB', 'SATA', '4 W', 'Solido', '128 MB', '520 MB/s', '430 MB/s');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Almacenamiento-Disco-Solido-SSD-TG-256GB-1.jpg', 116);
+
+-- Componente 117: Disco Solido SSD ADATA 512GB SU650SS 520MB/s
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Disco Solido SSD ADATA 512GB SU650SS 520MB/s', 41200.0, 10, 'ADATA');
+
+INSERT INTO Almacenamiento (id, capacidad, tipoDeConexion, consumo, tipoDeDisco, memoriaCache, velocidadLecturaSecuencial, velocidadEscrituraSecuencial)
+VALUES (117, '512 GB', 'SATA', '3 W', 'Solido', '128 MB', '520 MB/s', '450 MB/s');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Almacenamiento-Disco-Solido-SSD-ADATA-512GB-1.jpg', 117);
+
+-- Componente 118: Disco Sólido SSD WD 480GB GREEN 545MB/s SATA
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Disco Sólido SSD WD 480GB GREEN 545MB/s', 42800.0, 10, 'WD');
+
+INSERT INTO Almacenamiento (id, capacidad, tipoDeConexion, consumo, tipoDeDisco, memoriaCache, velocidadLecturaSecuencial, velocidadEscrituraSecuencial)
+VALUES (118, '480 GB', 'SATA', '3 W', 'Solido', '0 MB', '545 MB/s', '435 MB/s');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Almacenamiento-Disco-Solido-SSD-WD-480GB-1.jpg', 118);
+
+-- Componente 119: Disco Sólido SSD Kingston 480GB A400 500MB/s
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Disco Sólido SSD Kingston 480GB A400 500MB/s', 48000.0, 10, 'Kingston');
+
+INSERT INTO Almacenamiento (id, capacidad, tipoDeConexion, consumo, tipoDeDisco, memoriaCache, velocidadLecturaSecuencial, velocidadEscrituraSecuencial)
+VALUES (119, '480 GB', 'SATA', '3 W', 'Solido', '0 MB', '500 MB/s', '450 MB/s');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Almacenamiento-Disco-Solido-SSD-Kingston-480GB-1.jpg', 119);
+
+-- Componente 120: Disco Solido SSD WD 1TB Green 545MB/s WDS100T3G0A
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Disco Solido SSD WD 1TB Green 545MB/s', 75700.0, 10, 'WD');
+
+INSERT INTO Almacenamiento (id, capacidad, tipoDeConexion, consumo, tipoDeDisco, memoriaCache, velocidadLecturaSecuencial, velocidadEscrituraSecuencial)
+VALUES (120, '1 TB', 'SATA', '3 W', 'Solido', '128 MB', '545 MB/s', '250 MB/s');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Almacenamiento-Disco-Solido-SSD-WD-1TB-1.jpg', 120);
+
+-- Componente 121: Disco Solido SSD ADATA 2TB SU650SS 520MB/s
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Disco Solido SSD ADATA 2TB SU650SS 520MB/s', 132000.0, 10, 'ADATA');
+
+INSERT INTO Almacenamiento (id, capacidad, tipoDeConexion, consumo, tipoDeDisco, memoriaCache, velocidadLecturaSecuencial, velocidadEscrituraSecuencial)
+VALUES (121, '2 TB', 'SATA', '3 W', 'Solido', '128 MB', '520 MB/s', NULL);
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Almacenamiento-Disco-Solido-SSD-ADATA-2TB-1.jpg', 121);
+
+-- Componente 122: Disco Solido SSD Team 4TB T-Force Vulcan Z 500MB/s
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Disco Solido SSD Team 4TB T-Force Vulcan Z 500MB/s', 289300.0, 10, 'T-Force');
+
+INSERT INTO Almacenamiento (id, capacidad, tipoDeConexion, consumo, tipoDeDisco, memoriaCache, velocidadLecturaSecuencial, velocidadEscrituraSecuencial)
+VALUES (122, '4 TB', 'SATA', '3 W', 'Solido', '128 MB', '500 MB/s', NULL);
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Almacenamiento-Disco-Solido-SSD-T-Force-4TB-1.jpg', 122);
+
+-- Componente 123: Disco Solido SSD M.2 WD 500GB Green SN350 2400MB/s
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Disco Solido SSD M.2 WD 500GB Green SN350 2400MB/s', 50100.0, 10, 'WD');
+
+INSERT INTO Almacenamiento (id, capacidad, tipoDeConexion, consumo, tipoDeDisco, memoriaCache, velocidadLecturaSecuencial, velocidadEscrituraSecuencial)
+VALUES (123, '500 GB', 'M2', '3 W', 'Solido', '128 MB', '2400 MB/s', '1500 MB/s');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Almacenamiento-Disco-Solido-SSD-M2-WD-500GB-1.jpg', 123);
+
+-- Componente 124: Disco Sólido SSD M.2 Kingston 1TB NV3 6000MB/s NVMe PCIe Gen4 x4
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Disco Sólido SSD M.2 Kingston 1TB NV3 6000MB/s', 85400.0, 10, 'Kingston');
+
+INSERT INTO Almacenamiento (id, capacidad, tipoDeConexion, consumo, tipoDeDisco, memoriaCache, velocidadLecturaSecuencial, velocidadEscrituraSecuencial)
+VALUES (124, '1 TB', 'M2', '3 W', 'Solido', '128 MB', '6000 MB/s', '4000 MB/s');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Almacenamiento-Disco-Solido-SSD-M2-Kingston-1TB-1.jpg', 124);
+
+-- Componente 125: Disco Sólido SSD M.2 Corsair MP600 Core XT 1TB 5000MB/s NVMe PCIe x4 Gen4
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Disco Sólido SSD M.2 Corsair MP600 Core XT 1TB 5000MB/s', 121000.0, 10, 'Corsair');
+
+INSERT INTO Almacenamiento (id, capacidad, tipoDeConexion, consumo, tipoDeDisco, memoriaCache, velocidadLecturaSecuencial, velocidadEscrituraSecuencial)
+VALUES (125, '1 TB', 'M2', '3 W', 'Solido', '128 MB', '5000 MB/s', '4400 MB/s');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Almacenamiento-Disco-Solido-SSD-M2-Corsair-1TB-1.jpg', 125);
+
+-- Componente 126: Disco Solido SSD M.2 WD 2TB Green SN350 3200MB/s NVMe PCI-E Gen3 x4
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Disco Solido SSD M.2 WD 2TB Green SN350 3200MB/s', 158600.0, 10, 'WD');
+
+INSERT INTO Almacenamiento (id, capacidad, tipoDeConexion, consumo, tipoDeDisco, memoriaCache, velocidadLecturaSecuencial, velocidadEscrituraSecuencial)
+VALUES (126, '2 TB', 'M2', '3 W', 'Solido', '128 MB', '3200 MB/s', '3000 MB/s');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Almacenamiento-Disco-Solido-SSD-M2-WD-2TB-1.jpg', 126);
+
+-- Componente 127: Disco Solido SSD M.2 Crucial 2TB P310 7100MB/s NVMe PCI-E Gen4 x4
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Disco Solido SSD M.2 Crucial 2TB P310 7100MB/s', 208000.0, 10, 'Crucial');
+
+INSERT INTO Almacenamiento (id, capacidad, tipoDeConexion, consumo, tipoDeDisco, memoriaCache, velocidadLecturaSecuencial, velocidadEscrituraSecuencial)
+VALUES (127, '2 TB', 'M2', '3 W', 'Solido', '128 MB', '7100 MB/s', '6000 MB/s');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Almacenamiento-Disco-Solido-SSD-M2-Crucial-2TB-1.jpg', 127);
+
+-- Componente 128: Disco Solido SSD M.2 WD 2TB Black SN850X 7300MB/s NVMe PCIe Gen4 x4
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Disco Solido SSD M.2 WD 2TB Black SN850X 7300MB/s', 253000.0, 10, 'WD');
+
+INSERT INTO Almacenamiento (id, capacidad, tipoDeConexion, consumo, tipoDeDisco, memoriaCache, velocidadLecturaSecuencial, velocidadEscrituraSecuencial)
+VALUES (128, '2 TB', 'M2', '7 W', 'Solido', '128 MB', '7300 MB/s', '6600 MB/s');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Almacenamiento-Disco-Solido-SSD-M2-WD-Black-2TB-1.jpg', 128);
+
+-- Componente 129: Disco Sólido SSD M.2 Corsair MP600 PRO XT 4TB 7100MB/s NVMe PCIe x4 Gen4 Heatsink Black
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Disco Sólido SSD M.2 Corsair MP600 PRO XT 4TB 7100MB/s Heatsink Black', 493000.0, 10, 'Corsair');
+
+INSERT INTO Almacenamiento (id, capacidad, tipoDeConexion, consumo, tipoDeDisco, memoriaCache, velocidadLecturaSecuencial, velocidadEscrituraSecuencial)
+VALUES (129, '4 TB', 'M2', '3 W', 'Solido', '128 MB', '7100 MB/s', '6800 MB/s');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Almacenamiento-Disco-Solido-SSD-M2-Corsair-4TB-1.jpg', 129);
+
 
 
 -- =================================================================
 -- Fuentes de Alimentacion
 -- =================================================================
 
--- Componente 19: EVGA 600W
-INSERT INTO Componente (id, nombre, precio, stock, marca) VALUES (19, 'EVGA 600W', 40000.0, 14, 'EVGA');
-INSERT INTO FuenteDeAlimentacion (id, formato, wattsNominales, wattsReales, certificacion80Plus, tipoDeCableado, conector24Pines, cantConectoresCpu4PinesPlus, cantConexionesSata, cantConexionesMolex, cantConectoresCpu2PinesPlus, cantConectoresCpu4Pines, cantConectoresCpu6Pines, cantConexionesPcie16Pines) VALUES (19, 'ATX', '600W', '580W', '80 Plus White', 'Integrado', true, 1, 6, 3, 2, 0, 0, 0);
-INSERT INTO Imagen (id, urlImagen, componente_id) VALUES (19, 'evga-600w-1.jpg', 19);
+-- Componente 130: Fuente Be Quiet 1200W 80 Plus Platinum STRAIGHT POWER 12
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Fuente Be Quiet 1200W 80 Plus Platinum STRAIGHT POWER 12 Full Modular ATX 3.1 PCIe 5.1', 412000.0, 7, 'Be Quiet!');
 
--- Componente 20: Corsair 750W
-INSERT INTO Componente (id, nombre, precio, stock, marca) VALUES (20, 'Corsair 750W', 50000.0, 10, 'Corsair');
-INSERT INTO FuenteDeAlimentacion (id, formato, wattsNominales, wattsReales, certificacion80Plus, tipoDeCableado, conector24Pines, cantConectoresCpu4PinesPlus, cantConexionesSata, cantConexionesMolex, cantConectoresCpu2PinesPlus, cantConectoresCpu4Pines, cantConectoresCpu6Pines, cantConexionesPcie16Pines) VALUES (20, 'ATX', '750W', '745W', '80 Plus Bronze', 'Semi-Modular', true, 2, 8, 4, 4, 0, 0, 0);
-INSERT INTO Imagen (id, urlImagen, componente_id) VALUES (20, 'corsair-750w-1.jpg', 20);
+INSERT INTO FuenteDeAlimentacion (id, formato, wattsNominales, wattsReales, certificacion80Plus, tipoDeCableado, conector24Pines, cantConectoresCpu4Pines, cantConectoresCpu4PinesPlus, cantConectoresCpu6Pines, cantConectoresCpu2PinesPlus, cantConexionesSata, cantConexionesMolex, cantConexionesPcie16Pines)
+VALUES (
+           130, 'ATX', '1200W', '1200W', 'Platinum', 'Full Modular', true, 0, 2, 0, 4, 12, 2, 1
+       );
 
--- Componente 21: Gigabyte 650W
-INSERT INTO Componente (id, nombre, precio, stock, marca) VALUES (21, 'Gigabyte 650W', 45000.0, 11, 'Gigabyte');
-INSERT INTO FuenteDeAlimentacion (id, formato, wattsNominales, wattsReales, certificacion80Plus, tipoDeCableado, conector24Pines, cantConectoresCpu4PinesPlus, cantConexionesSata, cantConexionesMolex, cantConectoresCpu2PinesPlus, cantConectoresCpu4Pines, cantConectoresCpu6Pines, cantConexionesPcie16Pines) VALUES (21, 'ATX', '650W', '640W', '80 Plus Bronze', 'Integrado', true, 1, 6, 3, 2, 0, 0, 0);
-INSERT INTO Imagen (id, urlImagen, componente_id) VALUES (21, 'gigabyte-650w-1.jpg', 21);
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Fuente-Be-Quiet-1200W-80-Plus-Platinum-STRAIGHT-POWER-12-Full-Modular-ATX-3-1-PCIe-5-1-1.jpg', 130),
+       ('Fuente-Be-Quiet-1200W-80-Plus-Platinum-STRAIGHT-POWER-12-Full-Modular-ATX-3-1-PCIe-5-1-2.jpg', 130),
+       ('Fuente-Be-Quiet-1200W-80-Plus-Platinum-STRAIGHT-POWER-12-Full-Modular-ATX-3-1-PCIe-5-1-3.jpg', 130),
+       ('Fuente-Be-Quiet-1200W-80-Plus-Platinum-STRAIGHT-POWER-12-Full-Modular-ATX-3-1-PCIe-5-1-4.jpg', 130);
 
+-- Componente 131: Fuente Gigabyte AORUS Elite P850W 80 Plus Platinum
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Fuente Gigabyte AORUS Elite P850W 80 Plus Platinum GP-AE850PM PG5 ICE ATX 3.0 PCIe 5.0 Full Modular', 215000.0, 10, 'Gigabyte');
+
+INSERT INTO FuenteDeAlimentacion (id, formato, wattsNominales, wattsReales, certificacion80Plus, tipoDeCableado, conector24Pines, cantConectoresCpu4Pines, cantConectoresCpu4PinesPlus, cantConectoresCpu6Pines, cantConectoresCpu2PinesPlus, cantConexionesSata, cantConexionesMolex, cantConexionesPcie16Pines)
+VALUES (
+           131, 'ATX', '850W', '850W', 'Platinum', 'Full Modular', true, 0, 2, 0, 4, 8, 4, 1
+       );
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Fuente-Gigabyte-AORUS-Elite-P850W-80-Plus-Platinum-GP-AE850PM-PG5-ICE-ATX-3-0-PCIe-5-0-Full-Modular-1.jpg', 131),
+       ('Fuente-Gigabyte-AORUS-Elite-P850W-80-Plus-Platinum-GP-AE850PM-PG5-ICE-ATX-3-0-PCIe-5-0-Full-Modular-2.jpg', 131),
+       ('Fuente-Gigabyte-AORUS-Elite-P850W-80-Plus-Platinum-GP-AE850PM-PG5-ICE-ATX-3-0-PCIe-5-0-Full-Modular-3.jpg', 131),
+       ('Fuente-Gigabyte-AORUS-Elite-P850W-80-Plus-Platinum-GP-AE850PM-PG5-ICE-ATX-3-0-PCIe-5-0-Full-Modular-4.jpg', 131),
+       ('Fuente-Gigabyte-AORUS-Elite-P850W-80-Plus-Platinum-GP-AE850PM-PG5-ICE-ATX-3-0-PCIe-5-0-Full-Modular-5.jpg', 131);
+
+-- Componente 132: Fuente Gigabyte AORUS Elite P1000W 80 Plus Platinum
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Fuente Gigabyte AORUS Elite P1000W 80 Plus Platinum GP-AE1000PM PG5 ATX 3.0 PCIe 5.0 Full Modular', 254800.0, 9, 'Gigabyte');
+
+INSERT INTO FuenteDeAlimentacion (id, formato, wattsNominales, wattsReales, certificacion80Plus, tipoDeCableado, conector24Pines, cantConectoresCpu4Pines, cantConectoresCpu4PinesPlus, cantConectoresCpu6Pines, cantConectoresCpu2PinesPlus, cantConexionesSata, cantConexionesMolex, cantConexionesPcie16Pines)
+VALUES (
+           132, 'ATX', '1000W', '1000W', 'Platinum', 'Full Modular', true, 0, 2, 0, 6, 12, 4, 1
+       );
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Fuente-Gigabyte-AORUS-Elite-P1000W-80-Plus-Platinum-GP-AE1000PM-PG5-ATX-3-0-PCIe-5-0-Full-Modular-1.jpg', 132),
+       ('Fuente-Gigabyte-AORUS-Elite-P1000W-80-Plus-Platinum-GP-AE1000PM-PG5-ATX-3-0-PCIe-5-0-Full-Modular-2.jpg', 132),
+       ('Fuente-Gigabyte-AORUS-Elite-P1000W-80-Plus-Platinum-GP-AE1000PM-PG5-ATX-3-0-PCIe-5-0-Full-Modular-3.jpg', 132),
+       ('Fuente-Gigabyte-AORUS-Elite-P1000W-80-Plus-Platinum-GP-AE1000PM-PG5-ATX-3-0-PCIe-5-0-Full-Modular-4.jpg', 132),
+       ('Fuente-Gigabyte-AORUS-Elite-P1000W-80-Plus-Platinum-GP-AE1000PM-PG5-ATX-3-0-PCIe-5-0-Full-Modular-5.jpg', 132);
+
+-- Componente 133: Fuente ADATA XPG 1200W 80 Plus Gold CORE REACTOR II
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Fuente ADATA XPG 1200W 80 Plus Gold Full Modular ATX 3.0 PCIe 5.0 CORE REACTOR II', 310500.0, 11, 'ADATA XPG');
+
+INSERT INTO FuenteDeAlimentacion (id, formato, wattsNominales, wattsReales, certificacion80Plus, tipoDeCableado, conector24Pines, cantConectoresCpu4Pines, cantConectoresCpu4PinesPlus, cantConectoresCpu6Pines, cantConectoresCpu2PinesPlus, cantConexionesSata, cantConexionesMolex, cantConexionesPcie16Pines)
+VALUES (
+           133, 'ATX', '1200W', '1200W', 'Gold', 'Full Modular', true, 0, 2, 0, 8, 12, 4, 1
+       );
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Fuente-ADATA-XPG-1200W-80-Plus-Gold-Full-Modular-ATX-3-0-PCIe-5-0-CORE-REACTOR-II-1.jpg', 133),
+       ('Fuente-ADATA-XPG-1200W-80-Plus-Gold-Full-Modular-ATX-3-0-PCIe-5-0-CORE-REACTOR-II-2.jpg', 133),
+       ('Fuente-ADATA-XPG-1200W-80-Plus-Gold-Full-Modular-ATX-3-0-PCIe-5-0-CORE-REACTOR-II-3.jpg', 133),
+       ('Fuente-ADATA-XPG-1200W-80-Plus-Gold-Full-Modular-ATX-3-0-PCIe-5-0-CORE-REACTOR-II-4.jpg', 133);
+
+-- Componente 134: Fuente Gigabyte 850W 80 Plus Gold UD850GM PG5 White
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Fuente Gigabyte 850W 80 Plus Gold UD850GM PG5 White PCIe 5.0 Full Modular', 151900.0, 15, 'Gigabyte');
+
+INSERT INTO FuenteDeAlimentacion (id, formato, wattsNominales, wattsReales, certificacion80Plus, tipoDeCableado, conector24Pines, cantConectoresCpu4Pines, cantConectoresCpu4PinesPlus, cantConectoresCpu6Pines, cantConectoresCpu2PinesPlus, cantConexionesSata, cantConexionesMolex, cantConexionesPcie16Pines)
+VALUES (
+           134, 'ATX', '850W', '850W', 'Gold', 'Full Modular', true, 0, 2, 0, 4, 8, 4, 1
+       );
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Fuente-Gigabyte-850W-80-Plus-Gold-UD850GM-PG5-White-PCIe-5-0-Full-Modular-1.jpg', 134),
+       ('Fuente-Gigabyte-850W-80-Plus-Gold-UD850GM-PG5-White-PCIe-5-0-Full-Modular-2.jpg', 134),
+       ('Fuente-Gigabyte-850W-80-Plus-Gold-UD850GM-PG5-White-PCIe-5-0-Full-Modular-3.jpg', 134),
+       ('Fuente-Gigabyte-850W-80-Plus-Gold-UD850GM-PG5-White-PCIe-5-0-Full-Modular-4.jpg', 134),
+       ('Fuente-Gigabyte-850W-80-Plus-Gold-UD850GM-PG5-White-PCIe-5-0-Full-Modular-5.jpg', 134);
+
+-- Componente 135: Fuente Cooler Master 850W 80 Plus Gold Full Modular GX2
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Fuente Cooler Master 850W 80 Plus Gold Full Modular GX2 12VHPWR ATX 3.0', 165000.0, 14, 'Cooler Master');
+
+INSERT INTO FuenteDeAlimentacion (id, formato, wattsNominales, wattsReales, certificacion80Plus, tipoDeCableado, conector24Pines, cantConectoresCpu4Pines, cantConectoresCpu4PinesPlus, cantConectoresCpu6Pines, cantConectoresCpu2PinesPlus, cantConexionesSata, cantConexionesMolex, cantConexionesPcie16Pines)
+VALUES (
+           135, 'ATX', '850W', '850W', 'Gold', 'Full Modular', true, 0, 2, 0, 4, 12, 4, 1
+       );
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Fuente-Cooler-Master-850W-80-Plus-Gold-Full-Modular-GX2-12VHPWR-ATX-3-0-1.jpg', 135),
+       ('Fuente-Cooler-Master-850W-80-Plus-Gold-Full-Modular-GX2-12VHPWR-ATX-3-0-2.jpg', 135),
+       ('Fuente-Cooler-Master-850W-80-Plus-Gold-Full-Modular-GX2-12VHPWR-ATX-3-0-3.jpg', 135);
+
+-- Componente 136: Fuente MSI 750W 80 Plus Gold MAG A750GL
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Fuente MSI 750W 80 Plus Gold Full Modular PCIe 5.1 MAG A750GL ATX 3.1', 139000.0, 18, 'MSI');
+
+INSERT INTO FuenteDeAlimentacion (id, formato, wattsNominales, wattsReales, certificacion80Plus, tipoDeCableado, conector24Pines, cantConectoresCpu4Pines, cantConectoresCpu4PinesPlus, cantConectoresCpu6Pines, cantConectoresCpu2PinesPlus, cantConexionesSata, cantConexionesMolex, cantConexionesPcie16Pines)
+VALUES (
+           136, 'ATX', '750W', '750W', 'Gold', 'Full Modular', true, 0, 2, 0, 4, 8, 4, 1
+       );
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Fuente-MSI-750W-80-Plus-Gold-Full-Modular-PCIe-5-1-MAG-A750GL-ATX-3-1-1.jpg', 136),
+       ('Fuente-MSI-750W-80-Plus-Gold-Full-Modular-PCIe-5-1-MAG-A750GL-ATX-3-1-2.jpg', 136),
+       ('Fuente-MSI-750W-80-Plus-Gold-Full-Modular-PCIe-5-1-MAG-A750GL-ATX-3-1-3.jpg', 136),
+       ('Fuente-MSI-750W-80-Plus-Gold-Full-Modular-PCIe-5-1-MAG-A750GL-ATX-3-1-4.jpg', 136);
+
+-- Componente 137: Fuente Corsair 750W 80 Plus Bronze CX750
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Fuente Corsair 750W 80 Plus Bronze CX750', 105600.0, 20, 'Corsair');
+
+INSERT INTO FuenteDeAlimentacion (id, formato, wattsNominales, wattsReales, certificacion80Plus, tipoDeCableado, conector24Pines, cantConectoresCpu4Pines, cantConectoresCpu4PinesPlus, cantConectoresCpu6Pines, cantConectoresCpu2PinesPlus, cantConexionesSata, cantConexionesMolex, cantConexionesPcie16Pines)
+VALUES (
+           137, 'ATX', '750W', '750W', 'Bronze', 'Fijo', true, 0, 2, 0, 4, 6, 4, 0
+       );
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Fuente-Corsair-750W-80-Plus-Bronze-CX750-1.jpg', 137),
+       ('Fuente-Corsair-750W-80-Plus-Bronze-CX750-2.jpg', 137),
+       ('Fuente-Corsair-750W-80-Plus-Bronze-CX750-3.jpg', 137);
+
+-- Componente 138: Fuente Be Quiet 750W 80 Plus Gold PURE POWER 12 M
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Fuente Be Quiet 750W 80 Plus Gold PURE POWER 12 M Full Modular ATX 3.1 PCIe 5.1', 148500.0, 16, 'Be Quiet!');
+
+INSERT INTO FuenteDeAlimentacion (id, formato, wattsNominales, wattsReales, certificacion80Plus, tipoDeCableado, conector24Pines, cantConectoresCpu4Pines, cantConectoresCpu4PinesPlus, cantConectoresCpu6Pines, cantConectoresCpu2PinesPlus, cantConexionesSata, cantConexionesMolex, cantConexionesPcie16Pines)
+VALUES (
+           138, 'ATX', '750W', '750W', 'Gold', 'Full Modular', true, 0, 2, 0, 4, 6, 2, 1
+       );
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Fuente-Be-Quiet-750W-80-Plus-Gold-PURE-POWER-12-M-Full-Modular-ATX-3-1-PCIe-5-1-1.jpg', 138),
+       ('Fuente-Be-Quiet-750W-80-Plus-Gold-PURE-POWER-12-M-Full-Modular-ATX-3-1-PCIe-5-1-2.jpg', 138),
+       ('Fuente-Be-Quiet-750W-80-Plus-Gold-PURE-POWER-12-M-Full-Modular-ATX-3-1-PCIe-5-1-3.jpg', 138);
 
 -- =================================================================
 -- Gabinetes
 -- =================================================================
 
--- Componente 22: NZXT H510
-INSERT INTO Componente (id, nombre, precio, stock, marca) VALUES (22, 'NZXT H510', 60000.0, 9, 'NZXT');
-INSERT INTO Gabinete (id, color, conVentana, tipoDeVentana, tamanioGabinete, cantUSB, audioFrontal, cantCoolerFanDe120mmSoportados, cantCoolerFanDe120mmIncluidos, cantCoolerFanDe140mmSoportados, cantCoolerFanDe140mmIncluidos, cantCoolerFanDe80mmSoportados, cantCoolerFanDe80mmIncluidos, cantCoolerFanDe200mmSoportados, cantCoolerFanDe200mmIncluidos, cantRadiador240mmSoportados, cantRadiador280mmSoportados, cantRadiador360mmSoportados, cantRadiador420mmSoportados) VALUES (22, 'Negro', true, 'Vidrio Templado', 'Mid-Tower', 2, true, 4, 2, 2, 0, 0, 0, 0, 0, 1, 1, 0, 0);
-INSERT INTO Imagen (id, urlImagen, componente_id) VALUES (22, 'nzxt-h510-1.jpg', 22);
+-- Componente 139: Gabinete Antec NX292 ARGB MESH Black
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Gabinete Antec NX292 ARGB MESH Black 4x120mm ARGB Fans Vidrio Templado', 83500.0, 15, 'Antec');
 
--- Componente 23: Corsair Carbide
-INSERT INTO Componente (id, nombre, precio, stock, marca) VALUES (23, 'Corsair Carbide', 55000.0, 7, 'Corsair');
-INSERT INTO Gabinete (id, color, conVentana, tipoDeVentana, tamanioGabinete, cantUSB, audioFrontal, cantCoolerFanDe120mmSoportados, cantCoolerFanDe120mmIncluidos, cantCoolerFanDe140mmSoportados, cantCoolerFanDe140mmIncluidos, cantCoolerFanDe80mmSoportados, cantCoolerFanDe80mmIncluidos, cantCoolerFanDe200mmSoportados, cantCoolerFanDe200mmIncluidos, cantRadiador240mmSoportados, cantRadiador280mmSoportados, cantRadiador360mmSoportados, cantRadiador420mmSoportados) VALUES (23, 'Negro', true, 'Acrílico', 'Mid-Tower', 2, true, 5, 1, 2, 0, 0, 0, 0, 0, 1, 1, 1, 0);
-INSERT INTO Imagen (id, urlImagen, componente_id) VALUES (23, 'corsair-carbide-1.jpg', 23);
+INSERT INTO Gabinete (id, color, conVentana, tipoDeVentana, tamanioGabinete, cantUSB, audioFrontal, cantCoolerFanDe80mmSoportados, cantCoolerFanDe80mmIncluidos, cantCoolerFanDe120mmSoportados, cantCoolerFanDe120mmIncluidos, cantCoolerFanDe140mmSoportados, cantCoolerFanDe140mmIncluidos, cantCoolerFanDe200mmSoportados, cantCoolerFanDe200mmIncluidos, cantRadiador240mmSoportados, cantRadiador280mmSoportados, cantRadiador360mmSoportados, cantRadiador420mmSoportados)
+VALUES (
+           139, 'Negro', true, 'Vidrio Templado', 'Mid Tower', 3, true, 0, 0, 8, 4, 2, 0, 0, 0, 1, 1, 1, 0
+       );
 
--- Componente 24: Cooler Master Q300L
-INSERT INTO Componente (id, nombre, precio, stock, marca) VALUES (24, 'Cooler Master Q300L', 50000.0, 10, 'Cooler Master');
-INSERT INTO Gabinete (id, color, conVentana, tipoDeVentana, tamanioGabinete, cantUSB, audioFrontal, cantCoolerFanDe120mmSoportados, cantCoolerFanDe120mmIncluidos, cantCoolerFanDe140mmSoportados, cantCoolerFanDe140mmIncluidos, cantCoolerFanDe80mmSoportados, cantCoolerFanDe80mmIncluidos, cantCoolerFanDe200mmSoportados, cantCoolerFanDe200mmIncluidos, cantRadiador240mmSoportados, cantRadiador280mmSoportados, cantRadiador360mmSoportados, cantRadiador420mmSoportados) VALUES (24, 'Negro', true, 'Acrílico', 'Micro-ATX Tower', 2, true, 4, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0);
-INSERT INTO Imagen (id, urlImagen, componente_id) VALUES (24, 'cooler-master-q300l-1.jpg', 24);*/
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Gabinete-Antec-NX292-ARGB-MESH-Black-4x120mm-ARGB-Fans-Vidrio-Templado-1.jpg', 139),
+       ('Gabinete-Antec-NX292-ARGB-MESH-Black-4x120mm-ARGB-Fans-Vidrio-Templado-2.jpg', 139),
+       ('Gabinete-Antec-NX292-ARGB-MESH-Black-4x120mm-ARGB-Fans-Vidrio-Templado-3.jpg', 139),
+       ('Gabinete-Antec-NX292-ARGB-MESH-Black-4x120mm-ARGB-Fans-Vidrio-Templado-4.jpg', 139);
+
+-- Componente 140: Gabinete XYZ Airone 100 Mesh Black
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Gabinete XYZ Airone 100 Mesh Black 3x140mm + 3x120mm ARGB Fans Vidrio Templado', 105000.0, 10, 'Xigmatek');
+
+INSERT INTO Gabinete (id, color, conVentana, tipoDeVentana, tamanioGabinete, cantUSB, audioFrontal, cantCoolerFanDe80mmSoportados, cantCoolerFanDe80mmIncluidos, cantCoolerFanDe120mmSoportados, cantCoolerFanDe120mmIncluidos, cantCoolerFanDe140mmSoportados, cantCoolerFanDe140mmIncluidos, cantCoolerFanDe200mmSoportados, cantCoolerFanDe200mmIncluidos, cantRadiador240mmSoportados, cantRadiador280mmSoportados, cantRadiador360mmSoportados, cantRadiador420mmSoportados)
+VALUES (
+           140, 'Negro', true, 'Vidrio Templado', 'Mid Tower', 3, true, 0, 0, 9, 3, 3, 3, 0, 0, 1, 1, 1, 0
+       );
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Gabinete-XYZ-Airone-100-Mesh-Black-3x140mm-+-3x120mm-ARGB-Fans-Vidrio-Templado-1.jpg', 140),
+       ('Gabinete-XYZ-Airone-100-Mesh-Black-3x140mm-+-3x120mm-ARGB-Fans-Vidrio-Templado-2.jpg', 140),
+       ('Gabinete-XYZ-Airone-100-Mesh-Black-3x140mm-+-3x120mm-ARGB-Fans-Vidrio-Templado-3.jpg', 140),
+       ('Gabinete-XYZ-Airone-100-Mesh-Black-3x140mm-+-3x120mm-ARGB-Fans-Vidrio-Templado-4.jpg', 140);
+
+
+-- Componente 141: Gabinete Antec C5 ARGB White
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Gabinete Antec C5 ARGB White 7x120mm ARGB Fans Vidrio Templado 270° Inc Controladora', 159900.0, 8, 'Antec');
+
+INSERT INTO Gabinete (id, color, conVentana, tipoDeVentana, tamanioGabinete, cantUSB, audioFrontal, cantCoolerFanDe80mmSoportados, cantCoolerFanDe80mmIncluidos, cantCoolerFanDe120mmSoportados, cantCoolerFanDe120mmIncluidos, cantCoolerFanDe140mmSoportados, cantCoolerFanDe140mmIncluidos, cantCoolerFanDe200mmSoportados, cantCoolerFanDe200mmIncluidos, cantRadiador240mmSoportados, cantRadiador280mmSoportados, cantRadiador360mmSoportados, cantRadiador420mmSoportados)
+VALUES (
+           141, 'Blanco', true, 'Vidrio Templado', 'Mid Tower', 3, true, 0, 0, 10, 7, 3, 0, 0, 0, 1, 1, 1, 0
+       );
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Gabinete-Antec-C5-ARGB-White-7x120mm-ARGB-Fans-Vidrio-Templado-270-Inc-Controladora-1.jpg', 141),
+       ('Gabinete-Antec-C5-ARGB-White-7x120mm-ARGB-Fans-Vidrio-Templado-270-Inc-Controladora-2.jpg', 141),
+       ('Gabinete-Antec-C5-ARGB-White-7x120mm-ARGB-Fans-Vidrio-Templado-270-Inc-Controladora-3.jpg', 141),
+       ('Gabinete-Antec-C5-ARGB-White-7x120mm-ARGB-Fans-Vidrio-Templado-270-Inc-Controladora-4.jpg', 141),
+       ('Gabinete-Antec-C5-ARGB-White-7x120mm-ARGB-Fans-Vidrio-Templado-270-Inc-Controladora-5.jpg', 141);
+
+
+-- Componente 142: Gabinete ASUS ROG STRIX GX601 Helios
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Gabinete ASUS ROG STRIX GX601 Helios Aluminum Black RGB USB-C', 395000.0, 5, 'ASUS');
+
+INSERT INTO Gabinete (id, color, conVentana, tipoDeVentana, tamanioGabinete, cantUSB, audioFrontal, cantCoolerFanDe80mmSoportados, cantCoolerFanDe80mmIncluidos, cantCoolerFanDe120mmSoportados, cantCoolerFanDe120mmIncluidos, cantCoolerFanDe140mmSoportados, cantCoolerFanDe140mmIncluidos, cantCoolerFanDe200mmSoportados, cantCoolerFanDe200mmIncluidos, cantRadiador240mmSoportados, cantRadiador280mmSoportados, cantRadiador360mmSoportados, cantRadiador420mmSoportados)
+VALUES (
+           142, 'Negro', true, 'Vidrio Templado', 'Full Tower', 5, true, 0, 0, 4, 1, 7, 3, 0, 0, 1, 1, 1, 1
+       );
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Gabinete-ASUS-ROG-STRIX-GX601-Helios-Aluminum-Black-RGB-USB-C-1.jpg', 142),
+       ('Gabinete-ASUS-ROG-STRIX-GX601-Helios-Aluminum-Black-RGB-USB-C-2.jpg', 142),
+       ('Gabinete-ASUS-ROG-STRIX-GX601-Helios-Aluminum-Black-RGB-USB-C-3.jpg', 142),
+       ('Gabinete-ASUS-ROG-STRIX-GX601-Helios-Aluminum-Black-RGB-USB-C-4.jpg', 142),
+       ('Gabinete-ASUS-ROG-STRIX-GX601-Helios-Aluminum-Black-RGB-USB-C-5.jpg', 142);
+
+
+-- Componente 143: Gabinete Corsair 3000D TG Airflow Black RGB
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Gabinete Corsair 3000D TG Airflow Black RGB 3x120mm AR120 ARGB Fans ATX', 123400.0, 12, 'Corsair');
+
+INSERT INTO Gabinete (id, color, conVentana, tipoDeVentana, tamanioGabinete, cantUSB, audioFrontal, cantCoolerFanDe80mmSoportados, cantCoolerFanDe80mmIncluidos, cantCoolerFanDe120mmSoportados, cantCoolerFanDe120mmIncluidos, cantCoolerFanDe140mmSoportados, cantCoolerFanDe140mmIncluidos, cantCoolerFanDe200mmSoportados, cantCoolerFanDe200mmIncluidos, cantRadiador240mmSoportados, cantRadiador280mmSoportados, cantRadiador360mmSoportados, cantRadiador420mmSoportados)
+VALUES (
+           143, 'Negro', true, 'Vidrio Templado', 'Mid Tower', 2, true, 0, 0, 8, 3, 2, 0, 0, 0, 1, 1, 1, 0
+       );
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Gabinete-Corsair-3000D-TG-Airflow-Black-RGB-3x120mm-AR120-ARGB-Fans-ATX-1.jpg', 143),
+       ('Gabinete-Corsair-3000D-TG-Airflow-Black-RGB-3x120mm-AR120-ARGB-Fans-ATX-2.jpg', 143),
+       ('Gabinete-Corsair-3000D-TG-Airflow-Black-RGB-3x120mm-AR120-ARGB-Fans-ATX-3.jpg', 143);
+
+
+-- Componente 144: Gabinete Corsair 6500X TG Black Dual Chamber
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Gabinete Corsair 6500X TG Black Dual Chamber', 239000.0, 7, 'Corsair');
+
+INSERT INTO Gabinete (id, color, conVentana, tipoDeVentana, tamanioGabinete, cantUSB, audioFrontal, cantCoolerFanDe80mmSoportados, cantCoolerFanDe80mmIncluidos, cantCoolerFanDe120mmSoportados, cantCoolerFanDe120mmIncluidos, cantCoolerFanDe140mmSoportados, cantCoolerFanDe140mmIncluidos, cantCoolerFanDe200mmSoportados, cantCoolerFanDe200mmIncluidos, cantRadiador240mmSoportados, cantRadiador280mmSoportados, cantRadiador360mmSoportados, cantRadiador420mmSoportados)
+VALUES (
+           144, 'Negro', true, 'Vidrio Templado', 'Mid Tower', 5, true, 0, 0, 10, 0, 6, 0, 0, 0, 1, 1, 1, 0
+       );
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Gabinete-Corsair-6500X-TG-Black-Dual-Chamber-1.jpg', 144),
+       ('Gabinete-Corsair-6500X-TG-Black-Dual-Chamber-2.jpg', 144),
+       ('Gabinete-Corsair-6500X-TG-Black-Dual-Chamber-3.jpg', 144),
+       ('Gabinete-Corsair-6500X-TG-Black-Dual-Chamber-4.jpg', 144);
+
+
+-- Componente 145: Gabinete Thermaltake The Tower 300 Turquoise
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Gabinete Thermaltake The Tower 300 Turquoise 2x140mm Fans Vidrio Templado USB-C Gen2', 179850.0, 6, 'Thermaltake');
+
+INSERT INTO Gabinete (id, color, conVentana, tipoDeVentana, tamanioGabinete, cantUSB, audioFrontal, cantCoolerFanDe80mmSoportados, cantCoolerFanDe80mmIncluidos, cantCoolerFanDe120mmSoportados, cantCoolerFanDe120mmIncluidos, cantCoolerFanDe140mmSoportados, cantCoolerFanDe140mmIncluidos, cantCoolerFanDe200mmSoportados, cantCoolerFanDe200mmIncluidos, cantRadiador240mmSoportados, cantRadiador280mmSoportados, cantRadiador360mmSoportados, cantRadiador420mmSoportados)
+VALUES (
+           145, 'Turquesa', true, 'Vidrio Templado', 'Micro-ATX Tower', 3, true, 0, 0, 8, 0, 3, 2, 0, 0, 1, 1, 1, 1
+       );
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Gabinete-Thermaltake-The-Tower-300-Turquoise-2x140mm-Fans-Vidrio-Templado-USB-C-Gen2-1.jpg', 145),
+       ('Gabinete-Thermaltake-The-Tower-300-Turquoise-2x140mm-Fans-Vidrio-Templado-USB-C-Gen2-2.jpg', 145),
+       ('Gabinete-Thermaltake-The-Tower-300-Turquoise-2x140mm-Fans-Vidrio-Templado-USB-C-Gen2-3.jpg', 145),
+       ('Gabinete-Thermaltake-The-Tower-300-Turquoise-2x140mm-Fans-Vidrio-Templado-USB-C-Gen2-4.jpg', 145);
+
+-- Componente 146: Gabinete Be Quiet! PURE BASE 500DX Black ARGB
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Gabinete Be Quiet! PURE BASE 500DX Black ARGB 3x140mm Pure Wings 2 Fans Vidrio Templado USB-C', 145000.0, 9, 'Be Quiet!');
+
+INSERT INTO Gabinete (id, color, conVentana, tipoDeVentana, tamanioGabinete, cantUSB, audioFrontal, cantCoolerFanDe80mmSoportados, cantCoolerFanDe80mmIncluidos, cantCoolerFanDe120mmSoportados, cantCoolerFanDe120mmIncluidos, cantCoolerFanDe140mmSoportados, cantCoolerFanDe140mmIncluidos, cantCoolerFanDe200mmSoportados, cantCoolerFanDe200mmIncluidos, cantRadiador240mmSoportados, cantRadiador280mmSoportados, cantRadiador360mmSoportados, cantRadiador420mmSoportados)
+VALUES (
+           146, 'Negro', true, 'Vidrio Templado', 'Mid Tower', 2, true, 0, 0, 3, 1, 3, 2, 0, 0, 1, 1, 1, 0
+       );
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Gabinete-Be-Quiet-PURE-BASE-500DX-Black-ARGB-3x140mm-Pure-Wings-2-Fans-Vidrio-Templado-USB-C-1.jpg', 146),
+       ('Gabinete-Be-Quiet-PURE-BASE-500DX-Black-ARGB-3x140mm-Pure-Wings-2-Fans-Vidrio-Templado-USB-C-2.jpg', 146),
+       ('Gabinete-Be-Quiet-PURE-BASE-500DX-Black-ARGB-3x140mm-Pure-Wings-2-Fans-Vidrio-Templado-USB-C-3.jpg', 146),
+       ('Gabinete-Be-Quiet-PURE-BASE-500DX-Black-ARGB-3x140mm-Pure-Wings-2-Fans-Vidrio-Templado-USB-C-4.jpg', 146),
+       ('Gabinete-Be-Quiet-PURE-BASE-500DX-Black-ARGB-3x140mm-Pure-Wings-2-Fans-Vidrio-Templado-USB-C-5.jpg', 146);
+
+
+-- Componente 147: Gabinete Thermaltake CTE E660 MX Racing Green
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Gabinete Thermaltake CTE E660 MX Racing Green Incl. Cable Riser PCIe 4.0 Vidrio Templado USB-C', 215500.0, 4, 'Thermaltake');
+
+INSERT INTO Gabinete (id, color, conVentana, tipoDeVentana, tamanioGabinete, cantUSB, audioFrontal, cantCoolerFanDe80mmSoportados, cantCoolerFanDe80mmIncluidos, cantCoolerFanDe120mmSoportados, cantCoolerFanDe120mmIncluidos, cantCoolerFanDe140mmSoportados, cantCoolerFanDe140mmIncluidos, cantCoolerFanDe200mmSoportados, cantCoolerFanDe200mmIncluidos, cantRadiador240mmSoportados, cantRadiador280mmSoportados, cantRadiador360mmSoportados, cantRadiador420mmSoportados)
+VALUES (
+           147, 'Verde', true, 'Vidrio Templado', 'Mid Tower', 3, true, 0, 0, 11, 0, 9, 0, 0, 0, 1, 1, 1, 1
+       );
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Gabinete-Thermaltake-CTE-E660-MX-Racing-Green-Incl-Cable-Riser-PCIe-4-0-Vidrio-Templado-USB-C-1.jpg', 147),
+       ('Gabinete-Thermaltake-CTE-E660-MX-Racing-Green-Incl-Cable-Riser-PCIe-4-0-Vidrio-Templado-USB-C-2.jpg', 147),
+       ('Gabinete-Thermaltake-CTE-E660-MX-Racing-Green-Incl-Cable-Riser-PCIe-4-0-Vidrio-Templado-USB-C-3.jpg', 147),
+       ('Gabinete-Thermaltake-CTE-E660-MX-Racing-Green-Incl-Cable-Riser-PCIe-4-0-Vidrio-Templado-USB-C-4.jpg', 147);
+
+-- Componente 148: Gabinete DeepCool CH260 Mini Mesh
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Gabinete DeepCool CH260 Mini Mesh Vidrio Templado MATX', 65000.0, 20, 'DeepCool');
+
+INSERT INTO Gabinete (id, color, conVentana, tipoDeVentana, tamanioGabinete, cantUSB, audioFrontal, cantCoolerFanDe80mmSoportados, cantCoolerFanDe80mmIncluidos, cantCoolerFanDe120mmSoportados, cantCoolerFanDe120mmIncluidos, cantCoolerFanDe140mmSoportados, cantCoolerFanDe140mmIncluidos, cantCoolerFanDe200mmSoportados, cantCoolerFanDe200mmIncluidos, cantRadiador240mmSoportados, cantRadiador280mmSoportados, cantRadiador360mmSoportados, cantRadiador420mmSoportados)
+VALUES (
+           148, 'Negro', true, 'Vidrio Templado', 'Mini Tower', 2, true, 0, 0, 4, 0, 2, 0, 0, 0, 1, 1, 0, 0
+       );
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Gabinete-DeepCool-CH260-Mini-Mesh-Vidrio-Templado-MATX-1.jpg', 148);
+
+-- =================================================================
+-- Monitores
+-- =================================================================
+
+-- Componente 149: Monitor Gamer LG Ultragear 24GS60F-B 24" IPS FHD 1920*1080 180Hz G-SYNC FreeSync 1ms
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Monitor Gamer LG Ultragear 24GS60F-B 24" IPS FHD 1920*1080 180Hz G-SYNC FreeSync 1ms', 19350.0, 16, 'LG');
+
+INSERT INTO Monitor (id, tipoDeIluminacion, tipoDePanel, pantallaCurva, puertosHDMI,
+                     puertosDisplayPort, puertosMiniDisplayPort, puertosVGA, puertosDVI,
+                     puertosUSB, conectorAuriculares, pulgadas, resolucionMaxima,
+                     frecuenciaMaxima, tiempoDeRespuesta, nvidiaGSync, amdFreesync, ancho, alto, espesor, curvatura)
+VALUES (149, 'LED', 'IPS', false, 1, 1,
+        0, 0, 0, 0, true, '24',
+        '1920x1080', '180hz', '1ms', true,
+        true, '541mm', '324mm', '43mm', '0r');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Monitor-Gamer-LG-Ultragear-24GS60F-B-24_-IPS-FHD-1920_1080-180Hz-G-SYNC-FreeSync-1ms-1.jpg', 149),
+       ('Monitor-Gamer-LG-Ultragear-24GS60F-B-24_-IPS-FHD-1920_1080-180Hz-G-SYNC-FreeSync-1ms-2.jpg', 149);
+
+-- Componente 150: Monitor Samsung 22" T350FH FHD IPS 75Hz
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Monitor Samsung 22" T350FH FHD IPS 75Hz', 15200.0, 12, 'Samsung');
+
+INSERT INTO Monitor (id, tipoDeIluminacion, tipoDePanel, pantallaCurva, puertosHDMI,
+                     puertosDisplayPort, puertosMiniDisplayPort, puertosVGA, puertosDVI,
+                     puertosUSB, conectorAuriculares, pulgadas, resolucionMaxima,
+                     frecuenciaMaxima, tiempoDeRespuesta, nvidiaGSync, amdFreesync, ancho, alto, espesor, curvatura)
+VALUES (150, 'LED', 'IPS', false, 1, 0,
+        0, 1, 0, 0, false, '22',
+        '1920x1080', '75hz', '5ms', false,
+        false, '487mm', '369mm', '65mm', '0r');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Monitor-Samsung-22_-T350FH-FHD-IPS-75Hz-1.jpg', 150),
+       ('Monitor-Samsung-22_-T350FH-FHD-IPS-75Hz-2.jpg', 150);
+
+-- Componente 151: Monitor Gamer Curvo LG 34" UltraWide 34GP63A 160Hz WQHD 2K FreeSync Premium
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Monitor Gamer Curvo LG 34" UltraWide 34GP63A 160Hz WQHD 2K FreeSync Premium', 893150.0, 8, 'LG');
+
+INSERT INTO Monitor (id, tipoDeIluminacion, tipoDePanel, pantallaCurva, puertosHDMI,
+                     puertosDisplayPort, puertosMiniDisplayPort, puertosVGA, puertosDVI,
+                     puertosUSB, conectorAuriculares, pulgadas, resolucionMaxima,
+                     frecuenciaMaxima, tiempoDeRespuesta, nvidiaGSync, amdFreesync, ancho, alto, espesor, curvatura)
+VALUES (151, 'LED', 'VA', true, 2, 1,
+        0, 0, 0, 1, true, '34',
+        '3440x1440', '160hz', '5ms', false,
+        true, '808mm', '359mm', '92mm', '1800r');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Monitor-Gamer-Curvo-LG-34_-UltraWide-34GP63A-160Hz-WQHD-2K-FreeSync-Premium-1.jpg', 151),
+       ('Monitor-Gamer-Curvo-LG-34_-UltraWide-34GP63A-160Hz-WQHD-2K-FreeSync-Premium-2.jpg', 151);
+
+-- Componente 152: Monitor LG 24MS500-B 24" IPS FHD 100Hz 5ms
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Monitor LG 24MS500-B 24" IPS FHD 100Hz 5ms', 16750.0, 14, 'LG');
+
+INSERT INTO Monitor (id, tipoDeIluminacion, tipoDePanel, pantallaCurva, puertosHDMI,
+                     puertosDisplayPort, puertosMiniDisplayPort, puertosVGA, puertosDVI,
+                     puertosUSB, conectorAuriculares, pulgadas, resolucionMaxima,
+                     frecuenciaMaxima, tiempoDeRespuesta, nvidiaGSync, amdFreesync, ancho, alto, espesor, curvatura)
+VALUES (152, 'EDGE', 'IPS', false, 2, 0,
+        0, 0, 0, 0, true, '24',
+        '1920x1080', '100hz', '5ms', false,
+        false, '541mm', '324mm', '43mm', '0r');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Monitor-LG-24MS500-B-24_-IPS-FHD-100Hz-5ms-1.jpg', 152),
+       ('Monitor-LG-24MS500-B-24_-IPS-FHD-100Hz-5ms-2.jpg', 152);
+
+-- Componente 153: Monitor Gamer Curvo ViewSonic VX3218C-2K 32" 1500R QHD 1440p 180Hz VA 1ms MPRT FreeSync Premium
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Monitor Gamer Curvo ViewSonic VX3218C-2K 32" 1500R QHD 1440p 180Hz VA 1ms MPRT FreeSync Premium', 38900.0, 6, 'ViewSonic');
+
+INSERT INTO Monitor (id, tipoDeIluminacion, tipoDePanel, pantallaCurva, puertosHDMI,
+                     puertosDisplayPort, puertosMiniDisplayPort, puertosVGA, puertosDVI,
+                     puertosUSB, conectorAuriculares, pulgadas, resolucionMaxima,
+                     frecuenciaMaxima, tiempoDeRespuesta, nvidiaGSync, amdFreesync, ancho, alto, espesor, curvatura)
+VALUES (153, 'LED', 'VA', true, 2, 1,
+        0, 0, 0, 2, true, '32',
+        '2560x1440', '180hz', '1ms', false,
+        true, '709mm', '423mm', '94mm', '1500r');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Monitor-Gamer-Curvo-ViewSonic-VX3218C-2K-32_-1500R-QHD-1440p-180Hz-VA-1ms-MPRT-FreeSync-Premium-1.jpg', 153),
+       ('Monitor-Gamer-Curvo-ViewSonic-VX3218C-2K-32_-1500R-QHD-1440p-180Hz-VA-1ms-MPRT-FreeSync-Premium-2.jpg', 153);
+
+-- Componente 154: Monitor Gamer AsRock Phantom PG32QF2B 31.5" VA QHD 165Hz FreeSync Antena WiFi Integrada
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Monitor Gamer AsRock Phantom PG32QF2B 31.5" VA QHD 165Hz FreeSync Antena WiFi Integrada', 517200.0, 5, 'AsRock');
+
+INSERT INTO Monitor (id, tipoDeIluminacion, tipoDePanel, pantallaCurva, puertosHDMI,
+                     puertosDisplayPort, puertosMiniDisplayPort, puertosVGA, puertosDVI,
+                     puertosUSB, conectorAuriculares, pulgadas, resolucionMaxima,
+                     frecuenciaMaxima, tiempoDeRespuesta, nvidiaGSync, amdFreesync, ancho, alto, espesor, curvatura)
+VALUES (154, 'LED', 'VA', false, 2, 1,
+        0, 0, 0, 1, true, '31.5',
+        '2560x1440', '165hz', '1ms', false,
+        true, '708mm', '420mm', '56mm', '0r');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Monitor-Gamer-AsRock-Phantom-PG32QF2B-31.5_-VA-QHD-165Hz-FreeSync-Antena-WiFi-Integrada-1.jpg', 154),
+       ('Monitor-Gamer-AsRock-Phantom-PG32QF2B-31.5_-VA-QHD-165Hz-FreeSync-Antena-WiFi-Integrada-2.jpg', 154);
+
+-- Componente 155: Monitor Gamer ASUS VA27EHF-J 27" FHD IPS 100Hz
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Monitor Gamer ASUS VA27EHF-J 27" FHD IPS 100Hz', 22800.0, 10, 'ASUS');
+
+INSERT INTO Monitor (id, tipoDeIluminacion, tipoDePanel, pantallaCurva, puertosHDMI,
+                     puertosDisplayPort, puertosMiniDisplayPort, puertosVGA, puertosDVI,
+                     puertosUSB, conectorAuriculares, pulgadas, resolucionMaxima,
+                     frecuenciaMaxima, tiempoDeRespuesta, nvidiaGSync, amdFreesync, ancho, alto, espesor, curvatura)
+VALUES (155, 'LED', 'IPS', false, 2, 1,
+        0, 1, 0, 0, true, '27',
+        '1920x1080', '100hz', '1ms', false,
+        true, '611mm', '364mm', '52mm', '0r');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Monitor-Gamer-ASUS-VA27EHF-J-27_-FHD-IPS-100Hz-1.jpg', 155),
+       ('Monitor-Gamer-ASUS-VA27EHF-J-27_-FHD-IPS-100Hz-2.jpg', 155);
+
+-- Componente 156: Monitor Lenovo ThinkVision S22i-30 21.5" FHD IPS 75Hz Anti Glare VESA
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Monitor Lenovo ThinkVision S22i-30 21.5" FHD IPS 75Hz Anti Glare VESA', 18600.0, 9, 'Lenovo');
+
+INSERT INTO Monitor (id, tipoDeIluminacion, tipoDePanel, pantallaCurva, puertosHDMI,
+                     puertosDisplayPort, puertosMiniDisplayPort, puertosVGA, puertosDVI,
+                     puertosUSB, conectorAuriculares, pulgadas, resolucionMaxima,
+                     frecuenciaMaxima, tiempoDeRespuesta, nvidiaGSync, amdFreesync, ancho, alto, espesor, curvatura)
+VALUES (156, 'WLED', 'IPS', false, 1, 1,
+        0, 1, 0, 2, true, '21.5',
+        '1920x1080', '75hz', '4ms', false,
+        false, '489mm', '295mm', '38mm', '0r');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Monitor-Lenovo-ThinkVision-S22i-30-21.5_-FHD-IPS-75Hz-Anti-Glare-VESA-1.jpg', 156),
+       ('Monitor-Lenovo-ThinkVision-S22i-30-21.5_-FHD-IPS-75Hz-Anti-Glare-VESA-2.jpg', 156);
+
+-- Componente 157: Monitor LG 34WP75C-B 34" WQHD 3440x1440 VA 160Hz Ultrapanoramico
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Monitor LG 34WP75C-B 34" WQHD 3440x1440 VA 160Hz Ultrapanoramico', 1040150.0, 7, 'LG');
+
+INSERT INTO Monitor (id, tipoDeIluminacion, tipoDePanel, pantallaCurva, puertosHDMI,
+                     puertosDisplayPort, puertosMiniDisplayPort, puertosVGA, puertosDVI,
+                     puertosUSB, conectorAuriculares, pulgadas, resolucionMaxima,
+                     frecuenciaMaxima, tiempoDeRespuesta, nvidiaGSync, amdFreesync, ancho, alto, espesor, curvatura)
+VALUES (157, 'EDGE', 'VA', true, 2, 1,
+        0, 0, 0, 2, true, '34',
+        '3440x1440', '160hz', '5ms', false,
+        true, '808mm', '359mm', '92mm', '1800r');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Monitor-LG-34WP75C-B-34_-WQHD-3440x1440-VA-160Hz-Ultrapanoramico-1.jpg', 157),
+       ('Monitor-LG-34WP75C-B-34_-WQHD-3440x1440-VA-160Hz-Ultrapanoramico-2.jpg', 157);
+
+-- Componente 158: Monitor Gamer Samsung Odyssey G8 34" OLED UWQHD Curvo 1800R 175Hz AMD Freesync Premium
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Monitor Gamer Samsung Odyssey G8 34" OLED UWQHD Curvo 1800R 175Hz AMD Freesync Premium', 89500.0, 3, 'Samsung');
+
+INSERT INTO Monitor (id, tipoDeIluminacion, tipoDePanel, pantallaCurva, puertosHDMI,
+                     puertosDisplayPort, puertosMiniDisplayPort, puertosVGA, puertosDVI,
+                     puertosUSB, conectorAuriculares, pulgadas, resolucionMaxima,
+                     frecuenciaMaxima, tiempoDeRespuesta, nvidiaGSync, amdFreesync, ancho, alto, espesor, curvatura)
+VALUES (158, 'OLED', 'OLED', true, 0, 0,
+        1, 0, 0, 1, false, '34',
+        '3440x1440', '175hz', '1ms', false,
+        true, '814mm', '364mm', '128mm', '1800r');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Monitor-Gamer-Samsung-Odyssey-G8-34_-OLED-UWQHD-Curvo-1800R-175Hz-AMD-Freesync-Premium-1.jpg', 158),
+       ('Monitor-Gamer-Samsung-Odyssey-G8-34_-OLED-UWQHD-Curvo-1800R-175Hz-AMD-Freesync-Premium-2.jpg', 158);
+
+-- =================================================================
+-- Periferico Mouse
+-- =================================================================
+
+-- Componente 159: Mouse Logitech M240 Silent Bluetooth off white
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Mouse Logitech M240 Silent Bluetooth off white', 29990.0, 20, 'Logitech');
+
+INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
+                        conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
+VALUES (159, '0', 'inalámbrico', true, true, false, false, null, false, null);
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Periferico-Mouse-Logitech-M240-Silent-Bluetooth-off-white-1.jpg', 159),
+       ('Periferico-Mouse-Logitech-M240-Silent-Bluetooth-off-white-2.jpg', 159);
+
+-- Componente 160: Mouse Cougar Surpassion RX Wireless Pink RGB
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Mouse Cougar Surpassion RX Wireless Pink RGB', 89990.0, 12, 'Cougar');
+
+INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
+                        conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
+VALUES (160, '1', 'inalámbrico', false, false, true, true, 'USB-C', true, '1800m');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Periferico-Mouse-Cougar-Surpassion-RX-Wireless-Pink-RGB-1.jpg', 160),
+       ('Periferico-Mouse-Cougar-Surpassion-RX-Wireless-Pink-RGB-2.jpg', 160);
+
+-- Componente 161: Mouse Logitech G903 Wireless 2.4Ghz Lightspeed 1ms HERO 25K 110g 24Hs
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Mouse Logitech G903 Wireless 2.4Ghz Lightspeed 1ms HERO 25K 110g 24Hs', 106700.0, 8, 'Logitech');
+
+INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
+                        conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
+VALUES (161, '1', 'inalámbrico', false, false, true, true, 'USB-C', true, '1500m');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Periferico-Mouse-Logitech-G903-Wireless-2-4Ghz-Lightspeed-1ms-HERO-25K-110g-24Hs-1.jpg', 161),
+       ('Periferico-Mouse-Logitech-G903-Wireless-2-4Ghz-Lightspeed-1ms-HERO-25K-110g-24Hs-2.jpg', 161),
+       ('Periferico-Mouse-Logitech-G903-Wireless-2-4Ghz-Lightspeed-1ms-HERO-25K-110g-24Hs-3.jpg', 161);
+
+-- Componente 162: Mouse Redragon Impact M908 RGB 12.400dpi
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Mouse Redragon Impact M908 RGB 12.400dpi', 26800.0, 15, 'Redragon');
+
+INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
+                        conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
+VALUES (162, '1', 'cableado', false, false, false, false, 'USB-A', false, '1800m');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Periferico-Mouse-Redragon-Impact-M908-RGB-12-400dpi-1.jpg', 162),
+       ('Periferico-Mouse-Redragon-Impact-M908-RGB-12-400dpi-2.jpg', 162),
+       ('Periferico-Mouse-Redragon-Impact-M908-RGB-12-400dpi-3.jpg', 162);
+
+-- Componente 163: Mouse Logitech Wireless M280 Gray
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Mouse Logitech Wireless M280 Gray', 16990.0, 22, 'Logitech');
+
+INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
+                        conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
+VALUES (163, '1', 'inalámbrico', false, false, true, true, null, false, null);
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Periferico-Mouse-Logitech-Wireless-M280-Gray-1.jpg', 163),
+       ('Periferico-Mouse-Logitech-Wireless-M280-Gray-2.jpg', 163);
+
+-- Componente 164: Mouse Redragon Griffin M607W RGB White
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Mouse Redragon Griffin M607W RGB White', 19350.0, 16, 'Redragon');
+
+INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
+                        conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
+VALUES (164, '1', 'inalámbrico', false, false, true, true, 'USB-C', true, '1600m');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Periferico-Mouse-Redragon-Griffin-M607W-RGB-White-1.jpg', 164),
+       ('Periferico-Mouse-Redragon-Griffin-M607W-RGB-White-2.jpg', 164);
+
+-- =================================================================
+-- Periferico Teclado
+-- =================================================================
+
+-- Componente 165: Teclado Logitech K120 Negro USB
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Teclado Logitech K120 Negro USB', 15990.0, 25, 'Logitech');
+
+INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
+                        conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
+VALUES (165, '1', 'cableado', false, false, false, false, 'USB-A', false, '1500m');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Periferico-Teclado-Logitech-K120-Negro-USB-1.jpg', 165),
+       ('Periferico-Teclado-Logitech-K120-Negro-USB-2.jpg', 165);
+
+-- Componente 166: Teclado Redragon Mitra K551 Mechanical Retroiluminado RGB
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Teclado Redragon Mitra K551 Mechanical Retroiluminado RGB', 79990.0, 18, 'Redragon');
+
+INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
+                        conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
+VALUES (166, '1', 'cableado', false, false, false, false, 'USB-A', false, '1800m');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Periferico-Teclado-Redragon-Mitra-K551-Mechanical-Retroiluminado-RGB-1.jpg', 166),
+       ('Periferico-Teclado-Redragon-Mitra-K551-Mechanical-Retroiluminado-RGB-2.jpg', 166);
+
+-- Componente 167: Teclado Mecanico Logitech G915 Low Profile Lightspeed Wireless 2.4Ghz Bluetooth LightSync RGB Switch Brown TKL White 40hs
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Teclado Mecanico Logitech G915 Low Profile Lightspeed Wireless 2.4Ghz Bluetooth LightSync RGB Switch Brown TKL White 40hs', 263542.0, 6, 'Logitech');
+
+INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
+                        conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
+VALUES (167, '1', 'inalámbrico', true, false, true, true, 'USB-C', true, '1200m');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Periferico-Teclado-Mecanico-Logitech-G915-Low-Profile-Lightspeed-Wireless-2-4Ghz-Bluetooth-LightSync-RGB-Switch-Brown-TKL-White-40hs-1.jpg', 167),
+       ('Periferico-Teclado-Mecanico-Logitech-G915-Low-Profile-Lightspeed-Wireless-2-4Ghz-Bluetooth-LightSync-RGB-Switch-Brown-TKL-White-40hs-2.jpg', 167);
+
+-- Componente 168: Teclado Mecanico ASUS ROG Strix M701 Azoth RGB Wireless Bluetooth Switch NX Storm White
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Teclado Mecanico ASUS ROG Strix M701 Azoth RGB Wireless Bluetooth Switch NX Storm White', 299990.0, 4, 'ASUS');
+
+INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
+                        conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
+VALUES (168, '1', 'inalámbrico', true, false, true, true, 'USB-C', true, '1000m');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Periferico-Teclado-Mecanico-ASUS-ROG-Strix-M701-Azoth-RGB-Wireless-Bluetooth-Switch-NX-Storm-White-1.jpg', 168),
+       ('Periferico-Teclado-Mecanico-ASUS-ROG-Strix-M701-Azoth-RGB-Wireless-Bluetooth-Switch-NX-Storm-White-2.jpg', 168),
+       ('Periferico-Teclado-Mecanico-ASUS-ROG-Strix-M701-Azoth-RGB-Wireless-Bluetooth-Switch-NX-Storm-White-3.jpg', 168);
+
+-- Componente 169: Teclado Logitech MX Key Graphite VC
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Teclado Logitech MX Key Graphite VC', 159990.0, 10, 'Logitech');
+
+INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
+                        conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
+VALUES (169, '1', 'inalámbrico', true, false, true, true, 'USB-C', true, '1400m');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Periferico-Teclado-Logitech-MX-Key-Graphite-VC-1.jpg', 169),
+       ('Periferico-Teclado-Logitech-MX-Key-Graphite-VC-2.jpg', 169),
+       ('Periferico-Teclado-Logitech-MX-Key-Graphite-VC-3.jpg', 169);
+
+-- Componente 170: Teclado Logitech Pebble Keys 2 K380S Multidispositivo Bluetooth Black
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Teclado Logitech Pebble Keys 2 K380S Multidispositivo Bluetooth Black', 41200.0, 14, 'Logitech');
+
+INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
+                        conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
+VALUES (170, '0', 'inalámbrico', true, true, false, false, null, false, null);
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Periferico-Teclado-Logitech-Pebble-Keys-2-K380S-Multidispositivo-Bluetooth-Black-1.jpg', 170);
+
+-- =================================================================
+-- Periferico Auriculares
+-- =================================================================
+
+-- Componente 171: Auriculares Logitech G PRO X Gaming Premium 7.1
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Auriculares Logitech G PRO X Gaming Premium 7.1', 209990.0, 10, 'Logitech');
+
+INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
+                        conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
+VALUES (171, '1', 'cableado', false, false, false, false, 'USB-C', 0, '2000m');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Periferico-Auriculares-Logitech-G-PRO-X-Gaming-Premium-1.jpg', 171),
+       ('Periferico-Auriculares-Logitech-G-PRO-X-Gaming-Premium-2.jpg', 171),
+       ('Periferico-Auriculares-Logitech-G-PRO-X-Gaming-Premium-3.jpg', 171);
+
+-- Componente 172: Auriculares Redragon Ire H848 Ultra light Wireless USB Bluetooth White/Pink USB C
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Auriculares Redragon Ire H848 Ultra light Wireless USB Bluetooth White/Pink USB C', 89990.0, 15, 'Redragon');
+
+INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
+                        conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
+VALUES (172, '0', 'inalámbrico', true, false, true, true, 'USB-C', true, '1500m');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Periferico-Auriculares-Redragon-Ire-H848-Ultra-light-Wireless-USB-Bluetooth-White-Pink-USB-C-1.jpg', 172),
+       ('Periferico-Auriculares-Redragon-Ire-H848-Ultra-light-Wireless-USB-Bluetooth-White-Pink-USB-C-2.jpg', 172),
+       ('Periferico-Auriculares-Redragon-Ire-H848-Ultra-light-Wireless-USB-Bluetooth-White-Pink-USB-C-3.jpg', 172);
+
+-- Componente 173: Auriculares Logitech G935 Wireless 2.4Ghz 7.1 Lightsync DTS Headphone X RGB
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Auriculares Logitech G935 Wireless 2.4Ghz 7.1 Lightsync DTS Headphone X RGB', 169990.0, 8, 'Logitech');
+
+INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
+                        conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
+VALUES (173, '1', 'inalámbrico', false, false, true, true, null, false, null);
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Periferico-Auriculares-Logitech-G935-Wireless-2-4Ghz-7-1-Lightsync-DTS-Headphone-X-RGB-1.jpg', 173),
+       ('Periferico-Auriculares-Logitech-G935-Wireless-2-4Ghz-7-1-Lightsync-DTS-Headphone-X-RGB-2.jpg', 173),
+       ('Periferico-Auriculares-Logitech-G935-Wireless-2-4Ghz-7-1-Lightsync-DTS-Headphone-X-RGB-3.jpg', 173),
+       ('Periferico-Auriculares-Logitech-G935-Wireless-2-4Ghz-7-1-Lightsync-DTS-Headphone-X-RGB-4.jpg', 173);
+
+-- Componente 174: Auriculares Logitech G335 White PC/XBOX/PS
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Auriculares Logitech G335 White PC/XBOX/PS', 108200.0, 12, 'Logitech');
+
+INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
+                        conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
+VALUES (174, '0', 'cableado', false, false, false, false, 'Jack 3.5mm', false, '2500m');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Periferico-Auriculares-Logitech-G335-White-PC-XBOX-PS-1.jpg', 174),
+       ('Periferico-Auriculares-Logitech-G335-White-PC-XBOX-PS-2.jpg', 174);
+
+-- Componente 175: Auriculares Logitech Astro A50X Wireless Lightspeed 2.4Ghz Bluetooth Black PC/PS5/XBOX HDMI 2.1 24HS
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Auriculares Logitech Astro A50X Wireless Lightspeed 2.4Ghz Bluetooth Black PC/PS5/XBOX HDMI 2.1 24HS', 548500.0, 5, 'Logitech');
+
+INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
+                        conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
+VALUES (175, '1', 'inalámbrico', true, false, true, true, 'USB-C', true, '1800m');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Periferico-Auriculares-Logitech-Astro-A50X-Wireless-Lightspeed-2-4Ghz-Bluetooth-Black-PC-PS5-XBOX-HDMI-2-1-24HS-1.jpg', 175),
+       ('Periferico-Auriculares-Logitech-Astro-A50X-Wireless-Lightspeed-2-4Ghz-Bluetooth-Black-PC-PS5-XBOX-HDMI-2-1-24HS-2.jpg', 175),
+       ('Periferico-Auriculares-Logitech-Astro-A50X-Wireless-Lightspeed-2-4Ghz-Bluetooth-Black-PC-PS5-XBOX-HDMI-2-1-24HS-3.jpg', 175);
+
+-- Componente 176: Auriculares Redragon Ire H848 Ultra light Wireless USB Bluetooth Black USB C
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Auriculares Redragon Ire H848 Ultra light Wireless USB Bluetooth Black USB C', 89990.0, 15, 'Redragon');
+
+INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
+                        conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
+VALUES (176, '1', 'inalámbrico', true, false, true, true, 'USB-C', true, '1500m');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Periferico-Auriculares-Redragon-Ire-H848-Ultra-light-Wireless-USB-Bluetooth-Black-USB-C-1.jpg', 176),
+       ('Periferico-Auriculares-Redragon-Ire-H848-Ultra-light-Wireless-USB-Bluetooth-Black-USB-C-2.jpg', 176);
