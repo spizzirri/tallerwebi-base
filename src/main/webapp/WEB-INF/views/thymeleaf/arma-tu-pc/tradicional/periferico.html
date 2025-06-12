@@ -24,7 +24,7 @@
   <p class="text-muted">
     Mouses, Teclados, MousePad, Auriculares, y mas!
   </p>
-  <div th:replace="fragments/carga-componentes-arma-tu-pc :: cargarPaso (${armadoPcDto}, ${perifericoLista}, 'periferico', 'perifericos', 'monitor', '#')"></div>
+  <div th:replace="fragments/carga-componentes-arma-tu-pc :: cargarPaso (${armadoPcDto}, ${perifericoLista}, 'periferico', ${idsDeComponentesSeleccionados}, 'monitor', '#')"></div>
 </div>
 
 <!-- Boostrap core js -->

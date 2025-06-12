@@ -7,7 +7,6 @@ public class PagoRequest {
     private String metodoDePago;
     private Double costoEnvio = 0.0;
 
-
     // Constructor vacío necesario para el binding
     public PagoRequest() {}
 

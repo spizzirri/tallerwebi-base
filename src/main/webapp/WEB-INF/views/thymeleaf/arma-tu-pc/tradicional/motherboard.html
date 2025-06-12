@@ -26,7 +26,7 @@
         Es donde se conectaran todos los componentes de tu PC. Segun el modelo que elijas tendras diferentes beneficios de conectividad y expansion.
     </p>
     <h6 th:if="${armadoPcDto.motherboard == null}" class="alert-info text-warning border rounded bg-white p-2 d-inline">Este componente es necesario para completar el armado</h6>
-    <div th:replace="fragments/carga-componentes-arma-tu-pc :: cargarPaso (${armadoPcDto}, ${motherboardLista}, 'motherboard', 'motherboards', 'procesador', 'cooler')"></div>
+    <div th:replace="fragments/carga-componentes-arma-tu-pc :: cargarPaso (${armadoPcDto}, ${motherboardLista}, 'motherboard', ${idsDeComponentesSeleccionados}, 'procesador', 'cooler')"></div>
 </div>
 
 

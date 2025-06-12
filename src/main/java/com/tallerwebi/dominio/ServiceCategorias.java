@@ -14,14 +14,15 @@ public class ServiceCategorias {
 
     public ServiceCategorias() {
         this.categorias = new ArrayList<>();
-        this.categorias.add(new CategoriaDto("Procesadores", "procesador.jpg"));
-        this.categorias.add(new CategoriaDto("Perifericos", "perifericos.jpg"));
-        this.categorias.add(new CategoriaDto("Fuentes", "fuentes.jpg"));
-        this.categorias.add(new CategoriaDto("Memorias Ram", "ram.jpg"));
-//        this.categorias.add(new CategoriaDto("Placa de video", "placadevideo.jpg"));
-        this.categorias.add(new CategoriaDto("Almacenamiento", "almacenamiento.jpg"));
-        this.categorias.add(new CategoriaDto("Mothers", "mother.jpg"));
-        this.categorias.add(new CategoriaDto("Impresoras", "impresora.jpg"));
+        this.categorias.add(new CategoriaDto("Procesador", "Procesadores", "procesador.jpg"));
+        this.categorias.add(new CategoriaDto("Periferico", "perifericos", "perifericos.jpg"));
+        this.categorias.add(new CategoriaDto("FuenteDeAlimentacion","Fuentes de alimentacion", "fuentes.jpg"));
+        this.categorias.add(new CategoriaDto("MemoriaRAM","Memoria ram", "ram.jpg"));
+        this.categorias.add(new CategoriaDto("PlacaDeVideo", "Placa de video", "placadevideo.jpg"));
+        this.categorias.add(new CategoriaDto("Almacenamiento", "Almacenamiento", "almacenamiento.jpg"));
+        this.categorias.add(new CategoriaDto("Motherboard", "Mothers","mother.jpg"));
+        this.categorias.add(new CategoriaDto("Monitor", "Monitores", "monitor.jpg"));
+        this.categorias.add(new CategoriaDto("CoolerCPU", "Coolers", "impresora.jpg"));
     }
 
     public List<CategoriaDto> getCategorias() {

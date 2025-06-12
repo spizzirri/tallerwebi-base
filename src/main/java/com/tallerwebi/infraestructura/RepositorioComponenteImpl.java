@@ -78,4 +78,16 @@ public class RepositorioComponenteImpl implements RepositorioComponente {
 
         return query.getResultList();
     }
+
+    @Override
+    public List<Componente> obtenerComponentesPorTipoYPorQuery(String tipo, String nombre) throws ClassNotFoundException {
+        Class<?> tipoClase = Class.forName("com.tallerwebi.dominio.entidades." + tipo);
+        String hql = "FROM Componente c WHERE TYPE(c) = :tipo AND lower(c.nombre) LIKE lower(:nombre)";
+        Query query = sessionFactory.getCurrentSession().createQuery(hql);
+        query.setParameter("tipo", tipoClase);
+        query.setParameter("nombre", "%" + nombre + "%");
+        return query.getResultList();
+    }
+
+
 }

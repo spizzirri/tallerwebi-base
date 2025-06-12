@@ -41,9 +41,9 @@ h2{
     aspect-ratio: 1 / 1;
 }
 
-.large-category {
-    aspect-ratio: 2 / 1;
-}
+/*.large-category {*/
+/*    aspect-ratio: 2 / 4;*/
+/*}*/
 
 .category-img {
     width: 100%;

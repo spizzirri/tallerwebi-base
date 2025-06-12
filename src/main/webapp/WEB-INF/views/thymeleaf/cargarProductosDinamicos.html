@@ -1,23 +1,33 @@
-<!-- Esto NO es un fragmento. Es una vista parcial -->
 
-<div class="row row-cols-1 row-cols-md-3 g-4  ">
-    <div class="col" th:each="producto : ${productosDestacados}">
-        <div class="card h-100 border-0 bg-transparent">
-            <a th:href="@{/productoEspecifico/{id}(id=${producto.id})}" class="card h-100 border border-secondary-subtle  bg-transparent">
-                <img th:src="@{/imagenes/{imagen}(imagen=${producto.imagen})}"
-                     class="card-img-top" th:alt="${producto.nombre}">
-            </a>
-                <div class="card-body text-start">
-                    <p th:text="${producto.nombre}"></p>
-                    <div class="d-flex align-items-center gap-2">
-                        <span class="fw-bold" th:text="'$ ' + ${producto.precio}"></span>
-                        <button th:onclick="|agregarAlCarrito(${producto.id}, 1)|" class="btn btn-warning">
-                            <i class="bi bi-cart3"></i>
+    <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-3 justify-content-center">
+        <div class="col" th:each="producto : ${productosDestacados}">
+            <div class="card h-100 shadow border-0 position-relative">
+
+                <div class="p-3">
+                    <a th:href="@{/productoEspecifico/{id}(id=${producto.id})}">
+                        <img th:src="@{/imagenes/{imagen}(imagen=${producto.imagen})}"
+                             class="card-img-top rounded w-100"
+                             th:alt="${producto.nombre}"
+                             style="height: 200px; object-fit: contain;">
+                    </a>
+                </div>
+
+                <div class="card-body text-center d-flex flex-column justify-content-between p-3">
+                    <p class="card-title fw-bold mb-2 small" th:text="${producto.nombre}"></p>
+
+                    <div class="d-flex justify-content-between align-items-center mt-auto">
+                        <span class="fw-bold text-success" th:text="'$ ' + ${producto.precio}"></span>
+                        <button th:onclick="|agregarAlCarrito(${producto.id}, 1)|"
+                                class="btn btn-warning btn-sm">
+                            <i class="bi bi-cart3 fs-4"></i>
                         </button>
                     </div>
-
-                    <div th:id="'mensajeNotificacion-' + ${producto.id}" class="mensaje-notificacion" style="display:none;"></div>
                 </div>
+
+                <div th:id="'mensajeNotificacion-' + ${producto.id}"
+                     class="mensaje-notificacion">
+                </div>
+            </div>
         </div>
     </div>
-</div>
+

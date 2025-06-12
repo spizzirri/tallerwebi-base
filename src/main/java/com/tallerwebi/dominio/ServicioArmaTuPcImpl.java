@@ -3,6 +3,8 @@ package com.tallerwebi.dominio;
 import com.tallerwebi.dominio.entidades.ArmadoPc;
 import com.tallerwebi.dominio.entidades.Componente;
 import com.tallerwebi.dominio.excepcion.LimiteDeComponenteSobrepasadoEnElArmadoException;
+import com.tallerwebi.dominio.excepcion.QuitarComponenteInvalidoException;
+import com.tallerwebi.dominio.excepcion.QuitarStockDemasDeComponenteException;
 import com.tallerwebi.presentacion.dto.ArmadoPcDto;
 import com.tallerwebi.presentacion.dto.ComponenteDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +33,8 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
         put("almacenamiento", "Almacenamiento");
         put("fuente", "FuenteDeAlimentacion");
         put("gabinete", "Gabinete");
-        put("monitor", "Componente");
-        put("periferico", "Componente");
+        put("monitor", "Monitor");
+        put("periferico", "Periferico");
     }};
 
     @Autowired
@@ -117,6 +119,79 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
 
         return armadoPcDto;
     }
+
+    @Override
+    public ArmadoPcDto quitarComponenteAlArmado(Long idComponente, String tipoComponente, Integer cantidad, ArmadoPcDto armadoPcDto) throws QuitarComponenteInvalidoException, QuitarStockDemasDeComponenteException {
+
+        if (!this.verificarExistenciaDeComponenteEnElArmadoDto(idComponente, armadoPcDto)) throw new QuitarComponenteInvalidoException();
+
+        switch(tipoComponente.toLowerCase()){
+            case "procesador":
+                armadoPcDto.setProcesador(null);
+                break;
+            case "motherboard":
+                armadoPcDto.setMotherboard(null);
+                break;
+            case "cooler":
+                armadoPcDto.setCooler(null);
+                break;
+            case "memoria":
+                this.eliminarComponenteDeLaListaDeDtosPorId(armadoPcDto.getRams(), idComponente, cantidad);
+                break;
+            case "gpu":
+                armadoPcDto.setGpu(null);
+                break;
+            case "almacenamiento":
+                this.eliminarComponenteDeLaListaDeDtosPorId(armadoPcDto.getAlmacenamiento(), idComponente, cantidad);
+                break;
+            case "fuente":
+                armadoPcDto.setFuente(null);
+                break;
+            case "gabinete":
+                armadoPcDto.setGabinete(null);
+                break;
+            case "monitor":
+                armadoPcDto.setMonitor(null);
+                break;
+            case "periferico":
+                this.eliminarComponenteDeLaListaDeDtosPorId(armadoPcDto.getPerifericos(), idComponente, cantidad);
+                break;
+
+        }
+
+        return armadoPcDto;
+    }
+
+    private Boolean verificarExistenciaDeComponenteEnElArmadoDto(Long idComponente, ArmadoPcDto armadoPcDto) {
+
+        List<ComponenteDto> componentesDelArmado = new ArrayList<>();
+
+        componentesDelArmado.add(armadoPcDto.getProcesador());
+        componentesDelArmado.add(armadoPcDto.getMotherboard());
+        componentesDelArmado.add(armadoPcDto.getCooler());
+        componentesDelArmado.add(armadoPcDto.getGpu());
+        componentesDelArmado.add(armadoPcDto.getFuente());
+        componentesDelArmado.add(armadoPcDto.getGabinete());
+        componentesDelArmado.add(armadoPcDto.getMonitor());
+        componentesDelArmado.addAll(armadoPcDto.getRams());
+        componentesDelArmado.addAll(armadoPcDto.getAlmacenamiento());
+        componentesDelArmado.addAll(armadoPcDto.getPerifericos());
+
+        for(ComponenteDto c : componentesDelArmado) if(c != null && c.getId().equals(idComponente)) return true;
+
+        return false;
+    }
+
+    private void eliminarComponenteDeLaListaDeDtosPorId(List<ComponenteDto> componentesDto, Long idComponente, Integer cantidad) throws QuitarStockDemasDeComponenteException {
+
+        List<ComponenteDto> componentesAEliminar = new ArrayList<>();
+
+        for(ComponenteDto componenteDto : componentesDto) if(componenteDto.getId().equals(idComponente)) componentesAEliminar.add(componenteDto);
+
+        if(componentesAEliminar.size() >= cantidad && !componentesAEliminar.isEmpty()) componentesDto.removeAll(componentesAEliminar);
+        else throw new QuitarStockDemasDeComponenteException();
+    }
+
 
     private void seExcedeDeLimite(String tipoComponente, Integer cantidad, ArmadoPcDto armadoPcDto) throws LimiteDeComponenteSobrepasadoEnElArmadoException {
         if ((tipoComponente.equalsIgnoreCase("memoria") && armadoPcDto.getRams().size() + cantidad > 4) ||

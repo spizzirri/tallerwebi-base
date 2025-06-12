@@ -1,20 +1,20 @@
 package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.ServicioArmaTuPc;
+import com.tallerwebi.dominio.excepcion.QuitarComponenteInvalidoException;
 import com.tallerwebi.dominio.excepcion.LimiteDeComponenteSobrepasadoEnElArmadoException;
+import com.tallerwebi.dominio.excepcion.QuitarStockDemasDeComponenteException;
 import com.tallerwebi.presentacion.dto.ArmadoPcDto;
 import com.tallerwebi.presentacion.dto.ComponenteDto;
-import org.dom4j.rule.Mode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpSession;
-import org.springframework.ui.Model;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -766,6 +766,7 @@ public class ControladorArmaTuPcTest {
 
         assertThat(modelAndView.getViewName(), equalTo(vistaEsperada));
         assertThat(modelAndView.getModel().get("armadoPcDto"), instanceOf(ArmadoPcDto.class));
+        verify(servicioMock, times(1)).armadoCompleto(any());
 
     }
 
@@ -788,6 +789,7 @@ public class ControladorArmaTuPcTest {
         assertThat(modelAndView.getViewName(), equalTo(vistaEsperada));
         assertThat(modelAndView.getModel().get("armadoPcDto"), nullValue());
         assertThat(modelAndView.getModel().get("errorResumen"), equalTo(errorEsperado));
+        verify(servicioMock, times(1)).armadoCompleto(any());
     }
 
 
@@ -808,5 +810,164 @@ public class ControladorArmaTuPcTest {
         assertThat(modelAndView.getViewName(), equalTo(vistaEsperada));
         assertThat(session.getAttribute("armadoPcDto"), nullValue());
     }
+
+    @Test
+    public void cuandoQuitoUnComponenteProcesadorDelArmadoObtengoLaMismaVistaEnLaQueEstabaParadoYUnMensajeDeQueSeDeseleccionoElProcesadorDelArmado() throws QuitarComponenteInvalidoException, QuitarStockDemasDeComponenteException {
+
+        // Preparacion
+
+        when(this.servicioMock.quitarComponenteAlArmado(any(), any(), any(), any())).thenReturn(mock(ArmadoPcDto.class));
+
+        ComponenteDto componenteAQuitar = new ComponenteDto(1L, "Procesador", "Procesador1", 1000D, "imagen.jpg", 5);
+        when(this.servicioMock.obtenerComponenteDtoPorId(1L)).thenReturn(componenteAQuitar);
+
+        // Ejecucion
+
+        ModelAndView modelAndView = this.controlador.quitarComponenteDelArmado("procesador", 1L, 1, session);
+        String vistaObtenida = modelAndView.getViewName();
+
+        // Validacion
+        String vistaEsperada = "redirect:/arma-tu-pc/tradicional/procesador";
+        assertThat(modelAndView.getViewName(), equalTo(vistaEsperada));
+        assertThat(modelAndView.getModel().get("quitado"), equalTo("x1 Procesador1 fue quitado del armado."));
+    }
+
+    @Test
+    public void cuandoQuitoUnComponenteProcesadorDelArmadoQueNoTieneProcesadorCargadoObtengoLaMismaVistaEnLaQueEstabaParadoConUnError() throws QuitarComponenteInvalidoException, QuitarStockDemasDeComponenteException {
+        // Preparacion
+
+        when(this.servicioMock.quitarComponenteAlArmado(any(), any(), any(), any()))
+                .thenThrow(new QuitarComponenteInvalidoException());
+
+
+        // Ejecucion
+
+        ModelAndView modelAndView = this.controlador.quitarComponenteDelArmado("procesador", 1L, 1, session);
+        String vistaObtenida = modelAndView.getViewName();
+
+        // Validacion
+        String vistaEsperada = "redirect:/arma-tu-pc/tradicional/procesador";
+        assertThat(modelAndView.getViewName(), equalTo(vistaEsperada));
+        assertThat(modelAndView.getModel().get("errorQuitado"), equalTo("No es posible quitar un componente que no fue agregado al armado."));
+    }
+
+    @Test
+    public void cuandoQuito2ComponentesMemoriaDelArmadoQueNoTieneMemoriasCargadaObtengoLaMismaVistaEnLaQueEstabaParadoConUnError() throws QuitarComponenteInvalidoException, QuitarStockDemasDeComponenteException {
+        // Preparacion
+
+        when(this.servicioMock.quitarComponenteAlArmado(any(), any(), any(), any()))
+                .thenThrow(new QuitarStockDemasDeComponenteException());
+
+
+        // Ejecucion
+
+        ModelAndView modelAndView = this.controlador.quitarComponenteDelArmado("memoria", 1L, 2, session);
+        String vistaObtenida = modelAndView.getViewName();
+
+        // Validacion
+        String vistaEsperada = "redirect:/arma-tu-pc/tradicional/memoria";
+        assertThat(modelAndView.getViewName(), equalTo(vistaEsperada));
+        assertThat(modelAndView.getModel().get("errorQuitado"), equalTo("No es posible quitar una cantidad del componente que no posee el armado."));
+    }
+
+    @Test
+    public void cuandoQuieroProcesarLaAccionDeAgregarUnComponenteProcesadorObtengoLaVistaDeMotherboardConMensajeDeComponenteAgregadoYLosMetodosDeAgregadoCorrespondientesDelServicioSonLLamados() throws LimiteDeComponenteSobrepasadoEnElArmadoException {
+
+        //Preparacion
+
+        when(servicioMock.agregarComponenteAlArmado(any(), any(), any(), any()))
+                .thenReturn(mock(ArmadoPcDto.class));
+
+        ComponenteDto componenteARetornar = new ComponenteDto();
+        componenteARetornar.setId(1L);
+        componenteARetornar.setTipoComponente("procesador");
+        componenteARetornar.setModelo("Procesador1");
+
+        when(servicioMock.obtenerComponenteDtoPorId(any())).thenReturn(componenteARetornar);
+
+        when(servicioMock.sePuedeAgregarMasUnidades(any(), any())).thenReturn(false);
+
+
+        //Ejecucion
+
+        ModelAndView modelAndView = this.controlador.procesarAccion("procesador", "agregar", 1L, 1, session);
+        String vistaObtenida = modelAndView.getViewName();
+
+        //Validacion
+
+        assertThat(vistaObtenida, equalTo("redirect:/arma-tu-pc/tradicional/motherboard"));
+        assertThat(modelAndView.getModel().get("agregado"), equalTo("x1 Procesador1 agregado correctamente al armado!"));
+        verify(servicioMock, times(1)).agregarComponenteAlArmado(any(), any(), any(), any());
+        verify(servicioMock, times(1)).obtenerComponenteDtoPorId(any());
+        verify(servicioMock, times(1)).sePuedeAgregarMasUnidades(any(), any());
+    }
+
+    @Test
+    public void cuandoQuieroProcesarLaAccionDeQuitarUnComponenteProcesadorObtengoLaVistaDeProcesadorConMensajeDeComponenteQuitadoYLosMetodosDeQuitadoCorrespondientesDelServicioSonLLamados() throws QuitarComponenteInvalidoException, QuitarStockDemasDeComponenteException {
+
+        //Preparacion
+
+        when(servicioMock.quitarComponenteAlArmado(any(), any(), any(), any()))
+                .thenReturn(mock(ArmadoPcDto.class));
+
+        ComponenteDto componenteARetornar = new ComponenteDto();
+        componenteARetornar.setId(1L);
+        componenteARetornar.setTipoComponente("procesador");
+        componenteARetornar.setModelo("Procesador1");
+
+        when(servicioMock.obtenerComponenteDtoPorId(any())).thenReturn(componenteARetornar);
+
+        when(servicioMock.sePuedeAgregarMasUnidades(any(), any())).thenReturn(false);
+
+
+        //Ejecucion
+
+        ModelAndView modelAndView = this.controlador.procesarAccion("procesador", "quitar", 1L, 1, session);
+        String vistaObtenida = modelAndView.getViewName();
+
+        //Validacion
+
+        assertThat(vistaObtenida, equalTo("redirect:/arma-tu-pc/tradicional/procesador"));
+        assertThat(modelAndView.getModel().get("quitado"), equalTo("x1 Procesador1 fue quitado del armado."));
+        verify(servicioMock, times(1)).quitarComponenteAlArmado(any(), any(), any(), any());
+        verify(servicioMock, times(1)).obtenerComponenteDtoPorId(any());
+    }
+
+    @Test
+    public void cuandoQuieroProcesarUnaAccionInexistenteAUnComponenteProcesadorEntoncesObtengoLaVistaDelPasoProcesador(){
+
+        //Preparacion
+        //Ejecucion
+
+        ModelAndView modelAndView = this.controlador.procesarAccion("procesador", "inexistente123", 1L, 1, session);
+        String vistaObtenida = modelAndView.getViewName();
+
+        //Validacion
+
+        assertThat(vistaObtenida, equalTo("redirect:/arma-tu-pc/tradicional/procesador"));
+        assertThat(modelAndView.getModel().get("accionInvalida"), equalTo("Ingreso una accion invalida."));
+    }
+
+    @Test
+    public void cuandoQuieroCargarUnaSeccionProcesadorEntoncesObtengoLaVistaDelPasoProcesadorYTodosLosIdsDeLosComponentesAgregadosHastaElMomentoDelArmadoPcDtoDeLaSesion(){
+        // Preparacion
+
+        ArmadoPcDto armadoPcDto = new ArmadoPcDto();
+
+        armadoPcDto.setProcesador(new ComponenteDto(1L, "Procesador", "Procesador1", 1000D, "imagen.jpg", 5));
+        armadoPcDto.setRams(Arrays.asList(new ComponenteDto(2L, "Memoria", "Memoria1", 1000D, "imagen.jpg", 5), new ComponenteDto(2L, "Memoria", "Memoria1", 1000D, "imagen.jpg", 5)));
+
+        session.setAttribute("armadoPcDto", armadoPcDto);
+
+        // Ejecucion
+
+        ModelAndView modelAndView = this.controlador.cargarComponentes("procesador", session);
+
+        // Validacion
+
+        assertThat(modelAndView.getViewName(), equalTo("arma-tu-pc/tradicional/procesador"));
+        assertThat(modelAndView.getModel().get("idsDeComponentesSeleccionados"), equalTo(new HashSet<>(Arrays.asList(1L, 2L))));
+    }
+
 
 }

@@ -4,14 +4,16 @@ import com.tallerwebi.dominio.entidades.Componente;
 import com.tallerwebi.presentacion.ProductoCarritoDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
-@Service
-public class ServicioProductoCarrito {
+@Service("servicioProductoCarrito")
+@Transactional
+public class ServicioProductoCarritoImpl {
 
     private List<ProductoCarritoDto> productos;
     public Double valorTotal = 0.0;
@@ -41,7 +43,7 @@ public class ServicioProductoCarrito {
         return null;
     }
 
-    public void agregarProducto(Long componenteId, Integer cantidad){
+    public void agregarProducto(Long componenteId, Integer cantidad) {
         if(this.productos == null){
             this.productos = new ArrayList<>();
         }
@@ -51,24 +53,34 @@ public class ServicioProductoCarrito {
             existente.setCantidad(existente.getCantidad() + cantidad);
         } else {
             Componente componente = repositorioComponente.obtenerComponentePorId(componenteId);
-            ProductoCarritoDto nuevoProductoCarrito = new ProductoCarritoDto(componente, cantidad);
-            this.productos.add(nuevoProductoCarrito);
+
+            if (componente != null) {
+                ProductoCarritoDto nuevoProductoCarrito = new ProductoCarritoDto(componente, cantidad);
+                this.productos.add(nuevoProductoCarrito);
+            }
         }
     }
 
-    public boolean verificarStock(Long componenteId, Integer cantidadDeseada){
+    public boolean verificarStock(Long componenteId, Integer cantidadDeseada) {
         Componente componente = repositorioComponente.obtenerComponentePorId(componenteId);
         return componente.getStock() >= cantidadDeseada;
     }
 
     public Double calcularValorTotalDeLosProductos() {
+        if (this.productos == null || this.productos.isEmpty()) {
+            this.valorTotal = 0.0;
+            return this.valorTotal;
+        }
+
         Double total = 0.0;
-        for(ProductoCarritoDto productoCarritoDto : this.productos){
-            total += productoCarritoDto.getPrecio() * productoCarritoDto.getCantidad();
+        for(ProductoCarritoDto producto : this.productos){
+            if (producto.getPrecio() != null && producto.getCantidad() != null) {
+                total += producto.getPrecio() * producto.getCantidad();
+            }
         }
 
         BigDecimal valorTotalConDosDecimales = new BigDecimal(total);
-        valorTotalConDosDecimales = valorTotalConDosDecimales.setScale(2, RoundingMode.UP); //convierto el numero para que tenga dos decimales y redondee para arriba
+        valorTotalConDosDecimales = valorTotalConDosDecimales.setScale(2, RoundingMode.UP);
         this.valorTotal = valorTotalConDosDecimales.doubleValue();
 
         return this.valorTotal;
@@ -79,7 +91,7 @@ public class ServicioProductoCarrito {
         return productos;
     }
 
-    public Double calcularDescuento(Integer codigoDescuentoExtraido){
+    public Double calcularDescuento(Integer codigoDescuentoExtraido) {
         Double total = this.calcularValorTotalDeLosProductos();
         this.valorTotalConDescuento = total;
 
