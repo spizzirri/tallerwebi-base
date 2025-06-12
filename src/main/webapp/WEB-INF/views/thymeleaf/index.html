@@ -52,10 +52,7 @@
 <nav class="bg-secondary-subtle text-dark py-3 ">
     <div class="container d-flex justify-content-center gap-4">
         <a class="text-dark text-decoration-none px-3 fs-5" th:href="@{/productos}">Productos</a>
-        <a class="text-dark text-decoration-none px-3 fs-5" href="#">Notebooks</a>
-        <a class="text-dark text-decoration-none px-3 fs-5" th:href="@{/arma-tu-pc/tradicional/procesador}">Arma tu
-            PC</a>
-        <a class="text-dark text-decoration-none px-3 fs-5" href="#">Rastrea tu pedido</a>
+        <a class="text-dark text-decoration-none px-3 fs-5" th:href="@{/arma-tu-pc/tradicional/procesador}">Arma tu PC</a>
         <a class="text-dark text-decoration-none px-3 fs-5" href="#">Ayuda</a>
     </div>
 </nav>
@@ -151,7 +148,8 @@
                             </div>
                         </div>
                         <div th:id="'mensajeNotificacion-' + ${producto.id}" class="mensaje-notificacion"
-                             style="display:none;"></div>
+                             style="display:none;">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -204,34 +202,37 @@
         </div>
     </div>
 
-    <div class=" py-5">
-        <h2 class="mb-4 text-dark">Productos en <strong>descuento</strong></h2>
+<!--    <div class=" py-5">-->
+<!--        <h2 class="mb-4 text-dark">Productos en <strong>descuento</strong></h2>-->
 
-        <div class="swiper mySwiper">
-            <div class="swiper-button-next"></div>
-            <div class="swiper-button-prev"></div>
-            <div class="swiper-wrapper">
+<!--        <div class="swiper mySwiper">-->
+<!--            <div class="swiper-button-next"></div>-->
+<!--            <div class="swiper-button-prev"></div>-->
+<!--            <div class="swiper-wrapper">-->
 
-                <!-- th:each para iterar los productos en descuento -->
-                <div class="swiper-slide" th:each="producto : ${productosDescuento}">
-                    <div class="card h-100">
-                        <img th:src="@{/imagenes/{imagen}(imagen=${producto.imagen})}"
-                             class="card-img-top" th:alt="${producto.nombre}">
-                        <div class="card-body text-start">
-                            <p th:text="${producto.nombre}"></p>
-                            <div class="d-flex align-items-center gap-2">
-                                <p class="card-text text-danger fw-bold" th:text="'$' + ${producto.precio}"></p>
-                                <small class="text-muted text-decoration-line-through"
-                                       th:text="'$' + ${producto.precio}"></small>
-                                <button th:onclick="'agregarAlCarrito(' + ${producto.id} + ', 1)'"
-                                        class="btn btn-warning"><i class="bi bi-cart3"></i></button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+<!--                &lt;!&ndash; th:each para iterar los productos en descuento &ndash;&gt;-->
+<!--                <div class="swiper-slide" th:each="producto : ${productosDescuento}">-->
+<!--                    <div class="card h-100">-->
+<!--                        <img th:src="@{/imagenes/{imagen}(imagen=${producto.imagen})}"-->
+<!--                             class="card-img-top" th:alt="${producto.nombre}">-->
+<!--                        <div class="card-body text-start">-->
+<!--                            <p th:text="${producto.nombre}"></p>-->
+<!--                            <div class="d-flex align-items-center gap-2">-->
+<!--                                <p class="card-text text-danger fw-bold" th:text="'$' + ${producto.precio}"></p>-->
+<!--                                <small class="text-muted text-decoration-line-through"-->
+<!--                                       th:text="'$' + ${producto.precio}"></small>-->
+<!--                                <button th:onclick="'agregarAlCarrito(' + ${producto.id} + ', 1)'"-->
+<!--                                        class="btn btn-warning"><i class="bi bi-cart3"></i></button>-->
+<!--                            </div>-->
+<!--                            <div th:id="'mensajeNotificacion-' + ${producto.id}" class="mensaje-notificacion"-->
+<!--                                 style="display:none;">-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
 
 
 </div>

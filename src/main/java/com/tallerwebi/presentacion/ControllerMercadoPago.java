@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -43,8 +42,7 @@ public class ControllerMercadoPago {
     @ResponseBody
     public ModelAndView crearPago(HttpServletResponse response,
                                   @RequestParam(value = "metodoDePago", required = false) String metodoDePago,
-                                  @RequestParam(value = "costoEnvio", required = false) Double costoEnvio,
-                                  RedirectAttributes redirectAttributes)
+                                  @RequestParam(value = "costoEnvio", required = false) Double costoEnvio)
                                     throws IOException {
 
         // Creo un objeto PagoRequest manualmente

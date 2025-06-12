@@ -47,7 +47,6 @@ public class ServicioProductoCarritoTest {
 
         productos.add(productoMock1);
 
-
         ProductoCarritoDto productoEncontrado = servicioProductoCarritoImpl.buscarPorId(idBuscado);
         Assert.assertEquals(productoMock1, productoEncontrado);
     }
@@ -126,7 +125,6 @@ public class ServicioProductoCarritoTest {
         Integer cantidadDeseada = 2;
         Integer stockDisponible = 10;
 
-
         Componente componenteMock = mock(Componente.class);
         when(componenteMock.getId()).thenReturn(componenteId);
         when(componenteMock.getStock()).thenReturn(stockDisponible);
@@ -144,7 +142,6 @@ public class ServicioProductoCarritoTest {
         Integer cantidadDeseada = 2;
         Integer stockDisponible = 1;
 
-
         Componente componenteMock = mock(Componente.class);
         when(componenteMock.getId()).thenReturn(componenteId);
         when(componenteMock.getStock()).thenReturn(stockDisponible);
@@ -156,6 +153,7 @@ public class ServicioProductoCarritoTest {
         assertFalse(stockSuficiente);
     }
 
+    // calcularValorTotalDeLosProductos
     @Test
     public void cuandoQuieroCalcularElValorTotalDeLosProductosEnElCarritoObtengoElTotal() {
         when(productoMock1.getPrecio()).thenReturn(100.0);
@@ -170,7 +168,6 @@ public class ServicioProductoCarritoTest {
         servicioProductoCarritoImpl.setProductos(productos);
 
         Double valorTotal = servicioProductoCarritoImpl.calcularValorTotalDeLosProductos();
-        // Cálculo esperado: (100*2) + (50*1) = 200 + 50 = 250.0
         assertEquals(250.0, valorTotal);
     }
 
@@ -200,6 +197,7 @@ public class ServicioProductoCarritoTest {
         assertEquals(296.83, valorTotal);
     }
 
+    // calcularDescuento
     @Test
     public void cuandoAplicoDescuentoDelCincoPorcientoObtengoElValorTotalDeLosProductosCorrectamenteCalculadoConSuDescuento(){
         Integer codigoDeDescuento = 5;
@@ -252,16 +250,34 @@ public class ServicioProductoCarritoTest {
     @Test
     public void cuandoAgregoUnProductoAlCarritoConCantidadUnoLaCantidadTotalEsUno() {
         Integer cantidadProducto = 1;
+        Integer cantidadEsperada = 1;
         productos.add(productoMock1);
 
         when(productoMock1.getCantidad()).thenReturn(cantidadProducto);
 
         servicioProductoCarritoImpl.setProductos(productos);
 
-        productoMock1.setCantidad(1);
+        Integer cantidadDelCarrito = servicioProductoCarritoImpl.calcularCantidadTotalDeProductos();
+
+        assertEquals(cantidadEsperada, cantidadDelCarrito);
+    }
+
+    @Test
+    public void cuandoHayMultiplesProductosLaCantidadTotalEsLaSumaDeTodasLasCantidades(){
+        Integer cantidadProducto1 = 2;
+        Integer cantidadProducto2 = 3;
+        Integer cantidadEsperada = cantidadProducto1 + cantidadProducto2;
+
+        productos.add(productoMock1);
+        productos.add(productoMock2);
+
+        when(productoMock1.getCantidad()).thenReturn(cantidadProducto1);
+        when(productoMock2.getCantidad()).thenReturn(cantidadProducto2);
+
+        servicioProductoCarritoImpl.setProductos(productos);
 
         Integer cantidadDelCarrito = servicioProductoCarritoImpl.calcularCantidadTotalDeProductos();
 
-        assertEquals(cantidadDelCarrito, productos.size());
+        assertEquals(cantidadEsperada, cantidadDelCarrito);
     }
 }
