@@ -48,9 +48,6 @@ public class ControladorIndex {
         model.addAttribute("categoriaDestacada", categoriaDestacada);
         model.addAttribute("otrasCategorias",categoriasLimitada);
 
-        List<ProductoDto> productosDescuento = productoService.getProductosMenoresAUnPrecio(150000D);
-        model.addAttribute("productosDescuento", productosDescuento);
-
         return new ModelAndView("index", model);
     }
 
@@ -61,7 +58,7 @@ public class ControladorIndex {
 
         String tipoComponente = convertirIdATipoComponente(id);
         List<ProductoDto> productosDestacados = productoService.getProductosPorTipo(tipoComponente);
-        List<ProductoDto> productosLimitados = productosDestacados.stream().limit(6).collect(Collectors.toList());
+        List<ProductoDto> productosLimitados = productosDestacados.stream().limit(8).collect(Collectors.toList());
         model.addAttribute("productosDestacados", productosLimitados);
         return new ModelAndView("cargarProductosDinamicos", model);
     }

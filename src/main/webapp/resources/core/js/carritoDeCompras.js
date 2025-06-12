@@ -217,7 +217,7 @@ document.addEventListener("DOMContentLoaded", function () {
             let metodoSeleccionado = document.querySelector('input[name="metodoPago"]:checked');
             if (metodoSeleccionado === null) {
                 const errorDiv = document.getElementById("errorMetodoPago");
-                errorDiv.innerText = "Debes seleccionar un método de pago";
+                errorDiv.innerText = "Debes seleccionar un metodo de pago";
                 errorDiv.classList.remove("d-none");
                 return false;
             }
