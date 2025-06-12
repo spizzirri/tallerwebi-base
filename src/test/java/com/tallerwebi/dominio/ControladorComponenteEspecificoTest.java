@@ -1,4 +1,4 @@
-/*package com.tallerwebi.dominio;
+package com.tallerwebi.dominio;
 
 import com.tallerwebi.presentacion.ComponenteEspecificoDto;
 import com.tallerwebi.presentacion.ControladorComponenteEspecifico;
@@ -16,11 +16,12 @@ import static org.mockito.Mockito.verify;
 
 public class ControladorComponenteEspecificoTest {
 
-    ControladorComponenteEspecifico controladorComponenteEspecifico;
+    private ControladorComponenteEspecifico controladorComponenteEspecifico;
+    private ServicioProductoEspecifico servicioProductoEspecifico;
 
     @BeforeEach
     public void init() {
-        this.controladorComponenteEspecifico = new ControladorComponenteEspecifico();
+        this.controladorComponenteEspecifico = new ControladorComponenteEspecifico(servicioProductoEspecifico);
     }
 
     @Test
@@ -80,4 +81,3 @@ public class ControladorComponenteEspecificoTest {
     }
 
 }
-*/
