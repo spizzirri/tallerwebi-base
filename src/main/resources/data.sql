@@ -2454,9 +2454,408 @@ VALUES ('Gabinete-DeepCool-CH260-Mini-Mesh-Vidrio-Templado-MATX-1.jpg', 148);
 -- Monitores
 -- =================================================================
 
+-- Componente 149: Monitor Gamer LG Ultragear 24GS60F-B 24" IPS FHD 1920*1080 180Hz G-SYNC FreeSync 1ms
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Monitor Gamer LG Ultragear 24GS60F-B 24" IPS FHD 1920*1080 180Hz G-SYNC FreeSync 1ms', 19350.0, 16, 'LG');
 
+INSERT INTO Monitor (id, tipoDeIluminacion, tipoDePanel, pantallaCurva, puertosHDMI,
+                     puertosDisplayPort, puertosMiniDisplayPort, puertosVGA, puertosDVI,
+                     puertosUSB, conectorAuriculares, pulgadas, resolucionMaxima,
+                     frecuenciaMaxima, tiempoDeRespuesta, nvidiaGSync, amdFreesync, ancho, alto, espesor, curvatura)
+VALUES (149, 'LED', 'IPS', false, 1, 1,
+        0, 0, 0, 0, true, '24',
+        '1920x1080', '180hz', '1ms', true,
+        true, '541mm', '324mm', '43mm', '0r');
 
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Monitor-Gamer-LG-Ultragear-24GS60F-B-24"-IPS-FHD-1920*1080-180Hz-G-SYNC-FreeSync-1ms-1.jpg', 149),
+       ('Monitor-Gamer-LG-Ultragear-24GS60F-B-24"-IPS-FHD-1920*1080-180Hz-G-SYNC-FreeSync-1ms-2.jpg', 149);
+
+-- Componente 150: Monitor Samsung 22" T350FH FHD IPS 75Hz
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Monitor Samsung 22" T350FH FHD IPS 75Hz', 15200.0, 12, 'Samsung');
+
+INSERT INTO Monitor (id, tipoDeIluminacion, tipoDePanel, pantallaCurva, puertosHDMI,
+                     puertosDisplayPort, puertosMiniDisplayPort, puertosVGA, puertosDVI,
+                     puertosUSB, conectorAuriculares, pulgadas, resolucionMaxima,
+                     frecuenciaMaxima, tiempoDeRespuesta, nvidiaGSync, amdFreesync, ancho, alto, espesor, curvatura)
+VALUES (150, 'LED', 'IPS', false, 1, 0,
+        0, 1, 0, 0, false, '22',
+        '1920x1080', '75hz', '5ms', false,
+        false, '487mm', '369mm', '65mm', '0r');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Monitor-Samsung-22"-T350FH-FHD-IPS-75Hz-1.jpg', 150),
+       ('Monitor-Samsung-22"-T350FH-FHD-IPS-75Hz-2.jpg', 150);
+
+-- Componente 151: Monitor Gamer Curvo LG 34" UltraWide 34GP63A 160Hz WQHD 2K FreeSync Premium
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Monitor Gamer Curvo LG 34" UltraWide 34GP63A 160Hz WQHD 2K FreeSync Premium', 893150.0, 8, 'LG');
+
+INSERT INTO Monitor (id, tipoDeIluminacion, tipoDePanel, pantallaCurva, puertosHDMI,
+                     puertosDisplayPort, puertosMiniDisplayPort, puertosVGA, puertosDVI,
+                     puertosUSB, conectorAuriculares, pulgadas, resolucionMaxima,
+                     frecuenciaMaxima, tiempoDeRespuesta, nvidiaGSync, amdFreesync, ancho, alto, espesor, curvatura)
+VALUES (151, 'LED', 'VA', true, 2, 1,
+        0, 0, 0, 1, true, '34',
+        '3440x1440', '160hz', '5ms', false,
+        true, '808mm', '359mm', '92mm', '1800r');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Monitor-Gamer-Curvo-LG-34"-UltraWide-34GP63A-160Hz-WQHD-2K-FreeSync-Premium-1.jpg', 151),
+       ('Monitor-Gamer-Curvo-LG-34"-UltraWide-34GP63A-160Hz-WQHD-2K-FreeSync-Premium-2.jpg', 151);
+
+-- Componente 152: Monitor LG 24MS500-B 24" IPS FHD 100Hz 5ms
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Monitor LG 24MS500-B 24" IPS FHD 100Hz 5ms', 16750.0, 14, 'LG');
+
+INSERT INTO Monitor (id, tipoDeIluminacion, tipoDePanel, pantallaCurva, puertosHDMI,
+                     puertosDisplayPort, puertosMiniDisplayPort, puertosVGA, puertosDVI,
+                     puertosUSB, conectorAuriculares, pulgadas, resolucionMaxima,
+                     frecuenciaMaxima, tiempoDeRespuesta, nvidiaGSync, amdFreesync, ancho, alto, espesor, curvatura)
+VALUES (152, 'EDGE', 'IPS', false, 2, 0,
+        0, 0, 0, 0, true, '24',
+        '1920x1080', '100hz', '5ms', false,
+        false, '541mm', '324mm', '43mm', '0r');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Monitor-LG-24MS500-B-24"-IPS-FHD-100Hz-5ms-1.jpg', 152),
+       ('Monitor-LG-24MS500-B-24"-IPS-FHD-100Hz-5ms-2.jpg', 152);
+
+-- Componente 153: Monitor Gamer Curvo ViewSonic VX3218C-2K 32" 1500R QHD 1440p 180Hz VA 1ms MPRT FreeSync Premium
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Monitor Gamer Curvo ViewSonic VX3218C-2K 32" 1500R QHD 1440p 180Hz VA 1ms MPRT FreeSync Premium', 38900.0, 6, 'ViewSonic');
+
+INSERT INTO Monitor (id, tipoDeIluminacion, tipoDePanel, pantallaCurva, puertosHDMI,
+                     puertosDisplayPort, puertosMiniDisplayPort, puertosVGA, puertosDVI,
+                     puertosUSB, conectorAuriculares, pulgadas, resolucionMaxima,
+                     frecuenciaMaxima, tiempoDeRespuesta, nvidiaGSync, amdFreesync, ancho, alto, espesor, curvatura)
+VALUES (153, 'LED', 'VA', true, 2, 1,
+        0, 0, 0, 2, true, '32',
+        '2560x1440', '180hz', '1ms', false,
+        true, '709mm', '423mm', '94mm', '1500r');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Monitor-Gamer-Curvo-ViewSonic-VX3218C-2K-32"-1500R-QHD-1440p-180Hz-VA-1ms-MPRT-FreeSync-Premium-1.jpg', 153),
+       ('Monitor-Gamer-Curvo-ViewSonic-VX3218C-2K-32"-1500R-QHD-1440p-180Hz-VA-1ms-MPRT-FreeSync-Premium-2.jpg', 153);
+
+-- Componente 154: Monitor Gamer AsRock Phantom PG32QF2B 31.5" VA QHD 165Hz FreeSync Antena WiFi Integrada
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Monitor Gamer AsRock Phantom PG32QF2B 31.5" VA QHD 165Hz FreeSync Antena WiFi Integrada', 517200.0, 5, 'AsRock');
+
+INSERT INTO Monitor (id, tipoDeIluminacion, tipoDePanel, pantallaCurva, puertosHDMI,
+                     puertosDisplayPort, puertosMiniDisplayPort, puertosVGA, puertosDVI,
+                     puertosUSB, conectorAuriculares, pulgadas, resolucionMaxima,
+                     frecuenciaMaxima, tiempoDeRespuesta, nvidiaGSync, amdFreesync, ancho, alto, espesor, curvatura)
+VALUES (154, 'LED', 'VA', false, 2, 1,
+        0, 0, 0, 1, true, '31.5',
+        '2560x1440', '165hz', '1ms', false,
+        true, '708mm', '420mm', '56mm', '0r');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Monitor-Gamer-AsRock-Phantom-PG32QF2B-31.5"-VA-QHD-165Hz-FreeSync-Antena-WiFi-Integrada-1.jpg', 154),
+       ('Monitor-Gamer-AsRock-Phantom-PG32QF2B-31.5"-VA-QHD-165Hz-FreeSync-Antena-WiFi-Integrada-2.jpg', 154);
+
+-- Componente 155: Monitor Gamer ASUS VA27EHF-J 27" FHD IPS 100Hz
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Monitor Gamer ASUS VA27EHF-J 27" FHD IPS 100Hz', 22800.0, 10, 'ASUS');
+
+INSERT INTO Monitor (id, tipoDeIluminacion, tipoDePanel, pantallaCurva, puertosHDMI,
+                     puertosDisplayPort, puertosMiniDisplayPort, puertosVGA, puertosDVI,
+                     puertosUSB, conectorAuriculares, pulgadas, resolucionMaxima,
+                     frecuenciaMaxima, tiempoDeRespuesta, nvidiaGSync, amdFreesync, ancho, alto, espesor, curvatura)
+VALUES (155, 'LED', 'IPS', false, 2, 1,
+        0, 1, 0, 0, true, '27',
+        '1920x1080', '100hz', '1ms', false,
+        true, '611mm', '364mm', '52mm', '0r');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Monitor-Gamer-ASUS-VA27EHF-J-27"-FHD-IPS-100Hz-1.jpg', 155),
+       ('Monitor-Gamer-ASUS-VA27EHF-J-27"-FHD-IPS-100Hz-2.jpg', 155);
+
+-- Componente 156: Monitor Lenovo ThinkVision S22i-30 21.5" FHD IPS 75Hz Anti Glare VESA
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Monitor Lenovo ThinkVision S22i-30 21.5" FHD IPS 75Hz Anti Glare VESA', 18600.0, 9, 'Lenovo');
+
+INSERT INTO Monitor (id, tipoDeIluminacion, tipoDePanel, pantallaCurva, puertosHDMI,
+                     puertosDisplayPort, puertosMiniDisplayPort, puertosVGA, puertosDVI,
+                     puertosUSB, conectorAuriculares, pulgadas, resolucionMaxima,
+                     frecuenciaMaxima, tiempoDeRespuesta, nvidiaGSync, amdFreesync, ancho, alto, espesor, curvatura)
+VALUES (156, 'WLED', 'IPS', false, 1, 1,
+        0, 1, 0, 2, true, '21.5',
+        '1920x1080', '75hz', '4ms', false,
+        false, '489mm', '295mm', '38mm', '0r');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Monitor-Lenovo-ThinkVision-S22i-30-21.5"-FHD-IPS-75Hz-Anti-Glare-VESA-1.jpg', 156),
+       ('Monitor-Lenovo-ThinkVision-S22i-30-21.5"-FHD-IPS-75Hz-Anti-Glare-VESA-2.jpg', 156);
+
+-- Componente 157: Monitor LG 34WP75C-B 34" WQHD 3440x1440 VA 160Hz Ultrapanoramico
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Monitor LG 34WP75C-B 34" WQHD 3440x1440 VA 160Hz Ultrapanoramico', 1040150.0, 7, 'LG');
+
+INSERT INTO Monitor (id, tipoDeIluminacion, tipoDePanel, pantallaCurva, puertosHDMI,
+                     puertosDisplayPort, puertosMiniDisplayPort, puertosVGA, puertosDVI,
+                     puertosUSB, conectorAuriculares, pulgadas, resolucionMaxima,
+                     frecuenciaMaxima, tiempoDeRespuesta, nvidiaGSync, amdFreesync, ancho, alto, espesor, curvatura)
+VALUES (157, 'EDGE', 'VA', true, 2, 1,
+        0, 0, 0, 2, true, '34',
+        '3440x1440', '160hz', '5ms', false,
+        true, '808mm', '359mm', '92mm', '1800r');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Monitor-LG-34WP75C-B-34"-WQHD-3440x1440-VA-160Hz-Ultrapanoramico-1.jpg', 157),
+       ('Monitor-LG-34WP75C-B-34"-WQHD-3440x1440-VA-160Hz-Ultrapanoramico-2.jpg', 157);
+
+-- Componente 158: Monitor Gamer Samsung Odyssey G8 34" OLED UWQHD Curvo 1800R 175Hz AMD Freesync Premium
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Monitor Gamer Samsung Odyssey G8 34" OLED UWQHD Curvo 1800R 175Hz AMD Freesync Premium', 89500.0, 3, 'Samsung');
+
+INSERT INTO Monitor (id, tipoDeIluminacion, tipoDePanel, pantallaCurva, puertosHDMI,
+                     puertosDisplayPort, puertosMiniDisplayPort, puertosVGA, puertosDVI,
+                     puertosUSB, conectorAuriculares, pulgadas, resolucionMaxima,
+                     frecuenciaMaxima, tiempoDeRespuesta, nvidiaGSync, amdFreesync, ancho, alto, espesor, curvatura)
+VALUES (158, 'OLED', 'OLED', true, 0, 0,
+        1, 0, 0, 1, false, '34',
+        '3440x1440', '175hz', '1ms', false,
+        true, '814mm', '364mm', '128mm', '1800r');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Monitor-Gamer-Samsung-Odyssey-G8-34"-OLED-UWQHD-Curvo-1800R-175Hz-AMD-Freesync-Premium-1.jpg', 158),
+       ('Monitor-Gamer-Samsung-Odyssey-G8-34"-OLED-UWQHD-Curvo-1800R-175Hz-AMD-Freesync-Premium-2.jpg', 158);
 
 -- =================================================================
--- Perifericos
+-- Periferico Mouse
 -- =================================================================
+
+-- Componente 159: Mouse Logitech M240 Silent Bluetooth off white
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Mouse Logitech M240 Silent Bluetooth off white', 29990.0, 20, 'Logitech');
+
+INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
+                        conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
+VALUES (159, '0', 'inalámbrico', true, true, false, false, null, false, null);
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Periferico-Mouse-Logitech-M240-Silent-Bluetooth-off-white-1.jpg', 159),
+       ('Periferico-Mouse-Logitech-M240-Silent-Bluetooth-off-white-2.jpg', 159);
+
+-- Componente 160: Mouse Cougar Surpassion RX Wireless Pink RGB
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Mouse Cougar Surpassion RX Wireless Pink RGB', 89990.0, 12, 'Cougar');
+
+INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
+                        conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
+VALUES (160, '1', 'inalámbrico', false, false, true, true, 'USB-C', true, '1800m');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Periferico-Mouse-Cougar-Surpassion-RX-Wireless-Pink-RGB-1.jpg', 160),
+       ('Periferico-Mouse-Cougar-Surpassion-RX-Wireless-Pink-RGB-2.jpg', 160);
+
+-- Componente 161: Mouse Logitech G903 Wireless 2.4Ghz Lightspeed 1ms HERO 25K 110g 24Hs
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Mouse Logitech G903 Wireless 2.4Ghz Lightspeed 1ms HERO 25K 110g 24Hs', 106700.0, 8, 'Logitech');
+
+INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
+                        conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
+VALUES (161, '1', 'inalámbrico', false, false, true, true, 'USB-C', true, '1500m');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Periferico-Mouse-Logitech-G903-Wireless-2-4Ghz-Lightspeed-1ms-HERO-25K-110g-24Hs-1.jpg', 161),
+       ('Periferico-Mouse-Logitech-G903-Wireless-2-4Ghz-Lightspeed-1ms-HERO-25K-110g-24Hs-2.jpg', 161),
+       ('Periferico-Mouse-Logitech-G903-Wireless-2-4Ghz-Lightspeed-1ms-HERO-25K-110g-24Hs-3.jpg', 161);
+
+-- Componente 162: Mouse Redragon Impact M908 RGB 12.400dpi
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Mouse Redragon Impact M908 RGB 12.400dpi', 26800.0, 15, 'Redragon');
+
+INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
+                        conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
+VALUES (162, '1', 'cableado', false, false, false, false, 'USB-A', false, '1800m');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Periferico-Mouse-Redragon-Impact-M908-RGB-12-400dpi-1.jpg', 162),
+       ('Periferico-Mouse-Redragon-Impact-M908-RGB-12-400dpi-2.jpg', 162),
+       ('Periferico-Mouse-Redragon-Impact-M908-RGB-12-400dpi-3.jpg', 162);
+
+-- Componente 163: Mouse Logitech Wireless M280 Gray
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Mouse Logitech Wireless M280 Gray', 16990.0, 22, 'Logitech');
+
+INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
+                        conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
+VALUES (163, '1', 'inalámbrico', false, false, true, true, null, false, null);
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Periferico-Mouse-Logitech-Wireless-M280-Gray-1.jpg', 163),
+       ('Periferico-Mouse-Logitech-Wireless-M280-Gray-2.jpg', 163);
+
+-- Componente 164: Mouse Redragon Griffin M607W RGB White
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Mouse Redragon Griffin M607W RGB White', 19350.0, 16, 'Redragon');
+
+INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
+                        conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
+VALUES (164, '1', 'inalámbrico', false, false, true, true, 'USB-C', true, '1600m');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Periferico-Mouse-Redragon-Griffin-M607W-RGB-White-1.jpg', 164),
+       ('Periferico-Mouse-Redragon-Griffin-M607W-RGB-White-2.jpg', 164);
+
+-- =================================================================
+-- Periferico Teclado
+-- =================================================================
+
+-- Componente 165: Teclado Logitech K120 Negro USB
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Teclado Logitech K120 Negro USB', 15990.0, 25, 'Logitech');
+
+INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
+                        conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
+VALUES (165, '1', 'cableado', false, false, false, false, 'USB-A', false, '1500m');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Periferico-Teclado-Logitech-K120-Negro-USB-1.jpg', 165),
+       ('Periferico-Teclado-Logitech-K120-Negro-USB-2.jpg', 165);
+
+-- Componente 166: Teclado Redragon Mitra K551 Mechanical Retroiluminado RGB
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Teclado Redragon Mitra K551 Mechanical Retroiluminado RGB', 79990.0, 18, 'Redragon');
+
+INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
+                        conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
+VALUES (166, '1', 'cableado', false, false, false, false, 'USB-A', false, '1800m');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Periferico-Teclado-Redragon-Mitra-K551-Mechanical-Retroiluminado-RGB-1.jpg', 166),
+       ('Periferico-Teclado-Redragon-Mitra-K551-Mechanical-Retroiluminado-RGB-2.jpg', 166);
+
+-- Componente 167: Teclado Mecanico Logitech G915 Low Profile Lightspeed Wireless 2.4Ghz Bluetooth LightSync RGB Switch Brown TKL White 40hs
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Teclado Mecanico Logitech G915 Low Profile Lightspeed Wireless 2.4Ghz Bluetooth LightSync RGB Switch Brown TKL White 40hs', 263542.0, 6, 'Logitech');
+
+INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
+                        conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
+VALUES (167, '1', 'inalámbrico', true, false, true, true, 'USB-C', true, '1200m');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Periferico-Teclado-Mecanico-Logitech-G915-Low-Profile-Lightspeed-Wireless-2-4Ghz-Bluetooth-LightSync-RGB-Switch-Brown-TKL-White-40hs-1.jpg', 167),
+       ('Periferico-Teclado-Mecanico-Logitech-G915-Low-Profile-Lightspeed-Wireless-2-4Ghz-Bluetooth-LightSync-RGB-Switch-Brown-TKL-White-40hs-2.jpg', 167);
+
+-- Componente 168: Teclado Mecanico ASUS ROG Strix M701 Azoth RGB Wireless Bluetooth Switch NX Storm White
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Teclado Mecanico ASUS ROG Strix M701 Azoth RGB Wireless Bluetooth Switch NX Storm White', 299990.0, 4, 'ASUS');
+
+INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
+                        conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
+VALUES (168, '1', 'inalámbrico', true, false, true, true, 'USB-C', true, '1000m');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Periferico-Teclado-Mecanico-ASUS-ROG-Strix-M701-Azoth-RGB-Wireless-Bluetooth-Switch-NX-Storm-White-1.jpg', 168),
+       ('Periferico-Teclado-Mecanico-ASUS-ROG-Strix-M701-Azoth-RGB-Wireless-Bluetooth-Switch-NX-Storm-White-2.jpg', 168),
+       ('Periferico-Teclado-Mecanico-ASUS-ROG-Strix-M701-Azoth-RGB-Wireless-Bluetooth-Switch-NX-Storm-White-3.jpg', 168);
+
+-- Componente 169: Teclado Logitech MX Key Graphite VC
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Teclado Logitech MX Key Graphite VC', 159990.0, 10, 'Logitech');
+
+INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
+                        conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
+VALUES (169, '1', 'inalámbrico', true, false, true, true, 'USB-C', true, '1400m');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Periferico-Teclado-Logitech-MX-Key-Graphite-VC-1.jpg', 169),
+       ('Periferico-Teclado-Logitech-MX-Key-Graphite-VC-2.jpg', 169),
+       ('Periferico-Teclado-Logitech-MX-Key-Graphite-VC-3.jpg', 169);
+
+-- Componente 170: Teclado Logitech Pebble Keys 2 K380S Multidispositivo Bluetooth Black
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Teclado Logitech Pebble Keys 2 K380S Multidispositivo Bluetooth Black', 41200.0, 14, 'Logitech');
+
+INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
+                        conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
+VALUES (170, '0', 'inalámbrico', true, true, false, false, null, false, null);
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Periferico-Teclado-Logitech-Pebble-Keys-2-K380S-Multidispositivo-Bluetooth-Black-1.jpg', 170);
+
+-- =================================================================
+-- Periferico Auriculares
+-- =================================================================
+
+-- Componente 171: Auriculares Logitech G PRO X Gaming Premium 7.1
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Auriculares Logitech G PRO X Gaming Premium 7.1', 209990.0, 10, 'Logitech');
+
+INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
+                        conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
+VALUES (171, '1', 'cableado', false, false, false, false, 'USB-C', 0, '2000m');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Periferico-Auriculares-Logitech-G-PRO-X-Gaming-Premium-1.jpg', 171),
+       ('Periferico-Auriculares-Logitech-G-PRO-X-Gaming-Premium-2.jpg', 171),
+       ('Periferico-Auriculares-Logitech-G-PRO-X-Gaming-Premium-3.jpg', 171);
+
+-- Componente 172: Auriculares Redragon Ire H848 Ultra light Wireless USB Bluetooth White/Pink USB C
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Auriculares Redragon Ire H848 Ultra light Wireless USB Bluetooth White/Pink USB C', 89990.0, 15, 'Redragon');
+
+INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
+                        conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
+VALUES (172, '0', 'inalámbrico', true, false, true, true, 'USB-C', true, '1500m');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Periferico-Auriculares-Redragon-Ire-H848-Ultra-light-Wireless-USB-Bluetooth-White-Pink-USB-C-1.jpg', 172),
+       ('Periferico-Auriculares-Redragon-Ire-H848-Ultra-light-Wireless-USB-Bluetooth-White-Pink-USB-C-2.jpg', 172),
+       ('Periferico-Auriculares-Redragon-Ire-H848-Ultra-light-Wireless-USB-Bluetooth-White-Pink-USB-C-3.jpg', 172);
+
+-- Componente 173: Auriculares Logitech G935 Wireless 2.4Ghz 7.1 Lightsync DTS Headphone X RGB
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Auriculares Logitech G935 Wireless 2.4Ghz 7.1 Lightsync DTS Headphone X RGB', 169990.0, 8, 'Logitech');
+
+INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
+                        conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
+VALUES (173, '1', 'inalámbrico', false, false, true, true, null, false, null);
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Periferico-Auriculares-Logitech-G935-Wireless-2-4Ghz-7-1-Lightsync-DTS-Headphone-X-RGB-1.jpg', 173),
+       ('Periferico-Auriculares-Logitech-G935-Wireless-2-4Ghz-7-1-Lightsync-DTS-Headphone-X-RGB-2.jpg', 173),
+       ('Periferico-Auriculares-Logitech-G935-Wireless-2-4Ghz-7-1-Lightsync-DTS-Headphone-X-RGB-3.jpg', 173),
+       ('Periferico-Auriculares-Logitech-G935-Wireless-2-4Ghz-7-1-Lightsync-DTS-Headphone-X-RGB-4.jpg', 173);
+
+-- Componente 174: Auriculares Logitech G335 White PC/XBOX/PS
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Auriculares Logitech G335 White PC/XBOX/PS', 108200.0, 12, 'Logitech');
+
+INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
+                        conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
+VALUES (174, '0', 'cableado', false, false, false, false, 'Jack 3.5mm', false, '2500m');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Periferico-Auriculares-Logitech-G335-White-PC-XBOX-PS-1.jpg', 174),
+       ('Periferico-Auriculares-Logitech-G335-White-PC-XBOX-PS-2.jpg', 174);
+
+-- Componente 175: Auriculares Logitech Astro A50X Wireless Lightspeed 2.4Ghz Bluetooth Black PC/PS5/XBOX HDMI 2.1 24HS
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Auriculares Logitech Astro A50X Wireless Lightspeed 2.4Ghz Bluetooth Black PC/PS5/XBOX HDMI 2.1 24HS', 548500.0, 5, 'Logitech');
+
+INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
+                        conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
+VALUES (175, '1', 'inalámbrico', true, false, true, true, 'USB-C', true, '1800m');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Periferico-Auriculares-Logitech-Astro-A50X-Wireless-Lightspeed-2-4Ghz-Bluetooth-Black-PC-PS5-XBOX-HDMI-2-1-24HS-1.jpg', 175),
+       ('Periferico-Auriculares-Logitech-Astro-A50X-Wireless-Lightspeed-2-4Ghz-Bluetooth-Black-PC-PS5-XBOX-HDMI-2-1-24HS-2.jpg', 175),
+       ('Periferico-Auriculares-Logitech-Astro-A50X-Wireless-Lightspeed-2-4Ghz-Bluetooth-Black-PC-PS5-XBOX-HDMI-2-1-24HS-3.jpg', 175);
+
+-- Componente 176: Auriculares Redragon Ire H848 Ultra light Wireless USB Bluetooth Black USB C
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Auriculares Redragon Ire H848 Ultra light Wireless USB Bluetooth Black USB C', 89990.0, 15, 'Redragon');
+
+INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
+                        conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
+VALUES (176, '1', 'inalámbrico', true, false, true, true, 'USB-C', true, '1500m');
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Periferico-Auriculares-Redragon-Ire-H848-Ultra-light-Wireless-USB-Bluetooth-Black-USB-C-1.jpg', 176),
+       ('Periferico-Auriculares-Redragon-Ire-H848-Ultra-light-Wireless-USB-Bluetooth-Black-USB-C-2.jpg', 176);
