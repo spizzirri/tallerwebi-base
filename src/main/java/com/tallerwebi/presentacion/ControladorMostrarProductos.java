@@ -8,7 +8,9 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Controller
@@ -40,9 +42,11 @@ public class ControladorMostrarProductos {
     public ModelAndView showProductos() {
         ModelMap model = new ModelMap();
         List<ProductoDto> productos = productoService.getProductosEnStock();
+        Collections.shuffle(productos);
+        List<ProductoDto> productosLimitados = productos.stream().limit(24).collect(Collectors.toList());
         List<CategoriaDto> categorias = categoriasService.getCategorias();
         model.put("categorias", categorias);
-        model.addAttribute("productos", productos);
+        model.addAttribute("productos", productosLimitados);
 
         return new ModelAndView("productos", model);
     }

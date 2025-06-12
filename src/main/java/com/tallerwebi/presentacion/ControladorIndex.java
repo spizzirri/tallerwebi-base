@@ -2,7 +2,7 @@ package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.ServicioCategorias;
 import com.tallerwebi.dominio.ServicioBuscarProducto;
-import com.tallerwebi.dominio.ServicioProductoCarrito;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.transaction.Transactional;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,8 +21,7 @@ public class ControladorIndex {
     private ServicioCategorias categoriasService;
     @Autowired
     private ServicioBuscarProducto productoService;
-    @Autowired
-    private ServicioProductoCarrito servicioProductoCarrito;
+
 
 //    #1 Equipos y Notebook
 //    #2 Monitores
@@ -58,7 +58,8 @@ public class ControladorIndex {
 
         String tipoComponente = convertirIdATipoComponente(id);
         List<ProductoDto> productosDestacados = productoService.getProductosPorTipo(tipoComponente);
-        List<ProductoDto> productosLimitados = productosDestacados.stream().limit(6).collect(Collectors.toList());
+        Collections.shuffle(productosDestacados);
+        List<ProductoDto> productosLimitados = productosDestacados.stream().limit(8).collect(Collectors.toList());
         model.addAttribute("productosDestacados", productosLimitados);
         return new ModelAndView("cargarProductosDinamicos", model);
     }

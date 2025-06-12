@@ -150,5 +150,50 @@ public class RepositorioComponenteImplTest {
 
         assertTrue(resultado.get(0).getStock() > 0);
     }
+    @Sql("/data.sql")
+    @Test
+    @Rollback
+    public void CuandoLePidoObtenerComponentesMeTraeComponentes() {
+
+        List<Componente> resultado = repositorioComponente.obtenerComponentes();
+
+        assertFalse(resultado.isEmpty());
+    }
+    @Sql("/data.sql")
+    @Test
+    @Rollback
+    public void CuandoLePidoObtenerComponentesPorQueryMeTraeComponentesDeEsaQuery() {
+
+
+        List<Componente> resultado = repositorioComponente.obtenerComponentesPorQuery("Intel");
+        String nombreEsperado = "Intel";
+        assertFalse(resultado.isEmpty());
+
+       assertTrue(resultado.get(0).getNombre().contains(nombreEsperado));
+    }
+    @Sql("/data.sql")
+    @Test
+    @Rollback
+    public void CuandoLePidoObtenerComponentesMenoresAUnPrecioObtieneEsePrecicioPorParametroYDevuelveArticulosMenoresAEsePrecio() {
+
+
+        List<Componente> resultado = repositorioComponente.obtenerComponentesMenoresDelPrecioPorParametro(100000D);
+
+        assertFalse(resultado.isEmpty());
+        assertTrue(resultado.get(0).getPrecio()<100000D);
+    }
+    @Sql("/data.sql")
+    @Test
+    @Rollback
+    public void CuandoLePidoObtenerComponentesPorTipoYPorQueryMeDevuelveComponenteDeEseTipoYEsaQuery() throws ClassNotFoundException {
+
+        Componente claseEsperado = new Procesador();
+        List<Componente> resultado = repositorioComponente.obtenerComponentesPorTipoYPorQuery("Procesador","Intel");
+        String nombreEsperado = "Intel";
+
+        assertFalse(resultado.isEmpty());
+        assertTrue(resultado.get(0).getNombre().contains(nombreEsperado));
+        assertEquals(resultado.get(0).getClass(), claseEsperado.getClass());
+    }
 
 }
