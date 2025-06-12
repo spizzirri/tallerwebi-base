@@ -1,34 +1,24 @@
 package com.tallerwebi.presentacion;
 
-import com.tallerwebi.dominio.RepositorioComponente;
-import com.tallerwebi.dominio.ServiceCategorias;
+import com.tallerwebi.dominio.ServicioCategorias;
 import com.tallerwebi.dominio.ServicioBuscarProducto;
-import com.tallerwebi.dominio.ServicioProductoCarrito;
-import com.tallerwebi.dominio.entidades.Componente;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.transaction.Transactional;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 
 @Controller
 public class ControladorMostrarProductos {
 
     @Autowired
-    private ServiceCategorias categoriasService;
+    private ServicioCategorias categoriasService;
     @Autowired
     private ServicioBuscarProducto productoService;
-    @Autowired
-    private ServicioProductoCarrito servicioProductoCarrito;
-    @Autowired
-    private RepositorioComponente repositorioComponente;
+
 
 
 //    #1 Equipos y Notebook
@@ -40,8 +30,9 @@ public class ControladorMostrarProductos {
 //    #7 Mothers
 //    #8 Procesadores
 
-    public ControladorMostrarProductos(ServicioBuscarProducto productoService) {
+    public ControladorMostrarProductos(ServicioBuscarProducto productoService, ServicioCategorias categoriasServiceMock) {
         this.productoService = productoService;
+        this.categoriasService = categoriasServiceMock;
     }
 
 

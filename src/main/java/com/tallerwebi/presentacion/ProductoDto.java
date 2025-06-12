@@ -7,7 +7,7 @@ public class ProductoDto {
     private Long id;
     private String nombre;
     private Double precio;
-    private Integer cantidad;
+    private Integer stock;
     private String tipoComponente;
     private String imagen;
 
@@ -21,13 +21,14 @@ public class ProductoDto {
                 componente.getImagenes().get(0) != null)
                 ? componente.getImagenes().get(0).getUrlImagen()
                 : "imagen-generica.jpg";
+        this.stock = componente.getStock();
     }
 
-    public ProductoDto(Long id, String nombre, Double precio, String tipoComponente, String imagen) {
+    public ProductoDto(Long id, String nombre,Integer stock, Double precio, String tipoComponente, String imagen) {
         this.id = id;
         this.nombre = nombre;
         this.precio = precio;
-        this.cantidad = 2;
+        this.stock = stock;
         this.tipoComponente = tipoComponente;
         this.imagen = imagen;
     }
@@ -58,11 +59,11 @@ public class ProductoDto {
         this.precio = precio;
     }
 
-    public Integer getCantidad() {
-        return cantidad;
+    public Integer getStock() {
+        return stock;
     }
 
-    public void setCantidad(Integer cantidad) {
-        this.cantidad = cantidad;
+    public void setStock(Integer stock) {
+        this.stock = stock;
     }
 }

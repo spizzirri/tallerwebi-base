@@ -112,7 +112,6 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
             case "periferico":
                 armadoPcDto.getPerifericos().add(new ComponenteDto(componenteSolicitado));
                 break;
-
         }
 
         return armadoPcDto;

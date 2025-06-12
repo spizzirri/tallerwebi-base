@@ -1,10 +1,8 @@
 package com.tallerwebi.presentacion;
 
-import com.tallerwebi.dominio.RepositorioComponente;
-import com.tallerwebi.dominio.ServiceCategorias;
+import com.tallerwebi.dominio.ServicioCategorias;
 import com.tallerwebi.dominio.ServicioBuscarProducto;
 import com.tallerwebi.dominio.ServicioProductoCarrito;
-import com.tallerwebi.dominio.entidades.Componente;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -12,16 +10,14 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.transaction.Transactional;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
 public class ControladorIndex {
 
     @Autowired
-    private ServiceCategorias categoriasService;
+    private ServicioCategorias categoriasService;
     @Autowired
     private ServicioBuscarProducto productoService;
     @Autowired
@@ -36,8 +32,9 @@ public class ControladorIndex {
 //    #7 Mothers
 //    #8 Procesadores
 
-    public ControladorIndex(ServicioBuscarProducto productoService) {
+    public ControladorIndex(ServicioBuscarProducto productoService, ServicioCategorias categoriasService) {
         this.productoService = productoService;
+        this.categoriasService = categoriasService;
     }
 
     @GetMapping("/index")
@@ -50,9 +47,6 @@ public class ControladorIndex {
         List<CategoriaDto> categoriasLimitada = otrasCategorias.stream().limit(7).collect(Collectors.toList());
         model.addAttribute("categoriaDestacada", categoriaDestacada);
         model.addAttribute("otrasCategorias",categoriasLimitada);
-
-        List<ProductoDto> productosDescuento = productoService.getProductosMenoresAUnPrecio(150000D);
-        model.addAttribute("productosDescuento", productosDescuento);
 
         return new ModelAndView("index", model);
     }
@@ -84,39 +78,6 @@ public class ControladorIndex {
         }
     }
 
-    @PostMapping("/agregarAlCarrito")
-    @ResponseBody
-    public Map<String, Object> agregarProductoAlCarrito(
-            @RequestParam Long componenteId,
-            @RequestParam(defaultValue = "1") Integer cantidad) {
-
-        Map<String, Object> response = new HashMap<>();
-        try {
-            if (!servicioProductoCarrito.verificarStock(componenteId, cantidad)) {
-                response.put("success", false);
-                response.put("mensaje", "Stock insuficiente");
-            } else {
-                servicioProductoCarrito.agregarProducto(componenteId, cantidad);
-                response.put("success", true);
-                response.put("mensaje", "Producto agregado al carrito!");
-            }
-
-            // AGREGAR: Calcular cantidad total del carrito
-            try {
-                Integer cantidadTotal = servicioProductoCarrito.calcularCantidadTotalDeProductos();
-                response.put("cantidadEnCarrito", cantidadTotal != null ? cantidadTotal : 0);
-            } catch (Exception e) {
-                System.out.println("Error al calcular cantidad total: " + e.getMessage());
-                response.put("cantidadEnCarrito", 0);
-            }
-
-        } catch (Exception e) {
-            response.put("success", false);
-            response.put("mensaje", "Error al agregar producto al carrito!");
-            response.put("cantidadEnCarrito", 0);
-        }
-        return response;
-    }
 
 
 }
