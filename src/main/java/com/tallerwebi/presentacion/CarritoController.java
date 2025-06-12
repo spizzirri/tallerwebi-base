@@ -119,20 +119,19 @@ public class CarritoController {
     @ResponseBody
     public Map<String, Object> agregarMasCantidadDeUnProducto(@PathVariable Long id) {
         ProductoCarritoDto productoBuscado = this.productoService.buscarPorId(id);
+        Map<String, Object> response = new HashMap<>();
 
         if (productoBuscado != null) {
             productoBuscado.setCantidad(productoBuscado.getCantidad() + 1);
-            this.productoService.calcularValorTotalDeLosProductos();
+
+            Double valorTotalDelProductoBuscado = productoBuscado.getCantidad() * productoBuscado.getPrecio();
+            Double valorTotal = this.productoService.calcularValorTotalDeLosProductos();
+
+            assert productoBuscado != null;
+            response.put("cantidad", productoBuscado.getCantidad());
+            response.put("precioTotalDelProducto", valorTotalDelProductoBuscado);
+            response.put("valorTotal", valorTotal);
         }
-
-        Double valorTotalDelProductoBuscado = productoBuscado.getCantidad() * productoBuscado.getPrecio();
-        Double valorTotal = this.productoService.calcularValorTotalDeLosProductos();
-
-        Map<String, Object> response = new HashMap<>();
-        assert productoBuscado != null;
-        response.put("cantidad", productoBuscado.getCantidad());
-        response.put("precioTotalDelProducto", valorTotalDelProductoBuscado);
-        response.put("valorTotal", valorTotal);
 
         Integer cantidadTotal = this.productoService.calcularCantidadTotalDeProductos();
         response.put("cantidadEnCarrito", cantidadTotal);
@@ -148,7 +147,6 @@ public class CarritoController {
 
         if (productoBuscado != null && productoBuscado.getCantidad() > 1) {
             productoBuscado.setCantidad(productoBuscado.getCantidad() - 1);
-            this.productoService.calcularValorTotalDeLosProductos();
 
             Double valorTotalDelProductoBuscado = productoBuscado.getCantidad() * productoBuscado.getPrecio();
             Double valorTotal = this.productoService.calcularValorTotalDeLosProductos();
@@ -187,7 +185,7 @@ public class CarritoController {
         }
 
         if ("mercadoPago".equalsIgnoreCase(metodoDePago)) {
-            if(envioActual == null || codigoPostalActual == null) {
+            if (envioActual == null || codigoPostalActual == null) {
                 response.put("success", false);
                 response.put("error", "Debes agregar un codigo postal");
                 return response;
