@@ -1776,7 +1776,7 @@ VALUES ('MemoriaRAM-Corsair-DDR5-32GB-6000-1.jpg', 97);
 -- Placas de Video (GPU)
 -- =================================================================
 
-INSERT INTO Componente (nombre, precio, stock, marca) VALUES ('NVIDIA RTX 3060', 300000.0, 5, 'NVIDIA');
+/*INSERT INTO Componente (nombre, precio, stock, marca) VALUES ('NVIDIA RTX 3060', 300000.0, 5, 'NVIDIA');
 INSERT INTO PlacaDeVideo (id, chipsetGPU, cantidadDeCoolers, cantidadDeVGA, cantidadDeDVIDigital, cantidadDeHDMI, cantidadDeDisplayport, consumo, cantidadDePCIE8Pines, velocidadDelCoreBase, velocidadDelCoreTurbo, tecnologiaRAM, capacidadRAM, cantidadDePCIE6Pines, cantidadDePCIE16Pines, cantidadDeAdaptadores16Pines) VALUES (13, 'GeForce RTX 3060', 2, 0, 0, 1, 3, '170W', 1, '1320 MHz', '1777 MHz', 'GDDR6', '12GB', 0, 0, 0);
 INSERT INTO Imagen (urlImagen, componente_id) VALUES ('nvidia-rtx-3060-1.jpg', 13);
 
@@ -1837,4 +1837,4 @@ INSERT INTO Imagen (id, urlImagen, componente_id) VALUES (23, 'corsair-carbide-1
 -- Componente 24: Cooler Master Q300L
 INSERT INTO Componente (id, nombre, precio, stock, marca) VALUES (24, 'Cooler Master Q300L', 50000.0, 10, 'Cooler Master');
 INSERT INTO Gabinete (id, color, conVentana, tipoDeVentana, tamanioGabinete, cantUSB, audioFrontal, cantCoolerFanDe120mmSoportados, cantCoolerFanDe120mmIncluidos, cantCoolerFanDe140mmSoportados, cantCoolerFanDe140mmIncluidos, cantCoolerFanDe80mmSoportados, cantCoolerFanDe80mmIncluidos, cantCoolerFanDe200mmSoportados, cantCoolerFanDe200mmIncluidos, cantRadiador240mmSoportados, cantRadiador280mmSoportados, cantRadiador360mmSoportados, cantRadiador420mmSoportados) VALUES (24, 'Negro', true, 'Acrílico', 'Micro-ATX Tower', 2, true, 4, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0);
-INSERT INTO Imagen (id, urlImagen, componente_id) VALUES (24, 'cooler-master-q300l-1.jpg', 24);
+INSERT INTO Imagen (id, urlImagen, componente_id) VALUES (24, 'cooler-master-q300l-1.jpg', 24);*/
