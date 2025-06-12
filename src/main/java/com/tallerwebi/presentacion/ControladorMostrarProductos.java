@@ -1,29 +1,26 @@
 package com.tallerwebi.presentacion;
 
-import com.tallerwebi.dominio.RepositorioComponente;
-import com.tallerwebi.dominio.ServiceCategorias;
+import com.tallerwebi.dominio.ServicioCategorias;
 import com.tallerwebi.dominio.ServicioBuscarProducto;
-import com.tallerwebi.dominio.ServicioProductoCarritoImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Controller
 public class ControladorMostrarProductos {
 
     @Autowired
-    private ServiceCategorias categoriasService;
+    private ServicioCategorias categoriasService;
     @Autowired
     private ServicioBuscarProducto productoService;
-    @Autowired
-    private ServicioProductoCarritoImpl servicioProductoCarritoImpl;
-    @Autowired
-    private RepositorioComponente repositorioComponente;
+
 
 
 //    #1 Equipos y Notebook
@@ -35,8 +32,9 @@ public class ControladorMostrarProductos {
 //    #7 Mothers
 //    #8 Procesadores
 
-    public ControladorMostrarProductos(ServicioBuscarProducto productoService) {
+    public ControladorMostrarProductos(ServicioBuscarProducto productoService, ServicioCategorias categoriasServiceMock) {
         this.productoService = productoService;
+        this.categoriasService = categoriasServiceMock;
     }
 
 
@@ -44,9 +42,11 @@ public class ControladorMostrarProductos {
     public ModelAndView showProductos() {
         ModelMap model = new ModelMap();
         List<ProductoDto> productos = productoService.getProductosEnStock();
+        Collections.shuffle(productos);
+        List<ProductoDto> productosLimitados = productos.stream().limit(24).collect(Collectors.toList());
         List<CategoriaDto> categorias = categoriasService.getCategorias();
         model.put("categorias", categorias);
-        model.addAttribute("productos", productos);
+        model.addAttribute("productos", productosLimitados);
 
         return new ModelAndView("productos", model);
     }

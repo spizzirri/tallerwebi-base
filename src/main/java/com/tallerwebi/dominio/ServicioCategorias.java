@@ -7,12 +7,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
-@Service("serviceCategorias")
+@Service("servicioCategorias")
 @Transactional
-public class ServiceCategorias {
+public class ServicioCategorias {
     private List<CategoriaDto> categorias;
 
-    public ServiceCategorias() {
+    public ServicioCategorias() {
         this.categorias = new ArrayList<>();
         this.categorias.add(new CategoriaDto("Procesador", "Procesadores", "procesador.jpg"));
         this.categorias.add(new CategoriaDto("Periferico", "perifericos", "perifericos.jpg"));
