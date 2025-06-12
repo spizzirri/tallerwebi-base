@@ -187,12 +187,15 @@ public class CarritoController {
         }
 
         if ("mercadoPago".equalsIgnoreCase(metodoDePago)) {
+            if(envioActual == null || codigoPostalActual == null) {
+                response.put("success", false);
+                response.put("error", "Debes agregar un codigo postal");
+                return response;
+            }
             response.put("success", true);
             response.put("metodoPago", "mercadoPago");
+            response.put("costoEnvio", envioActual.getCosto());
 
-            if (envioActual != null && codigoPostalActual != null) {
-                response.put("costoEnvio", envioActual.getCosto());
-            }
         } else {
             response.put("success", true);
             response.put("metodoPago", metodoDePago);

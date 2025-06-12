@@ -30,8 +30,6 @@ public class ControladorCarritoTest {
     private ServicioProductoCarritoImpl servicioProductoCarritoImplMock;
     @Mock
     private ServicioDeEnviosImpl servicioEnviosMock;
-    @Mock
-    private RepositorioComponente repositorioMock;
 
 
     private CarritoController carritoController;
@@ -39,9 +37,7 @@ public class ControladorCarritoTest {
 
     @BeforeEach
     public void init() {
-        repositorioMock = mock(RepositorioComponente.class);
         MockitoAnnotations.openMocks(this);
-
         carritoController = new CarritoController(servicioProductoCarritoImplMock, servicioEnviosMock);
         productos = new ArrayList<>();
     }
