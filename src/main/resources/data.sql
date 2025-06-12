@@ -2468,8 +2468,8 @@ VALUES (149, 'LED', 'IPS', false, 1, 1,
         true, '541mm', '324mm', '43mm', '0r');
 
 INSERT INTO Imagen (urlImagen, componente_id)
-VALUES ('Monitor-Gamer-LG-Ultragear-24GS60F-B-24"-IPS-FHD-1920*1080-180Hz-G-SYNC-FreeSync-1ms-1.jpg', 149),
-       ('Monitor-Gamer-LG-Ultragear-24GS60F-B-24"-IPS-FHD-1920*1080-180Hz-G-SYNC-FreeSync-1ms-2.jpg', 149);
+VALUES ('Monitor-Gamer-LG-Ultragear-24GS60F-B-24_-IPS-FHD-1920_1080-180Hz-G-SYNC-FreeSync-1ms-1.jpg', 149),
+       ('Monitor-Gamer-LG-Ultragear-24GS60F-B-24_-IPS-FHD-1920_1080-180Hz-G-SYNC-FreeSync-1ms-2.jpg', 149);
 
 -- Componente 150: Monitor Samsung 22" T350FH FHD IPS 75Hz
 INSERT INTO Componente (nombre, precio, stock, marca)
@@ -2485,8 +2485,8 @@ VALUES (150, 'LED', 'IPS', false, 1, 0,
         false, '487mm', '369mm', '65mm', '0r');
 
 INSERT INTO Imagen (urlImagen, componente_id)
-VALUES ('Monitor-Samsung-22"-T350FH-FHD-IPS-75Hz-1.jpg', 150),
-       ('Monitor-Samsung-22"-T350FH-FHD-IPS-75Hz-2.jpg', 150);
+VALUES ('Monitor-Samsung-22_-T350FH-FHD-IPS-75Hz-1.jpg', 150),
+       ('Monitor-Samsung-22_-T350FH-FHD-IPS-75Hz-2.jpg', 150);
 
 -- Componente 151: Monitor Gamer Curvo LG 34" UltraWide 34GP63A 160Hz WQHD 2K FreeSync Premium
 INSERT INTO Componente (nombre, precio, stock, marca)
@@ -2502,8 +2502,8 @@ VALUES (151, 'LED', 'VA', true, 2, 1,
         true, '808mm', '359mm', '92mm', '1800r');
 
 INSERT INTO Imagen (urlImagen, componente_id)
-VALUES ('Monitor-Gamer-Curvo-LG-34"-UltraWide-34GP63A-160Hz-WQHD-2K-FreeSync-Premium-1.jpg', 151),
-       ('Monitor-Gamer-Curvo-LG-34"-UltraWide-34GP63A-160Hz-WQHD-2K-FreeSync-Premium-2.jpg', 151);
+VALUES ('Monitor-Gamer-Curvo-LG-34_-UltraWide-34GP63A-160Hz-WQHD-2K-FreeSync-Premium-1.jpg', 151),
+       ('Monitor-Gamer-Curvo-LG-34_-UltraWide-34GP63A-160Hz-WQHD-2K-FreeSync-Premium-2.jpg', 151);
 
 -- Componente 152: Monitor LG 24MS500-B 24" IPS FHD 100Hz 5ms
 INSERT INTO Componente (nombre, precio, stock, marca)
@@ -2519,8 +2519,8 @@ VALUES (152, 'EDGE', 'IPS', false, 2, 0,
         false, '541mm', '324mm', '43mm', '0r');
 
 INSERT INTO Imagen (urlImagen, componente_id)
-VALUES ('Monitor-LG-24MS500-B-24"-IPS-FHD-100Hz-5ms-1.jpg', 152),
-       ('Monitor-LG-24MS500-B-24"-IPS-FHD-100Hz-5ms-2.jpg', 152);
+VALUES ('Monitor-LG-24MS500-B-24_-IPS-FHD-100Hz-5ms-1.jpg', 152),
+       ('Monitor-LG-24MS500-B-24_-IPS-FHD-100Hz-5ms-2.jpg', 152);
 
 -- Componente 153: Monitor Gamer Curvo ViewSonic VX3218C-2K 32" 1500R QHD 1440p 180Hz VA 1ms MPRT FreeSync Premium
 INSERT INTO Componente (nombre, precio, stock, marca)
@@ -2536,8 +2536,8 @@ VALUES (153, 'LED', 'VA', true, 2, 1,
         true, '709mm', '423mm', '94mm', '1500r');
 
 INSERT INTO Imagen (urlImagen, componente_id)
-VALUES ('Monitor-Gamer-Curvo-ViewSonic-VX3218C-2K-32"-1500R-QHD-1440p-180Hz-VA-1ms-MPRT-FreeSync-Premium-1.jpg', 153),
-       ('Monitor-Gamer-Curvo-ViewSonic-VX3218C-2K-32"-1500R-QHD-1440p-180Hz-VA-1ms-MPRT-FreeSync-Premium-2.jpg', 153);
+VALUES ('Monitor-Gamer-Curvo-ViewSonic-VX3218C-2K-32_-1500R-QHD-1440p-180Hz-VA-1ms-MPRT-FreeSync-Premium-1.jpg', 153),
+       ('Monitor-Gamer-Curvo-ViewSonic-VX3218C-2K-32_-1500R-QHD-1440p-180Hz-VA-1ms-MPRT-FreeSync-Premium-2.jpg', 153);
 
 -- Componente 154: Monitor Gamer AsRock Phantom PG32QF2B 31.5" VA QHD 165Hz FreeSync Antena WiFi Integrada
 INSERT INTO Componente (nombre, precio, stock, marca)
@@ -2553,8 +2553,8 @@ VALUES (154, 'LED', 'VA', false, 2, 1,
         true, '708mm', '420mm', '56mm', '0r');
 
 INSERT INTO Imagen (urlImagen, componente_id)
-VALUES ('Monitor-Gamer-AsRock-Phantom-PG32QF2B-31.5"-VA-QHD-165Hz-FreeSync-Antena-WiFi-Integrada-1.jpg', 154),
-       ('Monitor-Gamer-AsRock-Phantom-PG32QF2B-31.5"-VA-QHD-165Hz-FreeSync-Antena-WiFi-Integrada-2.jpg', 154);
+VALUES ('Monitor-Gamer-AsRock-Phantom-PG32QF2B-31.5_-VA-QHD-165Hz-FreeSync-Antena-WiFi-Integrada-1.jpg', 154),
+       ('Monitor-Gamer-AsRock-Phantom-PG32QF2B-31.5_-VA-QHD-165Hz-FreeSync-Antena-WiFi-Integrada-2.jpg', 154);
 
 -- Componente 155: Monitor Gamer ASUS VA27EHF-J 27" FHD IPS 100Hz
 INSERT INTO Componente (nombre, precio, stock, marca)
@@ -2570,8 +2570,8 @@ VALUES (155, 'LED', 'IPS', false, 2, 1,
         true, '611mm', '364mm', '52mm', '0r');
 
 INSERT INTO Imagen (urlImagen, componente_id)
-VALUES ('Monitor-Gamer-ASUS-VA27EHF-J-27"-FHD-IPS-100Hz-1.jpg', 155),
-       ('Monitor-Gamer-ASUS-VA27EHF-J-27"-FHD-IPS-100Hz-2.jpg', 155);
+VALUES ('Monitor-Gamer-ASUS-VA27EHF-J-27_-FHD-IPS-100Hz-1.jpg', 155),
+       ('Monitor-Gamer-ASUS-VA27EHF-J-27_-FHD-IPS-100Hz-2.jpg', 155);
 
 -- Componente 156: Monitor Lenovo ThinkVision S22i-30 21.5" FHD IPS 75Hz Anti Glare VESA
 INSERT INTO Componente (nombre, precio, stock, marca)
@@ -2587,8 +2587,8 @@ VALUES (156, 'WLED', 'IPS', false, 1, 1,
         false, '489mm', '295mm', '38mm', '0r');
 
 INSERT INTO Imagen (urlImagen, componente_id)
-VALUES ('Monitor-Lenovo-ThinkVision-S22i-30-21.5"-FHD-IPS-75Hz-Anti-Glare-VESA-1.jpg', 156),
-       ('Monitor-Lenovo-ThinkVision-S22i-30-21.5"-FHD-IPS-75Hz-Anti-Glare-VESA-2.jpg', 156);
+VALUES ('Monitor-Lenovo-ThinkVision-S22i-30-21.5_-FHD-IPS-75Hz-Anti-Glare-VESA-1.jpg', 156),
+       ('Monitor-Lenovo-ThinkVision-S22i-30-21.5_-FHD-IPS-75Hz-Anti-Glare-VESA-2.jpg', 156);
 
 -- Componente 157: Monitor LG 34WP75C-B 34" WQHD 3440x1440 VA 160Hz Ultrapanoramico
 INSERT INTO Componente (nombre, precio, stock, marca)
@@ -2604,8 +2604,8 @@ VALUES (157, 'EDGE', 'VA', true, 2, 1,
         true, '808mm', '359mm', '92mm', '1800r');
 
 INSERT INTO Imagen (urlImagen, componente_id)
-VALUES ('Monitor-LG-34WP75C-B-34"-WQHD-3440x1440-VA-160Hz-Ultrapanoramico-1.jpg', 157),
-       ('Monitor-LG-34WP75C-B-34"-WQHD-3440x1440-VA-160Hz-Ultrapanoramico-2.jpg', 157);
+VALUES ('Monitor-LG-34WP75C-B-34_-WQHD-3440x1440-VA-160Hz-Ultrapanoramico-1.jpg', 157),
+       ('Monitor-LG-34WP75C-B-34_-WQHD-3440x1440-VA-160Hz-Ultrapanoramico-2.jpg', 157);
 
 -- Componente 158: Monitor Gamer Samsung Odyssey G8 34" OLED UWQHD Curvo 1800R 175Hz AMD Freesync Premium
 INSERT INTO Componente (nombre, precio, stock, marca)
@@ -2621,8 +2621,8 @@ VALUES (158, 'OLED', 'OLED', true, 0, 0,
         true, '814mm', '364mm', '128mm', '1800r');
 
 INSERT INTO Imagen (urlImagen, componente_id)
-VALUES ('Monitor-Gamer-Samsung-Odyssey-G8-34"-OLED-UWQHD-Curvo-1800R-175Hz-AMD-Freesync-Premium-1.jpg', 158),
-       ('Monitor-Gamer-Samsung-Odyssey-G8-34"-OLED-UWQHD-Curvo-1800R-175Hz-AMD-Freesync-Premium-2.jpg', 158);
+VALUES ('Monitor-Gamer-Samsung-Odyssey-G8-34_-OLED-UWQHD-Curvo-1800R-175Hz-AMD-Freesync-Premium-1.jpg', 158),
+       ('Monitor-Gamer-Samsung-Odyssey-G8-34_-OLED-UWQHD-Curvo-1800R-175Hz-AMD-Freesync-Premium-2.jpg', 158);
 
 -- =================================================================
 -- Periferico Mouse
