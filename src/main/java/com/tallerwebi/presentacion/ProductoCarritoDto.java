@@ -13,6 +13,7 @@ public class ProductoCarritoDto {
     private Double precio;
     private Integer cantidad = 1;
     private String marca;
+    private String imagen;
 
 
     public ProductoCarritoDto(Componente componente, Integer cantidad) {
@@ -21,6 +22,11 @@ public class ProductoCarritoDto {
         this.precio = componente.getPrecio();
         this.cantidad = cantidad;
         this.marca = componente.getMarca();
+        this.imagen =  (componente.getImagenes() != null &&
+                !componente.getImagenes().isEmpty() &&
+                componente.getImagenes().get(0) != null)
+                ? componente.getImagenes().get(0).getUrlImagen()
+                : "imagen-generica.jpg";
     }
 
     public ProductoCarritoDto(Long id, String nombre, Double precio, Integer cantidad, String marca) {
@@ -29,6 +35,7 @@ public class ProductoCarritoDto {
         this.precio = precio;
         this.cantidad = cantidad;
         this.marca = marca;
+        this.imagen = imagen;
     }
 
     public Long getId() {
@@ -47,7 +54,7 @@ public class ProductoCarritoDto {
         return marca;
     }
 
-    public void setMarca(String descripcion) {
+    public void setMarca(String marca) {
         this.marca = marca;
     }
 
@@ -65,5 +72,13 @@ public class ProductoCarritoDto {
 
     public void setCantidad(Integer cantidad) {
         this.cantidad = cantidad;
+    }
+
+    public String getImagen() {
+        return imagen;
+    }
+
+    public void setImagen(String imagen) {
+        this.imagen = imagen;
     }
 }

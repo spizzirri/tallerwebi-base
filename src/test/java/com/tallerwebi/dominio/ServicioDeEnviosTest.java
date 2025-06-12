@@ -17,20 +17,21 @@ public class ServicioDeEnviosTest {
     @Mock
     private RestTemplate restTemplateMock;
 
-    private ServicioDeEnvios servicioDeEnvios;
+    private ServicioDeEnviosImpl servicioDeEnvios;
 
     private String enviosUrl = "https://683b8d5e28a0b0f2fdc4ead9.mockapi.io/envios";
 
     @BeforeEach
     public void init() {
         MockitoAnnotations.initMocks(this);
-        servicioDeEnvios = new ServicioDeEnvios();
+        servicioDeEnvios = new ServicioDeEnviosImpl();
         // acceder y modificar campos privados
         ReflectionTestUtils.setField(servicioDeEnvios, "enviosUrl", enviosUrl);
         ReflectionTestUtils.setField(servicioDeEnvios, "restTemplate", restTemplateMock);
 
     }
 
+    // calcularEnvio
     @Test
     public void cuandoCalculoEnvioConCodigoPostalValidoYHayCoberturaObtengoElEnvio(){
         String codigoPostal = "1704";
@@ -83,8 +84,7 @@ public class ServicioDeEnviosTest {
         assertNull(envioDto);
     }
 
-    private OpcionEnvio crearOpcionEnvio(String empresa, Double costo, String tiempo,
-                                         String localidad, String provincia) {
+    private OpcionEnvio crearOpcionEnvio(String empresa, Double costo, String tiempo, String localidad, String provincia) {
         OpcionEnvio opcion = new OpcionEnvio();
         opcion.setEmpresa(empresa);
         opcion.setCostoEnvio(costo);

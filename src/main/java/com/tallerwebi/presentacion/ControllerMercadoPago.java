@@ -6,19 +6,15 @@ import com.mercadopago.client.common.IdentificationRequest;
 import com.mercadopago.client.common.PhoneRequest;
 import com.mercadopago.client.preference.*;
 import com.mercadopago.exceptions.MPApiException;
-import com.mercadopago.exceptions.MPException;
 
 import com.mercadopago.resources.preference.Preference;
 import com.tallerwebi.dominio.*;
-import com.tallerwebi.dominio.excepcion.UsuarioExistente;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -31,14 +27,14 @@ public class ControllerMercadoPago {
     private static final Logger logger = LoggerFactory.getLogger(ControllerMercadoPago.class);
 
     //ServicioProductoCarrito sabe los productos que estan en el carrito
-    private final ServicioProductoCarrito servicioProductoCarrito;
+    private final ServicioProductoCarritoImpl servicioProductoCarritoImpl;
 
     @Value("${mercadoPago.accessToken}")
     private String mercadoPagoAccessToken = "APP_USR-3784718513902185-053117-353d2d4a3d09f6e4ff6bd5750e1b6878-2465514854";
 
-    public ControllerMercadoPago(ServicioProductoCarrito servicioProductoCarrito) {
-        this.servicioProductoCarrito = servicioProductoCarrito;
-        this.servicioProductoCarrito.init();
+    public ControllerMercadoPago(ServicioProductoCarritoImpl servicioProductoCarritoImpl) {
+        this.servicioProductoCarritoImpl = servicioProductoCarritoImpl;
+        this.servicioProductoCarritoImpl.init();
     }
 
     //crearPago se activa cuando alguien hace submit en el formulario del carrito (procesar pago)
@@ -46,8 +42,7 @@ public class ControllerMercadoPago {
     @ResponseBody
     public ModelAndView crearPago(HttpServletResponse response,
                                   @RequestParam(value = "metodoDePago", required = false) String metodoDePago,
-                                  @RequestParam(value = "costoEnvio", required = false) Double costoEnvio,
-                                  RedirectAttributes redirectAttributes)
+                                  @RequestParam(value = "costoEnvio", required = false) Double costoEnvio)
                                     throws IOException {
 
         // Creo un objeto PagoRequest manualmente
@@ -55,7 +50,7 @@ public class ControllerMercadoPago {
         pagoRequest.setMetodoDePago(metodoDePago);
         pagoRequest.setCostoEnvio(costoEnvio);
         // Usa los productos del carrito en lugar de intentar obtenerlos del formulario
-        pagoRequest.setProductos(servicioProductoCarrito.getProductos());
+        pagoRequest.setProductos(servicioProductoCarritoImpl.getProductos());
 
         // Crear listas para almacenar cantidades e IDs de productos
         List<Integer> cantidades = new ArrayList<>();
@@ -170,8 +165,8 @@ public class ControllerMercadoPago {
         double precioOriginal = pagoRequest.getProductos().get(i).getPrecio();
         double factorDescuento = 1.0;
 
-        if (servicioProductoCarrito.valorTotal != null && servicioProductoCarrito.valorTotal > 0) {
-            factorDescuento = servicioProductoCarrito.valorTotalConDescuento / servicioProductoCarrito.valorTotal;
+        if (servicioProductoCarritoImpl.valorTotal != null && servicioProductoCarritoImpl.valorTotal > 0) {
+            factorDescuento = servicioProductoCarritoImpl.valorTotalConDescuento / servicioProductoCarritoImpl.valorTotal;
         }
 
         double precioFinal = precioOriginal * factorDescuento;

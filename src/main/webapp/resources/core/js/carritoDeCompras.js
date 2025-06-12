@@ -16,11 +16,9 @@ function obtenerCantidadCarritoAjax() {
     fetch('/spring/carritoDeCompras/cantidad')
         .then(response => response.json())
         .then(data => {
-            console.log("Cantidad obtenida via AJAX:", data.cantidadEnCarrito);
             actualizarContadorCarrito(data.cantidadEnCarrito);
         })
         .catch(error => {
-            console.error('Error al obtener cantidad del carrito:', error);
             // En caso de error, intentar calcular desde el DOM
             const cantidad = calcularCantidadDesdeDOM();
             actualizarContadorCarrito(cantidad);
@@ -33,37 +31,26 @@ function inicializarContadorCarrito() {
 
     if (typeof window.cantidadEnCarrito !== 'undefined') {
         cantidadEnCarrito = window.cantidadEnCarrito;
-        console.log("Cantidad obtenida desde window:", cantidadEnCarrito);
-    }
-    else if (document.querySelector('.productoCantidad')) {
+    } else if (document.querySelector('.productoCantidad')) {
         cantidadEnCarrito = calcularCantidadDesdeDOM();
-        console.log("Cantidad calculada desde DOM:", cantidadEnCarrito);
-    }
-    else {
-        console.log("Obteniendo cantidad via AJAX...");
+    } else {
         obtenerCantidadCarritoAjax();
-        return; 
+        return;
     }
 
-    console.log("Inicializando contador con cantidad:", cantidadEnCarrito);
     actualizarContadorCarrito(cantidadEnCarrito);
 }
 
 // Función global para actualizar el contador del carrito
 window.actualizarContadorCarrito = function (nuevaCantidad) {
-    console.log("Actualizando contador a:", nuevaCantidad);
     const contadorCarrito = document.getElementById("contadorCarrito");
     if (contadorCarrito) {
         contadorCarrito.textContent = nuevaCantidad;
-        console.log("Contador actualizado exitosamente");
-    } else {
-        console.error("Elemento contadorCarrito no encontrado");
     }
 }
 
 // Inicializar contador cuando se carga la página
 document.addEventListener("DOMContentLoaded", function () {
-    console.log("DOM cargado, inicializando contador...");
     inicializarContadorCarrito();
 });
 
@@ -84,15 +71,17 @@ document.addEventListener("DOMContentLoaded", function () {
             })
                 .then(response => response.json())
                 .then(data => {
-                    // Actualizar solo el valor de la cantidad
-                    spanCantidad.textContent = data.cantidad;
+                    if (data.cantidad !== undefined) {
+                        spanCantidad.textContent = data.cantidad;
+                    }
+
                     precioTotalDelProducto.textContent = data.precioTotalDelProducto.toFixed(2);
                     valorTotalDelCarrito.textContent = data.valorTotal.toFixed(2);
-                    actualizarContadorCarrito(data.cantidadEnCarrito);
+
+                    if (data.cantidadEnCarrito !== undefined && data.cantidadEnCarrito !== null) {
+                        actualizarContadorCarrito(data.cantidadEnCarrito);
+                    }
                 })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
         })
     })
 })
@@ -114,21 +103,25 @@ document.addEventListener("DOMContentLoaded", function () {
             })
                 .then(response => response.json())
                 .then(data => {
+
                     if (data.eliminado) {
-                        fila.remove(); // Eliminar la fila si se eliminó el producto
-                        actualizarContadorCarrito(data.cantidadEnCarrito);
-                        valorTotalDelCarrito.textContent = data.valorTotal.toFixed(2);
+                        fila.remove();
+                        if (data.valorTotal !== undefined && data.valorTotal !== null) {
+                            valorTotalDelCarrito.textContent = data.valorTotal.toFixed(2);
+                        }
                     } else {
-                        // Actualizar solo el valor de la cantidad
-                        spanCantidad.textContent = data.cantidad;
+                        if (data.cantidad !== undefined) {
+                            spanCantidad.textContent = data.cantidad;
+                        }
                         precioTotalDelProducto.textContent = data.precioTotalDelProducto.toFixed(2);
                         valorTotalDelCarrito.textContent = data.valorTotal.toFixed(2);
+
+                    }
+
+                    if (data.cantidadEnCarrito !== undefined && data.cantidadEnCarrito !== null) {
                         actualizarContadorCarrito(data.cantidadEnCarrito);
                     }
                 })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
         })
     })
 })
@@ -139,21 +132,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
     boton.forEach(element => {
         element.addEventListener('click', function () {
-                let idProductoAEliminar = this.dataset.id;
+            let idProductoAEliminar = this.dataset.id;
 
-                fetch(`/spring/carritoDeCompras/eliminarProducto/${idProductoAEliminar}`, {
-                    method: 'POST'
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.eliminado) {
-                            this.closest('tr').remove();
+            fetch(`/spring/carritoDeCompras/eliminarProducto/${idProductoAEliminar}`, {
+                method: 'POST'
+            })
+                .then(response => response.json())
+                .then(data => {
+
+                    if (data.eliminado) {
+                        this.closest('tr').remove();
+                        document.querySelector(".valorTotalDelCarrito").textContent = data.valorTotal.toFixed(2);
+
+                        // Actualizar el contador del carrito
+                        if (data.cantidadEnCarrito !== undefined) {
                             actualizarContadorCarrito(data.cantidadEnCarrito);
-                            document.querySelector(".valorTotalDelCarrito").textContent = data.valorTotal.toFixed(2);
                         }
-                    })
-            }
-        )
+                    }
+                })
+        })
     })
 })
 
@@ -197,14 +194,11 @@ document.addEventListener("DOMContentLoaded", function () {
                                 parrafoTotal.innerHTML = 'Total con envio y descuento: <span class="total-envio-valor"></span>';
                                 parrafoTotal.querySelector('.total-envio-valor').textContent = '$' + nuevoTotalConEnvio.toFixed(2);
                                 parrafoTotal.style.display = 'block';
-
-                                console.log('Total recalculado con descuento y envío:', nuevoTotalConEnvio);
                             }
                         }
                     }
                 })
                 .catch(error => {
-                    console.error('Error:', error);
                     contenidoMensaje.textContent = 'Hubo un error al aplicar el descuento.';
                     mensajeParaAlert.classList.remove("d-none");
                 });
@@ -223,7 +217,7 @@ document.addEventListener("DOMContentLoaded", function () {
             let metodoSeleccionado = document.querySelector('input[name="metodoPago"]:checked');
             if (metodoSeleccionado === null) {
                 const errorDiv = document.getElementById("errorMetodoPago");
-                errorDiv.innerText = "Debes seleccionar un método de pago";
+                errorDiv.innerText = "Debes seleccionar un metodo de pago";
                 errorDiv.classList.remove("d-none");
                 return false;
             }
@@ -258,7 +252,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     }
                 })
                 .catch(error => {
-                    console.error('Error:', error);
                     btnComprar.innerHTML = 'Finalizar compra';
                     btnComprar.disabled = false;
                     errorDiv.innerText = "Error al procesar el pago";
@@ -281,7 +274,6 @@ function crearFormularioMercadoPago(data) {
 
     if (costoEnvio && costoEnvio > 0) {
         form.innerHTML += `<input type="hidden" name="costoEnvio" value="${costoEnvio}">`;
-        console.log('Enviando costo de envío a MP:', costoEnvio);
     }
 
     document.body.appendChild(form);
@@ -332,7 +324,7 @@ function calcularConAjax(codigoPostal) {
 
                 //descuento
                 const hayDescuento = !document.getElementById('mensajeDescuento').classList.contains('d-none');
-                parrafoTotal.innerHTML = `Total con envío${hayDescuento ? ' y descuento' : ''}: <span class="total-envio-valor">$${totalConEnvio.toFixed(2)}</span>`;
+                parrafoTotal.innerHTML = `Total con envio${hayDescuento ? ' y descuento' : ''}: <span class="total-envio-valor">$${totalConEnvio.toFixed(2)}</span>`;
                 parrafoTotal.style.display = 'block';
 
                 //mp
@@ -353,7 +345,6 @@ function calcularConAjax(codigoPostal) {
             }
         })
         .catch(error => {
-            console.error('Error:', error);
             const form = document.getElementById('formulario-envio');
             if (form) {
                 form.submit();
