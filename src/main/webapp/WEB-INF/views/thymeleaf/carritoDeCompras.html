@@ -22,6 +22,7 @@
                 <table class="table">
                     <thead>
                     <tr class="text-center">
+                        <th scope="col">Foto</th>
                         <th scope="col">Nombre</th>
                         <th scope="col">Precio</th>
                         <th scope="col">Acciones</th>
@@ -29,6 +30,7 @@
                     </thead>
                     <tbody th:if="${productos != null and !productos.isEmpty()}">
                     <tr class="text-center" th:each="producto : ${productos}">
+                        <td> <img th:src="@{/imagenes/{imagen}(imagen=${producto.imagen})}" style="height: 50px; width: 50px"></td>
                         <td th:text="${producto.nombre}"></td>
                         <td class="precioTotalDelProducto" th:text="${producto.precio * producto.getCantidad()}"></td>
                         <td class="text-center" th:data-id="${producto.id}">

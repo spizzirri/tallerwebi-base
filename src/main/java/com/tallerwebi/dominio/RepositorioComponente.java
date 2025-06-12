@@ -15,6 +15,6 @@ public interface RepositorioComponente {
     List<Componente> obtenerComponentesEnStock();
 
     List<Componente> obtenerComponentesMenoresDelPrecioPorParametro(Double precio);
-
+    List<Componente> obtenerComponentesPorTipoYPorQuery(String tipo, String query) throws ClassNotFoundException;
     List<Componente> obtenerComponentesPorQuery(String query);
 }

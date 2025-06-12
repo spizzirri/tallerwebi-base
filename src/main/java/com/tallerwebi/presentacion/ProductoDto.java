@@ -27,7 +27,7 @@ public class ProductoDto {
         this.id = id;
         this.nombre = nombre;
         this.precio = precio;
-        this.cantidad = 2;
+        this.cantidad = 1;
         this.tipoComponente = tipoComponente;
         this.imagen = imagen;
     }

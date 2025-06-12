@@ -1,10 +1,9 @@
 package com.tallerwebi.presentacion;
 
-import com.tallerwebi.dominio.RepositorioComponente;
 import com.tallerwebi.dominio.ServiceCategorias;
 import com.tallerwebi.dominio.ServicioBuscarProducto;
-import com.tallerwebi.dominio.ServicioProductoCarrito;
-import com.tallerwebi.dominio.entidades.Componente;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -12,9 +11,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.transaction.Transactional;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 public class ControladorIndex {
@@ -24,7 +23,6 @@ public class ControladorIndex {
     @Autowired
     private ServicioBuscarProducto productoService;
     @Autowired
-    private ServicioProductoCarrito servicioProductoCarrito;
 
 //    #1 Equipos y Notebook
 //    #2 Monitores
@@ -46,12 +44,9 @@ public class ControladorIndex {
         ModelMap model = new ModelMap();
         CategoriaDto categoriaDestacada = categoriasAMostrar.get(0);
         List<CategoriaDto> otrasCategorias = categoriasAMostrar.subList(1, categoriasAMostrar.size());
-
+        List<CategoriaDto> categoriasLimitada = otrasCategorias.stream().limit(7).collect(Collectors.toList());
         model.addAttribute("categoriaDestacada", categoriaDestacada);
-        model.addAttribute("otrasCategorias", otrasCategorias);
-
-        List<ProductoDto> productosDescuento = productoService.getProductosMenoresAUnPrecio(150000D);
-        model.addAttribute("productosDescuento", productosDescuento);
+        model.addAttribute("otrasCategorias",categoriasLimitada);
 
         return new ModelAndView("index", model);
     }
@@ -63,8 +58,8 @@ public class ControladorIndex {
 
         String tipoComponente = convertirIdATipoComponente(id);
         List<ProductoDto> productosDestacados = productoService.getProductosPorTipo(tipoComponente);
-
-        model.addAttribute("productosDestacados", productosDestacados);
+        List<ProductoDto> productosLimitados = productosDestacados.stream().limit(8).collect(Collectors.toList());
+        model.addAttribute("productosDestacados", productosLimitados);
         return new ModelAndView("cargarProductosDinamicos", model);
     }
 
@@ -82,40 +77,4 @@ public class ControladorIndex {
             default: return "Componente";
         }
     }
-
-    @PostMapping("/agregarAlCarrito")
-    @ResponseBody
-    public Map<String, Object> agregarProductoAlCarrito(
-            @RequestParam Long componenteId,
-            @RequestParam(defaultValue = "1") Integer cantidad) {
-
-        Map<String, Object> response = new HashMap<>();
-        try {
-            if (!servicioProductoCarrito.verificarStock(componenteId, cantidad)) {
-                response.put("success", false);
-                response.put("mensaje", "Stock insuficiente");
-            } else {
-                servicioProductoCarrito.agregarProducto(componenteId, cantidad);
-                response.put("success", true);
-                response.put("mensaje", "Producto agregado al carrito!");
-            }
-
-            // AGREGAR: Calcular cantidad total del carrito
-            try {
-                Integer cantidadTotal = servicioProductoCarrito.calcularCantidadTotalDeProductos();
-                response.put("cantidadEnCarrito", cantidadTotal != null ? cantidadTotal : 0);
-            } catch (Exception e) {
-                System.out.println("Error al calcular cantidad total: " + e.getMessage());
-                response.put("cantidadEnCarrito", 0);
-            }
-
-        } catch (Exception e) {
-            response.put("success", false);
-            response.put("mensaje", "Error al agregar producto al carrito!");
-            response.put("cantidadEnCarrito", 0);
-        }
-        return response;
-    }
-
-
 }

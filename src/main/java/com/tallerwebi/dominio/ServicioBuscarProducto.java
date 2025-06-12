@@ -72,4 +72,23 @@ public class ServicioBuscarProducto {
         }
         return productos;
     }
+
+    public List<ProductoDto> getProductosPorCategoria(String categoria){
+        List<Componente> componentes = repositorioComponente.obtenerComponentesPorTipo(categoria);
+        List<ProductoDto> productos = new ArrayList<>();
+        for(Componente componente : componentes){
+            productos.add(new ProductoDto(componente));
+        }
+        return productos;
+    }
+
+    public List<ProductoDto> getProductosPorTipoYPorQuery(String tipo, String query) throws ClassNotFoundException {
+        List<Componente> componentes = repositorioComponente.obtenerComponentesPorTipoYPorQuery(tipo, query);
+        List<ProductoDto> productos = new ArrayList<>();
+        for(Componente componente : componentes){
+            productos.add(new ProductoDto(componente));
+        }
+
+        return productos;
+    }
 }
