@@ -24,14 +24,22 @@
   <h3 class="mb-4">Resumen Armado</h3>
     <div th:if="${errorResumen == null}">
         <!--FALTA PODER MOSTRAR LOS COMPONENTES QUE SON LISTAS-->
-        <div th:replace="fragments/tarjetaResumen :: cargarTarjetaDeResumen (${armadoPcDto.procesador}, 'Procesador', 'procesadores', 'procesadorVacio.png')"></div>
-        <div th:replace="fragments/tarjetaResumen :: cargarTarjetaDeResumen (${armadoPcDto.motherboard}, 'Motherboard', 'motherboards', 'motherboardVacia.png')"></div>
-        <div th:replace="fragments/tarjetaResumen :: cargarTarjetaDeResumen (${armadoPcDto.cooler}, 'Cooler', 'coolers', 'coolerVacio.png')"></div>
-        <div th:replace="fragments/tarjetaResumen :: cargarTarjetaDeResumen (${armadoPcDto.gpu}, 'Placa de Video', 'gpus', 'gpuVacia.png')"></div>
-        <div th:replace="fragments/tarjetaResumen :: cargarTarjetaDeResumen (${armadoPcDto.fuente}, 'Fuente', 'fuentes', 'fuenteVacia.png')"></div>
-        <div th:replace="fragments/tarjetaResumen :: cargarTarjetaDeResumen (${armadoPcDto.gabinete}, 'Gabinete', 'gabinetes', 'gabineteVacio.png')"></div>
-        <div th:replace="fragments/tarjetaResumen :: cargarTarjetaDeResumen (${armadoPcDto.monitor}, 'Monitor', 'monitores', 'monitorVacio.png')"></div>
-
+        <div th:replace="fragments/tarjetaResumen :: cargarTarjetaDeResumen (${armadoPcDto.procesador}, 'Procesador', '1', 'procesadorVacio.png')"></div>
+        <div th:replace="fragments/tarjetaResumen :: cargarTarjetaDeResumen (${armadoPcDto.motherboard}, 'Motherboard', '1', 'motherboardVacia.png')"></div>
+        <div th:replace="fragments/tarjetaResumen :: cargarTarjetaDeResumen (${armadoPcDto.cooler}, 'Cooler', '1', 'coolerVacio.png')"></div>
+        <div th:each="entry: ${armadoPcDto.ramsDetalladas}">
+            <div th:replace="fragments/tarjetaResumen :: cargarTarjetaDeResumen (${entry.key}, 'Memoria', ${entry.value}, 'memoriaVacia.png')"></div>
+        </div>
+        <div th:replace="fragments/tarjetaResumen :: cargarTarjetaDeResumen (${armadoPcDto.gpu}, 'Placa de Video', '1', 'gpuVacia.png')"></div>
+        <div th:each="entry: ${armadoPcDto.almacenamientoDetallado}">
+            <div th:replace="fragments/tarjetaResumen :: cargarTarjetaDeResumen (${entry.key}, 'Almacenamiento', ${entry.value}, 'almacenamientoVacio.png')"></div>
+        </div>
+        <div th:replace="fragments/tarjetaResumen :: cargarTarjetaDeResumen (${armadoPcDto.fuente}, 'Fuente', '1', 'fuenteVacia.png')"></div>
+        <div th:replace="fragments/tarjetaResumen :: cargarTarjetaDeResumen (${armadoPcDto.gabinete}, 'Gabinete', '1', 'gabineteVacio.png')"></div>
+        <div th:replace="fragments/tarjetaResumen :: cargarTarjetaDeResumen (${armadoPcDto.monitor}, 'Monitor', '1', 'monitorVacio.png')"></div>
+        <div th:each="entry: ${armadoPcDto.perifericosDetallados}">
+            <div th:replace="fragments/tarjetaResumen :: cargarTarjetaDeResumen (${entry.key}, 'Periferico', ${entry.value}, 'perifericoVacio.png')"></div>
+        </div>
         <div class="m-auto col-3 border rounded bg-white p-1 pt-2 mb-3 d-flex justify-content-center">
             <h3 class="d-inline">Total:  <span th:text="${'$'+armadoPcDto.precioTotal}" class="text-success"></span></h3>
         </div>
