@@ -1,8 +1,11 @@
 
-<div th:fragment="cargarPaso (armado, componentes, producto, carpetaComponenteFoto, pasoAnterior, pasoSiguiente)">
+<div th:fragment="cargarPaso (armado, componentes, producto, idsDeComponentesSeleccionados, pasoAnterior, pasoSiguiente)">
     <div class="container-xxl py-4">
         <p th:if="${param.errorLimite!=null}" th:text="${param.errorLimite}" class="alert alert-danger banners-info"></p>
+        <p th:if="${param.errorQuitado!=null}" th:text="${param.errorQuitado}" class="alert alert-danger banners-info"></p>
+        <p th:if="${param.accionInvalida!=null}" th:text="${param.accionInvalida}" class="alert alert-danger banners-info"></p>
         <p th:if="${param.agregado!=null}" th:text="${param.agregado}" class="alert alert-success banners-info"></p>
+        <p th:if="${param.quitado!=null}" th:text="${param.quitado}" class="alert alert-warning banners-info"></p>
         <div class="row">
             <!-- Sidebar -->
             <div class="col-lg-4 mb-3">
@@ -55,7 +58,8 @@
                             <div th:if="${armado.rams.size() > 0}" class="h-100">
                                 <div class="border rounded bg-light py-3 h-100 d-flex flex-column justify-content-between">
                                     <div th:each="entry: ${armado.ramsDetalladas}" class="w-100 m-0">
-                                        <p th:text="'x'+ ${entry.value} +' '+ ${entry.key} " class="m-0"></p>
+                                        <img th:src="@{'/imagenes/' + ${entry.key.imagen}}" style='height: 20px; width: 20px' class="w-25 m-auto my-3">
+                                        <p th:text="'x'+ ${entry.value} +' '+ ${entry.key.modelo} " class="m-0"></p>
                                     </div>
                                     <p>Memoria</p>
                                 </div>
@@ -86,7 +90,8 @@
                             <div th:if="${armado.almacenamiento.size() > 0}" class="h-100">
                                 <div class="border rounded bg-light py-3 h-100 d-flex flex-column justify-content-between">
                                     <div th:each="entry: ${armado.almacenamientoDetallado}" class="w-100 m-0">
-                                        <p th:text="'x'+ ${entry.value} +' '+ ${entry.key} " class="m-0"></p>
+                                        <img th:src="@{'/imagenes/' + ${entry.key.imagen}}" style='height: 20px; width: 20px' class="w-25 m-auto my-3">
+                                        <p th:text="'x'+ ${entry.value} +' '+ ${entry.key.modelo} " class="m-0"></p>
                                     </div>
                                     <p>Almacenamiento</p>
                                 </div>
@@ -144,7 +149,8 @@
                             <div th:if="${armado.perifericos.size() > 0}" class="h-100">
                                 <div class="border rounded bg-light py-3 h-100 d-flex flex-column justify-content-between">
                                     <div th:each="entry: ${armado.perifericosDetallados}" class="w-100 m-0">
-                                        <p th:text="'x'+ ${entry.value} +' '+ ${entry.key} " class="m-0"></p>
+                                        <img th:src="@{'/imagenes/' + ${entry.key.imagen}}" style='height: 20px; width: 20px' class="w-25 m-auto my-3">
+                                        <p th:text="'x'+ ${entry.value} +' '+ ${entry.key.modelo} " class="m-0"></p>
                                     </div>
                                     <p>Perifericos</p>
                                 </div>
@@ -183,7 +189,7 @@
                 <div class="row g-3">
                     <!-- Card ejemplo -->
                     <div class="col-md-6 col-lg-4 mt-2 h-100" th:each ="componente : ${componentes}">
-                        <form method="POST" th:action="@{'/arma-tu-pc/tradicional/' + ${producto}}" class="h-100">
+                        <form method="POST" th:action="@{'/arma-tu-pc/tradicional/' + ${producto} + '/accion'}" class="h-100">
                             <div class="card h-75">
                                 <div>
                                     <img th:src="@{'/imagenes/'+ ${componente.imagen}}" class="card-img-top img-fluid" th:alt="${componente.modelo}">
@@ -208,7 +214,8 @@
                                         <option value="5">5</option>
                                         <option value="6">6</option>
                                     </select>
-                                    <input type="submit" class="btn btn-outline-primary" value="Seleccionar">
+                                    <button type="submit" name="accion" class="btn btn-outline-primary" value="agregar">Agregar</button>
+                                    <button th:if="${idsDeComponentesSeleccionados.contains(componente.id)}" type="submit" name="accion" class="btn btn-outline-primary" value="quitar">Quitar</button>
                                 </div>
                             </div>
                         </form>

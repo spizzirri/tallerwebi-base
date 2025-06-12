@@ -4,6 +4,8 @@ import com.tallerwebi.dominio.entidades.ArmadoPc;
 import com.tallerwebi.dominio.entidades.Componente;
 import com.tallerwebi.dominio.entidades.Procesador;
 import com.tallerwebi.dominio.excepcion.LimiteDeComponenteSobrepasadoEnElArmadoException;
+import com.tallerwebi.dominio.excepcion.QuitarComponenteInvalidoException;
+import com.tallerwebi.dominio.excepcion.QuitarStockDemasDeComponenteException;
 import com.tallerwebi.presentacion.dto.ArmadoPcDto;
 import com.tallerwebi.presentacion.dto.ComponenteDto;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +26,6 @@ public class ServicioArmaTuPcImplTest {
 
     private ServicioArmaTuPc servicio;
     private RepositorioComponente repositorioComponenteMock;
-    // private RepositorioArmado repositorioArmadoMock // hace falta?
 
     @BeforeEach
     public void init() {
@@ -172,6 +173,81 @@ public class ServicioArmaTuPcImplTest {
         // Validacion
 
         assertFalse(sePuedeAgregar);
+    }
+
+    // test de quitar componente
+
+    @Test
+    public void cuandoQuitoUnComponenteProcesadorDelArmadoDtoConUnProcesadorObtengoElArmadoSinElProcesador() throws QuitarComponenteInvalidoException, QuitarStockDemasDeComponenteException {
+
+        // Preparacion
+
+        ArmadoPcDto armadoConProcesador = new ArmadoPcDto();
+        armadoConProcesador.setProcesador(new ComponenteDto(1L, "Procesador", "Procesador1", 1000D, "imagen.jpg", 5));
+
+        // Ejecucion
+
+        ArmadoPcDto armadoObtenido = this.servicio.quitarComponenteAlArmado(1L, "Procesador", 1, armadoConProcesador);
+
+        // Validacion
+
+        assertThat(armadoObtenido.getProcesador(), is(nullValue()));
+    }
+
+    @Test
+    public void cuandoQuitoUnaUnidadDeComponenteMemoriaConId1DelArmadoDtoConDosMemoriasDiferentesObtengoElArmadoCon1MemoriaYEsaTieneElId2() throws QuitarComponenteInvalidoException, QuitarStockDemasDeComponenteException {
+
+        // Preparacion
+
+        ArmadoPcDto armadoConMemorias = new ArmadoPcDto();
+        List<ComponenteDto> listaDeMemorias = new ArrayList<>(Arrays.asList(new ComponenteDto(1L, "Memoria", "Memoria1", 1000D, "imagen.jpg", 5),
+                new ComponenteDto(2L, "Memoria", "Memoria2", 2000D, "imagen.jpg", 5)));
+        armadoConMemorias.setRams(listaDeMemorias);
+
+        // Ejecucion
+
+        ArmadoPcDto armadoObtenido = this.servicio.quitarComponenteAlArmado(1L, "Memoria", 1, armadoConMemorias);
+
+        // Validacion
+
+        assertThat(armadoObtenido.getRams(), hasSize(1));
+        assertTrue(armadoObtenido.getRams().contains(new ComponenteDto(2L, "Memoria", "Memoria2", 2000D, "imagen.jpg", 5)));
+        assertFalse(armadoObtenido.getRams().contains(new ComponenteDto(1L, "Memoria", "Memoria1", 1000D, "imagen.jpg", 5)));
+    }
+
+    @Test
+    public void cuandoQuito3UnidadesDeComponenteAlmacenamientoConId1DelArmadoDtoCon2AlmacenamientosDeId1ObtengoUnQuitarComponenteInvalidoException(){
+
+        // Preparacion
+
+        ArmadoPcDto armadoConAlmacenamientos = new ArmadoPcDto();
+        List<ComponenteDto> listaDeAlmacenamientos = new ArrayList<>(Arrays.asList(new ComponenteDto(1L, "Almacenamiento", "Almacenamiento1", 1000D, "imagen.jpg", 5),
+                new ComponenteDto(1L, "Almacenamiento", "Almacenamiento1", 2000D, "imagen.jpg", 5)));
+        armadoConAlmacenamientos.setRams(listaDeAlmacenamientos);
+
+        // Ejecucion
+
+        assertThrows(QuitarStockDemasDeComponenteException.class, () -> {
+            this.servicio.quitarComponenteAlArmado(1L, "Almacenamiento", 3, armadoConAlmacenamientos);
+        });
+
+        // Validacion (hecha en la ejecucion)
+    }
+
+    @Test
+    public void cuandoQuitoUnProcesadorQueNoTengoEnElArmadoObtengoUnQuitarComponenteInvalidoException(){
+
+        // Preparacion
+
+        ArmadoPcDto armadoSinProcesador = new ArmadoPcDto();
+
+        // Ejecucion
+
+        assertThrows(QuitarComponenteInvalidoException.class, () -> {
+            this.servicio.quitarComponenteAlArmado(1L, "Procesador", 1, armadoSinProcesador);
+        });
+
+        // Validacion (hecha en la ejecucion)
     }
 
 }
