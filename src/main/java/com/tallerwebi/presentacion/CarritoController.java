@@ -40,20 +40,20 @@ public class CarritoController {
         return new ModelAndView("carritoDeCompras", model);
     }
 
-    @PostMapping(path = "/carritoDeCompras/home")
-    public ModelAndView agregarProductoAlCarrito(@ModelAttribute("productoDto") ProductoCarritoDto producto) {
-        ModelMap model = new ModelMap();
-        model.put("mensaje", "El producto fue agregado al carrito correctamente!");
-        model.put("productoDto", producto);
-        model.put("productos", this.productoService.getProductos());
-
-        Double total = this.productoService.calcularValorTotalDeLosProductos();
-        model.put("valorTotal", total);
-
-        Integer cantidadTotal = this.productoService.calcularCantidadTotalDeProductos();
-        model.put("cantidadEnCarrito", cantidadTotal);
-        return new ModelAndView("carritoDeCompras", model);
-    }
+//    @PostMapping(path = "/carritoDeCompras/home")
+//    public ModelAndView agregarProductoAlCarrito(@ModelAttribute("productoDto") ProductoCarritoDto producto) {
+//        ModelMap model = new ModelMap();
+//        model.put("mensaje", "El producto fue agregado al carrito correctamente!");
+//        model.put("productoDto", producto);
+//        model.put("productos", this.productoService.getProductos());
+//
+//        Double total = this.productoService.calcularValorTotalDeLosProductos();
+//        model.put("valorTotal", total);
+//
+//        Integer cantidadTotal = this.productoService.calcularCantidadTotalDeProductos();
+//        model.put("cantidadEnCarrito", cantidadTotal);
+//        return new ModelAndView("carritoDeCompras", model);
+//    }
 
 
     @PostMapping(path = "/carritoDeCompras/eliminarProducto/{id}")
@@ -286,9 +286,7 @@ public class CarritoController {
         Integer cantidadTotal = this.productoService.calcularCantidadTotalDeProductos();
         response.put("cantidadEnCarrito", cantidadTotal);
         return response;
-    }
-
-    @PostMapping("/agregarAlCarrito")
+    }    @PostMapping("/agregarAlCarrito")
     @ResponseBody
     public Map<String, Object> agregarProductoAlCarrito(
             @RequestParam Long componenteId,
@@ -308,7 +306,6 @@ public class CarritoController {
             Integer cantidadTotal = productoService.calcularCantidadTotalDeProductos();
             response.put("cantidadEnCarrito", cantidadTotal != null ? cantidadTotal : 0);
 
-
         } catch (Exception e) {
             response.put("success", false);
             response.put("mensaje", "Error al agregar producto al carrito!");
@@ -316,5 +313,7 @@ public class CarritoController {
         }
         return response;
     }
+
+
 
 }
