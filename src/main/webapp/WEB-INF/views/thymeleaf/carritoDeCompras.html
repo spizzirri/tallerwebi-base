@@ -32,7 +32,7 @@
                     <tr class="text-center" th:each="producto : ${productos}">
                         <td>  <img th:src="@{/imagenes/{imagen}(imagen=${producto.imagen})}" style="height: 30px; width: 30px"></td>
                         <td th:text="${producto.nombre}"></td>
-                        <td class="precioTotalDelProducto" th:text="${producto.precio * producto.getCantidad()}"></td>
+                        <td class="precioTotalDelProducto" th:text="'$' + ${producto.precio * producto.getCantidad()}"></td>
                         <td class="text-center" th:data-id="${producto.id}">
                             <div class="d-flex justify-content-center align-items-center gap-2">
                                 <button type="button" class="btn btn-outline-secondary btn-sm btnRestarCantidad">-</button>
@@ -55,7 +55,7 @@
             </div>
             <div class="card-footer">
                 <h3 class="card-title m-2 text-end">
-                    Total: <span class="valorTotalDelCarrito" th:text="${valorTotal}"></span>
+                    Total: <span class="valorTotalDelCarrito" th:text="'$' + ${valorTotal}"></span>
                 </h3>
             </div>
         </div>

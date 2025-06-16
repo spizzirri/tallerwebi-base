@@ -118,24 +118,22 @@ public class CarritoController {
     @PostMapping(path = "/carritoDeCompras/agregarMasCantidadDeUnProducto/{id}")
     @ResponseBody
     public Map<String, Object> agregarMasCantidadDeUnProducto(@PathVariable Long id) {
+
         ProductoCarritoDto productoBuscado = this.productoService.buscarPorId(id);
         Map<String, Object> response = new HashMap<>();
 
-        if (productoBuscado != null) {
+        if (productoBuscado != null && productoService.verificarStock(id)) {
+            productoService.actualizarStockAlComponente(id, 1);
             productoBuscado.setCantidad(productoBuscado.getCantidad() + 1);
-
-            Double valorTotalDelProductoBuscado = productoBuscado.getCantidad() * productoBuscado.getPrecio();
-            Double valorTotal = this.productoService.calcularValorTotalDeLosProductos();
 
             assert productoBuscado != null;
             response.put("cantidad", productoBuscado.getCantidad());
-            response.put("precioTotalDelProducto", valorTotalDelProductoBuscado);
-            response.put("valorTotal", valorTotal);
+            response.put("precioTotalDelProducto", productoBuscado.getCantidad() * productoBuscado.getPrecio());
+            response.put("valorTotal", productoService.calcularValorTotalDeLosProductos());
+            response.put("cantidadEnCarrito", productoService.calcularCantidadTotalDeProductos());
+        } else {
+            response.put("mensaje", "No hay stock suficiente para agregar mas unidades!");
         }
-
-        Integer cantidadTotal = this.productoService.calcularCantidadTotalDeProductos();
-        response.put("cantidadEnCarrito", cantidadTotal);
-
         return response;
     }
 
@@ -147,27 +145,21 @@ public class CarritoController {
 
         if (productoBuscado != null && productoBuscado.getCantidad() > 1) {
             productoBuscado.setCantidad(productoBuscado.getCantidad() - 1);
-
-            Double valorTotalDelProductoBuscado = productoBuscado.getCantidad() * productoBuscado.getPrecio();
-            Double valorTotal = this.productoService.calcularValorTotalDeLosProductos();
+            productoService.devolverStockAlComponente(id, 1);
 
             response.put("cantidad", productoBuscado.getCantidad());
-            response.put("precioTotalDelProducto", valorTotalDelProductoBuscado);
-            response.put("valorTotal", valorTotal);
+            response.put("precioTotalDelProducto", productoBuscado.getCantidad() * productoBuscado.getPrecio());
+            response.put("valorTotal", productoService.calcularValorTotalDeLosProductos());
             response.put("eliminado", false);
-
-            Integer cantidadTotal = this.productoService.calcularCantidadTotalDeProductos();
-            response.put("cantidadEnCarrito", cantidadTotal);
+            response.put("cantidadEnCarrito", productoService.calcularCantidadTotalDeProductos());
 
         } else if (productoBuscado != null) {
             this.productoService.getProductos().remove(productoBuscado);
-
-            Double valorTotal = this.productoService.calcularValorTotalDeLosProductos();
-            Integer cantidadTotal = this.productoService.calcularCantidadTotalDeProductos();
+            productoService.devolverStockAlComponente(id, 1);
 
             response.put("eliminado", true);
-            response.put("valorTotal", valorTotal);
-            response.put("cantidadEnCarrito", cantidadTotal);
+            response.put("valorTotal", productoService.calcularValorTotalDeLosProductos());
+            response.put("cantidadEnCarrito", productoService.calcularCantidadTotalDeProductos());
         }
 
         return response;
@@ -294,7 +286,7 @@ public class CarritoController {
 
         Map<String, Object> response = new HashMap<>();
         try {
-            if (!productoService.verificarStock(componenteId, cantidad)) {
+            if (!productoService.verificarStock(componenteId)) {
                 response.put("success", false);
                 response.put("mensaje", "Stock insuficiente");
             } else {

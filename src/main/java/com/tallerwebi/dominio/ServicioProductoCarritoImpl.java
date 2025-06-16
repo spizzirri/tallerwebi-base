@@ -43,6 +43,15 @@ public class ServicioProductoCarritoImpl {
         return null;
     }
 
+    public void actualizarStockAlComponente(Long componenteId, Integer cantidadARestar) {
+        repositorioComponente.actualizarStockDeUnComponente(componenteId, cantidadARestar);
+    }
+
+    public void devolverStockAlComponente(Long componenteId, Integer cantidadASumar) {
+        repositorioComponente.devolverStockDeUnComponente(componenteId, cantidadASumar);
+    }
+
+    //testear el agregado de actualizar stock
     public void agregarProducto(Long componenteId, Integer cantidad) {
         if(this.productos == null){
             this.productos = new ArrayList<>();
@@ -53,17 +62,18 @@ public class ServicioProductoCarritoImpl {
             existente.setCantidad(existente.getCantidad() + cantidad);
         } else {
             Componente componente = repositorioComponente.obtenerComponentePorId(componenteId);
-
             if (componente != null) {
                 ProductoCarritoDto nuevoProductoCarrito = new ProductoCarritoDto(componente, cantidad);
                 this.productos.add(nuevoProductoCarrito);
             }
         }
+        repositorioComponente.actualizarStockDeUnComponente(componenteId, cantidad);
+
     }
 
-    public boolean verificarStock(Long componenteId, Integer cantidadDeseada) {
+    public boolean verificarStock(Long componenteId) {
         Componente componente = repositorioComponente.obtenerComponentePorId(componenteId);
-        return componente.getStock() >= cantidadDeseada;
+        return componente.getStock() >= 1;
     }
 
     public Double calcularValorTotalDeLosProductos() {

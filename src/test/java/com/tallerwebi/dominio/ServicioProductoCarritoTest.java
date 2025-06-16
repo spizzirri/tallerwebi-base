@@ -131,7 +131,7 @@ public class ServicioProductoCarritoTest {
 
         when(repositorioComponente.obtenerComponentePorId(componenteId)).thenReturn(componenteMock);
 
-        boolean stockSuficiente = servicioProductoCarritoImpl.verificarStock(componenteMock.getId(), cantidadDeseada);
+        boolean stockSuficiente = servicioProductoCarritoImpl.verificarStock(componenteMock.getId());
 
         assertTrue(stockSuficiente);
     }
@@ -148,7 +148,7 @@ public class ServicioProductoCarritoTest {
 
         when(repositorioComponente.obtenerComponentePorId(componenteId)).thenReturn(componenteMock);
 
-        boolean stockSuficiente = servicioProductoCarritoImpl.verificarStock(componenteMock.getId(), cantidadDeseada);
+        boolean stockSuficiente = servicioProductoCarritoImpl.verificarStock(componenteMock.getId());
 
         assertFalse(stockSuficiente);
     }

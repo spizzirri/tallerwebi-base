@@ -75,8 +75,8 @@ document.addEventListener("DOMContentLoaded", function () {
                         spanCantidad.textContent = data.cantidad;
                     }
 
-                    precioTotalDelProducto.textContent = data.precioTotalDelProducto.toFixed(2);
-                    valorTotalDelCarrito.textContent = data.valorTotal.toFixed(2);
+                    precioTotalDelProducto.innerHTML = `$${data.precioTotalDelProducto.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`;
+                    valorTotalDelCarrito.innerHTML = `$${data.valorTotal.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`;
 
                     if (data.cantidadEnCarrito !== undefined && data.cantidadEnCarrito !== null) {
                         actualizarContadorCarrito(data.cantidadEnCarrito);
@@ -107,14 +107,14 @@ document.addEventListener("DOMContentLoaded", function () {
                     if (data.eliminado) {
                         fila.remove();
                         if (data.valorTotal !== undefined && data.valorTotal !== null) {
-                            valorTotalDelCarrito.textContent = data.valorTotal.toFixed(2);
+                            valorTotalDelCarrito.innerHTML = `$${data.valorTotal.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`;
                         }
                     } else {
                         if (data.cantidad !== undefined) {
                             spanCantidad.textContent = data.cantidad;
                         }
-                        precioTotalDelProducto.textContent = data.precioTotalDelProducto.toFixed(2);
-                        valorTotalDelCarrito.textContent = data.valorTotal.toFixed(2);
+                        precioTotalDelProducto.innerHTML = `$${data.precioTotalDelProducto.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`;
+                        valorTotalDelCarrito.innerHTML = `$${data.valorTotal.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`;
 
                     }
 
@@ -142,7 +142,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     if (data.eliminado) {
                         this.closest('tr').remove();
-                        document.querySelector(".valorTotalDelCarrito").textContent = data.valorTotal.toFixed(2);
+                        document.querySelector(".valorTotalDelCarrito").innerHTML = `$${data.valorTotal.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`;
 
                         // Actualizar el contador del carrito
                         if (data.cantidadEnCarrito !== undefined) {
@@ -183,18 +183,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
                         const valorTotalElement = document.querySelector('.valorTotalDelCarrito');
                         if (valorTotalElement) {
-                            valorTotalElement.textContent = data.valorTotal.toFixed(2);
-                        }
-
-                        if (window.datosEnvio && window.datosEnvio.costo) {
-                            const nuevoTotalConEnvio = data.valorTotal + window.datosEnvio.costo;
-                            let parrafoTotal = document.querySelector('.total-con-envio');
-
-                            if (parrafoTotal) {
-                                parrafoTotal.innerHTML = 'Total con envio y descuento: <span class="total-envio-valor"></span>';
-                                parrafoTotal.querySelector('.total-envio-valor').textContent = '$' + nuevoTotalConEnvio.toFixed(2);
-                                parrafoTotal.style.display = 'block';
+                            if (!valorTotalElement.dataset.valorOriginal) {
+                                const valorActualTexto = valorTotalElement.textContent || valorTotalElement.innerHTML;
+                                const valorLimpio = parseFloat(valorActualTexto.replace(/[^\d.-]/g, ''));
+                                valorTotalElement.dataset.valorOriginal = valorLimpio;
                             }
+
+                            valorTotalElement.dataset.valorConDescuento = data.valorTotal;
+
+                            valorTotalElement.innerHTML = `$${data.valorTotal.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`;
                         }
                     }
                 })
@@ -276,6 +273,20 @@ function crearFormularioMercadoPago(data) {
         form.innerHTML += `<input type="hidden" name="costoEnvio" value="${costoEnvio}">`;
     }
 
+    // ✅ Enviar información del descuento si existe
+    const valorTotalElement = document.querySelector('.valorTotalDelCarrito');
+    const valorOriginal = valorTotalElement.dataset.valorOriginal;
+    const valorConDescuento = valorTotalElement.dataset.valorConDescuento;
+
+    if (valorOriginal && valorConDescuento && valorOriginal !== valorConDescuento) {
+        form.innerHTML += `<input type="hidden" name="totalOriginal" value="${valorOriginal}">`;
+        form.innerHTML += `<input type="hidden" name="totalConDescuento" value="${valorConDescuento}">`;
+
+        console.log('📋 Enviando a MercadoPago:');
+        console.log('Total original:', valorOriginal);
+        console.log('Total con descuento:', valorConDescuento);
+    }
+
     document.body.appendChild(form);
     form.submit();
 }
@@ -306,14 +317,41 @@ function calcularConAjax(codigoPostal) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // envio
                 document.getElementById('alertaSinCobertura').classList.add('d-none');
                 document.getElementById('costo').textContent = '$' + data.costo;
                 document.getElementById('tiempo').textContent = data.tiempo;
                 document.getElementById('zona').textContent = data.destino;
 
-                const totalActual = parseFloat(document.querySelector('.valorTotalDelCarrito').textContent);
-                const totalConEnvio = totalActual + data.costo;
+                // ✅ SOLUCIÓN: Mejor parsing que detecta el formato
+                const valorTotalElement = document.querySelector('.valorTotalDelCarrito');
+                const totalTexto = valorTotalElement.textContent || '$0';
+
+                let totalActual;
+
+                if (totalTexto.includes(',') && totalTexto.lastIndexOf(',') > totalTexto.lastIndexOf('.')) {
+                    totalActual = parseFloat(
+                        totalTexto
+                            .replace('$', '')
+                            .replace(/\./g, '')
+                            .replace(',', '.')
+                    );
+                } else {
+                    // Formato estándar: $22650.0 o $22650
+                    totalActual = parseFloat(
+                        totalTexto.replace(/[^\d.-]/g, '')
+                    );
+                }
+
+                const costoEnvio = parseFloat(data.costo);
+
+                console.log('🔍 Debug info:');
+                console.log('Total texto:', totalTexto);
+                console.log('Total parseado:', totalActual);
+                console.log('Costo envío:', costoEnvio);
+
+                const totalConEnvio = (!isNaN(totalActual) && !isNaN(costoEnvio)) ? totalActual + costoEnvio : 0;
+
+                console.log('Total con envío:', totalConEnvio);
 
                 let parrafoTotal = document.querySelector('.total-con-envio');
                 if (!parrafoTotal) {
@@ -322,12 +360,10 @@ function calcularConAjax(codigoPostal) {
                     document.getElementById('btnComprar').parentElement.insertBefore(parrafoTotal, document.getElementById('btnComprar').parentElement.firstChild);
                 }
 
-                //descuento
                 const hayDescuento = !document.getElementById('mensajeDescuento').classList.contains('d-none');
-                parrafoTotal.innerHTML = `Total con envio${hayDescuento ? ' y descuento' : ''}: <span class="total-envio-valor">$${totalConEnvio.toFixed(2)}</span>`;
+                parrafoTotal.innerHTML = `Total con envio${hayDescuento ? ' y descuento' : ''}: <span class="total-envio-valor">$${totalConEnvio.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>`;
                 parrafoTotal.style.display = 'block';
 
-                //mp
                 window.datosEnvio = {
                     costo: data.costo,
                     destino: data.destino,
@@ -336,7 +372,6 @@ function calcularConAjax(codigoPostal) {
 
             } else {
                 document.getElementById('alertaSinCobertura').classList.remove('d-none');
-
                 const parrafoTotal = document.querySelector('.total-con-envio');
                 if (parrafoTotal) {
                     parrafoTotal.style.display = 'none';
@@ -345,6 +380,7 @@ function calcularConAjax(codigoPostal) {
             }
         })
         .catch(error => {
+            console.error('Error en calcularConAjax:', error);
             const form = document.getElementById('formulario-envio');
             if (form) {
                 form.submit();

@@ -172,7 +172,7 @@ public class ControladorCarritoTest {
         when(productoMock.getPrecio()).thenReturn(precioUnitario);
 
         when(servicioProductoCarritoImplMock.buscarPorId(productoId)).thenReturn(productoMock);
-
+        when(servicioProductoCarritoImplMock.verificarStock(productoId)).thenReturn(true);
         when(servicioProductoCarritoImplMock.calcularValorTotalDeLosProductos()).thenReturn(precioTotalEsperado);
 
         Map<String, Object> response = carritoController.agregarMasCantidadDeUnProducto(productoId);
@@ -205,6 +205,7 @@ public class ControladorCarritoTest {
 
         when(servicioProductoCarritoImplMock.buscarPorId(productoId)).thenReturn(productoMock);
 
+        when(servicioProductoCarritoImplMock.verificarStock(productoId)).thenReturn(true);
         when(servicioProductoCarritoImplMock.calcularValorTotalDeLosProductos()).thenReturn(precioTotalEsperado);
         when(servicioProductoCarritoImplMock.calcularCantidadTotalDeProductos()).thenReturn(cantidadFinal);
 
@@ -480,7 +481,7 @@ public class ControladorCarritoTest {
         Componente componenteMock = mock(Componente.class);
         when(componenteMock.getId()).thenReturn(componenteId);
 
-        when(servicioProductoCarritoImplMock.verificarStock(componenteId, cantidadAAgregar)).thenReturn(true);
+        when(servicioProductoCarritoImplMock.verificarStock(componenteId)).thenReturn(true);
         when(servicioProductoCarritoImplMock.calcularCantidadTotalDeProductos()).thenReturn(cantidadTotalEsperada);
 
         Map<String, Object> response = carritoController.agregarProductoAlCarrito(componenteMock.getId(), 1 );
@@ -489,7 +490,7 @@ public class ControladorCarritoTest {
         assertEquals("Producto agregado al carrito!", response.get("mensaje"));
         assertEquals(cantidadTotalEsperada, response.get("cantidadEnCarrito"));
 
-        verify(servicioProductoCarritoImplMock).verificarStock(componenteId, cantidadAAgregar);
+        verify(servicioProductoCarritoImplMock).verificarStock(componenteId);
         verify(servicioProductoCarritoImplMock).agregarProducto(componenteMock.getId(), cantidadAAgregar);
         verify(servicioProductoCarritoImplMock).calcularCantidadTotalDeProductos();
     }
@@ -503,7 +504,7 @@ public class ControladorCarritoTest {
         Componente componenteMock = mock(Componente.class);
         when(componenteMock.getId()).thenReturn(componenteId);
 
-        when(servicioProductoCarritoImplMock.verificarStock(componenteId, 1)).thenReturn(false);
+        when(servicioProductoCarritoImplMock.verificarStock(componenteId)).thenReturn(false);
         when(servicioProductoCarritoImplMock.calcularCantidadTotalDeProductos()).thenReturn(cantidadTotalEsperada);
 
         Map<String, Object> response = carritoController.agregarProductoAlCarrito(componenteMock.getId(), 1 );
@@ -512,7 +513,7 @@ public class ControladorCarritoTest {
         assertEquals("Stock insuficiente", response.get("mensaje"));
         assertEquals(cantidadTotalEsperada, response.get("cantidadEnCarrito"));
 
-        verify(servicioProductoCarritoImplMock).verificarStock(componenteId, cantidadAAgregar);
+        verify(servicioProductoCarritoImplMock).verificarStock(componenteId);
         verify(servicioProductoCarritoImplMock).calcularCantidadTotalDeProductos();
     }
 
@@ -524,7 +525,7 @@ public class ControladorCarritoTest {
         Componente componenteMock = mock(Componente.class);
         when(componenteMock.getId()).thenReturn(componenteId);
 
-        when(servicioProductoCarritoImplMock.verificarStock(componenteId, cantidadAAgregar)).thenReturn(true);
+        when(servicioProductoCarritoImplMock.verificarStock(componenteId)).thenReturn(true);
 
         doThrow(new RuntimeException("Error simulado"))
                 .when(servicioProductoCarritoImplMock)
