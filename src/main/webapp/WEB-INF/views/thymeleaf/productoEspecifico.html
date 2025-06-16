@@ -38,7 +38,12 @@
                     <!-- Precio principal -->
                     <div class="d-flex align-items-baseline mb-2">
                         <p class="me-2 mb-0 fw-semibold">Precio especial</p>
-                        <h2 class="text-primary mb-0" th:text=" ${componenteEspecificoDto.precio} "></h2>
+                        <h2 class="text-primary mb-0" th:text="'$' + ${componenteEspecificoDto.precio} "></h2>
+                    </div>
+                    <!-- Precio dolar -->
+                    <div class="d-flex align-items-baseline mb-2">
+                        <p class="me-2 mb-0 fw-semibold">Precio en dolares</p>
+                        <h4 class="text-primary mb-0" th:text="'USD $' + ${precioDolar} "></h4>
                     </div>
                     <hr>
                     <!-- Precio en cuotas -->
@@ -86,7 +91,7 @@
         <div class="container">
             <div class="col-md-12 row row-cols-2 p-0 m-0">
                 <table class="row p-0 m-0 pt-3" th:each="caracteristicas : ${componenteEspecificoDto.getCaracteristicas()}">
-                    <th th:text="${caracteristicas.getKey()}"></th>
+                    <th th:text="${caracteristicas.getKey()}" style="border-bottom: 1px solid red"></th>
                     <tr class="row" th:each="subCaracteristicas : ${caracteristicas.getValue()}">
                         <td class="col-md-7" th:text="${subCaracteristicas.getKey()}"></td>
                         <td class="col-md-5 text-end" th:text="${subCaracteristicas.getValue()}"></td>
