@@ -68,7 +68,6 @@ public class ServicioProductoCarritoImpl {
             }
         }
         repositorioComponente.actualizarStockDeUnComponente(componenteId, cantidad);
-
     }
 
     public boolean verificarStock(Long componenteId) {

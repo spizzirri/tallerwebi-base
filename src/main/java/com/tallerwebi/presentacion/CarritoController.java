@@ -278,21 +278,32 @@ public class CarritoController {
         Integer cantidadTotal = this.productoService.calcularCantidadTotalDeProductos();
         response.put("cantidadEnCarrito", cantidadTotal);
         return response;
-    }    @PostMapping("/agregarAlCarrito")
+    }
+
+    // testear el mensaje de agregado dos o mas veces el producto al carrito
+    @PostMapping("/agregarAlCarrito")
     @ResponseBody
     public Map<String, Object> agregarProductoAlCarrito(
             @RequestParam Long componenteId,
             @RequestParam(defaultValue = "1") Integer cantidad) {
 
         Map<String, Object> response = new HashMap<>();
+
         try {
             if (!productoService.verificarStock(componenteId)) {
                 response.put("success", false);
                 response.put("mensaje", "Stock insuficiente");
             } else {
+                ProductoCarritoDto existente = productoService.buscarPorId(componenteId);
+
                 productoService.agregarProducto(componenteId, cantidad);
+                if (existente != null) {
+                    int cantidadFinal = existente.getCantidad();
+                    response.put("mensaje", "Producto actualizado! Ahora tiene " + cantidadFinal + " unidades en el carrito.");
+                } else {
+                    response.put("mensaje", "Producto agregado al carrito!");
+                }
                 response.put("success", true);
-                response.put("mensaje", "Producto agregado al carrito!");
             }
 
             Integer cantidadTotal = productoService.calcularCantidadTotalDeProductos();
