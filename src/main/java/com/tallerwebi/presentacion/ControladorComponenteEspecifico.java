@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.*;
 
 @Controller
@@ -35,6 +37,8 @@ public class ControladorComponenteEspecifico {
         ModelMap model = new ModelMap();
 
         model.put("componenteEspecificoDto", componenteEspecificoDto);
+        model.put("precioFormateado", this.obtenerPrecioFormateado(componenteEspecificoDto.getPrecio()));
+        model.put("precioDeLista", this.obtenerPrecioDeLista(componenteEspecificoDto.getPrecio()));
         model.put("precioDolar", this.conversionPesoADolar(componenteEspecificoDto));
         model.put("terminos", "Estos son los terminos y condiciones para este producto...");
         model.put("cuotas", "12 cuotas fijas sin interes con tarjetas seleccionadas.");
@@ -52,11 +56,29 @@ public class ControladorComponenteEspecifico {
         return "redirect:/productoEspecifico/" + id;
     }
 
-    private Double conversionPesoADolar(ComponenteEspecificoDto componenteEspecificoDto) {
+    private String obtenerPrecioFormateado(Double precio) {
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+        symbols.setGroupingSeparator('.');
+        symbols.setDecimalSeparator(',');
+        DecimalFormat formatter = new DecimalFormat("#,##0.00", symbols);
+        return formatter.format(precio);
+    }
+
+    private String conversionPesoADolar(ComponenteEspecificoDto componenteEspecificoDto) {
         Double cotizacionDolarBlue = servicioDolar.obtenerCotizacionDolarBlue();
         Double precioEnPesos = componenteEspecificoDto.getPrecio();
+        Double precioEnDolares = precioEnPesos / cotizacionDolarBlue;
 
-        return Math.ceil(precioEnPesos / cotizacionDolarBlue);
+        return this.obtenerPrecioFormateado(precioEnDolares);
+    }
+
+    private String obtenerPrecioDeLista(Double precio) {
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+        symbols.setGroupingSeparator('.');
+        symbols.setDecimalSeparator(',');
+        DecimalFormat formatter = new DecimalFormat("#,##0.00", symbols);
+        Double precioDeLista = precio * 1.50;
+        return formatter.format(precioDeLista);
     }
 
 

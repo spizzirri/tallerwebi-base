@@ -16,19 +16,11 @@
                 <div class="col-md-6"> <!-- Este es para el sector de las imágenes -->
                     <!-- Imagen grande -->
                     <div class="text-center mb-3">
-                        <img id="mainImage"
-                             th:src="@{/imagenes/{img}(img=${componenteEspecificoDto.imagenes[0]})}"
-                             class="img-fluid img-thumbnail"
-                             alt="Imagen principal"
-                             style="max-height: 400px;">
+                        <img id="mainImage" th:src="@{/imagenes/{img}(img=${componenteEspecificoDto.imagenes[0]})}" class="img-fluid img-thumbnail" alt="Imagen principal" style="max-height: 400px;">
                     </div>
                     <!-- Miniaturas -->
                     <div class="d-flex gap-2 flex-wrap justify-content-center">
-                        <img th:each="imagen : ${componenteEspecificoDto.imagenes}"
-                             th:src="@{/imagenes/{img}(img=${imagen})}"
-                             class="img-thumbnail thumb-img"
-                             style="width: 100px; height: auto; cursor: pointer;"
-                             th:alt="${imagen}">
+                        <img th:each="imagen : ${componenteEspecificoDto.imagenes}" th:src="@{/imagenes/{img}(img=${imagen})}" class="img-thumbnail thumb-img" th:alt="${imagen}" style="width: 100px; height: auto; cursor: pointer;">
                     </div>
                 </div>
                 <div class="col-md-6"> <!-- Este es para el sector que tiene el nombre, precio, etc -->
@@ -38,7 +30,8 @@
                     <!-- Precio principal -->
                     <div class="d-flex align-items-baseline mb-2">
                         <p class="me-2 mb-0 fw-semibold">Precio especial</p>
-                        <h2 class="text-primary mb-0" th:text="'$' + ${componenteEspecificoDto.precio} "></h2>
+                        <h2 class="text-primary mb-0" th:text="'$' + ${precioFormateado}">
+                        </h2>
                     </div>
                     <!-- Precio dolar -->
                     <div class="d-flex align-items-baseline mb-2">
@@ -47,37 +40,36 @@
                     </div>
                     <hr>
                     <!-- Precio en cuotas -->
+<!--                    <div class="d-flex align-items-baseline mb-2">-->
+<!--                        <p class="me-2 mb-0 fw-semibold">12 cuotas fijas de</p>-->
+<!--                        <h4 class="mb-0 me-2">$1.200</h4>-->
+<!--                        <a class="small align-self-center" data-bs-toggle="offcanvas" href="#cuotasCanvas" role="button" aria-controls="cuotasCanvas">-->
+<!--                            Ver cuotas-->
+<!--                        </a>-->
+<!--                    </div>-->
+<!--                    <br>-->
+                    <!-- Precio de lista -->
                     <div class="d-flex align-items-baseline mb-2">
-                        <p class="me-2 mb-0 fw-semibold">12 cuotas fijas de</p>
-                        <h4 class="mb-0 me-2">$1.200</h4>
+                        <p class="me-2 mb-0 fw-semibold">Precio de lista</p>
+                        <h5 class="mb-0 me-2" th:text="'$' + ${precioDeLista} "></h5>
                         <a class="small align-self-center" data-bs-toggle="offcanvas" href="#cuotasCanvas" role="button" aria-controls="cuotasCanvas">
                             Ver cuotas
                         </a>
                     </div>
-                    <br>
-                    <!-- Precio de lista -->
-                    <div class="d-flex align-items-baseline mb-2">
-                        <p class="me-2 mb-0 fw-semibold">Precio de lista</p>
-                        <h4 class="mb-0 me-2">$14.400</h4>
-                    </div>
                     <hr>
                     <!-- Lista con iconos -->
                     <ul class="list-unstyled">
-                        <li class="d-flex align-items-center mb-2">
-                            <i class="fas fa-shield-alt text-success me-2"></i>
-                            Garantia - 12 meses <a href="#terminosCanvas"
-                                                   class="ms-2 small"
-                                                   data-bs-toggle="offcanvas"
-                                                   role="button"
-                                                   aria-controls="terminosCanvas">Ver terminos</a>
+                        <li class="d-flex align-items-center mb-2 col-md-12">
+                            <i class="fas fa-shield-alt text-success me-2 col-md-1" style="width:20px;"></i>
+                            <span class="col-md-11">Garantia - 12 meses <a href="#terminosCanvas" class="ms-2 small" data-bs-toggle="offcanvas" role="button" aria-controls="terminosCanvas">Ver terminos</a></span>
                         </li>
-                        <li class="d-flex align-items-center mb-2">
-                            <i class="fas fa-box text-success me-2"></i>
-                            Stock disponible
+                        <li class="d-flex align-items-center mb-2 col-md-12">
+                            <i class="fas fa-box text-success me-2 col-md-1" style="width:20px;"></i>
+                            <span class="col-md-11">Stock disponible</span>
                         </li>
-                        <li class="d-flex align-items-center mb-2">
-                            <i class="fas fa-truck text-success me-2"></i>
-                            Envios a todo el pais
+                        <li class="d-flex align-items-center mb-2 col-md-12">
+                            <i class="fas fa-truck text-success me-2 col-md-1" style="width:20px;"></i>
+                            <span class="col-md-11">Envios a todo el pais</span>
                         </li>
                     </ul>
                         <button th:onclick="|agregarAlCarrito(${componenteEspecificoDto.id}, 1)|" class="btn btn-danger mt-3">Sumar al carrito</button>
@@ -89,14 +81,18 @@
         </div>
         <br><br>
         <div class="container">
-            <div class="col-md-12 row row-cols-2 p-0 m-0">
-                <table class="row p-0 m-0 pt-3" th:each="caracteristicas : ${componenteEspecificoDto.getCaracteristicas()}">
-                    <th th:text="${caracteristicas.getKey()}" style="border-bottom: 1px solid red"></th>
-                    <tr class="row" th:each="subCaracteristicas : ${caracteristicas.getValue()}">
-                        <td class="col-md-7" th:text="${subCaracteristicas.getKey()}"></td>
-                        <td class="col-md-5 text-end" th:text="${subCaracteristicas.getValue()}"></td>
-                    </tr>
-                </table>
+            <div class="row row-cols-2">
+                <div class="col" th:each="caracteristicas : ${componenteEspecificoDto.getCaracteristicas()}">
+                    <table class="table table-striped table-borderless mt-3">
+                        <thead>
+                            <th th:text="${caracteristicas.getKey()}" style="border-bottom: 1px solid red"></th>
+                        </thead>
+                        <tr class="row m-0" th:each="subCaracteristicas : ${caracteristicas.getValue()}">
+                            <td class="col-md-7" th:text="${subCaracteristicas.getKey()}"></td>
+                            <td class="col-md-5 text-end" th:text="${#objects.nullSafe(subCaracteristicas.getValue(), '-')}"></td>
+                        </tr>
+                    </table>
+                </div>
             </div>
         </div>
         <footer th:replace="fragments/fragments :: footer"></footer>

@@ -1,33 +1,42 @@
-/*package com.tallerwebi.dominio;
+package com.tallerwebi.presentacion;
 
-import com.tallerwebi.presentacion.ComponenteEspecificoDto;
-import com.tallerwebi.presentacion.ControladorComponenteEspecifico;
+import com.tallerwebi.dominio.ServicioDolar;
+import com.tallerwebi.dominio.ServicioProductoEspecifico;
+import com.tallerwebi.dominio.entidades.Componente;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.servlet.ModelAndView;
-
 import javax.servlet.http.HttpSession;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 public class ControladorComponenteEspecificoTest {
 
     private ControladorComponenteEspecifico controladorComponenteEspecifico;
     private ServicioProductoEspecifico servicioProductoEspecifico;
+    private ServicioDolar servicioDolar;
 
     @BeforeEach
     public void init() {
-        this.controladorComponenteEspecifico = new ControladorComponenteEspecifico(servicioProductoEspecifico);
+        servicioProductoEspecifico = mock(ServicioProductoEspecifico.class);
+        servicioDolar = mock(ServicioDolar.class);
+        this.controladorComponenteEspecifico = new ControladorComponenteEspecifico(servicioProductoEspecifico, servicioDolar);
     }
 
     @Test
     public void dadoQueExisteUnControladorComponenteEspecificoCuandoPidoUnComponenteConID1MeDevuelveLaVistaDeUnComponenteEspecifico() {
 
-        ModelAndView modelAndView = this.controladorComponenteEspecifico.mostrarComponenteEspecifico(1L);
+        Long idComponente = 1L;
+        Componente componenteMock = new Componente();
+        componenteMock.setId(1L);
+        componenteMock.setPrecio(10000.0);
+
+        when(servicioProductoEspecifico.obtenerComponentePorId(idComponente)).thenReturn(componenteMock);
+        when(servicioDolar.obtenerCotizacionDolarBlue()).thenReturn(1200.0);
+
+        ModelAndView modelAndView = controladorComponenteEspecifico.mostrarComponenteEspecifico(idComponente);
 
         String vistaEsperada = "productoEspecifico";
 
@@ -37,12 +46,20 @@ public class ControladorComponenteEspecificoTest {
     @Test
     public void dadoQueExisteUnControladorComponenteEspecificoCuandoPidoUnComponenteConID1MeDevuelveLaVistaDeUnComponenteEspecificoYElModeloDeEseComponenteEspecifico() {
 
-        ModelAndView modelAndView = this.controladorComponenteEspecifico.mostrarComponenteEspecifico(1L);
+        Long idComponente = 1L;
+        Componente componenteMock = new Componente();
+        componenteMock.setId(1L);
+        componenteMock.setPrecio(10000.0);
+
+        when(servicioProductoEspecifico.obtenerComponentePorId(idComponente)).thenReturn(componenteMock);
+        when(servicioDolar.obtenerCotizacionDolarBlue()).thenReturn(1200.0);
+
+        ModelAndView modelAndView = controladorComponenteEspecifico.mostrarComponenteEspecifico(idComponente);
 
         String vistaEsperada = "productoEspecifico";
+
         ComponenteEspecificoDto componenteEsperado = new ComponenteEspecificoDto();
         componenteEsperado.setId(1L);
-        componenteEsperado.setNombre("ComponenteEspecifico");
 
         assertThat(modelAndView.getViewName(), equalTo(vistaEsperada));
         assertThat(modelAndView.getModel().get("componenteEspecificoDto"), equalTo(componenteEsperado));
@@ -51,7 +68,14 @@ public class ControladorComponenteEspecificoTest {
     @Test
     public void dadoQueExisteUnControladorComponenteEspecificoCuandoEstoyEnLaVistaDeUnComponenteConID1PuedoVerificarQueElOffCanvasDeTerminosLlegueEnElModelo() {
 
-        ModelAndView modelAndView = this.controladorComponenteEspecifico.mostrarComponenteEspecifico(1L);
+        Long idComponente = 1L;
+        Componente componenteMock = new Componente();
+        componenteMock.setId(1L);
+        componenteMock.setPrecio(10000.0);
+
+        when(servicioProductoEspecifico.obtenerComponentePorId(idComponente)).thenReturn(componenteMock);
+
+        ModelAndView modelAndView = controladorComponenteEspecifico.mostrarComponenteEspecifico(idComponente);
 
         assertThat(modelAndView.getModel().get("terminos"), notNullValue());
     }
@@ -59,7 +83,14 @@ public class ControladorComponenteEspecificoTest {
     @Test
     public void dadoQueExisteUnControladorComponenteEspecificoCuandoEstoyEnLaVistaDeUnComponenteConID1PuedoVerificarQueElOffCanvasDeCuotasLlegueEnElModelo() {
 
-        ModelAndView modelAndView = this.controladorComponenteEspecifico.mostrarComponenteEspecifico(1L);
+        Long idComponente = 1L;
+        Componente componenteMock = new Componente();
+        componenteMock.setId(1L);
+        componenteMock.setPrecio(10000.0);
+
+        when(servicioProductoEspecifico.obtenerComponentePorId(idComponente)).thenReturn(componenteMock);
+
+        ModelAndView modelAndView = controladorComponenteEspecifico.mostrarComponenteEspecifico(idComponente);
 
         assertThat(modelAndView.getModel().get("cuotas"), notNullValue());
     }
@@ -81,4 +112,3 @@ public class ControladorComponenteEspecificoTest {
     }
 
 }
-*/

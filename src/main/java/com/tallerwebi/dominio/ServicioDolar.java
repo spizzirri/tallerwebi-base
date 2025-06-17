@@ -8,11 +8,11 @@ import java.util.Map;
 @Service
 public class ServicioDolar {
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate = new RestTemplate(); //Clase que permite hacer llamdas HTTP a externos
     private final String API_URL = "https://dolarapi.com/v1/dolares/blue";
 
     public Double obtenerCotizacionDolarBlue() {
-        Map<String, Object> response = restTemplate.getForObject(API_URL, Map.class);
+        Map<String, Object> response = restTemplate.getForObject(API_URL, Map.class); //Hace la solicitud HTTP GET a la URL
         if (response != null && response.containsKey("venta")) {
             return Double.parseDouble(response.get("venta").toString());
         }
