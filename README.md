@@ -25,14 +25,19 @@ $ mvn clean jetty:run
 
 ### Iniciar el servidor
 ```shell
+# Opcion 1
 $ mvn clean jetty:run
+
+# Opcion 2 -- ver seccion 10 docker-compose
+$ docker-compose up --build
 ```
 ### Correr las pruebas en otra terminal
 ```shell
 $ mvn test -Dtest="VistaLoginE2E"
+$ mvn test -Dtest="VistaLoginE2E#deberiaNavegarAlHomeSiElUsuarioExiste"
 ```
 
-## 8. Como correr las pruebas unitarias de javascript
+## 8. Como correr las pruebas unitarias de javascript [Obsoleto]
 ```shell
 $ cd src/main/webapp/resources/core/js
 // Si es la primera vez debo descargar las dependencias
