@@ -49,42 +49,72 @@ public class VistaLoginE2E {
     }
 
     @Test
-    void deberiaDecirUNLAMEnElNavbar() {
-        String texto = vistaLogin.obtenerTextoDeLaBarraDeNavegacion();
-        assertThat("UNLAM", equalToIgnoringCase(texto));
+    void deberiaDecirUNLAMEnElNavbar() throws MalformedURLException {
+        dadoQueElUsuarioEstaEnLaVistaDeLogin();
+        entoncesDeberiaVerUNLAMEnElNavbar();
     }
 
     @Test
     void deberiaDarUnErrorAlNoCompletarElLoginYTocarElBoton() {
-        vistaLogin.escribirEMAIL("damian@unlam.edu.ar");
-        vistaLogin.escribirClave("unlam");
-        vistaLogin.darClickEnIniciarSesion();
-        String texto = vistaLogin.obtenerMensajeDeError();
-        assertThat("Error Usuario o clave incorrecta", equalToIgnoringCase(texto));
+        dadoQueElUsuarioIniciaSesionCon("damian@unlam.edu.ar", "unlam");
+        cuandoElUsuarioTocaElBotonDeLogin();
+        entoncesDeberiaVerUnMensajeDeError();
     }
 
     @Test
     void deberiaNavegarAlHomeSiElUsuarioExiste() throws MalformedURLException {
-        vistaLogin.escribirEMAIL("test@unlam.edu.ar");
-        vistaLogin.escribirClave("test");
-        vistaLogin.darClickEnIniciarSesion();
-        URL url = vistaLogin.obtenerURLActual();
-        assertThat(url.getPath(), matchesPattern("^/spring/home(?:;jsessionid=[^/\\s]+)?$"));
+        dadoQueElUsuarioIniciaSesionCon("test@unlam.edu.ar", "test");
+        cuandoElUsuarioTocaElBotonDeLogin();
+        entoncesDeberiaSerRedirigidoALaVistaDeHome();
     }
 
     @Test
     void deberiaRegistrarUnUsuarioEIniciarSesionExistosamente() throws MalformedURLException {
-        vistaLogin.darClickEnRegistrarse();
-        VistaNuevoUsuario vistaNuevoUsuario = new VistaNuevoUsuario(context.pages().get(0));
-        vistaNuevoUsuario.escribirEMAIL("juan@unlam.edu.ar");
-        vistaNuevoUsuario.escribirClave("123456");
-        vistaNuevoUsuario.darClickEnRegistrarme();
+        dadoQueElUsuarioNavegaALaVistaDeRegistro();
+        dadoQueElUsuarioSeRegistraCon("juan@unlam.edu.ar", "123456");
+        dadoQueElUsuarioEstaEnLaVistaDeLogin();
+        dadoQueElUsuarioIniciaSesionCon("juan@unlam.edu.ar", "123456");
+        cuandoElUsuarioTocaElBotonDeLogin();    
+        entoncesDeberiaSerRedirigidoALaVistaDeHome();
+    }
+
+    private void entoncesDeberiaVerUNLAMEnElNavbar() {
+        String texto = vistaLogin.obtenerTextoDeLaBarraDeNavegacion();
+        assertThat("UNLAM", equalToIgnoringCase(texto));
+    }
+
+    private void dadoQueElUsuarioEstaEnLaVistaDeLogin() throws MalformedURLException {
         URL urlLogin = vistaLogin.obtenerURLActual();
         assertThat(urlLogin.getPath(), matchesPattern("^/spring/login(?:;jsessionid=[^/\\s]+)?$"));
-        vistaLogin.escribirEMAIL("juan@unlam.edu.ar");
-        vistaLogin.escribirClave("123456");
+    }
+
+    private void cuandoElUsuarioTocaElBotonDeLogin() {
         vistaLogin.darClickEnIniciarSesion();
-        URL urlHome = vistaLogin.obtenerURLActual();
-        assertThat(urlHome.getPath(), matchesPattern("^/spring/home(?:;jsessionid=[^/\\s]+)?$"));
+    }
+
+    private void entoncesDeberiaSerRedirigidoALaVistaDeHome() throws MalformedURLException {
+        URL url = vistaLogin.obtenerURLActual();
+        assertThat(url.getPath(), matchesPattern("^/spring/home(?:;jsessionid=[^/\\s]+)?$"));
+    }
+
+    private void entoncesDeberiaVerUnMensajeDeError() {
+        String texto = vistaLogin.obtenerMensajeDeError();
+        assertThat("Error Usuario o clave incorrecta", equalToIgnoringCase(texto));
+    }
+
+    private void dadoQueElUsuarioIniciaSesionCon(String email, String clave) {
+        vistaLogin.escribirEMAIL(email);
+        vistaLogin.escribirClave(clave);
+    }
+
+    private void dadoQueElUsuarioNavegaALaVistaDeRegistro() {
+        vistaLogin.darClickEnRegistrarse();
+    }
+
+    private void dadoQueElUsuarioSeRegistraCon(String email, String clave) {
+        VistaNuevoUsuario vistaNuevoUsuario = new VistaNuevoUsuario(context.pages().get(0));
+        vistaNuevoUsuario.escribirEMAIL(email);
+        vistaNuevoUsuario.escribirClave(clave);
+        vistaNuevoUsuario.darClickEnRegistrarme();
     }
 }
