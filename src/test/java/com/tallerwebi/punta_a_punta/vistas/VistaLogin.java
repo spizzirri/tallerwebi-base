@@ -28,4 +28,8 @@ public class VistaLogin extends VistaWeb {
     public void darClickEnIniciarSesion(){
         this.darClickEnElElemento("#btn-login");
     }
+
+    public void darClickEnRegistrarse(){
+        this.darClickEnElElemento("#btn-register");
+    }
 }
