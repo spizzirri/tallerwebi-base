@@ -33,6 +33,7 @@ $ docker-compose up --build
 ```
 ### Correr las pruebas en otra terminal
 ```shell
+$ mvn test -Dtest="*E2E"
 $ mvn test -Dtest="VistaLoginE2E"
 $ mvn test -Dtest="VistaLoginE2E#deberiaNavegarAlHomeSiElUsuarioExiste"
 ```

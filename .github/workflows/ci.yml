@@ -1,22 +1,46 @@
 name: integracion_continua
-run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
+run-name: ${{ github.actor }} está probando GitHub Actions 🚀
+
 on:
   pull_request:
     branches: ["main"]
   push:
     branches: ["main"]
+
 jobs:
   Explore-GitHub-Actions:
     runs-on: ubuntu-latest
+
     steps:
-      - run: echo "🎉 Esta tarea (job) fue lanzado automaticamente por el evento ${{ github.event_name }}"
-      - run: echo "🐧 Esta tarea esta corriendo en un servidor ${{ runner.os }} por GitHub!"
-      - run: echo "🔎 El nombre de la rama es ${{ github.ref }} y tu repositorio es ${{ github.repository }}."
-      - name: Descargando el codigo
+      - run: echo "🎉 Esta tarea fue lanzada por el evento ${{ github.event_name }}"
+      - run: echo "🐧 Corriendo en ${{ runner.os }} por GitHub!"
+      - run: echo "🔎 Rama: ${{ github.ref }} - Repositorio: ${{ github.repository }}"
+
+      - name: Descargar el código
         uses: actions/checkout@v3
-      - run: echo "💡 El repositorio ${{ github.repository }} ha sido clonado."
-      - run: echo "🖥️ El workflow esta listo para testear el codigo"
-      - name: Corriendo las pruebas
+
+      - run: echo "💡 El repositorio ha sido clonado."
+      - run: echo "🖥️ Listo para testear el código"
+
+      - name: Pruebas unitarias
+        run: mvn clean test
+
+      - name: Instalar Docker Compose
         run: |
-          mvn clean test
-      - run: echo "🍏 El estado de la tarea es ${{ job.status }}."
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
+
+      - name: Build del proyecto
+        run: mvn clean package
+
+      - name: Levantar entorno con docker-compose
+        run: docker-compose up -d
+
+      - name: Ejecutar pruebas E2E
+        run: mvn test -Dtest="*E2E"
+
+      - name: Detener servicios
+        if: always()
+        run: docker-compose down
+
+      - run: echo "🍏 Estado final del job: ${{ job.status }}"
