@@ -2,15 +2,19 @@ package com.tallerwebi.punta_a_punta;
 
 import com.microsoft.playwright.*;
 import com.tallerwebi.punta_a_punta.vistas.VistaLogin;
+import com.tallerwebi.punta_a_punta.vistas.VistaNuevoUsuario;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsStringIgnoringCase;
+import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
+
 public class VistaLoginE2E {
 
     static Playwright playwright;
@@ -23,7 +27,6 @@ public class VistaLoginE2E {
         playwright = Playwright.create();
         browser = playwright.chromium().launch();
         //browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false).setSlowMo(50));
-
     }
 
     @AfterAll
@@ -33,6 +36,8 @@ public class VistaLoginE2E {
 
     @BeforeEach
     void crearContextoYPagina() {
+        ReiniciarDB.limpiarBaseDeDatos();
+
         context = browser.newContext();
         Page page = context.newPage();
         vistaLogin = new VistaLogin(page);
@@ -59,11 +64,27 @@ public class VistaLoginE2E {
     }
 
     @Test
-    void deberiaNavegarAlHomeSiElUsuarioExiste() {
+    void deberiaNavegarAlHomeSiElUsuarioExiste() throws MalformedURLException {
         vistaLogin.escribirEMAIL("test@unlam.edu.ar");
         vistaLogin.escribirClave("test");
         vistaLogin.darClickEnIniciarSesion();
-        String url = vistaLogin.obtenerURLActual();
-        assertThat(url, containsStringIgnoringCase("/spring/home"));
+        URL url = vistaLogin.obtenerURLActual();
+        assertThat(url.getPath(), matchesPattern("^/spring/home(?:;jsessionid=[^/\\s]+)?$"));
+    }
+
+    @Test
+    void deberiaRegistrarUnUsuarioEIniciarSesionExistosamente() throws MalformedURLException {
+        vistaLogin.darClickEnRegistrarse();
+        VistaNuevoUsuario vistaNuevoUsuario = new VistaNuevoUsuario(context.pages().get(0));
+        vistaNuevoUsuario.escribirEMAIL("juan@unlam.edu.ar");
+        vistaNuevoUsuario.escribirClave("123456");
+        vistaNuevoUsuario.darClickEnRegistrarme();
+        URL urlLogin = vistaLogin.obtenerURLActual();
+        assertThat(urlLogin.getPath(), matchesPattern("^/spring/login(?:;jsessionid=[^/\\s]+)?$"));
+        vistaLogin.escribirEMAIL("juan@unlam.edu.ar");
+        vistaLogin.escribirClave("123456");
+        vistaLogin.darClickEnIniciarSesion();
+        URL urlHome = vistaLogin.obtenerURLActual();
+        assertThat(urlHome.getPath(), matchesPattern("^/spring/home(?:;jsessionid=[^/\\s]+)?$"));
     }
 }
