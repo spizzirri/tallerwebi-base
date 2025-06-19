@@ -20,3 +20,11 @@ jobs:
         run: |
           mvn clean test
       - run: echo "🍏 El estado de la tarea es ${{ job.status }}."
+      - name: Instalar paquetes de node
+        run: |
+          cd src/main/webapp/resources/core/js
+          npm install
+      - name: Ejecutar pruebas de javascript
+        run: |
+          cd src/main/webapp/resources/core/js
+          npm run test

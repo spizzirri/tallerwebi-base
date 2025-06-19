@@ -37,13 +37,13 @@ $ mvn test -Dtest="VistaLoginE2E"
 $ mvn test -Dtest="VistaLoginE2E#deberiaNavegarAlHomeSiElUsuarioExiste"
 ```
 
-## 8. Como correr las pruebas unitarias de javascript [Obsoleto]
+## 8. Como correr las pruebas unitarias de javascript
 ```shell
 $ cd src/main/webapp/resources/core/js
-// Si es la primera vez debo descargar las dependencias
+# Si es la primera vez debo descargar las dependencias
 $ npm install
-// Ejecuto las pruebas
-$ npm test
+# Ejecuto las pruebas
+$ npm run test
 ```
 
 ## 9. Docker:
