@@ -1,5 +1,4 @@
 name: integracion_continua
-run-name: ${{ github.actor }} está probando GitHub Actions 🚀
 
 on:
   pull_request:
@@ -9,6 +8,7 @@ on:
 
 jobs:
   Explore-GitHub-Actions:
+    name: ${{ github.actor }} está probando GitHub Actions 🚀
     runs-on: ubuntu-latest
 
     steps:
