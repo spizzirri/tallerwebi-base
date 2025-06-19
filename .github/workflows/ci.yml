@@ -21,6 +21,9 @@ jobs:
       - name: Pruebas unitarias
         run: mvn clean test
 
+      - name: Instalar navegadores de Playwright
+        run: npx playwright install --with-deps
+
       - name: Instalar Docker Compose
         run: |
           sudo apt-get update
