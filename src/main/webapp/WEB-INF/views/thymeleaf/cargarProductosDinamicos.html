@@ -5,7 +5,7 @@
 
                 <div class="p-3">
                     <a th:href="@{/productoEspecifico/{id}(id=${producto.id})}">
-                        <img th:src="@{/imagenes/{imagen}(imagen=${producto.imagen})}"
+                        <img th:src="'http://www.imagenesproyecto.free.nf/' + ${producto.imagen}"
                              class="card-img-top rounded w-100"
                              th:alt="${producto.nombre}"
                              style="height: 200px; object-fit: contain;">
