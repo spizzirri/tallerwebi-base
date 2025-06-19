@@ -12,10 +12,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - run: echo "🎉 Esta tarea fue lanzada por el evento ${{ github.event_name }}"
-      - run: echo "🐧 Corriendo en ${{ runner.os }} por GitHub!"
-      - run: echo "🔎 Rama: ${{ github.ref }} - Repositorio: ${{ github.repository }}"
-
       - name: Descargar el código
         uses: actions/checkout@v3
 
