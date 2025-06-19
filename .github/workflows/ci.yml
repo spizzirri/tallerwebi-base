@@ -39,4 +39,4 @@ jobs:
         if: always()
         run: docker-compose down
 
-      - run: echo "🍏 Estado final del job: ${{ job.status }}"
+      - run: echo "${{ job.status }}"
