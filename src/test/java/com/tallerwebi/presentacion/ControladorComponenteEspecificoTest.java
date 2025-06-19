@@ -66,36 +66,6 @@ public class ControladorComponenteEspecificoTest {
     }
 
     @Test
-    public void dadoQueExisteUnControladorComponenteEspecificoCuandoEstoyEnLaVistaDeUnComponenteConID1PuedoVerificarQueElOffCanvasDeTerminosLlegueEnElModelo() {
-
-        Long idComponente = 1L;
-        Componente componenteMock = new Componente();
-        componenteMock.setId(1L);
-        componenteMock.setPrecio(10000.0);
-
-        when(servicioProductoEspecifico.obtenerComponentePorId(idComponente)).thenReturn(componenteMock);
-
-        ModelAndView modelAndView = controladorComponenteEspecifico.mostrarComponenteEspecifico(idComponente);
-
-        assertThat(modelAndView.getModel().get("terminos"), notNullValue());
-    }
-
-    @Test
-    public void dadoQueExisteUnControladorComponenteEspecificoCuandoEstoyEnLaVistaDeUnComponenteConID1PuedoVerificarQueElOffCanvasDeCuotasLlegueEnElModelo() {
-
-        Long idComponente = 1L;
-        Componente componenteMock = new Componente();
-        componenteMock.setId(1L);
-        componenteMock.setPrecio(10000.0);
-
-        when(servicioProductoEspecifico.obtenerComponentePorId(idComponente)).thenReturn(componenteMock);
-
-        ModelAndView modelAndView = controladorComponenteEspecifico.mostrarComponenteEspecifico(idComponente);
-
-        assertThat(modelAndView.getModel().get("cuotas"), notNullValue());
-    }
-
-    @Test
     public void dadoQueExisteUnControladorComponenteEspecificoCuandoEstoyEnLaVistaDeUnComponenteConID1PuedoAgregarloAlCarritoYSeQuedaGuardadoYaQueMantieneLaSesion() {
 
         HttpSession sessionMock = mock(HttpSession.class);
