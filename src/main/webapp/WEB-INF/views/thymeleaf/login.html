@@ -31,7 +31,7 @@
                 <input th:field="*{email}" id="email" type="email" class="form-control" required/>
                 <input th:field="*{password}" type="password" id="password" class="form-control" required/>
 
-                <button id="btn-login" class="btn btn-lg btn-primary btn-block" Type="Submit">Login</button>
+                <button id="btn-login" class="btn btn-lg btn-primary btn-block" Type="Submit" disabled>Login</button>
 
                 <p th:if="${error != null}" class="alert alert-danger" th:text="'Error ' + ${error}">
                 </p>
@@ -44,6 +44,6 @@
 
 <!-- Boostrap core js -->
 <script type="text/javascript" th:src="@{webjars/bootstrap/5.2.0/js/bootstrap.min.js}"></script>
-<script type="text/javascript" th:src="@{js/main.js}"></script>
+<script type="module" th:src="@{js/login.js}"></script>
 </body>
 </html>

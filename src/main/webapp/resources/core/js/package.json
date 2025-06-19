@@ -1,0 +1,16 @@
+{
+  "name": "tallerwebi",
+  "version": "1.0.0",
+  "description": "pruebas unitarias",
+  "type": "module",
+  "scripts": {
+    "test": "jasmine"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "jasmine": "^5.8.0",
+    "jasmine-spec-reporter": "^7.0.0",
+    "jsdom": "^26.1.0"
+  }
+}
