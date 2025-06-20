@@ -132,5 +132,6 @@ docker-compose down
 * Mockito 5.3.1
 * Playwright 1.36.0
 * Node 18.16.1 o superior <- Instalación manual desde la [página de node](https://nodejs.org/en) 
+* npm --> npm install -g npm
 
 *_Proyecto modificado en base a: [Spring MVC hello world example (Maven and Thymeleaf)](https://mkyong.com/spring-mvc/spring-mvc-hello-world-example/) _*
