@@ -26,7 +26,7 @@ public class VistaLoginE2E {
     static void abrirNavegador() {
         playwright = Playwright.create();
         browser = playwright.chromium().launch();
-        //browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false).setSlowMo(50));
+        //browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false).setSlowMo(500));
     }
 
     @AfterAll
@@ -55,15 +55,15 @@ public class VistaLoginE2E {
     }
 
     @Test
-    void deberiaDarUnErrorAlNoCompletarElLoginYTocarElBoton() {
-        dadoQueElUsuarioIniciaSesionCon("damian@unlam.edu.ar", "unlam");
+    void deberiaDarUnErrorAlIntentarIniciarSesionConUnUsuarioQueNoExiste() {
+        dadoQueElUsuarioCargaSusDatosDeLoginCon("damian@unlam.edu.ar", "unlam");
         cuandoElUsuarioTocaElBotonDeLogin();
         entoncesDeberiaVerUnMensajeDeError();
     }
 
     @Test
     void deberiaNavegarAlHomeSiElUsuarioExiste() throws MalformedURLException {
-        dadoQueElUsuarioIniciaSesionCon("test@unlam.edu.ar", "test");
+        dadoQueElUsuarioCargaSusDatosDeLoginCon("test@unlam.edu.ar", "test");
         cuandoElUsuarioTocaElBotonDeLogin();
         entoncesDeberiaSerRedirigidoALaVistaDeHome();
     }
@@ -73,7 +73,7 @@ public class VistaLoginE2E {
         dadoQueElUsuarioNavegaALaVistaDeRegistro();
         dadoQueElUsuarioSeRegistraCon("juan@unlam.edu.ar", "123456");
         dadoQueElUsuarioEstaEnLaVistaDeLogin();
-        dadoQueElUsuarioIniciaSesionCon("juan@unlam.edu.ar", "123456");
+        dadoQueElUsuarioCargaSusDatosDeLoginCon("juan@unlam.edu.ar", "123456");
         cuandoElUsuarioTocaElBotonDeLogin();    
         entoncesDeberiaSerRedirigidoALaVistaDeHome();
     }
@@ -102,7 +102,7 @@ public class VistaLoginE2E {
         assertThat("Error Usuario o clave incorrecta", equalToIgnoringCase(texto));
     }
 
-    private void dadoQueElUsuarioIniciaSesionCon(String email, String clave) {
+    private void dadoQueElUsuarioCargaSusDatosDeLoginCon(String email, String clave) {
         vistaLogin.escribirEMAIL(email);
         vistaLogin.escribirClave(clave);
     }
