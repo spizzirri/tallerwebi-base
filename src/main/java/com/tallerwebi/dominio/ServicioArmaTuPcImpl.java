@@ -23,6 +23,10 @@ import java.util.Map;
 public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
 
     private RepositorioComponente repositorioComponente;
+    private ServicioMotherboard servicioMotherboard;
+    private ServicioCooler servicioCooler;
+    private ServicioPlacaDeVideo servicioPlacaDeVideo;
+    private ServicioFuente servicioFuente;
 
     private final Map<String, String> correspondenciaDeVistaConTablasEnLaBD = new LinkedHashMap<>() {{
         put("procesador", "Procesador");
@@ -36,6 +40,7 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
         put("monitor", "Monitor");
         put("periferico", "Periferico");
     }};
+
 
     @Autowired
     public ServicioArmaTuPcImpl(RepositorioComponente repositorioComponente) {
@@ -53,12 +58,22 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
     }
 
     @Override
-    public List<ComponenteDto> obtenerListaDeComponentesDto(String tipoComponente) {
+    public List<ComponenteDto> obtenerListaDeComponentesCompatiblesDto(String tipoComponente, ArmadoPcDto armadoPcDto) {
 
         String tablaDelTipoDeComponente = this.correspondenciaDeVistaConTablasEnLaBD.get(tipoComponente);
         List<Componente> componentesDeTipo = this.repositorioComponente.obtenerComponentesPorTipo(tablaDelTipoDeComponente);
 
-        // traer componentes compatibles
+//        for (Componente componente : componentesDeTipo) {
+//            // traer componentes compatibles
+//            switch (tablaDelTipoDeComponente) {
+//                case "Motherboard":
+//
+//                    servicioMotherboard.compararComponenteConArmado(componente, armadoPcDto);
+//
+//                    break;
+//            }
+//        }
+
 
         List<ComponenteDto> listaDeComponentesDto = transformarComponentesADtos(componentesDeTipo);
 
@@ -83,9 +98,17 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
 
         // determinar un metodo de componente que diga cuando un componente es compatible con el armado
 
+        List<ComponenteDto> perifericosPrecargados = armadoPcDto.getPerifericos();
+        ComponenteDto monitorPrecargado = armadoPcDto.getMonitor();
+
         switch(tipoComponente.toLowerCase()){
             case "procesador":
+
+                armadoPcDto = new ArmadoPcDto();
                 armadoPcDto.setProcesador(new ComponenteDto(componenteSolicitado));
+                armadoPcDto.setPerifericos(perifericosPrecargados);
+                armadoPcDto.setMonitor(monitorPrecargado);
+
                 break;
             case "motherboard":
                 armadoPcDto.setMotherboard(new ComponenteDto (componenteSolicitado));
@@ -124,24 +147,46 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
 
         if (!this.verificarExistenciaDeComponenteEnElArmadoDto(idComponente, armadoPcDto)) throw new QuitarComponenteInvalidoException();
 
+        List<ComponenteDto> perifericosPrecargados = armadoPcDto.getPerifericos();
+        ComponenteDto monitorPrecargado = armadoPcDto.getMonitor();
+
         switch(tipoComponente.toLowerCase()){
             case "procesador":
-                armadoPcDto.setProcesador(null);
+
+                armadoPcDto = new ArmadoPcDto();
+                armadoPcDto.setPerifericos(perifericosPrecargados);
+                armadoPcDto.setMonitor(monitorPrecargado);
+
                 break;
+
             case "motherboard":
-                armadoPcDto.setMotherboard(null);
+
+                ComponenteDto procesadorPrecargado = armadoPcDto.getProcesador();
+                armadoPcDto = new ArmadoPcDto();
+                armadoPcDto.setPerifericos(perifericosPrecargados);
+                armadoPcDto.setMonitor(monitorPrecargado);
+                armadoPcDto.setProcesador(procesadorPrecargado);
+
                 break;
+
             case "cooler":
+
                 armadoPcDto.setCooler(null);
+                armadoPcDto.setFuente(null);
+                armadoPcDto.setGabinete(null);
+
                 break;
             case "memoria":
                 this.eliminarComponenteDeLaListaDeDtosPorId(armadoPcDto.getRams(), idComponente, cantidad);
+                armadoPcDto.setFuente(null);
                 break;
             case "gpu":
                 armadoPcDto.setGpu(null);
+                armadoPcDto.setFuente(null);
                 break;
             case "almacenamiento":
                 this.eliminarComponenteDeLaListaDeDtosPorId(armadoPcDto.getAlmacenamiento(), idComponente, cantidad);
+                armadoPcDto.setFuente(null);
                 break;
             case "fuente":
                 armadoPcDto.setFuente(null);

@@ -50,7 +50,7 @@ public class ControladorArmaTuPcTest {
                 new ComponenteDto(3L,"Procesador","Procesador3", 3000D, "imagen.jpg", 5)
         );
 
-        when(servicioMock.obtenerListaDeComponentesDto("procesador")).thenReturn(listaProcesadores);
+        when(servicioMock.obtenerListaDeComponentesCompatiblesDto("procesador", any())).thenReturn(listaProcesadores);
 
         // Ejecucion
         ModelAndView modelAndView = this.controlador.cargarComponentes("procesador", session);
@@ -128,7 +128,7 @@ public class ControladorArmaTuPcTest {
                 new ComponenteDto(3L,"Motherboard","Motherboard3", 3000D, "imagen.jpg", 5)
         );
 
-        when(servicioMock.obtenerListaDeComponentesDto("motherboard")).thenReturn(listaMotherboards);
+        when(servicioMock.obtenerListaDeComponentesCompatiblesDto("motherboard", any())).thenReturn(listaMotherboards);
 
         // Ejecucion
         ModelAndView modelAndView = this.controlador.cargarComponentes("motherboard", session);
@@ -179,7 +179,7 @@ public class ControladorArmaTuPcTest {
                 new ComponenteDto(3L,"Cooler","Cooler3", 3000D, "imagen.jpg", 5)
         );
 
-        when(servicioMock.obtenerListaDeComponentesDto("cooler")).thenReturn(listaCoolers);
+        when(servicioMock.obtenerListaDeComponentesCompatiblesDto("cooler", any())).thenReturn(listaCoolers);
 
         // Ejecucion
         ModelAndView modelAndView = this.controlador.cargarComponentes("cooler", session);
@@ -229,7 +229,7 @@ public class ControladorArmaTuPcTest {
                 new ComponenteDto(3L,"Memoria","Memoria3", 3000D, "imagen.jpg", 5)
         );
 
-        when(servicioMock.obtenerListaDeComponentesDto("memoria")).thenReturn(listaMemorias);
+        when(servicioMock.obtenerListaDeComponentesCompatiblesDto("memoria", any())).thenReturn(listaMemorias);
 
         // Ejecucion
         ModelAndView modelAndView = this.controlador.cargarComponentes("memoria",session);
@@ -347,7 +347,7 @@ public class ControladorArmaTuPcTest {
                 new ComponenteDto(3L,"Gpu","Gpu3", 3000D, "imagen.jpg", 5)
         );
 
-        when(servicioMock.obtenerListaDeComponentesDto("gpu")).thenReturn(listaGpus);
+        when(servicioMock.obtenerListaDeComponentesCompatiblesDto("gpu", any())).thenReturn(listaGpus);
 
         // Ejecucion
         ModelAndView modelAndView = this.controlador.cargarComponentes("gpu", session);
@@ -397,7 +397,7 @@ public class ControladorArmaTuPcTest {
                 new ComponenteDto(3L,"Almacenamiento","Almacenamiento3", 3000D, "imagen.jpg", 5)
         );
 
-        when(servicioMock.obtenerListaDeComponentesDto("almacenamiento")).thenReturn(listaAlmacenamientos);
+        when(servicioMock.obtenerListaDeComponentesCompatiblesDto("almacenamiento", any())).thenReturn(listaAlmacenamientos);
 
         // Ejecucion
         ModelAndView modelAndView = this.controlador.cargarComponentes("almacenamiento", session);
@@ -525,7 +525,7 @@ public class ControladorArmaTuPcTest {
                 new ComponenteDto(3L,"Fuente","Fuente3", 3000D, "imagen.jpg", 5)
         );
 
-        when(servicioMock.obtenerListaDeComponentesDto("fuente")).thenReturn(listaFuentes);
+        when(servicioMock.obtenerListaDeComponentesCompatiblesDto("fuente", any())).thenReturn(listaFuentes);
 
         // Ejecucion
         ModelAndView modelAndView = this.controlador.cargarComponentes("fuente", session);
@@ -576,7 +576,7 @@ public class ControladorArmaTuPcTest {
                 new ComponenteDto(3L,"Gabinete","Gabinete3", 3000D, "imagen.jpg", 5)
         );
 
-        when(servicioMock.obtenerListaDeComponentesDto("gabinete")).thenReturn(listaGabinetes);
+        when(servicioMock.obtenerListaDeComponentesCompatiblesDto("gabinete", any())).thenReturn(listaGabinetes);
 
         // Ejecucion
         ModelAndView modelAndView = this.controlador.cargarComponentes("gabinete", session);
@@ -628,7 +628,7 @@ public class ControladorArmaTuPcTest {
                 new ComponenteDto(3L,"Monitor","Monitor3", 3000D, "imagen.jpg", 5)
         );
 
-        when(servicioMock.obtenerListaDeComponentesDto("monitor")).thenReturn(listaMonitores);
+        when(servicioMock.obtenerListaDeComponentesCompatiblesDto("monitor", any())).thenReturn(listaMonitores);
 
         // Ejecucion
         ModelAndView modelAndView = this.controlador.cargarComponentes("monitor", session);
@@ -679,7 +679,7 @@ public class ControladorArmaTuPcTest {
                 new ComponenteDto(3L,"Periferico","Periferico3", 3000D, "imagen.jpg", 5)
         );
 
-        when(servicioMock.obtenerListaDeComponentesDto("periferico")).thenReturn(listaPerifericos);
+        when(servicioMock.obtenerListaDeComponentesCompatiblesDto("periferico", any())).thenReturn(listaPerifericos);
 
         // Ejecucion
         ModelAndView modelAndView = this.controlador.cargarComponentes("periferico", session);

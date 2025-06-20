@@ -10,7 +10,7 @@ import com.tallerwebi.presentacion.dto.ComponenteDto;
 import java.util.List;
 
 public interface ServicioArmaTuPc {
-    List<ComponenteDto> obtenerListaDeComponentesDto(String tipoComponente);
+    List<ComponenteDto> obtenerListaDeComponentesCompatiblesDto(String tipoComponente, ArmadoPcDto armadoPcDto);
 
     ArmadoPcDto agregarComponenteAlArmado(Long idComponente, String tipoComponente, Integer cantidad, ArmadoPcDto armadoPcDto) throws LimiteDeComponenteSobrepasadoEnElArmadoException;
 

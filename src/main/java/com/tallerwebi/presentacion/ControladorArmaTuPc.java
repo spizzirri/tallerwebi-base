@@ -39,8 +39,8 @@ public class ControladorArmaTuPc {
     public ModelAndView cargarComponentes(@PathVariable("tipoComponente") String tipoComponente, HttpSession sesion) {
 
         ModelMap model = new ModelMap();
-        model.put(tipoComponente+"Lista", this.servicioArmaTuPc.obtenerListaDeComponentesDto(tipoComponente));
         ArmadoPcDto armadoPcDto = obtenerArmadoPcDtoDeLaSession(sesion);
+        model.put(tipoComponente+"Lista", this.servicioArmaTuPc.obtenerListaDeComponentesCompatiblesDto(tipoComponente, armadoPcDto));
         model.put("armadoPcDto", armadoPcDto);
         model.put("idsDeComponentesSeleccionados", obtenerIdsDeArmadoDeSession(armadoPcDto));
 
