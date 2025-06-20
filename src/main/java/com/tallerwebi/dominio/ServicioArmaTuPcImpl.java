@@ -111,25 +111,48 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
 
                 break;
             case "motherboard":
+
+                ComponenteDto procesadorPrecargado = armadoPcDto.getProcesador();
+                armadoPcDto = new ArmadoPcDto();
+                armadoPcDto.setPerifericos(perifericosPrecargados);
+                armadoPcDto.setMonitor(monitorPrecargado);
+                armadoPcDto.setProcesador(procesadorPrecargado);
                 armadoPcDto.setMotherboard(new ComponenteDto (componenteSolicitado));
+
                 break;
             case "cooler":
                 armadoPcDto.setCooler(new ComponenteDto (componenteSolicitado));
+                armadoPcDto.setFuente(null);
+                armadoPcDto.setGabinete(null);
+
                 break;
             case "memoria":
+
                 for(int i = 0; i<cantidad;i++) armadoPcDto.getRams().add(new ComponenteDto (componenteSolicitado));
+                armadoPcDto.setFuente(null);
+
                 break;
             case "gpu":
+
                 armadoPcDto.setGpu(new ComponenteDto (componenteSolicitado));
+                armadoPcDto.setFuente(null);
+
                 break;
             case "almacenamiento":
+
                 for(int i = 0; i<cantidad;i++) armadoPcDto.getAlmacenamiento().add(new ComponenteDto (componenteSolicitado));
+                armadoPcDto.setFuente(null);
+
                 break;
             case "fuente":
+
                 armadoPcDto.setFuente(new ComponenteDto(componenteSolicitado));
+
                 break;
             case "gabinete":
+
                 armadoPcDto.setGabinete(new ComponenteDto(componenteSolicitado));
+
                 break;
             case "monitor":
                 armadoPcDto.setMonitor(new ComponenteDto(componenteSolicitado));
@@ -229,6 +252,8 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
     private void eliminarComponenteDeLaListaDeDtosPorId(List<ComponenteDto> componentesDto, Long idComponente, Integer cantidad) throws QuitarStockDemasDeComponenteException {
 
         List<ComponenteDto> componentesAEliminar = new ArrayList<>();
+
+        // sacar cantidad exacta, averiguar
 
         for(ComponenteDto componenteDto : componentesDto) if(componenteDto.getId().equals(idComponente)) componentesAEliminar.add(componenteDto);
 
