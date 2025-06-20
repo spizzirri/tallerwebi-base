@@ -3,7 +3,7 @@ DOCU DE JASMINE: https://jasmine.github.io/api/5.8/global
 **/
 import { validarCamposDeLogin } from "../login_funciones.js";
 
-describe("Main", function() {
+describe("Login Funciones", function() {
   it("debe devolver true cuando el email y la contraseña son validos", function() {
     expect(validarCamposDeLogin("test@unlam.edu.ar", "test")).toBe(true);
   });
