@@ -253,11 +253,10 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
 
         List<ComponenteDto> componentesAEliminar = new ArrayList<>();
 
-        // sacar cantidad exacta, averiguar
+        for(ComponenteDto componenteDto : componentesDto) if(componenteDto.getId().equals(idComponente) && componentesAEliminar.size() < cantidad) componentesAEliminar.add(componenteDto);
 
-        for(ComponenteDto componenteDto : componentesDto) if(componenteDto.getId().equals(idComponente)) componentesAEliminar.add(componenteDto);
+        if(componentesAEliminar.size() >= cantidad && !componentesAEliminar.isEmpty()) for(ComponenteDto componenteAEliminar : componentesAEliminar) componentesDto.remove(componenteAEliminar);
 
-        if(componentesAEliminar.size() >= cantidad && !componentesAEliminar.isEmpty()) componentesDto.removeAll(componentesAEliminar);
         else throw new QuitarStockDemasDeComponenteException();
     }
 
