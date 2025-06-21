@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
-window.agregarAlCarrito = function(componenteId, cantidad = 1) {
+window.agregarAlCarrito = function (componenteId, cantidad = 1) {
 
     return fetch("/spring/agregarAlCarrito", {
         method: 'POST',
@@ -17,14 +17,14 @@ window.agregarAlCarrito = function(componenteId, cantidad = 1) {
         .then(response => response.json())
         .then(data => {
 
-            if(data.success){
+            if (data.success) {
                 mostrarMensaje(data.mensaje, 'success', componenteId);
             } else {
                 mostrarMensaje(data.mensaje, 'error', componenteId);
             }
 
             // Actualizar contador si viene en la respuesta
-            if(data.cantidadEnCarrito !== undefined) {
+            if (data.cantidadEnCarrito !== undefined) {
                 actualizarContadorCarrito(data.cantidadEnCarrito);
             }
 
@@ -36,10 +36,10 @@ window.agregarAlCarrito = function(componenteId, cantidad = 1) {
         });
 }
 
-window.mostrarMensaje = function(mensaje, tipo, productId) {
+window.mostrarMensaje = function (mensaje, tipo, productId) {
     const mensajeNotificacion = document.getElementById(`mensajeNotificacion-${productId}`);
 
-    if(mensajeNotificacion){
+    if (mensajeNotificacion) {
         mensajeNotificacion.textContent = mensaje;
         mensajeNotificacion.className = `alert alert-${tipo === 'success' ? 'success' : 'danger'} mt-2`;
         mensajeNotificacion.style.display = 'block';
@@ -52,10 +52,18 @@ window.mostrarMensaje = function(mensaje, tipo, productId) {
     }
 }
 
-window.actualizarContadorCarrito = function(nuevaCantidad){
+window.actualizarContadorCarrito = function (nuevaCantidad) {
     const contadorCarrito = document.getElementById("contadorCarrito");
 
-    if(contadorCarrito){
+    if (contadorCarrito) {
         contadorCarrito.textContent = nuevaCantidad;
     }
 }
+
+document.getElementById('abrirResumenCarrito').addEventListener('click', () => {
+    document.getElementById('resumenCarrito').classList.add('abierto');
+});
+
+document.getElementById('cerrarResumenCarrito').addEventListener('click', () => {
+    document.getElementById('resumenCarrito').classList.remove('abierto');
+});

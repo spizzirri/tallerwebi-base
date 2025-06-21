@@ -40,22 +40,6 @@ public class CarritoController {
         return new ModelAndView("carritoDeCompras", model);
     }
 
-//    @PostMapping(path = "/carritoDeCompras/home")
-//    public ModelAndView agregarProductoAlCarrito(@ModelAttribute("productoDto") ProductoCarritoDto producto) {
-//        ModelMap model = new ModelMap();
-//        model.put("mensaje", "El producto fue agregado al carrito correctamente!");
-//        model.put("productoDto", producto);
-//        model.put("productos", this.productoService.getProductos());
-//
-//        Double total = this.productoService.calcularValorTotalDeLosProductos();
-//        model.put("valorTotal", total);
-//
-//        Integer cantidadTotal = this.productoService.calcularCantidadTotalDeProductos();
-//        model.put("cantidadEnCarrito", cantidadTotal);
-//        return new ModelAndView("carritoDeCompras", model);
-//    }
-
-
     @PostMapping(path = "/carritoDeCompras/eliminarProducto/{id}")
     @ResponseBody
     public Map<String, Object> eliminarProductoDelCarrito(@PathVariable Long id) {
@@ -177,11 +161,12 @@ public class CarritoController {
         }
 
         if ("mercadoPago".equalsIgnoreCase(metodoDePago)) {
-            if (envioActual == null || codigoPostalActual == null) {
+            if (this.envioActual == null || this.codigoPostalActual == null) {
                 response.put("success", false);
                 response.put("error", "Debes agregar un codigo postal");
                 return response;
             }
+
             response.put("success", true);
             response.put("metodoPago", "mercadoPago");
             response.put("costoEnvio", envioActual.getCosto());
@@ -240,7 +225,7 @@ public class CarritoController {
         return new ModelAndView("carritoDeCompras", model);
     }
 
-    @GetMapping(path = "/carritoDeCompras/calcular")
+    @GetMapping(path = "/carritoDeCompras/calcularEnvio")
     @ResponseBody
     public Map<String, Object> calcularEnvioAjax(@RequestParam String codigoPostal) {
         Map<String, Object> response = new HashMap<>();

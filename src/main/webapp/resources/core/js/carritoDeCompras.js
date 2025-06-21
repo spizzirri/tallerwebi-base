@@ -273,7 +273,6 @@ function crearFormularioMercadoPago(data) {
         form.innerHTML += `<input type="hidden" name="costoEnvio" value="${costoEnvio}">`;
     }
 
-    // ✅ Enviar información del descuento si existe
     const valorTotalElement = document.querySelector('.valorTotalDelCarrito');
     const valorOriginal = valorTotalElement.dataset.valorOriginal;
     const valorConDescuento = valorTotalElement.dataset.valorConDescuento;
@@ -298,6 +297,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (form) {
         form.addEventListener('submit', function (e) {
+            e.preventDefault();
             const codigoPostal = document.getElementById('codigoPostal').value.trim();
             if (window.fetch && codigoPostal) {
                 e.preventDefault();
@@ -308,21 +308,26 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function calcularConAjax(codigoPostal) {
+    console.log('🔍 Iniciando calcularConAjax con código:', codigoPostal);
+
     const loading = document.getElementById('loading');
     if (loading) {
         loading.classList.remove('d-none');
     }
 
-    fetch(`/spring/carritoDeCompras/calcular?codigoPostal=${codigoPostal}`)
+    fetch(`/spring/carritoDeCompras/calcularEnvio?codigoPostal=${codigoPostal}`)
         .then(response => response.json())
         .then(data => {
+            console.log(' Datos recibidos:', data);
+
             if (data.success) {
+                console.log(' Envío exitoso, procesando...');
+
                 document.getElementById('alertaSinCobertura').classList.add('d-none');
                 document.getElementById('costo').textContent = '$' + data.costo;
                 document.getElementById('tiempo').textContent = data.tiempo;
                 document.getElementById('zona').textContent = data.destino;
 
-                // ✅ SOLUCIÓN: Mejor parsing que detecta el formato
                 const valorTotalElement = document.querySelector('.valorTotalDelCarrito');
                 const totalTexto = valorTotalElement.textContent || '$0';
 
@@ -343,11 +348,6 @@ function calcularConAjax(codigoPostal) {
                 }
 
                 const costoEnvio = parseFloat(data.costo);
-
-                console.log('🔍 Debug info:');
-                console.log('Total texto:', totalTexto);
-                console.log('Total parseado:', totalActual);
-                console.log('Costo envío:', costoEnvio);
 
                 const totalConEnvio = (!isNaN(totalActual) && !isNaN(costoEnvio)) ? totalActual + costoEnvio : 0;
 

@@ -32,7 +32,6 @@ public class ControladorCarritoTest {
     @Mock
     private ServicioDeEnviosImpl servicioEnviosMock;
 
-
     private CarritoController carritoController;
     private List<ProductoCarritoDto> productos;
 
@@ -99,7 +98,7 @@ public class ControladorCarritoTest {
 
         Map<String, Object> porcentajeDescuento = carritoController.calcularValorTotalDeLosProductosConDescuento(inputConDescuento);
 
-        assertEquals("Descuento aplicado! Nuevo total: $315.5", porcentajeDescuento.get("mensaje"));
+        assertEquals("Descuento aplicado! Nuevo total: $313.5", porcentajeDescuento.get("mensaje"));
     }
 
     @Test

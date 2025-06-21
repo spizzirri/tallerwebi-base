@@ -1,0 +1,35 @@
+.carrito-sidebar {
+    position: fixed;
+    top: 0;
+    right: -400px;
+    width: 350px;
+    height: 100%;
+    background: #fff;
+    box-shadow: -2px 0 10px rgba(0,0,0,0.2);
+    z-index: 1050;
+    transition: right 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column;
+}
+
+.carrito-sidebar.abierto {
+    right: 0;
+}
+
+.carrito-header, .carrito-footer {
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+.carrito-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+}
+
+.carrito-header button {
+    background: none;
+    border: none;
+    font-size: 24px;
+    float: right;
+}
