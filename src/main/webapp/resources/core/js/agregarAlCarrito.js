@@ -61,7 +61,6 @@ window.actualizarResumenCarrito = function () {
                         elemento.innerHTML = `$${precioNumerico.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`;
                     }
                 });
-
                 asignarEventosDelResumenCarrito();
             }
         })
