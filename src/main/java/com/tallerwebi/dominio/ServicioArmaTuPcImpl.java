@@ -59,7 +59,7 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
     public List<ComponenteDto> obtenerListaDeComponentesCompatiblesDto(String tipoComponente, ArmadoPcDto armadoPcDto) {
 
         String tablaDelTipoDeComponente = this.correspondenciaDeVistaConTablasEnLaBD.get(tipoComponente);
-        List<Componente> componentesDeTipo = this.repositorioComponente.obtenerComponentesPorTipo(tablaDelTipoDeComponente);
+        List<Componente> componentesDeTipo = this.repositorioComponente.obtenerComponentesPorTipoEnStock(tablaDelTipoDeComponente);
         List<Componente> componentesCompatibles = new ArrayList<>();
 
         for (Componente componente : componentesDeTipo) {

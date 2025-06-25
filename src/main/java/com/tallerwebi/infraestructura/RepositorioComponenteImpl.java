@@ -30,6 +30,16 @@ public class RepositorioComponenteImpl implements RepositorioComponente {
     }
 
     @Override
+    public List<Componente> obtenerComponentesPorTipoEnStock(String tipo) {
+
+        String hql = "FROM " + tipo + " c WHERE c.stock > 0";
+
+        Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
+
+        return query.getResultList();
+    }
+
+    @Override
     public Componente obtenerComponentePorId(Long idComponente) {
 
         String hql = "FROM Componente WHERE id = :idComponente";
