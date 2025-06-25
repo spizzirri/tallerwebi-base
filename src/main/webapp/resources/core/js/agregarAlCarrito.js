@@ -53,6 +53,15 @@ window.actualizarResumenCarrito = function () {
 
             if (resumenActual && nuevoResumen) {
                 resumenActual.innerHTML = nuevoResumen.innerHTML;
+
+                resumenActual.querySelectorAll('.precioTotalDelProducto').forEach(elemento => {
+                    const precioTexto = elemento.textContent || elemento.innerHTML;
+                    const precioNumerico = parseFloat(precioTexto.replace(/[^\d.-]/g, ''));
+                    if (!isNaN(precioNumerico)) {
+                        elemento.innerHTML = `$${precioNumerico.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`;
+                    }
+                });
+
                 asignarEventosDelResumenCarrito();
             }
         })
