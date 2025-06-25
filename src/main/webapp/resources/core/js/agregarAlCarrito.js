@@ -91,10 +91,7 @@ window.actualizarContadorCarrito = function (nuevaCantidad) {
 }
 
 function asignarEventosVistaCarrito() {
-    console.log("🔍 Asignando eventos vista carrito...");
-
     document.querySelectorAll(".btnSumarCantidad").forEach(element => {
-        console.log("🔍 Botón sumar encontrado:", element);
 
         if (!element.dataset.eventoAsignado) {
             element.dataset.eventoAsignado = 'true';
@@ -113,6 +110,7 @@ function asignarEventosVistaCarrito() {
                         return response.json();
                     })
                     .then(data => {
+                        actualizarResumenCarrito();
 
                         if (data.cantidad !== undefined) {
                             spanCantidad.textContent = data.cantidad;

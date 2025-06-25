@@ -50,7 +50,7 @@ public class CarritoController {
         model.put("cantidadEnCarrito", cantidadTotalEnCarrito);
         return new ModelAndView("carritoDeCompras", model);
     }
-
+    // testear
     @GetMapping(path = "/fragments/fragments")
     public ModelAndView mostrarResumenCarritoDeCompras() {
         ModelMap model = new ModelMap();
@@ -149,7 +149,8 @@ public class CarritoController {
             response.put("valorTotal", productoService.calcularValorTotalDeLosProductos());
             response.put("cantidadEnCarrito", productoService.calcularCantidadTotalDeProductos());
         } else {
-            response.put("mensaje", "No hay stock suficiente para agregar mas unidades!");
+            response.put("success", false);
+            response.put("mensaje", "No hay stock suficiente!");
         }
         return response;
     }
