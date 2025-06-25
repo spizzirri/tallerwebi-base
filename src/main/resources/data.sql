@@ -1781,7 +1781,7 @@ INSERT INTO Componente (nombre, precio, stock, marca)
 VALUES ('Placa de Video Zotac GeForce RTX 3060 12GB GDDR6 Twin Edge', 424000.0, 10, 'Zotac');
 
 INSERT INTO PlacaDeVideo (id, chipsetGPU, cantidadDeCoolers, cantidadDeVGA, cantidadDeDVIDigital, cantidadDeHDMI, cantidadDeDisplayport, consumo, cantidadDePCIE6Pines, cantidadDePCIE8Pines, cantidadDePCIE16Pines, cantidadDeAdaptadores16Pines, velocidadDelCoreBase, velocidadDelCoreTurbo, tecnologiaRAM, capacidadRAM)
-VALUES (98, 'GeForce RTX 3060', 2, 0, 0, 1, 3, '170W', 0, 1, 0, 0, '1500 MHz', '1777 MHz', 'GDDR6', '12 GB');
+VALUES (98, 'GeForce RTX 3060', 2, 0, 0, 1, 3, '170 W', 0, 1, 0, 0, '1500 MHz', '1777 MHz', 'GDDR6', '12 GB');
 
 INSERT INTO Imagen (urlImagen, componente_id)
 VALUES ('PlacaDeVideo-Zotac-RTX-3060-12GB-1.jpg', 98),
@@ -1795,7 +1795,7 @@ INSERT INTO Componente (nombre, precio, stock, marca)
 VALUES ('Placa de Video MSI GeForce RTX 5060 TI 8GB GAMING TRIO OC', 725000.0, 10, 'MSI');
 
 INSERT INTO PlacaDeVideo (id, chipsetGPU, cantidadDeCoolers, cantidadDeVGA, cantidadDeDVIDigital, cantidadDeHDMI, cantidadDeDisplayport, consumo, cantidadDePCIE6Pines, cantidadDePCIE8Pines, cantidadDePCIE16Pines, cantidadDeAdaptadores16Pines, velocidadDelCoreBase, velocidadDelCoreTurbo, tecnologiaRAM, capacidadRAM)
-VALUES (99, 'GeForce RTX 5060 Ti', 3, 0, 0, 1, 3, '200W', 0, 0, 1, 1, '2450 MHz', '2715 MHz', 'GDDR7', '8 GB');
+VALUES (99, 'GeForce RTX 5060 Ti', 3, 0, 0, 1, 3, '200 W', 0, 0, 1, 1, '2450 MHz', '2715 MHz', 'GDDR7', '8 GB');
 
 INSERT INTO Imagen (urlImagen, componente_id)
 VALUES ('PlacaDeVideo-MSI-RTX-5060-TI-8GB-1.jpg', 99),
@@ -1809,7 +1809,7 @@ INSERT INTO Componente (nombre, precio, stock, marca)
 VALUES ('Placa de video Zotac GeForce RTX 5060 Ti 16GB GDDR7 Twin Edge OC', 821000.0, 10, 'Zotac');
 
 INSERT INTO PlacaDeVideo (id, chipsetGPU, cantidadDeCoolers, cantidadDeVGA, cantidadDeDVIDigital, cantidadDeHDMI, cantidadDeDisplayport, consumo, cantidadDePCIE6Pines, cantidadDePCIE8Pines, cantidadDePCIE16Pines, cantidadDeAdaptadores16Pines, velocidadDelCoreBase, velocidadDelCoreTurbo, tecnologiaRAM, capacidadRAM)
-VALUES (100, 'GeForce RTX 5060 Ti', 2, 0, 0, 1, 3, '210W', 0, 0, 1, 1, '2450 MHz', '2730 MHz', 'GDDR7', '16 GB');
+VALUES (100, 'GeForce RTX 5060 Ti', 2, 0, 0, 1, 3, '210 W', 0, 0, 1, 1, '2450 MHz', '2730 MHz', 'GDDR7', '16 GB');
 
 INSERT INTO Imagen (urlImagen, componente_id)
 VALUES ('PlacaDeVideo-Zotac-RTX-5060-TI-16GB-1.jpg', 100),
@@ -1822,7 +1822,7 @@ INSERT INTO Componente (nombre, precio, stock, marca)
 VALUES ('Placa de Video MSI GeForce RTX 5070 12GB GDDR7 VENTUS 3X', 1030500.0, 10, 'MSI');
 
 INSERT INTO PlacaDeVideo (id, chipsetGPU, cantidadDeCoolers, cantidadDeVGA, cantidadDeDVIDigital, cantidadDeHDMI, cantidadDeDisplayport, consumo, cantidadDePCIE6Pines, cantidadDePCIE8Pines, cantidadDePCIE16Pines, cantidadDeAdaptadores16Pines, velocidadDelCoreBase, velocidadDelCoreTurbo, tecnologiaRAM, capacidadRAM)
-VALUES (101, 'GeForce RTX 5070', 3, 0, 0, 1, 3, '250W', 0, 0, 1, 1, '2500 MHz', '2800 MHz', 'GDDR7', '12 GB');
+VALUES (101, 'GeForce RTX 5070', 3, 0, 0, 1, 3, '250 W', 0, 0, 1, 1, '2500 MHz', '2800 MHz', 'GDDR7', '12 GB');
 
 INSERT INTO Imagen (urlImagen, componente_id)
 VALUES ('PlacaDeVideo-MSI-RTX-5070-12GB-1.jpg', 101),
@@ -1835,7 +1835,7 @@ INSERT INTO Componente (nombre, precio, stock, marca)
 VALUES ('Placa de Video Zotac GeForce RTX 5070 Ti 16GB GDDR7 AMP EXTREME INFINITY', 1400500.0, 10, 'Zotac');
 
 INSERT INTO PlacaDeVideo (id, chipsetGPU, cantidadDeCoolers, cantidadDeVGA, cantidadDeDVIDigital, cantidadDeHDMI, cantidadDeDisplayport, consumo, cantidadDePCIE6Pines, cantidadDePCIE8Pines, cantidadDePCIE16Pines, cantidadDeAdaptadores16Pines, velocidadDelCoreBase, velocidadDelCoreTurbo, tecnologiaRAM, capacidadRAM)
-VALUES (102, 'GeForce RTX 5070 Ti', 3, 0, 0, 1, 3, '300W', 0, 0, 1, 1, '2550 MHz', '2850 MHz', 'GDDR7', '16 GB');
+VALUES (102, 'GeForce RTX 5070 Ti', 3, 0, 0, 1, 3, '300 W', 0, 0, 1, 1, '2550 MHz', '2850 MHz', 'GDDR7', '16 GB');
 
 INSERT INTO Imagen (urlImagen, componente_id)
 VALUES ('PlacaDeVideo-Zotac-RTX-5070-TI-16GB-1.jpg', 102),
@@ -1848,7 +1848,7 @@ INSERT INTO Componente (nombre, precio, stock, marca)
 VALUES ('Placa de Video ASUS ROG GeForce RTX 5080 16GB GDDR7 ASTRAL OC', 2600000.0, 10, 'ASUS');
 
 INSERT INTO PlacaDeVideo (id, chipsetGPU, cantidadDeCoolers, cantidadDeVGA, cantidadDeDVIDigital, cantidadDeHDMI, cantidadDeDisplayport, consumo, cantidadDePCIE6Pines, cantidadDePCIE8Pines, cantidadDePCIE16Pines, cantidadDeAdaptadores16Pines, velocidadDelCoreBase, velocidadDelCoreTurbo, tecnologiaRAM, capacidadRAM)
-VALUES (103, 'GeForce RTX 5080', 3, 0, 0, 1, 3, '350W', 0, 0, 1, 1, '2600 MHz', '2900 MHz', 'GDDR7', '16 GB');
+VALUES (103, 'GeForce RTX 5080', 3, 0, 0, 1, 3, '350 W', 0, 0, 1, 1, '2600 MHz', '2900 MHz', 'GDDR7', '16 GB');
 
 INSERT INTO Imagen (urlImagen, componente_id)
 VALUES ('PlacaDeVideo-ASUS-RTX-5080-16GB-1.jpg', 103),
@@ -1862,7 +1862,7 @@ INSERT INTO Componente (nombre, precio, stock, marca)
 VALUES ('Placa de Video MSI GeForce RTX 5090 32GB GDDR7 GAMING TRIO OC', 4200000.0, 10, 'MSI');
 
 INSERT INTO PlacaDeVideo (id, chipsetGPU, cantidadDeCoolers, cantidadDeVGA, cantidadDeDVIDigital, cantidadDeHDMI, cantidadDeDisplayport, consumo, cantidadDePCIE6Pines, cantidadDePCIE8Pines, cantidadDePCIE16Pines, cantidadDeAdaptadores16Pines, velocidadDelCoreBase, velocidadDelCoreTurbo, tecnologiaRAM, capacidadRAM)
-VALUES (104, 'GeForce RTX 5090', 3, 0, 0, 1, 3, '450W', 0, 0, 1, 1, '2700 MHz', '3100 MHz', 'GDDR7', '32 GB');
+VALUES (104, 'GeForce RTX 5090', 3, 0, 0, 1, 3, '450 W', 0, 0, 1, 1, '2700 MHz', '3100 MHz', 'GDDR7', '32 GB');
 
 INSERT INTO Imagen (urlImagen, componente_id)
 VALUES ('PlacaDeVideo-MSI-RTX-5090-32GB-1.jpg', 104),
@@ -1878,7 +1878,7 @@ INSERT INTO Componente (nombre, precio, stock, marca)
 VALUES ('Placa de Video Asrock Radeon RX 7600 8GB GDDR6 Steel Legend OC', 436000.0, 10, 'Asrock');
 
 INSERT INTO PlacaDeVideo (id, chipsetGPU, cantidadDeCoolers, cantidadDeVGA, cantidadDeDVIDigital, cantidadDeHDMI, cantidadDeDisplayport, consumo, cantidadDePCIE6Pines, cantidadDePCIE8Pines, cantidadDePCIE16Pines, cantidadDeAdaptadores16Pines, velocidadDelCoreBase, velocidadDelCoreTurbo, tecnologiaRAM, capacidadRAM)
-VALUES (105, 'Radeon RX 7600', 3, 0, 0, 1, 3, '165W', 0, 1, 0, 0, '2250 MHz', '2655 MHz', 'GDDR6', '8 GB');
+VALUES (105, 'Radeon RX 7600', 3, 0, 0, 1, 3, '165 W', 0, 1, 0, 0, '2250 MHz', '2655 MHz', 'GDDR6', '8 GB');
 
 INSERT INTO Imagen (urlImagen, componente_id)
 VALUES ('PlacaDeVideo-Asrock-RX-7600-8GB-1.jpg', 105),
@@ -1891,7 +1891,7 @@ INSERT INTO Componente (nombre, precio, stock, marca)
 VALUES ('Placa de Video XFX Radeon RX 9060 XT 8GB GDDR6 SWIFT OC Gaming Edition', 510000.0, 10, 'XFX');
 
 INSERT INTO PlacaDeVideo (id, chipsetGPU, cantidadDeCoolers, cantidadDeVGA, cantidadDeDVIDigital, cantidadDeHDMI, cantidadDeDisplayport, consumo, cantidadDePCIE6Pines, cantidadDePCIE8Pines, cantidadDePCIE16Pines, cantidadDeAdaptadores16Pines, velocidadDelCoreBase, velocidadDelCoreTurbo, tecnologiaRAM, capacidadRAM)
-VALUES (106, 'Radeon RX 9060 XT', 2, 0, 0, 1, 3, '200W', 0, 2, 0, 0, '2500 MHz', '2800 MHz', 'GDDR6', '8 GB');
+VALUES (106, 'Radeon RX 9060 XT', 2, 0, 0, 1, 3, '200 W', 0, 2, 0, 0, '2500 MHz', '2800 MHz', 'GDDR6', '8 GB');
 
 INSERT INTO Imagen (urlImagen, componente_id)
 VALUES ('PlacaDeVideo-XFX-RX-7600-XT-8GB-1.jpg', 106),
@@ -1905,7 +1905,7 @@ INSERT INTO Componente (nombre, precio, stock, marca)
 VALUES ('Placa de Video XFX Radeon RX 9060 XT 16GB GDDR6 SWIFT OC Triple Fan Gaming Edition', 660000.0, 10, 'XFX');
 
 INSERT INTO PlacaDeVideo (id, chipsetGPU, cantidadDeCoolers, cantidadDeVGA, cantidadDeDVIDigital, cantidadDeHDMI, cantidadDeDisplayport, consumo, cantidadDePCIE6Pines, cantidadDePCIE8Pines, cantidadDePCIE16Pines, cantidadDeAdaptadores16Pines, velocidadDelCoreBase, velocidadDelCoreTurbo, tecnologiaRAM, capacidadRAM)
-VALUES (107, 'Radeon RX 9060 XT', 3, 0, 0, 1, 3, '210W', 0, 2, 0, 0, '2500 MHz', '2815 MHz', 'GDDR6', '16 GB');
+VALUES (107, 'Radeon RX 9060 XT', 3, 0, 0, 1, 3, '210 W', 0, 2, 0, 0, '2500 MHz', '2815 MHz', 'GDDR6', '16 GB');
 
 INSERT INTO Imagen (urlImagen, componente_id)
 VALUES ('PlacaDeVideo-XFX-RX-9060-XT-16GB-1.jpg', 107),
@@ -1919,7 +1919,7 @@ INSERT INTO Componente (nombre, precio, stock, marca)
 VALUES ('Placa de Video XFX Radeon RX 7800 XT Core 16GB GDDR6 SPEEDSTER QICK 319', 700000.0, 10, 'XFX');
 
 INSERT INTO PlacaDeVideo (id, chipsetGPU, cantidadDeCoolers, cantidadDeVGA, cantidadDeDVIDigital, cantidadDeHDMI, cantidadDeDisplayport, consumo, cantidadDePCIE6Pines, cantidadDePCIE8Pines, cantidadDePCIE16Pines, cantidadDeAdaptadores16Pines, velocidadDelCoreBase, velocidadDelCoreTurbo, tecnologiaRAM, capacidadRAM)
-VALUES (108, 'Radeon RX 7800 XT', 3, 0, 0, 1, 3, '263W', 0, 2, 0, 0, '1295 MHz', '2430 MHz', 'GDDR6', '16 GB');
+VALUES (108, 'Radeon RX 7800 XT', 3, 0, 0, 1, 3, '263 W', 0, 2, 0, 0, '1295 MHz', '2430 MHz', 'GDDR6', '16 GB');
 
 INSERT INTO Imagen (urlImagen, componente_id)
 VALUES ('PlacaDeVideo-XFX-RX-7800-XT-16GB-1.jpg', 108),
@@ -1932,7 +1932,7 @@ INSERT INTO Componente (nombre, precio, stock, marca)
 VALUES ('Placa de Video XFX Radeon RX 7900 XT 20GB GDDR6 SPEEDSTER MERC 310 ULTRA', 1050000.0, 10, 'XFX');
 
 INSERT INTO PlacaDeVideo (id, chipsetGPU, cantidadDeCoolers, cantidadDeVGA, cantidadDeDVIDigital, cantidadDeHDMI, cantidadDeDisplayport, consumo, cantidadDePCIE6Pines, cantidadDePCIE8Pines, cantidadDePCIE16Pines, cantidadDeAdaptadores16Pines, velocidadDelCoreBase, velocidadDelCoreTurbo, tecnologiaRAM, capacidadRAM)
-VALUES (109, 'Radeon RX 7900 XT', 3, 0, 0, 1, 3, '315W', 0, 2, 0, 0, '1500 MHz', '2500 MHz', 'GDDR6', '20 GB');
+VALUES (109, 'Radeon RX 7900 XT', 3, 0, 0, 1, 3, '315 W', 0, 2, 0, 0, '1500 MHz', '2500 MHz', 'GDDR6', '20 GB');
 
 INSERT INTO Imagen (urlImagen, componente_id)
 VALUES ('PlacaDeVideo-XFX-RX-7900-XT-20GB-1.jpg', 109),
@@ -1944,7 +1944,7 @@ INSERT INTO Componente (nombre, precio, stock, marca)
 VALUES ('Placa de Video XFX Radeon RX 9070 XT 16GB GDDR6 Mercury OC Gaming Edition RGB', 1117000.0, 10, 'XFX');
 
 INSERT INTO PlacaDeVideo (id, chipsetGPU, cantidadDeCoolers, cantidadDeVGA, cantidadDeDVIDigital, cantidadDeHDMI, cantidadDeDisplayport, consumo, cantidadDePCIE6Pines, cantidadDePCIE8Pines, cantidadDePCIE16Pines, cantidadDeAdaptadores16Pines, velocidadDelCoreBase, velocidadDelCoreTurbo, tecnologiaRAM, capacidadRAM)
-VALUES (110, 'Radeon RX 9070 XT', 3, 0, 0, 1, 3, '300W', 0, 2, 0, 0, '2600 MHz', '2950 MHz', 'GDDR6', '16 GB');
+VALUES (110, 'Radeon RX 9070 XT', 3, 0, 0, 1, 3, '300 W', 0, 2, 0, 0, '2600 MHz', '2950 MHz', 'GDDR6', '16 GB');
 
 INSERT INTO Imagen (urlImagen, componente_id)
 VALUES ('PlacaDeVideo-XFX-RX-9070-XT-16GB-1.jpg', 110),
@@ -1957,7 +1957,7 @@ INSERT INTO Componente (nombre, precio, stock, marca)
 VALUES ('Placa de Video ASUS PRIME Radeon RX 9070 XT 16GB GDDR6 OC', 1150000.0, 10, 'ASUS');
 
 INSERT INTO PlacaDeVideo (id, chipsetGPU, cantidadDeCoolers, cantidadDeVGA, cantidadDeDVIDigital, cantidadDeHDMI, cantidadDeDisplayport, consumo, cantidadDePCIE6Pines, cantidadDePCIE8Pines, cantidadDePCIE16Pines, cantidadDeAdaptadores16Pines, velocidadDelCoreBase, velocidadDelCoreTurbo, tecnologiaRAM, capacidadRAM)
-VALUES (111, 'Radeon RX 9070 XT', 3, 0, 0, 1, 3, '290W', 0, 2, 0, 0, '2580 MHz', '2920 MHz', 'GDDR6', '16 GB');
+VALUES (111, 'Radeon RX 9070 XT', 3, 0, 0, 1, 3, '290 W', 0, 2, 0, 0, '2580 MHz', '2920 MHz', 'GDDR6', '16 GB');
 
 INSERT INTO Imagen (urlImagen, componente_id)
 VALUES ('PlacaDeVideo-ASUS-RX-9070-XT-16GB-1.jpg', 111),
