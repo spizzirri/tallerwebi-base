@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (typeof inicializarContadorCarrito === 'function') {
         inicializarContadorCarrito();
     }
+    actualizarResumenCarrito();
 });
 
 window.agregarAlCarrito = function (componenteId, cantidad = 1) {
@@ -27,6 +28,7 @@ window.agregarAlCarrito = function (componenteId, cantidad = 1) {
             if (data.cantidadEnCarrito !== undefined) {
                 actualizarContadorCarrito(data.cantidadEnCarrito);
             }
+            actualizarResumenCarrito();
 
             return data;
         })
@@ -36,6 +38,70 @@ window.agregarAlCarrito = function (componenteId, cantidad = 1) {
         });
 }
 
+window.actualizarResumenCarrito = function () {
+    fetch('/spring/fragments/fragments')
+        .then(res => res.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const nuevoResumen = doc.querySelector('#resumenCarrito');
+            const resumenActual = document.getElementById('resumenCarrito');
+
+            if (resumenActual && nuevoResumen) {
+                resumenActual.innerHTML = nuevoResumen.innerHTML;
+
+                asignarEventosDelResumenCarrito();
+            }
+        })
+        .catch(err => console.error("Error al recargar resumen del carrito", err));
+}
+
+//reusar los metodos de la vista del carrito para el resumen
+window.asignarEventosDelResumenCarrito = function () {
+    document.querySelectorAll('.btnRestarCantidad').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = btn.closest('td').dataset.id;
+            fetch(`/spring/carritoDeCompras/restarCantidadDeUnProducto/${id}`, {method: 'POST'})
+                .then(res => res.json())
+                .then(data => {  // ← Cambiar () por (data)
+                    actualizarResumenCarrito();
+                    if (data.cantidadEnCarrito !== undefined) {
+                        actualizarContadorCarrito(data.cantidadEnCarrito);
+                    }
+                });
+        });
+    });
+
+    document.querySelectorAll('.btnSumarCantidad').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = btn.closest('td').dataset.id;
+            fetch(`/spring/carritoDeCompras/agregarMasCantidadDeUnProducto/${id}`, {method: 'POST'})
+                .then(res => res.json())
+                .then(data => {  // ← Cambiar () por (data)
+                    actualizarResumenCarrito();
+                    if (data.cantidadEnCarrito !== undefined) {
+                        actualizarContadorCarrito(data.cantidadEnCarrito);
+                    }
+                });
+        });
+    });
+
+    document.querySelectorAll('.btnEliminarProducto').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = btn.dataset.id;
+            fetch(`/spring/carritoDeCompras/eliminarProducto/${id}`, {method: 'POST'})
+                .then(res => res.json())
+                .then(data => {  // ← Cambiar () por (data)
+                    actualizarResumenCarrito();
+                    if (data.cantidadEnCarrito !== undefined) {
+                        actualizarContadorCarrito(data.cantidadEnCarrito);
+                    }
+                });
+        });
+    });
+}
+
+//mostrar mensaje al agregar producto al carrito
 window.mostrarMensaje = function (mensaje, tipo, productId) {
     const mensajeNotificacion = document.getElementById(`mensajeNotificacion-${productId}`);
 
@@ -64,6 +130,8 @@ document.getElementById('abrirResumenCarrito').addEventListener('click', () => {
     document.getElementById('resumenCarrito').classList.add('abierto');
 });
 
-document.getElementById('cerrarResumenCarrito').addEventListener('click', () => {
-    document.getElementById('resumenCarrito').classList.remove('abierto');
+document.addEventListener('click', (e) => {
+    if (e.target.id === 'cerrarResumenCarrito') {
+        document.getElementById('resumenCarrito').classList.remove('abierto');
+    }
 });

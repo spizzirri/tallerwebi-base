@@ -23,39 +23,41 @@
 <body class="bg-light text-dark " style="margin: 0px;padding: 0px;">
 
 
-<header class="sticky-top bg-dark " style="height: 80px; z-index: 1030;">
-    <div class="container-fluid d-flex align-items-center justify-content-between h-100 px-4"
-         style="max-width: 1300px;">
-        <!-- Logo -->
-        <a href="index.html" class="d-flex align-items-center text-decoration-none">
-            <img th:src="@{/uploads/dragon-logo.png}" alt="Logo" width="100" height="80">
-            <span class="ms-2 fw-bold fs-4 text-light">Compra Gamer 2</span>
-        </a>
+<!--<header class="sticky-top bg-dark " style="height: 80px; z-index: 1030;">-->
+<!--    <div class="container-fluid d-flex align-items-center justify-content-between h-100 px-4"-->
+<!--         style="max-width: 1300px;">-->
+<!--        &lt;!&ndash; Logo &ndash;&gt;-->
+<!--        <a href="index.html" class="d-flex align-items-center text-decoration-none">-->
+<!--            <img th:src="@{/uploads/dragon-logo.png}" alt="Logo" width="100" height="80">-->
+<!--            <span class="ms-2 fw-bold fs-4 text-light">Compra Gamer 2</span>-->
+<!--        </a>-->
 
-        <form class="d-flex" role="search"  th:action="@{/productos/search}" method="get">
-            <input class="bg-dark border  border-light-subtle form-control me-2 align-content-center text-light "
-                   type="search" placeholder="Buscar productos" name="q" aria-label="Search" style="width:400px;">
-            <button class="btn btn-warning align-content-center me-1" type="submit"><i class="bi bi-search"></i>
-            </button>
-        </form>
-        <!-- Botones / iconos -->
-        <div>
-            <a class="btn btn-warning me-2" th:href="@{/carritoDeCompras/index}">
-                <i class="bi bi-cart3"> (<span id="contadorCarrito">0</span>)</i>
-            </a>
-            <button class="btn btn-outline-secondary text-light"><i class="bi bi-person">Ingresa</i></button>
-        </div>
-    </div>
-</header>
+<!--        <form class="d-flex" role="search"  th:action="@{/productos/search}" method="get">-->
+<!--            <input class="bg-dark border  border-light-subtle form-control me-2 align-content-center text-light "-->
+<!--                   type="search" placeholder="Buscar productos" name="q" aria-label="Search" style="width:400px;">-->
+<!--            <button class="btn btn-warning align-content-center me-1" type="submit"><i class="bi bi-search"></i>-->
+<!--            </button>-->
+<!--        </form>-->
+<!--        &lt;!&ndash; Botones / iconos &ndash;&gt;-->
+<!--        <div>-->
+<!--            &lt;!&ndash; th:href="@{/carritoDeCompras/index}" &ndash;&gt;-->
+<!--            <a class="btn btn-warning me-2" id="abrirResumenCarritoIndex">-->
+<!--                <i class="bi bi-cart3"> (<span id="contadorCarrito">0</span>)</i>-->
+<!--            </a>-->
+<!--            <button class="btn btn-outline-secondary text-light"><i class="bi bi-person">Ingresa</i></button>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</header>-->
 
+<div th:replace="fragments/fragments :: header"></div>
 
-<nav class="bg-secondary-subtle text-dark py-3 ">
-    <div class="container d-flex justify-content-center gap-4">
-        <a class="text-dark text-decoration-none px-3 fs-5" th:href="@{/productos}">Productos</a>
-        <a class="text-dark text-decoration-none px-3 fs-5" th:href="@{/arma-tu-pc/tradicional/procesador}">Arma tu PC</a>
-        <a class="text-dark text-decoration-none px-3 fs-5" href="#">Ayuda</a>
-    </div>
-</nav>
+<!--<nav class="bg-secondary-subtle text-dark py-3 ">-->
+<!--    <div class="container d-flex justify-content-center gap-4">-->
+<!--        <a class="text-dark text-decoration-none px-3 fs-5" th:href="@{/productos}">Productos</a>-->
+<!--        <a class="text-dark text-decoration-none px-3 fs-5" th:href="@{/arma-tu-pc/tradicional/procesador}">Arma tu PC</a>-->
+<!--        <a class="text-dark text-decoration-none px-3 fs-5" href="#">Ayuda</a>-->
+<!--    </div>-->
+<!--</nav>-->
 
 
 <!--  //Carrousel-->

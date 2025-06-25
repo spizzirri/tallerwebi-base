@@ -19,8 +19,8 @@ public class ProductoCarritoDto {
     public ProductoCarritoDto(Componente componente, Integer cantidad) {
         this.id = componente.getId();
         this.nombre = componente.getNombre();
-        this.precio = componente.getPrecio();
-        this.cantidad = cantidad;
+        this.precio = componente.getPrecio() != null ? componente.getPrecio() : 0.0;
+        this.cantidad = cantidad != null ? cantidad : 1;;
         this.marca = componente.getMarca();
         this.imagen =  (componente.getImagenes() != null &&
                 !componente.getImagenes().isEmpty() &&

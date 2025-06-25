@@ -25,18 +25,65 @@
             </div>
         </div>
     </header>
-
-    <div id="resumenCarrito" class="carrito-sidebar">
-        <div class="carrito-header">
-            <h5>Tu carrito</h5>
-            <button id="cerrarResumenCarrito">&times;</button>
-        </div>
-        <div class="carrito-body" id="carritoContenido">
-
-        </div>
-        <div class="carrito-footer">
-            <p>Total: <span id="totalCarrito">$0.00</span></p>
-            <a href="/spring/carritoDeCompras/index" class="btn btn-primary w-100">Ir al pago</a>
+    <div th:fragment="resumenCarrito">
+        <div id="resumenCarrito" class="carrito-sidebar">
+            <div class="carrito-header">
+                <h5>Tu carrito</h5>
+                <button id="cerrarResumenCarrito">X</button>
+            </div>
+            <div class="carrito-body" id="carritoContenido">
+                <div class="card mb-4">
+                    <h3 class="card-title m-3">Productos</h3>
+                    <div class="card-body">
+                        <table class="table">
+                            <thead>
+                            <tr class="text-center">
+                                <th scope="col">Foto</th>
+                                <th scope="col">Nombre</th>
+                                <th scope="col">Precio</th>
+                                <th scope="col">Acciones</th>
+                            </tr>
+                            </thead>
+                            <tbody th:if="${productosCarrito != null and !productosCarrito.isEmpty()}">
+                            <tr class="text-center" th:each="producto : ${productosCarrito}">
+                                <td><img th:src="@{/imagenes/{imagen}(imagen=${producto.imagen})}"
+                                         style="height: 30px; width: 30px"></td>
+                                <td th:text="${producto.nombre}"
+                                    style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></td>
+                                <td class="precioTotalDelProducto"
+                                    th:text="'$' + ${producto.precio * producto.getCantidad()}"></td>
+                                <td class="text-center" th:data-id="${producto.id}">
+                                    <div class="d-flex justify-content-center align-items-center gap-2">
+                                        <button type="button"
+                                                class="btn btn-outline-secondary btn-sm btnRestarCantidad">-
+                                        </button>
+                                        <span th:text="${producto.cantidad}" class="mx-2 productoCantidad"></span>
+                                        <button type="button" class="btn btn-outline-secondary btn-sm btnSumarCantidad">
+                                            +
+                                        </button>
+                                        <button type="button" th:data-id="${producto.id}"
+                                                class="btn btn-outline-danger btn-sm ms-2 btnEliminarProducto">
+                                            <i class="bi bi-trash3"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                            <tbody th:if="${productosCarrito == null or productosCarrito.isEmpty()}">
+                            <tr>
+                                <td colspan="3" class="text-center py-4">No hay productos en el carrito.</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="card-footer">
+                        <h3 class="card-title m-2 text-end">
+                            Total: <span class="valorTotalDelCarrito" th:text="'$' + ${valorTotal}"></span>
+                        </h3>
+                        <a href="/spring/carritoDeCompras/index" class="btn btn-warning w-100">Ir al pago</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 

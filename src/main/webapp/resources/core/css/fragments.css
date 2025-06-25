@@ -1,8 +1,8 @@
 .carrito-sidebar {
     position: fixed;
     top: 0;
-    right: -400px;
-    width: 350px;
+    right: -550px;
+    width: 550px;
     height: 100%;
     background: #fff;
     box-shadow: -2px 0 10px rgba(0,0,0,0.2);
