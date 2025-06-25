@@ -571,7 +571,7 @@ INSERT INTO Procesador (
 INSERT INTO Imagen (urlImagen, componente_id)
 VALUES ('Procesador-IntelCorei5-12600K-1.jpg', 31),
        ('Procesador-IntelCorei5-12600K-2.jpg', 31),
-       ('Procesador-IntelCorei5-12600k-3.jpg', 31);
+       ('Procesador-IntelCorei5-12600K-3.jpg', 31);
 
 -- Componente 32: Procesador Intel Core i5 14600K (Socket LGA1700 → 3)
 INSERT INTO Componente (nombre, precio, stock, marca)

@@ -1,7 +1,6 @@
 package com.tallerwebi.presentacion;
 
-import com.tallerwebi.dominio.ServicioProductoEspecifico;
-import com.tallerwebi.dominio.ServicioProductoEspecificoImpl;
+import com.tallerwebi.dominio.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -12,26 +11,35 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
-import java.util.*;
 
 @Controller
 public class ControladorComponenteEspecifico {
 
+    private ServicioPrecios servicioPrecios;
     private ServicioProductoEspecifico servicioProductoEspecifico;
+    private ServicioDolar servicioDolar;
 
     @Autowired
-    public ControladorComponenteEspecifico(ServicioProductoEspecifico servicioProductoEspecifico) {
+    public ControladorComponenteEspecifico(ServicioProductoEspecifico servicioProductoEspecifico, ServicioDolar servicioDolar, ServicioPrecios servicioPrecios) {
         this.servicioProductoEspecifico = servicioProductoEspecifico;
+        this.servicioDolar = servicioDolar;
+        this.servicioPrecios = servicioPrecios;
     }
 
     @GetMapping(path = "productoEspecifico/{id}")
     public ModelAndView mostrarComponenteEspecifico(@PathVariable Long id) {
 
+        ComponenteEspecificoDto componenteEspecificoDto = new ComponenteEspecificoDto(servicioProductoEspecifico.obtenerComponentePorId(id));
+
         ModelMap model = new ModelMap();
 
-        model.put("componenteEspecificoDto", new ComponenteEspecificoDto(servicioProductoEspecifico.obtenerComponentePorId(id)));
-        model.put("terminos", "Estos son los terminos y condiciones para este producto...");
-        model.put("cuotas", "12 cuotas fijas sin interes con tarjetas seleccionadas.");
+        model.put("componenteEspecificoDto", componenteEspecificoDto);
+        model.put("precioFormateado", servicioPrecios.obtenerPrecioFormateado(componenteEspecificoDto.getPrecio()));
+        model.put("precioDolar", servicioPrecios.conversionPesoADolar(componenteEspecificoDto));
+        model.put("precioDeLista", servicioPrecios.obtenerPrecioDeLista(componenteEspecificoDto.getPrecio()));
+        model.put("precio3Cuotas", servicioPrecios.obtenerPrecioCon3Cuotas(componenteEspecificoDto.getPrecio()));
+        model.put("precio6Cuotas", servicioPrecios.obtenerPrecioCon6Cuotas(componenteEspecificoDto.getPrecio()));
+        model.put("precio12Cuotas", servicioPrecios.obtenerPrecioCon12Cuotas(componenteEspecificoDto.getPrecio()));
 
         return new ModelAndView("productoEspecifico", model);
     }
@@ -46,5 +54,9 @@ public class ControladorComponenteEspecifico {
         return "redirect:/productoEspecifico/" + id;
     }
 
+    @GetMapping("/terminosYCondiciones.html")
+    public String verTerminos() {
+        return "terminosYCondiciones";
+    }
 
 }

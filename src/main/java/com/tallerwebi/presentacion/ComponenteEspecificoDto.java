@@ -488,4 +488,16 @@ public class ComponenteEspecificoDto {
     public void setCaracteristicas(Map<String, Map<String, String>> caracteristicas) {
         this.caracteristicas = caracteristicas;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        ComponenteEspecificoDto that = (ComponenteEspecificoDto) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
 }
