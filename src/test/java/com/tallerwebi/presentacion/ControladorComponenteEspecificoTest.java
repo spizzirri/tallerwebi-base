@@ -1,6 +1,7 @@
 package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.ServicioDolar;
+import com.tallerwebi.dominio.ServicioPrecios;
 import com.tallerwebi.dominio.ServicioProductoEspecifico;
 import com.tallerwebi.dominio.entidades.Componente;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,7 +10,6 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpSession;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Mockito.*;
 
 public class ControladorComponenteEspecificoTest {
@@ -17,12 +17,14 @@ public class ControladorComponenteEspecificoTest {
     private ControladorComponenteEspecifico controladorComponenteEspecifico;
     private ServicioProductoEspecifico servicioProductoEspecifico;
     private ServicioDolar servicioDolar;
+    private ServicioPrecios servicioPrecios;
 
     @BeforeEach
     public void init() {
         servicioProductoEspecifico = mock(ServicioProductoEspecifico.class);
         servicioDolar = mock(ServicioDolar.class);
-        this.controladorComponenteEspecifico = new ControladorComponenteEspecifico(servicioProductoEspecifico, servicioDolar);
+        servicioPrecios = mock(ServicioPrecios.class);
+        this.controladorComponenteEspecifico = new ControladorComponenteEspecifico(servicioProductoEspecifico, servicioDolar, servicioPrecios);
     }
 
     @Test
