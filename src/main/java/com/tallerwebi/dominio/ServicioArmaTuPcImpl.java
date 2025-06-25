@@ -1,7 +1,6 @@
 package com.tallerwebi.dominio;
 
-import com.tallerwebi.dominio.entidades.ArmadoPc;
-import com.tallerwebi.dominio.entidades.Componente;
+import com.tallerwebi.dominio.entidades.*;
 import com.tallerwebi.dominio.excepcion.LimiteDeComponenteSobrepasadoEnElArmadoException;
 import com.tallerwebi.dominio.excepcion.QuitarComponenteInvalidoException;
 import com.tallerwebi.dominio.excepcion.QuitarStockDemasDeComponenteException;
@@ -23,10 +22,7 @@ import java.util.Map;
 public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
 
     private RepositorioComponente repositorioComponente;
-    private ServicioMotherboard servicioMotherboard;
-    private ServicioCooler servicioCooler;
-    private ServicioPlacaDeVideo servicioPlacaDeVideo;
-    private ServicioFuente servicioFuente;
+    private ServicioCompatibilidades servicioCompatibilidades;
 
     private final Map<String, String> correspondenciaDeVistaConTablasEnLaBD = new LinkedHashMap<>() {{
         put("procesador", "Procesador");
@@ -42,9 +38,11 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
     }};
 
 
+
     @Autowired
-    public ServicioArmaTuPcImpl(RepositorioComponente repositorioComponente) {
+    public ServicioArmaTuPcImpl(RepositorioComponente repositorioComponente, ServicioCompatibilidades servicioCompatibilidades) {
         this.repositorioComponente = repositorioComponente;
+        this.servicioCompatibilidades = servicioCompatibilidades;
     }
 
     @Override
@@ -62,23 +60,44 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
 
         String tablaDelTipoDeComponente = this.correspondenciaDeVistaConTablasEnLaBD.get(tipoComponente);
         List<Componente> componentesDeTipo = this.repositorioComponente.obtenerComponentesPorTipo(tablaDelTipoDeComponente);
+        List<Componente> componentesCompatibles = new ArrayList<>();
 
-//        for (Componente componente : componentesDeTipo) {
-//            // traer componentes compatibles
-//            switch (tablaDelTipoDeComponente) {
-//                case "Motherboard":
-//
-//                    servicioMotherboard.compararComponenteConArmado(componente, armadoPcDto);
-//
-//                    break;
-//            }
-//        }
+        for (Componente componente : componentesDeTipo) {
+//            ArmadoPc armadoPcEntidad = this.completarEntidadArmadoPc(armadoPcDto.obtenerEntidad());
+            Boolean esCompatibleConElArmado = this.servicioCompatibilidades.esCompatibleConElArmado(componente, armadoPcDto.obtenerEntidad());
+            if (esCompatibleConElArmado) componentesCompatibles.add(componente);
+        }
 
 
-        List<ComponenteDto> listaDeComponentesDto = transformarComponentesADtos(componentesDeTipo);
+        List<ComponenteDto> listaDeComponentesDto = transformarComponentesADtos(componentesCompatibles);
 
         return listaDeComponentesDto;
     }
+
+//    private ArmadoPc completarEntidadArmadoPc(ArmadoPc armadoPcEntidad) {
+//
+//        armadoPcEntidad.setProcesador((armadoPcEntidad.getProcesador() != null) ? (Procesador)this.repositorioComponente.obtenerComponentePorId(armadoPcEntidad.getProcesador().getId()) : null);
+//        armadoPcEntidad.setMotherboard((armadoPcEntidad.getMotherboard() != null) ? (Motherboard)this.repositorioComponente.obtenerComponentePorId(armadoPcEntidad.getMotherboard().getId()) : null);
+//        armadoPcEntidad.setCoolerCPU((armadoPcEntidad.getCoolerCPU() != null) ? (CoolerCPU)this.repositorioComponente.obtenerComponentePorId(armadoPcEntidad.getCoolerCPU().getId()) : null);
+//        armadoPcEntidad.setPlacaDeVideo((armadoPcEntidad.getPlacaDeVideo() != null) ? (PlacaDeVideo)this.repositorioComponente.obtenerComponentePorId(armadoPcEntidad.getPlacaDeVideo().getId()) : null);
+//        armadoPcEntidad.setFuenteDeAlimentacion((armadoPcEntidad.getFuenteDeAlimentacion() != null) ? (FuenteDeAlimentacion)this.repositorioComponente.obtenerComponentePorId(armadoPcEntidad.getFuenteDeAlimentacion().getId()) : null);
+//        armadoPcEntidad.setGabinete((armadoPcEntidad.getGabinete() != null) ? (Gabinete)this.repositorioComponente.obtenerComponentePorId(armadoPcEntidad.getGabinete().getId()) : null);
+//        armadoPcEntidad.setMonitor((armadoPcEntidad.getMonitor() != null) ? (Monitor)this.repositorioComponente.obtenerComponentePorId(armadoPcEntidad.getMonitor().getId()) : null);
+//
+//        if (!armadoPcEntidad.getMemoriaRAM().isEmpty()) armadoPcEntidad.setMemoriaRAM(this.obtenerListaDeComponentesEntidadConInformacionCompleta(armadoPcEntidad.getMemoriaRAM(), MemoriaRAM.class));
+//        if (!armadoPcEntidad.getAlmacenamiento().isEmpty()) armadoPcEntidad.setAlmacenamiento(this.obtenerListaDeComponentesEntidadConInformacionCompleta(armadoPcEntidad.getAlmacenamiento(), Almacenamiento.class));
+//        if (!armadoPcEntidad.getPerifericos().isEmpty()) armadoPcEntidad.setPerifericos(this.obtenerListaDeComponentesEntidadConInformacionCompleta(armadoPcEntidad.getPerifericos(), Periferico.class));
+//
+//        return armadoPcEntidad;
+//    }
+
+//    private <T extends Componente> List<T>  obtenerListaDeComponentesEntidadConInformacionCompleta(List<T> componentesACompletar, Class<T> tipoDeDato) {
+//        List<T> entidadesCompletas = new ArrayList<>();
+//        for( T componente : componentesACompletar ) {
+//            entidadesCompletas.add(tipoDeDato.cast(this.repositorioComponente.obtenerComponentePorId(componente.getId())));
+//        }
+//        return entidadesCompletas;
+//    }
 
     private List<ComponenteDto> transformarComponentesADtos(List<Componente> componentesDeTipo) {
 
@@ -263,8 +282,10 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
 
     private void seExcedeDeLimite(String tipoComponente, Integer cantidad, ArmadoPcDto armadoPcDto) throws LimiteDeComponenteSobrepasadoEnElArmadoException {
         if ((tipoComponente.equalsIgnoreCase("memoria") && armadoPcDto.getRams().size() + cantidad > 4) ||
+                // verificar cantidad de slots de memoria de entidad y cantidad de cada tipo de almacenamiento(SATA y M.2)
                 (tipoComponente.equalsIgnoreCase("almacenamiento") && armadoPcDto.getAlmacenamiento().size() + cantidad > 6) ||
                 (tipoComponente.equalsIgnoreCase("periferico") && armadoPcDto.getPerifericos().size() + cantidad > 10)) {
+
 
             throw new LimiteDeComponenteSobrepasadoEnElArmadoException();
         }

@@ -27,11 +27,11 @@ public class ServicioArmaTuPcImplTest {
     private ServicioArmaTuPc servicio;
     private RepositorioComponente repositorioComponenteMock;
 
-    @BeforeEach
-    public void init() {
-        this.repositorioComponenteMock = mock(RepositorioComponente.class);
-        this.servicio = new ServicioArmaTuPcImpl(repositorioComponenteMock);
-    }
+//    @BeforeEach
+//    public void init() {
+//        this.repositorioComponenteMock = mock(RepositorioComponente.class);
+//        this.servicio = new ServicioArmaTuPcImpl(repositorioComponenteMock);
+//    }
 
 //    @Test
 //    public void dadoQueExisteUnServicioArmaTuPcImplCuandoPidoObtenerListaDeComponentesDtoPorUnTipoObtengoLosComponentesDeEsteTipo() {

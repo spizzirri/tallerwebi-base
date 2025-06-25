@@ -1,10 +1,7 @@
 package com.tallerwebi.dominio.entidades;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 public class Socket {
@@ -89,4 +86,17 @@ public class Socket {
     public String toString() {
         return nombre;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Socket socket = (Socket) o;
+        return Objects.equals(id, socket.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
 }
+
