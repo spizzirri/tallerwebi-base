@@ -132,6 +132,7 @@ public class CarritoController {
         return response;
     }
 
+    //modificar test para los stocks
     @PostMapping(path = "/carritoDeCompras/agregarMasCantidadDeUnProducto/{id}")
     @ResponseBody
     public Map<String, Object> agregarMasCantidadDeUnProducto(@PathVariable Long id) {

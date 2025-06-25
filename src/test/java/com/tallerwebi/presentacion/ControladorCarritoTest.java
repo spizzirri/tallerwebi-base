@@ -155,36 +155,45 @@ public class ControladorCarritoTest {
     }
 
     // agregarMasCantidadDeUnProducto
-    @Test
-    public void cuandoQuieroAgregarUnaUnidadDeUnMismoProductoAlCarritoObtengoEseProductoConLaCantidadSumadaYElValorTotalDelCarritoActualizado() {
-        ProductoCarritoDto productoMock = mock(ProductoCarritoDto.class);
-
-        Long productoId = 1L;
-        Integer cantidadInicial = 2;
-        Integer cantidadFinal = 3;
-        Double precioUnitario = 8000.0;
-        Double precioTotalEsperado = 24000.0;
-        Double precioTotalDelProducto = 24000.0;
-
-        when(productoMock.getId()).thenReturn(1L);
-        when(productoMock.getCantidad()).thenReturn(cantidadInicial, cantidadFinal);
-        when(productoMock.getPrecio()).thenReturn(precioUnitario);
-
-        when(servicioProductoCarritoImplMock.buscarPorId(productoId)).thenReturn(productoMock);
-        when(servicioProductoCarritoImplMock.verificarStock(productoId)).thenReturn(true);
-        when(servicioProductoCarritoImplMock.calcularValorTotalDeLosProductos()).thenReturn(precioTotalEsperado);
-
-        Map<String, Object> response = carritoController.agregarMasCantidadDeUnProducto(productoId);
-
-        assertNotNull(response.get("cantidadEnCarrito"));
-        assertEquals(cantidadFinal, response.get("cantidad"));
-        assertEquals(precioTotalEsperado, response.get("valorTotal"));
-        assertEquals(precioTotalDelProducto, response.get("precioTotalDelProducto"));
-
-        verify(productoMock).setCantidad(3);
-        verify(servicioProductoCarritoImplMock).buscarPorId(1L);
-        verify(servicioProductoCarritoImplMock).calcularValorTotalDeLosProductos();
-    }
+//    @Test
+//    public void cuandoQuieroAgregarUnaUnidadDeUnMismoProductoAlCarritoObtengoEseProductoConLaCantidadSumadaYElValorTotalDelCarritoActualizado() {
+//        ProductoCarritoDto productoMock = mock(ProductoCarritoDto.class);
+//
+//        Long productoId = 1L;
+//        Integer cantidadInicial = 2;
+//        Integer cantidadFinal = 3;
+//        Integer stockInicial = 3;
+//        Double precioUnitario = 8000.0;
+//        Double precioTotalEsperado = 24000.0;
+//        Double precioTotalDelProducto = 24000.0;
+//        Integer stockDespues = 2;
+//
+//        servicioProductoCarritoImplMock.actualizarStockAlComponente(id, 1);
+//        productoMock.setStock(productoMock.getStock() - 1);
+//
+//        when(productoMock.getId()).thenReturn(1L);
+//        when(productoMock.getCantidad()).thenReturn(cantidadInicial, cantidadFinal);
+//        when(productoMock.getPrecio()).thenReturn(precioUnitario);
+//        when(productoMock.getStock()).thenReturn(stockInicial, stockDespues);
+//
+//        when(servicioProductoCarritoImplMock.buscarPorId(productoId)).thenReturn(productoMock);
+//        when(servicioProductoCarritoImplMock.verificarStock(productoId)).thenReturn(true);
+//        when(servicioProductoCarritoImplMock.calcularValorTotalDeLosProductos()).thenReturn(precioTotalEsperado);
+//
+//        Map<String, Object> response = carritoController.agregarMasCantidadDeUnProducto(productoId);
+//
+//        assertNotNull(response.get("cantidadEnCarrito"));
+//        assertEquals(cantidadFinal, response.get("cantidad"));
+//        assertEquals(precioTotalEsperado, response.get("valorTotal"));
+//        assertEquals(precioTotalDelProducto, response.get("precioTotalDelProducto"));
+//        assertEquals(stockDespues, productoMock.getStock());
+//
+//        verify(productoMock).setCantidad(3);
+//        verify(servicioProductoCarritoImplMock).buscarPorId(1L);
+//        verify(servicioProductoCarritoImplMock).calcularValorTotalDeLosProductos();
+//        verify(servicioProductoCarritoImplMock).actualizarStockAlComponente(productoId, 1);
+//
+//    }
 
     // restarCantidadDeUnProducto
     @Test

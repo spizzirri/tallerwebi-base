@@ -43,6 +43,7 @@ public class ServicioProductoCarritoImpl {
         return null;
     }
 
+    //testear
     public void actualizarStockAlComponente(Long componenteId, Integer cantidadARestar) {
         repositorioComponente.actualizarStockDeUnComponente(componenteId, cantidadARestar);
     }

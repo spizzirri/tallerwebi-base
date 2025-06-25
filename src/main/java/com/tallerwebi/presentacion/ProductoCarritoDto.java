@@ -11,6 +11,7 @@ public class ProductoCarritoDto {
     private final Long id;
     private String nombre;
     private Double precio;
+    private Integer stock;
     private Integer cantidad = 1;
     private String marca;
     private String imagen;
@@ -20,6 +21,7 @@ public class ProductoCarritoDto {
         this.id = componente.getId();
         this.nombre = componente.getNombre();
         this.precio = componente.getPrecio() != null ? componente.getPrecio() : 0.0;
+        this.stock = componente.getStock();
         this.cantidad = cantidad != null ? cantidad : 1;;
         this.marca = componente.getMarca();
         this.imagen =  (componente.getImagenes() != null &&
@@ -34,6 +36,7 @@ public class ProductoCarritoDto {
         this.nombre = nombre;
         this.precio = precio;
         this.cantidad = cantidad;
+        this.stock = 10;
         this.marca = marca;
         this.imagen = imagen;
     }
@@ -60,6 +63,14 @@ public class ProductoCarritoDto {
 
     public Double getPrecio() {
         return precio;
+    }
+
+    public Integer getStock() {
+        return stock;
+    }
+
+    public void setStock(Integer stock) {
+        this.stock = stock;
     }
 
     public void setPrecio(Double precio) {

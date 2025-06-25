@@ -67,7 +67,7 @@
                             </thead>
                             <tbody th:if="${productosCarrito != null and !productosCarrito.isEmpty()}">
                             <tr class="text-center" th:each="producto : ${productosCarrito}">
-                                <td><img th:src="@{/imagenes/{imagen}(imagen=${producto.imagen})}"
+                                <td><img th:src="'http://www.imagenesproyecto.free.nf/' + ${producto.imagen}"
                                          style="height: 30px; width: 30px"></td>
                                 <td th:text="${producto.nombre}"
                                     style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></td>
