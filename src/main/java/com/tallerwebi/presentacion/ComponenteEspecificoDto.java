@@ -162,7 +162,7 @@ public class ComponenteEspecificoDto {
         //coolersYDisipadores.put("Incluye Cooler", ((Procesador) productoEspecifico).getIncluyeCooler());
         coolersYDisipadores.put("Incluye Cooler", productoEspecifico.getIncluyeCooler() != null &&
                 productoEspecifico.getIncluyeCooler() ? "Si" : "No");
-        coolersYDisipadores.put("TDP Predeterminado", productoEspecifico.getTdpPredeterminado());
+        coolersYDisipadores.put("TDP Predeterminado", productoEspecifico.getConsumo());
         return coolersYDisipadores;
     }
 

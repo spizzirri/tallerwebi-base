@@ -26,7 +26,7 @@ public class ArmadoPc {
         return this.motherboard;
     }
 
-    public CoolerCPU getCooler() {
+    public CoolerCPU getCoolerCPU() {
         return this.coolerCPU;
     }
 

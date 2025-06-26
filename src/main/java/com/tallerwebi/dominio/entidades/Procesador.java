@@ -33,7 +33,7 @@ public class Procesador extends Componente {
     /*Coolers y Disipadores*/
     private Boolean incluyeCooler;
     @Column(length = 100)
-    private String tdpPredeterminado;
+    private String consumo;
 
     /*Memoria*/
     @Column(length = 100)
@@ -48,7 +48,7 @@ public class Procesador extends Componente {
     public Procesador(Long id, String nombre, Double precio, Integer stock, String marca,
                       String modelo, Socket socket, String procesoDeFabricacion, Boolean incluyeGraficosIntegrados, String chipsetGPU, String familia,
                       Integer nucleos, Integer hilos, String frecuencia, String frecuenciaTurbo,
-                      Boolean incluyeCooler, String tdpPredeterminado,
+                      Boolean incluyeCooler, String consumo,
                       String l1Cache, String l2Cache, String l3Cache) {
         super(id, nombre, precio, stock, marca);
 
@@ -65,7 +65,7 @@ public class Procesador extends Componente {
         this.frecuenciaTurbo = frecuenciaTurbo;
 
         this.incluyeCooler = incluyeCooler;
-        this.tdpPredeterminado = tdpPredeterminado;
+        this.consumo = consumo;
 
         this.l1Cache = l1Cache;
         this.l2Cache = l2Cache;
@@ -160,12 +160,12 @@ public class Procesador extends Componente {
         this.incluyeCooler = incluyeCooler;
     }
 
-    public String getTdpPredeterminado() {
-        return tdpPredeterminado;
+    public String getConsumo() {
+        return consumo;
     }
 
-    public void setTdpPredeterminado(String tdpPredeterminado) {
-        this.tdpPredeterminado = tdpPredeterminado;
+    public void setConsumo(String consumo) {
+        this.consumo = consumo;
     }
 
     public String getL1Cache() {

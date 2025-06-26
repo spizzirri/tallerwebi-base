@@ -23,8 +23,9 @@
     <p class="text-muted">
         El procesador grafico de una tarjeta es muchisimo mas potente que el que tienen los procesadores, por esta razon es necesaria para el buen funcionamiento del equipo y muy recomendada para gamers y profesionales de los graficos.
     </p>
-    <div th:replace="fragments/carga-componentes-arma-tu-pc :: cargarPaso (${armadoPcDto}, ${gpuLista}, 'gpu', ${idsDeComponentesSeleccionados}, 'memoria', 'almacenamiento')"></div>
+    <div th:replace="fragments/carga-componentes-arma-tu-pc :: cargarPaso"></div>
 </div>
+<div th:replace="fragments/fragments :: footer"></div>
 
 <!-- Boostrap core js -->
 <script type="text/javascript" th:src="@{webjars/bootstrap/5.2.0/js/bootstrap.min.js}"></script>

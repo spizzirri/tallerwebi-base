@@ -74,7 +74,7 @@ public class ComponenteDto {
                 entidad = new Periferico();
                 break;
             default:
-                entidad = new Componente();
+                return null;
         }
 
         entidad.setId(this.id);

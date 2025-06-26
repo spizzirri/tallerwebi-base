@@ -28,6 +28,7 @@ public class ServicioBuscarProductoTest {
     @Test
     public void CuandoLePidoUnaListaDeProductosMeDevuelveUnaListaDeProductos() {
         Componente componente = new Componente();
+        componente.setPrecio(0D);
         componente.setNombre("Producto de prueba");
         when(repositorioComponenteMock.obtenerComponentes()).thenReturn(List.of(componente));
 
@@ -40,6 +41,7 @@ public class ServicioBuscarProductoTest {
     @Test
     public void CuandoLePidoUnComponenteLLamadoProcesadordeberiaDevolverProductosPorTipoProcesador() {
         Componente componente = new Procesador();
+        componente.setPrecio(0D);
         when(repositorioComponenteMock.obtenerComponentesPorTipo("Procesador")).thenReturn(Arrays.asList(componente));
 
         List<ProductoDto> resultado = servicio.getProductosPorTipo("Procesador");
@@ -64,6 +66,7 @@ public class ServicioBuscarProductoTest {
     @Test
     public void CuandoPidoUnaListaDeProductosEnStockDeberiaDevolvermeProductosEnStockMayoresACero() {
         Componente componente = new Componente();
+        componente.setPrecio(0D);
         componente.setStock(10);
         when(repositorioComponenteMock.obtenerComponentesEnStock()).thenReturn(Arrays.asList(componente));
 
@@ -76,6 +79,7 @@ public class ServicioBuscarProductoTest {
     @Test
     public void CuandoBuscoUnProductoPorQueryAlNombreDeIntelDeberiaDevolverProductosPorQueryConElNombreIntel() {
         Componente componente = new Componente();
+        componente.setPrecio(0D);
         componente.setNombre("intel");
         when(repositorioComponenteMock.obtenerComponentesPorQuery("intel")).thenReturn(Arrays.asList(componente));
 
@@ -88,6 +92,7 @@ public class ServicioBuscarProductoTest {
     @Test
     public void CuandoLePidoUnComponentePorCategoriadeberiaDevolverProductosDeEsaCategoria() {
         Componente componente = new PlacaDeVideo();
+        componente.setPrecio(0D);
         when(repositorioComponenteMock.obtenerComponentesPorTipo("PlacaDeVideo")).thenReturn(Arrays.asList(componente));
 
         List<ProductoDto> resultado = servicio.getProductosPorCategoria("PlacaDeVideo");
@@ -100,6 +105,7 @@ public class ServicioBuscarProductoTest {
     @Test
     public void deberiaDevolverProductosPorTipoYPorQuery() throws ClassNotFoundException {
         Componente componente = new Procesador();
+        componente.setPrecio(0D);
         componente.setNombre("Intel");
 
         when(repositorioComponenteMock.obtenerComponentesPorTipoYPorQuery("Procesador", "Intel")).thenReturn(Arrays.asList(componente));
@@ -111,7 +117,5 @@ public class ServicioBuscarProductoTest {
         assertEquals("Procesador", claseObtenida);
         assertEquals("Intel", nombre);
     }
-
-
 
 }

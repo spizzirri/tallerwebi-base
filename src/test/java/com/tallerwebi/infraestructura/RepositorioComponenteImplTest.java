@@ -196,4 +196,53 @@ public class RepositorioComponenteImplTest {
         assertEquals(resultado.get(0).getClass(), claseEsperado.getClass());
     }
 
+
+    @Sql("/data.sql")
+    @Test
+    @Rollback
+    public void cuandoPidoComponentesPorTipoEnStockDevuelveSoloLosDeEseTipoConStockPositivo() {
+        // Ejecución
+        List<Componente> resultado = repositorioComponente.obtenerComponentesPorTipoEnStock("PlacaDeVideo");
+
+        // Verificación
+        assertFalse(resultado.isEmpty());
+        assertEquals(98L, resultado.get(0).getId()); // Verifica que sea la 'Placa de Video Zotac GeForce RTX 3060 12GB GDDR6 Twin Edge'
+        assertThat(resultado, everyItem(instanceOf(PlacaDeVideo.class)));
+        assertThat(resultado, everyItem(hasProperty("stock", greaterThan(0))));
+    }
+
+
+    @Sql("/data.sql")
+    @Test
+    @Rollback
+    public void cuandoPidoComponentesPorTipoEnStockOrdenadosPorPrecioDevuelveListaOrdenadaAscendentemente() {
+        // Ejecución
+        List<Componente> resultado = repositorioComponente.obtenerComponentesPorTipoEnStockOrdenadosPorPrecio("Procesador");
+
+        // Verificación
+        assertFalse(resultado.isEmpty());
+        // El Procesador con ID 2 ('AMD Ryzen 5 5600X') tiene menor precio que el ID 1 ('Intel Core i5-12400F')
+        assertEquals(2L, resultado.get(0).getId());
+        assertEquals(1L, resultado.get(1).getId());
+        assertThat(resultado.get(0).getPrecio(), lessThan(resultado.get(1).getPrecio()));
+    }
+
+
+    @Sql("/data.sql")
+    @Test
+    @Rollback
+    public void cuandoPidoComponentesFiltradosPorNombreYTipoConStockDevuelveListaCorrectaYOrdenada() {
+        // Ejecución: Buscamos todos los procesadores con stock que contengan "Ryzen" en su nombre.
+        // En data.sql solo hay uno: 'AMD Ryzen 5 5600X'
+        List<Componente> resultado = repositorioComponente.obtenerComponentesPorTipoYFiltradosPorNombreEnStockOrdenadosPorPrecio("Procesador", "Ryzen");
+
+        // Verificación
+        assertFalse(resultado.isEmpty());
+
+        Componente componenteEncontrado = resultado.get(0);
+        assertEquals(2L, componenteEncontrado.getId());
+        assertThat(componenteEncontrado.getNombre(), containsStringIgnoringCase("Ryzen"));
+        assertThat(componenteEncontrado.getStock(), greaterThan(0));
+    }
 }
+
