@@ -8,7 +8,10 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -33,28 +36,41 @@ public class CarritoController {
         model.put("productos", this.productoService.getProductos());
 
         Double total = this.productoService.calcularValorTotalDeLosProductos();
-        model.put("valorTotal", total);
+        DecimalFormat formatter = new DecimalFormat("#,##0.00");
+        DecimalFormatSymbols simbolosArgentinos = new DecimalFormatSymbols();
+
+        simbolosArgentinos.setGroupingSeparator('.');
+        simbolosArgentinos.setDecimalSeparator(',');
+        formatter.setDecimalFormatSymbols(simbolosArgentinos);
+
+        String totalFormateado = formatter.format(total);
+        model.put("valorTotal", totalFormateado);
 
         Integer cantidadTotalEnCarrito = this.productoService.calcularCantidadTotalDeProductos();
         model.put("cantidadEnCarrito", cantidadTotalEnCarrito);
         return new ModelAndView("carritoDeCompras", model);
     }
-
-    @PostMapping(path = "/carritoDeCompras/home")
-    public ModelAndView agregarProductoAlCarrito(@ModelAttribute("productoDto") ProductoCarritoDto producto) {
+    // testear
+    @GetMapping(path = "/fragments/fragments")
+    public ModelAndView mostrarResumenCarritoDeCompras() {
         ModelMap model = new ModelMap();
-        model.put("mensaje", "El producto fue agregado al carrito correctamente!");
-        model.put("productoDto", producto);
-        model.put("productos", this.productoService.getProductos());
+        model.put("productosCarrito", this.productoService.getProductos());
 
         Double total = this.productoService.calcularValorTotalDeLosProductos();
-        model.put("valorTotal", total);
+        DecimalFormat formatter = new DecimalFormat("#,##0.00");
+        DecimalFormatSymbols simbolosArgentinos = new DecimalFormatSymbols();
 
-        Integer cantidadTotal = this.productoService.calcularCantidadTotalDeProductos();
-        model.put("cantidadEnCarrito", cantidadTotal);
-        return new ModelAndView("carritoDeCompras", model);
+        simbolosArgentinos.setGroupingSeparator('.');
+        simbolosArgentinos.setDecimalSeparator(',');
+        formatter.setDecimalFormatSymbols(simbolosArgentinos);
+
+        String totalFormateado = formatter.format(total);
+        model.put("valorTotal", totalFormateado);
+
+        Integer cantidadTotalEnCarrito = this.productoService.calcularCantidadTotalDeProductos();
+        model.put("cantidadEnCarrito", cantidadTotalEnCarrito);
+        return new ModelAndView("fragments/fragments :: resumenCarrito", model);
     }
-
 
     @PostMapping(path = "/carritoDeCompras/eliminarProducto/{id}")
     @ResponseBody
@@ -97,7 +113,8 @@ public class CarritoController {
     @PostMapping(path = "/carritoDeCompras/aplicarDescuento")
     @ResponseBody
     //este metodo solo se usa para enviar un mensaje de respuesta al cliente cuando se aplica un descuento
-    public Map<String, Object> calcularValorTotalDeLosProductosConDescuento(@RequestBody Map<String, String> codigoDescuentoMap) {
+    public Map<String, Object> calcularValorTotalDeLosProductosConDescuento
+            (@RequestBody Map<String, String> codigoDescuentoMap) {
         String codigoDescuento = codigoDescuentoMap.get("codigoInput");
 
         Integer codigoDescuentoExtraido = extraerPorcentajeDesdeCodigoDeDescuento(codigoDescuento);
@@ -115,27 +132,27 @@ public class CarritoController {
         return response;
     }
 
+    //modificar test para los stocks
     @PostMapping(path = "/carritoDeCompras/agregarMasCantidadDeUnProducto/{id}")
     @ResponseBody
     public Map<String, Object> agregarMasCantidadDeUnProducto(@PathVariable Long id) {
+
         ProductoCarritoDto productoBuscado = this.productoService.buscarPorId(id);
         Map<String, Object> response = new HashMap<>();
 
-        if (productoBuscado != null) {
+        if (productoBuscado != null && productoService.verificarStock(id)) {
+            productoService.actualizarStockAlComponente(id, 1);
             productoBuscado.setCantidad(productoBuscado.getCantidad() + 1);
-
-            Double valorTotalDelProductoBuscado = productoBuscado.getCantidad() * productoBuscado.getPrecio();
-            Double valorTotal = this.productoService.calcularValorTotalDeLosProductos();
 
             assert productoBuscado != null;
             response.put("cantidad", productoBuscado.getCantidad());
-            response.put("precioTotalDelProducto", valorTotalDelProductoBuscado);
-            response.put("valorTotal", valorTotal);
+            response.put("precioTotalDelProducto", productoBuscado.getCantidad() * productoBuscado.getPrecio());
+            response.put("valorTotal", productoService.calcularValorTotalDeLosProductos());
+            response.put("cantidadEnCarrito", productoService.calcularCantidadTotalDeProductos());
+        } else {
+            response.put("success", false);
+            response.put("mensaje", "No hay stock suficiente!");
         }
-
-        Integer cantidadTotal = this.productoService.calcularCantidadTotalDeProductos();
-        response.put("cantidadEnCarrito", cantidadTotal);
-
         return response;
     }
 
@@ -147,27 +164,21 @@ public class CarritoController {
 
         if (productoBuscado != null && productoBuscado.getCantidad() > 1) {
             productoBuscado.setCantidad(productoBuscado.getCantidad() - 1);
-
-            Double valorTotalDelProductoBuscado = productoBuscado.getCantidad() * productoBuscado.getPrecio();
-            Double valorTotal = this.productoService.calcularValorTotalDeLosProductos();
+            productoService.devolverStockAlComponente(id, 1);
 
             response.put("cantidad", productoBuscado.getCantidad());
-            response.put("precioTotalDelProducto", valorTotalDelProductoBuscado);
-            response.put("valorTotal", valorTotal);
+            response.put("precioTotalDelProducto", productoBuscado.getCantidad() * productoBuscado.getPrecio());
+            response.put("valorTotal", productoService.calcularValorTotalDeLosProductos());
             response.put("eliminado", false);
-
-            Integer cantidadTotal = this.productoService.calcularCantidadTotalDeProductos();
-            response.put("cantidadEnCarrito", cantidadTotal);
+            response.put("cantidadEnCarrito", productoService.calcularCantidadTotalDeProductos());
 
         } else if (productoBuscado != null) {
             this.productoService.getProductos().remove(productoBuscado);
-
-            Double valorTotal = this.productoService.calcularValorTotalDeLosProductos();
-            Integer cantidadTotal = this.productoService.calcularCantidadTotalDeProductos();
+            productoService.devolverStockAlComponente(id, 1);
 
             response.put("eliminado", true);
-            response.put("valorTotal", valorTotal);
-            response.put("cantidadEnCarrito", cantidadTotal);
+            response.put("valorTotal", productoService.calcularValorTotalDeLosProductos());
+            response.put("cantidadEnCarrito", productoService.calcularCantidadTotalDeProductos());
         }
 
         return response;
@@ -185,11 +196,12 @@ public class CarritoController {
         }
 
         if ("mercadoPago".equalsIgnoreCase(metodoDePago)) {
-            if (envioActual == null || codigoPostalActual == null) {
+            if (this.envioActual == null || this.codigoPostalActual == null) {
                 response.put("success", false);
                 response.put("error", "Debes agregar un codigo postal");
                 return response;
             }
+
             response.put("success", true);
             response.put("metodoPago", "mercadoPago");
             response.put("costoEnvio", envioActual.getCosto());
@@ -248,7 +260,7 @@ public class CarritoController {
         return new ModelAndView("carritoDeCompras", model);
     }
 
-    @GetMapping(path = "/carritoDeCompras/calcular")
+    @GetMapping(path = "/carritoDeCompras/calcularEnvio")
     @ResponseBody
     public Map<String, Object> calcularEnvioAjax(@RequestParam String codigoPostal) {
         Map<String, Object> response = new HashMap<>();
@@ -288,6 +300,7 @@ public class CarritoController {
         return response;
     }
 
+    // testear el mensaje de agregado dos o mas veces el producto al carrito
     @PostMapping("/agregarAlCarrito")
     @ResponseBody
     public Map<String, Object> agregarProductoAlCarrito(
@@ -295,19 +308,26 @@ public class CarritoController {
             @RequestParam(defaultValue = "1") Integer cantidad) {
 
         Map<String, Object> response = new HashMap<>();
+
         try {
-            if (!productoService.verificarStock(componenteId, cantidad)) {
+            if (!productoService.verificarStock(componenteId)) {
                 response.put("success", false);
                 response.put("mensaje", "Stock insuficiente");
             } else {
+                ProductoCarritoDto existente = productoService.buscarPorId(componenteId);
+
                 productoService.agregarProducto(componenteId, cantidad);
+                if (existente != null) {
+                    int cantidadFinal = existente.getCantidad();
+                    response.put("mensaje", "Producto actualizado! Ahora tiene " + cantidadFinal + " unidades en el carrito.");
+                } else {
+                    response.put("mensaje", "Producto agregado al carrito!");
+                }
                 response.put("success", true);
-                response.put("mensaje", "Producto agregado al carrito!");
             }
 
             Integer cantidadTotal = productoService.calcularCantidadTotalDeProductos();
             response.put("cantidadEnCarrito", cantidadTotal != null ? cantidadTotal : 0);
-
 
         } catch (Exception e) {
             response.put("success", false);
@@ -316,5 +336,4 @@ public class CarritoController {
         }
         return response;
     }
-
 }

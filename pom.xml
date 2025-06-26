@@ -216,7 +216,7 @@
                         <port>8080</port>
                     </httpConnector>
                     <webApp>
-                        <contextPath>/spring</contextPath>
+                        <contextPath>/</contextPath>
                     </webApp>
                 </configuration>
             </plugin>

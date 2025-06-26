@@ -18,7 +18,7 @@ public class ControladorLoginTest {
 
 	private ControladorLogin controladorLogin;
 	private Usuario usuarioMock;
-	private DatosLogin datosLoginMock;
+	private DatosLoginDto datosLoginMock;
 	private HttpServletRequest requestMock;
 	private HttpSession sessionMock;
 	private ServicioLogin servicioLoginMock;
@@ -26,7 +26,7 @@ public class ControladorLoginTest {
 
 	@BeforeEach
 	public void init(){
-		datosLoginMock = new DatosLogin("dami@unlam.com", "123");
+		datosLoginMock = new DatosLoginDto("dami@unlam.com", "123");
 		usuarioMock = mock(Usuario.class);
 		when(usuarioMock.getEmail()).thenReturn("dami@unlam.com");
 		requestMock = mock(HttpServletRequest.class);
@@ -41,7 +41,7 @@ public class ControladorLoginTest {
 		when(servicioLoginMock.consultarUsuario(anyString(), anyString())).thenReturn(null);
 
 		// ejecucion
-		ModelAndView modelAndView = controladorLogin.validarLogin(datosLoginMock, requestMock);
+		ModelAndView modelAndView = controladorLogin.validarLogin(datosLoginMock,"url", requestMock);
 
 		// validacion
 		assertThat(modelAndView.getViewName(), equalToIgnoringCase("login"));
@@ -59,7 +59,7 @@ public class ControladorLoginTest {
 		when(servicioLoginMock.consultarUsuario(anyString(), anyString())).thenReturn(usuarioEncontradoMock);
 
 		// ejecucion
-		ModelAndView modelAndView = controladorLogin.validarLogin(datosLoginMock, requestMock);
+		ModelAndView modelAndView = controladorLogin.validarLogin(datosLoginMock, "url", requestMock);
 
 		// validacion
 		assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/home"));

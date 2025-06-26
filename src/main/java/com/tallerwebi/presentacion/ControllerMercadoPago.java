@@ -42,7 +42,9 @@ public class ControllerMercadoPago {
     @ResponseBody
     public ModelAndView crearPago(HttpServletResponse response,
                                   @RequestParam(value = "metodoDePago", required = false) String metodoDePago,
-                                  @RequestParam(value = "costoEnvio", required = false) Double costoEnvio)
+                                  @RequestParam(value = "costoEnvio", required = false) Double costoEnvio,
+                                  @RequestParam(value = "totalOriginal", required = false) Double totalOriginal,
+                                  @RequestParam(value = "totalConDescuento", required = false) Double totalConDescuento)
                                     throws IOException {
 
         // Creo un objeto PagoRequest manualmente
@@ -68,10 +70,15 @@ public class ControllerMercadoPago {
         // Creo un objeto de preferencia
         PreferenceClient client = new PreferenceClient();
 
+        double factorDescuento = 1.0;
+        if (totalOriginal != null && totalConDescuento != null && totalOriginal > 0) {
+            factorDescuento = totalConDescuento / totalOriginal;
+        }
+
         // Creo un ítem con los productos en la preferencia de mercado pago (de forma que lo entienda su sistema)
         List<PreferenceItemRequest> items = new ArrayList<>();
         for (int i = 0; i < pagoRequest.getProductos().size(); i++) {
-            double precioFinal = getPrecioFinal(pagoRequest, i);
+            double precioFinal = pagoRequest.getProductos().get(i).getPrecio() * factorDescuento;
             PreferenceItemRequest item =
                     PreferenceItemRequest.builder()
                             .title(pagoRequest.getProductos().get(i).getNombre() + " - " + pagoRequest.getProductos().get(i).getMarca())

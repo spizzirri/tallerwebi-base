@@ -23,14 +23,10 @@ public class RepositorioUsuarioImpl implements RepositorioUsuario {
     public Usuario buscarUsuario(String email, String password) {
 
         final Session session = sessionFactory.getCurrentSession();
-        Usuario usuario = (Usuario) session.createCriteria(Usuario.class)
+        return (Usuario) session.createCriteria(Usuario.class)
                 .add(Restrictions.eq("email", email))
                 .add(Restrictions.eq("password", password))
                 .uniqueResult();
-        if(usuario != null && new BCryptPasswordEncoder().matches(password, usuario.getPassword())){
-            return usuario;
-        }
-        return null;
     }
 
     @Override

@@ -1,74 +1,199 @@
-
 <!-- Header Fragment -->
 <div th:fragment="header">
-  <header class="sticky-top bg-dark " style="height: 80px; z-index: 1030;">
-    <div class="container-fluid d-flex align-items-center justify-content-between h-100 px-4" style="max-width: 1300px;">
-      <!-- Logo -->
-      <a th:href="@{/index.html}" class="d-flex align-items-center text-decoration-none">
-        <img th:src="@{/uploads/dragon-logo.png}" alt="Logo" width="100" height="80">
-        <span class="ms-2 fw-bold fs-4 text-light">Compra Gamer 2</span>
-      </a>
+    <!DOCTYPE html>
+    <html lang="en">
+    <html lang="es" xmlns:th="http://www.thymeleaf.org">
 
-      <form class="d-flex" role="search" th:action="@{/productos/search}" method="get" >
-        <input class="bg-dark text-white border border-light-subtle form-control me-2 align-content-center "  name="q" type="search" placeholder="Buscar productos" aria-label="Search" style="width:400px;">
-        <button class="btn btn-warning align-content-center me-1" type="submit"><i class="bi bi-search"></i></button>
-      </form>
-      <!-- Botones / iconos -->
-      <div>
-          <a class="btn btn-warning me-2" th:href="@{/carritoDeCompras/index}">
-            <i class="bi bi-cart3"> (<span id="contadorCarrito">0</span>)</i>
-          </a>
-        <button class="btn btn-outline-secondary text-light"><i class="bi bi-person">Ingresa</i></button>
-      </div>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>Compra gamer 2</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
+              integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT"
+              crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css"/>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+              integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
+              crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css"/>
+
+        <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.2.0/css/bootstrap.min.css}"/>
+        <link rel="stylesheet" th:href="@{/css/fragments.css}">
+        <link rel="stylesheet" th:href="@{/css/main.css}"/>
+    </head>
+
+    <body style="margin: 0px;padding: 0px;">
+
+    <header class="sticky-top bg-dark " style="height: 80px; z-index: 1030;">
+        <div class="container-fluid d-flex align-items-center justify-content-between h-100 px-4"
+             style="max-width: 1300px;">
+            <!-- Logo -->
+            <a th:href="@{/index.html}" class="d-flex align-items-center text-decoration-none">
+                <img th:src="@{/uploads/dragon-logo.png}" alt="Logo" width="100" height="80">
+                <span class="ms-2 fw-bold fs-4 text-light">Compra Gamer 2</span>
+            </a>
+
+            <form class="d-flex" role="search" th:action="@{/productos/search}" method="get">
+                <input class="bg-dark text-white border border-light-subtle form-control me-2 align-content-center "
+                       name="q" type="search" placeholder="Buscar productos" aria-label="Search" style="width:400px;">
+                <button class="btn btn-warning align-content-center me-1" type="submit"><i class="bi bi-search"></i>
+                </button>
+            </form>
+            <!-- Botones / iconos -->
+            <div>
+                <a class="btn btn-warning me-2" id="abrirResumenCarrito">
+                    <i class="bi bi-cart3"> (<span id="contadorCarrito">0</span>)</i>
+                </a>
+                <button type="button" class="btn btn-outline-secondary text-light" data-bs-toggle="modal"
+                        data-bs-target="#loginModal">
+                    <i class="bi bi-person">Ingresa</i>
+                </button>
+
+
+            </div>
+        </div>
+    </header>
+
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div th:replace="login"></div>
+
+            </div>
+        </div>
     </div>
-  </header>
 
-
-
-  <nav class="bg-secondary-subtle text-dark py-3 mb-3">
-    <div class="container d-flex justify-content-center gap-4">
-      <a class="text-dark text-decoration-none px-3 fs-5" th:href="@{/productos}">Productos</a>
-      <a class="text-dark text-decoration-none px-3 fs-5" th:href="@{/arma-tu-pc/tradicional/procesador}">Arma tu PC</a>
-      <a class="text-dark text-decoration-none px-3 fs-5" href="#">Ayuda</a>
+    <div th:fragment="resumenCarrito">
+        <div id="resumenCarrito" class="carrito-sidebar">
+            <div class="carrito-header">
+                <h5>Tu carrito</h5>
+                <button id="cerrarResumenCarrito">X</button>
+            </div>
+            <div class="carrito-body" id="carritoContenido">
+                <div class="card mb-4">
+                    <h3 class="card-title m-3">Productos</h3>
+                    <div class="card-body">
+                        <table class="table">
+                            <thead>
+                            <tr class="text-center">
+                                <th scope="col">Foto</th>
+                                <th scope="col">Nombre</th>
+                                <th scope="col">Precio</th>
+                                <th scope="col">Acciones</th>
+                            </tr>
+                            </thead>
+                            <tbody th:if="${productosCarrito != null and !productosCarrito.isEmpty()}">
+                            <tr class="text-center" th:each="producto : ${productosCarrito}">
+                                <td><img th:src="'http://www.imagenesproyecto.free.nf/' + ${producto.imagen}"
+                                         style="height: 30px; width: 30px"></td>
+                                <td th:text="${producto.nombre}"
+                                    style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></td>
+                                <td class="precioTotalDelProducto"
+                                    th:text="'$' + ${producto.precio * producto.getCantidad()}"></td>
+                                <td class="text-center" th:data-id="${producto.id}">
+                                    <div class="d-flex justify-content-center align-items-center gap-2">
+                                        <button type="button"
+                                                class="btn btn-outline-secondary btn-sm btnRestarCantidad">-
+                                        </button>
+                                        <span th:text="${producto.cantidad}" class="mx-2 productoCantidad"></span>
+                                        <button type="button" class="btn btn-outline-secondary btn-sm btnSumarCantidad">
+                                            +
+                                        </button>
+                                        <button type="button" th:data-id="${producto.id}"
+                                                class="btn btn-outline-danger btn-sm ms-2 btnEliminarProducto">
+                                            <i class="bi bi-trash3"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                            <tbody th:if="${productosCarrito == null or productosCarrito.isEmpty()}">
+                            <tr>
+                                <td colspan="3" class="text-center py-4">No hay productos en el carrito.</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="card-footer">
+                        <h3 class="card-title m-2 text-end">
+                            Total: <span class="valorTotalDelCarrito" th:text="'$' + ${valorTotal}"></span>
+                        </h3>
+                        <a href="/spring/carritoDeCompras/index" class="btn btn-warning w-100">Ir al pago</a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </nav>
 
+    <nav class="bg-secondary-subtle text-dark py-3 mb-3">
+        <div class="container d-flex justify-content-center gap-4">
+            <a class="text-dark text-decoration-none px-3 fs-5" th:href="@{/productos}">Productos</a>
+            <a class="text-dark text-decoration-none px-3 fs-5" th:href="@{/arma-tu-pc/tradicional/procesador}">Arma tu
+                PC</a>
+            <a class="text-dark text-decoration-none px-3 fs-5" href="#">Ayuda</a>
+        </div>
+    </nav>
 
 </div>
+
 <!-- Footer Fragment -->
 <div th:fragment="footer">
-  <footer class="bg-dark text-light pt-5 pb-3 mt-5">
-    <div class="container" style="max-width: 1300px;">
-      <div class="row">
-        <div class="col-md-4 mb-4">
-          <h5 class="text-uppercase fw-bold mb-3">Seguinos</h5>
-          <div class="d-flex gap-3">
-            <a href="#" class="text-light fs-4"><i class="bi bi-facebook"></i></a>
-            <a href="#" class="text-light fs-4"><i class="bi bi-instagram"></i></a>
-            <a href="#" class="text-light fs-4"><i class="bi bi-twitter-x"></i></a>
-            <a href="#" class="text-light fs-4"><i class="bi bi-youtube"></i></a>
-            <a href="#" class="text-light fs-4"><i class="bi bi-whatsapp"></i></a>
-          </div>
+    <footer class="bg-dark text-light pt-5 pb-3 mt-5">
+        <div class="container" style="max-width: 1300px;">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <h5 class="text-uppercase fw-bold mb-3">Seguinos</h5>
+                    <div class="d-flex gap-3">
+                        <a href="#" class="text-light fs-4"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="text-light fs-4"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="text-light fs-4"><i class="bi bi-twitter-x"></i></a>
+                        <a href="#" class="text-light fs-4"><i class="bi bi-youtube"></i></a>
+                        <a href="#" class="text-light fs-4"><i class="bi bi-whatsapp"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5 class="text-uppercase fw-bold mb-3">Enlaces utiles</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-light text-decoration-none">Terminos y condiciones</a></li>
+                        <li><a href="#" class="text-light text-decoration-none">Politica de privacidad</a></li>
+                        <li><a href="#" class="text-light text-decoration-none">Preguntas frecuentes</a></li>
+                        <li><a href="#" class="text-light text-decoration-none">Contacto</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5 class="text-uppercase fw-bold mb-3">Contacto</h5>
+                    <p class="mb-1"><i class="bi bi-geo-alt-fill me-2"></i>Av. Gamer 123, Buenos Aires</p>
+                    <p class="mb-1"><i class="bi bi-telephone-fill me-2"></i>+54 11 1234-5678</p>
+                    <p class="mb-1"><i class="bi bi-envelope-fill me-2"></i>contacto@compragamer2.com</p>
+                </div>
+            </div>
+            <div class="border-top border-secondary pt-3 text-center">
+                <small>&copy; 2025 Compra Gamer 2. Todos los derechos reservados.</small>
+            </div>
         </div>
-        <div class="col-md-4 mb-4">
-          <h5 class="text-uppercase fw-bold mb-3">Enlaces utiles</h5>
-          <ul class="list-unstyled">
-            <li><a href="#" class="text-light text-decoration-none">Terminos y condiciones</a></li>
-            <li><a href="#" class="text-light text-decoration-none">Politica de privacidad</a></li>
-            <li><a href="#" class="text-light text-decoration-none">Preguntas frecuentes</a></li>
-            <li><a href="#" class="text-light text-decoration-none">Contacto</a></li>
-          </ul>
-        </div>
-        <div class="col-md-4 mb-4">
-          <h5 class="text-uppercase fw-bold mb-3">Contacto</h5>
-          <p class="mb-1"><i class="bi bi-geo-alt-fill me-2"></i>Av. Gamer 123, Buenos Aires</p>
-          <p class="mb-1"><i class="bi bi-telephone-fill me-2"></i>+54 11 1234-5678</p>
-          <p class="mb-1"><i class="bi bi-envelope-fill me-2"></i>contacto@compragamer2.com</p>
-        </div>
-      </div>
-      <div class="border-top border-secondary pt-3 text-center">
-        <small>&copy; 2025 Compra Gamer 2. Todos los derechos reservados.</small>
-      </div>
-    </div>
-  </footer>
+    </footer>
+
+    <!-- Boostrap core js -->
+    <script th:src="@{/webjars/bootstrap/5.2.0/js/bootstrap.min.js}"></script>
+    <script th:src="@{/webjars/bootstrap/5.2.0/js/bootstrap.bundle.min.js}"></script>
+
+    <script th:src="@{/js/main.js}"></script>
+    <script type="text/javascript" th:src="@{/js/productoEspecifico.js}"></script>
+    <script type="text/javascript" th:src="@{/js/armaTuPc.js}"></script>
+    <script type="text/javascript" th:src="@{/js/agregarAlCarrito.js}"></script>
+    <script type="text/javascript" th:src="@{/js/carritoDeCompras.js}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO"
+            crossorigin="anonymous"></script>
+    <script type="text/javascript"
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://kit.fontawesome.com/36c2602d92.js" crossorigin="anonymous"></script>
+    <script type="text/javascript"
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    </body>
+    </html>
 </div>
