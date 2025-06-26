@@ -14,15 +14,14 @@ if (!window.eventosCarritoAsignados) {
 }
 
 window.agregarAlCarrito = function (componenteId, cantidad = 1) {
-    return fetch("/agregarAlCarrito", {
-        method: 'POST',
+    return fetch(`/agregarAlCarrito/${componenteId}/${cantidad}`, {
+        method: 'GET',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: `componenteId=${componenteId}&cantidad=${cantidad}`
+        }
     })
-        .then(response => response.json())
-        .then(data => {
+        .then(response => response.json()) // convierte la respuesta del fetch (peticion http) y la convierte a un objeto js
+        .then(data => { //objeto json ya parseado
             if (data.success) {
                 mostrarMensaje(data.mensaje, 'success', componenteId);
             } else {

@@ -38,7 +38,7 @@ public class ProductoCarritoDto {
         this.cantidad = cantidad;
         this.stock = 10;
         this.marca = marca;
-        this.imagen = imagen;
+        this.imagen = "imagen-generica.jpg";
     }
 
     public Long getId() {

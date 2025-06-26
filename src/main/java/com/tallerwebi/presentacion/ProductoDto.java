@@ -9,6 +9,7 @@ public class ProductoDto {
     private Double precio;
     private Integer stock;
     private String tipoComponente;
+    private Integer cantidad = 1;
     private String imagen;
     private String precioFormateado;
 
@@ -16,6 +17,7 @@ public class ProductoDto {
         this.id = componente.getId();
         this.nombre = componente.getNombre();
         this.precio = componente.getPrecio();
+        this.cantidad = cantidad != null ? cantidad : 1;;
         this.tipoComponente = componente.getClass().getSimpleName();
         this.imagen =  (componente.getImagenes() != null &&
                 !componente.getImagenes().isEmpty() &&
@@ -43,6 +45,14 @@ public class ProductoDto {
     }
     public String getTipoComponente() {
         return tipoComponente;
+    }
+
+    public Integer getCantidad() {
+        return cantidad;
+    }
+
+    public void setCantidad(Integer cantidad) {
+        this.cantidad = cantidad != null ? cantidad : 1;
     }
 
     public String getNombre() {
