@@ -2,6 +2,7 @@ package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.ServicioCategorias;
 import com.tallerwebi.dominio.ServicioBuscarProducto;
+import com.tallerwebi.dominio.ServicioPrecios;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -16,11 +17,9 @@ import java.util.stream.Collectors;
 @Controller
 public class ControladorMostrarProductos {
 
-    @Autowired
     private ServicioCategorias categoriasService;
-    @Autowired
     private ServicioBuscarProducto productoService;
-
+    private ServicioPrecios servicioPrecios;
 
 
 //    #1 Equipos y Notebook
@@ -32,9 +31,12 @@ public class ControladorMostrarProductos {
 //    #7 Mothers
 //    #8 Procesadores
 
-    public ControladorMostrarProductos(ServicioBuscarProducto productoService, ServicioCategorias categoriasServiceMock) {
+    @Autowired
+    public ControladorMostrarProductos(ServicioBuscarProducto productoService, ServicioCategorias categoriasService, ServicioPrecios servicioPrecios) {
         this.productoService = productoService;
-        this.categoriasService = categoriasServiceMock;
+        this.categoriasService = categoriasService;
+        this.servicioPrecios = servicioPrecios;
+
     }
 
 
@@ -46,6 +48,12 @@ public class ControladorMostrarProductos {
         List<ProductoDto> productosLimitados = productos.stream().limit(24).collect(Collectors.toList());
         List<CategoriaDto> categorias = categoriasService.getCategorias();
         model.put("categorias", categorias);
+
+        for (ProductoDto producto : productos) {
+            String totalFormateado = this.servicioPrecios.obtenerPrecioFormateado(producto.getPrecio());
+            producto.setPrecioFormateado(totalFormateado);
+        }
+
         model.addAttribute("productos", productosLimitados);
 
         return new ModelAndView("productos", model);
@@ -67,6 +75,11 @@ public class ControladorMostrarProductos {
             model.addAttribute("mensaje", "Mostrando todos los productos.");
         }
 
+        for (ProductoDto producto : productos) {
+            String totalFormateado = this.servicioPrecios.obtenerPrecioFormateado(producto.getPrecio());
+            producto.setPrecioFormateado(totalFormateado);
+        }
+
         model.put("productosBuscados", productos);
         model.put("categorias", categorias);
 
@@ -79,8 +92,6 @@ public class ControladorMostrarProductos {
 
         return new ModelAndView("productos", model);
     }
-
-
 
 
 }

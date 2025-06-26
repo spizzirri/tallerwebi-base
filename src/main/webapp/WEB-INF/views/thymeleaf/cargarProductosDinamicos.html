@@ -16,7 +16,8 @@
                     <p class="card-title fw-bold mb-2 small" th:text="${producto.nombre}"></p>
 
                     <div class="d-flex justify-content-between align-items-center mt-auto">
-                        <span class="fw-bold text-success" th:text="'$ ' + ${producto.precio}"></span>
+                        <span class="fw-bold text-success" th:text="'$ ' + ${producto.precioFormateado}"></span>
+
                         <button th:onclick="|agregarAlCarrito(${producto.id}, 1)|"
                                 class="btn btn-warning btn-sm">
                             <i class="bi bi-cart3 fs-4"></i>
