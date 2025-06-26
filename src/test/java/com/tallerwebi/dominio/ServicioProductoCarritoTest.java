@@ -14,8 +14,7 @@ import java.util.List;
 
 import static junit.framework.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class ServicioProductoCarritoTest {
 
@@ -73,6 +72,28 @@ public class ServicioProductoCarritoTest {
         assertNull(productoEncontrado);
     }
 
+    // descontarStockAlComponente
+    @Test
+    public void cuandoDescuentoStockAlComponenteSeActualizaElStockEnElRepositorio(){
+        Long componenteId = 1L;
+        Integer cantidadARestar = 1;
+
+        servicioProductoCarritoImpl.descontarStockAlComponente(componenteId, cantidadARestar);
+
+        verify(repositorioComponente).descontarStockDeUnComponente(componenteId, cantidadARestar);
+    }
+
+    // devolverStockAlComponente
+    @Test
+    public void cuandoDevuelvoStockAlComponenteSeActualizaElStockEnElRepositorio(){
+        Long componenteId = 1L;
+        Integer cantidadARestar = 1;
+
+        servicioProductoCarritoImpl.devolverStockAlComponente(componenteId, cantidadARestar);
+
+        verify(repositorioComponente).devolverStockDeUnComponente(componenteId, cantidadARestar);
+    }
+
     // agregarProducto
     @Test
     public void cuandoAgregoUnProductoAlCarritoEsteSeAgregaCorrectamente() {
@@ -122,7 +143,6 @@ public class ServicioProductoCarritoTest {
     @Test
     public void cuandoVerificoElStockYAlcanzaObtengoTrue(){
         Long componenteId = 1L;
-        Integer cantidadDeseada = 2;
         Integer stockDisponible = 10;
 
         Componente componenteMock = mock(Componente.class);
@@ -139,8 +159,7 @@ public class ServicioProductoCarritoTest {
     @Test
     public void cuandoVerificoStockYNoAlcanzaObtengoFalse() {
         Long componenteId = 1L;
-        Integer cantidadDeseada = 2;
-        Integer stockDisponible = 1;
+        Integer stockDisponible = 0;
 
         Componente componenteMock = mock(Componente.class);
         when(componenteMock.getId()).thenReturn(componenteId);

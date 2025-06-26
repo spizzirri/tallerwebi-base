@@ -2,6 +2,7 @@ package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.RepositorioComponente;
 import com.tallerwebi.dominio.ServicioDeEnviosImpl;
+import com.tallerwebi.dominio.ServicioPreciosImpl;
 import com.tallerwebi.dominio.ServicioProductoCarritoImpl;
 
 import com.tallerwebi.dominio.entidades.Componente;
@@ -31,6 +32,8 @@ public class ControladorCarritoTest {
     private ServicioProductoCarritoImpl servicioProductoCarritoImplMock;
     @Mock
     private ServicioDeEnviosImpl servicioEnviosMock;
+    @Mock
+//    private ServicioPreciosImpl servicioPreciosMock;
 
     private CarritoController carritoController;
     private List<ProductoCarritoDto> productos;
@@ -45,8 +48,37 @@ public class ControladorCarritoTest {
     // mostrarVistaCarritoDeCompras
     @Test
     public void cuandoQuieroVerElCarritoDeComprasObtengoLaVistaDelCarrito() {
+        productos.add(productoMock1);
+        productos.add(productoMock2);
+
+        when(productoMock1.getPrecio()).thenReturn(100.0);
+        when(productoMock2.getPrecio()).thenReturn(130.0);
+        when(servicioProductoCarritoImplMock.calcularValorTotalDeLosProductos()).thenReturn(230.0);
+
         ModelAndView mostrarVistaCarrito = carritoController.mostrarVistaCarritoDeCompras();
+        ModelMap model = new ModelMap();
+
+        model.put("productos", productos);
+        model.put("cantidadEnCarrito", productos);
         assertThat(mostrarVistaCarrito.getViewName(), equalTo("carritoDeCompras"));
+    }
+
+    // mostrarResumenCarritoDeCompras
+    @Test
+    public void cuandoQuieroVerElResumenDelCarritoDeComprasObtengoElResumenCarrito() {
+        productos.add(productoMock1);
+        productos.add(productoMock2);
+
+        when(productoMock1.getPrecio()).thenReturn(100.0);
+        when(productoMock2.getPrecio()).thenReturn(130.0);
+        when(servicioProductoCarritoImplMock.calcularValorTotalDeLosProductos()).thenReturn(230.0);
+
+        ModelAndView mostrarResumenCarrito = carritoController.mostrarResumenCarritoDeCompras();
+        ModelMap model = new ModelMap();
+
+        model.put("productos", productos);
+        model.put("cantidadEnCarrito", productos);
+        assertThat(mostrarResumenCarrito.getViewName(), equalTo("fragments/fragments :: resumenCarrito"));
     }
 
     // eliminarProductoDelCarrito
@@ -81,7 +113,7 @@ public class ControladorCarritoTest {
 
     // calcularValorTotalDeLosProductosConDescuento
     @Test
-    public void cuandoIntroduzcoUnCodigoDeDescuentoDelCincoPorcientoObtengoElPrecioTotalDelCarritoConSuDescuentoAplicado(){
+    public void cuandoIntroduzcoUnCodigoDeDescuentoDelCincoPorcientoObtengoElPrecioTotalDelCarritoConSuDescuentoAplicado() {
         when(productoMock1.getPrecio()).thenReturn(100.0);
         when(productoMock1.getCantidad()).thenReturn(2);
         when(productoMock2.getPrecio()).thenReturn(130.0);
@@ -102,7 +134,7 @@ public class ControladorCarritoTest {
     }
 
     @Test
-    public void cuandoIntroduzcoUnCodigoDeDescuentoDelDiezPorcientoObtengoElPrecioTotalDelCarritoConSuDescuentoAplicado(){
+    public void cuandoIntroduzcoUnCodigoDeDescuentoDelDiezPorcientoObtengoElPrecioTotalDelCarritoConSuDescuentoAplicado() {
         when(productoMock1.getPrecio()).thenReturn(100.0);
         when(productoMock1.getCantidad()).thenReturn(2);
         when(productoMock2.getPrecio()).thenReturn(130.0);
@@ -123,7 +155,7 @@ public class ControladorCarritoTest {
     }
 
     @Test
-    public void cuandoIntroduzcoUnCodigoDeDescuentoDelQuincePorcientoObtengoElPrecioTotalDelCarritoConSuDescuentoAplicado(){
+    public void cuandoIntroduzcoUnCodigoDeDescuentoDelQuincePorcientoObtengoElPrecioTotalDelCarritoConSuDescuentoAplicado() {
         when(productoMock1.getPrecio()).thenReturn(100.0);
         when(productoMock1.getCantidad()).thenReturn(2);
         when(productoMock2.getPrecio()).thenReturn(130.0);
@@ -155,45 +187,41 @@ public class ControladorCarritoTest {
     }
 
     // agregarMasCantidadDeUnProducto
-//    @Test
-//    public void cuandoQuieroAgregarUnaUnidadDeUnMismoProductoAlCarritoObtengoEseProductoConLaCantidadSumadaYElValorTotalDelCarritoActualizado() {
-//        ProductoCarritoDto productoMock = mock(ProductoCarritoDto.class);
-//
-//        Long productoId = 1L;
-//        Integer cantidadInicial = 2;
-//        Integer cantidadFinal = 3;
-//        Integer stockInicial = 3;
-//        Double precioUnitario = 8000.0;
-//        Double precioTotalEsperado = 24000.0;
-//        Double precioTotalDelProducto = 24000.0;
-//        Integer stockDespues = 2;
-//
-//        servicioProductoCarritoImplMock.actualizarStockAlComponente(id, 1);
-//        productoMock.setStock(productoMock.getStock() - 1);
-//
-//        when(productoMock.getId()).thenReturn(1L);
-//        when(productoMock.getCantidad()).thenReturn(cantidadInicial, cantidadFinal);
-//        when(productoMock.getPrecio()).thenReturn(precioUnitario);
-//        when(productoMock.getStock()).thenReturn(stockInicial, stockDespues);
-//
-//        when(servicioProductoCarritoImplMock.buscarPorId(productoId)).thenReturn(productoMock);
-//        when(servicioProductoCarritoImplMock.verificarStock(productoId)).thenReturn(true);
-//        when(servicioProductoCarritoImplMock.calcularValorTotalDeLosProductos()).thenReturn(precioTotalEsperado);
-//
-//        Map<String, Object> response = carritoController.agregarMasCantidadDeUnProducto(productoId);
-//
-//        assertNotNull(response.get("cantidadEnCarrito"));
-//        assertEquals(cantidadFinal, response.get("cantidad"));
-//        assertEquals(precioTotalEsperado, response.get("valorTotal"));
-//        assertEquals(precioTotalDelProducto, response.get("precioTotalDelProducto"));
-//        assertEquals(stockDespues, productoMock.getStock());
-//
-//        verify(productoMock).setCantidad(3);
-//        verify(servicioProductoCarritoImplMock).buscarPorId(1L);
-//        verify(servicioProductoCarritoImplMock).calcularValorTotalDeLosProductos();
-//        verify(servicioProductoCarritoImplMock).actualizarStockAlComponente(productoId, 1);
-//
-//    }
+    @Test
+    public void cuandoQuieroAgregarUnaUnidadDeUnMismoProductoAlCarritoObtengoEseProductoConLaCantidadSumadaYElValorTotalDelCarritoActualizado() {
+        ProductoCarritoDto productoMock = mock(ProductoCarritoDto.class);
+
+        Long productoId = 1L;
+        Integer cantidadInicial = 2;
+        Integer cantidadFinal = 3;
+        Integer stockInicial = 3;
+        Double precioUnitario = 8000.0;
+        Double precioTotalEsperado = 24000.0;
+        Double precioTotalDelProducto = 24000.0;
+
+        servicioProductoCarritoImplMock.descontarStockAlComponente(productoId, 1);
+        productoMock.setStock(productoMock.getStock() - 1);
+
+        when(productoMock.getId()).thenReturn(1L);
+        when(productoMock.getCantidad()).thenReturn(cantidadInicial, cantidadFinal);
+        when(productoMock.getPrecio()).thenReturn(precioUnitario);
+        when(productoMock.getStock()).thenReturn(stockInicial);
+
+        when(servicioProductoCarritoImplMock.buscarPorId(productoId)).thenReturn(productoMock);
+        when(servicioProductoCarritoImplMock.verificarStock(productoId)).thenReturn(true);
+        when(servicioProductoCarritoImplMock.calcularValorTotalDeLosProductos()).thenReturn(precioTotalEsperado);
+
+        Map<String, Object> response = carritoController.agregarMasCantidadDeUnProducto(productoId);
+
+        assertNotNull(response.get("cantidadEnCarrito"));
+        assertEquals(cantidadFinal, response.get("cantidad"));
+        assertEquals(precioTotalEsperado, response.get("valorTotal"));
+        assertEquals(precioTotalDelProducto, response.get("precioTotalDelProducto"));
+
+        verify(productoMock).setCantidad(3);
+        verify(servicioProductoCarritoImplMock).buscarPorId(1L);
+        verify(servicioProductoCarritoImplMock).calcularValorTotalDeLosProductos();
+    }
 
     // restarCantidadDeUnProducto
     @Test
@@ -203,13 +231,18 @@ public class ControladorCarritoTest {
         Long productoId = 1L;
         Integer cantidadInicial = 2;
         Integer cantidadFinal = 1;
+        Integer stockInicial = 3;
         Double precioUnitario = 8000.0;
         Double precioTotalEsperado = 8000.0;
         Double precioTotalDelProducto = 8000.0;
 
+        servicioProductoCarritoImplMock.devolverStockAlComponente(productoId, 1);
+        productoMock.setStock(productoMock.getStock() - 1);
+
         when(productoMock.getId()).thenReturn(productoId);
         when(productoMock.getCantidad()).thenReturn(cantidadInicial, cantidadFinal);
         when(productoMock.getPrecio()).thenReturn(precioUnitario);
+        when(productoMock.getStock()).thenReturn(stockInicial);
 
         when(servicioProductoCarritoImplMock.buscarPorId(productoId)).thenReturn(productoMock);
 
@@ -232,7 +265,7 @@ public class ControladorCarritoTest {
 
     // procesarCompra
     @Test
-    public void cuandoSeleccionoElMetodoDePagoValidoSinEnvioObtengoUnMensajeDeError(){
+    public void cuandoSeleccionoElMetodoDePagoValidoSinEnvioObtengoUnMensajeDeError() {
         carritoController.envioActual = null;
         carritoController.codigoPostalActual = null;
 
@@ -276,7 +309,7 @@ public class ControladorCarritoTest {
     }
 
     @Test
-    public void cuandoElMetodoDePagoEsVacioDebeRetornarError(){
+    public void cuandoElMetodoDePagoEsVacioDebeRetornarError() {
         String metodoPagoVacio = "";
 
         Map<String, Object> response = carritoController.procesarCompra(metodoPagoVacio);
@@ -288,7 +321,7 @@ public class ControladorCarritoTest {
 
     // calcularEnvio
     @Test
-    public void cuandoIngresoUnCodigoPostalValidoObtengoLaVistaDelCarritoConSusValores(){
+    public void cuandoIngresoUnCodigoPostalValidoObtengoLaVistaDelCarritoConSusValores() {
         String codigoPostalValido = "1704";
         Double costoEnvio = 1500.0;
         Double totalCarrito = 10000.0;
@@ -313,7 +346,7 @@ public class ControladorCarritoTest {
     }
 
     @Test
-    public void cuandoIngresoUnCodigoPostalNoValidoObtengoErrorEnElEnvio(){
+    public void cuandoIngresoUnCodigoPostalNoValidoObtengoErrorEnElEnvio() {
         String codigoPostalInvalido = "12";
 
         ModelAndView modelAndView = carritoController.calcularEnvio(codigoPostalInvalido);
@@ -328,7 +361,7 @@ public class ControladorCarritoTest {
     }
 
     @Test
-    public void cuandoElCodigoPostalTieneMasDeCuatroNumerosDevuelveError(){
+    public void cuandoElCodigoPostalTieneMasDeCuatroNumerosDevuelveError() {
         String codigoPostalInvalido = "12345";
 
         when(servicioProductoCarritoImplMock.getProductos()).thenReturn(List.of());
@@ -343,7 +376,7 @@ public class ControladorCarritoTest {
     }
 
     @Test
-    public void cuandoElCodigoPostalTieneLetrasDevuelveError(){
+    public void cuandoElCodigoPostalTieneLetrasDevuelveError() {
         String codigoPostalInvalido = "aa15";
         when(servicioProductoCarritoImplMock.getProductos()).thenReturn(List.of());
         when(servicioProductoCarritoImplMock.calcularValorTotalDeLosProductos()).thenReturn(0.0);
@@ -373,7 +406,7 @@ public class ControladorCarritoTest {
     }
 
     @Test
-    public void cuandoElCodigoPostalEsNuloNoCalculaEnvio(){
+    public void cuandoElCodigoPostalEsNuloNoCalculaEnvio() {
         when(servicioProductoCarritoImplMock.getProductos()).thenReturn(List.of());
         when(servicioProductoCarritoImplMock.calcularValorTotalDeLosProductos()).thenReturn(0.0);
 
@@ -386,7 +419,7 @@ public class ControladorCarritoTest {
     }
 
     @Test
-    public void cuandoElCodigoPostalSoloTieneEspaciosNoSeCalculaElEnvio(){
+    public void cuandoElCodigoPostalSoloTieneEspaciosNoSeCalculaElEnvio() {
         when(servicioProductoCarritoImplMock.getProductos()).thenReturn(List.of());
         when(servicioProductoCarritoImplMock.calcularValorTotalDeLosProductos()).thenReturn(0.0);
 
@@ -394,12 +427,12 @@ public class ControladorCarritoTest {
         ModelMap model = modelAndView.getModelMap();
 
         assertThat(modelAndView.getViewName(), equalTo("carritoDeCompras"));
-        assertEquals(null ,model.get("envioCalculado"));
+        assertEquals(null, model.get("envioCalculado"));
         assertEquals(" ", model.get("codigoPostal"));
     }
 
     @Test
-    public void cuandoElServicioDeEnviosLanzaExcepcionDevuelveError(){
+    public void cuandoElServicioDeEnviosLanzaExcepcionDevuelveError() {
         String codigoPostal = "1704";
 
         when(servicioEnviosMock.calcularEnvio(codigoPostal)).thenThrow(new RuntimeException("Error"));
@@ -415,7 +448,7 @@ public class ControladorCarritoTest {
     }
 
     @Test
-    public void siempreDevuelveLaVistaCorrectaConProductosYTotal(){
+    public void siempreDevuelveLaVistaCorrectaConProductosYTotal() {
         String codigoPostal = "1704";
         List<ProductoCarritoDto> productos = Arrays.asList(new ProductoCarritoDto(1L, "Motherboard", 50000.0, 1, "motherboard"));
         Double total = productos.get(0).getPrecio();
@@ -428,13 +461,13 @@ public class ControladorCarritoTest {
 
         assertThat(modelAndView.getViewName(), equalTo("carritoDeCompras"));
         assertEquals(total, model.get("valorTotal"));
-        assertEquals(productos,  model.get("productos"));
+        assertEquals(productos, model.get("productos"));
         assertEquals(codigoPostal, model.get("codigoPostal"));
     }
 
     // calcularEnvioAjax
     @Test
-    public void cuandoCalculoEnvioConCodigoValidoDevuelveEnvioExitoso(){
+    public void cuandoCalculoEnvioConCodigoValidoDevuelveEnvioExitoso() {
         String codigoPostal = "1704";
         Double valorTotalCarrito = 50000.0;
 
@@ -456,7 +489,7 @@ public class ControladorCarritoTest {
     }
 
     @Test
-    public void cuandoCalculoEnvioSinCoberturaDevuelveError(){
+    public void cuandoCalculoEnvioSinCoberturaDevuelveError() {
         String codigoPostal = "9999";
 
         when(servicioEnviosMock.calcularEnvio(codigoPostal)).thenReturn(null);
@@ -468,7 +501,7 @@ public class ControladorCarritoTest {
     }
 
     @Test
-    public void cuandoElServicioLanzaUnaExepcionDevuelveError(){
+    public void cuandoElServicioLanzaUnaExepcionDevuelveError() {
         String codigoPostal = "1704";
 
         when(servicioEnviosMock.calcularEnvio(codigoPostal)).thenThrow(new RuntimeException("Error"));
@@ -479,9 +512,9 @@ public class ControladorCarritoTest {
         assertEquals("Error al calcular envío", response.get("mensaje"));
     }
 
-    // agregarProductoAlCarito
+    // agregarProductoAlCarrito
     @Test
-    public void cuandoAgregoUnProductoAlCarritoObtengoUnMensajeDeExitoYSeActualizaLaCantidadEnELMismo(){
+    public void cuandoAgregoUnProductoAlCarritoObtengoUnMensajeDeExitoYSeActualizaLaCantidadEnELMismo() {
         Integer cantidadAAgregar = 1;
         Long componenteId = 1L;
         Integer cantidadTotalEsperada = 2;
@@ -492,7 +525,7 @@ public class ControladorCarritoTest {
         when(servicioProductoCarritoImplMock.verificarStock(componenteId)).thenReturn(true);
         when(servicioProductoCarritoImplMock.calcularCantidadTotalDeProductos()).thenReturn(cantidadTotalEsperada);
 
-        Map<String, Object> response = carritoController.agregarProductoAlCarrito(componenteMock.getId(), 1 );
+        Map<String, Object> response = carritoController.agregarProductoAlCarrito(componenteMock.getId(), 1);
 
         assertEquals(true, response.get("success"));
         assertEquals("Producto agregado al carrito!", response.get("mensaje"));
@@ -503,8 +536,35 @@ public class ControladorCarritoTest {
         verify(servicioProductoCarritoImplMock).calcularCantidadTotalDeProductos();
     }
 
+
     @Test
-    public void cuandoAgregoUnProductoAlCarritoQueNoTieneStockObtengoUnMensajeDeError(){
+    public void cuandoAgregoUnProductoAlCarritoMasDeUnaVezObtengoUnMensajeDeExitoCuantasVecesLoAgregueYSeActualizaLaCantidadEnELMismo() {
+        Integer cantidadAAgregar = 1;
+        Long componenteId = productoMock1.getId();
+        Integer cantidadFinal = 2;
+
+        when(productoMock1.getCantidad()).thenReturn(cantidadFinal);
+
+        Componente componenteMock = mock(Componente.class);
+
+        when(servicioProductoCarritoImplMock.buscarPorId(componenteId)).thenReturn(productoMock1);
+        when(servicioProductoCarritoImplMock.verificarStock(componenteId)).thenReturn(true);
+        when(servicioProductoCarritoImplMock.calcularCantidadTotalDeProductos()).thenReturn(cantidadFinal);
+
+        Map<String, Object> response = carritoController.agregarProductoAlCarrito(componenteMock.getId(), 1);
+
+        assertEquals(true, response.get("success"));
+        assertEquals("Producto actualizado! Ahora tiene " + cantidadFinal + " unidades en el carrito.", response.get("mensaje"));
+        assertEquals(cantidadFinal, response.get("cantidadEnCarrito"));
+
+        verify(servicioProductoCarritoImplMock).verificarStock(componenteId);
+        verify(servicioProductoCarritoImplMock).buscarPorId(componenteId);
+        verify(servicioProductoCarritoImplMock).agregarProducto(componenteMock.getId(), cantidadAAgregar);
+        verify(servicioProductoCarritoImplMock).calcularCantidadTotalDeProductos();
+    }
+
+    @Test
+    public void cuandoAgregoUnProductoAlCarritoQueNoTieneStockObtengoUnMensajeDeError() {
         Integer cantidadAAgregar = 1;
         Long componenteId = 1L;
         Integer cantidadTotalEsperada = 1;
@@ -515,7 +575,7 @@ public class ControladorCarritoTest {
         when(servicioProductoCarritoImplMock.verificarStock(componenteId)).thenReturn(false);
         when(servicioProductoCarritoImplMock.calcularCantidadTotalDeProductos()).thenReturn(cantidadTotalEsperada);
 
-        Map<String, Object> response = carritoController.agregarProductoAlCarrito(componenteMock.getId(), 1 );
+        Map<String, Object> response = carritoController.agregarProductoAlCarrito(componenteMock.getId(), cantidadAAgregar);
 
         assertEquals(false, response.get("success"));
         assertEquals("Stock insuficiente", response.get("mensaje"));
@@ -526,7 +586,7 @@ public class ControladorCarritoTest {
     }
 
     @Test
-    public void cuandoAgregoUnProductoYOcurreAlgoInesperadoObtengoUnMensajeDeError(){
+    public void cuandoAgregoUnProductoYOcurreAlgoInesperadoObtengoUnMensajeDeError() {
         Integer cantidadAAgregar = 1;
         Long componenteId = 1L;
 

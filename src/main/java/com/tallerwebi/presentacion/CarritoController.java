@@ -1,9 +1,9 @@
 package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.ServicioDeEnviosImpl;
+import com.tallerwebi.dominio.ServicioPrecios;
+import com.tallerwebi.dominio.ServicioPreciosImpl;
 import com.tallerwebi.dominio.ServicioProductoCarritoImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -11,22 +11,22 @@ import org.springframework.web.servlet.ModelAndView;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RestController
 public class CarritoController {
-    private static final Logger logger = LoggerFactory.getLogger(CarritoController.class);
 
     private final ServicioProductoCarritoImpl productoService;
     private final ServicioDeEnviosImpl servicioDeEnvios;
-
+//    private final ServicioPrecios servicioPrecios;
+//    ServicioPreciosImpl servicioPrecios
     public String codigoPostalActual;
     public EnvioDto envioActual;
 
     public CarritoController(ServicioProductoCarritoImpl servicioProductoCarritoImpl, ServicioDeEnviosImpl servicioDeEnvios) {
         this.productoService = servicioProductoCarritoImpl;
         this.servicioDeEnvios = servicioDeEnvios;
+//        this.servicioPrecios = servicioPrecios;
         servicioProductoCarritoImpl.init();
     }
 
@@ -36,6 +36,8 @@ public class CarritoController {
         model.put("productos", this.productoService.getProductos());
 
         Double total = this.productoService.calcularValorTotalDeLosProductos();
+//        String totalFormateado = this.servicioPrecios.obtenerPrecioFormateado(total);
+
         DecimalFormat formatter = new DecimalFormat("#,##0.00");
         DecimalFormatSymbols simbolosArgentinos = new DecimalFormatSymbols();
 
@@ -50,6 +52,7 @@ public class CarritoController {
         model.put("cantidadEnCarrito", cantidadTotalEnCarrito);
         return new ModelAndView("carritoDeCompras", model);
     }
+
     // testear
     @GetMapping(path = "/fragments/fragments")
     public ModelAndView mostrarResumenCarritoDeCompras() {
@@ -132,7 +135,6 @@ public class CarritoController {
         return response;
     }
 
-    //modificar test para los stocks
     @PostMapping(path = "/carritoDeCompras/agregarMasCantidadDeUnProducto/{id}")
     @ResponseBody
     public Map<String, Object> agregarMasCantidadDeUnProducto(@PathVariable Long id) {
@@ -141,7 +143,7 @@ public class CarritoController {
         Map<String, Object> response = new HashMap<>();
 
         if (productoBuscado != null && productoService.verificarStock(id)) {
-            productoService.actualizarStockAlComponente(id, 1);
+            productoService.descontarStockAlComponente(id, 1);
             productoBuscado.setCantidad(productoBuscado.getCantidad() + 1);
 
             assert productoBuscado != null;
@@ -300,7 +302,6 @@ public class CarritoController {
         return response;
     }
 
-    // testear el mensaje de agregado dos o mas veces el producto al carrito
     @PostMapping("/agregarAlCarrito")
     @ResponseBody
     public Map<String, Object> agregarProductoAlCarrito(

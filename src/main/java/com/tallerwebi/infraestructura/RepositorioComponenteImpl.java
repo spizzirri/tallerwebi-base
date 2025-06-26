@@ -51,7 +51,7 @@ public class RepositorioComponenteImpl implements RepositorioComponente {
     }
 
     @Override
-    public boolean actualizarStockDeUnComponente(Long componenteId, Integer cantidadARestar) {
+    public boolean descontarStockDeUnComponente(Long componenteId, Integer cantidadARestar) {
         String hql = "UPDATE Componente SET stock = stock - :cantidadARestar WHERE id = :idComponente AND stock >= :cantidadARestar";
 
         Query query = this.sessionFactory.getCurrentSession().createQuery(hql);

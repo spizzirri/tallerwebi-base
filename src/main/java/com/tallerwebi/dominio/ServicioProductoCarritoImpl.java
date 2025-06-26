@@ -43,16 +43,14 @@ public class ServicioProductoCarritoImpl {
         return null;
     }
 
-    //testear
-    public void actualizarStockAlComponente(Long componenteId, Integer cantidadARestar) {
-        repositorioComponente.actualizarStockDeUnComponente(componenteId, cantidadARestar);
+    public void descontarStockAlComponente(Long componenteId, Integer cantidadARestar) {
+        repositorioComponente.descontarStockDeUnComponente(componenteId, cantidadARestar);
     }
 
     public void devolverStockAlComponente(Long componenteId, Integer cantidadASumar) {
         repositorioComponente.devolverStockDeUnComponente(componenteId, cantidadASumar);
     }
 
-    //testear el agregado de actualizar stock
     public void agregarProducto(Long componenteId, Integer cantidad) {
         if(this.productos == null){
             this.productos = new ArrayList<>();
@@ -68,7 +66,7 @@ public class ServicioProductoCarritoImpl {
                 this.productos.add(nuevoProductoCarrito);
             }
         }
-        repositorioComponente.actualizarStockDeUnComponente(componenteId, cantidad);
+        repositorioComponente.descontarStockDeUnComponente(componenteId, cantidad);
     }
 
     public boolean verificarStock(Long componenteId) {

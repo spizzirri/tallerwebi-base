@@ -15,7 +15,7 @@ public interface RepositorioComponente {
 
     List<Componente> obtenerComponentesEnStock();
 
-    boolean actualizarStockDeUnComponente(Long componenteId, Integer cantidadARestar);
+    boolean descontarStockDeUnComponente(Long componenteId, Integer cantidadARestar);
 
     boolean devolverStockDeUnComponente(Long componenteId, Integer cantidadASumar);
 
