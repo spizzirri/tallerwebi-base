@@ -231,4 +231,21 @@ public class ArmadoPcDto {
         componentesDto.addAll(this.perifericos);
         return componentesDto;
     }
+
+    public Map<Long, Integer> getIdYCantidadComponentes() {
+        Map<Long, Integer> idYCantidad = new HashMap<>();
+
+        List<ComponenteDto> componentesDto = this.getComponentesDto();
+
+
+        for(ComponenteDto componente : componentesDto){
+
+            if (idYCantidad.containsKey(componente.getId()))
+                idYCantidad.put(componente.getId(), idYCantidad.get(componente.getId()) + 1);
+            else
+                idYCantidad.put(componente.getId(), 1);
+
+        }
+        return idYCantidad;
+    }
 }

@@ -35,7 +35,6 @@ public class ControladorArmaTuPc {
         return (ArmadoPcDto) session.getAttribute("armadoPcDto");
     }
 
-
     @RequestMapping(path = "arma-tu-pc/tradicional/{tipoComponente}", method = RequestMethod.GET)
     public ModelAndView cargarComponentes(@PathVariable("tipoComponente") String tipoComponente,
                                           @RequestParam(value = "q", required = false) String query,
@@ -79,7 +78,9 @@ public class ControladorArmaTuPc {
 
     private Set<Long> obtenerIdsDeArmadoDeSession(ArmadoPcDto armadoPcDto) {
         Set<Long> idsDeArmadoDeSession = new HashSet<>();
-        for(ComponenteDto componente : armadoPcDto.getComponentesDto()) if(componente != null) idsDeArmadoDeSession.add(componente.getId());
+        for(ComponenteDto componente : armadoPcDto.getComponentesDto())
+            if(componente != null && componente.getId() != null)
+                idsDeArmadoDeSession.add(componente.getId());
         return idsDeArmadoDeSession;
     }
 

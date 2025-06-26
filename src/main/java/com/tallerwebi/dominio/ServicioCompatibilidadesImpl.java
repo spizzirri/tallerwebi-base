@@ -122,7 +122,7 @@ public class ServicioCompatibilidadesImpl implements ServicioCompatibilidades {
         armadoPcEntidad.setCoolerCPU((armadoPcEntidad.getCoolerCPU() != null) ? (CoolerCPU)this.repositorioComponente.obtenerComponentePorId(armadoPcEntidad.getCoolerCPU().getId()) : null);
         armadoPcEntidad.setPlacaDeVideo((armadoPcEntidad.getPlacaDeVideo() != null) ? (PlacaDeVideo)this.repositorioComponente.obtenerComponentePorId(armadoPcEntidad.getPlacaDeVideo().getId()) : null);
 
-        if (!armadoPcEntidad.getAlmacenamiento().isEmpty()) armadoPcEntidad.setAlmacenamiento(this.obtenerListaDeComponentesEntidadConInformacionCompleta(armadoPcEntidad.getAlmacenamiento(), Almacenamiento.class));
+        if (armadoPcEntidad.getAlmacenamiento() != null && !armadoPcEntidad.getAlmacenamiento().isEmpty()) armadoPcEntidad.setAlmacenamiento(this.obtenerListaDeComponentesEntidadConInformacionCompleta(armadoPcEntidad.getAlmacenamiento(), Almacenamiento.class));
 
         return armadoPcEntidad;
     }

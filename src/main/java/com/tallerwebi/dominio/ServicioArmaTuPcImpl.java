@@ -93,31 +93,6 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
         return listaDeComponentesDto;
     }
 
-//    private ArmadoPc completarEntidadArmadoPc(ArmadoPc armadoPcEntidad) {
-//
-//        armadoPcEntidad.setProcesador((armadoPcEntidad.getProcesador() != null) ? (Procesador)this.repositorioComponente.obtenerComponentePorId(armadoPcEntidad.getProcesador().getId()) : null);
-//        armadoPcEntidad.setMotherboard((armadoPcEntidad.getMotherboard() != null) ? (Motherboard)this.repositorioComponente.obtenerComponentePorId(armadoPcEntidad.getMotherboard().getId()) : null);
-//        armadoPcEntidad.setCoolerCPU((armadoPcEntidad.getCoolerCPU() != null) ? (CoolerCPU)this.repositorioComponente.obtenerComponentePorId(armadoPcEntidad.getCoolerCPU().getId()) : null);
-//        armadoPcEntidad.setPlacaDeVideo((armadoPcEntidad.getPlacaDeVideo() != null) ? (PlacaDeVideo)this.repositorioComponente.obtenerComponentePorId(armadoPcEntidad.getPlacaDeVideo().getId()) : null);
-//        armadoPcEntidad.setFuenteDeAlimentacion((armadoPcEntidad.getFuenteDeAlimentacion() != null) ? (FuenteDeAlimentacion)this.repositorioComponente.obtenerComponentePorId(armadoPcEntidad.getFuenteDeAlimentacion().getId()) : null);
-//        armadoPcEntidad.setGabinete((armadoPcEntidad.getGabinete() != null) ? (Gabinete)this.repositorioComponente.obtenerComponentePorId(armadoPcEntidad.getGabinete().getId()) : null);
-//        armadoPcEntidad.setMonitor((armadoPcEntidad.getMonitor() != null) ? (Monitor)this.repositorioComponente.obtenerComponentePorId(armadoPcEntidad.getMonitor().getId()) : null);
-//
-//        if (!armadoPcEntidad.getMemoriaRAM().isEmpty()) armadoPcEntidad.setMemoriaRAM(this.obtenerListaDeComponentesEntidadConInformacionCompleta(armadoPcEntidad.getMemoriaRAM(), MemoriaRAM.class));
-//        if (!armadoPcEntidad.getAlmacenamiento().isEmpty()) armadoPcEntidad.setAlmacenamiento(this.obtenerListaDeComponentesEntidadConInformacionCompleta(armadoPcEntidad.getAlmacenamiento(), Almacenamiento.class));
-//        if (!armadoPcEntidad.getPerifericos().isEmpty()) armadoPcEntidad.setPerifericos(this.obtenerListaDeComponentesEntidadConInformacionCompleta(armadoPcEntidad.getPerifericos(), Periferico.class));
-//
-//        return armadoPcEntidad;
-//    }
-
-//    private <T extends Componente> List<T>  obtenerListaDeComponentesEntidadConInformacionCompleta(List<T> componentesACompletar, Class<T> tipoDeDato) {
-//        List<T> entidadesCompletas = new ArrayList<>();
-//        for( T componente : componentesACompletar ) {
-//            entidadesCompletas.add(tipoDeDato.cast(this.repositorioComponente.obtenerComponentePorId(componente.getId())));
-//        }
-//        return entidadesCompletas;
-//    }
-
     private List<ComponenteDto> transformarComponentesADtos(List<Componente> componentesDeTipo) {
 
         List<ComponenteDto> listaDeComponentesDto = new ArrayList<ComponenteDto>();
