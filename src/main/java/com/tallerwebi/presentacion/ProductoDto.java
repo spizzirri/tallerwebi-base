@@ -9,12 +9,15 @@ public class ProductoDto {
     private Double precio;
     private Integer stock;
     private String tipoComponente;
+    private Integer cantidad = 1;
     private String imagen;
+    private String precioFormateado;
 
     public ProductoDto(Componente componente) {
         this.id = componente.getId();
         this.nombre = componente.getNombre();
         this.precio = componente.getPrecio();
+        this.cantidad = cantidad != null ? cantidad : 1;;
         this.tipoComponente = componente.getClass().getSimpleName();
         this.imagen =  (componente.getImagenes() != null &&
                 !componente.getImagenes().isEmpty() &&
@@ -22,6 +25,7 @@ public class ProductoDto {
                 ? componente.getImagenes().get(0).getUrlImagen()
                 : "imagen-generica.jpg";
         this.stock = componente.getStock();
+        this.precioFormateado = componente.getPrecio().toString();
     }
 
     public ProductoDto(Long id, String nombre,Integer stock, Double precio, String tipoComponente, String imagen) {
@@ -41,6 +45,14 @@ public class ProductoDto {
     }
     public String getTipoComponente() {
         return tipoComponente;
+    }
+
+    public Integer getCantidad() {
+        return cantidad;
+    }
+
+    public void setCantidad(Integer cantidad) {
+        this.cantidad = cantidad != null ? cantidad : 1;
     }
 
     public String getNombre() {
@@ -65,5 +77,13 @@ public class ProductoDto {
 
     public void setStock(Integer stock) {
         this.stock = stock;
+    }
+
+    public String getPrecioFormateado() {
+        return precioFormateado;
+    }
+
+    public void setPrecioFormateado(String precioFormateado) {
+        this.precioFormateado = precioFormateado;
     }
 }

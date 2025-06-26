@@ -42,7 +42,9 @@ public class ControllerMercadoPago {
     @ResponseBody
     public ModelAndView crearPago(HttpServletResponse response,
                                   @RequestParam(value = "metodoDePago", required = false) String metodoDePago,
-                                  @RequestParam(value = "costoEnvio", required = false) Double costoEnvio)
+                                  @RequestParam(value = "costoEnvio", required = false) Double costoEnvio,
+                                  @RequestParam(value = "totalOriginal", required = false) Double totalOriginal,
+                                  @RequestParam(value = "totalConDescuento", required = false) Double totalConDescuento)
                                     throws IOException {
 
         // Creo un objeto PagoRequest manualmente
@@ -68,10 +70,16 @@ public class ControllerMercadoPago {
         // Creo un objeto de preferencia
         PreferenceClient client = new PreferenceClient();
 
+        double factorDescuento = 1.0;
+        if (totalOriginal != null && totalConDescuento != null && totalOriginal > 0) {
+            factorDescuento = totalConDescuento / totalOriginal;
+        }
+
         // Creo un ítem con los productos en la preferencia de mercado pago (de forma que lo entienda su sistema)
         List<PreferenceItemRequest> items = new ArrayList<>();
         for (int i = 0; i < pagoRequest.getProductos().size(); i++) {
             double precioFinal = getPrecioFinal(pagoRequest, i);
+
             PreferenceItemRequest item =
                     PreferenceItemRequest.builder()
                             .title(pagoRequest.getProductos().get(i).getNombre() + " - " + pagoRequest.getProductos().get(i).getMarca())
@@ -117,7 +125,7 @@ public class ControllerMercadoPago {
         PreferencePayerRequest payer = PreferencePayerRequest.builder()
                 .name("Test")
                 .surname("User")
-                .email("test_user_1339781340@testuser.com") // Email ficticio para pruebas
+                .email("test_user_46542185@testuser.com") // Email ficticio para pruebas
                 .phone(PhoneRequest.builder()
                         .areaCode("11")
                         .number("11112222")
@@ -132,9 +140,9 @@ public class ControllerMercadoPago {
 
         //Donde redireccionar depues de hacer el pago (arreglarlo para que me devuelva a la vista de nuestra app)
         PreferenceBackUrlsRequest backUrls = PreferenceBackUrlsRequest.builder()
-                .success("http://localhost:8080/spring/checkout/carritoDeCompras")
-                .failure("http://localhost:8080/spring/checkout/carritoDeCompras")
-                .pending("http://localhost:8080/spring/checkout/carritoDeCompras")
+                .success("http://localhost:8080/checkout/carritoDeCompras")
+                .failure("http://localhost:8080/checkout/carritoDeCompras")
+                .pending("http://localhost:8080/checkout/carritoDeCompras")
                 .build();
 
         // Creo la preferencia final que va a ser mandada a mercado pago para la redireccion a su pagina

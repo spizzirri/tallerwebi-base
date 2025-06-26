@@ -28,6 +28,15 @@ public class RepositorioComponenteImpl implements RepositorioComponente {
 
         return query.getResultList();
     }
+    @Override
+    public Componente buscarComponenteConImagenesPorId(Long id) {
+        // La magia está en "LEFT JOIN FETCH c.imagenes"
+        String jpql = "SELECT c FROM Componente c LEFT JOIN FETCH c.imagenes WHERE c.id = :id";
+        return (Componente) sessionFactory.getCurrentSession()
+                .createQuery(jpql, Componente.class)
+                .setParameter("id", id)
+                .getSingleResult();
+    }
 
     @Override
     public List<Componente> obtenerComponentesPorTipoEnStock(String tipo) {
@@ -73,6 +82,28 @@ public class RepositorioComponenteImpl implements RepositorioComponente {
 
 
         return query.getResultList();
+    }
+
+    @Override
+    public boolean descontarStockDeUnComponente(Long componenteId, Integer cantidadARestar) {
+        String hql = "UPDATE Componente SET stock = stock - :cantidadARestar WHERE id = :idComponente AND stock >= :cantidadARestar";
+
+        Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
+        query.setParameter("cantidadARestar", cantidadARestar);
+        query.setParameter("idComponente", componenteId);
+        int filasActualizadas = query.executeUpdate();
+        return filasActualizadas > 0;
+    }
+
+    @Override
+    public boolean devolverStockDeUnComponente(Long componenteId, Integer cantidadASumar) {
+        String hql = "UPDATE Componente SET stock = stock + :cantidadASumar WHERE id = :idComponente";
+
+        Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
+        query.setParameter("cantidadASumar", cantidadASumar);
+        query.setParameter("idComponente", componenteId);
+        int filasActualizadas = query.executeUpdate();
+        return filasActualizadas > 0;
     }
 
     @Override

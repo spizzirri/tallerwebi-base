@@ -2456,7 +2456,7 @@ VALUES ('Gabinete-DeepCool-CH260-Mini-Mesh-Vidrio-Templado-MATX-1.jpg', 148);
 
 -- Componente 149: Monitor Gamer LG Ultragear 24GS60F-B 24" IPS FHD 1920*1080 180Hz G-SYNC FreeSync 1ms
 INSERT INTO Componente (nombre, precio, stock, marca)
-VALUES ('Monitor Gamer LG Ultragear 24GS60F-B 24" IPS FHD 1920*1080 180Hz G-SYNC FreeSync 1ms', 19350.0, 16, 'LG');
+VALUES ('Monitor Gamer LG Ultragear 24GS60F-B 24" IPS FHD 1920*1080 180Hz G-SYNC FreeSync 1ms', 244980.0, 16, 'LG');
 
 INSERT INTO Monitor (id, tipoDeIluminacion, tipoDePanel, pantallaCurva, puertosHDMI,
                      puertosDisplayPort, puertosMiniDisplayPort, puertosVGA, puertosDVI,
@@ -2473,7 +2473,7 @@ VALUES ('Monitor-Gamer-LG-Ultragear-24GS60F-B-24_-IPS-FHD-1920_1080-180Hz-G-SYNC
 
 -- Componente 150: Monitor Samsung 22" T350FH FHD IPS 75Hz
 INSERT INTO Componente (nombre, precio, stock, marca)
-VALUES ('Monitor Samsung 22" T350FH FHD IPS 75Hz', 15200.0, 12, 'Samsung');
+VALUES ('Monitor Samsung 22" T350FH FHD IPS 75Hz', 127920.0, 12, 'Samsung');
 
 INSERT INTO Monitor (id, tipoDeIluminacion, tipoDePanel, pantallaCurva, puertosHDMI,
                      puertosDisplayPort, puertosMiniDisplayPort, puertosVGA, puertosDVI,
@@ -2490,7 +2490,7 @@ VALUES ('Monitor-Samsung-22_-T350FH-FHD-IPS-75Hz-1.jpg', 150),
 
 -- Componente 151: Monitor Gamer Curvo LG 34" UltraWide 34GP63A 160Hz WQHD 2K FreeSync Premium
 INSERT INTO Componente (nombre, precio, stock, marca)
-VALUES ('Monitor Gamer Curvo LG 34" UltraWide 34GP63A 160Hz WQHD 2K FreeSync Premium', 893150.0, 8, 'LG');
+VALUES ('Monitor Gamer Curvo LG 34" UltraWide 34GP63A 160Hz WQHD 2K FreeSync Premium', 866356.0, 8, 'LG');
 
 INSERT INTO Monitor (id, tipoDeIluminacion, tipoDePanel, pantallaCurva, puertosHDMI,
                      puertosDisplayPort, puertosMiniDisplayPort, puertosVGA, puertosDVI,
@@ -2507,7 +2507,7 @@ VALUES ('Monitor-Gamer-Curvo-LG-34_-UltraWide-34GP63A-160Hz-WQHD-2K-FreeSync-Pre
 
 -- Componente 152: Monitor LG 24MS500-B 24" IPS FHD 100Hz 5ms
 INSERT INTO Componente (nombre, precio, stock, marca)
-VALUES ('Monitor LG 24MS500-B 24" IPS FHD 100Hz 5ms', 16750.0, 14, 'LG');
+VALUES ('Monitor LG 24MS500-B 24" IPS FHD 100Hz 5ms', 171902.0, 14, 'LG');
 
 INSERT INTO Monitor (id, tipoDeIluminacion, tipoDePanel, pantallaCurva, puertosHDMI,
                      puertosDisplayPort, puertosMiniDisplayPort, puertosVGA, puertosDVI,
@@ -2524,7 +2524,7 @@ VALUES ('Monitor-LG-24MS500-B-24_-IPS-FHD-100Hz-5ms-1.jpg', 152),
 
 -- Componente 153: Monitor Gamer Curvo ViewSonic VX3218C-2K 32" 1500R QHD 1440p 180Hz VA 1ms MPRT FreeSync Premium
 INSERT INTO Componente (nombre, precio, stock, marca)
-VALUES ('Monitor Gamer Curvo ViewSonic VX3218C-2K 32" 1500R QHD 1440p 180Hz VA 1ms MPRT FreeSync Premium', 38900.0, 6, 'ViewSonic');
+VALUES ('Monitor Gamer Curvo ViewSonic VX3218C-2K 32" 1500R QHD 1440p 180Hz VA 1ms MPRT FreeSync Premium', 477796.0, 6, 'ViewSonic');
 
 INSERT INTO Monitor (id, tipoDeIluminacion, tipoDePanel, pantallaCurva, puertosHDMI,
                      puertosDisplayPort, puertosMiniDisplayPort, puertosVGA, puertosDVI,
@@ -2541,7 +2541,7 @@ VALUES ('Monitor-Gamer-Curvo-ViewSonic-VX3218C-2K-32_-1500R-QHD-1440p-180Hz-VA-1
 
 -- Componente 154: Monitor Gamer AsRock Phantom PG32QF2B 31.5" VA QHD 165Hz FreeSync Antena WiFi Integrada
 INSERT INTO Componente (nombre, precio, stock, marca)
-VALUES ('Monitor Gamer AsRock Phantom PG32QF2B 31.5" VA QHD 165Hz FreeSync Antena WiFi Integrada', 517200.0, 5, 'AsRock');
+VALUES ('Monitor Gamer AsRock Phantom PG32QF2B 31.5" VA QHD 165Hz FreeSync Antena WiFi Integrada', 465174.0, 5, 'AsRock');
 
 INSERT INTO Monitor (id, tipoDeIluminacion, tipoDePanel, pantallaCurva, puertosHDMI,
                      puertosDisplayPort, puertosMiniDisplayPort, puertosVGA, puertosDVI,
@@ -2558,7 +2558,7 @@ VALUES ('Monitor-Gamer-AsRock-Phantom-PG32QF2B-31.5_-VA-QHD-165Hz-FreeSync-Anten
 
 -- Componente 155: Monitor Gamer ASUS VA27EHF-J 27" FHD IPS 100Hz
 INSERT INTO Componente (nombre, precio, stock, marca)
-VALUES ('Monitor Gamer ASUS VA27EHF-J 27" FHD IPS 100Hz', 22800.0, 10, 'ASUS');
+VALUES ('Monitor Gamer ASUS VA27EHF-J 27" FHD IPS 100Hz', 169660.0, 10, 'ASUS');
 
 INSERT INTO Monitor (id, tipoDeIluminacion, tipoDePanel, pantallaCurva, puertosHDMI,
                      puertosDisplayPort, puertosMiniDisplayPort, puertosVGA, puertosDVI,
@@ -2575,7 +2575,7 @@ VALUES ('Monitor-Gamer-ASUS-VA27EHF-J-27_-FHD-IPS-100Hz-1.jpg', 155),
 
 -- Componente 156: Monitor Lenovo ThinkVision S22i-30 21.5" FHD IPS 75Hz Anti Glare VESA
 INSERT INTO Componente (nombre, precio, stock, marca)
-VALUES ('Monitor Lenovo ThinkVision S22i-30 21.5" FHD IPS 75Hz Anti Glare VESA', 18600.0, 9, 'Lenovo');
+VALUES ('Monitor Lenovo ThinkVision S22i-30 21.5" FHD IPS 75Hz Anti Glare VESA', 118688.0, 9, 'Lenovo');
 
 INSERT INTO Monitor (id, tipoDeIluminacion, tipoDePanel, pantallaCurva, puertosHDMI,
                      puertosDisplayPort, puertosMiniDisplayPort, puertosVGA, puertosDVI,
@@ -2592,7 +2592,7 @@ VALUES ('Monitor-Lenovo-ThinkVision-S22i-30-21.5_-FHD-IPS-75Hz-Anti-Glare-VESA-1
 
 -- Componente 157: Monitor LG 34WP75C-B 34" WQHD 3440x1440 VA 160Hz Ultrapanoramico
 INSERT INTO Componente (nombre, precio, stock, marca)
-VALUES ('Monitor LG 34WP75C-B 34" WQHD 3440x1440 VA 160Hz Ultrapanoramico', 1040150.0, 7, 'LG');
+VALUES ('Monitor LG 34WP75C-B 34" WQHD 3440x1440 VA 160Hz Ultrapanoramico', 1008946.0, 7, 'LG');
 
 INSERT INTO Monitor (id, tipoDeIluminacion, tipoDePanel, pantallaCurva, puertosHDMI,
                      puertosDisplayPort, puertosMiniDisplayPort, puertosVGA, puertosDVI,
@@ -2609,7 +2609,7 @@ VALUES ('Monitor-LG-34WP75C-B-34_-WQHD-3440x1440-VA-160Hz-Ultrapanoramico-1.jpg'
 
 -- Componente 158: Monitor Gamer Samsung Odyssey G8 34" OLED UWQHD Curvo 1800R 175Hz AMD Freesync Premium
 INSERT INTO Componente (nombre, precio, stock, marca)
-VALUES ('Monitor Gamer Samsung Odyssey G8 34" OLED UWQHD Curvo 1800R 175Hz AMD Freesync Premium', 89500.0, 3, 'Samsung');
+VALUES ('Monitor Gamer Samsung Odyssey G8 34" OLED UWQHD Curvo 1800R 175Hz AMD Freesync Premium', 2493942.0, 3, 'Samsung');
 
 INSERT INTO Monitor (id, tipoDeIluminacion, tipoDePanel, pantallaCurva, puertosHDMI,
                      puertosDisplayPort, puertosMiniDisplayPort, puertosVGA, puertosDVI,

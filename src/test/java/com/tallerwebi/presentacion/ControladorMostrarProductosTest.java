@@ -5,6 +5,7 @@ import com.tallerwebi.dominio.ServicioBuscarProducto;
 
 import java.util.*;
 
+import com.tallerwebi.dominio.ServicioPrecios;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -28,6 +29,9 @@ public class ControladorMostrarProductosTest {
     private ServicioCategorias categoriasServiceMock;
     @Mock
     private CategoriaDto categoriaDtoMock;
+    @Mock
+    private ServicioPrecios servicioPreciosMock;
+
     private ControladorMostrarProductos controladorMostrarProductos;
     private List<ProductoDto> productos;
 
@@ -36,7 +40,7 @@ public class ControladorMostrarProductosTest {
     @BeforeEach
     public void init() {
         MockitoAnnotations.openMocks(this);
-        this.controladorMostrarProductos = new ControladorMostrarProductos(this.productoServiceMock, this.categoriasServiceMock);
+        this.controladorMostrarProductos = new ControladorMostrarProductos(this.productoServiceMock, this.categoriasServiceMock, this.servicioPreciosMock);
         this.productos = new ArrayList<>();
 
     }

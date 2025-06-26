@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.tallerwebi.dominio.ServicioPrecios;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,6 +33,10 @@ public class ControladorIndexTest {
     private ServicioCategorias categoriasServiceMock;
     @Mock
     private CategoriaDto categoriaDtoMock;
+
+    @Mock
+    private ServicioPrecios servicioPreciosMock;
+
     private ControladorIndex controladorIndex;
     private List<ProductoDto> productos;
 
@@ -40,7 +45,7 @@ public class ControladorIndexTest {
     @BeforeEach
     public void init() {
         MockitoAnnotations.openMocks(this);
-        this.controladorIndex = new ControladorIndex(this.productoServiceMock, this.categoriasServiceMock);
+        this.controladorIndex = new ControladorIndex(this.productoServiceMock, this.categoriasServiceMock, this.servicioPreciosMock);
         this.productos = new ArrayList<>();
 
 
