@@ -8,6 +8,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -77,7 +80,7 @@ public class ServicioCompatibilidadesTest {
         // Preparación
         ArmadoPc armadoConProcesador = new ArmadoPc();
         armadoConProcesador.setProcesador(procesador);
-        when(repositorioComponenteMock.obtenerComponentePorId(1L)).thenReturn(procesador);
+        when(repositorioComponenteMock.obtenerComponentePorId(anyLong())).thenReturn(procesador);
         when(servicioMotherboardMock.verificarCompatibilidadDeMotherboardConProcesador(motherboard, procesador)).thenReturn(true);
 
         // Ejecución
@@ -107,8 +110,9 @@ public class ServicioCompatibilidadesTest {
         armadoCompleto.setProcesador(procesador);
         armadoCompleto.setMotherboard(motherboard);
 
-        when(repositorioComponenteMock.obtenerComponentePorId(1L)).thenReturn(procesador);
-        when(repositorioComponenteMock.obtenerComponentePorId(2L)).thenReturn(motherboard);
+        when(repositorioComponenteMock.obtenerComponentePorId(anyLong()))
+                .thenReturn(procesador)
+                .thenReturn(motherboard);
         when(servicioCoolerMock.verificarCoolerIncluido(cooler, procesador)).thenReturn(true);
 
         // Ejecución
@@ -127,8 +131,9 @@ public class ServicioCompatibilidadesTest {
         armadoCompleto.setProcesador(procesador);
         armadoCompleto.setMotherboard(motherboard);
 
-        when(repositorioComponenteMock.obtenerComponentePorId(1L)).thenReturn(procesador);
-        when(repositorioComponenteMock.obtenerComponentePorId(2L)).thenReturn(motherboard);
+        when(repositorioComponenteMock.obtenerComponentePorId(anyLong()))
+                .thenReturn(procesador)
+                .thenReturn(motherboard);
         when(servicioCoolerMock.verificarCoolerIncluido(cooler, procesador)).thenReturn(false);
         when(servicioCoolerMock.verificarCompatibilidadDeCoolerConMotherboard(motherboard, cooler)).thenReturn(true);
 
@@ -145,7 +150,7 @@ public class ServicioCompatibilidadesTest {
         // Preparación
         ArmadoPc armadoConMother = new ArmadoPc();
         armadoConMother.setMotherboard(motherboard);
-        when(repositorioComponenteMock.obtenerComponentePorId(2L)).thenReturn(motherboard);
+        when(repositorioComponenteMock.obtenerComponentePorId(anyLong())).thenReturn(motherboard);
         when(servicioMotherboardMock.verificarCompatibilidadDeMotherboardConMemoriaRAM(motherboard, ram)).thenReturn(true);
 
         // Ejecución
@@ -161,7 +166,7 @@ public class ServicioCompatibilidadesTest {
         // Preparación
         ArmadoPc armadoConProcesador = new ArmadoPc();
         armadoConProcesador.setProcesador(procesador);
-        when(repositorioComponenteMock.obtenerComponentePorId(1L)).thenReturn(procesador);
+        when(repositorioComponenteMock.obtenerComponentePorId(anyLong())).thenReturn(procesador);
         when(servicioPlacaDeVideoMock.verificarGraficosIntegrados(gpu, procesador)).thenReturn(false);
         when(servicioPlacaDeVideoMock.verificarPrecioMayorACero(gpu)).thenReturn(true);
 
@@ -180,6 +185,22 @@ public class ServicioCompatibilidadesTest {
                 () -> servicioCompatibilidades.esCompatibleConElArmado(almacenamiento, armadoVacio));
     }
 
+    @Test
+    public void cuandoSeVerificaAlmacenamientoYEnUnArmadoConMotherDevuelveTrue() throws ComponenteDeterminateDelArmadoEnNullException {
+        // Preparación
+        ArmadoPc armadoConMother = new ArmadoPc();
+        armadoConMother.setMotherboard(motherboard);
+
+        when(repositorioComponenteMock.obtenerComponentePorId(anyLong())).thenReturn(motherboard);
+        when(servicioMotherboardMock.verificarCompatibilidadDeMotherboardConTipoDeConexionDeAlmacenamiento(motherboard, almacenamiento)).thenReturn(true);
+
+        // Ejecución
+        Boolean esCompatible = servicioCompatibilidades.esCompatibleConElArmado(almacenamiento, armadoConMother);
+
+        // Verificación
+        assertTrue(esCompatible);
+    }
+
     // Tests para FuenteDeAlimentacion
     @Test
     public void cuandoSeVerificaUnaFuenteCompatibleConLosWattsDelArmadoDevuelveTrue() throws ComponenteDeterminateDelArmadoEnNullException {
@@ -188,9 +209,9 @@ public class ServicioCompatibilidadesTest {
         armadoPc.setProcesador(procesador);
         armadoPc.setPlacaDeVideo(gpu);
 
-        // Mock para el método privado que completa entidades
-        when(repositorioComponenteMock.obtenerComponentePorId(1L)).thenReturn(procesador);
-        when(repositorioComponenteMock.obtenerComponentePorId(5L)).thenReturn(gpu);
+        when(repositorioComponenteMock.obtenerComponentePorId(anyLong()))
+                .thenReturn(procesador)
+                .thenReturn(gpu);
 
         when(servicioFuenteMock.verificarCompatibilidadDeFuenteConWatsDelArmado(eq(fuente), any(ArmadoPc.class))).thenReturn(true);
 
@@ -228,6 +249,34 @@ public class ServicioCompatibilidadesTest {
 
         // Verificación
         assertTrue(esCompatible);
+    }
+
+    // Test para la recuperacion de entidades en listas de componentes.
+    @Test
+    public void seCompletaLaListaDeAlmacenamientoAntesDeVerificarCompatibilidadDeFuente() throws ComponenteDeterminateDelArmadoEnNullException {
+        // Arrange
+        FuenteDeAlimentacion fuente = new FuenteDeAlimentacion();
+        fuente.setId(10L);
+
+        Almacenamiento almacen1 = new Almacenamiento();
+        almacen1.setId(1L);
+        Almacenamiento almacen2 = new Almacenamiento();
+        almacen2.setId(2L);
+
+        ArmadoPc armado = new ArmadoPc();
+        armado.setAlmacenamiento(new ArrayList<>(List.of(almacen1, almacen2)));
+
+        when(repositorioComponenteMock.obtenerComponentePorId(1L)).thenReturn(almacen1);
+        when(repositorioComponenteMock.obtenerComponentePorId(2L)).thenReturn(almacen2);
+        when(servicioFuenteMock.verificarCompatibilidadDeFuenteConWatsDelArmado(eq(fuente), any())).thenReturn(true);
+
+        // Act
+        Boolean compatible = servicioCompatibilidades.esCompatibleConElArmado(fuente, armado);
+
+        // Assert
+        assertTrue(compatible);
+        verify(repositorioComponenteMock, times(1)).obtenerComponentePorId(1L);
+        verify(repositorioComponenteMock, times(1)).obtenerComponentePorId(2L);
     }
 
     // Métodos helper para crear entidades de prueba

@@ -11,7 +11,7 @@ import java.util.List;
 public class ServicioFuenteImpl implements ServicioFuente {
     @Override
     public Boolean verificarCompatibilidadDeFuenteConWatsDelArmado(FuenteDeAlimentacion fuenteDeAlimentacion, ArmadoPc armadoPc) {
-        return fuenteDeAlimentacion != null && obtenerConsumoFormateado(fuenteDeAlimentacion) > obtenerWatsTotales(armadoPc); // se le puede sumar un margen
+        return armadoPc != null && fuenteDeAlimentacion != null && obtenerConsumoFormateado(fuenteDeAlimentacion) > obtenerWatsTotales(armadoPc); // se le puede sumar un margen
     }
 
     private Integer obtenerWatsTotales(ArmadoPc armadoPc) {

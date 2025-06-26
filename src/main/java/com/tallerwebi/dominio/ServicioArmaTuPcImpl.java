@@ -87,7 +87,6 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
             if (esCompatibleConElArmado) componentesCompatibles.add(componente);
         }
 
-
         List<ComponenteDto> listaDeComponentesDto = transformarComponentesADtos(componentesCompatibles);
 
         return listaDeComponentesDto;
@@ -101,6 +100,8 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
 
         return listaDeComponentesDto;
     }
+
+    // LOS SWITCH DE AGREGAR Y QUITAR PODRIAN ESTAR EN UN SOLO METODO QUE DEPENDIENDO EL PARAMETRO DE AGREGAR O QUITAR EJECUTE LO CORRESPONDIENTE (esto para mantener un solo switch y que no sea tan engorroso)
 
     @Override
     public ArmadoPcDto agregarComponenteAlArmado(Long idComponente, String tipoComponente, Integer cantidad, ArmadoPcDto armadoPcDto) throws LimiteDeComponenteSobrepasadoEnElArmadoException {
