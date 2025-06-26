@@ -64,10 +64,6 @@ public class CarritoController {
 
         List<ProductoCarritoDto> carritoSesion = obtenerCarritoDeSesion(session);
 
-        // DEBUG: Ver qué contiene la sesión
-        System.out.println("Carrito desde sesión: " + carritoSesion);
-        System.out.println("Tamaño: " + (carritoSesion != null ? carritoSesion.size() : "null"));
-
         this.productoService.setProductos(carritoSesion);
 
         List<ProductoCarritoDto> productos = this.productoService.getProductos();
