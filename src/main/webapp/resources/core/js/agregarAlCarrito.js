@@ -101,7 +101,6 @@ function asignarEventosVistaCarrito() {
                 let idProducto = this.closest('td').dataset.id;
                 let fila = this.closest('tr');
                 let precioTotalDelProducto = fila.querySelector(".precioTotalDelProducto");
-                let valorTotalDelCarrito = document.querySelector(".valorTotalDelCarrito");
 
                 fetch(`/spring/carritoDeCompras/agregarMasCantidadDeUnProducto/${idProducto}`, {
                     method: 'POST'
@@ -117,7 +116,6 @@ function asignarEventosVistaCarrito() {
                         }
                         precioTotalDelProducto.innerHTML = `$${data.precioTotalDelProducto.toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
 
-                        // valorTotalDelCarrito.innerHTML = `$${data.valorTotal.toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
                         document.querySelectorAll(".valorTotalDelCarrito").forEach((el, index) => {
                             el.innerHTML = `$${data.valorTotal.toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
                         });
@@ -150,7 +148,6 @@ document.querySelectorAll(".btnRestarCantidad").forEach(element => {
                     if (data.eliminado) {
                         fila.remove();
                         if (data.valorTotal !== undefined && data.valorTotal !== null) {
-                            // CAMBIAR: Actualizar TODOS los elementos
                             document.querySelectorAll(".valorTotalDelCarrito").forEach((el, index) => {
                                 el.innerHTML = `$${data.valorTotal.toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
                             });
@@ -161,7 +158,6 @@ document.querySelectorAll(".btnRestarCantidad").forEach(element => {
                         }
                         precioTotalDelProducto.innerHTML = `$${data.precioTotalDelProducto.toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
 
-                        // CAMBIAR: Actualizar TODOS los elementos
                         document.querySelectorAll(".valorTotalDelCarrito").forEach((el, index) => {
                             el.innerHTML = `$${data.valorTotal.toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
                         });
@@ -188,7 +184,6 @@ document.querySelectorAll(".btnEliminarProducto").forEach(element => {
                     if (data.eliminado) {
                         this.closest('tr').remove();
 
-                        // CAMBIAR: Actualizar TODOS los elementos
                         document.querySelectorAll(".valorTotalDelCarrito").forEach((el, index) => {
                             el.innerHTML = `$${data.valorTotal.toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
                         });

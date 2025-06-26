@@ -18,15 +18,15 @@ public class CarritoController {
 
     private final ServicioProductoCarritoImpl productoService;
     private final ServicioDeEnviosImpl servicioDeEnvios;
-//    private final ServicioPrecios servicioPrecios;
-//    ServicioPreciosImpl servicioPrecios
+    private final ServicioPrecios servicioPrecios;
+
     public String codigoPostalActual;
     public EnvioDto envioActual;
 
-    public CarritoController(ServicioProductoCarritoImpl servicioProductoCarritoImpl, ServicioDeEnviosImpl servicioDeEnvios) {
+    public CarritoController(ServicioProductoCarritoImpl servicioProductoCarritoImpl, ServicioDeEnviosImpl servicioDeEnvios, ServicioPrecios servicioPrecios) {
         this.productoService = servicioProductoCarritoImpl;
         this.servicioDeEnvios = servicioDeEnvios;
-//        this.servicioPrecios = servicioPrecios;
+        this.servicioPrecios = servicioPrecios;
         servicioProductoCarritoImpl.init();
     }
 
@@ -36,16 +36,8 @@ public class CarritoController {
         model.put("productos", this.productoService.getProductos());
 
         Double total = this.productoService.calcularValorTotalDeLosProductos();
-//        String totalFormateado = this.servicioPrecios.obtenerPrecioFormateado(total);
+        String totalFormateado = this.servicioPrecios.obtenerPrecioFormateado(total);
 
-        DecimalFormat formatter = new DecimalFormat("#,##0.00");
-        DecimalFormatSymbols simbolosArgentinos = new DecimalFormatSymbols();
-
-        simbolosArgentinos.setGroupingSeparator('.');
-        simbolosArgentinos.setDecimalSeparator(',');
-        formatter.setDecimalFormatSymbols(simbolosArgentinos);
-
-        String totalFormateado = formatter.format(total);
         model.put("valorTotal", totalFormateado);
 
         Integer cantidadTotalEnCarrito = this.productoService.calcularCantidadTotalDeProductos();
@@ -53,21 +45,14 @@ public class CarritoController {
         return new ModelAndView("carritoDeCompras", model);
     }
 
-    // testear
     @GetMapping(path = "/fragments/fragments")
     public ModelAndView mostrarResumenCarritoDeCompras() {
         ModelMap model = new ModelMap();
         model.put("productosCarrito", this.productoService.getProductos());
 
         Double total = this.productoService.calcularValorTotalDeLosProductos();
-        DecimalFormat formatter = new DecimalFormat("#,##0.00");
-        DecimalFormatSymbols simbolosArgentinos = new DecimalFormatSymbols();
+        String totalFormateado = this.servicioPrecios.obtenerPrecioFormateado(total);
 
-        simbolosArgentinos.setGroupingSeparator('.');
-        simbolosArgentinos.setDecimalSeparator(',');
-        formatter.setDecimalFormatSymbols(simbolosArgentinos);
-
-        String totalFormateado = formatter.format(total);
         model.put("valorTotal", totalFormateado);
 
         Integer cantidadTotalEnCarrito = this.productoService.calcularCantidadTotalDeProductos();

@@ -1,9 +1,6 @@
 package com.tallerwebi.presentacion;
 
-import com.tallerwebi.dominio.RepositorioComponente;
-import com.tallerwebi.dominio.ServicioDeEnviosImpl;
-import com.tallerwebi.dominio.ServicioPreciosImpl;
-import com.tallerwebi.dominio.ServicioProductoCarritoImpl;
+import com.tallerwebi.dominio.*;
 
 import com.tallerwebi.dominio.entidades.Componente;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,7 +30,7 @@ public class ControladorCarritoTest {
     @Mock
     private ServicioDeEnviosImpl servicioEnviosMock;
     @Mock
-//    private ServicioPreciosImpl servicioPreciosMock;
+    private ServicioPrecios servicioPreciosMock;
 
     private CarritoController carritoController;
     private List<ProductoCarritoDto> productos;
@@ -41,7 +38,7 @@ public class ControladorCarritoTest {
     @BeforeEach
     public void init() {
         MockitoAnnotations.openMocks(this);
-        carritoController = new CarritoController(servicioProductoCarritoImplMock, servicioEnviosMock);
+        carritoController = new CarritoController(servicioProductoCarritoImplMock, servicioEnviosMock, servicioPreciosMock);
         productos = new ArrayList<>();
     }
 
