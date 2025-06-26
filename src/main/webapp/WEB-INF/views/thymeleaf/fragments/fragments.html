@@ -90,9 +90,8 @@
                                          style="height: 30px; width: 30px"></td>
                                 <td th:text="${producto.nombre}"
                                     style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></td>
-<!--                                <td class="precioTotalDelProducto"-->
-<!--                                    th:text="'$' + ${producto.precio * producto.getCantidad()}"></td>-->
-                                <td class="precioTotalDelProducto" th:text="'$' + ${valorTotal}"></td>
+                                <td class="precioTotalDelProducto"
+                                    th:text="'$' + ${producto.precio * producto.getCantidad()}"></td>
 
                                 <td class="text-center" th:data-id="${producto.id}">
                                     <div class="d-flex justify-content-center align-items-center gap-2">
