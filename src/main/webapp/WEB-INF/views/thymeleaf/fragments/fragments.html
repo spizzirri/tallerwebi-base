@@ -84,14 +84,16 @@
                                 <th scope="col">Acciones</th>
                             </tr>
                             </thead>
-                            <tbody th:if="${productosCarrito != null and !productosCarrito.isEmpty()}">
-                            <tr class="text-center" th:each="producto : ${productosCarrito}">
+                            <tbody th:if="${productos != null and !productos.isEmpty()}">
+                            <tr class="text-center" th:each="producto : ${productos}">
                                 <td><img th:src="'http://www.imagenesproyecto.free.nf/' + ${producto.imagen}"
                                          style="height: 30px; width: 30px"></td>
                                 <td th:text="${producto.nombre}"
                                     style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></td>
-                                <td class="precioTotalDelProducto"
-                                    th:text="'$' + ${producto.precio * producto.getCantidad()}"></td>
+<!--                                <td class="precioTotalDelProducto"-->
+<!--                                    th:text="'$' + ${producto.precio * producto.getCantidad()}"></td>-->
+                                <td class="precioTotalDelProducto" th:text="'$' + ${valorTotal}"></td>
+
                                 <td class="text-center" th:data-id="${producto.id}">
                                     <div class="d-flex justify-content-center align-items-center gap-2">
                                         <button type="button"
@@ -109,7 +111,7 @@
                                 </td>
                             </tr>
                             </tbody>
-                            <tbody th:if="${productosCarrito == null or productosCarrito.isEmpty()}">
+                            <tbody th:if="${productos == null or productos.isEmpty()}">
                             <tr>
                                 <td colspan="3" class="text-center py-4">No hay productos en el carrito.</td>
                             </tr>

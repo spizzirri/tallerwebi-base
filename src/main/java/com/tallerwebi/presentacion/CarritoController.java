@@ -8,10 +8,11 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 public class CarritoController {
@@ -31,8 +32,12 @@ public class CarritoController {
     }
 
     @GetMapping(path = "/carritoDeCompras/index")
-    public ModelAndView mostrarVistaCarritoDeCompras() {
+    public ModelAndView mostrarVistaCarritoDeCompras(HttpSession session) {
         ModelMap model = new ModelMap();
+
+        List<ProductoCarritoDto> carritoSesion = obtenerCarritoDeSesion(session);
+        this.productoService.setProductos(carritoSesion);
+
         model.put("productos", this.productoService.getProductos());
 
         Double total = this.productoService.calcularValorTotalDeLosProductos();
@@ -46,24 +51,40 @@ public class CarritoController {
     }
 
     @GetMapping(path = "/fragments/fragments")
-    public ModelAndView mostrarResumenCarritoDeCompras() {
+    public ModelAndView mostrarResumenCarritoDeCompras(HttpSession session) {
         ModelMap model = new ModelMap();
-        model.put("productosCarrito", this.productoService.getProductos());
+
+        List<ProductoCarritoDto> carritoSesion = obtenerCarritoDeSesion(session);
+
+        // DEBUG: Ver qué contiene la sesión
+        System.out.println("Carrito desde sesión: " + carritoSesion);
+        System.out.println("Tamaño: " + (carritoSesion != null ? carritoSesion.size() : "null"));
+
+        this.productoService.setProductos(carritoSesion);
+
+        List<ProductoCarritoDto> productos = this.productoService.getProductos();
+        System.out.println("Productos del servicio: " + productos);
+
+        model.put("productos", productos != null ? productos : new ArrayList<>());
 
         Double total = this.productoService.calcularValorTotalDeLosProductos();
-        String totalFormateado = this.servicioPrecios.obtenerPrecioFormateado(total);
+        String totalFormateado = this.servicioPrecios.obtenerPrecioFormateado(total != null ? total : 0.0);
 
         model.put("valorTotal", totalFormateado);
 
         Integer cantidadTotalEnCarrito = this.productoService.calcularCantidadTotalDeProductos();
-        model.put("cantidadEnCarrito", cantidadTotalEnCarrito);
+        model.put("cantidadEnCarrito", cantidadTotalEnCarrito != null ? cantidadTotalEnCarrito : 0);
+
         return new ModelAndView("fragments/fragments :: resumenCarrito", model);
     }
 
     @PostMapping(path = "/carritoDeCompras/eliminarProducto/{id}")
     @ResponseBody
-    public Map<String, Object> eliminarProductoDelCarrito(@PathVariable Long id) {
+    public Map<String, Object> eliminarProductoDelCarrito(@PathVariable Long id, HttpSession session) {
         Map<String, Object> response = new HashMap<>();
+        List<ProductoCarritoDto> carritoSesion = obtenerCarritoDeSesion(session);
+        this.productoService.setProductos(carritoSesion);
+
         ProductoCarritoDto productoBuscado = this.productoService.buscarPorId(id);
 
         if (productoBuscado != null) {
@@ -72,6 +93,8 @@ public class CarritoController {
         } else {
             response.put("eliminado", false);
         }
+        session.setAttribute("carritoSesion", this.productoService.getProductos());
+
         response.put("productos", this.productoService.getProductos());
 
         Double total = this.productoService.calcularValorTotalDeLosProductos();
@@ -122,51 +145,62 @@ public class CarritoController {
 
     @PostMapping(path = "/carritoDeCompras/agregarMasCantidadDeUnProducto/{id}")
     @ResponseBody
-    public Map<String, Object> agregarMasCantidadDeUnProducto(@PathVariable Long id) {
-
-        ProductoCarritoDto productoBuscado = this.productoService.buscarPorId(id);
+    public Map<String, Object> agregarMasCantidadDeUnProducto(@PathVariable Long id, HttpSession session) {
         Map<String, Object> response = new HashMap<>();
 
-        if (productoBuscado != null && productoService.verificarStock(id)) {
-            productoService.descontarStockAlComponente(id, 1);
+        List<ProductoCarritoDto> carritoSesion = obtenerCarritoDeSesion(session);
+        this.productoService.setProductos(carritoSesion);
+
+        ProductoCarritoDto productoBuscado = this.productoService.buscarPorId(id);
+
+        if (productoBuscado != null && this.productoService.verificarStock(id)) {
+            this.productoService.descontarStockAlComponente(id, 1);
             productoBuscado.setCantidad(productoBuscado.getCantidad() + 1);
 
             assert productoBuscado != null;
             response.put("cantidad", productoBuscado.getCantidad());
             response.put("precioTotalDelProducto", productoBuscado.getCantidad() * productoBuscado.getPrecio());
-            response.put("valorTotal", productoService.calcularValorTotalDeLosProductos());
-            response.put("cantidadEnCarrito", productoService.calcularCantidadTotalDeProductos());
+            response.put("valorTotal", this.productoService.calcularValorTotalDeLosProductos());
+            response.put("cantidadEnCarrito", this.productoService.calcularCantidadTotalDeProductos());
         } else {
             response.put("success", false);
             response.put("mensaje", "No hay stock suficiente!");
         }
+        session.setAttribute("carritoSesion", this.productoService.getProductos());
+
         return response;
     }
 
     @PostMapping("/carritoDeCompras/restarCantidadDeUnProducto/{id}")
     @ResponseBody
-    public Map<String, Object> restarCantidadDeUnProducto(@PathVariable Long id) {
-        ProductoCarritoDto productoBuscado = this.productoService.buscarPorId(id);
+    public Map<String, Object> restarCantidadDeUnProducto(@PathVariable Long id, HttpSession session) {
         Map<String, Object> response = new HashMap<>();
+
+        List<ProductoCarritoDto> carritoSesion = obtenerCarritoDeSesion(session);
+        this.productoService.setProductos(carritoSesion);
+
+        ProductoCarritoDto productoBuscado = this.productoService.buscarPorId(id);
 
         if (productoBuscado != null && productoBuscado.getCantidad() > 1) {
             productoBuscado.setCantidad(productoBuscado.getCantidad() - 1);
-            productoService.devolverStockAlComponente(id, 1);
+            this.productoService.devolverStockAlComponente(id, 1);
 
             response.put("cantidad", productoBuscado.getCantidad());
             response.put("precioTotalDelProducto", productoBuscado.getCantidad() * productoBuscado.getPrecio());
-            response.put("valorTotal", productoService.calcularValorTotalDeLosProductos());
+            response.put("valorTotal", this.productoService.calcularValorTotalDeLosProductos());
             response.put("eliminado", false);
-            response.put("cantidadEnCarrito", productoService.calcularCantidadTotalDeProductos());
+            response.put("cantidadEnCarrito", this.productoService.calcularCantidadTotalDeProductos());
 
         } else if (productoBuscado != null) {
             this.productoService.getProductos().remove(productoBuscado);
-            productoService.devolverStockAlComponente(id, 1);
+            this.productoService.devolverStockAlComponente(id, 1);
 
             response.put("eliminado", true);
-            response.put("valorTotal", productoService.calcularValorTotalDeLosProductos());
-            response.put("cantidadEnCarrito", productoService.calcularCantidadTotalDeProductos());
+            response.put("valorTotal", this.productoService.calcularValorTotalDeLosProductos());
+            response.put("cantidadEnCarrito", this.productoService.calcularCantidadTotalDeProductos());
         }
+
+        session.setAttribute("carritoSesion", this.productoService.getProductos());
 
         return response;
     }
@@ -202,9 +236,11 @@ public class CarritoController {
     }
 
     @PostMapping(path = "/carritoDeCompras/calcularEnvio")
-    public ModelAndView calcularEnvio(@RequestParam(value = "codigoPostal", required = false) String codigoPostal) {
+    public ModelAndView calcularEnvio(@RequestParam(value = "codigoPostal", required = false) String codigoPostal, HttpSession session) {
 
         ModelMap model = new ModelMap();
+        List<ProductoCarritoDto> carritoSesion = obtenerCarritoDeSesion(session);
+        this.productoService.setProductos(carritoSesion);
 
         this.codigoPostalActual = codigoPostal;
 
@@ -249,8 +285,11 @@ public class CarritoController {
 
     @GetMapping(path = "/carritoDeCompras/calcularEnvio")
     @ResponseBody
-    public Map<String, Object> calcularEnvioAjax(@RequestParam String codigoPostal) {
+    public Map<String, Object> calcularEnvioAjax(@RequestParam String codigoPostal, HttpSession session) {
         Map<String, Object> response = new HashMap<>();
+
+        List<ProductoCarritoDto> carritoSesion = obtenerCarritoDeSesion(session);
+        this.productoService.setProductos(carritoSesion);
 
         try {
             EnvioDto envio = servicioDeEnvios.calcularEnvio(codigoPostal);
@@ -287,11 +326,12 @@ public class CarritoController {
         return response;
     }
 
-    @PostMapping("/agregarAlCarrito")
+    @GetMapping("/agregarAlCarrito/{componenteId}/{cantidad}")
     @ResponseBody
     public Map<String, Object> agregarProductoAlCarrito(
-            @RequestParam Long componenteId,
-            @RequestParam(defaultValue = "1") Integer cantidad) {
+            @PathVariable Long componenteId,
+            @PathVariable Integer cantidad,
+            HttpSession session) {
 
         Map<String, Object> response = new HashMap<>();
 
@@ -300,15 +340,21 @@ public class CarritoController {
                 response.put("success", false);
                 response.put("mensaje", "Stock insuficiente");
             } else {
-                ProductoCarritoDto existente = productoService.buscarPorId(componenteId);
+                List<ProductoCarritoDto> carritoSesion = obtenerCarritoDeSesion(session);
 
+                productoService.setProductos(carritoSesion);
+
+                ProductoCarritoDto existente = productoService.buscarPorId(componenteId);
                 productoService.agregarProducto(componenteId, cantidad);
+
                 if (existente != null) {
                     int cantidadFinal = existente.getCantidad();
                     response.put("mensaje", "Producto actualizado! Ahora tiene " + cantidadFinal + " unidades en el carrito.");
                 } else {
                     response.put("mensaje", "Producto agregado al carrito!");
                 }
+
+                session.setAttribute("carritoSesion", productoService.getProductos());
                 response.put("success", true);
             }
 
@@ -321,5 +367,14 @@ public class CarritoController {
             response.put("cantidadEnCarrito", 0);
         }
         return response;
+    }
+
+    private List<ProductoCarritoDto> obtenerCarritoDeSesion(HttpSession session) {
+        List<ProductoCarritoDto> carritoSesion = (List<ProductoCarritoDto>) session.getAttribute("carritoSesion");
+        if (carritoSesion == null) {
+            carritoSesion = new ArrayList<>();
+            session.setAttribute("carritoSesion", carritoSesion);
+        }
+        return carritoSesion;
     }
 }
