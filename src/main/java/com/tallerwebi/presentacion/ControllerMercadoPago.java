@@ -78,7 +78,8 @@ public class ControllerMercadoPago {
         // Creo un ítem con los productos en la preferencia de mercado pago (de forma que lo entienda su sistema)
         List<PreferenceItemRequest> items = new ArrayList<>();
         for (int i = 0; i < pagoRequest.getProductos().size(); i++) {
-            double precioFinal = pagoRequest.getProductos().get(i).getPrecio() * factorDescuento;
+            double precioFinal = getPrecioFinal(pagoRequest, i);
+
             PreferenceItemRequest item =
                     PreferenceItemRequest.builder()
                             .title(pagoRequest.getProductos().get(i).getNombre() + " - " + pagoRequest.getProductos().get(i).getMarca())
@@ -124,7 +125,7 @@ public class ControllerMercadoPago {
         PreferencePayerRequest payer = PreferencePayerRequest.builder()
                 .name("Test")
                 .surname("User")
-                .email("test_user_1339781340@testuser.com") // Email ficticio para pruebas
+                .email("test_user_46542185@testuser.com") // Email ficticio para pruebas
                 .phone(PhoneRequest.builder()
                         .areaCode("11")
                         .number("11112222")
