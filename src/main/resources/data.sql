@@ -19,7 +19,7 @@ VALUES ('Procesador AMD RYZEN 3 3200G', 74900.0, 10, 'AMD');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
             1, 'Ryzen 3 3200G', 1, '12 nm', true,
             'Radeon Vega 8', 'AMD Ryzen 3', 4, 4, '3600 MHz', '4000 MHz',
@@ -39,7 +39,7 @@ VALUES ('Procesador AMD RYZEN 3 4100', 73550.0, 10, 'AMD');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
             2, 'Ryzen 3 4100', 1, '7 nm', false,
             NULL, 'AMD Ryzen 3', 4, 8, '3800 MHz', '4000 MHz',
@@ -57,7 +57,7 @@ VALUES ('Procesador AMD RYZEN 3 5300G', 109900.0, 10, 'AMD');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
             3, 'Ryzen 3 5300G', 1, '7 nm', true,
             'Radeon Vega 6', 'AMD Ryzen 3', 4, 8, '4000 MHz', '4200 MHz',
@@ -74,7 +74,7 @@ VALUES ('Procesador AMD RYZEN 5 5500', 103500.0, 10, 'AMD');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
             4, 'Ryzen 5 5500', 1, '7 nm', false,
             NULL, 'AMD Ryzen 5', 6, 12, '3600 MHz', '4200 MHz',
@@ -92,7 +92,7 @@ VALUES ('Procesador AMD RYZEN 5 5600GT', 172600.0, 10, 'AMD');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
             5, 'Ryzen 5 5600GT', 1, '7 nm', true,
             'AMD Radeon Graphics', 'AMD Ryzen 5', 6, 12, '3600 MHz', '4600 MHz',
@@ -111,7 +111,7 @@ VALUES ('Procesador AMD RYZEN 5 5600XT', 203500.0, 10, 'AMD');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
             6, 'Ryzen 5 5600XT', 1, '7 nm', false,
             NULL, 'AMD Ryzen 5', 6, 12, '3700 MHz', '4700 MHz',
@@ -128,7 +128,7 @@ VALUES ('Procesador AMD RYZEN 5 8600G', 240900.0, 10, 'AMD');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
              7, 'Ryzen 5 8600G', 2, '4 nm', true,
              'AMD Radeon Graphics', 'AMD Ryzen 5', 6, 12, '4300 MHz', '5000 MHz',
@@ -146,7 +146,7 @@ VALUES ('Procesador AMD RYZEN 5 7600', 275650.0, 10, 'AMD');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
             8, 'Ryzen 5 7600', 2, '5 nm', true,
             'AMD Radeon Graphics', 'AMD Ryzen 5', 6, 12, '3800 MHz', '5100 MHz',
@@ -167,7 +167,7 @@ VALUES ('Procesador AMD RYZEN 5 9600X', 314900.0, 10, 'AMD');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
             9, 'Ryzen 5 9600X', 2, '6 nm', true,
             'AMD Radeon Graphics', 'AMD Ryzen 5', 6, 12, '3900 MHz', '5400 MHz',
@@ -184,7 +184,7 @@ VALUES ('Procesador AMD RYZEN 5 9600', 321500.0, 10, 'AMD');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
             10, 'Ryzen 5 9600', 2, '6 nm', true,
             'AMD Radeon Graphics', 'AMD Ryzen 5', 6, 12, '3800 MHz', '5200 MHz',
@@ -201,7 +201,7 @@ VALUES ('Procesador AMD RYZEN 7 5700', 174900.0, 10, 'AMD');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
             11, 'Ryzen 7 5700', 1, '7 nm', false,
             NULL, 'AMD Ryzen 7', 8, 16, '3700 MHz', '4600 MHz',
@@ -219,7 +219,7 @@ VALUES ('Procesador AMD RYZEN 7 5800XT', 266900.0, 10, 'AMD');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
             12, 'Ryzen 7 5800XT', 1, '12 nm', false,
             NULL, 'AMD Ryzen 7', 8, 16, '3800 MHz', '4800 MHz',
@@ -237,7 +237,7 @@ VALUES ('Procesador AMD RYZEN 7 8700G', 347500.0, 10, 'AMD');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
             13, 'Ryzen 7 8700G', 2, '4 nm', true,
             'AMD Radeon Graphics', 'AMD Ryzen 7', 8, 16, '4200 MHz', '5000 MHz',
@@ -255,7 +255,7 @@ VALUES ('Procesador AMD RYZEN 7 7700', 407900.0, 10, 'AMD');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
             14, 'Ryzen 7 7700', 2, '5 nm', true,
             'AMD Radeon Graphics', 'AMD Ryzen 7', 8, 16, '3800 MHz', '5300 MHz',
@@ -275,7 +275,7 @@ VALUES ('Procesador AMD RYZEN 7 9700X', 446900.0, 10, 'AMD');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
             15, 'Ryzen 7 9700X', 2, '6 nm', true,
             'AMD Radeon Graphics', 'AMD Ryzen 7', 8, 16, '3800 MHz', '5500 MHz',
@@ -292,7 +292,7 @@ VALUES ('Procesador AMD RYZEN 7 7800X3D', 600000.0, 10, 'AMD');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
             16, 'Ryzen 7 7800X3D', 2, '5 nm', true,
             'AMD Radeon Graphics', 'AMD Ryzen 7', 8, 16, '4200 MHz', '5000 MHz',
@@ -309,7 +309,7 @@ VALUES ('Procesador AMD RYZEN 7 9800X3D', 664900.0, 10, 'AMD');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
             17, 'Ryzen 7 9800X3D', 2, '6 nm', true,
             'AMD Radeon Graphics', 'AMD Ryzen 7', 8, 16, '4700 MHz', '5200 MHz',
@@ -326,7 +326,7 @@ VALUES ('Procesador AMD RYZEN 9 5900XT', 451850.0, 10, 'AMD');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
             18, 'Ryzen 9 5900XT', 1, '12 nm', false,
             NULL, 'AMD Ryzen 9', 16, 32, '3300 MHz', '4800 MHz',
@@ -343,7 +343,7 @@ VALUES ('Procesador AMD RYZEN 9 7900', 485000.0, 10, 'AMD');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
             19, 'Ryzen 9 7900', 2, '5 nm', true,
             'AMD Radeon Graphics', 'AMD Ryzen 9', 12, 24, '3700 MHz', '5400 MHz',
@@ -362,7 +362,7 @@ VALUES ('Procesador AMD RYZEN 9 9900X', 570600.0, 10, 'AMD');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
             20, 'Ryzen 9 9900X', 2, '6 nm', true,
             'AMD Radeon Graphics', 'AMD Ryzen 9', 12, 24, '4400 MHz', '5600 MHz',
@@ -379,7 +379,7 @@ VALUES ('Procesador AMD RYZEN 9 7950X', 756000.0, 10, 'AMD');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
             21, 'Ryzen 9 7950X', 2, '5 nm', true,
             'AMD Radeon Graphics', 'AMD Ryzen 9', 16, 32, '4500 MHz', '5700 MHz',
@@ -398,7 +398,7 @@ VALUES ('Procesador AMD RYZEN 9 9950X', 825000.0, 10, 'AMD');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
             22, 'Ryzen 9 9950X', 2, '6 nm', true,
             'AMD Radeon Graphics', 'AMD Ryzen 9', 16, 32, '4300 MHz', '5700 MHz',
@@ -415,7 +415,7 @@ VALUES ('Procesador AMD RYZEN 9 9900X3D', 869000.0, 10, 'AMD');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
             23, 'Ryzen 9 9900X3D', 2, '6 nm', true,
             'AMD Radeon Graphics', 'AMD Ryzen 9', 12, 24, '4400 MHz', '5500 MHz',
@@ -432,7 +432,7 @@ VALUES ('Procesador AMD RYZEN 9 9950X3D', 999000.0, 10, 'AMD');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
             24, 'Ryzen 9 9950X3D', 2, '6 nm', true,
             'AMD Radeon Graphics', 'AMD Ryzen 9', 16, 32, '4300 MHz', '5700 MHz',
@@ -453,7 +453,7 @@ VALUES ('Procesador Intel Core i3 14100F', 115000.0, 10, 'INTEL');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
             25, 'Intel Core i3 14100F', 3, '10 nm', false,
             NULL, 'Intel Core i3', 4, 8, '3500 MHz', '4700 MHz',
@@ -470,7 +470,7 @@ VALUES ('Procesador Intel Core i3 12100', 153000.0, 10, 'INTEL');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
             26, 'Intel Core i3 12100', 3, '10 nm', true,
             'UHD Graphics 730', 'Intel Core i3', 4, 8, '3300 MHz', '4300 MHz',
@@ -489,7 +489,7 @@ VALUES ('Procesador Intel Core i3 14100', 160000.0, 10, 'INTEL');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
             27, 'Intel Core i3 14100', 3, '10 nm', true,
             'UHD Graphics 730', 'Intel Core i3', 4, 8, '3500 MHz', '4700 MHz',
@@ -506,7 +506,7 @@ VALUES ('Procesador Intel Core i5 12400F', 160000.0, 10, 'INTEL');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
             28, 'Intel Core i5 12400F', 3, '10 nm', false,
             NULL, 'Intel Core i5', 6, 12, '2500 MHz', '4400 MHz',
@@ -525,7 +525,7 @@ VALUES ('Procesador Intel Core i5 12400', 198000.0, 10, 'INTEL');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
             29, 'Intel Core i5 12400', 3, '10 nm', true,
             'UHD Graphics 730', 'Intel Core i5', 6, 12, '2500 MHz', '4400 MHz',
@@ -544,7 +544,7 @@ VALUES ('Procesador Intel Core i5 14400F', 205000.0, 10, 'INTEL');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
             30, 'Intel Core i5 14400F', 3, '10 nm', false,
             NULL, 'Intel Core i5', 10, 16, '2500 MHz', '4700 MHz',
@@ -561,7 +561,7 @@ VALUES ('Procesador Intel Core i5 12600K', 266000.0, 10, 'INTEL');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
             31, 'Intel Core i5 12600K', 3, '10 nm', true,
             'UHD Graphics 770', 'Intel Core i5', 10, 16, '2800 MHz', '4900 MHz',
@@ -580,7 +580,7 @@ VALUES ('Procesador Intel Core i5 14600K', 350000.0, 10, 'INTEL');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
             32, 'Intel Core i5 14600K', 3, '10 nm', true,
             'UHD Graphics 770', 'Intel Core i5', 14, 20, '3500 MHz', '5300 MHz',
@@ -597,7 +597,7 @@ VALUES ('Procesador Intel Core i7 12700K', 334000.0, 10, 'INTEL');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
             33, 'Intel Core i7 12700K', 3, '10 nm', true,
             'UHD Graphics 770', 'Intel Core i7', 12, 20, '2700 MHz', '5000 MHz',
@@ -616,7 +616,7 @@ VALUES ('Procesador Intel Core i7 12700F', 345000.0, 10, 'INTEL');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
              34, 'Intel Core i7 12700F', 3, '10 nm', false,
              NULL, 'Intel Core i7', 12, 20, '1600 MHz', '5000 MHz',
@@ -635,7 +635,7 @@ VALUES ('Procesador Intel Core i7 12700', 383000.0, 10, 'INTEL');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
              35, 'Intel Core i7 12700', 3, '10 nm', true,
              'UHD Graphics 770', 'Intel Core i7', 12, 20, '2100 MHz', '4900 MHz',
@@ -654,7 +654,7 @@ VALUES ('Procesador Intel Core i7 14700F', 430000.0, 10, 'INTEL');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
             36, 'Intel Core i7 14700F', 3, '10 nm', false,
             NULL, 'Intel Core i7', 20, 28, '1500 MHz', '5300 MHz',
@@ -671,7 +671,7 @@ VALUES ('Procesador Intel Core i7 14700', 452000.0, 10, 'INTEL');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
              37, 'Intel Core i7 14700', 3, '10 nm', true,
              'UHD Graphics 770', 'Intel Core i7', 20, 28, '2100 MHz', '5400 MHz',
@@ -688,7 +688,7 @@ VALUES ('Procesador Intel Core i7 14700KF', 469000.0, 10, 'INTEL');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
              38, 'Intel Core i7 14700KF', 3, '10 nm', false,
              NULL, 'Intel Core i7', 20, 28, '2500 MHz', '5600 MHz',
@@ -705,7 +705,7 @@ VALUES ('Procesador Intel Core i7 14700K', 489000.0, 10, 'INTEL');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
              39, 'Intel Core i7 14700K', 3, '10 nm', true,
              'UHD Graphics 770', 'Intel Core i7', 20, 28, '2500 MHz', '5600 MHz',
@@ -722,7 +722,7 @@ VALUES ('Procesador Intel Core i9 12900KF', 492000.0, 10, 'INTEL');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
             40, 'Intel Core i9 12900KF', 3, '10 nm', false,
             NULL, 'Intel Core i9', 16, 24, '2400 MHz', '5200 MHz',
@@ -741,7 +741,7 @@ VALUES ('Procesador Intel Core i9 12900K', 560000.0, 10, 'INTEL');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
              41, 'Intel Core i9 12900K', 3, '10 nm', true,
              'UHD Graphics 770', 'Intel Core i9', 16, 24, '2400 MHz', '5200 MHz',
@@ -760,7 +760,7 @@ VALUES ('Procesador Intel Core i9 12900', 568000.0, 10, 'INTEL');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
              42, 'Intel Core i9 12900', 3, '10 nm', true,
              'UHD Graphics 770', 'Intel Core i9', 16, 24, '2400 MHz', '5100 MHz',
@@ -779,7 +779,7 @@ VALUES ('Procesador Intel Core i9 14900KF', 643000.0, 10, 'INTEL');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
              43, 'Intel Core i9 14900KF', 3, '10 nm', false,
              NULL, 'Intel Core i9', 24, 32, '2400 MHz', '5600 MHz',
@@ -796,7 +796,7 @@ VALUES ('Procesador Intel Core i9 14900K', 673000.0, 10, 'INTEL');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
              44, 'Intel Core i9 14900K', 3, '10 nm', true,
              'UHD Graphics 770', 'Intel Core i9', 24, 32, '2400 MHz', '5600 MHz',
@@ -813,7 +813,7 @@ VALUES ('Procesador Intel Core i9 14900F', 799000.0, 10, 'INTEL');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
              45, 'Intel Core i9 14900F', 3, '10 nm', false,
              NULL, 'Intel Core i9', 24, 32, '4300 MHz', '5800 MHz',
@@ -830,7 +830,7 @@ VALUES ('Procesador Intel Core i9 14900', 838000.0, 10, 'INTEL');
 INSERT INTO Procesador (
     id, modelo, socket_id, procesoDeFabricacion, incluyeGraficosIntegrados,
     chipsetGPU, familia, nucleos, hilos, frecuencia, frecuenciaTurbo,
-    incluyeCooler, tdpPredeterminado, l1Cache, l2Cache, l3Cache
+    incluyeCooler, consumo, l1Cache, l2Cache, l3Cache
 ) VALUES (
              46, 'Intel Core i9 14900', 3, '10 nm', true,
              'UHD Graphics 770', 'Intel Core i9', 24, 32, '4300 MHz', '5800 MHz',
@@ -1970,9 +1970,9 @@ VALUES ('PlacaDeVideo-ASUS-RX-9070-XT-16GB-1.jpg', 111),
 -- Almacenamiento
 -- =================================================================
 
--- Componente 112: Disco Rígido Seagate 2TB Barracuda 6GB/s
+-- Componente 112: Disco Rigido Seagate 2TB Barracuda 6GB/s
 INSERT INTO Componente (nombre, precio, stock, marca)
-VALUES ('Disco Rígido Seagate 2TB Barracuda 6GB/s', 80170.0, 10, 'Seagate');
+VALUES ('Disco Rigido Seagate 2TB Barracuda 6GB/s', 80170.0, 10, 'Seagate');
 
 INSERT INTO Almacenamiento (id, capacidad, tipoDeConexion, consumo, tipoDeDisco, memoriaCache, velocidadLecturaSecuencial, velocidadEscrituraSecuencial)
 VALUES (112, '2 TB', 'SATA', '5 W', 'Mecanico', '256 MB', '220 MB/s', NULL);
@@ -1980,9 +1980,9 @@ VALUES (112, '2 TB', 'SATA', '5 W', 'Mecanico', '256 MB', '220 MB/s', NULL);
 INSERT INTO Imagen (urlImagen, componente_id)
 VALUES ('Almacenamiento-Disco-Rigido-Seagate-2TB-1.jpg', 112);
 
--- Componente 113: Disco Rígido Seagate 4TB Barracuda 256MB SATA 6GB/s
+-- Componente 113: Disco Rigido Seagate 4TB Barracuda 256MB SATA 6GB/s
 INSERT INTO Componente (nombre, precio, stock, marca)
-VALUES ('Disco Rígido Seagate 4TB Barracuda 6GB/s', 123000.0, 10, 'Seagate');
+VALUES ('Disco Rigido Seagate 4TB Barracuda 6GB/s', 123000.0, 10, 'Seagate');
 
 INSERT INTO Almacenamiento (id, capacidad, tipoDeConexion, consumo, tipoDeDisco, memoriaCache, velocidadLecturaSecuencial, velocidadEscrituraSecuencial)
 VALUES (113, '4 TB', 'SATA', '5 W', 'Mecanico', '256 MB', '190 MB/s', '130 MB/s');
@@ -2002,7 +2002,7 @@ VALUES ('Almacenamiento-Disco-Rigido-WD-6TB-1.jpg', 114);
 
 -- Componente 115: Disco Rigido Seagate 8TB Barracuda 256MB SATA 6GB/s
 INSERT INTO Componente (nombre, precio, stock, marca)
-VALUES ('Disco Rígido Seagate 8TB Barracuda 6GB/s', 188000.0, 10, 'Seagate');
+VALUES ('Disco Rigido Seagate 8TB Barracuda 6GB/s', 188000.0, 10, 'Seagate');
 
 INSERT INTO Almacenamiento (id, capacidad, tipoDeConexion, consumo, tipoDeDisco, memoriaCache, velocidadLecturaSecuencial, velocidadEscrituraSecuencial)
 VALUES (115, '8 TB', 'SATA', '5 W', 'Mecanico', '256 MB', '190 MB/s', NULL);
@@ -2030,9 +2030,9 @@ VALUES (117, '512 GB', 'SATA', '3 W', 'Solido', '128 MB', '520 MB/s', '450 MB/s'
 INSERT INTO Imagen (urlImagen, componente_id)
 VALUES ('Almacenamiento-Disco-Solido-SSD-ADATA-512GB-1.jpg', 117);
 
--- Componente 118: Disco Sólido SSD WD 480GB GREEN 545MB/s SATA
+-- Componente 118: Disco Solido SSD WD 480GB GREEN 545MB/s SATA
 INSERT INTO Componente (nombre, precio, stock, marca)
-VALUES ('Disco Sólido SSD WD 480GB GREEN 545MB/s', 42800.0, 10, 'WD');
+VALUES ('Disco Solido SSD WD 480GB GREEN 545MB/s', 42800.0, 10, 'WD');
 
 INSERT INTO Almacenamiento (id, capacidad, tipoDeConexion, consumo, tipoDeDisco, memoriaCache, velocidadLecturaSecuencial, velocidadEscrituraSecuencial)
 VALUES (118, '480 GB', 'SATA', '3 W', 'Solido', '0 MB', '545 MB/s', '435 MB/s');
@@ -2040,9 +2040,9 @@ VALUES (118, '480 GB', 'SATA', '3 W', 'Solido', '0 MB', '545 MB/s', '435 MB/s');
 INSERT INTO Imagen (urlImagen, componente_id)
 VALUES ('Almacenamiento-Disco-Solido-SSD-WD-480GB-1.jpg', 118);
 
--- Componente 119: Disco Sólido SSD Kingston 480GB A400 500MB/s
+-- Componente 119: Disco Solido SSD Kingston 480GB A400 500MB/s
 INSERT INTO Componente (nombre, precio, stock, marca)
-VALUES ('Disco Sólido SSD Kingston 480GB A400 500MB/s', 48000.0, 10, 'Kingston');
+VALUES ('Disco Solido SSD Kingston 480GB A400 500MB/s', 48000.0, 10, 'Kingston');
 
 INSERT INTO Almacenamiento (id, capacidad, tipoDeConexion, consumo, tipoDeDisco, memoriaCache, velocidadLecturaSecuencial, velocidadEscrituraSecuencial)
 VALUES (119, '480 GB', 'SATA', '3 W', 'Solido', '0 MB', '500 MB/s', '450 MB/s');
@@ -2090,9 +2090,9 @@ VALUES (123, '500 GB', 'M2', '3 W', 'Solido', '128 MB', '2400 MB/s', '1500 MB/s'
 INSERT INTO Imagen (urlImagen, componente_id)
 VALUES ('Almacenamiento-Disco-Solido-SSD-M2-WD-500GB-1.jpg', 123);
 
--- Componente 124: Disco Sólido SSD M.2 Kingston 1TB NV3 6000MB/s NVMe PCIe Gen4 x4
+-- Componente 124: Disco Solido SSD M.2 Kingston 1TB NV3 6000MB/s NVMe PCIe Gen4 x4
 INSERT INTO Componente (nombre, precio, stock, marca)
-VALUES ('Disco Sólido SSD M.2 Kingston 1TB NV3 6000MB/s', 85400.0, 10, 'Kingston');
+VALUES ('Disco Solido SSD M.2 Kingston 1TB NV3 6000MB/s', 85400.0, 10, 'Kingston');
 
 INSERT INTO Almacenamiento (id, capacidad, tipoDeConexion, consumo, tipoDeDisco, memoriaCache, velocidadLecturaSecuencial, velocidadEscrituraSecuencial)
 VALUES (124, '1 TB', 'M2', '3 W', 'Solido', '128 MB', '6000 MB/s', '4000 MB/s');
@@ -2100,9 +2100,9 @@ VALUES (124, '1 TB', 'M2', '3 W', 'Solido', '128 MB', '6000 MB/s', '4000 MB/s');
 INSERT INTO Imagen (urlImagen, componente_id)
 VALUES ('Almacenamiento-Disco-Solido-SSD-M2-Kingston-1TB-1.jpg', 124);
 
--- Componente 125: Disco Sólido SSD M.2 Corsair MP600 Core XT 1TB 5000MB/s NVMe PCIe x4 Gen4
+-- Componente 125: Disco Solido SSD M.2 Corsair MP600 Core XT 1TB 5000MB/s NVMe PCIe x4 Gen4
 INSERT INTO Componente (nombre, precio, stock, marca)
-VALUES ('Disco Sólido SSD M.2 Corsair MP600 Core XT 1TB 5000MB/s', 121000.0, 10, 'Corsair');
+VALUES ('Disco Solido SSD M.2 Corsair MP600 Core XT 1TB 5000MB/s', 121000.0, 10, 'Corsair');
 
 INSERT INTO Almacenamiento (id, capacidad, tipoDeConexion, consumo, tipoDeDisco, memoriaCache, velocidadLecturaSecuencial, velocidadEscrituraSecuencial)
 VALUES (125, '1 TB', 'M2', '3 W', 'Solido', '128 MB', '5000 MB/s', '4400 MB/s');
@@ -2140,9 +2140,9 @@ VALUES (128, '2 TB', 'M2', '7 W', 'Solido', '128 MB', '7300 MB/s', '6600 MB/s');
 INSERT INTO Imagen (urlImagen, componente_id)
 VALUES ('Almacenamiento-Disco-Solido-SSD-M2-WD-Black-2TB-1.jpg', 128);
 
--- Componente 129: Disco Sólido SSD M.2 Corsair MP600 PRO XT 4TB 7100MB/s NVMe PCIe x4 Gen4 Heatsink Black
+-- Componente 129: Disco Solido SSD M.2 Corsair MP600 PRO XT 4TB 7100MB/s NVMe PCIe x4 Gen4 Heatsink Black
 INSERT INTO Componente (nombre, precio, stock, marca)
-VALUES ('Disco Sólido SSD M.2 Corsair MP600 PRO XT 4TB 7100MB/s Heatsink Black', 493000.0, 10, 'Corsair');
+VALUES ('Disco Solido SSD M.2 Corsair MP600 PRO XT 4TB 7100MB/s Heatsink Black', 493000.0, 10, 'Corsair');
 
 INSERT INTO Almacenamiento (id, capacidad, tipoDeConexion, consumo, tipoDeDisco, memoriaCache, velocidadLecturaSecuencial, velocidadEscrituraSecuencial)
 VALUES (129, '4 TB', 'M2', '3 W', 'Solido', '128 MB', '7100 MB/s', '6800 MB/s');
@@ -2634,7 +2634,7 @@ VALUES ('Mouse Logitech M240 Silent Bluetooth off white', 29990.0, 20, 'Logitech
 
 INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
                         conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
-VALUES (159, '0', 'inalámbrico', true, true, false, false, null, false, null);
+VALUES (159, '0', 'inalambrico', true, true, false, false, null, false, null);
 
 INSERT INTO Imagen (urlImagen, componente_id)
 VALUES ('Periferico-Mouse-Logitech-M240-Silent-Bluetooth-off-white-1.jpg', 159),
@@ -2646,7 +2646,7 @@ VALUES ('Mouse Cougar Surpassion RX Wireless Pink RGB', 89990.0, 12, 'Cougar');
 
 INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
                         conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
-VALUES (160, '1', 'inalámbrico', false, false, true, true, 'USB-C', true, '1800m');
+VALUES (160, '1', 'inalambrico', false, false, true, true, 'USB-C', true, '1800m');
 
 INSERT INTO Imagen (urlImagen, componente_id)
 VALUES ('Periferico-Mouse-Cougar-Surpassion-RX-Wireless-Pink-RGB-1.jpg', 160),
@@ -2658,7 +2658,7 @@ VALUES ('Mouse Logitech G903 Wireless 2.4Ghz Lightspeed 1ms HERO 25K 110g 24Hs',
 
 INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
                         conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
-VALUES (161, '1', 'inalámbrico', false, false, true, true, 'USB-C', true, '1500m');
+VALUES (161, '1', 'inalambrico', false, false, true, true, 'USB-C', true, '1500m');
 
 INSERT INTO Imagen (urlImagen, componente_id)
 VALUES ('Periferico-Mouse-Logitech-G903-Wireless-2-4Ghz-Lightspeed-1ms-HERO-25K-110g-24Hs-1.jpg', 161),
@@ -2684,7 +2684,7 @@ VALUES ('Mouse Logitech Wireless M280 Gray', 16990.0, 22, 'Logitech');
 
 INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
                         conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
-VALUES (163, '1', 'inalámbrico', false, false, true, true, null, false, null);
+VALUES (163, '1', 'inalambrico', false, false, true, true, null, false, null);
 
 INSERT INTO Imagen (urlImagen, componente_id)
 VALUES ('Periferico-Mouse-Logitech-Wireless-M280-Gray-1.jpg', 163),
@@ -2696,7 +2696,7 @@ VALUES ('Mouse Redragon Griffin M607W RGB White', 19350.0, 16, 'Redragon');
 
 INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
                         conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
-VALUES (164, '1', 'inalámbrico', false, false, true, true, 'USB-C', true, '1600m');
+VALUES (164, '1', 'inalambrico', false, false, true, true, 'USB-C', true, '1600m');
 
 INSERT INTO Imagen (urlImagen, componente_id)
 VALUES ('Periferico-Mouse-Redragon-Griffin-M607W-RGB-White-1.jpg', 164),
@@ -2736,7 +2736,7 @@ VALUES ('Teclado Mecanico Logitech G915 Low Profile Lightspeed Wireless 2.4Ghz B
 
 INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
                         conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
-VALUES (167, '1', 'inalámbrico', true, false, true, true, 'USB-C', true, '1200m');
+VALUES (167, '1', 'inalambrico', true, false, true, true, 'USB-C', true, '1200m');
 
 INSERT INTO Imagen (urlImagen, componente_id)
 VALUES ('Periferico-Teclado-Mecanico-Logitech-G915-Low-Profile-Lightspeed-Wireless-2-4Ghz-Bluetooth-LightSync-RGB-Switch-Brown-TKL-White-40hs-1.jpg', 167),
@@ -2748,7 +2748,7 @@ VALUES ('Teclado Mecanico ASUS ROG Strix M701 Azoth RGB Wireless Bluetooth Switc
 
 INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
                         conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
-VALUES (168, '1', 'inalámbrico', true, false, true, true, 'USB-C', true, '1000m');
+VALUES (168, '1', 'inalambrico', true, false, true, true, 'USB-C', true, '1000m');
 
 INSERT INTO Imagen (urlImagen, componente_id)
 VALUES ('Periferico-Teclado-Mecanico-ASUS-ROG-Strix-M701-Azoth-RGB-Wireless-Bluetooth-Switch-NX-Storm-White-1.jpg', 168),
@@ -2761,7 +2761,7 @@ VALUES ('Teclado Logitech MX Key Graphite VC', 159990.0, 10, 'Logitech');
 
 INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
                         conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
-VALUES (169, '1', 'inalámbrico', true, false, true, true, 'USB-C', true, '1400m');
+VALUES (169, '1', 'inalambrico', true, false, true, true, 'USB-C', true, '1400m');
 
 INSERT INTO Imagen (urlImagen, componente_id)
 VALUES ('Periferico-Teclado-Logitech-MX-Key-Graphite-VC-1.jpg', 169),
@@ -2774,7 +2774,7 @@ VALUES ('Teclado Logitech Pebble Keys 2 K380S Multidispositivo Bluetooth Black',
 
 INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
                         conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
-VALUES (170, '0', 'inalámbrico', true, true, false, false, null, false, null);
+VALUES (170, '0', 'inalambrico', true, true, false, false, null, false, null);
 
 INSERT INTO Imagen (urlImagen, componente_id)
 VALUES ('Periferico-Teclado-Logitech-Pebble-Keys-2-K380S-Multidispositivo-Bluetooth-Black-1.jpg', 170);
@@ -2802,7 +2802,7 @@ VALUES ('Auriculares Redragon Ire H848 Ultra light Wireless USB Bluetooth White/
 
 INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
                         conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
-VALUES (172, '0', 'inalámbrico', true, false, true, true, 'USB-C', true, '1500m');
+VALUES (172, '0', 'inalambrico', true, false, true, true, 'USB-C', true, '1500m');
 
 INSERT INTO Imagen (urlImagen, componente_id)
 VALUES ('Periferico-Auriculares-Redragon-Ire-H848-Ultra-light-Wireless-USB-Bluetooth-White-Pink-USB-C-1.jpg', 172),
@@ -2815,7 +2815,7 @@ VALUES ('Auriculares Logitech G935 Wireless 2.4Ghz 7.1 Lightsync DTS Headphone X
 
 INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
                         conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
-VALUES (173, '1', 'inalámbrico', false, false, true, true, null, false, null);
+VALUES (173, '1', 'inalambrico', false, false, true, true, null, false, null);
 
 INSERT INTO Imagen (urlImagen, componente_id)
 VALUES ('Periferico-Auriculares-Logitech-G935-Wireless-2-4Ghz-7-1-Lightsync-DTS-Headphone-X-RGB-1.jpg', 173),
@@ -2841,7 +2841,7 @@ VALUES ('Auriculares Logitech Astro A50X Wireless Lightspeed 2.4Ghz Bluetooth Bl
 
 INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
                         conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
-VALUES (175, '1', 'inalámbrico', true, false, true, true, 'USB-C', true, '1800m');
+VALUES (175, '1', 'inalambrico', true, false, true, true, 'USB-C', true, '1800m');
 
 INSERT INTO Imagen (urlImagen, componente_id)
 VALUES ('Periferico-Auriculares-Logitech-Astro-A50X-Wireless-Lightspeed-2-4Ghz-Bluetooth-Black-PC-PS5-XBOX-HDMI-2-1-24HS-1.jpg', 175),
@@ -2854,8 +2854,42 @@ VALUES ('Auriculares Redragon Ire H848 Ultra light Wireless USB Bluetooth Black 
 
 INSERT INTO Periferico (id, usbRequeridos, tipoDeConexion, conexionBluetooth, receptorBluetoothIncluido,
                         conexionWireless, receptorWirelessIncluido, tipoDeCable, cableExtraible, largoDelCable)
-VALUES (176, '1', 'inalámbrico', true, false, true, true, 'USB-C', true, '1500m');
+VALUES (176, '1', 'inalambrico', true, false, true, true, 'USB-C', true, '1500m');
 
 INSERT INTO Imagen (urlImagen, componente_id)
 VALUES ('Periferico-Auriculares-Redragon-Ire-H848-Ultra-light-Wireless-USB-Bluetooth-Black-USB-C-1.jpg', 176),
        ('Periferico-Auriculares-Redragon-Ire-H848-Ultra-light-Wireless-USB-Bluetooth-Black-USB-C-2.jpg', 176);
+
+-- =================================================================
+-- Cooler CPU y Graficos Integrados
+-- =================================================================
+
+-- Componente 177: Cooler CPU Integrado
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Cooler CPU Incluido en el Procesador', 0.0, 10000, NULL);
+
+INSERT INTO CoolerCPU (
+    id, consumo, tdpPredeterminado, tipoDeDisipacion,
+    cantCoolersIncluidos, tamanioCoolers, tipoDeIlumninacion, nivelMaximoDeRuido
+) VALUES (
+             177, '5 W', NULL, 'Aire',
+             1, '120 mm', NULL, '25 dBA'
+         );
+
+INSERT INTO cooler_socket (cooler_id, socket_id)
+VALUES (177, 1), -- AM4
+       (177, 2), -- AM5
+       (177, 3); -- LGA1700
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Imagen-Para-Producto-Sin-Foto.jpg', 177);
+
+-- Componente 178: Graficos Integrados en Procesador
+INSERT INTO Componente (nombre, precio, stock, marca)
+VALUES ('Graficos Integrados en el Procesador', 0.0, 10000, NULL);
+
+INSERT INTO PlacaDeVideo (id, chipsetGPU, cantidadDeCoolers, cantidadDeVGA, cantidadDeDVIDigital, cantidadDeHDMI, cantidadDeDisplayport, consumo, cantidadDePCIE6Pines, cantidadDePCIE8Pines, cantidadDePCIE16Pines, cantidadDeAdaptadores16Pines, velocidadDelCoreBase, velocidadDelCoreTurbo, tecnologiaRAM, capacidadRAM)
+VALUES (178, NULL, NULL, NULL, NULL, NULL, NULL, '50 W', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+
+INSERT INTO Imagen (urlImagen, componente_id)
+VALUES ('Imagen-Para-Producto-Sin-Foto.jpg', 178);

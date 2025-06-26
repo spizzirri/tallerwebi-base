@@ -40,6 +40,21 @@ public class RepositorioComponenteImpl implements RepositorioComponente {
     }
 
     @Override
+    public List<Componente> obtenerComponentesPorTipoEnStockOrdenadosPorPrecio(String tipo) {
+        String hql = "FROM " + tipo + " c WHERE c.stock > 0 ORDER BY c.precio ASC"; // o DESC si querés de mayor a menor
+        Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
+        return query.getResultList();
+    }
+
+    @Override
+    public List<Componente> obtenerComponentesPorTipoYFiltradosPorNombreEnStockOrdenadosPorPrecio(String tipo, String nombre) {
+        String hql = "FROM " + tipo + " c WHERE c.stock > 0 AND lower(c.nombre) LIKE lower(:nombre) ORDER BY c.precio ASC"; // o DESC si querés de mayor a menor
+        Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
+        query.setParameter("nombre", "%" + nombre + "%");
+        return query.getResultList();
+    }
+
+    @Override
     public Componente obtenerComponentePorId(Long idComponente) {
 
         String hql = "FROM Componente WHERE id = :idComponente";

@@ -39,7 +39,7 @@ public class ServicioFuenteImpl implements ServicioFuente {
         if (componente instanceof CoolerCPU) watsEnString = ((CoolerCPU) componente).getConsumo();
         if (componente instanceof PlacaDeVideo) watsEnString = ((PlacaDeVideo) componente).getConsumo();
         if (componente instanceof Almacenamiento) watsEnString = ((Almacenamiento) componente).getConsumo();
-        if (componente instanceof Procesador) watsEnString = ((Procesador) componente).getTdpPredeterminado();
+        if (componente instanceof Procesador) watsEnString = ((Procesador) componente).getConsumo();
 
         return Integer.parseInt(watsEnString.split(" ")[0]);
     }

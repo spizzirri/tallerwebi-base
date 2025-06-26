@@ -1,6 +1,7 @@
 package com.tallerwebi.dominio;
 
 import com.tallerwebi.dominio.entidades.*;
+import com.tallerwebi.dominio.excepcion.ComponenteDeterminateDelArmadoEnNullException;
 import com.tallerwebi.dominio.excepcion.LimiteDeComponenteSobrepasadoEnElArmadoException;
 import com.tallerwebi.dominio.excepcion.QuitarComponenteInvalidoException;
 import com.tallerwebi.dominio.excepcion.QuitarStockDemasDeComponenteException;
@@ -56,14 +57,32 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
     }
 
     @Override
-    public List<ComponenteDto> obtenerListaDeComponentesCompatiblesDto(String tipoComponente, ArmadoPcDto armadoPcDto) {
+    public List<ComponenteDto> obtenerListaDeComponentesCompatiblesDto(String tipoComponente, ArmadoPcDto armadoPcDto) throws ComponenteDeterminateDelArmadoEnNullException {
 
         String tablaDelTipoDeComponente = this.correspondenciaDeVistaConTablasEnLaBD.get(tipoComponente);
-        List<Componente> componentesDeTipo = this.repositorioComponente.obtenerComponentesPorTipoEnStock(tablaDelTipoDeComponente);
+        List<Componente> componentesDeTipo = this.repositorioComponente.obtenerComponentesPorTipoEnStockOrdenadosPorPrecio(tablaDelTipoDeComponente);
         List<Componente> componentesCompatibles = new ArrayList<>();
 
         for (Componente componente : componentesDeTipo) {
-//            ArmadoPc armadoPcEntidad = this.completarEntidadArmadoPc(armadoPcDto.obtenerEntidad());
+            Boolean esCompatibleConElArmado = this.servicioCompatibilidades.esCompatibleConElArmado(componente, armadoPcDto.obtenerEntidad());
+            if (esCompatibleConElArmado) componentesCompatibles.add(componente);
+        }
+
+
+        List<ComponenteDto> listaDeComponentesDto = transformarComponentesADtos(componentesCompatibles);
+
+        return listaDeComponentesDto;
+    }
+
+    @Override
+    public List<ComponenteDto> obtenerListaDeComponentesCompatiblesFiltradosDto(String tipoComponente, String nombreFiltro, ArmadoPcDto armadoPcDto) throws ComponenteDeterminateDelArmadoEnNullException {
+        String tablaDelTipoDeComponente = this.correspondenciaDeVistaConTablasEnLaBD.get(tipoComponente);
+
+        List<Componente> componentesDeTipo = this.repositorioComponente.obtenerComponentesPorTipoYFiltradosPorNombreEnStockOrdenadosPorPrecio(tablaDelTipoDeComponente, nombreFiltro);
+
+        List<Componente> componentesCompatibles = new ArrayList<>();
+
+        for (Componente componente : componentesDeTipo) {
             Boolean esCompatibleConElArmado = this.servicioCompatibilidades.esCompatibleConElArmado(componente, armadoPcDto.obtenerEntidad());
             if (esCompatibleConElArmado) componentesCompatibles.add(componente);
         }

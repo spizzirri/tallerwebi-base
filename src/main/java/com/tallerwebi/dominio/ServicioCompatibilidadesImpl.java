@@ -1,6 +1,7 @@
 package com.tallerwebi.dominio;
 
 import com.tallerwebi.dominio.entidades.*;
+import com.tallerwebi.dominio.excepcion.ComponenteDeterminateDelArmadoEnNullException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +32,7 @@ public class ServicioCompatibilidadesImpl implements ServicioCompatibilidades {
     this.repositorioComponente = repositorioComponente;
     }
 
-    public Boolean esCompatibleConElArmado(Componente componente, ArmadoPc armadoPc) {
+    public Boolean esCompatibleConElArmado(Componente componente, ArmadoPc armadoPc) throws ComponenteDeterminateDelArmadoEnNullException {
 
         // Compatibilidades
         // Motherboard
@@ -43,6 +44,9 @@ public class ServicioCompatibilidadesImpl implements ServicioCompatibilidades {
 
             switch (componente.getClass().getSimpleName()) {
                 case "Motherboard": {
+
+                    if (armadoPc.getProcesador() == null) throw new ComponenteDeterminateDelArmadoEnNullException("Debe seleccionar un Procesador para poder elegir una Motherboard.");
+
                     Procesador procesadorArmado = (Procesador) this.repositorioComponente.obtenerComponentePorId(armadoPc.getProcesador().getId());
 
                     esCompatible = servicioMotherboard.verificarCompatibilidadDeMotherboardConProcesador((Motherboard) componente, procesadorArmado);
@@ -50,6 +54,9 @@ public class ServicioCompatibilidadesImpl implements ServicioCompatibilidades {
                     break;
                 }
                 case "CoolerCPU": {
+
+                    if (armadoPc.getProcesador() == null) throw new ComponenteDeterminateDelArmadoEnNullException("Debe seleccionar un Procesador para poder elegir un Cooler.");
+                    if (armadoPc.getMotherboard() == null) throw new ComponenteDeterminateDelArmadoEnNullException("Debe seleccionar una Motherboard para poder elegir un Cooler.");
 
                     Procesador procesadorArmado = (Procesador) this.repositorioComponente.obtenerComponentePorId(armadoPc.getProcesador().getId());
                     Motherboard motherboardArmado = (Motherboard) this.repositorioComponente.obtenerComponentePorId(armadoPc.getMotherboard().getId());
@@ -61,6 +68,8 @@ public class ServicioCompatibilidadesImpl implements ServicioCompatibilidades {
                 }
                 case "MemoriaRAM": {
 
+                    if (armadoPc.getMotherboard() == null) throw new ComponenteDeterminateDelArmadoEnNullException("Debe seleccionar una Motherboard para poder elegir un Memoria RAM.");
+
                     Motherboard motherboardArmado = (Motherboard) this.repositorioComponente.obtenerComponentePorId(armadoPc.getMotherboard().getId());
 
                     esCompatible = servicioMotherboard.verificarCompatibilidadDeMotherboardConMemoriaRAM(motherboardArmado, (MemoriaRAM) componente); // boolean = comparar DDRR
@@ -68,6 +77,9 @@ public class ServicioCompatibilidadesImpl implements ServicioCompatibilidades {
                     break;
                 }
                 case "PlacaDeVideo": {
+
+                    if (armadoPc.getProcesador() == null) throw new ComponenteDeterminateDelArmadoEnNullException("Debe seleccionar un Procesador para poder elegir una Placa de Video.");
+                    // analizar si despues comparar el ddr de la mother
 
                     Procesador procesadorArmado = (Procesador) this.repositorioComponente.obtenerComponentePorId(armadoPc.getProcesador().getId());
 
@@ -78,6 +90,8 @@ public class ServicioCompatibilidadesImpl implements ServicioCompatibilidades {
                 }
                 case "Almacenamiento": {
 
+                    if (armadoPc.getMotherboard() == null) throw new ComponenteDeterminateDelArmadoEnNullException("Debe seleccionar una Motherboard para poder elegir el Almacenamiento.");
+
                     Motherboard motherboardArmado = (Motherboard) this.repositorioComponente.obtenerComponentePorId(armadoPc.getMotherboard().getId());
 
                     esCompatible = servicioMotherboard.verificarCompatibilidadDeMotherboardConTipoDeConexionDeAlmacenamiento(motherboardArmado, (Almacenamiento) componente);
@@ -87,7 +101,7 @@ public class ServicioCompatibilidadesImpl implements ServicioCompatibilidades {
                 case "FuenteDeAlimentacion": {
 
                     esCompatible = servicioFuente.verificarCompatibilidadDeFuenteConWatsDelArmado((FuenteDeAlimentacion) componente, completarEntidadArmadoPcParaEvaluarFuente(armadoPc));
-                    // hacer sumatoria de wats del armado hasta ahora y verificar que la fuente tenga capacidad superior.
+
                     break;
                 }
 //                case "Gabinete":

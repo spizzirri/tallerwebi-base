@@ -11,11 +11,11 @@ import javax.transaction.Transactional;
 public class ServicioPlacaDeVideoImpl implements ServicioPlacaDeVideo {
     @Override
     public Boolean verificarGraficosIntegrados(PlacaDeVideo placaDeVideo, Procesador procesador) {
-        return procesador.getIncluyeGraficosIntegrados() && placaDeVideo.getPrecio() == 0.0;
+        return procesador != null && placaDeVideo != null && procesador.getIncluyeGraficosIntegrados() && placaDeVideo.getPrecio() == 0.0;
     }
 
     @Override
     public Boolean verificarPrecioMayorACero(PlacaDeVideo placaDeVideo) {
-        return placaDeVideo.getPrecio() > 0.0;
+        return placaDeVideo != null && placaDeVideo.getPrecio() > 0.0;
     }
 }
