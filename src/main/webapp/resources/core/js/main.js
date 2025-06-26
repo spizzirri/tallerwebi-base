@@ -9,7 +9,7 @@ function multiplicar(a, b) {
 // Función para obtener cantidad vía AJAX como respaldo
 function obtenerCantidadCarritoAjax() {
 
-    fetch('/spring/carritoDeCompras/cantidad')
+    fetch('/carritoDeCompras/cantidad')
         .then(response => response.json())
         .then(data => {
             actualizarContadorCarrito(data.cantidadEnCarrito);
@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function cargarProductos(idCategoria) {
-    fetch(`/spring/productos/tipoComponente/${idCategoria}`)
+    fetch(`/productos/tipoComponente/${idCategoria}`)
         .then(response => response.text())
         .then(html => {
             document.getElementById("productos-container").innerHTML = html;

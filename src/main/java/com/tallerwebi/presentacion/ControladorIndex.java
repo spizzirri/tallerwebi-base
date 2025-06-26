@@ -41,6 +41,7 @@ public class ControladorIndex {
         this.servicioPrecios = servicioPrecios;
     }
 
+
     @GetMapping("/index")
     public ModelAndView irAlIndex() {
         List<CategoriaDto> categoriasAMostrar = categoriasService.getCategorias();

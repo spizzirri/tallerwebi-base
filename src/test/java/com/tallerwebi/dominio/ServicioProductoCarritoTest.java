@@ -143,6 +143,7 @@ public class ServicioProductoCarritoTest {
     @Test
     public void cuandoVerificoElStockYAlcanzaObtengoTrue(){
         Long componenteId = 1L;
+        Integer cantidadDeseada = 2;
         Integer stockDisponible = 10;
 
         Componente componenteMock = mock(Componente.class);

@@ -23,6 +23,7 @@
         <link rel="stylesheet" th:href="@{/css/fragments.css}">
         <link rel="stylesheet" th:href="@{/css/main.css}"/>
     </head>
+
     <body style="margin: 0px;padding: 0px;">
 
     <header class="sticky-top bg-dark " style="height: 80px; z-index: 1030;">
@@ -45,10 +46,25 @@
                 <a class="btn btn-warning me-2" id="abrirResumenCarrito">
                     <i class="bi bi-cart3"> (<span id="contadorCarrito">0</span>)</i>
                 </a>
-                <button class="btn btn-outline-secondary text-light"><i class="bi bi-person">Ingresa</i></button>
+                <button type="button" class="btn btn-outline-secondary text-light" data-bs-toggle="modal"
+                        data-bs-target="#loginModal">
+                    <i class="bi bi-person">Ingresa</i>
+                </button>
+
+
             </div>
         </div>
     </header>
+
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div th:replace="login"></div>
+
+            </div>
+        </div>
+    </div>
+
     <div th:fragment="resumenCarrito">
         <div id="resumenCarrito" class="carrito-sidebar">
             <div class="carrito-header">
@@ -120,8 +136,8 @@
         </div>
     </nav>
 
-
 </div>
+
 <!-- Footer Fragment -->
 <div th:fragment="footer">
     <footer class="bg-dark text-light pt-5 pb-3 mt-5">
