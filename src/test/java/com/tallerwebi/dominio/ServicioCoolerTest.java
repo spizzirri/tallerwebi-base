@@ -61,15 +61,17 @@ public class ServicioCoolerTest {
 
     // Test para verificar compatibilidad cooler con motherboard
 
+
     @Test
-    public void debeDevolverTrueSiElCoolerEsCompatibleConElSocketDeLaMotherboard() {
+    public void debeDevolverTrueSiElCoolerTieneSocketCompatibleYPrecioMayorACero() {
         Socket socketAM4 = new Socket(1L, "AM4");
 
         Motherboard motherboard = new Motherboard();
         motherboard.setSocket(socketAM4);
 
         CoolerCPU cooler = new CoolerCPU();
-        cooler.setSockets(new HashSet<Socket>(List.of(socketAM4)));
+        cooler.setSockets(new HashSet<>(List.of(socketAM4)));
+        cooler.setPrecio(4500.0);
 
         assertTrue(servicio.verificarCompatibilidadDeCoolerConMotherboard(motherboard, cooler));
     }
@@ -84,6 +86,20 @@ public class ServicioCoolerTest {
 
         CoolerCPU cooler = new CoolerCPU();
         cooler.setSockets(new HashSet<Socket>(List.of(socketLGA1700)));
+
+        assertFalse(servicio.verificarCompatibilidadDeCoolerConMotherboard(motherboard, cooler));
+    }
+
+    @Test
+    public void debeDevolverFalseSiCoolerTieneSocketCompatiblePeroPrecioEsCero() {
+        Socket socketAM4 = new Socket(1L, "AM4");
+
+        Motherboard motherboard = new Motherboard();
+        motherboard.setSocket(socketAM4);
+
+        CoolerCPU cooler = new CoolerCPU();
+        cooler.setSockets(new HashSet<>(List.of(socketAM4)));
+        cooler.setPrecio(0.0);
 
         assertFalse(servicio.verificarCompatibilidadDeCoolerConMotherboard(motherboard, cooler));
     }

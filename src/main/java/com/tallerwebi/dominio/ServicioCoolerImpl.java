@@ -17,6 +17,6 @@ public class ServicioCoolerImpl implements ServicioCooler {
 
     @Override
     public Boolean verificarCompatibilidadDeCoolerConMotherboard(Motherboard motherboard, CoolerCPU coolerCPU) {
-        return coolerCPU != null && motherboard != null && coolerCPU.getSockets().contains(motherboard.getSocket());
+        return coolerCPU != null && motherboard != null && coolerCPU.getSockets().contains(motherboard.getSocket()) && coolerCPU.getPrecio() > 0.0;
     }
 }
