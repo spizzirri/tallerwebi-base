@@ -14,7 +14,7 @@ if (!window.eventosCarritoAsignados) {
 }
 
 window.agregarAlCarrito = function (componenteId, cantidad = 1) {
-    return fetch("/spring/agregarAlCarrito", {
+    return fetch("/agregarAlCarrito", {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
@@ -43,7 +43,7 @@ window.agregarAlCarrito = function (componenteId, cantidad = 1) {
 }
 
 window.actualizarResumenCarrito = function () {
-    fetch('/spring/fragments/fragments')
+    fetch('/fragments/fragments')
         .then(res => res.text())
         .then(html => {
             const parser = new DOMParser();
@@ -102,7 +102,7 @@ function asignarEventosVistaCarrito() {
                 let fila = this.closest('tr');
                 let precioTotalDelProducto = fila.querySelector(".precioTotalDelProducto");
 
-                fetch(`/spring/carritoDeCompras/agregarMasCantidadDeUnProducto/${idProducto}`, {
+                fetch(`/carritoDeCompras/agregarMasCantidadDeUnProducto/${idProducto}`, {
                     method: 'POST'
                 })
                     .then(response => {
@@ -140,7 +140,7 @@ document.querySelectorAll(".btnRestarCantidad").forEach(element => {
             let fila = this.closest('tr');
             let precioTotalDelProducto = fila.querySelector(".precioTotalDelProducto");
 
-            fetch(`/spring/carritoDeCompras/restarCantidadDeUnProducto/${idProducto}`, {
+            fetch(`/carritoDeCompras/restarCantidadDeUnProducto/${idProducto}`, {
                 method: 'POST'
             })
                 .then(response => response.json())
@@ -176,7 +176,7 @@ document.querySelectorAll(".btnEliminarProducto").forEach(element => {
         element.addEventListener('click', function () {
             let idProductoAEliminar = this.dataset.id;
 
-            fetch(`/spring/carritoDeCompras/eliminarProducto/${idProductoAEliminar}`, {
+            fetch(`/carritoDeCompras/eliminarProducto/${idProductoAEliminar}`, {
                 method: 'POST'
             })
                 .then(response => response.json())
@@ -201,7 +201,7 @@ window.asignarEventosDelResumenCarrito = function () {
     document.querySelectorAll('#resumenCarrito .btnRestarCantidad').forEach(btn => {
         btn.addEventListener('click', () => {
             const id = btn.closest('td').dataset.id;
-            fetch(`/spring/carritoDeCompras/restarCantidadDeUnProducto/${id}`, {method: 'POST'})
+            fetch(`/carritoDeCompras/restarCantidadDeUnProducto/${id}`, {method: 'POST'})
                 .then(res => res.json())
                 .then(data => {
                     actualizarResumenCarrito();
@@ -215,7 +215,7 @@ window.asignarEventosDelResumenCarrito = function () {
     document.querySelectorAll('#resumenCarrito .btnSumarCantidad').forEach(btn => {
         btn.addEventListener('click', () => {
             const id = btn.closest('td').dataset.id;
-            fetch(`/spring/carritoDeCompras/agregarMasCantidadDeUnProducto/${id}`, {method: 'POST'})
+            fetch(`/carritoDeCompras/agregarMasCantidadDeUnProducto/${id}`, {method: 'POST'})
                 .then(res => res.json())
                 .then(data => {
                     actualizarResumenCarrito();
@@ -229,7 +229,7 @@ window.asignarEventosDelResumenCarrito = function () {
     document.querySelectorAll('#resumenCarrito .btnEliminarProducto').forEach(btn => {
         btn.addEventListener('click', () => {
             const id = btn.dataset.id;
-            fetch(`/spring/carritoDeCompras/eliminarProducto/${id}`, {method: 'POST'})
+            fetch(`/carritoDeCompras/eliminarProducto/${id}`, {method: 'POST'})
                 .then(res => res.json())
                 .then(data => {
                     actualizarResumenCarrito();
