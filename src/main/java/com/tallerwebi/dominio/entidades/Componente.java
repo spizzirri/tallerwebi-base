@@ -1,5 +1,7 @@
 package com.tallerwebi.dominio.entidades;
 
+import org.hibernate.annotations.BatchSize;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +26,8 @@ public class Componente {
     @Column(length = 100)
     private String marca;
 
-    @OneToMany(mappedBy = "componente", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "componente", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @BatchSize(size = 10)
     private List<Imagen> imagenes;
 
     public Componente() {}

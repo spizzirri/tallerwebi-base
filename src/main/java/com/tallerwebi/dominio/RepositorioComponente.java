@@ -9,6 +9,10 @@ import java.util.List;
 public interface RepositorioComponente {
     List<Componente> obtenerComponentesPorTipo(String tipo);
 
+
+
+    Componente buscarComponenteConImagenesPorId(Long id);
+
     Componente obtenerComponentePorId(Long idComponente);
 
     List<Componente> obtenerComponentes();

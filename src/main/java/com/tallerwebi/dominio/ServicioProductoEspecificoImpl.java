@@ -19,6 +19,6 @@ public class ServicioProductoEspecificoImpl implements ServicioProductoEspecific
 
     @Override
     public Componente obtenerComponentePorId(Long idComponente) {
-        return this.repositorioComponente.obtenerComponentePorId(idComponente);
+        return this.repositorioComponente.buscarComponenteConImagenesPorId(idComponente);
     }
 }

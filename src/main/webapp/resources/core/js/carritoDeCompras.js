@@ -11,7 +11,7 @@ function calcularCantidadDesdeDOM() {
 }
 
 function obtenerCantidadCarritoAjax() {
-    fetch('/spring/carritoDeCompras/cantidad')
+    fetch('/carritoDeCompras/cantidad')
         .then(response => response.json())
         .then(data => {
             actualizarContadorCarrito(data.cantidadEnCarrito);
@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const codigo = input.value.trim();
             if (!codigo) return;
 
-            fetch('/spring/carritoDeCompras/aplicarDescuento', {
+            fetch('/carritoDeCompras/aplicarDescuento', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({codigoInput: codigo})
@@ -111,7 +111,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const params = new URLSearchParams();
             params.append('metodoPago', metodoSeleccionado.value);
 
-            fetch('/spring/carritoDeCompras/formularioPago', {
+            fetch('/carritoDeCompras/formularioPago', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -142,7 +142,7 @@ document.addEventListener("DOMContentLoaded", function () {
 function crearFormularioMercadoPago(data) {
     const form = document.createElement('form');
     form.method = 'POST';
-    form.action = '/spring/checkout/create-payment';
+    form.action = '/checkout/create-payment';
     form.innerHTML += `<input type="hidden" name="metodoDePago" value="mercadoPago">`;
 
     let costoEnvio = data.costoEnvio;
@@ -187,7 +187,7 @@ function calcularConAjax(codigoPostal) {
         loading.classList.remove('d-none');
     }
 
-    fetch(`/spring/carritoDeCompras/calcularEnvio?codigoPostal=${codigoPostal}`)
+    fetch(`/carritoDeCompras/calcularEnvio?codigoPostal=${codigoPostal}`)
         .then(response => response.json())
         .then(data => {
             if (data.success) {

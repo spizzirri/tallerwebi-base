@@ -28,6 +28,15 @@ public class RepositorioComponenteImpl implements RepositorioComponente {
 
         return query.getResultList();
     }
+    @Override
+    public Componente buscarComponenteConImagenesPorId(Long id) {
+        // La magia está en "LEFT JOIN FETCH c.imagenes"
+        String jpql = "SELECT c FROM Componente c LEFT JOIN FETCH c.imagenes WHERE c.id = :id";
+        return (Componente) sessionFactory.getCurrentSession()
+                .createQuery(jpql, Componente.class)
+                .setParameter("id", id)
+                .getSingleResult();
+    }
 
     @Override
     public Componente obtenerComponentePorId(Long idComponente) {

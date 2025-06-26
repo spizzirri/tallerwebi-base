@@ -24,5 +24,5 @@ public interface ServicioArmaTuPc {
 
     ComponenteDto obtenerComponenteDtoPorId(Long idComponente);
 
-    ;
+
 }
