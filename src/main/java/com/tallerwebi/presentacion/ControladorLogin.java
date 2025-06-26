@@ -59,7 +59,7 @@ public class ControladorLogin {
             if (redirectUrl != null && redirectUrl.startsWith("/")) {
                 return new ModelAndView("redirect:" + redirectUrl);
             }
-            return new ModelAndView("redirect:/home");
+            return new ModelAndView("redirect:/index");
         } else {
             model.put("error", "Usuario o clave incorrecta");
             return new ModelAndView("login", model);
@@ -68,7 +68,7 @@ public class ControladorLogin {
 
 
     @RequestMapping(path = "/registrarme", method = RequestMethod.POST)
-    public ModelAndView registrarme(@ModelAttribute("usuario") Usuario usuario) {
+    public ModelAndView registrarme(@ModelAttribute("usuario") Usuario usuario, @RequestParam("redirectUrl") String redirectUrl) {
         ModelMap model = new ModelMap();
         try {
             servicioLogin.registrar(usuario);
@@ -79,7 +79,9 @@ public class ControladorLogin {
             model.put("error", "Error al registrar el nuevo usuario");
             return new ModelAndView("nuevo-usuario", model);
         }
-        return new ModelAndView("redirect:/login");
+        model.put("mensajeRegistroExitoso", "El Registro fue exitoso");
+
+        return new ModelAndView("redirect:/index", model);
     }
 
     @RequestMapping(path = "/nuevo-usuario", method = RequestMethod.GET)
@@ -96,6 +98,6 @@ public class ControladorLogin {
 
     @RequestMapping(path = "/", method = RequestMethod.GET)
     public ModelAndView inicio() {
-        return new ModelAndView("redirect:/login");
+        return new ModelAndView("redirect:/index");
     }
 }

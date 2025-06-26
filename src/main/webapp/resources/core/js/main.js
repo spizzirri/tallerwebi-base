@@ -5,6 +5,21 @@ function suma(a, b) {
 function multiplicar(a, b) {
     return a * b;
 }
+const botonIrARegistrarme = document.getElementById("ir-a-registrarme");
+const botonRegistrarme = document.getElementById("btn-registrarme");
+const divLogin = document.getElementById("loginbox");
+
+botonIrARegistrarme.onclick = function ()
+{
+    fetch(`/nuevo-usuario`)
+        .then(response => response.text())
+        .then(html => {
+            divLogin.innerHTML = html;
+        })
+
+};
+
+
 
 // Función para obtener cantidad vía AJAX como respaldo
 function obtenerCantidadCarritoAjax() {
@@ -18,6 +33,14 @@ function obtenerCantidadCarritoAjax() {
             actualizarContadorCarrito(0);
         });
 }
+
+window.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('modalRegistroExitoso');
+    if (modal) {
+        const bootstrapModal = new bootstrap.Modal(modal);
+        bootstrapModal.show();
+    }
+});
 
 document.addEventListener("DOMContentLoaded", function () {
     // Inicializar contador del carrito
