@@ -24,7 +24,7 @@ public class ArmadoPcDto {
     public ArmadoPcDto(ArmadoPc entidad) {
         this.procesador = new ComponenteDto(entidad.getProcesador());
         this.motherboard = new ComponenteDto(entidad.getMotherboard());
-        this.cooler = new ComponenteDto(entidad.getCooler());
+        this.cooler = new ComponenteDto(entidad.getCoolerCPU());
         this.rams = this.convertirListaDeComponentesEntidadADtos(entidad.getMemoriaRAM());
         this.gpu = new ComponenteDto(entidad.getPlacaDeVideo());
         this.almacenamiento = this.convertirListaDeComponentesEntidadADtos(entidad.getAlmacenamiento());
@@ -70,15 +70,15 @@ public class ArmadoPcDto {
 
     public ArmadoPc obtenerEntidad() {
         ArmadoPc entidad = new ArmadoPc();
-        entidad.setProcesador((Procesador) this.procesador.obtenerEntidad());
-        entidad.setMotherboard((Motherboard) this.motherboard.obtenerEntidad());
-        entidad.setCoolerCPU((CoolerCPU) this.cooler.obtenerEntidad());
+        if (this.procesador != null) entidad.setProcesador((Procesador) this.procesador.obtenerEntidad());
+        if (this.motherboard != null) entidad.setMotherboard((Motherboard) this.motherboard.obtenerEntidad());
+        if (this.cooler != null) entidad.setCoolerCPU((CoolerCPU) this.cooler.obtenerEntidad());
         entidad.setMemoriaRAM(this.convertirListaDeDtosAEntidades(this.rams, MemoriaRAM.class));
-        entidad.setPlacaDeVideo((PlacaDeVideo) this.gpu.obtenerEntidad());
+        if (this.gpu != null) entidad.setPlacaDeVideo((PlacaDeVideo) this.gpu.obtenerEntidad());
         entidad.setAlmacenamiento(this.convertirListaDeDtosAEntidades(this.almacenamiento, Almacenamiento.class));
-        entidad.setFuenteDeAlimentacion((FuenteDeAlimentacion) this.fuente.obtenerEntidad());
-        entidad.setGabinete((Gabinete) this.gabinete.obtenerEntidad());
-        entidad.setMonitor((Monitor) this.monitor.obtenerEntidad());
+        if (this.fuente != null) entidad.setFuenteDeAlimentacion((FuenteDeAlimentacion) this.fuente.obtenerEntidad());
+        if (this.gabinete != null) entidad.setGabinete((Gabinete) this.gabinete.obtenerEntidad());
+        if (this.monitor != null) entidad.setMonitor((Monitor) this.monitor.obtenerEntidad());
         entidad.setPerifericos(this.convertirListaDeDtosAEntidades(this.perifericos, Periferico.class));
         return entidad;
     }
@@ -230,5 +230,22 @@ public class ArmadoPcDto {
         componentesDto.addAll(this.almacenamiento);
         componentesDto.addAll(this.perifericos);
         return componentesDto;
+    }
+
+    public Map<Long, Integer> getIdYCantidadComponentes() {
+        Map<Long, Integer> idYCantidad = new HashMap<>();
+
+        List<ComponenteDto> componentesDto = this.getComponentesDto();
+
+
+        for(ComponenteDto componente : componentesDto){
+
+            if (idYCantidad.containsKey(componente.getId()))
+                idYCantidad.put(componente.getId(), idYCantidad.get(componente.getId()) + 1);
+            else
+                idYCantidad.put(componente.getId(), 1);
+
+        }
+        return idYCantidad;
     }
 }

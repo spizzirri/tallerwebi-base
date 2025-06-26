@@ -13,6 +13,8 @@ public class ProductoDto {
     private String imagen;
     private String precioFormateado;
 
+    public ProductoDto() {}
+
     public ProductoDto(Componente componente) {
         this.id = componente.getId();
         this.nombre = componente.getNombre();
@@ -28,13 +30,14 @@ public class ProductoDto {
         this.precioFormateado = componente.getPrecio().toString();
     }
 
-    public ProductoDto(Long id, String nombre,Integer stock, Double precio, String tipoComponente, String imagen) {
+    public ProductoDto(Long id, String nombre,Integer stock, Double precio, String tipoComponente, String imagen, String precioFormateado) {
         this.id = id;
         this.nombre = nombre;
         this.precio = precio;
         this.stock = stock;
         this.tipoComponente = tipoComponente;
         this.imagen = imagen;
+        this.precioFormateado = precioFormateado;
     }
 
     public Long getId() {
