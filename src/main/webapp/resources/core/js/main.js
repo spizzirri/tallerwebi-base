@@ -5,19 +5,33 @@ function suma(a, b) {
 function multiplicar(a, b) {
     return a * b;
 }
-const botonIrARegistrarme = document.getElementById("ir-a-registrarme");
+// const botonIrARegistrarme = document.getElementById("ir-a-registrarme");
 const botonRegistrarme = document.getElementById("btn-registrarme");
-const divLogin = document.getElementById("loginbox");
+const divModal = document.getElementById("modal-div");
 
-botonIrARegistrarme.onclick = function ()
-{
-    fetch(`/nuevo-usuario`)
-        .then(response => response.text())
-        .then(html => {
-            divLogin.innerHTML = html;
-        })
 
-};
+asignarHandlersLogin();
+function asignarHandlersLogin() {
+  const botonIrARegistrarme = document.getElementById("ir-a-registrarme");
+
+    if (botonIrARegistrarme) {
+        botonIrARegistrarme.onclick = function () {
+            fetch(`/nuevo-usuario`)
+                .then(response => response.text())
+                .then(html => {
+                    document.querySelector("#loginModal .modal-content").innerHTML = html;
+                    // asignarHandlersRegistro(); // por si también necesitás volver a enganchar botones de registro
+                });
+        };
+    }
+}
+fetch("/login")
+    .then(response => response.text())
+    .then(html => {
+        document.querySelector("#loginModal .modal-content").innerHTML = html;
+    });
+
+
 
 
 
@@ -35,6 +49,7 @@ function obtenerCantidadCarritoAjax() {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
+    asignarHandlersLogin();
     const modal = document.getElementById('modalRegistroExitoso');
     if (modal) {
         const bootstrapModal = new bootstrap.Modal(modal);
@@ -79,5 +94,5 @@ function cargarProductos(idCategoria) {
         .then(html => {
             document.getElementById("productos-container").innerHTML = html;
         })
-}
 
+}

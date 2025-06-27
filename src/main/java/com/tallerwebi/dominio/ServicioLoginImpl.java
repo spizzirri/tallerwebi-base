@@ -30,5 +30,11 @@ public class ServicioLoginImpl implements ServicioLogin {
         repositorioUsuario.guardar(usuario);
     }
 
+    @Override
+    public Usuario obtenerUsuarioPorEmailYPassword(String email, String password) {
+       Usuario usuario = this.repositorioUsuario.obtenerUsuarioPorEmailYPassword(email, password);
+       return usuario;
+    }
+
 }
 

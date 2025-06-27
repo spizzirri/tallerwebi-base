@@ -1,5 +1,7 @@
 package com.tallerwebi.dominio;
 
+import com.tallerwebi.dominio.entidades.Componente;
+
 public interface RepositorioUsuario {
 
     Usuario buscarUsuario(String email, String password);
@@ -7,5 +9,5 @@ public interface RepositorioUsuario {
     Usuario buscar(String email);
     void modificar(Usuario usuario);
     void eliminarUsuario(Long idUsuario);
-}
+    Usuario obtenerUsuarioPorEmailYPassword(String email, String password);}
 

@@ -2,12 +2,16 @@ package com.tallerwebi.infraestructura;
 
 import com.tallerwebi.dominio.RepositorioUsuario;
 import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.entidades.Componente;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Repository;
+
+import javax.persistence.NoResultException;
+import javax.persistence.Query;
 
 @Repository("repositorioUsuario")
 public class RepositorioUsuarioImpl implements RepositorioUsuario {
@@ -29,6 +33,19 @@ public class RepositorioUsuarioImpl implements RepositorioUsuario {
                 .uniqueResult();
     }
 
+    @Override
+    public Usuario obtenerUsuarioPorEmailYPassword(String email, String password) {
+        String hql = "FROM Usuario WHERE email = :email AND password = :password";
+        Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
+        query.setParameter("email", email);
+        query.setParameter("password", password);
+
+        try {
+            return (Usuario) query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
     @Override
     public void guardar(Usuario usuario) {
         sessionFactory.getCurrentSession().save(usuario);

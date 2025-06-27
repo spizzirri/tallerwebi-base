@@ -56,8 +56,8 @@
 
     <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
-            <div class="modal-content">
-                <div th:replace="login"></div>
+            <div class="modal-content" id="modal-div">
+                <div th:replace="fragments/login :: login"></div>
             </div>
         </div>
     </div>
