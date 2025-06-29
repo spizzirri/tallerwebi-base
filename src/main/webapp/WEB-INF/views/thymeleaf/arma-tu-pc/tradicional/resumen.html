@@ -46,7 +46,9 @@
 
         <div class="m-auto d-flex justify-content-center gap-2">
             <a th:href="@{/arma-tu-pc/tradicional/procesador}" class="btn btn-outline-secondary">Volver al armado</a>
-            <a href="#" class="btn btn-outline-primary">Sumar al carrito</a>
+            <form method="POST" th:action="@{/arma-tu-pc/carrito}">
+                <input type="submit" class="btn btn-outline-primary">Sumar al carrito</input>
+            </form>
             <a href="#" class="btn btn-outline-primary">Guardar Armado</a>
         </div>
     </div>

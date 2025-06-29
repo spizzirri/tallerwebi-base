@@ -180,4 +180,22 @@ public class ControladorArmaTuPc {
         return new ModelAndView("redirect:/arma-tu-pc/tradicional/procesador");
     }
 
+    @RequestMapping(path = "arma-tu-pc/carrito", method = RequestMethod.POST)
+    public ModelAndView sumarArmadoAlCarrito(HttpSession session) {
+
+        List<ProductoCarritoDto> carritoSesion;
+
+        if (session.getAttribute("carritoSesion") != null) {
+            carritoSesion = (List<ProductoCarritoDto>) session.getAttribute("carritoSesion");
+        } else {
+            carritoSesion = new ArrayList<>();
+        }
+
+        carritoSesion.addAll(this.servicioArmaTuPc.pasajeAProductoDtoParaAgregarAlCarrito(obtenerArmadoPcDtoDeLaSession(session)));
+
+        // controlar el stock con servicio ServicioProductoCarritoImpl
+
+        return new ModelAndView("redirect:/carritoDeCompras/index");
+    }
+
 }
