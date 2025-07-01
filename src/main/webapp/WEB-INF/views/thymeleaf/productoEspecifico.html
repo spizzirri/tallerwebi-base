@@ -17,11 +17,11 @@
                 <div class="col-md-6"> <!-- Este es para el sector de las imágenes -->
                     <!-- Imagen grande -->
                     <div class="text-center mb-3">
-                        <img id="mainImage" th:src="'http://www.imagenesproyecto.free.nf/' + ${componenteEspecificoDto.imagenes[0]}" class="img-fluid img-thumbnail" alt="Imagen principal" style="max-height: 400px;">
+                        <img id="mainImage" th:src="'http://www.imagenestaller.free.nf/' + ${componenteEspecificoDto.imagenes[0]}" class="img-fluid img-thumbnail" alt="Imagen principal" style="max-height: 400px;">
                     </div>
                     <!-- Miniaturas -->
                     <div class="d-flex gap-2 flex-wrap justify-content-center">
-                        <img th:each="imagen : ${componenteEspecificoDto.imagenes}" th:src="'http://www.imagenesproyecto.free.nf/' + ${imagen}" class="img-thumbnail thumb-img" th:alt="${imagen}" style="width: 100px; height: auto; cursor: pointer;">
+                        <img th:each="imagen : ${componenteEspecificoDto.imagenes}" th:src="'http://www.imagenestaller.free.nf/' + ${imagen}" class="img-thumbnail thumb-img" th:alt="${imagen}" style="width: 100px; height: auto; cursor: pointer;">
                     </div>
                 </div>
                 <div class="col-md-6"> <!-- Este es para el sector que tiene el nombre, precio, etc -->
