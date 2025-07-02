@@ -74,7 +74,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             }
 
                             valorTotalElement.dataset.valorConDescuento = data.valorTotal;
-                            valorTotalElement.innerHTML = `$${data.valorTotal.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`;
+                            valorTotalElement.innerHTML = `$${data.valorTotal}`;
                         }
                     }
                 })
@@ -217,7 +217,7 @@ function calcularConAjax(codigoPostal) {
                 }
 
                 const hayDescuento = !document.getElementById('mensajeDescuento').classList.contains('d-none');
-                parrafoTotal.innerHTML = `Total con envio${hayDescuento ? ' y descuento' : ''}: <span class="total-envio-valor">$${totalConEnvio.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>`;
+                parrafoTotal.innerHTML = `Total con envio${hayDescuento ? ' y descuento' : ''}: <span class="total-envio-valor">$${totalConEnvio}</span>`;
                 parrafoTotal.style.display = 'block';
 
                 window.datosEnvio = {
