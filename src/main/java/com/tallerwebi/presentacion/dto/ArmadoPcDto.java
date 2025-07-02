@@ -192,13 +192,13 @@ public class ArmadoPcDto {
     public Double getPrecioTotal(){
         Double sumatoria = 0.0;
 
-        if(this.procesador != null) sumatoria += this.procesador.getPrecio();
-        if(this.motherboard != null) sumatoria += this.motherboard.getPrecio();
-        if(this.cooler != null) sumatoria += this.cooler.getPrecio();
-        if(this.gpu != null) sumatoria += this.gpu.getPrecio();
-        if(this.fuente != null) sumatoria += this.fuente.getPrecio();
-        if(this.gabinete != null) sumatoria += this.gabinete.getPrecio();
-        if(this.monitor != null) sumatoria += this.monitor.getPrecio();
+        if(this.procesador != null) sumatoria += this.procesador.getPrecioFormateado();
+        if(this.motherboard != null) sumatoria += this.motherboard.getPrecioFormateado();
+        if(this.cooler != null) sumatoria += this.cooler.getPrecioFormateado();
+        if(this.gpu != null) sumatoria += this.gpu.getPrecioFormateado();
+        if(this.fuente != null) sumatoria += this.fuente.getPrecioFormateado();
+        if(this.gabinete != null) sumatoria += this.gabinete.getPrecioFormateado();
+        if(this.monitor != null) sumatoria += this.monitor.getPrecioFormateado();
         if(this.rams != null && !this.rams.isEmpty()) sumatoria += sumatoriaDeListaDeComponente(this.rams);
         if(this.almacenamiento != null && !this.almacenamiento.isEmpty()) sumatoria += sumatoriaDeListaDeComponente(this.almacenamiento);
         if(this.perifericos != null && !this.perifericos.isEmpty()) sumatoria += sumatoriaDeListaDeComponente(this.perifericos);
@@ -209,7 +209,7 @@ public class ArmadoPcDto {
     private Double sumatoriaDeListaDeComponente(List<ComponenteDto> componentes) {
         Double sumatoriaDeLista = 0.0;
         for(ComponenteDto componente : componentes){
-            sumatoriaDeLista += componente.getPrecio();
+            sumatoriaDeLista += componente.getPrecioFormateado();
         }
         return sumatoriaDeLista;
     }

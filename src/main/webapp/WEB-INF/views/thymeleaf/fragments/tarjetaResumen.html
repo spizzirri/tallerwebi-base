@@ -11,13 +11,13 @@
     <div class="col-md-3">
       <div th:if="${cantidad} > 1">
         <h5 class="d-inline me-3">Precio (acumulado): </h5>
-        <span class="fs-5 text-primary" th:text="${'$' + componente.precio * cantidad}"></span>
+        <span class="fs-5 text-primary" th:text="${'$' + componente.precioFormateado * cantidad}"></span>
         <h6 class="d-inline me-3">Por unidad: </h6>
-        <span class="fs-5 text-primary" th:text="${'$' + componente.precio}"></span>
+        <span class="fs-5 text-primary" th:text="${'$' + componente.precioFormateado}"></span>
       </div>
       <div th:if="${cantidad} == 1">
         <h5 class="d-inline me-3">Precio: </h5>
-        <span class="fs-5 text-primary" th:text="${'$' + componente.precio}"></span>
+        <span class="fs-5 text-primary" th:text="${'$' + componente.precioFormateado}"></span>
       </div>
 
     </div>

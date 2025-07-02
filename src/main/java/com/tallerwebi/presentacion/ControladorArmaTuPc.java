@@ -86,18 +86,17 @@ public class ControladorArmaTuPc {
 //        return componentesCompatiblesADevolver;
 //    }
     private List<ComponenteDto> pasarPreciosAPesos(List<ComponenteDto> componentesCompatiblesADevolver) {
-        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
-        symbols.setGroupingSeparator('.');
-        symbols.setDecimalSeparator(',');
-        DecimalFormat formatoLatino = new DecimalFormat("#,##0.00", symbols);
 
         for (ComponenteDto componente : componentesCompatiblesADevolver) {
-            String precioFormateado = this.servicioPrecios.conversionDolarAPeso(componente.getPrecio());
-            try {
-                Number numero = formatoLatino.parse(precioFormateado);
-                componente.setPrecio(numero.doubleValue());
-            } catch (ParseException e) {
-                e.printStackTrace(); // Manejalo como necesites
+
+            if (componente != null){
+                String precioFormateado = this.servicioPrecios.conversionDolarAPeso(componente.getPrecio());
+                try {
+                    Number numero = formatoLatino.parse(precioFormateado);
+                    componente.setPrecioFormateado(numero.doubleValue());
+                } catch (ParseException e) {
+                    e.printStackTrace(); // Manejalo como necesites
+                }
             }
         }
         return componentesCompatiblesADevolver;
@@ -153,6 +152,8 @@ public class ControladorArmaTuPc {
             model.put("errorLimite", "Supero el limite de "+tipoComponente+" de su armado");
             return new ModelAndView("redirect:/arma-tu-pc/tradicional/" + tipoComponente, model);
         }
+
+        this.pasarPreciosAPesos(armadoPcDtoConComponenteAgregado.getComponentesDto());
 
         session.setAttribute("armadoPcDto", armadoPcDtoConComponenteAgregado);
 
