@@ -2,16 +2,12 @@ package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.ServicioDeEnviosImpl;
 import com.tallerwebi.dominio.ServicioPrecios;
-import com.tallerwebi.dominio.ServicioPreciosImpl;
 import com.tallerwebi.dominio.ServicioProductoCarritoImpl;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.util.*;
 
 @RestController

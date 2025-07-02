@@ -133,12 +133,14 @@ public class ControladorCarritoTest {
         when(servicioProductoCarritoImplMock.calcularValorTotalDeLosProductos()).thenReturn(130.0);
         when(servicioProductoCarritoImplMock.calcularCantidadTotalDeProductos()).thenReturn(1);
 
+        when(servicioPreciosMock.conversionDolarAPeso(130.0)).thenReturn("$159.250,0");
+
         Map<String, Object> response = carritoController.eliminarProductoDelCarrito(1L, httpSessionMock);
 
         assertThat(response.get("eliminado"), equalTo(true));
         assertThat(response.get("productos"), equalTo(productosSinUno));
         assertThat(response.get("cantidadEnCarrito"), equalTo(1));
-        assertThat(response.get("valorTotal"), equalTo(130.0));
+        assertThat(response.get("valorTotal"), equalTo("$159.250,0"));
 
         verify(servicioProductoCarritoImplMock, times(1)).calcularValorTotalDeLosProductos();
         verify(servicioProductoCarritoImplMock, times(1)).calcularCantidadTotalDeProductos();
@@ -240,9 +242,10 @@ public class ControladorCarritoTest {
         Integer cantidadInicial = 2;
         Integer cantidadFinal = 3;
         Integer stockInicial = 3;
-        Double precioUnitario = 8000.0;
-        Double precioTotalEsperado = 24000.0;
-        Double precioTotalDelProducto = 24000.0;
+        Double precioUnitario = 150.0;
+
+        Double precioTotalDolar = cantidadFinal * precioUnitario;
+        String precioTotalFormateado = "$477.750,0";
 
         when(httpSessionMock.getAttribute("carritoSesion")).thenReturn(carritoSesion);
 
@@ -256,14 +259,16 @@ public class ControladorCarritoTest {
 
         when(servicioProductoCarritoImplMock.buscarPorId(productoId)).thenReturn(productoMock);
         when(servicioProductoCarritoImplMock.verificarStock(productoId)).thenReturn(true);
-        when(servicioProductoCarritoImplMock.calcularValorTotalDeLosProductos()).thenReturn(precioTotalEsperado);
+        when(servicioProductoCarritoImplMock.calcularValorTotalDeLosProductos()).thenReturn(precioTotalDolar);
+
+        when(servicioPreciosMock.conversionDolarAPeso(precioTotalDolar)).thenReturn(precioTotalFormateado);
 
         Map<String, Object> response = carritoController.agregarMasCantidadDeUnProducto(productoId, httpSessionMock);
 
         assertNotNull(response.get("cantidadEnCarrito"));
         assertThat(response.get("cantidad"), equalTo(cantidadFinal));
-        assertThat(response.get("valorTotal"), equalTo(precioTotalEsperado));
-        assertThat(response.get("precioTotalDelProducto"), equalTo(precioTotalDelProducto));
+        assertThat(response.get("valorTotal"), equalTo(precioTotalFormateado));
+        assertThat(response.get("precioTotalDelProducto"), equalTo(precioTotalFormateado));
 
         verify(servicioProductoCarritoImplMock, times(1)).buscarPorId(1L);
         verify(servicioProductoCarritoImplMock, times(1)).calcularValorTotalDeLosProductos();
@@ -278,9 +283,10 @@ public class ControladorCarritoTest {
         Integer cantidadInicial = 2;
         Integer cantidadFinal = 1;
         Integer stockInicial = 3;
-        Double precioUnitario = 8000.0;
-        Double precioTotalEsperado = 8000.0;
-        Double precioTotalDelProducto = 8000.0;
+        Double precioUnitario = 230.0;
+
+        Double totalPorProductoDolar = cantidadFinal * precioUnitario;
+        String precioTotalPorProducoFormateado = "$281.750,0";
 
         when(httpSessionMock.getAttribute("carritoSesion")).thenReturn(carritoSesion);
 
@@ -295,15 +301,17 @@ public class ControladorCarritoTest {
         when(servicioProductoCarritoImplMock.buscarPorId(productoId)).thenReturn(productoMock);
 
         when(servicioProductoCarritoImplMock.verificarStock(productoId)).thenReturn(true);
-        when(servicioProductoCarritoImplMock.calcularValorTotalDeLosProductos()).thenReturn(precioTotalEsperado);
+        when(servicioProductoCarritoImplMock.calcularValorTotalDeLosProductos()).thenReturn(totalPorProductoDolar);
         when(servicioProductoCarritoImplMock.calcularCantidadTotalDeProductos()).thenReturn(cantidadFinal);
+
+        when(servicioPreciosMock.conversionDolarAPeso(totalPorProductoDolar)).thenReturn(precioTotalPorProducoFormateado);
 
         Map<String, Object> response = carritoController.restarCantidadDeUnProducto(productoId, httpSessionMock);
 
         assertNotNull(response.get("cantidadEnCarrito"));
         assertThat(response.get("cantidad"), equalTo(cantidadFinal));
-        assertThat(response.get("valorTotal"), equalTo(precioTotalEsperado));
-        assertThat(response.get("precioTotalDelProducto"), equalTo(precioTotalDelProducto));
+        assertThat(response.get("valorTotal"), equalTo(precioTotalPorProducoFormateado));
+        assertThat(response.get("precioTotalDelProducto"), equalTo(precioTotalPorProducoFormateado));
 
         verify(servicioProductoCarritoImplMock, times(1)).buscarPorId(1L);
         verify(servicioProductoCarritoImplMock, times(1)).calcularValorTotalDeLosProductos();
