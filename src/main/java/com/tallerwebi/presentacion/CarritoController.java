@@ -254,53 +254,53 @@ public class CarritoController {
         return response;
     }
 
-    @PostMapping(path = "/carritoDeCompras/calcularEnvio")
-    public ModelAndView calcularEnvio(@RequestParam(value = "codigoPostal", required = false) String codigoPostal, HttpSession session) {
-
-        ModelMap model = new ModelMap();
-        List<ProductoCarritoDto> carritoSesion = obtenerCarritoDeSesion(session);
-        this.productoService.setProductos(carritoSesion);
-
-        this.codigoPostalActual = codigoPostal;
-
-        model.put("productos", this.productoService.getProductos());
-
-        Double total = this.productoService.calcularValorTotalDeLosProductos();
-
-        model.put("valorTotal", total);
-        model.put("codigoPostal", codigoPostal);
-
-        try {
-            if (codigoPostal != null && !codigoPostal.trim().isEmpty()) {
-                if (!codigoPostal.matches("\\d{4}")) {
-                    model.put("errorEnvio", "El código postal debe tener 4 dígitos");
-                    model.put("envioCalculado", false);
-                    model.put("sinCobertura", false);
-                } else {
-                    EnvioDto envio = servicioDeEnvios.calcularEnvio(codigoPostal);
-
-                    if (envio != null) {
-                        this.envioActual = envio;
-                        model.put("envio", envio);
-                        Double totalConEnvio = total + envio.getCosto();
-
-                        model.put("totalConEnvio", totalConEnvio);
-                        model.put("envioCalculado", true);
-                        model.put("sinCobertura", false);
-                    } else {
-                        model.put("envioCalculado", false);
-                        model.put("sinCobertura", true);
-                        model.put("mensajeEnvio", "No disponemos de envío Andreani para este código postal");
-                    }
-                }
-            }
-        } catch (Exception e) {
-            model.put("errorEnvio", "Error al calcular envío. Intenta nuevamente.");
-            model.put("envioCalculado", false);
-            model.put("sinCobertura", false);
-        }
-        return new ModelAndView("carritoDeCompras", model);
-    }
+//    @PostMapping(path = "/carritoDeCompras/calcularEnvio")
+//    public ModelAndView calcularEnvio(@RequestParam(value = "codigoPostal", required = false) String codigoPostal, HttpSession session) {
+//
+//        ModelMap model = new ModelMap();
+//        List<ProductoCarritoDto> carritoSesion = obtenerCarritoDeSesion(session);
+//        this.productoService.setProductos(carritoSesion);
+//
+//        this.codigoPostalActual = codigoPostal;
+//
+//        model.put("productos", this.productoService.getProductos());
+//
+//        Double total = this.productoService.calcularValorTotalDeLosProductos();
+//
+//        model.put("valorTotal", total);
+//        model.put("codigoPostal", codigoPostal);
+//
+//        try {
+//            if (codigoPostal != null && !codigoPostal.trim().isEmpty()) {
+//                if (!codigoPostal.matches("\\d{4}")) {
+//                    model.put("errorEnvio", "El código postal debe tener 4 dígitos");
+//                    model.put("envioCalculado", false);
+//                    model.put("sinCobertura", false);
+//                } else {
+//                    EnvioDto envio = servicioDeEnvios.calcularEnvio(codigoPostal);
+//
+//                    if (envio != null) {
+//                        this.envioActual = envio;
+//                        model.put("envio", envio);
+//                        Double totalConEnvio = total + envio.getCosto();
+//
+//                        model.put("totalConEnvio", totalConEnvio);
+//                        model.put("envioCalculado", true);
+//                        model.put("sinCobertura", false);
+//                    } else {
+//                        model.put("envioCalculado", false);
+//                        model.put("sinCobertura", true);
+//                        model.put("mensajeEnvio", "No disponemos de envío Andreani para este código postal");
+//                    }
+//                }
+//            }
+//        } catch (Exception e) {
+//            model.put("errorEnvio", "Error al calcular envío. Intenta nuevamente.");
+//            model.put("envioCalculado", false);
+//            model.put("sinCobertura", false);
+//        }
+//        return new ModelAndView("carritoDeCompras", model);
+//    }
 
     @GetMapping(path = "/carritoDeCompras/calcularEnvio")
     @ResponseBody
