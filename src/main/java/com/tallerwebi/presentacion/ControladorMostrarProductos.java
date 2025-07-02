@@ -50,7 +50,7 @@ public class ControladorMostrarProductos {
         model.put("categorias", categorias);
 
         for (ProductoDto producto : productos) {
-            String totalFormateado = this.servicioPrecios.obtenerPrecioFormateado(producto.getPrecio());
+            String totalFormateado = this.servicioPrecios.conversionDolarAPeso(producto.getPrecio());
             producto.setPrecioFormateado(totalFormateado);
         }
 
@@ -76,7 +76,7 @@ public class ControladorMostrarProductos {
         }
 
         for (ProductoDto producto : productos) {
-            String totalFormateado = this.servicioPrecios.obtenerPrecioFormateado(producto.getPrecio());
+            String totalFormateado = this.servicioPrecios.conversionDolarAPeso(producto.getPrecio());
             producto.setPrecioFormateado(totalFormateado);
         }
 

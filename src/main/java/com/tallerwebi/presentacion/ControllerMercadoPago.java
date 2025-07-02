@@ -28,12 +28,15 @@ public class ControllerMercadoPago {
 
     //ServicioProductoCarrito sabe los productos que estan en el carrito
     private final ServicioProductoCarritoImpl servicioProductoCarritoImpl;
+    private final ServicioPrecios servicioPrecios;
+
 
     @Value("${mercadoPago.accessToken}")
     private String mercadoPagoAccessToken = "APP_USR-3784718513902185-053117-353d2d4a3d09f6e4ff6bd5750e1b6878-2465514854";
 
-    public ControllerMercadoPago(ServicioProductoCarritoImpl servicioProductoCarritoImpl) {
+    public ControllerMercadoPago(ServicioProductoCarritoImpl servicioProductoCarritoImpl, ServicioPrecios servicioPrecios) {
         this.servicioProductoCarritoImpl = servicioProductoCarritoImpl;
+        this.servicioPrecios = servicioPrecios;
         this.servicioProductoCarritoImpl.init();
     }
 
@@ -78,12 +81,11 @@ public class ControllerMercadoPago {
         // Creo un ítem con los productos en la preferencia de mercado pago (de forma que lo entienda su sistema)
         List<PreferenceItemRequest> items = new ArrayList<>();
         for (int i = 0; i < pagoRequest.getProductos().size(); i++) {
-            double precioFinal = getPrecioFinal(pagoRequest, i);
+            Double precioFinal = getPrecioFinal(pagoRequest, i);
 
             PreferenceItemRequest item =
                     PreferenceItemRequest.builder()
-                            .title(pagoRequest.getProductos().get(i).getNombre() + " - " + pagoRequest.getProductos().get(i).getMarca())
-                            .description(pagoRequest.getProductos().get(i).getMarca())
+                            .title(pagoRequest.getProductos().get(i).getNombre())
                             .quantity(pagoRequest.getProductos().get(i).getCantidad())
                             .currencyId("ARS")
                             .unitPrice(BigDecimal.valueOf(precioFinal))
@@ -158,7 +160,7 @@ public class ControllerMercadoPago {
         try {
             Preference preference = client.create(preferenceRequest);
             response.sendRedirect(preference.getSandboxInitPoint());
-            return null; //null porque ya redirigio
+            return null;
         } catch (MPApiException e) {
             String errorMsg = e.getApiResponse() != null ? e.getApiResponse().getContent() : "Sin contenido de error";
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error al crear la preferencia de pago. Detalle: " + errorMsg);
@@ -169,9 +171,9 @@ public class ControllerMercadoPago {
         }
     }
 
-    private double getPrecioFinal(PagoRequest pagoRequest, int i) {
-        double precioOriginal = pagoRequest.getProductos().get(i).getPrecio();
-        double factorDescuento = 1.0;
+    private Double getPrecioFinal(PagoRequest pagoRequest, int i) {
+        Double precioOriginal = pagoRequest.getProductos().get(i).getPrecio();
+        Double factorDescuento = 1.0;
 
         if (servicioProductoCarritoImpl.valorTotal != null && servicioProductoCarritoImpl.valorTotal > 0) {
             factorDescuento = servicioProductoCarritoImpl.valorTotalConDescuento / servicioProductoCarritoImpl.valorTotal;
@@ -183,6 +185,8 @@ public class ControllerMercadoPago {
         if (Double.isNaN(precioFinal) || precioFinal <= 0) {
             precioFinal = precioOriginal;
         }
-        return precioFinal;
+        Double precioEnPesos = this.servicioPrecios.conversionDolarAPesoDouble(precioFinal);
+
+        return precioEnPesos;
     }
 }
