@@ -39,22 +39,21 @@ public class CarritoController {
         this.productoService.setProductos(carritoSesion);
         List<ProductoCarritoDto> productosGuardados = this.productoService.getProductos();
 
-        String totalPrecioFormateado = null;
-
         for (ProductoCarritoDto producto : productosGuardados) {
-            Double totalPrecio = producto.getPrecio() * producto.getCantidad();
-            totalPrecioFormateado = this.servicioPrecios.conversionDolarAPeso(totalPrecio);
-            producto.setPrecioFormateado(totalPrecioFormateado);
+            Double totalPorProducto = producto.getPrecio() * producto.getCantidad();
+            String totalProductoFormateado = this.servicioPrecios.conversionDolarAPeso(totalPorProducto);
+            producto.setPrecioFormateado(totalProductoFormateado);
         }
 
         model.put("productos", productosGuardados);
+
         Double total = this.productoService.calcularValorTotalDeLosProductos();
         String totalFormateado = this.servicioPrecios.conversionDolarAPeso(total);
-
         model.put("valorTotal", totalFormateado);
 
         Integer cantidadTotalEnCarrito = this.productoService.calcularCantidadTotalDeProductos();
         model.put("cantidadEnCarrito", cantidadTotalEnCarrito);
+
         return new ModelAndView("carritoDeCompras", model);
     }
 
@@ -63,23 +62,20 @@ public class CarritoController {
         ModelMap model = new ModelMap();
 
         List<ProductoCarritoDto> carritoSesion = obtenerCarritoDeSesion(session);
-
         this.productoService.setProductos(carritoSesion);
-
         List<ProductoCarritoDto> productos = this.productoService.getProductos();
-        String precioFormateado = null;
-        for (ProductoCarritoDto producto : productos) {
-            //Double totalPrecio = producto.getPrecio() * producto.getCantidad();
-            precioFormateado = this.servicioPrecios.conversionDolarAPeso(producto.getPrecio() * producto.getCantidad());
-            producto.setPrecioFormateado(precioFormateado);
-        }
-        System.out.println("Productos del servicio: " + productos);
 
-        model.put("productos", productos != null ? productos : new ArrayList<>());
+        for (ProductoCarritoDto producto : productos) {
+            Double totalPorProducto = producto.getPrecio() * producto.getCantidad();
+            String totalProductoFormateado = this.servicioPrecios.conversionDolarAPeso(totalPorProducto);
+            producto.setPrecioFormateado(totalProductoFormateado);
+
+        }
+
+        model.put("productos", productos);
 
         Double total = this.productoService.calcularValorTotalDeLosProductos();
         String totalFormateado = this.servicioPrecios.conversionDolarAPeso(total != null ? total : 0.0);
-
         model.put("valorTotal", totalFormateado);
 
         Integer cantidadTotalEnCarrito = this.productoService.calcularCantidadTotalDeProductos();
@@ -103,12 +99,13 @@ public class CarritoController {
         } else {
             response.put("eliminado", false);
         }
-        session.setAttribute("carritoSesion", this.productoService.getProductos());
 
+        session.setAttribute("carritoSesion", this.productoService.getProductos());
         response.put("productos", this.productoService.getProductos());
 
         Double total = this.productoService.calcularValorTotalDeLosProductos();
-        response.put("valorTotal", total);
+        String totalFormateado = this.servicioPrecios.conversionDolarAPeso(total);
+        response.put("valorTotal", totalFormateado);
 
         Integer cantidadTotal = this.productoService.calcularCantidadTotalDeProductos();
         response.put("cantidadEnCarrito", cantidadTotal);
@@ -167,17 +164,23 @@ public class CarritoController {
             this.productoService.descontarStockAlComponente(id, 1);
             productoBuscado.setCantidad(productoBuscado.getCantidad() + 1);
 
-            assert productoBuscado != null;
             response.put("cantidad", productoBuscado.getCantidad());
-            response.put("precioTotalDelProducto", productoBuscado.getCantidad() * productoBuscado.getPrecio());
-            response.put("valorTotal", this.productoService.calcularValorTotalDeLosProductos());
+
+            Double totalPorProducto = productoBuscado.getCantidad() * productoBuscado.getPrecio();
+            String totalFormateadoPorProducto = this.servicioPrecios.conversionDolarAPeso(totalPorProducto);
+            response.put("precioTotalDelProducto", totalFormateadoPorProducto);
+
+            Double totalGeneral = this.productoService.calcularValorTotalDeLosProductos();
+            String totalGeneralFormateado = this.servicioPrecios.conversionDolarAPeso(totalGeneral);
+            response.put("valorTotal", totalGeneralFormateado);
+
             response.put("cantidadEnCarrito", this.productoService.calcularCantidadTotalDeProductos());
         } else {
             response.put("success", false);
             response.put("mensaje", "No hay stock suficiente!");
         }
-        session.setAttribute("carritoSesion", this.productoService.getProductos());
 
+        session.setAttribute("carritoSesion", this.productoService.getProductos());
         return response;
     }
 
@@ -196,9 +199,17 @@ public class CarritoController {
             this.productoService.devolverStockAlComponente(id, 1);
 
             response.put("cantidad", productoBuscado.getCantidad());
-            response.put("precioTotalDelProducto", productoBuscado.getCantidad() * productoBuscado.getPrecio());
-            response.put("valorTotal", this.productoService.calcularValorTotalDeLosProductos());
+
+            Double totalPorProducto = productoBuscado.getCantidad() * productoBuscado.getPrecio();
+            String totalFormateadoPorProducto = this.servicioPrecios.conversionDolarAPeso(totalPorProducto);
+            response.put("precioTotalDelProducto", totalFormateadoPorProducto);
+
             response.put("eliminado", false);
+
+            Double totalGeneral = this.productoService.calcularValorTotalDeLosProductos();
+            String totalGeneralFormateado = this.servicioPrecios.conversionDolarAPeso(totalGeneral);
+            response.put("valorTotal", totalGeneralFormateado);
+
             response.put("cantidadEnCarrito", this.productoService.calcularCantidadTotalDeProductos());
 
         } else if (productoBuscado != null) {
@@ -206,12 +217,15 @@ public class CarritoController {
             this.productoService.devolverStockAlComponente(id, 1);
 
             response.put("eliminado", true);
-            response.put("valorTotal", this.productoService.calcularValorTotalDeLosProductos());
+
+            Double totalGeneral = this.productoService.calcularValorTotalDeLosProductos();
+            String totalGeneralFormateado = this.servicioPrecios.conversionDolarAPeso(totalGeneral);
+            response.put("valorTotal", totalGeneralFormateado);
+
             response.put("cantidadEnCarrito", this.productoService.calcularCantidadTotalDeProductos());
         }
 
         session.setAttribute("carritoSesion", this.productoService.getProductos());
-
         return response;
     }
 

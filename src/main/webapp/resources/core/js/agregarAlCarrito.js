@@ -7,8 +7,6 @@ if (!window.eventosCarritoAsignados) {
             inicializarContadorCarrito();
         }
         actualizarResumenCarrito();
-
-        // Asignar eventos para la vista principal del carrito
         asignarEventosVistaCarrito();
     });
 }
@@ -20,8 +18,8 @@ window.agregarAlCarrito = function (componenteId, cantidad = 1) {
             'Content-Type': 'application/x-www-form-urlencoded'
         }
     })
-        .then(response => response.json()) // convierte la respuesta del fetch (peticion http) y la convierte a un objeto js
-        .then(data => { //objeto json ya parseado
+        .then(response => response.json())
+        .then(data => {
             if (data.success) {
                 mostrarMensaje(data.mensaje, 'success', componenteId);
             } else {
@@ -52,8 +50,6 @@ window.actualizarResumenCarrito = function () {
 
             if (resumenActual && nuevoResumen) {
                 resumenActual.innerHTML = nuevoResumen.innerHTML;
-
-                resumenActual.querySelectorAll('.precioTotalDelProducto');
                 asignarEventosDelResumenCarrito();
             }
         })
@@ -85,34 +81,149 @@ window.actualizarContadorCarrito = function (nuevaCantidad) {
 
 function asignarEventosVistaCarrito() {
     document.querySelectorAll(".btnSumarCantidad").forEach(element => {
-
         if (!element.dataset.eventoAsignado) {
             element.dataset.eventoAsignado = 'true';
-            element.addEventListener("click", function () {
+            element.addEventListener("click", function (event) {
+                event.preventDefault();
 
-                let spanCantidad = this.parentElement.querySelector(".productoCantidad");
-                let idProducto = this.closest('td').dataset.id;
-                let fila = this.closest('tr');
-                let precioTotalDelProducto = fila.querySelector(".precioTotalDelProducto");
+                const btn = event.target;
+                const fila = btn.closest('tr');
+
+                if (!fila) {
+                    console.error("No se pudo encontrar la fila del producto");
+                    return;
+                }
+
+                const spanCantidad = fila.querySelector(".productoCantidad");
+                const precioTotalDelProducto = fila.querySelector(".precioTotalDelProducto");
+                const tdConId = fila.querySelector('[data-id]');
+
+                const idProducto = tdConId.dataset.id;
 
                 fetch(`/carritoDeCompras/agregarMasCantidadDeUnProducto/${idProducto}`, {
                     method: 'POST'
                 })
-                    .then(response => {
-                        return response.json();
-                    })
+                    .then(response => response.json())
                     .then(data => {
+
                         actualizarResumenCarrito();
 
-                        if (data.cantidad !== undefined) {
+                        if (data.cantidad !== undefined && spanCantidad) {
                             spanCantidad.textContent = data.cantidad;
                         }
-                        precioTotalDelProducto.innerHTML = data.precioTotalDelProducto;
 
-                        document.querySelectorAll(".valorTotalDelCarrito").forEach((el, index) => {
-                            el.innerHTML = data.valorTotal;
-                        });
-                        if (data.cantidadEnCarrito !== undefined && data.cantidadEnCarrito !== null) {
+                        if (data.precioTotalDelProducto !== undefined && precioTotalDelProducto) {
+                            precioTotalDelProducto.textContent = `$${data.precioTotalDelProducto}`;
+                        }
+
+                        if (data.valorTotal !== undefined) {
+                            document.querySelectorAll(".valorTotalDelCarrito").forEach(el => {
+                                el.textContent = `$${data.valorTotal}`;
+                            });
+                        }
+
+                        if (data.cantidadEnCarrito !== undefined) {
+                            actualizarContadorCarrito(data.cantidadEnCarrito);
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                    });
+            });
+        }
+    });
+
+    document.querySelectorAll(".btnRestarCantidad").forEach(element => {
+        if (!element.dataset.eventoAsignado) {
+            element.dataset.eventoAsignado = 'true';
+            element.addEventListener("click", function (event) {
+                event.preventDefault();
+
+                const btn = event.target;
+                const fila = btn.closest('tr');
+
+                if (!fila) {
+                    console.error("No se pudo encontrar la fila del producto");
+                    return;
+                }
+
+                const spanCantidad = fila.querySelector(".productoCantidad");
+                const precioTotalDelProducto = fila.querySelector(".precioTotalDelProducto");
+                const tdConId = fila.querySelector('[data-id]');
+
+                if (!tdConId) {
+                    console.error("No se pudo encontrar el data-id del producto");
+                    return;
+                }
+
+                const idProducto = tdConId.dataset.id;
+
+                fetch(`/carritoDeCompras/restarCantidadDeUnProducto/${idProducto}`, {
+                    method: 'POST'
+                })
+                    .then(response => response.json())
+                    .then(data => {
+
+                        if (data.eliminado) {
+                            fila.remove();
+                        } else {
+                            if (data.cantidad !== undefined && spanCantidad) {
+                                spanCantidad.textContent = data.cantidad;
+                            }
+                            if (data.precioTotalDelProducto !== undefined && precioTotalDelProducto) {
+                                precioTotalDelProducto.textContent = `$${data.precioTotalDelProducto}`;
+                            }
+                        }
+
+                        if (data.valorTotal !== undefined) {
+                            document.querySelectorAll(".valorTotalDelCarrito").forEach(el => {
+                                el.textContent = `$${data.valorTotal}`;
+                            });
+                        }
+
+                        if (data.cantidadEnCarrito !== undefined) {
+                            actualizarContadorCarrito(data.cantidadEnCarrito);
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                    });
+            });
+        }
+    });
+
+    document.querySelectorAll(".btnEliminarProducto").forEach(element => {
+        if (!element.dataset.eventoAsignado) {
+            element.dataset.eventoAsignado = 'true';
+            element.addEventListener('click', function (event) {
+                event.preventDefault();
+
+                const btn = event.target;
+                const idProductoAEliminar = btn.dataset.id;
+                const fila = btn.closest('tr');
+
+                if (!idProductoAEliminar) {
+                    console.error("No se pudo encontrar el ID del producto a eliminar");
+                    return;
+                }
+
+                fetch(`/carritoDeCompras/eliminarProducto/${idProductoAEliminar}`, {
+                    method: 'POST'
+                })
+                    .then(response => response.json())
+                    .then(data => {
+
+                        if (data.eliminado && fila) {
+                            fila.remove();
+                        }
+
+                        if (data.valorTotal !== undefined) {
+                            document.querySelectorAll(".valorTotalDelCarrito").forEach(el => {
+                                el.textContent = `$${data.valorTotal}`;
+                            });
+                        }
+
+                        if (data.cantidadEnCarrito !== undefined) {
                             actualizarContadorCarrito(data.cantidadEnCarrito);
                         }
                     })
@@ -124,118 +235,89 @@ function asignarEventosVistaCarrito() {
     });
 }
 
-document.querySelectorAll(".btnRestarCantidad").forEach(element => {
-    if (!element.dataset.eventoAsignado) {
-        element.dataset.eventoAsignado = 'true';
-        element.addEventListener("click", function () {
-            let spanCantidad = this.parentElement.querySelector(".productoCantidad");
-            let idProducto = this.closest('td').dataset.id;
-            let fila = this.closest('tr');
-            let precioTotalDelProducto = fila.querySelector(".precioTotalDelProducto");
+window.asignarEventosDelResumenCarrito = function () {
+    document.querySelectorAll('#resumenCarrito .btnRestarCantidad').forEach(btn => {
+        if (!btn.dataset.eventoAsignado) {
+            btn.dataset.eventoAsignado = 'true';
+            btn.addEventListener('click', (event) => {
+                event.preventDefault();
 
-            fetch(`/carritoDeCompras/restarCantidadDeUnProducto/${idProducto}`, {
-                method: 'POST'
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.eliminado) {
-                        fila.remove();
-                        if (data.valorTotal !== undefined && data.valorTotal !== null) {
-                            document.querySelectorAll(".valorTotalDelCarrito").forEach((el, index) => {
-                                el.innerHTML = data.valorTotal;
-                            });
-                        }
-                    } else {
-                        if (data.cantidad !== undefined) {
-                            spanCantidad.textContent = data.cantidad;
-                        }
-                        precioTotalDelProducto.innerHTML = data.precioTotalDelProducto;
+                const fila = btn.closest('tr');
+                const tdConId = fila ? fila.querySelector('[data-id]') : null;
+                const id = tdConId ? tdConId.dataset.id : null;
 
-                        document.querySelectorAll(".valorTotalDelCarrito").forEach((el, index) => {
-                            el.innerHTML = data.valorTotal;
-                        });
-                    }
-                    if (data.cantidadEnCarrito !== undefined && data.cantidadEnCarrito !== null) {
-                        actualizarContadorCarrito(data.cantidadEnCarrito);
-                    }
-                });
-        });
-    }
-});
-
-document.querySelectorAll(".btnEliminarProducto").forEach(element => {
-    if (!element.dataset.eventoAsignado) {
-        element.dataset.eventoAsignado = 'true';
-        element.addEventListener('click', function () {
-            let idProductoAEliminar = this.dataset.id;
-
-            fetch(`/carritoDeCompras/eliminarProducto/${idProductoAEliminar}`, {
-                method: 'POST'
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.eliminado) {
-                        this.closest('tr').remove();
-
-                        document.querySelectorAll(".valorTotalDelCarrito").forEach((el, index) => {
-                            el.innerHTML = data.valorTotal;
-                        });
-
+                fetch(`/carritoDeCompras/restarCantidadDeUnProducto/${id}`, {method: 'POST'})
+                    .then(res => res.json())
+                    .then(data => {
+                        actualizarResumenCarrito();
                         if (data.cantidadEnCarrito !== undefined) {
                             actualizarContadorCarrito(data.cantidadEnCarrito);
                         }
-                    }
-                });
-        });
-    }
-});
-
-window.asignarEventosDelResumenCarrito = function () {
-    document.querySelectorAll('#resumenCarrito .btnRestarCantidad').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const id = btn.closest('td').dataset.id;
-            fetch(`/carritoDeCompras/restarCantidadDeUnProducto/${id}`, {method: 'POST'})
-                .then(res => res.json())
-                .then(data => {
-                    actualizarResumenCarrito();
-                    if (data.cantidadEnCarrito !== undefined) {
-                        actualizarContadorCarrito(data.cantidadEnCarrito);
-                    }
-                });
-        });
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                    });
+            });
+        }
     });
 
     document.querySelectorAll('#resumenCarrito .btnSumarCantidad').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const id = btn.closest('td').dataset.id;
-            fetch(`/carritoDeCompras/agregarMasCantidadDeUnProducto/${id}`, {method: 'POST'})
-                .then(res => res.json())
-                .then(data => {
-                    actualizarResumenCarrito();
-                    if (data.cantidadEnCarrito !== undefined) {
-                        actualizarContadorCarrito(data.cantidadEnCarrito);
-                    }
-                });
-        });
+        if (!btn.dataset.eventoAsignado) {
+            btn.dataset.eventoAsignado = 'true';
+            btn.addEventListener('click', (event) => {
+                event.preventDefault();
+
+                const fila = btn.closest('tr');
+                const tdConId = fila ? fila.querySelector('[data-id]') : null;
+                const id = tdConId ? tdConId.dataset.id : null;
+
+                fetch(`/carritoDeCompras/agregarMasCantidadDeUnProducto/${id}`, {method: 'POST'})
+                    .then(res => res.json())
+                    .then(data => {
+                        actualizarResumenCarrito();
+                        if (data.cantidadEnCarrito !== undefined) {
+                            actualizarContadorCarrito(data.cantidadEnCarrito);
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                    });
+            });
+        }
     });
 
     document.querySelectorAll('#resumenCarrito .btnEliminarProducto').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const id = btn.dataset.id;
-            fetch(`/carritoDeCompras/eliminarProducto/${id}`, {method: 'POST'})
-                .then(res => res.json())
-                .then(data => {
-                    actualizarResumenCarrito();
-                    if (data.cantidadEnCarrito !== undefined) {
-                        actualizarContadorCarrito(data.cantidadEnCarrito);
-                    }
-                });
-        });
+        if (!btn.dataset.eventoAsignado) {
+            btn.dataset.eventoAsignado = 'true';
+            btn.addEventListener('click', (event) => {
+                event.preventDefault();
+
+                const id = btn.dataset.id;
+
+                fetch(`/carritoDeCompras/eliminarProducto/${id}`, {method: 'POST'})
+                    .then(res => res.json())
+                    .then(data => {
+                        actualizarResumenCarrito();
+                        if (data.cantidadEnCarrito !== undefined) {
+                            actualizarContadorCarrito(data.cantidadEnCarrito);
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                    });
+            });
+        }
     });
 }
 
-document.getElementById('abrirResumenCarrito').addEventListener('click', () => {
-    document.getElementById('resumenCarrito').classList.add('abierto');
+// Resto del código para abrir/cerrar el resumen
+document.addEventListener('DOMContentLoaded', function() {
+    const abrirBtn = document.getElementById('abrirResumenCarrito');
+    if (abrirBtn) {
+        abrirBtn.addEventListener('click', () => {
+            document.getElementById('resumenCarrito').classList.add('abierto');
+        });
+    }
 });
 
 document.addEventListener('click', (e) => {

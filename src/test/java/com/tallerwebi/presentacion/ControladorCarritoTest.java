@@ -526,7 +526,7 @@ public class ControladorCarritoTest {
     @Test
     public void siempreDevuelveLaVistaCorrectaConProductosYTotal() {
         String codigoPostal = "1704";
-        List<ProductoCarritoDto> productos = Arrays.asList(new ProductoCarritoDto(1L, "Motherboard", 50000.0, 1, "motherboard"));
+        List<ProductoCarritoDto> productos = Arrays.asList(new ProductoCarritoDto(1L, "Motherboard", 50000.0, 1));
         Double total = productos.get(0).getPrecio();
 
         when(servicioProductoCarritoImplMock.getProductos()).thenReturn(productos);
