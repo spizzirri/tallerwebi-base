@@ -35,7 +35,7 @@ public class ControladorComponenteEspecifico {
 
         model.put("componenteEspecificoDto", componenteEspecificoDto);
         model.put("precioFormateado", servicioPrecios.obtenerPrecioFormateado(componenteEspecificoDto.getPrecio()));
-        model.put("precioDolar", servicioPrecios.conversionPesoADolar(componenteEspecificoDto));
+        model.put("precioEnPesos", servicioPrecios.conversionDolarAPeso(componenteEspecificoDto.getPrecio()));
         model.put("precioDeLista", servicioPrecios.obtenerPrecioDeLista(componenteEspecificoDto.getPrecio()));
         model.put("precio3Cuotas", servicioPrecios.obtenerPrecioCon3Cuotas(componenteEspecificoDto.getPrecio()));
         model.put("precio6Cuotas", servicioPrecios.obtenerPrecioCon6Cuotas(componenteEspecificoDto.getPrecio()));
