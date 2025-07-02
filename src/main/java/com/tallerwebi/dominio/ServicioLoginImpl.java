@@ -1,5 +1,6 @@
 package com.tallerwebi.dominio;
 import com.tallerwebi.dominio.excepcion.UsuarioExistente;
+import com.tallerwebi.presentacion.UsuarioDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,8 +18,9 @@ public class ServicioLoginImpl implements ServicioLogin {
     }
 
     @Override
-    public Usuario consultarUsuario (String email, String password) {
-        return repositorioUsuario.buscarUsuario(email, password);
+    public UsuarioDto consultarUsuario (String email, String password) {
+        Usuario usuario = this.repositorioUsuario.buscarUsuario(email, password);
+        return new UsuarioDto(usuario.getNombre(), usuario.getApellido(), usuario.getEmail(),  usuario.getTelefono(), usuario.getDni(), usuario.getRol());
     }
 
     @Override

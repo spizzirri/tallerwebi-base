@@ -30,41 +30,42 @@ public class ControladorLogin {
         ModelMap modelo = new ModelMap();
         modelo.put("datosLogin", new DatosLoginDto());
         return new ModelAndView("login", modelo);
+
     }
 
+    @RequestMapping(path = "/validar-login", method = RequestMethod.POST)
+    public ModelAndView validarLogin(@ModelAttribute("datosLogin") DatosLoginDto datosLogin, HttpServletRequest request) {
+        ModelMap model = new ModelMap();
+
+        UsuarioDto usuarioBuscado = servicioLogin.consultarUsuario(datosLogin.getEmail(), datosLogin.getPassword());
+        if (usuarioBuscado != null) {
+            request.getSession().setAttribute("usuario", usuarioBuscado);
+            return new ModelAndView("redirect:/index");
+        } else {
+            model.put("error", "Usuario o clave incorrecta");
+        }
+        return new ModelAndView("login", model);
+    }
 //    @RequestMapping(path = "/validar-login", method = RequestMethod.POST)
-//    public ModelAndView validarLogin(@ModelAttribute("datosLogin") DatosLoginDto datosLogin, HttpServletRequest request) {
+//    public ModelAndView validarLogin(@ModelAttribute("datosLogin") DatosLoginDto datosLogin,
+//                                     @RequestParam("redirectUrl") String redirectUrl,
+//                                     HttpServletRequest request) {
 //        ModelMap model = new ModelMap();
 //
 //        Usuario usuarioBuscado = servicioLogin.consultarUsuario(datosLogin.getEmail(), datosLogin.getPassword());
+//
 //        if (usuarioBuscado != null) {
 //            request.getSession().setAttribute("ROL", usuarioBuscado.getRol());
+//
+//            if (redirectUrl != null && redirectUrl.startsWith("/")) {
+//                return new ModelAndView("redirect:" + redirectUrl);
+//            }
 //            return new ModelAndView("redirect:/home");
 //        } else {
 //            model.put("error", "Usuario o clave incorrecta");
+//            return new ModelAndView("login", model);
 //        }
-//        return new ModelAndView("login", model);
 //    }
-    @RequestMapping(path = "/validar-login", method = RequestMethod.POST)
-    public ModelAndView validarLogin(@ModelAttribute("datosLogin") DatosLoginDto datosLogin,
-                                     @RequestParam("redirectUrl") String redirectUrl,
-                                     HttpServletRequest request) {
-        ModelMap model = new ModelMap();
-
-        Usuario usuarioBuscado = servicioLogin.consultarUsuario(datosLogin.getEmail(), datosLogin.getPassword());
-
-        if (usuarioBuscado != null) {
-            request.getSession().setAttribute("ROL", usuarioBuscado.getRol());
-
-            if (redirectUrl != null && redirectUrl.startsWith("/")) {
-                return new ModelAndView("redirect:" + redirectUrl);
-            }
-            return new ModelAndView("redirect:/home");
-        } else {
-            model.put("error", "Usuario o clave incorrecta");
-            return new ModelAndView("login", model);
-        }
-    }
 
 
     @RequestMapping(path = "/registrarme", method = RequestMethod.POST)
@@ -89,13 +90,14 @@ public class ControladorLogin {
         return new ModelAndView("nuevo-usuario", model);
     }
 
-    @RequestMapping(path = "/home", method = RequestMethod.GET)
-    public ModelAndView irAHome() {
-        return new ModelAndView("home");
+    @RequestMapping(path = "/logout", method = RequestMethod.GET)
+    public ModelAndView logout(HttpServletRequest request) {
+        request.getSession().removeAttribute("usuario");
+        return new ModelAndView("redirect:/index");
     }
 
     @RequestMapping(path = "/", method = RequestMethod.GET)
     public ModelAndView inicio() {
-        return new ModelAndView("redirect:/login");
+        return new ModelAndView("redirect:/index");
     }
 }

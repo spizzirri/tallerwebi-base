@@ -17,6 +17,7 @@ import static org.mockito.Mockito.*;
 public class ControladorLoginTest {
 
 	private ControladorLogin controladorLogin;
+	private UsuarioDto usuarioDtoMock;
 	private Usuario usuarioMock;
 	private DatosLoginDto datosLoginMock;
 	private HttpServletRequest requestMock;
@@ -27,6 +28,7 @@ public class ControladorLoginTest {
 	@BeforeEach
 	public void init(){
 		datosLoginMock = new DatosLoginDto("dami@unlam.com", "123");
+		usuarioDtoMock = mock(UsuarioDto.class);
 		usuarioMock = mock(Usuario.class);
 		when(usuarioMock.getEmail()).thenReturn("dami@unlam.com");
 		requestMock = mock(HttpServletRequest.class);
@@ -41,7 +43,7 @@ public class ControladorLoginTest {
 		when(servicioLoginMock.consultarUsuario(anyString(), anyString())).thenReturn(null);
 
 		// ejecucion
-		ModelAndView modelAndView = controladorLogin.validarLogin(datosLoginMock,"url", requestMock);
+		ModelAndView modelAndView = controladorLogin.validarLogin(datosLoginMock, requestMock);
 
 		// validacion
 		assertThat(modelAndView.getViewName(), equalToIgnoringCase("login"));
@@ -52,14 +54,14 @@ public class ControladorLoginTest {
 	@Test
 	public void loginConUsuarioYPasswordCorrectosDeberiaLLevarAHome(){
 		// preparacion
-		Usuario usuarioEncontradoMock = mock(Usuario.class);
+		UsuarioDto usuarioEncontradoMock = mock(UsuarioDto.class);
 		when(usuarioEncontradoMock.getRol()).thenReturn("ADMIN");
 
 		when(requestMock.getSession()).thenReturn(sessionMock);
 		when(servicioLoginMock.consultarUsuario(anyString(), anyString())).thenReturn(usuarioEncontradoMock);
 
 		// ejecucion
-		ModelAndView modelAndView = controladorLogin.validarLogin(datosLoginMock, "url", requestMock);
+		ModelAndView modelAndView = controladorLogin.validarLogin(datosLoginMock, requestMock);
 
 		// validacion
 		assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/home"));
