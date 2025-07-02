@@ -69,7 +69,6 @@ public class CarritoController {
             Double totalPorProducto = producto.getPrecio() * producto.getCantidad();
             String totalProductoFormateado = this.servicioPrecios.conversionDolarAPeso(totalPorProducto);
             producto.setPrecioFormateado(totalProductoFormateado);
-
         }
 
         model.put("productos", productos);

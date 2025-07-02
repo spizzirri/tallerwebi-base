@@ -1,6 +1,8 @@
 package com.tallerwebi.dominio;
 
 import com.tallerwebi.presentacion.ComponenteEspecificoDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +14,7 @@ import java.text.DecimalFormatSymbols;
 @Transactional
 public class ServicioPreciosImpl implements ServicioPrecios {
 
+    private Logger log = LoggerFactory.getLogger(ServicioPreciosImpl.class);
     private ServicioDolar servicioDolar;
 
     @Autowired
@@ -33,6 +36,13 @@ public class ServicioPreciosImpl implements ServicioPrecios {
         Double cotizacionDolarBlue = servicioDolar.obtenerCotizacionDolarBlue();
         Double precioEnPesos = precio * cotizacionDolarBlue;
         return this.obtenerPrecioFormateado(precioEnPesos);
+    }
+
+    @Override
+    public Double conversionDolarAPesoDouble(Double precio) {
+        Double cotizacionDolarBlue = servicioDolar.obtenerCotizacionDolarBlue();
+        Double precioEnPesos = precio * cotizacionDolarBlue;
+        return precioEnPesos;
     }
 
     @Override
