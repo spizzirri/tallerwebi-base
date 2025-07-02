@@ -9,7 +9,6 @@ import java.util.Map;
 
 public class ArmadoPcDto {
 
-
     private ComponenteDto procesador;
     private ComponenteDto motherboard;
     private ComponenteDto cooler;

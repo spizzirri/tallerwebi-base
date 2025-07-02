@@ -1,6 +1,7 @@
 package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.ServicioArmaTuPc;
+import com.tallerwebi.dominio.ServicioPrecios;
 import com.tallerwebi.dominio.entidades.Componente;
 import com.tallerwebi.dominio.excepcion.ComponenteDeterminateDelArmadoEnNullException;
 import com.tallerwebi.dominio.excepcion.LimiteDeComponenteSobrepasadoEnElArmadoException;
@@ -15,16 +16,20 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.ParseException;
 import java.util.*;
 
 @Controller
 public class ControladorArmaTuPc {
 
     private ServicioArmaTuPc servicioArmaTuPc;
+    private ServicioPrecios servicioPrecios;
     private List<String> pasos = Arrays.asList("procesador", "motherboard", "cooler", "memoria", "gpu", "almacenamiento", "fuente", "gabinete", "monitor", "periferico", "resumen");
 
     @Autowired
-    public ControladorArmaTuPc(ServicioArmaTuPc servicioArmaTuPc) { this.servicioArmaTuPc =  servicioArmaTuPc; }
+    public ControladorArmaTuPc(ServicioArmaTuPc servicioArmaTuPc, ServicioPrecios servicioPrecios) {this.servicioArmaTuPc =  servicioArmaTuPc;this.servicioPrecios = servicioPrecios;}
     public ControladorArmaTuPc() {}
 
      private ArmadoPcDto obtenerArmadoPcDtoDeLaSession(HttpSession session) {
@@ -49,7 +54,7 @@ public class ControladorArmaTuPc {
                     ? this.servicioArmaTuPc.obtenerListaDeComponentesCompatiblesFiltradosDto(tipoComponente, query, armadoPcDto)
                     : this.servicioArmaTuPc.obtenerListaDeComponentesCompatiblesDto(tipoComponente, armadoPcDto);
 
-            model.put("componentesLista", componentesCompatiblesADevolver);
+            model.put("componentesLista", this.pasarPreciosAPesos(componentesCompatiblesADevolver));
 
         } catch (ComponenteDeterminateDelArmadoEnNullException e) {
             model.put("errorLista", e.getMessage());
@@ -64,6 +69,38 @@ public class ControladorArmaTuPc {
         model.put("pasoSiguiente", obtenerPasoSiguiente(tipoComponente));
 
         return new ModelAndView("arma-tu-pc/tradicional/" + tipoComponente, model);
+    }
+
+//    private List<ComponenteDto> pasarPreciosAPesos(List<ComponenteDto> componentesCompatiblesADevolver) {
+//        List<ComponenteDto> componentesCompatibles = componentesCompatiblesADevolver;
+//        for (ComponenteDto componente : componentesCompatibles) {
+//            componente.setPrecio(Double.valueOf(this.servicioPrecios.conversionDolarAPeso(componente.getPrecio())));
+//        }
+//        return componentesCompatibles;
+//    }
+//    private List<ComponenteDto> pasarPreciosAPesos(List<ComponenteDto> componentesCompatiblesADevolver) {
+//        for (ComponenteDto componente : componentesCompatiblesADevolver) {
+//            double precioEnPesos = Double.parseDouble(this.servicioPrecios.conversionDolarAPeso(componente.getPrecio()));
+//            componente.setPrecio(precioEnPesos);
+//        }
+//        return componentesCompatiblesADevolver;
+//    }
+    private List<ComponenteDto> pasarPreciosAPesos(List<ComponenteDto> componentesCompatiblesADevolver) {
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+        symbols.setGroupingSeparator('.');
+        symbols.setDecimalSeparator(',');
+        DecimalFormat formatoLatino = new DecimalFormat("#,##0.00", symbols);
+
+        for (ComponenteDto componente : componentesCompatiblesADevolver) {
+            String precioFormateado = this.servicioPrecios.conversionDolarAPeso(componente.getPrecio());
+            try {
+                Number numero = formatoLatino.parse(precioFormateado);
+                componente.setPrecio(numero.doubleValue());
+            } catch (ParseException e) {
+                e.printStackTrace(); // Manejalo como necesites
+            }
+        }
+        return componentesCompatiblesADevolver;
     }
 
     private String obtenerPasoSiguiente(String tipoComponente) {

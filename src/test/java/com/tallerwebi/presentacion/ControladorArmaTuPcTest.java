@@ -1,5 +1,6 @@
 package com.tallerwebi.presentacion;
 import com.tallerwebi.dominio.ServicioArmaTuPc;
+import com.tallerwebi.dominio.ServicioPrecios;
 import com.tallerwebi.dominio.excepcion.ComponenteDeterminateDelArmadoEnNullException;
 import com.tallerwebi.dominio.excepcion.LimiteDeComponenteSobrepasadoEnElArmadoException;
 import com.tallerwebi.dominio.excepcion.QuitarComponenteInvalidoException;
@@ -30,14 +31,16 @@ public class ControladorArmaTuPcTest {
     private ArmadoPcDto armadoPcDtoMock;
     private ComponenteDto componenteDtoMock;
     private ControladorArmaTuPc controladorArmaTuPc;
+    private ServicioPrecios servicioPreciosMock;
 
     @BeforeEach
     public void init() {
         servicioArmaTuPcMock = mock(ServicioArmaTuPc.class);
+        servicioPreciosMock = mock(ServicioPrecios.class);
         sessionMock = mock(HttpSession.class);
         armadoPcDtoMock = mock(ArmadoPcDto.class);
         componenteDtoMock = mock(ComponenteDto.class);
-        controladorArmaTuPc = new ControladorArmaTuPc(servicioArmaTuPcMock);
+        controladorArmaTuPc = new ControladorArmaTuPc(servicioArmaTuPcMock, servicioPreciosMock);
     }
 
     // Tests para obtenerArmadoPcDtoDeLaSession (Lógica interna)
