@@ -43,13 +43,13 @@ public class CarritoController {
 
         for (ProductoCarritoDto producto : productosGuardados) {
             Double totalPrecio = producto.getPrecio() * producto.getCantidad();
-            totalPrecioFormateado = this.servicioPrecios.obtenerPrecioFormateado(totalPrecio);
+            totalPrecioFormateado = this.servicioPrecios.conversionDolarAPeso(totalPrecio);
             producto.setPrecioFormateado(totalPrecioFormateado);
         }
 
         model.put("productos", productosGuardados);
         Double total = this.productoService.calcularValorTotalDeLosProductos();
-        String totalFormateado = this.servicioPrecios.obtenerPrecioFormateado(total);
+        String totalFormateado = this.servicioPrecios.conversionDolarAPeso(total);
 
         model.put("valorTotal", totalFormateado);
 
@@ -67,12 +67,18 @@ public class CarritoController {
         this.productoService.setProductos(carritoSesion);
 
         List<ProductoCarritoDto> productos = this.productoService.getProductos();
+        String precioFormateado = null;
+        for (ProductoCarritoDto producto : productos) {
+            //Double totalPrecio = producto.getPrecio() * producto.getCantidad();
+            precioFormateado = this.servicioPrecios.conversionDolarAPeso(producto.getPrecio() * producto.getCantidad());
+            producto.setPrecioFormateado(precioFormateado);
+        }
         System.out.println("Productos del servicio: " + productos);
 
         model.put("productos", productos != null ? productos : new ArrayList<>());
 
         Double total = this.productoService.calcularValorTotalDeLosProductos();
-        String totalFormateado = this.servicioPrecios.obtenerPrecioFormateado(total != null ? total : 0.0);
+        String totalFormateado = this.servicioPrecios.conversionDolarAPeso(total != null ? total : 0.0);
 
         model.put("valorTotal", totalFormateado);
 

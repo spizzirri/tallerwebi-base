@@ -6,7 +6,7 @@ public interface ServicioPrecios {
 
     String obtenerPrecioFormateado(Double precio);
 
-    String conversionPesoADolar(ComponenteEspecificoDto componenteEspecificoDto);
+    String conversionDolarAPeso(Double precio);
 
     String obtenerPrecioDeLista(Double precio);
 

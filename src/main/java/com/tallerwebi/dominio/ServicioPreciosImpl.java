@@ -29,34 +29,33 @@ public class ServicioPreciosImpl implements ServicioPrecios {
     }
 
     @Override
-    public String conversionPesoADolar(ComponenteEspecificoDto componenteEspecificoDto) {
+    public String conversionDolarAPeso(Double precio) {
         Double cotizacionDolarBlue = servicioDolar.obtenerCotizacionDolarBlue();
-        Double precioEnPesos = componenteEspecificoDto.getPrecio();
-        Double precioEnDolares = precioEnPesos / cotizacionDolarBlue;
-        return this.obtenerPrecioFormateado(precioEnDolares);
+        Double precioEnPesos = precio * cotizacionDolarBlue;
+        return this.obtenerPrecioFormateado(precioEnPesos);
     }
 
     @Override
     public String obtenerPrecioDeLista(Double precio) {
         Double precioDeLista = precio * 1.50;
-        return this.obtenerPrecioFormateado(precioDeLista);
+        return this.conversionDolarAPeso(precioDeLista);
     }
 
     @Override
     public String obtenerPrecioCon3Cuotas(Double precio) {
         Double precioPorCuota = precio / 3;
-        return this.obtenerPrecioDeLista(precioPorCuota);
+        return this.conversionDolarAPeso(precioPorCuota);
     }
 
     @Override
     public String obtenerPrecioCon6Cuotas(Double precio) {
         Double precioPorCuota = precio / 6;
-        return this.obtenerPrecioDeLista(precioPorCuota);
+        return this.conversionDolarAPeso(precioPorCuota);
     }
 
     @Override
     public String obtenerPrecioCon12Cuotas(Double precio) {
         Double precioPorCuota = precio / 12;
-        return this.obtenerPrecioDeLista(precioPorCuota);
+        return this.conversionDolarAPeso(precioPorCuota);
     }
 }

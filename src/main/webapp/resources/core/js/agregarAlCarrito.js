@@ -53,13 +53,7 @@ window.actualizarResumenCarrito = function () {
             if (resumenActual && nuevoResumen) {
                 resumenActual.innerHTML = nuevoResumen.innerHTML;
 
-                resumenActual.querySelectorAll('.precioTotalDelProducto').forEach(elemento => {
-                    const precioTexto = elemento.textContent || elemento.innerHTML;
-                    const precioNumerico = parseFloat(precioTexto.replace(/[^\d.-]/g, ''));
-                    if (!isNaN(precioNumerico)) {
-                        elemento.innerHTML = `$${precioNumerico.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`;
-                    }
-                });
+                resumenActual.querySelectorAll('.precioTotalDelProducto');
                 asignarEventosDelResumenCarrito();
             }
         })
@@ -113,10 +107,10 @@ function asignarEventosVistaCarrito() {
                         if (data.cantidad !== undefined) {
                             spanCantidad.textContent = data.cantidad;
                         }
-                        precioTotalDelProducto.innerHTML = `$${data.precioTotalDelProducto.toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
+                        precioTotalDelProducto.innerHTML = data.precioTotalDelProducto;
 
                         document.querySelectorAll(".valorTotalDelCarrito").forEach((el, index) => {
-                            el.innerHTML = `$${data.valorTotal.toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
+                            el.innerHTML = data.valorTotal;
                         });
                         if (data.cantidadEnCarrito !== undefined && data.cantidadEnCarrito !== null) {
                             actualizarContadorCarrito(data.cantidadEnCarrito);
@@ -148,17 +142,17 @@ document.querySelectorAll(".btnRestarCantidad").forEach(element => {
                         fila.remove();
                         if (data.valorTotal !== undefined && data.valorTotal !== null) {
                             document.querySelectorAll(".valorTotalDelCarrito").forEach((el, index) => {
-                                el.innerHTML = `$${data.valorTotal.toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
+                                el.innerHTML = data.valorTotal;
                             });
                         }
                     } else {
                         if (data.cantidad !== undefined) {
                             spanCantidad.textContent = data.cantidad;
                         }
-                        precioTotalDelProducto.innerHTML = `$${data.precioTotalDelProducto.toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
+                        precioTotalDelProducto.innerHTML = data.precioTotalDelProducto;
 
                         document.querySelectorAll(".valorTotalDelCarrito").forEach((el, index) => {
-                            el.innerHTML = `$${data.valorTotal.toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
+                            el.innerHTML = data.valorTotal;
                         });
                     }
                     if (data.cantidadEnCarrito !== undefined && data.cantidadEnCarrito !== null) {
@@ -184,7 +178,7 @@ document.querySelectorAll(".btnEliminarProducto").forEach(element => {
                         this.closest('tr').remove();
 
                         document.querySelectorAll(".valorTotalDelCarrito").forEach((el, index) => {
-                            el.innerHTML = `$${data.valorTotal.toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
+                            el.innerHTML = data.valorTotal;
                         });
 
                         if (data.cantidadEnCarrito !== undefined) {

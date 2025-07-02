@@ -67,7 +67,7 @@ public class ControladorIndex {
         List<ProductoDto> productosLimitados = productosDestacados.stream().limit(8).collect(Collectors.toList());
 
         for (ProductoDto producto : productosDestacados) {
-            String totalFormateado = this.servicioPrecios.obtenerPrecioFormateado(producto.getPrecio());
+            String totalFormateado = this.servicioPrecios.conversionDolarAPeso(producto.getPrecio());
             producto.setPrecioFormateado(totalFormateado);
         }
 

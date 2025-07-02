@@ -31,13 +31,13 @@
                     <!-- Precio principal -->
                     <div class="d-flex align-items-baseline mb-2">
                         <p class="me-2 mb-0 fw-semibold">Precio especial</p>
-                        <h2 class="text-primary mb-0" th:text="'$' + ${precioFormateado}">
+                        <h2 class="text-primary mb-0" th:text="'$' + ${precioEnPesos}">
                         </h2>
                     </div>
                     <!-- Precio dolar -->
                     <div class="d-flex align-items-baseline mb-2">
                         <p class="me-2 mb-0 fw-semibold">Precio en dolares</p>
-                        <h4 class="text-primary mb-0" th:text="'USD $' + ${precioDolar} "></h4>
+                        <h4 class="text-primary mb-0" th:text="'USD $' + ${precioFormateado} "></h4>
                     </div>
                     <hr>
                     <!-- Precio de lista -->

@@ -61,7 +61,7 @@ public class ControladorCarritoTest {
         when(servicioProductoCarritoImplMock.calcularValorTotalDeLosProductos()).thenReturn(230.0);
         when(servicioProductoCarritoImplMock.calcularCantidadTotalDeProductos()).thenReturn(2);
 
-        when(servicioPreciosMock.obtenerPrecioFormateado(230.0)).thenReturn("$230.0");
+        when(servicioPreciosMock.conversionDolarAPeso(230.0)).thenReturn("$230.0");
 
         ModelAndView mostrarvista = carritoController.mostrarVistaCarritoDeCompras(httpSessionMock);
         ModelMap model = (ModelMap) mostrarvista.getModel();
@@ -92,7 +92,7 @@ public class ControladorCarritoTest {
         when(servicioProductoCarritoImplMock.calcularValorTotalDeLosProductos()).thenReturn(230.0);
         when(servicioProductoCarritoImplMock.calcularCantidadTotalDeProductos()).thenReturn(2);
 
-        when(servicioPreciosMock.obtenerPrecioFormateado(230.0)).thenReturn("$230.0");
+        when(servicioPreciosMock.conversionDolarAPeso(230.0)).thenReturn("$230.0");
 
         ModelAndView mostrarResumen = carritoController.mostrarResumenCarritoDeCompras(httpSessionMock);
         ModelMap model = (ModelMap) mostrarResumen.getModel();
