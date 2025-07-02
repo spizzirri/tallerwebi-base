@@ -9,7 +9,9 @@ import java.util.Map;
 public class ServicioDolar {
 
     private final RestTemplate restTemplate = new RestTemplate(); //Clase que permite hacer llamdas HTTP a externos
-    private final String API_URL = "https://dolarapi.com/v1/dolares/blue";
+    private final String API_URL = (System.getenv("API_DOLAR") != null)
+            ? System.getenv("API_DOLAR")
+            : "https://dolarapi.com/v1/dolares/blue";
 
     public Double obtenerCotizacionDolarBlue() {
         Map<String, Object> response = restTemplate.getForObject(API_URL, Map.class); //Hace la solicitud HTTP GET a la URL
