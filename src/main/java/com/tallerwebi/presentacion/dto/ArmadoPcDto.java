@@ -19,6 +19,7 @@ public class ArmadoPcDto {
     private ComponenteDto gabinete;
     private ComponenteDto monitor;
     private List<ComponenteDto> perifericos;
+    private String precioFormateado;
 
     public ArmadoPcDto(ArmadoPc entidad) {
         this.procesador = new ComponenteDto(entidad.getProcesador());
@@ -31,6 +32,7 @@ public class ArmadoPcDto {
         this.gabinete = new ComponenteDto(entidad.getGabinete());
         this.monitor = new ComponenteDto(entidad.getMonitor());
         this.perifericos = this.convertirListaDeComponentesEntidadADtos(entidad.getPerifericos());
+        this.precioFormateado = "0.0";
     }
 
     public ArmadoPcDto(ComponenteDto procesador,
@@ -53,6 +55,7 @@ public class ArmadoPcDto {
         this.gabinete = gabinete;
         this.monitor = monitor;
         this.perifericos = perifericos;
+        this.precioFormateado = "0.0";
     }
 
     public ArmadoPcDto() {
@@ -166,6 +169,14 @@ public class ArmadoPcDto {
         this.motherboard = motherboard;
     }
 
+    public String getPrecioFormateado() {
+        return precioFormateado;
+    }
+
+    public void setPrecioFormateado(String precioFormateado) {
+        this.precioFormateado = precioFormateado;
+    }
+
     public Map<ComponenteDto, Integer> getRamsDetalladas(){
         return obtenerListaComponenteDetallado(this.rams);
     }
@@ -192,13 +203,13 @@ public class ArmadoPcDto {
     public Double getPrecioTotal(){
         Double sumatoria = 0.0;
 
-        if(this.procesador != null) sumatoria += this.procesador.getPrecioFormateado();
-        if(this.motherboard != null) sumatoria += this.motherboard.getPrecioFormateado();
-        if(this.cooler != null) sumatoria += this.cooler.getPrecioFormateado();
-        if(this.gpu != null) sumatoria += this.gpu.getPrecioFormateado();
-        if(this.fuente != null) sumatoria += this.fuente.getPrecioFormateado();
-        if(this.gabinete != null) sumatoria += this.gabinete.getPrecioFormateado();
-        if(this.monitor != null) sumatoria += this.monitor.getPrecioFormateado();
+        if(this.procesador != null) sumatoria += this.procesador.getPrecio();
+        if(this.motherboard != null) sumatoria += this.motherboard.getPrecio();
+        if(this.cooler != null) sumatoria += this.cooler.getPrecio();
+        if(this.gpu != null) sumatoria += this.gpu.getPrecio();
+        if(this.fuente != null) sumatoria += this.fuente.getPrecio();
+        if(this.gabinete != null) sumatoria += this.gabinete.getPrecio();
+        if(this.monitor != null) sumatoria += this.monitor.getPrecio();
         if(this.rams != null && !this.rams.isEmpty()) sumatoria += sumatoriaDeListaDeComponente(this.rams);
         if(this.almacenamiento != null && !this.almacenamiento.isEmpty()) sumatoria += sumatoriaDeListaDeComponente(this.almacenamiento);
         if(this.perifericos != null && !this.perifericos.isEmpty()) sumatoria += sumatoriaDeListaDeComponente(this.perifericos);
@@ -209,7 +220,7 @@ public class ArmadoPcDto {
     private Double sumatoriaDeListaDeComponente(List<ComponenteDto> componentes) {
         Double sumatoriaDeLista = 0.0;
         for(ComponenteDto componente : componentes){
-            sumatoriaDeLista += componente.getPrecioFormateado();
+            sumatoriaDeLista += componente.getPrecio();
         }
         return sumatoriaDeLista;
     }

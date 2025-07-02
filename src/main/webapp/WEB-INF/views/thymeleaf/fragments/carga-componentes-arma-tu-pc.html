@@ -165,7 +165,7 @@
                     </div>
                 </div>
                 <div class="border rounded p-3 bg-white text-center">
-                    <p class="fw-bold" th:text="${'$ ' + armadoPcDto.precioTotal}"></p> <!-- aca deberia entrar la sumatoria del armadoPcDto-->
+                    <p class="fw-bold" th:text="${'$ ' + armadoPcDto.precioFormateado}"></p> <!-- aca deberia entrar la sumatoria del armadoPcDto-->
                     <div class="d-flex justify-content-between">
                         <a th:if="${pasoActual != 'procesador'}" th:href="${pasoAnterior}" class="btn btn-outline-primary btn-sm">Anterior paso</a>
                         <form th:action="@{/arma-tu-pc/tradicional/reiniciar-armado}" method="POST">

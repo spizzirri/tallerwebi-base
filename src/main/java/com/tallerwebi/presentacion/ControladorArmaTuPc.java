@@ -88,16 +88,7 @@ public class ControladorArmaTuPc {
     private List<ComponenteDto> pasarPreciosAPesos(List<ComponenteDto> componentesCompatiblesADevolver) {
 
         for (ComponenteDto componente : componentesCompatiblesADevolver) {
-
-            if (componente != null){
-                String precioFormateado = this.servicioPrecios.conversionDolarAPeso(componente.getPrecio());
-                try {
-                    Number numero = formatoLatino.parse(precioFormateado);
-                    componente.setPrecioFormateado(numero.doubleValue());
-                } catch (ParseException e) {
-                    e.printStackTrace(); // Manejalo como necesites
-                }
-            }
+            if (componente != null) componente.setPrecioFormateado(this.servicioPrecios.conversionDolarAPeso(componente.getPrecio()));
         }
         return componentesCompatiblesADevolver;
     }
@@ -153,7 +144,9 @@ public class ControladorArmaTuPc {
             return new ModelAndView("redirect:/arma-tu-pc/tradicional/" + tipoComponente, model);
         }
 
-        this.pasarPreciosAPesos(armadoPcDtoConComponenteAgregado.getComponentesDto());
+        armadoPcDtoConComponenteAgregado.setPrecioFormateado(
+                this.servicioPrecios.conversionDolarAPeso(armadoPcDtoConComponenteAgregado.getPrecioTotal())
+                );
 
         session.setAttribute("armadoPcDto", armadoPcDtoConComponenteAgregado);
 
