@@ -12,11 +12,12 @@ if (!window.eventosCarritoAsignados) {
 }
 
 window.agregarAlCarrito = function (componenteId, cantidad = 1) {
-    return fetch(`/agregarAlCarrito/${componenteId}/${cantidad}`, {
-        method: 'GET',
+    return fetch("/agregarAlCarrito", {
+        method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
-        }
+        },
+        body: `componenteId=${componenteId}&cantidad=${cantidad}`
     })
         .then(response => response.json())
         .then(data => {
@@ -100,6 +101,7 @@ function asignarEventosVistaCarrito() {
 
                 const idProducto = tdConId.dataset.id;
 
+
                 fetch(`/carritoDeCompras/agregarMasCantidadDeUnProducto/${idProducto}`, {
                     method: 'POST'
                 })
@@ -123,6 +125,7 @@ function asignarEventosVistaCarrito() {
                         }
 
                         if (data.cantidadEnCarrito !== undefined) {
+
                             actualizarContadorCarrito(data.cantidadEnCarrito);
                         }
                     })
@@ -178,12 +181,14 @@ function asignarEventosVistaCarrito() {
                         if (data.valorTotal !== undefined) {
                             document.querySelectorAll(".valorTotalDelCarrito").forEach(el => {
                                 el.textContent = `$${data.valorTotal}`;
+
                             });
                         }
 
                         if (data.cantidadEnCarrito !== undefined) {
                             actualizarContadorCarrito(data.cantidadEnCarrito);
                         }
+
                     })
                     .catch(error => {
                         console.error("Error:", error);
@@ -221,7 +226,7 @@ function asignarEventosVistaCarrito() {
                             document.querySelectorAll(".valorTotalDelCarrito").forEach(el => {
                                 el.textContent = `$${data.valorTotal}`;
                             });
-                        }
+
 
                         if (data.cantidadEnCarrito !== undefined) {
                             actualizarContadorCarrito(data.cantidadEnCarrito);

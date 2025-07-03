@@ -1,24 +1,38 @@
+<div th:replace="fragments/fragments :: header"></div>
+<div class="container" style="margin-top: 80px;">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <form action="#" th:action="@{/validar-login}" method="POST" th:object="${datosLogin}"
+                  class="p-4 shadow rounded bg-light">
+                <h3 class="mb-4 text-center">Iniciar sesion</h3>
 
-    <div th:fragment="login">
-
-                    <div id="loginbox" style="margin-top:50px;" class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
-                        <form action="#" th:action="@{/validar-login}" method="POST" th:object="${datosLogin}">
-                            <h3 class="form-signin-heading">Taller Web I</h3>
-                            <hr class="colorgraph"><br>
-
-                            <input th:field="*{email}" id="email" type="email" class="form-control" required/>
-                            <input th:field="*{password}" type="password" id="password" class="form-control" required/>
-                            <input type="hidden" name="redirectUrl" th:value="${#httpServletRequest.requestURI}" />
-
-                            <button id="btn-login" class="btn btn-lg btn-primary btn-block" Type="Submit">Login</button>
-
-                            <p th:if="${error != null}" class="alert alert-danger" th:text="'Error ' + ${error}">
-                            </p>
-                        </form>
-                        <a id="ir-a-registrarme" href="nuevo-usuario">Registrarme</a>
-                    </div>
+                <div class="form-floating mb-3">
+                    <input th:field="*{email}" id="email" type="email" class="form-control" placeholder="Email"
+                           required>
+                    <label for="email">Email</label>
                 </div>
-            </div>
+
+                <div class="form-floating mb-3">
+                    <input th:field="*{password}" type="password" id="password" class="form-control"
+                           placeholder="Contraseña" required>
+                    <label for="password">Password</label>
+                </div>
+
+                <input type="hidden" name="redirectUrl" th:value="${redirectUrl}"/>
+                <button id="btn-login" class="btn btn-primary w-100" type="submit">Ingresar</button>
+
+                <p th:if="${error != null}" class="alert alert-danger mt-3" th:text="'Error: ' + ${error}"></p>
+            </form>
+
+            <form th:action="@{/nuevo-usuario}" method="post" class="mt-3 text-center">
+                <input type="hidden" name="redirectUrl" th:value="${redirectUrl}"/>
+                <button type="submit" id="ir-a-registrarme" class="btn btn-outline-secondary">No tenes cuenta?
+                    Registrate
+                </button>
+            </form>
         </div>
     </div>
+</div>
 
+
+<div th:replace="fragments/fragments :: footer"></div>

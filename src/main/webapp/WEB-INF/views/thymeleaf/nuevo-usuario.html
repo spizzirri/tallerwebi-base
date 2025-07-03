@@ -1,48 +1,58 @@
-<!DOCTYPE HTML>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<div th:replace="fragments/fragments :: header"></div>
 
-  <title>Taller Web I</title>
+<div class="container" style="margin-top: 80px;">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <form action="#" th:action="@{/registrarme}" method="POST" th:object="${usuario}" class="p-4 shadow rounded bg-light">
+        <h3 class="mb-4 text-center">Registro de nuevo usuario</h3>
 
-  <!-- Boostrap core css -->
-  <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.2.0/css/bootstrap.min.css}"/>
+        <div class="row g-3">
+          <div class="col-md-6 form-floating">
+            <input th:field="*{nombre}" type="text" id="nombre" class="form-control" placeholder="Nombre" required />
+            <label for="nombre">Nombre</label>
+          </div>
 
-  <!-- custom style -->
-  <link rel="stylesheet" th:href="@{/css/main.css}"/>
+          <div class="col-md-6 form-floating">
+            <input th:field="*{apellido}" type="text" id="apellido" class="form-control" placeholder="Apellido" required />
+            <label for="apellido">Apellido</label>
+          </div>
 
-</head>
+          <div class="col-md-6 form-floating">
+            <input th:field="*{email}" type="email" id="email" class="form-control" placeholder="Email" required />
+            <label for="email">Email</label>
+          </div>
 
-<body>
+          <div class="col-md-6 form-floating">
+            <input th:field="*{password}" type="password" id="password" class="form-control" placeholder="Contraseña" required />
+            <label for="password">Contrasenia</label>
+          </div>
 
-<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-  <a class="navbar-brand" href="#">UNLAM</a>
-</nav>
+          <div class="col-md-6 form-floating">
+            <input th:field="*{telefono}" type="text" id="telefono" class="form-control" placeholder="Teléfono" required />
+            <label for="telefono">Telefono</label>
+          </div>
 
-<main role="main" class="container">
+          <div class="col-md-6 form-floating">
+            <input th:field="*{dni}" type="text" id="dni" class="form-control" placeholder="DNI" required />
+            <label for="dni">DNI</label>
+          </div>
+        </div>
 
-  <div class = "container">
-    <div id="loginbox" style="margin-top:50px;" class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
-      <form action="#" th:action="@{/registrarme}" method="POST" th:object="${usuario}">
-        <h3 class="form-signin-heading">Nuevo Usuario</h3>
-        <hr class="colorgraph"><br>
+        <!-- Valores que no se editan por el usuario -->
+        <input type="hidden" th:field="*{activo}" value="true" />
+        <input type="hidden" name="redirectUrl" th:value="${redirectUrl}" />
 
-        <input th:field="*{email}" id="email" class="form-control" required/>
-        <input th:field="*{password}" type="password" id="password" class="form-control" required/>
+        <button id="btn-registrarme" class="btn btn-success w-100 mt-4" type="submit">Registrarme</button>
 
-        <button id="btn-registrarme" class="btn btn-lg btn-primary btn-block" Type="Submit">Registrarme</button>
-        <p th:if="${error != null}" class="alert alert-danger" th:text="'Error ' + ${error}">
-        </p>
+        <p th:if="${error != null}" class="alert alert-danger mt-3" th:text="'Error: ' + ${error}"></p>
       </form>
-
     </div>
   </div>
+</div>
 
-</main>
+
 <!-- /.container -->
 
 <!-- Boostrap core js -->
 <script type="text/javascript" th:src="@{webjars/bootstrap/5.2.0/js/bootstrap.min.js}"></script>
-</body>
-</html>
+<div th:replace="fragments/fragments :: footer"></div>

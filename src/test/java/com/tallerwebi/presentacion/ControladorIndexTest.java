@@ -59,7 +59,7 @@ public class ControladorIndexTest {
         // Configurar el mock para productos en descuento
         Mockito.when(productoServiceMock.getProductosMenoresAUnPrecio(Mockito.anyDouble())).thenReturn(productos);
         // Ejecutar
-        ModelAndView mostrarVistaIndex = controladorIndex.irAlIndex();
+        ModelAndView mostrarVistaIndex = controladorIndex.irAlIndex("");
         // Verificar
         assertThat(mostrarVistaIndex.getViewName(), equalTo("index"));
     }
@@ -77,7 +77,7 @@ public class ControladorIndexTest {
         );
         Mockito.when(categoriasServiceMock.getCategorias()).thenReturn(categoriasMock);
         CategoriaDto categoriaEsperada = categoriasMock.get(0);
-        ModelMap modeloObtenido = controladorIndex.irAlIndex().getModelMap();
+        ModelMap modeloObtenido = controladorIndex.irAlIndex("").getModelMap();
         CategoriaDto categoriaObtenida = (CategoriaDto) modeloObtenido.get("categoriaDestacada");
 
         assertThat(categoriaEsperada, Matchers.equalTo(categoriaObtenida));
