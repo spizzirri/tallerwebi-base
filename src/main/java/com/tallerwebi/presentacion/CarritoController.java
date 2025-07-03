@@ -89,6 +89,7 @@ public class CarritoController {
         ProductoCarritoDto productoBuscado = this.productoService.buscarPorId(id);
 
         if (productoBuscado != null) {
+            this.productoService.devolverStockAlComponente(id, productoBuscado.getCantidad());
             this.productoService.getProductos().remove(productoBuscado);
             response.put("eliminado", true);
         } else {
@@ -137,10 +138,13 @@ public class CarritoController {
             response.put("mensajeDescuento", "Codigo de descuento invalido!");
             return response;
         }
+
         Double valorTotalConDescuento = this.productoService.calcularDescuento(codigoDescuentoExtraido);
 
-        response.put("mensaje", "Descuento aplicado! Nuevo total: $" + valorTotalConDescuento.toString());
-        response.put("valorTotal", valorTotalConDescuento);
+        String valorTotalFormateado = this.servicioPrecios.conversionDolarAPeso(valorTotalConDescuento);
+
+        response.put("mensaje", "Descuento aplicado! Nuevo total: $" + valorTotalFormateado);
+        response.put("valorTotal", valorTotalFormateado); // Ahora envías el String formateado
 
         return response;
     }
@@ -234,23 +238,24 @@ public class CarritoController {
             response.put("error", "Debes seleccionar un metodo de pago");
             return response;
         }
-
+        if (metodoDePago.equalsIgnoreCase("tarjetaCredito")) {
+            response.put("success", true);
+            response.put("redirect", "/tarjetaDeCredito");
+            return response;
+        }
         if ("mercadoPago".equalsIgnoreCase(metodoDePago)) {
             if (this.envioActual == null || this.codigoPostalActual == null) {
                 response.put("success", false);
                 response.put("error", "Debes agregar un codigo postal");
                 return response;
             }
-
             response.put("success", true);
             response.put("metodoPago", "mercadoPago");
             response.put("costoEnvio", envioActual.getCosto());
-
         } else {
-            response.put("success", true);
-            response.put("metodoPago", metodoDePago);
+            response.put("success", false);
+            response.put("error", "Método de pago no soportado: " + metodoDePago);
         }
-
         return response;
     }
 

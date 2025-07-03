@@ -244,5 +244,29 @@ public class RepositorioComponenteImplTest {
         assertThat(componenteEncontrado.getNombre(), containsStringIgnoringCase("Ryzen"));
         assertThat(componenteEncontrado.getStock(), greaterThan(0));
     }
+
+    @Sql("/data.sql")
+    @Test
+    @Rollback
+    public void cuandoDescuentoStockDeUnComponenteObtengoUnResultadoExitoso(){
+        Long componenteId = 1L;
+        Integer cantidadARestar = 1;
+
+        Boolean resultado = repositorioComponente.descontarStockDeUnComponente(componenteId, cantidadARestar);
+
+        assertTrue(resultado);
+    }
+
+    @Sql("/data.sql")
+    @Test
+    @Rollback
+    public void cuandoDevuelvoStockDeUnComponenteObtengoUnResultadoExitoso(){
+        Long componenteId = 1L;
+        Integer cantidadASumar = 1;
+
+        Boolean resultado = repositorioComponente.devolverStockDeUnComponente(componenteId, cantidadASumar);
+
+        assertTrue(resultado);
+    }
 }
 

@@ -15,6 +15,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -367,5 +368,89 @@ public class ControladorArmaTuPcTest {
         // Verificación
         verify(sessionMock, times(1)).removeAttribute("armadoPcDto");
         assertThat(mav.getViewName(), equalTo("redirect:/arma-tu-pc/tradicional/procesador"));
+    }
+
+    // Tests para verificar las llamadas al ServicioPrecios
+    @Test
+    public void cuandoSeCarganComponentesSeConviertenSusPreciosAPesos() throws ComponenteDeterminateDelArmadoEnNullException {
+        // Preparación
+        String tipoComponente = "procesador";
+        ComponenteDto comp1 = new ComponenteDto();
+        comp1.setPrecio(100.0);
+        ComponenteDto comp2 = new ComponenteDto();
+        comp2.setPrecio(200.0);
+        List<ComponenteDto> listaComponentes = List.of(comp1, comp2);
+
+        when(sessionMock.getAttribute("armadoPcDto")).thenReturn(armadoPcDtoMock);
+        when(servicioArmaTuPcMock.obtenerListaDeComponentesCompatiblesDto(tipoComponente, armadoPcDtoMock))
+                .thenReturn(listaComponentes);
+        when(servicioPreciosMock.conversionDolarAPeso(100.0)).thenReturn("$ 100.000,00");
+        when(servicioPreciosMock.conversionDolarAPeso(200.0)).thenReturn("$ 200.000,00");
+
+        // Ejecución
+        controladorArmaTuPc.cargarComponentes(tipoComponente, null, sessionMock);
+
+        // Verificación
+        // Se debe llamar al servicio de precios una vez por cada componente
+        verify(servicioPreciosMock, times(1)).conversionDolarAPeso(100.0);
+        verify(servicioPreciosMock, times(1)).conversionDolarAPeso(200.0);
+        assertThat(comp1.getPrecioFormateado(), is(equalTo("$ 100.000,00")));
+        assertThat(comp2.getPrecioFormateado(), is(equalTo("$ 200.000,00")));
+    }
+
+    @Test
+    public void cuandoSeAgregaUnComponenteSeActualizaElPrecioTotalDelArmadoEnPesos() throws LimiteDeComponenteSobrepasadoEnElArmadoException {
+        // Preparación
+        Long idComponente = 1L;
+        String tipoComponente = "procesador";
+        Double precioTotalEnDolares = 550.5;
+        String precioTotalEnPesos = "$ 550.500,50";
+
+        when(sessionMock.getAttribute("armadoPcDto")).thenReturn(armadoPcDtoMock);
+        when(servicioArmaTuPcMock.agregarComponenteAlArmado(anyLong(), anyString(), anyInt(), ArgumentMatchers.any(ArmadoPcDto.class)))
+                .thenReturn(armadoPcDtoMock);
+        when(armadoPcDtoMock.getPrecioTotal()).thenReturn(precioTotalEnDolares);
+        when(servicioPreciosMock.conversionDolarAPeso(precioTotalEnDolares)).thenReturn(precioTotalEnPesos);
+        when(servicioArmaTuPcMock.obtenerComponenteDtoPorId(anyLong())).thenReturn(componenteDtoMock);
+
+        // Ejecución
+        controladorArmaTuPc.agregarComponenteAlArmado(tipoComponente, idComponente, 1, sessionMock);
+
+        // Verificación
+        // Se verifica que se llame al servicio de precios con el total del armado
+        verify(servicioPreciosMock, times(1)).conversionDolarAPeso(precioTotalEnDolares);
+        // Se verifica que el precio formateado se establezca en el DTO del armado
+        verify(armadoPcDtoMock, times(1)).setPrecioFormateado(precioTotalEnPesos);
+    }
+
+    // Test para el método sumarArmadoAlCarrito
+    @Test
+    public void alSumarArmadoAlCarritoSeAgreganLosProductosALaSessionYRedirige() {
+        // Preparación
+        // Mocks para los DTOs que se agregarán al carrito
+        ProductoCarritoDto producto1 = mock(ProductoCarritoDto.class);
+        ProductoCarritoDto producto2 = mock(ProductoCarritoDto.class);
+        List<ProductoCarritoDto> productosDelArmado = List.of(producto1, producto2);
+
+        // Simular que ya hay un item en el carrito de la sesión
+        ProductoCarritoDto productoExistente = mock(ProductoCarritoDto.class);
+        List<ProductoCarritoDto> carritoActual = new ArrayList<>();
+        carritoActual.add(productoExistente);
+
+        when(sessionMock.getAttribute("armadoPcDto")).thenReturn(armadoPcDtoMock);
+        when(sessionMock.getAttribute("carritoSesion")).thenReturn(carritoActual);
+        when(servicioArmaTuPcMock.pasajeAProductoDtoParaAgregarAlCarrito(armadoPcDtoMock)).thenReturn(productosDelArmado);
+
+        // Ejecución
+        ModelAndView mav = controladorArmaTuPc.sumarArmadoAlCarrito(sessionMock);
+
+        // Verificación
+
+        verify(servicioArmaTuPcMock, times(1)).pasajeAProductoDtoParaAgregarAlCarrito(armadoPcDtoMock);
+        // Verificar que la lista final en la sesión contiene todos los productos (los existentes + los nuevos)
+        // El tamaño de la lista ahora debería ser 3
+        assertThat(carritoActual, hasSize(3));
+        assertThat(carritoActual, hasItems(productoExistente, producto1, producto2));
+        assertThat(mav.getViewName(), equalTo("redirect:/carritoDeCompras/index"));
     }
 }

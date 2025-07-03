@@ -47,6 +47,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const mensajeParaAlert = document.getElementById("mensajeDescuento");
     const contenidoMensaje = document.getElementById("contenidoMensaje");
 
+
     if (boton) {
         boton.addEventListener("click", function () {
             const codigo = input.value.trim();
@@ -105,11 +106,12 @@ document.addEventListener("DOMContentLoaded", function () {
             errorDiv.classList.add("d-none");
 
             const btnComprar = document.getElementById("btnComprar");
-            btnComprar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Redirigiendo a MercadoPago...';
-            btnComprar.disabled = true;
+
 
             const params = new URLSearchParams();
             params.append('metodoPago', metodoSeleccionado.value);
+            const valorTotalElement = document.querySelector('.valorTotalDelCarrito');
+            params.append('totalConDescuento',valorTotalElement.dataset.valorConDescuento);
 
             fetch('/carritoDeCompras/formularioPago', {
                 method: 'POST',
@@ -120,9 +122,17 @@ document.addEventListener("DOMContentLoaded", function () {
             })
                 .then(response => response.json())
                 .then(data => {
-                    if (data.success) {
+                    if (data.success && metodoSeleccionado.value === "mercadoPago") {
                         crearFormularioMercadoPago(data);
-                    } else {
+                        btnComprar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Redirigiendo a MercadoPago...';
+                        btnComprar.disabled = true;
+                    }
+                    if ( data.success && metodoSeleccionado.value === "tarjetaCredito" && data.redirect ) {
+                        window.location.href = data.redirect;
+                        btnComprar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Redirigiendo a Tarjeta de credito...';
+                        btnComprar.disabled = true;
+                    }
+                    else if (!data.success && data.error) {
                         btnComprar.innerHTML = 'Finalizar compra';
                         btnComprar.disabled = false;
                         errorDiv.innerText = data.error;
@@ -150,19 +160,23 @@ function crearFormularioMercadoPago(data) {
         costoEnvio = window.datosEnvio.costo;
     }
 
+
     if (costoEnvio && costoEnvio > 0) {
         form.innerHTML += `<input type="hidden" name="costoEnvio" value="${costoEnvio}">`;
     }
-
+    /**
     const valorTotalElement = document.querySelector('.valorTotalDelCarrito');
-    const valorOriginal = valorTotalElement.dataset.valorOriginal;
+    const valorOriginal = document.getElementById("totalOriginal").value;
     const valorConDescuento = valorTotalElement.dataset.valorConDescuento;
+    console.log(valorConDescuento);
 
     if (valorOriginal && valorConDescuento && valorOriginal !== valorConDescuento) {
-        form.innerHTML += `<input type="hidden" name="totalOriginal" value="${valorOriginal}">`;
-        form.innerHTML += `<input type="hidden" name="totalConDescuento" value="${valorConDescuento}">`;
+         form.innerHTML += `<input type="hidden" name="totalOriginal" value="` + valorOriginal + `">`;
+       form.innerHTML += `<input type="hidden" name="totalConDescuento" value="`+ valorConDescuento + `">`;
     }
+    **/
 
+    console.log(form);
     document.body.appendChild(form);
     form.submit();
 }

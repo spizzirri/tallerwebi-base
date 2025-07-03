@@ -71,20 +71,6 @@ public class ControladorArmaTuPc {
         return new ModelAndView("arma-tu-pc/tradicional/" + tipoComponente, model);
     }
 
-//    private List<ComponenteDto> pasarPreciosAPesos(List<ComponenteDto> componentesCompatiblesADevolver) {
-//        List<ComponenteDto> componentesCompatibles = componentesCompatiblesADevolver;
-//        for (ComponenteDto componente : componentesCompatibles) {
-//            componente.setPrecio(Double.valueOf(this.servicioPrecios.conversionDolarAPeso(componente.getPrecio())));
-//        }
-//        return componentesCompatibles;
-//    }
-//    private List<ComponenteDto> pasarPreciosAPesos(List<ComponenteDto> componentesCompatiblesADevolver) {
-//        for (ComponenteDto componente : componentesCompatiblesADevolver) {
-//            double precioEnPesos = Double.parseDouble(this.servicioPrecios.conversionDolarAPeso(componente.getPrecio()));
-//            componente.setPrecio(precioEnPesos);
-//        }
-//        return componentesCompatiblesADevolver;
-//    }
     private List<ComponenteDto> pasarPreciosAPesos(List<ComponenteDto> componentesCompatiblesADevolver) {
 
         for (ComponenteDto componente : componentesCompatiblesADevolver) {

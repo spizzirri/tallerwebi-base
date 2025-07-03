@@ -468,5 +468,32 @@ public class ServicioArmaTuPcTest {
         assertFalse(servicioArmaTuPc.armadoCompleto(armadoPcDto));
     }
 
+    @Test
+    public void cuandoAgregoUnComponenteSeFormateaSuPrecioEnPesos() throws LimiteDeComponenteSobrepasadoEnElArmadoException {
+        // Preparación
+        Long idComponente = 1L;
+        String tipoComponente = "procesador";
+        ArmadoPcDto armadoPcDtoInicial = new ArmadoPcDto();
+        Componente componenteAAgregar = crearComponente(idComponente, "Intel i5", "Procesador");
+        componenteAAgregar.setPrecio(250.0);
+        String precioFormateadoEsperado = "$ 250.000,00";
+
+        when(repositorioComponenteMock.obtenerComponentePorId(idComponente)).thenReturn(componenteAAgregar);
+        when(servicioPreciosMock.conversionDolarAPeso(250.0)).thenReturn(precioFormateadoEsperado);
+
+        // Ejecución
+        ArmadoPcDto armadoResultante = servicioArmaTuPc.agregarComponenteAlArmado(idComponente, tipoComponente, 1, armadoPcDtoInicial);
+
+        // Verificación
+        // Verificar que el servicio de precios fue llamado con el precio correcto en dólares
+        verify(servicioPreciosMock, times(1)).conversionDolarAPeso(250.0);
+
+        // Verificar que el DTO del componente agregado tiene el precio formateado
+        ComponenteDto componenteAgregadoDto = armadoResultante.getProcesador();
+        assertNotNull(componenteAgregadoDto);
+        assertEquals(precioFormateadoEsperado, componenteAgregadoDto.getPrecioFormateado());
+    }
+
+
 
 }
