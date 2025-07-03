@@ -6,9 +6,12 @@ public class VistaLogin extends VistaWeb {
 
     public VistaLogin(Page page) {
         super(page);
-        page.navigate("http://localhost:8080/login");
+
     }
 
+    public void ir() {
+        page.navigate("http://localhost:8080/login");
+    }
 //    public String obtenerTextoDeLaBarraDeNavegacion(){
 //        return this.obtenerTextoDelElemento("nav a.navbar-brand");
 //    }
