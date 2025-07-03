@@ -1,19 +1,24 @@
 package com.tallerwebi.punta_a_punta;
 
 import com.microsoft.playwright.*;
-import com.tallerwebi.punta_a_punta.vistas.*;
+import com.tallerwebi.punta_a_punta.vistas.VistaCoolers;
+import com.tallerwebi.punta_a_punta.vistas.VistaLogin;
+import com.tallerwebi.punta_a_punta.vistas.VistaProductos;
+import com.tallerwebi.punta_a_punta.vistas.VistaRegistrarme;
 import org.junit.jupiter.api.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class VistaProductosE2E {
+public class VistaQueValidaFaltaDeStock {
 
     static Playwright playwright;
     static Browser browser;
     BrowserContext context;
+    VistaRegistrarme vistaRegistrarme;
+    VistaLogin vistaLogin;
+    VistaProductos vistaProductos;
     VistaCoolers vistaCoolers;
 
     @BeforeAll
@@ -21,6 +26,7 @@ public class VistaProductosE2E {
         playwright = Playwright.create();
         browser = playwright.chromium().launch();
         browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false).setSlowMo(500));
+
     }
 
     @AfterAll
@@ -32,30 +38,37 @@ public class VistaProductosE2E {
     void crearContextoYPagina() {
         context = browser.newContext();
         Page page = context.newPage();
+        vistaProductos = new VistaProductos(page);
         vistaCoolers = new VistaCoolers(page);
+        vistaLogin = new VistaLogin(page);
+        vistaRegistrarme = new VistaRegistrarme(page);
         vistaCoolers.ir();
     }
+
 
     @AfterEach
     void cerrarContexto() {
         context.close();
     }
 
+
     @Test
     public void CuandoLeDoyClickAUnMismoItemOnceVecesSeSumaDiezVecesYObtengoUnMensajeDeError() {
-        vistaCoolers.darClickEnAgregarPrimerProductoAlCarrito();
-        vistaCoolers.darClickEnAgregarPrimerProductoAlCarrito();
-        vistaCoolers.darClickEnAgregarPrimerProductoAlCarrito();
-        vistaCoolers.darClickEnAgregarPrimerProductoAlCarrito();
-        vistaCoolers.darClickEnAgregarPrimerProductoAlCarrito();
-        vistaCoolers.darClickEnAgregarPrimerProductoAlCarrito();
-        vistaCoolers.darClickEnAgregarPrimerProductoAlCarrito();
-        vistaCoolers.darClickEnAgregarPrimerProductoAlCarrito();
-        vistaCoolers.darClickEnAgregarPrimerProductoAlCarrito();
-        vistaCoolers.darClickEnAgregarPrimerProductoAlCarrito();
-        vistaCoolers.darClickEnAgregarPrimerProductoAlCarrito();
-        String mensajeError = vistaCoolers.obtenerMensajeDeErrorCooler();
+        cuandoLeDoyClickAIngresaMeLlevaALaPaginaLogin();
+        deberiaIniciarSesionCorrectamenteDespuesDeRegistrarUnUsuarioYcompletarElFormulario();
 
+        vistaCoolers.darClickEnAgregarPrimerProductoAlCarrito();
+        vistaCoolers.darClickEnAgregarPrimerProductoAlCarrito();
+        vistaCoolers.darClickEnAgregarPrimerProductoAlCarrito();
+        vistaCoolers.darClickEnAgregarPrimerProductoAlCarrito();
+        vistaCoolers.darClickEnAgregarPrimerProductoAlCarrito();
+        vistaCoolers.darClickEnAgregarPrimerProductoAlCarrito();
+        vistaCoolers.darClickEnAgregarPrimerProductoAlCarrito();
+        vistaCoolers.darClickEnAgregarPrimerProductoAlCarrito();
+        vistaCoolers.darClickEnAgregarPrimerProductoAlCarrito();
+        vistaCoolers.darClickEnAgregarPrimerProductoAlCarrito();
+        vistaCoolers.darClickEnAgregarPrimerProductoAlCarrito();
+        String mensajeError = vistaCoolers.obtenerMensajeDeErrorProcesador();
         assertThat(mensajeError, equalTo("Stock insuficiente"));
     }
 
@@ -67,5 +80,16 @@ public class VistaProductosE2E {
         String contador = vistaCoolers.obtenerContadorDelCarrito();
 
         assertThat(Integer.parseInt(contador), greaterThanOrEqualTo(1));
+    }
+
+    public void cuandoLeDoyClickAIngresaMeLlevaALaPaginaLogin() {
+        vistaProductos.darClickEnBotonIngresa();
+    }
+
+
+    public void deberiaIniciarSesionCorrectamenteDespuesDeRegistrarUnUsuarioYcompletarElFormulario() {
+        vistaRegistrarme.escribirEMAIL("Huesos12@gmail.com");
+        vistaRegistrarme.escribirClave("123");
+        vistaRegistrarme.darClickEnIniciarSesion();
     }
 }

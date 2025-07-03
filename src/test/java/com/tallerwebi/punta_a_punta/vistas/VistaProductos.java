@@ -13,19 +13,24 @@ public class VistaProductos extends VistaWeb {
         page.navigate("http://localhost:8080/productos");
     }
 
-    public void darClickEnAgregarPrimerProductoAlCarrito() {
-        Locator contador = page.locator("#contadorCarrito");
-        String valorInicial = contador.innerText();
+//    public void darClickEnAgregarPrimerProductoAlCarrito() {
+//        Locator contador = page.locator("#contadorCarrito");
+//        String valorInicial = contador.innerText();
+//
+//        // Hacemos click en el botón para agregar el producto
+//        page.locator("[data-testid='agregar-carrito-btn']").first().click();
+//
+//        // Esperamos a que el contador cambie su valor (espera activa)
+//        page.waitForFunction(
+//                "([contador, valorInicial]) => contador.innerText !== valorInicial",
+//                new Object[]{contador, valorInicial}
+//        );
+//    }
 
-        // Hacemos click en el botón para agregar el producto
-        page.locator("[data-testid='agregar-carrito-btn']").first().click();
-
-        // Esperamos a que el contador cambie su valor (espera activa)
-        page.waitForFunction(
-                "([contador, valorInicial]) => contador.innerText !== valorInicial",
-                new Object[]{contador, valorInicial}
-        );
+    public void darClickEnBotonIngresa(){
+        this.darClickEnElElemento("#btn-ingresa");
     }
+
 
     public void abrirResumenCarrito() {
         page.locator("#abrirResumenCarrito").click();

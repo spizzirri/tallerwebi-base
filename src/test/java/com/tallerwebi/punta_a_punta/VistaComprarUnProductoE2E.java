@@ -47,7 +47,7 @@ public class VistaComprarUnProductoE2E {
         vistaProductos = new VistaProductos(page);
         vistaCoolers = new VistaCoolers(page);
         vistaCarrito = new VistaCarrito(page);
-        vistaTarjetaDeCredito  = new VistaTarjetaDeCredito(page);
+        vistaTarjetaDeCredito = new VistaTarjetaDeCredito(page);
         vistaIndex.ir();
     }
 
@@ -91,8 +91,8 @@ public class VistaComprarUnProductoE2E {
     }
 
     //        public void deberiaRegistrarUnUsuarioAlPonerTodosLosDatosBienEnLosCampos() {
-//        loginValidoDeUsuarioGustavoNarancio();
-//         }
+    //        loginValidoDeUsuarioGustavoNarancio();
+    //         }
     public void deberiaIniciarSesionCorrectamenteDespuesDeRegistrarUnUsuarioYcompletarElFormulario() {
         loginValidoDeUsuarioGustavoNarancio();
         vistaRegistrarme.escribirEMAIL("Huesos12@gmail.com");
@@ -126,7 +126,7 @@ public class VistaComprarUnProductoE2E {
 
     }
 
-    public void deberiaCargarLosDatosCorrectamenteYNavegarAlMensajeDeExito(){
+    public void deberiaCargarLosDatosCorrectamenteYNavegarAlMensajeDeExito() {
         vistaTarjetaDeCredito.darClickEnNumeroDeTarjeta();
         vistaTarjetaDeCredito.escribirNumeroDeTarjeta("4567867567541234");
         vistaTarjetaDeCredito.darClickEnNombreDelTitular();
