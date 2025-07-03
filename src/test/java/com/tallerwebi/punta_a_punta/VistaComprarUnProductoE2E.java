@@ -82,14 +82,14 @@ public class VistaComprarUnProductoE2E {
 //         }
          public void deberiaIniciarSesionCorrectamenteDespuesDeRegistrarUnUsuarioYcompletarElFormulario(){
              loginValidoDeUsuarioGustavoNarancio();
-             vistaRegistrarme.escribirEMAIL("Huesos12@gmail.com");
+             vistaRegistrarme.escribirEMAIL("Huesos123@gmail.com");
              vistaRegistrarme.escribirClave("123");
              vistaRegistrarme.darClickEnIniciarSesion();
          }
         public void loginValidoDeUsuarioGustavoNarancio(){
         vistaNuevoUsuario.escribirNOMBRE("Gustavo");
         vistaNuevoUsuario.escribirAPELLIDO("Narancio");
-        vistaNuevoUsuario.escribirEMAIL("Huesos12@gmail.com");
+        vistaNuevoUsuario.escribirEMAIL("Huesos123@gmail.com");
         vistaNuevoUsuario.escribirClave("123");
         vistaNuevoUsuario.escribirTELEFONO("11425123112");
         vistaNuevoUsuario.escribirDNI("39.022.123");
