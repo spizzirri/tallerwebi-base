@@ -1,4 +1,4 @@
-INSERT INTO Usuario(id, email, password, rol, activo) VALUES(null, 'test@unlam.edu.ar', 'test', 'ADMIN', true);
+INSERT INTO Usuario(id, email, nombre, password, dni, telefono, rol, activo) VALUES(null, 'test@unlam.edu.ar', 'admin', '$2a$10$ooHFgPSccJGztmq.U8WKJe80aMx1r5NGxhzLt9H2/JtwJr0lItvvS', '', '','ADMIN', true);
 
 -- insert de entidades del proyecto para componentes default
 
