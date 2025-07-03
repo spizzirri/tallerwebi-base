@@ -22,7 +22,13 @@ public class ControladorLogin {
         this.servicioLogin = servicioLogin;
     }
 
-
+    @GetMapping("/login")
+    public ModelAndView irALoginConGet(@RequestParam(value = "redirectUrl", required = false) String redirectUrl) {
+        ModelMap modelo = new ModelMap();
+        modelo.put("datosLogin", new DatosLoginDto());
+        modelo.put("redirectUrl", redirectUrl != null ? redirectUrl : "/index");
+        return new ModelAndView("login", modelo);
+    }
     @PostMapping("/login")
     public ModelAndView irALogin(@RequestParam(value = "redirectUrl", required = false) String redirectUrl) {
         ModelMap modelo = new ModelMap();
@@ -87,8 +93,24 @@ public class ControladorLogin {
         return new ModelAndView("login", model);
     }
 
+    @GetMapping("/registrarme")
+    public ModelAndView mostrarFormularioRegistro(@RequestParam(value = "redirectUrl", required = false) String redirectUrl) {
+        ModelMap model = new ModelMap();
+        model.put("usuario", new Usuario()); // objeto vacío para el form
+        model.put("redirectUrl", redirectUrl != null ? redirectUrl : "/index");
+        return new ModelAndView("nuevo-usuario", model);
+    }
+
+
     @RequestMapping(path = "/nuevo-usuario", method = RequestMethod.POST)
     public ModelAndView nuevoUsuario(@RequestParam("redirectUrl") String redirectUrl) {
+        ModelMap model = new ModelMap();
+        model.put("redirectUrl", redirectUrl != null ? redirectUrl : "/index");
+        model.put("usuario", new Usuario());
+        return new ModelAndView("nuevo-usuario", model);
+    }
+    @GetMapping(path = "/nuevo-usuario")
+    public ModelAndView nuevoUsuarioConGet(@RequestParam(value = "redirectUrl", required = false) String redirectUrl) {
         ModelMap model = new ModelMap();
         model.put("redirectUrl", redirectUrl != null ? redirectUrl : "/index");
         model.put("usuario", new Usuario());
