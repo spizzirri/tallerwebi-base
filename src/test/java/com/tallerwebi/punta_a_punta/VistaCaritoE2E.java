@@ -20,7 +20,7 @@ public class VistaCaritoE2E {
     static void abrirNavegador() {
         playwright = Playwright.create();
         browser = playwright.chromium().launch();
-        browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false).setSlowMo(1000));
+        browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false).setSlowMo(100));
 
     }
 
@@ -73,11 +73,7 @@ public class VistaCaritoE2E {
         vistaCarrito.darClickEnFinalizarCompra();
         String url = vistaCarrito.obtenerURLActual();
 
-//        MatcherAssert.assertThat(url, containsStringIgnoringCase("/tarjetaDeCredito/validar"));
-        MatcherAssert.assertThat(url, containsStringIgnoringCase("/carritoDeCompras/index"));
-
-//        MatcherAssert.assertThat(url, matchesPattern("https://sandbox\\.mercadopago\\.com\\.ar/checkout/v1/redirect\\?preference-id=.*"));
-
+        MatcherAssert.assertThat(url, containsStringIgnoringCase("/tarjetaDeCredito"));
     }
 
 }

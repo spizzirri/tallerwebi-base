@@ -10,30 +10,27 @@ public class VistaCarrito extends VistaWeb {
         page.navigate("http://localhost:8080/carritoDeCompras/index");
     }
 
-    public void escribirCodigoDeDescuento(String codigoInput){
+    public void escribirCodigoDeDescuento(String codigoInput) {
         this.escribirEnElElemento("#codigoInput", codigoInput);
     }
 
-    public void darClickEnCalcularDescuento(){
+    public void darClickEnCalcularDescuento() {
         this.darClickEnElElemento("#btnAplicarDescuento");
     }
 
-    public void escribirCodigoPostal(String codigoPostal){
+    public void escribirCodigoPostal(String codigoPostal) {
         this.escribirEnElElemento("#codigoPostal", codigoPostal);
     }
 
-    public void darClickEnCalcularEnvio(){
+    public void darClickEnCalcularEnvio() {
         this.darClickEnElElemento("#btnCalcular");
     }
 
-    public void darClickEnTarjetaDeCredito(){
-        this.darClickEnElElemento("#mercadoPago");
+    public void darClickEnTarjetaDeCredito() {
+        this.darClickEnElElemento("#tarjetaCredito");
     }
-//    public void darClickEnTarjetaDeCredito(){
-//        this.darClickEnElElemento("#tarjetaCredito");
-//    }
 
-    public void darClickEnFinalizarCompra(){
+    public void darClickEnFinalizarCompra() {
         this.darClickEnElElemento("#btnComprar");
     }
 

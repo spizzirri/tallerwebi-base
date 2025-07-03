@@ -115,9 +115,9 @@ public class ControllerMercadoPago {
 
         //Donde redireccionar depues de hacer el pago (arreglarlo para que me devuelva a la vista de nuestra app)
         PreferenceBackUrlsRequest backUrls = PreferenceBackUrlsRequest.builder()
-                .success("http://localhost:8080/checkout/carritoDeCompras")
-                .failure("http://localhost:8080/checkout/carritoDeCompras")
-                .pending("http://localhost:8080/checkout/carritoDeCompras")
+                .success("http://localhost:8080/pagoExitoso")
+                .failure("http://localhost:8080/pagoExitoso")
+                .pending("http://localhost:8080/pagoExitoso")
                 .build();
 
         // Creo la preferencia final que va a ser mandada a mercado pago para la redireccion a su pagina
