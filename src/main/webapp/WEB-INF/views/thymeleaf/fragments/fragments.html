@@ -91,7 +91,7 @@
                 <div th:unless="${usuarioLogueado != null}" class="me-3">
                     <form th:action="@{/login}" method="post" class="m-0 p-0">
                         <input type="hidden" name="redirectUrl" th:value="${#httpServletRequest.requestURI}" />
-                        <button type="submit" class="btn btn-outline-secondary text-light">
+                        <button id="btn-ingresa" type="submit" class="btn btn-outline-secondary text-light">
                             <i class="bi bi-person"></i> Ingresa
                         </button>
                     </form>
@@ -166,7 +166,7 @@
 
     <nav class="bg-secondary-subtle text-dark py-3 mb-3">
         <div class="container d-flex justify-content-center gap-4">
-            <a class="text-dark text-decoration-none px-3 fs-5" th:href="@{/productos}">Productos</a>
+            <a class="text-dark text-decoration-none px-3 fs-5" id="nav-productos" th:href="@{/productos}">Productos</a>
             <a class="text-dark text-decoration-none px-3 fs-5" th:href="@{/arma-tu-pc/tradicional/procesador}">Arma tu
                 PC</a>
             <a class="text-dark text-decoration-none px-3 fs-5" href="#">Ayuda</a>

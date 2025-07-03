@@ -7,8 +7,12 @@ public class VistaCarrito extends VistaWeb {
 
     public VistaCarrito(Page page) {
         super(page);
+    }
+
+    public void ir() {
         page.navigate("http://localhost:8080/carritoDeCompras/index");
     }
+
 
     public void escribirCodigoDeDescuento(String codigoInput) {
         this.escribirEnElElemento("#codigoInput", codigoInput);
