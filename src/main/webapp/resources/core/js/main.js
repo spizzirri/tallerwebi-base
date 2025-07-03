@@ -5,6 +5,35 @@ function suma(a, b) {
 function multiplicar(a, b) {
     return a * b;
 }
+// const botonIrARegistrarme = document.getElementById("ir-a-registrarme");
+const botonRegistrarme = document.getElementById("btn-registrarme");
+const divModal = document.getElementById("modal-div");
+
+
+asignarHandlersLogin();
+function asignarHandlersLogin() {
+  const botonIrARegistrarme = document.getElementById("ir-a-registrarme");
+
+    if (botonIrARegistrarme) {
+        botonIrARegistrarme.onclick = function () {
+            fetch(`/nuevo-usuario`)
+                .then(response => response.text())
+                .then(html => {
+                    document.querySelector("#loginModal .modal-content").innerHTML = html;
+                    // asignarHandlersRegistro(); // por si también necesitás volver a enganchar botones de registro
+                });
+        };
+    }
+}
+fetch("/login")
+    .then(response => response.text())
+    .then(html => {
+        document.querySelector("#loginModal .modal-content").innerHTML = html;
+    });
+
+
+
+
 
 // Función para obtener cantidad vía AJAX como respaldo
 function obtenerCantidadCarritoAjax() {
@@ -18,6 +47,15 @@ function obtenerCantidadCarritoAjax() {
             actualizarContadorCarrito(0);
         });
 }
+
+window.addEventListener('DOMContentLoaded', () => {
+    asignarHandlersLogin();
+    const modal = document.getElementById('modalRegistroExitoso');
+    if (modal) {
+        const bootstrapModal = new bootstrap.Modal(modal);
+        bootstrapModal.show();
+    }
+});
 
 document.addEventListener("DOMContentLoaded", function () {
     // Inicializar contador del carrito
@@ -56,5 +94,5 @@ function cargarProductos(idCategoria) {
         .then(html => {
             document.getElementById("productos-container").innerHTML = html;
         })
-}
 
+}

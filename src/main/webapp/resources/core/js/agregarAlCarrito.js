@@ -14,14 +14,15 @@ if (!window.eventosCarritoAsignados) {
 }
 
 window.agregarAlCarrito = function (componenteId, cantidad = 1) {
-    return fetch(`/agregarAlCarrito/${componenteId}/${cantidad}`, {
-        method: 'GET',
+    return fetch("/agregarAlCarrito", {
+        method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
-        }
+        },
+        body: `componenteId=${componenteId}&cantidad=${cantidad}`
     })
-        .then(response => response.json()) // convierte la respuesta del fetch (peticion http) y la convierte a un objeto js
-        .then(data => { //objeto json ya parseado
+        .then(response => response.json())
+        .then(data => {
             if (data.success) {
                 mostrarMensaje(data.mensaje, 'success', componenteId);
             } else {
@@ -100,6 +101,7 @@ function asignarEventosVistaCarrito() {
                 let idProducto = this.closest('td').dataset.id;
                 let fila = this.closest('tr');
                 let precioTotalDelProducto = fila.querySelector(".precioTotalDelProducto");
+                let valorTotalDelCarrito = document.querySelector(".valorTotalDelCarrito");
 
                 fetch(`/carritoDeCompras/agregarMasCantidadDeUnProducto/${idProducto}`, {
                     method: 'POST'
@@ -115,6 +117,7 @@ function asignarEventosVistaCarrito() {
                         }
                         precioTotalDelProducto.innerHTML = `$${data.precioTotalDelProducto.toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
 
+                        // valorTotalDelCarrito.innerHTML = `$${data.valorTotal.toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
                         document.querySelectorAll(".valorTotalDelCarrito").forEach((el, index) => {
                             el.innerHTML = `$${data.valorTotal.toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
                         });
@@ -147,6 +150,7 @@ document.querySelectorAll(".btnRestarCantidad").forEach(element => {
                     if (data.eliminado) {
                         fila.remove();
                         if (data.valorTotal !== undefined && data.valorTotal !== null) {
+                            // CAMBIAR: Actualizar TODOS los elementos
                             document.querySelectorAll(".valorTotalDelCarrito").forEach((el, index) => {
                                 el.innerHTML = `$${data.valorTotal.toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
                             });
@@ -157,6 +161,7 @@ document.querySelectorAll(".btnRestarCantidad").forEach(element => {
                         }
                         precioTotalDelProducto.innerHTML = `$${data.precioTotalDelProducto.toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
 
+                        // CAMBIAR: Actualizar TODOS los elementos
                         document.querySelectorAll(".valorTotalDelCarrito").forEach((el, index) => {
                             el.innerHTML = `$${data.valorTotal.toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
                         });
@@ -183,6 +188,7 @@ document.querySelectorAll(".btnEliminarProducto").forEach(element => {
                     if (data.eliminado) {
                         this.closest('tr').remove();
 
+                        // CAMBIAR: Actualizar TODOS los elementos
                         document.querySelectorAll(".valorTotalDelCarrito").forEach((el, index) => {
                             el.innerHTML = `$${data.valorTotal.toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
                         });

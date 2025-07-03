@@ -43,10 +43,11 @@ public class ControladorIndex {
 
 
     @GetMapping("/index")
-    public ModelAndView irAlIndex() {
+    public ModelAndView irAlIndex(@RequestParam(required = false) String mensajeRegistroExitoso) {
         List<CategoriaDto> categoriasAMostrar = categoriasService.getCategorias();
 
         ModelMap model = new ModelMap();
+        model.put("mensajeRegistroExitoso", mensajeRegistroExitoso);
         CategoriaDto categoriaDestacada = categoriasAMostrar.get(0);
         List<CategoriaDto> otrasCategorias = categoriasAMostrar.subList(1, categoriasAMostrar.size());
         List<CategoriaDto> categoriasLimitada = otrasCategorias.stream().limit(7).collect(Collectors.toList());

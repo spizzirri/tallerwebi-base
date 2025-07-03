@@ -1,0 +1,14 @@
+
+    <div id="registerBox" style="margin-top:50px;" class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
+      <form action="#" th:action="@{/registrarme}" method="POST" th:object="${usuario}">
+        <h3 class="form-signin-heading">Nuevo Usuario</h3>
+        <hr class="colorgraph"><br>
+
+        <input th:field="*{email}" id="email" class="form-control" required/>
+        <input th:field="*{password}" type="password" id="password" class="form-control" required/>
+        <input type="hidden" name="redirectUrl" th:value="${#httpServletRequest.requestURI}" />
+        <button id="btn-registrarme" class="btn btn-lg btn-primary btn-block" Type="Submit">Registrarme</button>
+        <p th:if="${error != null}" class="alert alert-danger" th:text="'Error ' + ${error}">
+        </p>
+      </form>
+    </div>
