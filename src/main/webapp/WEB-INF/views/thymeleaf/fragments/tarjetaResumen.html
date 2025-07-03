@@ -10,33 +10,16 @@
     </div>
     <div class="col-md-3">
       <div th:if="${cantidad} > 1">
-        <h5 class="d-inline me-3">Precio (acumulado): </h5>
-        <span class="fs-5 text-primary" th:text="${'$' + componente.precio * cantidad}"></span>
-        <h6 class="d-inline me-3">Por unidad: </h6>
-        <span class="fs-5 text-primary" th:text="${'$' + componente.precio}"></span>
+        <h5 class="d-inline me-2">Precio (acumulado): </h5>
+        <span class="fs-5 text-primary precio-producto" th:data-precio="${componente.precioFormateado}" th:data-cantidad="${cantidad}"></span>
+        <h6 class="d-inline me-2">Por unidad: </h6>
+        <span class="fs-5 text-primary" th:text="${'$' + componente.precioFormateado}"></span>
       </div>
       <div th:if="${cantidad} == 1">
-        <h5 class="d-inline me-3">Precio: </h5>
-        <span class="fs-5 text-primary" th:text="${'$' + componente.precio}"></span>
+        <h5 class="d-inline me-2">Precio: </h5>
+        <span class="fs-5 text-primary" th:text="${'$' + componente.precioFormateado}"></span>
       </div>
 
     </div>
   </div>
-
-  <!--Analizar si es necesario mostrar componentes no elegidos -->
-
-<!--  <div th:if="${componente == null}"class="row border rounded bg-white p-1 mb-3 align-items-center">-->
-<!--    <div class="col-md-3 text-center">-->
-<!--      <img th:src="@{'/imagenes/' + ${imagenComponenteVacia}}" th:alt="${producto}" class="img-fluid w-50 m-auto my-3">-->
-<!--    </div>-->
-<!--    <div class="col-md-6">-->
-<!--      <h5 class="mb-1" th:text="${producto}"></h5>-->
-<!--      <small class="text-muted">No se eligio ningun producto en este paso.</small>-->
-<!--    </div>-->
-<!--    <div class="col-md-3">-->
-<!--      <h5 class="d-inline me-3">Precio: </h5>-->
-<!--      <span class="fs-5 text-primary">$0.0</span>-->
-<!--    </div>-->
-<!--  </div>-->
-
 </div>

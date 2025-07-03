@@ -23,13 +23,15 @@ public class ServicioArmaTuPcTest {
 
     private RepositorioComponente repositorioComponenteMock;
     private ServicioCompatibilidades servicioCompatibilidadesMock;
+    private ServicioPrecios servicioPreciosMock;
     private ServicioArmaTuPcImpl servicioArmaTuPc;
 
     @BeforeEach
     public void init() {
         repositorioComponenteMock = mock(RepositorioComponente.class);
         servicioCompatibilidadesMock = mock(ServicioCompatibilidades.class);
-        servicioArmaTuPc = new ServicioArmaTuPcImpl(repositorioComponenteMock, servicioCompatibilidadesMock);
+        servicioPreciosMock = mock(ServicioPrecios.class);
+        servicioArmaTuPc = new ServicioArmaTuPcImpl(repositorioComponenteMock, servicioPreciosMock, servicioCompatibilidadesMock);
     }
 
     // con este metodo hago componentes mas facil

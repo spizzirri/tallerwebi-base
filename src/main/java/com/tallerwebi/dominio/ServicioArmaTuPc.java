@@ -5,9 +5,11 @@ import com.tallerwebi.dominio.excepcion.ComponenteDeterminateDelArmadoEnNullExce
 import com.tallerwebi.dominio.excepcion.QuitarComponenteInvalidoException;
 import com.tallerwebi.dominio.excepcion.LimiteDeComponenteSobrepasadoEnElArmadoException;
 import com.tallerwebi.dominio.excepcion.QuitarStockDemasDeComponenteException;
+import com.tallerwebi.presentacion.ProductoCarritoDto;
 import com.tallerwebi.presentacion.dto.ArmadoPcDto;
 import com.tallerwebi.presentacion.dto.ComponenteDto;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface ServicioArmaTuPc {
@@ -27,6 +29,7 @@ public interface ServicioArmaTuPc {
 
     ComponenteDto obtenerComponenteDtoPorId(Long idComponente);
 
+    List<ProductoCarritoDto> pasajeAProductoDtoParaAgregarAlCarrito(ArmadoPcDto armadoPcDto);
 
 
     ;

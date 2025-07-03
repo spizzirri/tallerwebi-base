@@ -5,6 +5,7 @@ import com.tallerwebi.dominio.excepcion.ComponenteDeterminateDelArmadoEnNullExce
 import com.tallerwebi.dominio.excepcion.LimiteDeComponenteSobrepasadoEnElArmadoException;
 import com.tallerwebi.dominio.excepcion.QuitarComponenteInvalidoException;
 import com.tallerwebi.dominio.excepcion.QuitarStockDemasDeComponenteException;
+import com.tallerwebi.presentacion.ProductoCarritoDto;
 import com.tallerwebi.presentacion.dto.ArmadoPcDto;
 import com.tallerwebi.presentacion.dto.ComponenteDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ import java.util.Map;
 public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
 
     private RepositorioComponente repositorioComponente;
+    private ServicioPrecios servicioPrecios;
     private ServicioCompatibilidades servicioCompatibilidades;
 
     private final Map<String, String> correspondenciaDeVistaConTablasEnLaBD = new LinkedHashMap<>() {{
@@ -41,8 +43,9 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
 
 
     @Autowired
-    public ServicioArmaTuPcImpl(RepositorioComponente repositorioComponente, ServicioCompatibilidades servicioCompatibilidades) {
+    public ServicioArmaTuPcImpl(RepositorioComponente repositorioComponente, ServicioPrecios servicioPrecios , ServicioCompatibilidades servicioCompatibilidades) {
         this.repositorioComponente = repositorioComponente;
+        this.servicioPrecios = servicioPrecios;
         this.servicioCompatibilidades = servicioCompatibilidades;
     }
 
@@ -54,6 +57,23 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
     @Override
     public ComponenteDto obtenerComponenteDtoPorId(Long idComponente) {
         return new ComponenteDto(this.obtenerComponentePorId(idComponente));
+    }
+
+    @Override
+    public List<ProductoCarritoDto> pasajeAProductoDtoParaAgregarAlCarrito(ArmadoPcDto armadoPcDto) {
+
+        List<ProductoCarritoDto> productoCarritoDtos = new ArrayList<>();
+
+        Map<Long, Integer> idDeComponentesDelArmadoYCantidades = armadoPcDto.getIdYCantidadComponentes();
+
+        for(Map.Entry<Long, Integer> componente : idDeComponentesDelArmadoYCantidades.entrySet()){
+
+            Componente componenteEntidad = this.repositorioComponente.obtenerComponentePorId(componente.getKey());
+            ProductoCarritoDto productoCarritoDto = new ProductoCarritoDto(componenteEntidad , componente.getValue());
+            productoCarritoDtos.add(productoCarritoDto);
+        }
+
+        return productoCarritoDtos;
     }
 
     @Override
@@ -115,11 +135,15 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
         List<ComponenteDto> perifericosPrecargados = armadoPcDto.getPerifericos();
         ComponenteDto monitorPrecargado = armadoPcDto.getMonitor();
 
+        ComponenteDto componenteSolicitadoDto = new ComponenteDto(componenteSolicitado);
+        String precioFormateado = this.servicioPrecios.conversionDolarAPeso(componenteSolicitadoDto.getPrecio());
+        componenteSolicitadoDto.setPrecioFormateado(precioFormateado);
+
         switch(tipoComponente.toLowerCase()){
             case "procesador":
 
                 armadoPcDto = new ArmadoPcDto();
-                armadoPcDto.setProcesador(new ComponenteDto(componenteSolicitado));
+                armadoPcDto.setProcesador(componenteSolicitadoDto);
                 armadoPcDto.setPerifericos(perifericosPrecargados);
                 armadoPcDto.setMonitor(monitorPrecargado);
 
@@ -131,48 +155,48 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
                 armadoPcDto.setPerifericos(perifericosPrecargados);
                 armadoPcDto.setMonitor(monitorPrecargado);
                 armadoPcDto.setProcesador(procesadorPrecargado);
-                armadoPcDto.setMotherboard(new ComponenteDto (componenteSolicitado));
+                armadoPcDto.setMotherboard(componenteSolicitadoDto);
 
                 break;
             case "cooler":
-                armadoPcDto.setCooler(new ComponenteDto (componenteSolicitado));
+                armadoPcDto.setCooler(componenteSolicitadoDto);
                 armadoPcDto.setFuente(null);
                 armadoPcDto.setGabinete(null);
 
                 break;
             case "memoria":
 
-                for(int i = 0; i<cantidad;i++) armadoPcDto.getRams().add(new ComponenteDto (componenteSolicitado));
+                for(int i = 0; i<cantidad;i++) armadoPcDto.getRams().add(componenteSolicitadoDto);
                 armadoPcDto.setFuente(null);
 
                 break;
             case "gpu":
 
-                armadoPcDto.setGpu(new ComponenteDto (componenteSolicitado));
+                armadoPcDto.setGpu(componenteSolicitadoDto);
                 armadoPcDto.setFuente(null);
 
                 break;
             case "almacenamiento":
 
-                for(int i = 0; i<cantidad;i++) armadoPcDto.getAlmacenamiento().add(new ComponenteDto (componenteSolicitado));
+                for(int i = 0; i<cantidad;i++) armadoPcDto.getAlmacenamiento().add(componenteSolicitadoDto);
                 armadoPcDto.setFuente(null);
 
                 break;
             case "fuente":
 
-                armadoPcDto.setFuente(new ComponenteDto(componenteSolicitado));
+                armadoPcDto.setFuente(componenteSolicitadoDto);
 
                 break;
             case "gabinete":
 
-                armadoPcDto.setGabinete(new ComponenteDto(componenteSolicitado));
+                armadoPcDto.setGabinete(componenteSolicitadoDto);
 
                 break;
             case "monitor":
-                armadoPcDto.setMonitor(new ComponenteDto(componenteSolicitado));
+                armadoPcDto.setMonitor(componenteSolicitadoDto);
                 break;
             case "periferico":
-                armadoPcDto.getPerifericos().add(new ComponenteDto(componenteSolicitado));
+                armadoPcDto.getPerifericos().add(componenteSolicitadoDto);
                 break;
         }
 

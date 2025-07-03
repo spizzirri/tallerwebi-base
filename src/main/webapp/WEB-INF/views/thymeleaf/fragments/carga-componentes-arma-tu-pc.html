@@ -165,7 +165,7 @@
                     </div>
                 </div>
                 <div class="border rounded p-3 bg-white text-center">
-                    <p class="fw-bold" th:text="${'$ ' + armadoPcDto.precioTotal}"></p> <!-- aca deberia entrar la sumatoria del armadoPcDto-->
+                    <p class="fw-bold" th:text="${'$ ' + armadoPcDto.precioFormateado}"></p> <!-- aca deberia entrar la sumatoria del armadoPcDto-->
                     <div class="d-flex justify-content-between">
                         <a th:if="${pasoActual != 'procesador'}" th:href="${pasoAnterior}" class="btn btn-outline-primary btn-sm">Anterior paso</a>
                         <form th:action="@{/arma-tu-pc/tradicional/reiniciar-armado}" method="POST">
@@ -212,7 +212,7 @@
                                     </div>
                                     <div class="card-body">
                                         <h6 class="card-title" th:text="${componente.modelo}"></h6>
-                                        <p class="card-text text-muted" th:text="'$'+${componente.precio}"></p>
+                                        <p class="card-text text-muted" th:text="'$'+${componente.precioFormateado}"></p>
                                         <span class="badge bg-success">Compatible</span>
                                         <input type="hidden" name="id" th:value="${componente.id}">
                                         <input th:if="${pasoActual != 'memoria' && pasoActual != 'almacenamiento'}" type="hidden" name="cantidad" value="1">
