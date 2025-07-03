@@ -87,11 +87,11 @@ public class ServicioProductoCarritoImpl {
             }
         }
 
-        BigDecimal valorTotalConDosDecimales = new BigDecimal(total);
-        valorTotalConDosDecimales = valorTotalConDosDecimales.setScale(2, RoundingMode.UP);
-        this.valorTotal = valorTotalConDosDecimales.doubleValue();
+//        BigDecimal valorTotalConDosDecimales = new BigDecimal(total);
+//        valorTotalConDosDecimales = valorTotalConDosDecimales.setScale(2, RoundingMode.UP);
+//        this.valorTotal = valorTotalConDosDecimales.doubleValue();
 
-        return this.valorTotal;
+        return total;
     }
 
     public List<ProductoCarritoDto> getProductos() {

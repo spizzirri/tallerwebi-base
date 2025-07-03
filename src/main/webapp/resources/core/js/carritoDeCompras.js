@@ -74,7 +74,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             }
 
                             valorTotalElement.dataset.valorConDescuento = data.valorTotal;
-                            valorTotalElement.innerHTML = `$${data.valorTotal.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`;
+                            valorTotalElement.innerHTML = `$${data.valorTotal}`;
                         }
                     }
                 })
@@ -192,7 +192,7 @@ function calcularConAjax(codigoPostal) {
         .then(data => {
             if (data.success) {
                 document.getElementById('alertaSinCobertura').classList.add('d-none');
-                document.getElementById('costo').textContent = '$' + data.costo;
+                document.getElementById('costo').textContent = formatearPrecio(data.costo);
                 document.getElementById('tiempo').textContent = data.tiempo;
                 document.getElementById('zona').textContent = data.destino;
 
@@ -205,9 +205,8 @@ function calcularConAjax(codigoPostal) {
                 } else {
                     totalActual = parseFloat(totalTexto.replace(/[^\d.-]/g, ''));
                 }
-
                 const costoEnvio = parseFloat(data.costo);
-                const totalConEnvio = (!isNaN(totalActual) && !isNaN(costoEnvio)) ? totalActual + costoEnvio : 0;
+                const totalConEnvio = (!isNaN(totalActual) && !isNaN(costoEnvio)) ? formatearPrecio(totalActual + costoEnvio) : 0;
 
                 let parrafoTotal = document.querySelector('.total-con-envio');
                 if (!parrafoTotal) {
@@ -217,7 +216,7 @@ function calcularConAjax(codigoPostal) {
                 }
 
                 const hayDescuento = !document.getElementById('mensajeDescuento').classList.contains('d-none');
-                parrafoTotal.innerHTML = `Total con envio${hayDescuento ? ' y descuento' : ''}: <span class="total-envio-valor">$${totalConEnvio.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>`;
+                parrafoTotal.innerHTML = `Total con envio${hayDescuento ? ' y descuento' : ''}: <span class="total-envio-valor">${totalConEnvio}</span>`;
                 parrafoTotal.style.display = 'block';
 
                 window.datosEnvio = {
@@ -245,4 +244,18 @@ function calcularConAjax(codigoPostal) {
                 loading.classList.add('d-none');
             }
         });
+}
+
+function formatearPrecio(valor) {
+    if (typeof valor === 'string') {
+        valor = parseFloat(valor.replace(/\./g, '').replace(',', '.'));
+    }
+
+    if (isNaN(valor)) return '$0,00';
+
+    return new Intl.NumberFormat('es-AR', {
+        style: 'currency',
+        currency: 'ARS',
+        minimumFractionDigits: 2
+    }).format(valor);
 }

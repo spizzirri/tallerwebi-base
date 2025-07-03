@@ -2,16 +2,12 @@ package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.ServicioDeEnviosImpl;
 import com.tallerwebi.dominio.ServicioPrecios;
-import com.tallerwebi.dominio.ServicioPreciosImpl;
 import com.tallerwebi.dominio.ServicioProductoCarritoImpl;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.util.*;
 
 @RestController
@@ -39,22 +35,21 @@ public class CarritoController {
         this.productoService.setProductos(carritoSesion);
         List<ProductoCarritoDto> productosGuardados = this.productoService.getProductos();
 
-        String totalPrecioFormateado = null;
-
         for (ProductoCarritoDto producto : productosGuardados) {
-            Double totalPrecio = producto.getPrecio() * producto.getCantidad();
-            totalPrecioFormateado = this.servicioPrecios.obtenerPrecioFormateado(totalPrecio);
-            producto.setPrecioFormateado(totalPrecioFormateado);
+            Double totalPorProducto = producto.getPrecio() * producto.getCantidad();
+            String totalProductoFormateado = this.servicioPrecios.conversionDolarAPeso(totalPorProducto);
+            producto.setPrecioFormateado(totalProductoFormateado);
         }
 
         model.put("productos", productosGuardados);
-        Double total = this.productoService.calcularValorTotalDeLosProductos();
-        String totalFormateado = this.servicioPrecios.obtenerPrecioFormateado(total);
 
+        Double total = this.productoService.calcularValorTotalDeLosProductos();
+        String totalFormateado = this.servicioPrecios.conversionDolarAPeso(total);
         model.put("valorTotal", totalFormateado);
 
         Integer cantidadTotalEnCarrito = this.productoService.calcularCantidadTotalDeProductos();
         model.put("cantidadEnCarrito", cantidadTotalEnCarrito);
+
         return new ModelAndView("carritoDeCompras", model);
     }
 
@@ -63,17 +58,19 @@ public class CarritoController {
         ModelMap model = new ModelMap();
 
         List<ProductoCarritoDto> carritoSesion = obtenerCarritoDeSesion(session);
-
         this.productoService.setProductos(carritoSesion);
-
         List<ProductoCarritoDto> productos = this.productoService.getProductos();
-        System.out.println("Productos del servicio: " + productos);
 
-        model.put("productos", productos != null ? productos : new ArrayList<>());
+        for (ProductoCarritoDto producto : productos) {
+            Double totalPorProducto = producto.getPrecio() * producto.getCantidad();
+            String totalProductoFormateado = this.servicioPrecios.conversionDolarAPeso(totalPorProducto);
+            producto.setPrecioFormateado(totalProductoFormateado);
+        }
+
+        model.put("productos", productos);
 
         Double total = this.productoService.calcularValorTotalDeLosProductos();
-        String totalFormateado = this.servicioPrecios.obtenerPrecioFormateado(total != null ? total : 0.0);
-
+        String totalFormateado = this.servicioPrecios.conversionDolarAPeso(total != null ? total : 0.0);
         model.put("valorTotal", totalFormateado);
 
         Integer cantidadTotalEnCarrito = this.productoService.calcularCantidadTotalDeProductos();
@@ -97,12 +94,13 @@ public class CarritoController {
         } else {
             response.put("eliminado", false);
         }
-        session.setAttribute("carritoSesion", this.productoService.getProductos());
 
+        session.setAttribute("carritoSesion", this.productoService.getProductos());
         response.put("productos", this.productoService.getProductos());
 
         Double total = this.productoService.calcularValorTotalDeLosProductos();
-        response.put("valorTotal", total);
+        String totalFormateado = this.servicioPrecios.conversionDolarAPeso(total);
+        response.put("valorTotal", totalFormateado);
 
         Integer cantidadTotal = this.productoService.calcularCantidadTotalDeProductos();
         response.put("cantidadEnCarrito", cantidadTotal);
@@ -161,17 +159,23 @@ public class CarritoController {
             this.productoService.descontarStockAlComponente(id, 1);
             productoBuscado.setCantidad(productoBuscado.getCantidad() + 1);
 
-            assert productoBuscado != null;
             response.put("cantidad", productoBuscado.getCantidad());
-            response.put("precioTotalDelProducto", productoBuscado.getCantidad() * productoBuscado.getPrecio());
-            response.put("valorTotal", this.productoService.calcularValorTotalDeLosProductos());
+
+            Double totalPorProducto = productoBuscado.getCantidad() * productoBuscado.getPrecio();
+            String totalFormateadoPorProducto = this.servicioPrecios.conversionDolarAPeso(totalPorProducto);
+            response.put("precioTotalDelProducto", totalFormateadoPorProducto);
+
+            Double totalGeneral = this.productoService.calcularValorTotalDeLosProductos();
+            String totalGeneralFormateado = this.servicioPrecios.conversionDolarAPeso(totalGeneral);
+            response.put("valorTotal", totalGeneralFormateado);
+
             response.put("cantidadEnCarrito", this.productoService.calcularCantidadTotalDeProductos());
         } else {
             response.put("success", false);
             response.put("mensaje", "No hay stock suficiente!");
         }
-        session.setAttribute("carritoSesion", this.productoService.getProductos());
 
+        session.setAttribute("carritoSesion", this.productoService.getProductos());
         return response;
     }
 
@@ -190,9 +194,17 @@ public class CarritoController {
             this.productoService.devolverStockAlComponente(id, 1);
 
             response.put("cantidad", productoBuscado.getCantidad());
-            response.put("precioTotalDelProducto", productoBuscado.getCantidad() * productoBuscado.getPrecio());
-            response.put("valorTotal", this.productoService.calcularValorTotalDeLosProductos());
+
+            Double totalPorProducto = productoBuscado.getCantidad() * productoBuscado.getPrecio();
+            String totalFormateadoPorProducto = this.servicioPrecios.conversionDolarAPeso(totalPorProducto);
+            response.put("precioTotalDelProducto", totalFormateadoPorProducto);
+
             response.put("eliminado", false);
+
+            Double totalGeneral = this.productoService.calcularValorTotalDeLosProductos();
+            String totalGeneralFormateado = this.servicioPrecios.conversionDolarAPeso(totalGeneral);
+            response.put("valorTotal", totalGeneralFormateado);
+
             response.put("cantidadEnCarrito", this.productoService.calcularCantidadTotalDeProductos());
 
         } else if (productoBuscado != null) {
@@ -200,12 +212,15 @@ public class CarritoController {
             this.productoService.devolverStockAlComponente(id, 1);
 
             response.put("eliminado", true);
-            response.put("valorTotal", this.productoService.calcularValorTotalDeLosProductos());
+
+            Double totalGeneral = this.productoService.calcularValorTotalDeLosProductos();
+            String totalGeneralFormateado = this.servicioPrecios.conversionDolarAPeso(totalGeneral);
+            response.put("valorTotal", totalGeneralFormateado);
+
             response.put("cantidadEnCarrito", this.productoService.calcularCantidadTotalDeProductos());
         }
 
         session.setAttribute("carritoSesion", this.productoService.getProductos());
-
         return response;
     }
 
@@ -239,53 +254,53 @@ public class CarritoController {
         return response;
     }
 
-    @PostMapping(path = "/carritoDeCompras/calcularEnvio")
-    public ModelAndView calcularEnvio(@RequestParam(value = "codigoPostal", required = false) String codigoPostal, HttpSession session) {
-
-        ModelMap model = new ModelMap();
-        List<ProductoCarritoDto> carritoSesion = obtenerCarritoDeSesion(session);
-        this.productoService.setProductos(carritoSesion);
-
-        this.codigoPostalActual = codigoPostal;
-
-        model.put("productos", this.productoService.getProductos());
-
-        Double total = this.productoService.calcularValorTotalDeLosProductos();
-
-        model.put("valorTotal", total);
-        model.put("codigoPostal", codigoPostal);
-
-        try {
-            if (codigoPostal != null && !codigoPostal.trim().isEmpty()) {
-                if (!codigoPostal.matches("\\d{4}")) {
-                    model.put("errorEnvio", "El código postal debe tener 4 dígitos");
-                    model.put("envioCalculado", false);
-                    model.put("sinCobertura", false);
-                } else {
-                    EnvioDto envio = servicioDeEnvios.calcularEnvio(codigoPostal);
-
-                    if (envio != null) {
-                        this.envioActual = envio;
-                        model.put("envio", envio);
-                        Double totalConEnvio = total + envio.getCosto();
-
-                        model.put("totalConEnvio", totalConEnvio);
-                        model.put("envioCalculado", true);
-                        model.put("sinCobertura", false);
-                    } else {
-                        model.put("envioCalculado", false);
-                        model.put("sinCobertura", true);
-                        model.put("mensajeEnvio", "No disponemos de envío Andreani para este código postal");
-                    }
-                }
-            }
-        } catch (Exception e) {
-            model.put("errorEnvio", "Error al calcular envío. Intenta nuevamente.");
-            model.put("envioCalculado", false);
-            model.put("sinCobertura", false);
-        }
-        return new ModelAndView("carritoDeCompras", model);
-    }
+//    @PostMapping(path = "/carritoDeCompras/calcularEnvio")
+//    public ModelAndView calcularEnvio(@RequestParam(value = "codigoPostal", required = false) String codigoPostal, HttpSession session) {
+//
+//        ModelMap model = new ModelMap();
+//        List<ProductoCarritoDto> carritoSesion = obtenerCarritoDeSesion(session);
+//        this.productoService.setProductos(carritoSesion);
+//
+//        this.codigoPostalActual = codigoPostal;
+//
+//        model.put("productos", this.productoService.getProductos());
+//
+//        Double total = this.productoService.calcularValorTotalDeLosProductos();
+//
+//        model.put("valorTotal", total);
+//        model.put("codigoPostal", codigoPostal);
+//
+//        try {
+//            if (codigoPostal != null && !codigoPostal.trim().isEmpty()) {
+//                if (!codigoPostal.matches("\\d{4}")) {
+//                    model.put("errorEnvio", "El código postal debe tener 4 dígitos");
+//                    model.put("envioCalculado", false);
+//                    model.put("sinCobertura", false);
+//                } else {
+//                    EnvioDto envio = servicioDeEnvios.calcularEnvio(codigoPostal);
+//
+//                    if (envio != null) {
+//                        this.envioActual = envio;
+//                        model.put("envio", envio);
+//                        Double totalConEnvio = total + envio.getCosto();
+//
+//                        model.put("totalConEnvio", totalConEnvio);
+//                        model.put("envioCalculado", true);
+//                        model.put("sinCobertura", false);
+//                    } else {
+//                        model.put("envioCalculado", false);
+//                        model.put("sinCobertura", true);
+//                        model.put("mensajeEnvio", "No disponemos de envío Andreani para este código postal");
+//                    }
+//                }
+//            }
+//        } catch (Exception e) {
+//            model.put("errorEnvio", "Error al calcular envío. Intenta nuevamente.");
+//            model.put("envioCalculado", false);
+//            model.put("sinCobertura", false);
+//        }
+//        return new ModelAndView("carritoDeCompras", model);
+//    }
 
     @GetMapping(path = "/carritoDeCompras/calcularEnvio")
     @ResponseBody

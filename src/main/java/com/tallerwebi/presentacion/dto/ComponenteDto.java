@@ -13,6 +13,7 @@ public class ComponenteDto {
     private String tipoComponente;
     private String imagen;
     private Integer stock;
+    private String precioFormateado;
 
     public ComponenteDto() {}
 
@@ -26,16 +27,18 @@ public class ComponenteDto {
                     ? entidad.getImagenes().get(0).getUrlImagen()
                     : "imagen-generica.jpg";
         this.stock = entidad.getStock();
+        this.precioFormateado = "0.0";
 
     }
 
-    public ComponenteDto(Long id, String tipoComponente, String modelo, Double precio, String imagen, Integer stock) {
+    public ComponenteDto(Long id, String tipoComponente, String modelo, Double precio, String imagen, Integer stock, String precioFormateado) {
         this.id = id;
         this.tipoComponente = tipoComponente;
         this.modelo = modelo;
         this.precio = precio;
         this.imagen = imagen;
         this.stock = stock;
+        this.precioFormateado = precioFormateado;
     }
 
     public Componente obtenerEntidad() {
@@ -128,6 +131,14 @@ public class ComponenteDto {
 
     public Integer getStock() {
         return this.stock;
+    }
+
+    public String getPrecioFormateado() {
+        return precioFormateado;
+    }
+
+    public void setPrecioFormateado(String precioFormateado) {
+        this.precioFormateado = precioFormateado;
     }
 
     @Override

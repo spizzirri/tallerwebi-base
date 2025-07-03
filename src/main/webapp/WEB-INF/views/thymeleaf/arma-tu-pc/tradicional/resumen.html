@@ -1,22 +1,3 @@
-<!--<!DOCTYPE html>-->
-<!--<html lang="en">-->
-<!--<head>-->
-<!--    <meta charset="UTF-8">-->
-<!--    <title>Arma tu PC</title>-->
-
-<!--  &lt;!&ndash; Boostrap core css &ndash;&gt;-->
-<!--  <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.2.0/css/bootstrap.min.css}"/>-->
-
-<!--  &lt;!&ndash; custom style &ndash;&gt;-->
-<!--  <link rel="stylesheet" th:href="@{/css/main.css}"/>-->
-
-<!--    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">-->
-
-<!--    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />-->
-
-
-<!--</head>-->
-<!--<body>-->
 
 <div th:replace="fragments/fragments :: header"></div>
 
@@ -41,13 +22,15 @@
             <div th:replace="fragments/tarjetaResumen :: cargarTarjetaDeResumen (${entry.key}, 'Periferico', ${entry.value}, 'perifericoVacio.png')"></div>
         </div>
         <div class="m-auto col-3 border rounded bg-white p-1 pt-2 mb-3 d-flex justify-content-center">
-            <h3 class="d-inline">Total:  <span th:text="${'$'+armadoPcDto.precioTotal}" class="text-success"></span></h3>
+            <h3 class="d-inline">Total:  <span th:text="${'$'+armadoPcDto.precioFormateado}" class="text-success"></span></h3>
         </div>
 
         <div class="m-auto d-flex justify-content-center gap-2">
             <a th:href="@{/arma-tu-pc/tradicional/procesador}" class="btn btn-outline-secondary">Volver al armado</a>
-            <a href="#" class="btn btn-outline-primary">Sumar al carrito</a>
-            <a href="#" class="btn btn-outline-primary">Guardar Armado</a>
+            <form class="m-0" method="POST" th:action="@{/arma-tu-pc/carrito}">
+                <input type="submit" class="btn btn-outline-primary" value="Sumar al carrito">
+            </form>
+<!--            <a href="#" class="btn btn-outline-primary">Guardar Armado</a>-->
         </div>
     </div>
 
@@ -61,15 +44,11 @@
 
 
 </div>
-
-<script th:inline="javascript"> // convierte el armado a un json
-    let armadoPc = /*[[${armadoPcDto}]]*/ {};
-</script>
-
+<div th:replace="fragments/fragments :: footer"></div>
 <!-- Boostrap core js -->
 <script type="text/javascript" th:src="@{webjars/bootstrap/5.2.0/js/bootstrap.min.js}"></script>
 <script type="text/javascript" th:src="@{/js/main.js}"></script>
-<script type="text/javascript" th:src="@{/js/agregarArmadoAlCarrito.js}"></script>
+<script type="text/javascript" th:src="@{/js/resumenCalculoDeListas.js}"></script>
 <script th:src="@{/webjars/bootstrap/5.2.0/js/bootstrap.bundle.min.js}"></script>
 <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
