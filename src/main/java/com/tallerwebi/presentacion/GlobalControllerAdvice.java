@@ -14,8 +14,6 @@ public class GlobalControllerAdvice {
         return new DatosLoginDto();
     }
 
-
-
     @ModelAttribute("usuarioLogueado")
     public UsuarioDto usuarioLogueado(HttpSession session) {
         return (UsuarioDto) session.getAttribute("usuario"); // O el atributo real que usás
