@@ -68,21 +68,9 @@ public class VistaNuevoUsuarioE2E {
 
     @Test
     void deberiaDarmeUnMensajeDeUsuarioRepetidoAlRegistrarUnUsuarioDosVecesBien() {
-        vistaNuevoUsuario.escribirNOMBRE("Gustavo");
-        vistaNuevoUsuario.escribirAPELLIDO("Narancio");
-        vistaNuevoUsuario.escribirEMAIL("Huesos@gmail.com");
-        vistaNuevoUsuario.escribirClave("123");
-        vistaNuevoUsuario.escribirTELEFONO("11425123112");
-        vistaNuevoUsuario.escribirDNI("39.022.123");
-        vistaNuevoUsuario.darClickEnRegistrarme();
+        loginValidoDeUsuarioGustavoNarancio();
         vistaRegistrarme.darClickEnRegistarteVistaRegistrarme();
-        vistaNuevoUsuario.escribirNOMBRE("Gustavo");
-        vistaNuevoUsuario.escribirAPELLIDO("Narancio");
-        vistaNuevoUsuario.escribirEMAIL("Huesos@gmail.com");
-        vistaNuevoUsuario.escribirClave("123");
-        vistaNuevoUsuario.escribirTELEFONO("11425123112");
-        vistaNuevoUsuario.escribirDNI("39.022.123");
-        vistaNuevoUsuario.darClickEnRegistrarme();
+        loginValidoDeUsuarioGustavoNarancio();
         String textoObtenido = vistaNuevoUsuario.obtenerMensajeDeError();
         String textoEsperado = "Error: El usuario ya existe";
        assertEquals(textoEsperado, textoObtenido);
