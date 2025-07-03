@@ -5,7 +5,6 @@ import com.microsoft.playwright.Page;
 public class VistaCoolers extends VistaWeb {
     public VistaCoolers(Page page) {
         super(page);
-        page.navigate("http://localhost:8080/productos/search?cat=CoolerCPU");
     }
 
     public void darClickEnAgregarPrimerProductoAlCarrito() {
@@ -13,6 +12,10 @@ public class VistaCoolers extends VistaWeb {
     }
 
     public void darClickCoolers() {
+        page.waitForSelector("#btn-link-Coolers").click();
+    }
+
+    public void darClickEnCarritoNavbar() {
         this.darClickEnElElemento("#btn-link-Coolers");
     }
 

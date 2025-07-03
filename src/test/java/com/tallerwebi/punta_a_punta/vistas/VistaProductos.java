@@ -25,7 +25,9 @@ public class VistaProductos extends VistaWeb {
         return page.locator("#resumenCarrito");
     }
 
-
+    public void darClickEnIrAlPago() {
+        this.darClickEnElElemento("#resumen-carrito");
+    }
 
 }
 

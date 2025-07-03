@@ -9,7 +9,7 @@ import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertTha
 import static org.hamcrest.Matchers.containsStringIgnoringCase;
 import static org.hamcrest.Matchers.matchesPattern;
 
-public class VistaCaritoE2E {
+public class VistaCarritoE2E {
 
     static Playwright playwright;
     static Browser browser;
