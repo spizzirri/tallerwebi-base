@@ -42,7 +42,7 @@ public class VistaCaritoE2E {
     }
 
     @Test
-    void deberiaDevolvermeUnMensajeConElCodigoDeDescuento(){
+    void deberiaDevolvermeUnMensajeConElCodigoDeDescuento() {
         vistaCarrito.escribirCodigoDeDescuento("compra5");
         vistaCarrito.darClickEnCalcularDescuento();
 
@@ -66,7 +66,7 @@ public class VistaCaritoE2E {
     }
 
     @Test
-    void deberiaNavegarALaVistaTarjetaDeCreditoSiElMetodoDePagoEsValido() {
+    public void deberiaNavegarALaVistaTarjetaDeCreditoSiElMetodoDePagoEsValido() {
         deberiaDevolvermeUnMensajeConElCodigoDeDescuento();
         deberiaDevolvermeUnMensajeConCostoTiempoYZonaDeEnvio();
         vistaCarrito.darClickEnTarjetaDeCredito();

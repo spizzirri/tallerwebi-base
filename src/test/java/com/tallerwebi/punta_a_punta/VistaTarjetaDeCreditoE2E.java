@@ -41,7 +41,7 @@ public class VistaTarjetaDeCreditoE2E {
     }
 
     @Test
-    void deberiaCargarLosDatosCorrectamenteYNavegarAlMensajeDeExito(){
+    public void deberiaCargarLosDatosCorrectamenteYNavegarAlMensajeDeExito(){
         vistaTarjetaDeCredito.darClickEnNumeroDeTarjeta();
         vistaTarjetaDeCredito.escribirNumeroDeTarjeta("4567867567541234");
         vistaTarjetaDeCredito.darClickEnNombreDelTitular();
