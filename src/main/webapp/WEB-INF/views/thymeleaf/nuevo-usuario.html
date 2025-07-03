@@ -44,7 +44,7 @@
 
         <button id="btn-registrarme" class="btn btn-success w-100 mt-4" type="submit">Registrarme</button>
 
-        <p th:if="${error != null}" class="alert alert-danger mt-3" th:text="'Error: ' + ${error}"></p>
+        <p th:if="${error != null}" id="mensajeErrorRegistrarse" class="alert alert-danger mt-3" th:text="'Error: ' + ${error}"></p>
       </form>
     </div>
   </div>

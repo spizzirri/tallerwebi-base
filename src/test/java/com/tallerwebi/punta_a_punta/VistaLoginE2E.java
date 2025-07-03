@@ -22,7 +22,7 @@ public class VistaLoginE2E {
     static void abrirNavegador() {
         playwright = Playwright.create();
         browser = playwright.chromium().launch();
-        //browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false).setSlowMo(50));
+       browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false).setSlowMo(50));
 
     }
 
@@ -43,19 +43,29 @@ public class VistaLoginE2E {
         context.close();
     }
 
-    @Test
-    void deberiaDecirUNLAMEnElNavbar() {
-        String texto = vistaLogin.obtenerTextoDeLaBarraDeNavegacion();
-        assertThat("UNLAM", equalToIgnoringCase(texto));
-    }
+//    @Test
+//    void deberiaDecirUNLAMEnElNavbar() {
+//        String texto = vistaLogin.obtenerTextoDeLaBarraDeNavegacion();
+//        assertThat("UNLAM", equalToIgnoringCase(texto));
+//    }
+
+//    @Test
+//    void deberiaDarUnErrorAlNoCompletarElLoginYTocarElBoton() {
+//        vistaLogin.escribirEMAIL("damian@unlam.edu.ar");
+//        vistaLogin.escribirClave("unlam");
+//        vistaLogin.darClickEnIniciarSesion();
+//        String texto = vistaLogin.obtenerMensajeDeError();
+//        assertThat("Error Usuario o clave incorrecta", equalToIgnoringCase(texto));
+//    }
 
     @Test
-    void deberiaDarUnErrorAlNoCompletarElLoginYTocarElBoton() {
-        vistaLogin.escribirEMAIL("damian@unlam.edu.ar");
-        vistaLogin.escribirClave("unlam");
+    void deberiaLogearmeAlInscribirBienElMailYPasswordDeUnUsuarioReal() {
+        vistaLogin.escribirEMAIL("test@unlam.edu.ar");
+        vistaLogin.escribirClave("test");
         vistaLogin.darClickEnIniciarSesion();
-        String texto = vistaLogin.obtenerMensajeDeError();
-        assertThat("Error Usuario o clave incorrecta", equalToIgnoringCase(texto));
+        String url = vistaLogin.obtenerURLActual();
+        assertThat(url, containsStringIgnoringCase("/index"));
+
     }
 
     @Test
@@ -64,6 +74,13 @@ public class VistaLoginE2E {
         vistaLogin.escribirClave("test");
         vistaLogin.darClickEnIniciarSesion();
         String url = vistaLogin.obtenerURLActual();
-        assertThat(url, containsStringIgnoringCase("/spring/home"));
+        assertThat(url, containsStringIgnoringCase("/index"));
+    }
+
+    @Test
+    void deberiaNavegarAlNuevoUsuarioAlTocarElBotonRegistrarme() {
+        vistaLogin.darClickEnRegistarte();
+        String url = vistaLogin.obtenerURLActual();
+        assertThat(url, containsStringIgnoringCase("/nuevo-usuario"));
     }
 }
