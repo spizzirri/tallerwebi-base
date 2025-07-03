@@ -86,19 +86,9 @@ public class ControladorArmaTuPc {
 //        return componentesCompatiblesADevolver;
 //    }
     private List<ComponenteDto> pasarPreciosAPesos(List<ComponenteDto> componentesCompatiblesADevolver) {
-        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
-        symbols.setGroupingSeparator('.');
-        symbols.setDecimalSeparator(',');
-        DecimalFormat formatoLatino = new DecimalFormat("#,##0.00", symbols);
 
         for (ComponenteDto componente : componentesCompatiblesADevolver) {
-            String precioFormateado = this.servicioPrecios.conversionDolarAPeso(componente.getPrecio());
-            try {
-                Number numero = formatoLatino.parse(precioFormateado);
-                componente.setPrecio(numero.doubleValue());
-            } catch (ParseException e) {
-                e.printStackTrace(); // Manejalo como necesites
-            }
+            if (componente != null) componente.setPrecioFormateado(this.servicioPrecios.conversionDolarAPeso(componente.getPrecio()));
         }
         return componentesCompatiblesADevolver;
     }
@@ -153,6 +143,10 @@ public class ControladorArmaTuPc {
             model.put("errorLimite", "Supero el limite de "+tipoComponente+" de su armado");
             return new ModelAndView("redirect:/arma-tu-pc/tradicional/" + tipoComponente, model);
         }
+
+        armadoPcDtoConComponenteAgregado.setPrecioFormateado(
+                this.servicioPrecios.conversionDolarAPeso(armadoPcDtoConComponenteAgregado.getPrecioTotal())
+                );
 
         session.setAttribute("armadoPcDto", armadoPcDtoConComponenteAgregado);
 
@@ -215,6 +209,24 @@ public class ControladorArmaTuPc {
     public ModelAndView reiniciarArmado(HttpSession session) {
         session.removeAttribute("armadoPcDto");
         return new ModelAndView("redirect:/arma-tu-pc/tradicional/procesador");
+    }
+
+    @RequestMapping(path = "arma-tu-pc/carrito", method = RequestMethod.POST)
+    public ModelAndView sumarArmadoAlCarrito(HttpSession session) {
+
+        List<ProductoCarritoDto> carritoSesion;
+
+        if (session.getAttribute("carritoSesion") != null) {
+            carritoSesion = (List<ProductoCarritoDto>) session.getAttribute("carritoSesion");
+        } else {
+            carritoSesion = new ArrayList<>();
+        }
+
+        carritoSesion.addAll(this.servicioArmaTuPc.pasajeAProductoDtoParaAgregarAlCarrito(obtenerArmadoPcDtoDeLaSession(session)));
+
+        // controlar el stock con servicio ServicioProductoCarritoImpl
+
+        return new ModelAndView("redirect:/carritoDeCompras/index");
     }
 
 }

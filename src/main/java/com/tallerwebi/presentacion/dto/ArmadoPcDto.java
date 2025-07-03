@@ -19,6 +19,7 @@ public class ArmadoPcDto {
     private ComponenteDto gabinete;
     private ComponenteDto monitor;
     private List<ComponenteDto> perifericos;
+    private String precioFormateado;
 
     public ArmadoPcDto(ArmadoPc entidad) {
         this.procesador = new ComponenteDto(entidad.getProcesador());
@@ -31,6 +32,7 @@ public class ArmadoPcDto {
         this.gabinete = new ComponenteDto(entidad.getGabinete());
         this.monitor = new ComponenteDto(entidad.getMonitor());
         this.perifericos = this.convertirListaDeComponentesEntidadADtos(entidad.getPerifericos());
+        this.precioFormateado = "0.0";
     }
 
     public ArmadoPcDto(ComponenteDto procesador,
@@ -53,6 +55,7 @@ public class ArmadoPcDto {
         this.gabinete = gabinete;
         this.monitor = monitor;
         this.perifericos = perifericos;
+        this.precioFormateado = "0.0";
     }
 
     public ArmadoPcDto() {
@@ -164,6 +167,14 @@ public class ArmadoPcDto {
 
     public void setMotherboard(ComponenteDto motherboard) {
         this.motherboard = motherboard;
+    }
+
+    public String getPrecioFormateado() {
+        return precioFormateado;
+    }
+
+    public void setPrecioFormateado(String precioFormateado) {
+        this.precioFormateado = precioFormateado;
     }
 
     public Map<ComponenteDto, Integer> getRamsDetalladas(){
