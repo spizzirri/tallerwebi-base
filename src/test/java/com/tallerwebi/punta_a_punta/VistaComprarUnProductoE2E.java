@@ -90,9 +90,6 @@ public class VistaComprarUnProductoE2E {
         vistaCoolers.ir();
     }
 
-    //        public void deberiaRegistrarUnUsuarioAlPonerTodosLosDatosBienEnLosCampos() {
-    //        loginValidoDeUsuarioGustavoNarancio();
-    //         }
     public void deberiaIniciarSesionCorrectamenteDespuesDeRegistrarUnUsuarioYcompletarElFormulario() {
         loginValidoDeUsuarioGustavoNarancio();
         vistaRegistrarme.escribirEMAIL("Huesos12@gmail.com");

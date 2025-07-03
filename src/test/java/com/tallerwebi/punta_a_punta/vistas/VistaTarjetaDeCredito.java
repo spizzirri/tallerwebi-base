@@ -6,6 +6,9 @@ public class VistaTarjetaDeCredito extends VistaWeb{
 
     public VistaTarjetaDeCredito(Page page) {
         super(page);
+    }
+
+    public void ir() {
         page.navigate("http://localhost:8080/tarjetaDeCredito");
     }
 

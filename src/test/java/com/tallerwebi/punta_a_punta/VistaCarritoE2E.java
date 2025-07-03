@@ -7,7 +7,6 @@ import org.junit.jupiter.api.*;
 
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
 import static org.hamcrest.Matchers.containsStringIgnoringCase;
-import static org.hamcrest.Matchers.matchesPattern;
 
 public class VistaCarritoE2E {
 
@@ -21,7 +20,6 @@ public class VistaCarritoE2E {
         playwright = Playwright.create();
         browser = playwright.chromium().launch();
         browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false).setSlowMo(100));
-
     }
 
     @AfterAll
@@ -42,7 +40,8 @@ public class VistaCarritoE2E {
     }
 
     @Test
-    void deberiaDevolvermeUnMensajeConElCodigoDeDescuento() {
+    public void deberiaDevolvermeUnMensajeConElCodigoDeDescuento() {
+        vistaCarrito.ir();
         vistaCarrito.escribirCodigoDeDescuento("compra5");
         vistaCarrito.darClickEnCalcularDescuento();
 
@@ -52,7 +51,8 @@ public class VistaCarritoE2E {
     }
 
     @Test
-    void deberiaDevolvermeUnMensajeConCostoTiempoYZonaDeEnvio() {
+    public void deberiaDevolvermeUnMensajeConCostoTiempoYZonaDeEnvio() {
+        vistaCarrito.ir();
         vistaCarrito.escribirCodigoPostal("1704");
         vistaCarrito.darClickEnCalcularEnvio();
 
@@ -67,6 +67,7 @@ public class VistaCarritoE2E {
 
     @Test
     public void deberiaNavegarALaVistaTarjetaDeCreditoSiElMetodoDePagoEsValido() {
+        vistaCarrito.ir();
         deberiaDevolvermeUnMensajeConElCodigoDeDescuento();
         deberiaDevolvermeUnMensajeConCostoTiempoYZonaDeEnvio();
         vistaCarrito.darClickEnTarjetaDeCredito();
