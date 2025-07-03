@@ -59,6 +59,17 @@ public class VistaNuevoUsuarioE2E {
     }
 
     @Test
+    void deberiaRegistrarUnUsuarioAlPonerTodosLosDatosBienEnLosCamposYLuegoAlRedirigirmePoderLogearmeCorrectamente() {
+        loginValidoDeUsuarioGustavoNarancio();
+        vistaRegistrarme.escribirEMAIL("Huesos@gmail.com");
+        vistaRegistrarme.escribirClave("123");
+        vistaRegistrarme.darClickEnIniciarSesion();
+        String url = vistaNuevoUsuario.obtenerURLActual();
+        assertThat(url, containsStringIgnoringCase("/index"));
+
+    }
+
+    @Test
     void deberiaDarmeUnMensajeDeErrorAlCorrerEsteTestPorSegundaVezRegistrarUnUsuarioAlPonerTodosLosDatosBienEnLosCampos() {
         loginValidoDeUsuarioGustavoNarancio();
         String textoObtenido = vistaNuevoUsuario.obtenerMensajeDeError();

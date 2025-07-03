@@ -5,9 +5,11 @@ import com.microsoft.playwright.Page;
 public class VistaNuevoUsuario extends VistaWeb{
     public VistaNuevoUsuario(Page page) {
         super(page);
-        page.navigate("http://localhost:8080/nuevo-usuario");
     }
 
+    public void ir() {
+        page.navigate("http://localhost:8080/nuevo-usuario");
+    }
 
     public void escribirEMAIL(String email){
         this.escribirEnElElemento("#email", email);

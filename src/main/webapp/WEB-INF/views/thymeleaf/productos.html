@@ -8,7 +8,7 @@
         <div class="col-md-2 mb-4">
             <div class="list-group">
                 <a href="#" class="list-group-item list-group-item-action active">Categorias</a>
-                <a th:each="cat : ${categorias}" th:id="'btn-link-' + ${cat.descripcion}"
+                <a  th:each="cat : ${categorias}" th:id="'btn-link-' + ${cat.descripcion}"
                    th:href="@{/productos/search(cat=${cat.nombre})}"
                    th:text="${cat.descripcion}"
                    class="list-group-item list-group-item-action">
@@ -51,8 +51,8 @@
                             <div class="d-flex justify-content-between align-items-center mt-auto">
                                 <span class="fw-bold text-success" th:text="'$ ' + ${producto.precioFormateado}"></span>
                                 <button data-testid="agregar-carrito-btn" th:onclick="|agregarAlCarrito(${producto.id}, 1)|"
-                                        class="card-producto-agregar-carrito btn btn-warning btn-sm">
-                                    <i class="bi bi-cart3 fs-4"></i>
+                                        class=" btn btn-warning btn-sm">
+                                    <i class="card-producto-agregar-carrito bi bi-cart3 fs-4"></i>
                                 </button>
                             </div>
                         </div>

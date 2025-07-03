@@ -6,6 +6,10 @@ public class VistaRegistrarme extends VistaWeb {
 
     public VistaRegistrarme(Page page) {
         super(page);
+
+    }
+
+    public void ir() {
         page.navigate("http://localhost:8080/registrarme");
     }
 
