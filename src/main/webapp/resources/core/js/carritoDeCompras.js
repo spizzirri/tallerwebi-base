@@ -47,6 +47,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const mensajeParaAlert = document.getElementById("mensajeDescuento");
     const contenidoMensaje = document.getElementById("contenidoMensaje");
 
+
     if (boton) {
         boton.addEventListener("click", function () {
             const codigo = input.value.trim();
@@ -110,6 +111,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const params = new URLSearchParams();
             params.append('metodoPago', metodoSeleccionado.value);
+            const valorTotalElement = document.querySelector('.valorTotalDelCarrito');
+            params.append('totalConDescuento',valorTotalElement.dataset.valorConDescuento);
 
             fetch('/carritoDeCompras/formularioPago', {
                 method: 'POST',
@@ -150,19 +153,23 @@ function crearFormularioMercadoPago(data) {
         costoEnvio = window.datosEnvio.costo;
     }
 
+
     if (costoEnvio && costoEnvio > 0) {
         form.innerHTML += `<input type="hidden" name="costoEnvio" value="${costoEnvio}">`;
     }
-
+    /**
     const valorTotalElement = document.querySelector('.valorTotalDelCarrito');
-    const valorOriginal = valorTotalElement.dataset.valorOriginal;
+    const valorOriginal = document.getElementById("totalOriginal").value;
     const valorConDescuento = valorTotalElement.dataset.valorConDescuento;
+    console.log(valorConDescuento);
 
     if (valorOriginal && valorConDescuento && valorOriginal !== valorConDescuento) {
-        form.innerHTML += `<input type="hidden" name="totalOriginal" value="${valorOriginal}">`;
-        form.innerHTML += `<input type="hidden" name="totalConDescuento" value="${valorConDescuento}">`;
+         form.innerHTML += `<input type="hidden" name="totalOriginal" value="` + valorOriginal + `">`;
+       form.innerHTML += `<input type="hidden" name="totalConDescuento" value="`+ valorConDescuento + `">`;
     }
+    **/
 
+    console.log(form);
     document.body.appendChild(form);
     form.submit();
 }

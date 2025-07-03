@@ -138,10 +138,13 @@ public class CarritoController {
             response.put("mensajeDescuento", "Codigo de descuento invalido!");
             return response;
         }
+
         Double valorTotalConDescuento = this.productoService.calcularDescuento(codigoDescuentoExtraido);
 
-        response.put("mensaje", "Descuento aplicado! Nuevo total: $" + valorTotalConDescuento.toString());
-        response.put("valorTotal", valorTotalConDescuento);
+        String valorTotalFormateado = this.servicioPrecios.conversionDolarAPeso(valorTotalConDescuento);
+
+        response.put("mensaje", "Descuento aplicado! Nuevo total: $" + valorTotalFormateado);
+        response.put("valorTotal", valorTotalFormateado); // Ahora envías el String formateado
 
         return response;
     }

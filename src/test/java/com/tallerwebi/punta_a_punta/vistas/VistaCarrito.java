@@ -1,9 +1,7 @@
 package com.tallerwebi.punta_a_punta.vistas;
 
-import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 
-import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
 
 public class VistaCarrito extends VistaWeb {
 
