@@ -106,8 +106,7 @@ document.addEventListener("DOMContentLoaded", function () {
             errorDiv.classList.add("d-none");
 
             const btnComprar = document.getElementById("btnComprar");
-            btnComprar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Redirigiendo a MercadoPago...';
-            btnComprar.disabled = true;
+
 
             const params = new URLSearchParams();
             params.append('metodoPago', metodoSeleccionado.value);
@@ -123,9 +122,17 @@ document.addEventListener("DOMContentLoaded", function () {
             })
                 .then(response => response.json())
                 .then(data => {
-                    if (data.success) {
+                    if (data.success && metodoSeleccionado.value === "mercadoPago") {
                         crearFormularioMercadoPago(data);
-                    } else {
+                        btnComprar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Redirigiendo a MercadoPago...';
+                        btnComprar.disabled = true;
+                    }
+                    if ( data.success && metodoSeleccionado.value === "tarjetaCredito" && data.redirect ) {
+                        window.location.href = data.redirect;
+                        btnComprar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Redirigiendo a Tarjeta de credito...';
+                        btnComprar.disabled = true;
+                    }
+                    else if (!data.success && data.error) {
                         btnComprar.innerHTML = 'Finalizar compra';
                         btnComprar.disabled = false;
                         errorDiv.innerText = data.error;
