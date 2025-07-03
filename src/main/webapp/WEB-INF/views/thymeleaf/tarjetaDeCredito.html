@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Agrega una nueva tarjeta</title>
+    <link rel="stylesheet" th:href="@{/core/css/main.css}" />
+    <style>
+        .tarjeta-container {
+            max-width: 600px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            padding: 32px 24px;
+        }
+        .tarjeta-header {
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+        .tarjeta-form label {
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+        .tarjeta-form input, .tarjeta-form select {
+            width: 100%;
+            padding: 10px 12px;
+            margin-bottom: 18px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        .tarjeta-form .row {
+            display: flex;
+            gap: 16px;
+        }
+        .tarjeta-form .row > div {
+            flex: 1;
+        }
+        .tarjeta-form .btn-continuar {
+            width: 180px;
+            background: #1976d2;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 12px 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: block;
+            margin: 32px auto 0 auto;
+        }
+        .tarjeta-form .btn-continuar:hover {
+            background: #1565c0;
+        }
+        @media (max-width: 700px) {
+            .tarjeta-container { padding: 18px 4px; }
+            .tarjeta-form .row { flex-direction: column; gap: 0; }
+        }
+    </style>
+</head>
+<body style="background: #f5f6fa;">
+<div th:replace="fragments/fragments :: header"></div>
+<div class="tarjeta-container">
+    <div class="tarjeta-header">Agrega una nueva tarjeta</div>
+    <div style="margin-bottom: 18px;">
+        <button type="button" style="background: #f3f4f6; border: none; border-radius: 20px; padding: 8px 18px; font-weight: 500; display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 1.2em;">&#128179;</span> Nueva tarjeta de crédito
+        </button>
+    </div>
+
+    <form class="tarjeta-form" method="post" th:action="@{/tarjetaDeCredito/validar}">
+        <label for="numeroTarjeta">Número de tarjeta</label>
+        <input type="number" id="numeroTarjeta" name="numeroTarjeta" maxlength="19" placeholder="1234 1234 1234 1234" autocomplete="cc-number" required />
+        <p th:if="${mensajeTarjeta != null}" class="alert alert-danger" th:text="'Error ' + ${mensajeTarjeta}">
+        </p>
+        <label for="nombreTitular">Nombre del titular</label>
+        <input type="text" id="nombreTitular" name="nombreTitular" placeholder="Ej.: María López" autocomplete="cc-name" required />
+        <small style="color: #888; margin-bottom: 12px; display: block;">Como aparece en la tarjeta.</small>
+
+        <div class="row">
+            <div>
+                <label for="vencimiento">Vencimiento</label>
+                <input type="text" id="vencimiento" name="vencimiento" maxlength="5" pattern="\d{2}/\d{2}" placeholder="MM/AA" required />
+
+                <p th:if="${mensajeVencimiento != null}" class="alert alert-danger" th:text="'Error ' + ${mensajeVencimiento}">
+                </p>
+            </div>
+            <div>
+                <label for="codigoSeguridad">Código de seguridad</label>
+                <input type="number" id="codigoSeguridad" name="codigoSeguridad" maxlength="4" placeholder="Ej.: 123" autocomplete="cc-csc" required />
+                <p th:if="${mensajeCodigo != null}" class="alert alert-danger" th:text="'Error ' + ${mensajeCodigo}">
+                </p>
+
+            </div>
+        </div>
+
+        <label for="documento">Documento del titular</label>
+        <div class="row">
+            <div style="max-width: 120px;">
+                <select id="tipoDocumento" name="tipoDocumento" required>
+                    <option value="DNI">DNI</option>
+                    <option value="CUIT">CUIT</option>
+                    <option value="LC">LC</option>
+                    <option value="LE">LE</option>
+                </select>
+            </div>
+            <div>
+                <input type="number" id="documento" name="documento" placeholder="99.999.999" required />
+            </div>
+        </div>
+
+        <button type="submit" id="continuar" class="btn-continuar">Continuar</button>
+    </form>
+</div>
+<div th:replace="fragments/fragments :: footer"></div>
+</body>
+</html>

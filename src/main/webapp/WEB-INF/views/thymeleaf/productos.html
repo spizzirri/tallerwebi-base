@@ -1,25 +1,4 @@
-<!--<!DOCTYPE HTML>-->
-<!--<html lang="es" xmlns:th="http://www.thymeleaf.org">-->
-<!--<head>-->
-<!--    <meta charset="UTF-8">-->
-<!--    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">-->
 
-<!--    <title>Compra Gamer 2</title>-->
-
-<!--    &lt;!&ndash; Boostrap core css &ndash;&gt;-->
-<!--    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.2.0/css/bootstrap.min.css}"/>-->
-
-
-<!--    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">-->
-
-<!--    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css"/>-->
-
-<!--    &lt;!&ndash; custom style &ndash;&gt;-->
-<!--    <link rel="stylesheet" th:href="@{/css/main.css}"/>-->
-<!--    <link rel="stylesheet" th:href="@{/css/fragments.css}">-->
-
-<!--</head>-->
-<!--<body>-->
 <div th:replace="fragments/fragments :: header"></div>
 
 
@@ -29,7 +8,7 @@
         <div class="col-md-2 mb-4">
             <div class="list-group">
                 <a href="#" class="list-group-item list-group-item-action active">Categorias</a>
-                <a th:each="cat : ${categorias}"
+                <a th:each="cat : ${categorias}" th:id="'btn-link-' + ${cat.descripcion}"
                    th:href="@{/productos/search(cat=${cat.nombre})}"
                    th:text="${cat.descripcion}"
                    class="list-group-item list-group-item-action">
@@ -71,8 +50,8 @@
 
                             <div class="d-flex justify-content-between align-items-center mt-auto">
                                 <span class="fw-bold text-success" th:text="'$ ' + ${producto.precioFormateado}"></span>
-                                <button th:onclick="|agregarAlCarrito(${producto.id}, 1)|"
-                                        class="btn btn-warning btn-sm">
+                                <button data-testid="agregar-carrito-btn" th:onclick="|agregarAlCarrito(${producto.id}, 1)|"
+                                        class="card-producto-agregar-carrito btn btn-warning btn-sm">
                                     <i class="bi bi-cart3 fs-4"></i>
                                 </button>
                             </div>

@@ -163,15 +163,22 @@ public class ControladorCarritoTest {
         when(servicioProductoCarritoImplMock.getProductos()).thenReturn(carritoSesion);
         when(servicioProductoCarritoImplMock.calcularDescuento(5)).thenReturn(313.5);
 
+
+        when(servicioPreciosMock.conversionDolarAPeso(313.5)).thenReturn("384.037,50");
+
         Map<String, String> inputConDescuento = new HashMap<>();
         inputConDescuento.put("codigoInput", "baratija5");
 
         Map<String, Object> porcentajeDescuento = carritoController.calcularValorTotalDeLosProductosConDescuento(inputConDescuento);
 
-        assertThat(porcentajeDescuento.get("mensaje"), equalTo("Descuento aplicado! Nuevo total: $313.5"));
-        assertThat(porcentajeDescuento.get("valorTotal"), equalTo(313.5));
+        assertThat(porcentajeDescuento.get("mensaje"), equalTo("Descuento aplicado! Nuevo total: $384.037,50"));
+        assertThat(porcentajeDescuento.get("valorTotal"), equalTo("384.037,50"));
+
+        assertThat(porcentajeDescuento.get("mensaje"), equalTo("Descuento aplicado! Nuevo total: $384.037,50"));
+        assertThat(porcentajeDescuento.get("valorTotal"), equalTo("384.037,50"));
 
         verify(servicioProductoCarritoImplMock, times(1)).calcularDescuento(5);
+        verify(servicioPreciosMock, times(1)).conversionDolarAPeso(313.5);
     }
 
     @Test
@@ -179,7 +186,7 @@ public class ControladorCarritoTest {
         when(productoMock1.getPrecio()).thenReturn(100.0);
         when(productoMock1.getCantidad()).thenReturn(2);
         when(productoMock2.getPrecio()).thenReturn(130.0);
-        when(productoMock1.getCantidad()).thenReturn(1);
+        when(productoMock2.getCantidad()).thenReturn(1);
 
         carritoSesion.add(productoMock1);
         carritoSesion.add(productoMock2);
@@ -187,15 +194,18 @@ public class ControladorCarritoTest {
         when(servicioProductoCarritoImplMock.getProductos()).thenReturn(carritoSesion);
         when(servicioProductoCarritoImplMock.calcularDescuento(10)).thenReturn(297.0);
 
+        when(servicioPreciosMock.conversionDolarAPeso(297.0)).thenReturn("363.825,00");
+
         Map<String, String> inputConDescuento = new HashMap<>();
         inputConDescuento.put("codigoInput", "baratija10");
 
         Map<String, Object> porcentajeDescuento = carritoController.calcularValorTotalDeLosProductosConDescuento(inputConDescuento);
 
-        assertThat(porcentajeDescuento.get("mensaje"), equalTo("Descuento aplicado! Nuevo total: $297.0"));
-        assertThat(porcentajeDescuento.get("valorTotal"), equalTo(297.0));
+        assertThat(porcentajeDescuento.get("mensaje"), equalTo("Descuento aplicado! Nuevo total: $363.825,00"));
+        assertThat(porcentajeDescuento.get("valorTotal"), equalTo("363.825,00"));
 
         verify(servicioProductoCarritoImplMock, times(1)).calcularDescuento(10);
+        verify(servicioPreciosMock, times(1)).conversionDolarAPeso(297.0);
     }
 
     @Test
@@ -203,7 +213,7 @@ public class ControladorCarritoTest {
         when(productoMock1.getPrecio()).thenReturn(100.0);
         when(productoMock1.getCantidad()).thenReturn(2);
         when(productoMock2.getPrecio()).thenReturn(130.0);
-        when(productoMock1.getCantidad()).thenReturn(1);
+        when(productoMock2.getCantidad()).thenReturn(1);
 
         carritoSesion.add(productoMock1);
         carritoSesion.add(productoMock2);
@@ -211,15 +221,18 @@ public class ControladorCarritoTest {
         when(servicioProductoCarritoImplMock.getProductos()).thenReturn(carritoSesion);
         when(servicioProductoCarritoImplMock.calcularDescuento(15)).thenReturn(280.5);
 
+        when(servicioPreciosMock.conversionDolarAPeso(280.5)).thenReturn("343.612,50");
+
         Map<String, String> inputConDescuento = new HashMap<>();
         inputConDescuento.put("codigoInput", "baratija15");
 
         Map<String, Object> porcentajeDescuento = carritoController.calcularValorTotalDeLosProductosConDescuento(inputConDescuento);
 
-        assertThat(porcentajeDescuento.get("mensaje"), equalTo("Descuento aplicado! Nuevo total: $280.5"));
-        assertThat(porcentajeDescuento.get("valorTotal"), equalTo(280.5));
+        assertThat(porcentajeDescuento.get("mensaje"), equalTo("Descuento aplicado! Nuevo total: $343.612,50"));
+        assertThat(porcentajeDescuento.get("valorTotal"), equalTo("343.612,50"));
 
         verify(servicioProductoCarritoImplMock, times(1)).calcularDescuento(15);
+        verify(servicioPreciosMock, times(1)).conversionDolarAPeso(280.5);
     }
 
     @Test
@@ -700,7 +713,7 @@ public class ControladorCarritoTest {
                 .when(servicioProductoCarritoImplMock)
                 .agregarProducto(componenteId, cantidadAAgregar);
 
-        Map<String, Object> response = carritoController.agregarProductoAlCarrito(componenteMock.getId(), 1,  httpSessionMock);
+        Map<String, Object> response = carritoController.agregarProductoAlCarrito(componenteMock.getId(), 1, httpSessionMock);
 
         assertThat(response.get("success"), equalTo(false));
         assertThat(response.get("mensaje"), equalTo("Error al agregar producto al carrito!"));

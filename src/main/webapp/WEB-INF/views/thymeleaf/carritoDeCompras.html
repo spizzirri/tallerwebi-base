@@ -60,6 +60,7 @@
             <div class="card-footer">
                 <h3 class="card-title m-2 text-end">
                     Total: <span class="valorTotalDelCarrito" th:text="'$' + ${valorTotal}"></span>
+                    <input type="hidden" id="totalOriginal" name="totalOriginal" th:value="${valorTotal}">
                 </h3>
             </div>
         </div>
@@ -156,7 +157,6 @@
                         <h3 class="card-title mb-3">Método de pago</h3>
                         <form method="POST" action="/checkout/create-payment" id="formulario-pago">
                             <div id="campos-productos"></div>
-
                             <div class="form-check mb-3">
                                 <input class="form-check-input" type="radio" id="mercadoPago" name="metodoPago"
                                        value="mercadoPago">
@@ -164,6 +164,15 @@
                                     Mercado pago - Usás tu cuenta de MP
                                 </label>
                             </div>
+                            <!-- Nueva opción: Tarjeta de crédito -->
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="radio" id="tarjetaCredito" name="metodoPago"
+                                       value="tarjetaCredito">
+                                <label class="form-check-label" for="tarjetaCredito">
+                                    Abonar con tarjeta de crédito
+                                </label>
+                            </div>
+
 
                             <!-- Alertas y botón -->
                             <div id="errorMetodoPago" class="alert alert-danger d-none" role="alert"></div>
@@ -172,7 +181,7 @@
                             </div>
 
                             <div class="d-grid">
-                                <button type="submit" id="btnComprar" class="btn btn-dark btn-lg">
+                                <button id="btnComprar" class="btn btn-dark btn-lg">
                                     Finalizar compra
                                 </button>
                             </div>

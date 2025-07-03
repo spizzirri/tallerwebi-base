@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>¡Gracias por tu compra!</title>
+    <link rel="stylesheet" th:href="@{/core/css/main.css}" />
+    <style>
+        body { background: #f5f6fa; }
+        .exito-container {
+            max-width: 800px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+            padding: 40px 32px 32px 32px;
+        }
+        .exito-check {
+            color: #43b324;
+            font-size: 4rem;
+            margin-bottom: 18px;
+        }
+        .exito-titulo {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .exito-sub {
+            font-size: 1.1rem;
+            color: #444;
+            margin-bottom: 18px;
+        }
+        .exito-pedido {
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .exito-fecha {
+            font-size: 0.98rem;
+            color: #666;
+            margin-bottom: 24px;
+        }
+        .exito-resumen {
+            background: #f7f9fa;
+            border-radius: 10px;
+            padding: 18px 20px;
+            margin-bottom: 28px;
+        }
+        .exito-resumen-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 24px;
+            margin-bottom: 10px;
+        }
+        .exito-resumen-col {
+            flex: 1;
+        }
+        .exito-volver {
+            display: block;
+            margin: 0 auto;
+            background: #1976d2;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 14px 38px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            text-align: center;
+            transition: background 0.2s;
+        }
+        .exito-volver:hover {
+            background: #1256a3;
+            color: #fff;
+        }
+        @media (max-width: 900px) {
+            .exito-container { padding: 18px 4px; }
+        }
+        @media (max-width: 600px) {
+            .exito-resumen-row { flex-direction: column; gap: 0; }
+        }
+    </style>
+</head>
+<body>
+<div th:replace="fragments/fragments :: header"></div>
+<div class="exito-container">
+    <div class="text-center">
+        <div class="exito-check">
+            <i class="fa fa-check-circle"></i>
+        </div>
+        <div class="exito-titulo">¡Gracias por tu compra!</div>
+        <div class="exito-sub">Tu solicitud de compra fue recibida</div>
+        <div style="color: #666; margin-bottom: 18px;">Tu pedido se encuentra en proceso de validación, en breve recibirás un correo con el detalle de tu compra.</div>
+        <div class="exito-pedido">Pedido: <span style="color:#1976d2;">OV01-00000001</span></div>
+        <div class="exito-fecha">
+            Fecha de Solicitud de compra: <span th:text="${fechaCompra}"></span>
+        </div>
+    </div>
+    <div class="exito-resumen">
+        <div class="exito-resumen-row">
+            <div class="exito-resumen-col">
+                <b>Entrega</b><br>
+                Fecha Entrega Estimada: <b>05/07/2025</b><br>
+                Argentina<br>
+                Ramos Mejia<br>
+
+            </div>
+            <div class="exito-resumen-col">
+                <b>Medio de Pago</b><br>
+                Número de tarjeta<br>
+                <span th:if="${tarjeta != null}" th:text="'**** **** **** ' + ${#strings.substring(tarjeta.numeroDeTarjeta, tarjeta.numeroDeTarjeta.length() - 4)}"></span>
+                <span th:if="${tarjeta == null}">No disponible</span>
+            </div>
+            <div class="exito-resumen-col">
+                <b>Resumen</b><br>
+                Subtotal: <span style="float:right" th:text="'S/ ' + ${subtotal}"></span><br>
+
+                Costo del envío: <span style="float:right">$ 1.500</span><br>
+                <hr style="margin: 8px 0;">
+                <b>Total</b>: <span style="float:right; color:#1976d2; font-size:1.1em;">S/ 150.00</span>
+            </div>
+        </div>
+    </div>
+    <a th:href="@{/index.html}" class="exito-volver">Volver al inicio</a>
+</div>
+<div th:replace="fragments/fragments :: footer"></div>
+<!-- FontAwesome para el icono de check -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</body>
+</html>

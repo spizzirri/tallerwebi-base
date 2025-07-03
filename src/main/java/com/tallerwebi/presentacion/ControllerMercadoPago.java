@@ -9,9 +9,6 @@ import com.mercadopago.exceptions.MPApiException;
 
 import com.mercadopago.resources.preference.Preference;
 import com.tallerwebi.dominio.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -24,15 +21,14 @@ import java.util.*;
 @RestController
 @RequestMapping("/checkout")
 public class ControllerMercadoPago {
-    private static final Logger logger = LoggerFactory.getLogger(ControllerMercadoPago.class);
 
     //ServicioProductoCarrito sabe los productos que estan en el carrito
     private final ServicioProductoCarritoImpl servicioProductoCarritoImpl;
     private final ServicioPrecios servicioPrecios;
 
 
-    @Value("${mercadoPago.accessToken}")
-    private String mercadoPagoAccessToken = "APP_USR-3784718513902185-053117-353d2d4a3d09f6e4ff6bd5750e1b6878-2465514854";
+//    @Value("${mercadoPago.accessToken}")
+//    private String mercadoPagoAccessToken = "APP_USR-3784718513902185-053117-353d2d4a3d09f6e4ff6bd5750e1b6878-2465514854";
 
     public ControllerMercadoPago(ServicioProductoCarritoImpl servicioProductoCarritoImpl, ServicioPrecios servicioPrecios) {
         this.servicioProductoCarritoImpl = servicioProductoCarritoImpl;
@@ -73,11 +69,6 @@ public class ControllerMercadoPago {
         // Creo un objeto de preferencia
         PreferenceClient client = new PreferenceClient();
 
-        double factorDescuento = 1.0;
-        if (totalOriginal != null && totalConDescuento != null && totalOriginal > 0) {
-            factorDescuento = totalConDescuento / totalOriginal;
-        }
-
         // Creo un ítem con los productos en la preferencia de mercado pago (de forma que lo entienda su sistema)
         List<PreferenceItemRequest> items = new ArrayList<>();
         for (int i = 0; i < pagoRequest.getProductos().size(); i++) {
@@ -105,24 +96,6 @@ public class ControllerMercadoPago {
             items.add(itemEnvio);
         }
 
-
-//        ESTO LO VOY A USAR CUANDO TENGAMOS USUARIOS LOGUEADOS, TRAEMOS LOS DATOS DEL USUARIO EN SESION PARA CARGAR EL PAYER NECESARIO DE MP (AUNQUE NO ES OBLIGATORIAMENTE NECESARIO PARA MP)
-//        Usuario usuario = obtenerUsuarioDeSesion();
-//
-//        PreferencePayerRequest payer = PreferencePayerRequest.builder()
-//                .name(usuario.getNombre())
-//                .surname(usuario.getApellido())
-//                .email(usuario.getEmail())
-//                .phone(PhoneRequest.builder()
-//                        .areaCode("11")
-//                        .number("11112222")
-//                        .build())
-//                .identification(IdentificationRequest.builder()
-//                        .type("DNI")
-//                        .number("12345678")
-//                        .build())
-//                .build();
-
         // Creo un comprador para mercado pago con los datos del compradorTest
         PreferencePayerRequest payer = PreferencePayerRequest.builder()
                 .name("Test")
@@ -142,9 +115,9 @@ public class ControllerMercadoPago {
 
         //Donde redireccionar depues de hacer el pago (arreglarlo para que me devuelva a la vista de nuestra app)
         PreferenceBackUrlsRequest backUrls = PreferenceBackUrlsRequest.builder()
-                .success("http://localhost:8080/checkout/carritoDeCompras")
-                .failure("http://localhost:8080/checkout/carritoDeCompras")
-                .pending("http://localhost:8080/checkout/carritoDeCompras")
+                .success("http://localhost:8080/pagoExitoso")
+                .failure("http://localhost:8080/pagoExitoso")
+                .pending("http://localhost:8080/pagoExitoso")
                 .build();
 
         // Creo la preferencia final que va a ser mandada a mercado pago para la redireccion a su pagina
@@ -185,8 +158,7 @@ public class ControllerMercadoPago {
         if (Double.isNaN(precioFinal) || precioFinal <= 0) {
             precioFinal = precioOriginal;
         }
-        Double precioEnPesos = this.servicioPrecios.conversionDolarAPesoDouble(precioFinal);
 
-        return precioEnPesos;
+        return this.servicioPrecios.conversionDolarAPesoDouble(precioFinal);
     }
 }
