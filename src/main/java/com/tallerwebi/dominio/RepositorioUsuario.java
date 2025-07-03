@@ -9,8 +9,11 @@ public interface RepositorioUsuario {
     Usuario buscarUsuarioPorEmailYPassword(String email, String password);
 
     void guardar(Usuario usuario);
+
     Usuario buscar(String email);
+
     void modificar(Usuario usuario);
+
     void eliminarUsuario(Long idUsuario);
-    Usuario obtenerUsuarioPorEmailYPassword(String email, String password);}
+}
 

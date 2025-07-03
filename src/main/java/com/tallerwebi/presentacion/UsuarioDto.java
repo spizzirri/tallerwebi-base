@@ -10,23 +10,21 @@ public class UsuarioDto {
     private String telefono;
     private String dni;
     private String rol;
-    private String password;
+
     
-    public UsuarioDto(String nombre, String apellido, String email, String telefono, String dni, String rol, String password) {
+    public UsuarioDto(String nombre, String apellido, String email, String telefono, String dni) {
         this.nombre = nombre;
         this.apellido = apellido;
         this.email = email;
         this.telefono = telefono;
         this.dni = dni;
-        this.rol = rol;
-        this.password = password;
+        this.rol = "user";
+
     }
 
     public UsuarioDto(){};
 
-    public String getPassword(){
-        return password;
-    }
+
     public String getRol(){
         return rol;
     }

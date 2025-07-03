@@ -21,13 +21,11 @@ public class ServicioLoginImpl implements ServicioLogin {
     public UsuarioDto consultarUsuario (String email, String password) {
         Usuario usuario = this.repositorioUsuario.buscarUsuarioPorEmailYPassword(email, password);
         if (usuario != null) {
-        return new UsuarioDto(usuario.getNombre(), usuario.getApellido(), usuario.getEmail(),  usuario.getTelefono(), usuario.getDni(), usuario.getRol(), usuario.getPassword());
+        return new UsuarioDto(usuario.getNombre(), usuario.getApellido(), usuario.getEmail(),  usuario.getTelefono(), usuario.getDni());
         } else {
             return null;
         }
     }
-
-
 
     @Override
     public void registrar(Usuario usuario) throws UsuarioExistente {
@@ -36,12 +34,6 @@ public class ServicioLoginImpl implements ServicioLogin {
             throw new UsuarioExistente("El usuario ya existe en el sistema, por favor ingrese con otro correo electrónico.");
         }
         repositorioUsuario.guardar(usuario);
-    }
-
-    @Override
-    public Usuario obtenerUsuarioPorEmailYPassword(String email, String password) {
-       Usuario usuario = this.repositorioUsuario.obtenerUsuarioPorEmailYPassword(email, password);
-       return usuario;
     }
 
 }

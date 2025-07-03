@@ -7,5 +7,4 @@ public interface ServicioLogin {
 
     UsuarioDto consultarUsuario(String email, String password);
     void registrar(Usuario usuario) throws UsuarioExistente;
-    Usuario obtenerUsuarioPorEmailYPassword(String email, String password);
 }
