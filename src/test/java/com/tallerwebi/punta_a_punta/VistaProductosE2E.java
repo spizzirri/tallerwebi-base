@@ -71,7 +71,6 @@ public class VistaProductosE2E {
     @Test
     public void deberiaAgregarUnProductoAlCarrito() {
 
-
         vistaCoolers.darClickEnAgregarPrimerProductoAlCarrito();
 
         String contador = vistaCoolers.obtenerContadorDelCarrito();
