@@ -8,13 +8,10 @@ public class VistaIndex  extends VistaWeb{
         super(page);
 
     }
+
     public void ir() {
         page.navigate("http://localhost:8080/index");
     }
-    public void darClickEnBotonCarrito(){
-        this.darClickEnElElemento(".card-producto-agregar-carrito");
-    }
-
     public void darClickEnBotonProductos(){
         this.darClickEnElElemento("#nav-productos");
     }

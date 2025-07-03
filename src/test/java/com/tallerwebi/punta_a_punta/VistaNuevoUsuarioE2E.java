@@ -21,7 +21,7 @@ public class VistaNuevoUsuarioE2E {
     static void abrirNavegador() {
         playwright = Playwright.create();
         browser = playwright.chromium().launch();
-      browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false).setSlowMo(50));
+        browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false).setSlowMo(50));
 
     }
 
@@ -42,7 +42,8 @@ public class VistaNuevoUsuarioE2E {
     void cerrarContexto() {
         context.close();
     }
-    void loginValidoDeUsuarioGustavoNarancio(){
+
+    void loginValidoDeUsuarioGustavoNarancio() {
         vistaNuevoUsuario.escribirNOMBRE("Gustavo");
         vistaNuevoUsuario.escribirAPELLIDO("Narancio");
         vistaNuevoUsuario.escribirEMAIL("Huesos@gmail.com");
@@ -51,6 +52,7 @@ public class VistaNuevoUsuarioE2E {
         vistaNuevoUsuario.escribirDNI("39.022.123");
         vistaNuevoUsuario.darClickEnRegistrarme();
     }
+
     @Test
     void deberiaRegistrarUnUsuarioAlPonerTodosLosDatosBienEnLosCampos() {
         loginValidoDeUsuarioGustavoNarancio();
@@ -66,7 +68,6 @@ public class VistaNuevoUsuarioE2E {
         vistaRegistrarme.darClickEnIniciarSesion();
         String url = vistaNuevoUsuario.obtenerURLActual();
         assertThat(url, containsStringIgnoringCase("/index"));
-
     }
 
     @Test
@@ -84,7 +85,7 @@ public class VistaNuevoUsuarioE2E {
         loginValidoDeUsuarioGustavoNarancio();
         String textoObtenido = vistaNuevoUsuario.obtenerMensajeDeError();
         String textoEsperado = "Error: El usuario ya existe";
-       assertEquals(textoEsperado, textoObtenido);
+        assertEquals(textoEsperado, textoObtenido);
     }
 
 

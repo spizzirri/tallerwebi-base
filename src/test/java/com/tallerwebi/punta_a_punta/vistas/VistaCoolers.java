@@ -26,7 +26,11 @@ public class VistaCoolers extends VistaWeb {
         return page.locator("#contadorCarrito").innerText();
     }
 
-    public String obtenerMensajeDeError(){
+    public String obtenerMensajeDeErrorCooler(){
         return this.obtenerTextoDelElemento("#mensajeNotificacion-70");
+    }
+
+    public String obtenerMensajeDeErrorProcesador(){
+        return this.obtenerTextoDelElemento("#mensajeNotificacion-1");
     }
 }

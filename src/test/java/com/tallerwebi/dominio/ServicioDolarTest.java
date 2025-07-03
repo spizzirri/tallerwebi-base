@@ -37,13 +37,13 @@ public class ServicioDolarTest {
     }
 
     @Test
-    public void dadoQueExisteUnLlamadoAUnaAPIQueNoDevuelveUn200DebeRetornarCeroComoCotizacion() {
+    public void dadoQueExisteQueElPrimerLlamadoALaAPINoDevuelveUn200DebeRetornar1200ComoCotizacion() {
         Mockito.when(restTemplate.getForObject(Mockito.anyString(), Mockito.eq(Map.class)))
                 .thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
 
         Double cotizacion = servicioDolar.obtenerCotizacionDolarBlue();
 
-        assertEquals(0.0, cotizacion);
+        assertEquals(1200.0, cotizacion);
     }
 
     @Test
@@ -65,6 +65,25 @@ public class ServicioDolarTest {
         // Verifica que solo se llamó una vez
         Mockito.verify(restTemplate, Mockito.times(1))
                 .getForObject(Mockito.anyString(), Mockito.eq(Map.class));
+    }
+
+    @Test
+    public void dadoQueYaHuboUnLlamadoALaAPISeIntentaHacerUnSegundoLLamadoQueResultaVacioYLaCotizacionDevuelveElValorCacheado() {
+        // Primer llamado a la api exitoso
+        Map<String, Object> respuestaSimulada = new HashMap<>();
+        respuestaSimulada.put("venta", 1250.0);
+
+        // Segundo llamado llega null
+
+        Map<String, Object> respuestaSimuladaVacia = null;
+
+        Mockito.when(restTemplate.getForObject(Mockito.anyString(), Mockito.eq(Map.class)))
+                .thenReturn(respuestaSimulada)
+                .thenReturn(respuestaSimuladaVacia);
+
+        Double cotizacion = servicioDolar.obtenerCotizacionDolarBlue();
+
+        assertEquals(1250.0, cotizacion);
     }
 
 }
