@@ -69,7 +69,7 @@
                 </a>
 
                 <!-- Si está logueado -->
-                <div class="dropdown" th:if="${estaLogueado}">
+                <div class="dropdown me-3" th:if="${usuarioLogueado != null}">
                     <button class="btn btn-outline-secondary text-light dropdown-toggle" type="button" id="menuUsuario"
                             data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="bi bi-person"></i> <span th:text="${usuarioLogueado.nombre}">Usuario</span>
@@ -89,14 +89,17 @@
                 </div>
 
                 <!-- Si no está logueado -->
-                <div th:unless="${estaLogueado}">
-                    <a class="btn btn-outline-secondary text-light" th:href="@{login.html}"  >
-                        <i class="bi bi-person"></i> Ingresa
-                    </a>
+                <div th:unless="${usuarioLogueado != null}" class="me-3">
+                    <form th:action="@{/login}" method="post" class="m-0 p-0">
+                        <input type="hidden" name="redirectUrl" th:value="${#httpServletRequest.requestURI}" />
+                        <button type="submit" class="btn btn-outline-secondary text-light">
+                            <i class="bi bi-person"></i> Ingresa
+                        </button>
+                    </form>
                 </div>
 
-
             </div>
+
 
         </div>
     </header>

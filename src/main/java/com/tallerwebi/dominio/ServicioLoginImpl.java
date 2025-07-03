@@ -19,15 +19,21 @@ public class ServicioLoginImpl implements ServicioLogin {
 
     @Override
     public UsuarioDto consultarUsuario (String email, String password) {
-        Usuario usuario = this.repositorioUsuario.buscarUsuario(email, password);
-        return new UsuarioDto(usuario.getNombre(), usuario.getApellido(), usuario.getEmail(),  usuario.getTelefono(), usuario.getDni(), usuario.getRol());
+        Usuario usuario = this.repositorioUsuario.buscarUsuarioPorEmailYPassword(email, password);
+        if (usuario != null) {
+        return new UsuarioDto(usuario.getNombre(), usuario.getApellido(), usuario.getEmail(),  usuario.getTelefono(), usuario.getDni(), usuario.getRol(), usuario.getPassword());
+        } else {
+            return null;
+        }
     }
+
+
 
     @Override
     public void registrar(Usuario usuario) throws UsuarioExistente {
-        Usuario usuarioEncontrado = repositorioUsuario.buscarUsuario(usuario.getEmail(), usuario.getPassword());
+        Usuario usuarioEncontrado = repositorioUsuario.buscarUsuario(usuario.getEmail());
         if(usuarioEncontrado != null){
-            throw new UsuarioExistente("El usuario ya existe en el sistema, por favor ingrese con otro correo electrónico o contraseña.");
+            throw new UsuarioExistente("El usuario ya existe en el sistema, por favor ingrese con otro correo electrónico.");
         }
         repositorioUsuario.guardar(usuario);
     }

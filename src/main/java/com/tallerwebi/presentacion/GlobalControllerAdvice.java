@@ -21,8 +21,8 @@ public class GlobalControllerAdvice {
         return (UsuarioDto) session.getAttribute("usuario"); // O el atributo real que usás
     }
 
-    @ModelAttribute("estaLogueado")
-    public boolean estaLogueado(HttpSession session) {
-        return session.getAttribute("usuario") != null;
-    }
+//    @ModelAttribute("estaLogueado")
+//    public boolean estaLogueado(HttpSession session) {
+//        return session.getAttribute("usuario") != null;
+//    }
 }

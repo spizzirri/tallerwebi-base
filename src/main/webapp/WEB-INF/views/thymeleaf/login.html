@@ -6,13 +6,16 @@
 
         <input th:field="*{email}" id="email" type="email" class="form-control" required/>
         <input th:field="*{password}" type="password" id="password" class="form-control" required/>
-        <input type="hidden" name="redirectUrl" th:value="${#httpServletRequest.requestURI}"/>
 
+        <input type="hidden" name="redirectUrl" th:value="${redirectUrl}" />
         <button id="btn-login" class="btn btn-lg btn-primary btn-block" Type="Submit">Login</button>
 
         <p th:if="${error != null}" class="alert alert-danger" th:text="'Error ' + ${error}">
         </p>
     </form>
-    <a id="ir-a-registrarme" href="nuevo-usuario">Registrarme</a>
+    <form th:action="@{/nuevo-usuario}" method="post">
+        <input type="hidden" name="redirectUrl" th:value="${redirectUrl}" />
+    <button type="submit" id="ir-a-registrarme">Registrarme</button>
+    </form>
 </div>
 
