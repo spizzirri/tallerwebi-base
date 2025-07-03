@@ -89,6 +89,7 @@ public class CarritoController {
         ProductoCarritoDto productoBuscado = this.productoService.buscarPorId(id);
 
         if (productoBuscado != null) {
+            this.productoService.devolverStockAlComponente(id, productoBuscado.getCantidad());
             this.productoService.getProductos().remove(productoBuscado);
             response.put("eliminado", true);
         } else {
