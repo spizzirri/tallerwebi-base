@@ -13,7 +13,7 @@ import java.util.*;
 @RestController
 public class CarritoController {
 
-    private final ServicioProductoCarritoImpl productoService;
+    private final ServicioProductoCarritoImpl servicioProductoCarrito;
     private final ServicioDeEnviosImpl servicioDeEnvios;
     private final ServicioPrecios servicioPrecios;
 
@@ -21,7 +21,7 @@ public class CarritoController {
     public EnvioDto envioActual;
 
     public CarritoController(ServicioProductoCarritoImpl servicioProductoCarritoImpl, ServicioDeEnviosImpl servicioDeEnvios, ServicioPrecios servicioPrecios) {
-        this.productoService = servicioProductoCarritoImpl;
+        this.servicioProductoCarrito = servicioProductoCarritoImpl;
         this.servicioDeEnvios = servicioDeEnvios;
         this.servicioPrecios = servicioPrecios;
         servicioProductoCarritoImpl.init();
@@ -32,8 +32,8 @@ public class CarritoController {
         ModelMap model = new ModelMap();
 
         List<ProductoCarritoDto> carritoSesion = obtenerCarritoDeSesion(session);
-        this.productoService.setProductos(carritoSesion);
-        List<ProductoCarritoDto> productosGuardados = this.productoService.getProductos();
+        this.servicioProductoCarrito.setProductos(carritoSesion);
+        List<ProductoCarritoDto> productosGuardados = this.servicioProductoCarrito.getProductos();
 
         for (ProductoCarritoDto producto : productosGuardados) {
             Double totalPorProducto = producto.getPrecio() * producto.getCantidad();
@@ -43,11 +43,11 @@ public class CarritoController {
 
         model.put("productos", productosGuardados);
 
-        Double total = this.productoService.calcularValorTotalDeLosProductos();
+        Double total = this.servicioProductoCarrito.calcularValorTotalDeLosProductos();
         String totalFormateado = this.servicioPrecios.conversionDolarAPeso(total);
         model.put("valorTotal", totalFormateado);
 
-        Integer cantidadTotalEnCarrito = this.productoService.calcularCantidadTotalDeProductos();
+        Integer cantidadTotalEnCarrito = this.servicioProductoCarrito.calcularCantidadTotalDeProductos();
         model.put("cantidadEnCarrito", cantidadTotalEnCarrito);
 
         return new ModelAndView("carritoDeCompras", model);
@@ -58,8 +58,8 @@ public class CarritoController {
         ModelMap model = new ModelMap();
 
         List<ProductoCarritoDto> carritoSesion = obtenerCarritoDeSesion(session);
-        this.productoService.setProductos(carritoSesion);
-        List<ProductoCarritoDto> productos = this.productoService.getProductos();
+        this.servicioProductoCarrito.setProductos(carritoSesion);
+        List<ProductoCarritoDto> productos = this.servicioProductoCarrito.getProductos();
 
         for (ProductoCarritoDto producto : productos) {
             Double totalPorProducto = producto.getPrecio() * producto.getCantidad();
@@ -69,11 +69,11 @@ public class CarritoController {
 
         model.put("productos", productos);
 
-        Double total = this.productoService.calcularValorTotalDeLosProductos();
+        Double total = this.servicioProductoCarrito.calcularValorTotalDeLosProductos();
         String totalFormateado = this.servicioPrecios.conversionDolarAPeso(total != null ? total : 0.0);
         model.put("valorTotal", totalFormateado);
 
-        Integer cantidadTotalEnCarrito = this.productoService.calcularCantidadTotalDeProductos();
+        Integer cantidadTotalEnCarrito = this.servicioProductoCarrito.calcularCantidadTotalDeProductos();
         model.put("cantidadEnCarrito", cantidadTotalEnCarrito != null ? cantidadTotalEnCarrito : 0);
 
         return new ModelAndView("fragments/fragments :: resumenCarrito", model);
@@ -84,26 +84,26 @@ public class CarritoController {
     public Map<String, Object> eliminarProductoDelCarrito(@PathVariable Long id, HttpSession session) {
         Map<String, Object> response = new HashMap<>();
         List<ProductoCarritoDto> carritoSesion = obtenerCarritoDeSesion(session);
-        this.productoService.setProductos(carritoSesion);
+        this.servicioProductoCarrito.setProductos(carritoSesion);
 
-        ProductoCarritoDto productoBuscado = this.productoService.buscarPorId(id);
+        ProductoCarritoDto productoBuscado = this.servicioProductoCarrito.buscarPorId(id);
 
         if (productoBuscado != null) {
-            this.productoService.devolverStockAlComponente(id, productoBuscado.getCantidad());
-            this.productoService.getProductos().remove(productoBuscado);
+            this.servicioProductoCarrito.devolverStockAlComponente(id, productoBuscado.getCantidad());
+            this.servicioProductoCarrito.getProductos().remove(productoBuscado);
             response.put("eliminado", true);
         } else {
             response.put("eliminado", false);
         }
 
-        session.setAttribute("carritoSesion", this.productoService.getProductos());
-        response.put("productos", this.productoService.getProductos());
+        session.setAttribute("carritoSesion", this.servicioProductoCarrito.getProductos());
+        response.put("productos", this.servicioProductoCarrito.getProductos());
 
-        Double total = this.productoService.calcularValorTotalDeLosProductos();
+        Double total = this.servicioProductoCarrito.calcularValorTotalDeLosProductos();
         String totalFormateado = this.servicioPrecios.conversionDolarAPeso(total);
         response.put("valorTotal", totalFormateado);
 
-        Integer cantidadTotal = this.productoService.calcularCantidadTotalDeProductos();
+        Integer cantidadTotal = this.servicioProductoCarrito.calcularCantidadTotalDeProductos();
         response.put("cantidadEnCarrito", cantidadTotal);
 
         return response;
@@ -139,7 +139,7 @@ public class CarritoController {
             return response;
         }
 
-        Double valorTotalConDescuento = this.productoService.calcularDescuento(codigoDescuentoExtraido);
+        Double valorTotalConDescuento = this.servicioProductoCarrito.calcularDescuento(codigoDescuentoExtraido);
 
         String valorTotalFormateado = this.servicioPrecios.conversionDolarAPeso(valorTotalConDescuento);
 
@@ -155,12 +155,12 @@ public class CarritoController {
         Map<String, Object> response = new HashMap<>();
 
         List<ProductoCarritoDto> carritoSesion = obtenerCarritoDeSesion(session);
-        this.productoService.setProductos(carritoSesion);
+        this.servicioProductoCarrito.setProductos(carritoSesion);
 
-        ProductoCarritoDto productoBuscado = this.productoService.buscarPorId(id);
+        ProductoCarritoDto productoBuscado = this.servicioProductoCarrito.buscarPorId(id);
 
-        if (productoBuscado != null && this.productoService.verificarStock(id)) {
-            this.productoService.descontarStockAlComponente(id, 1);
+        if (productoBuscado != null && this.servicioProductoCarrito.verificarStock(id)) {
+            this.servicioProductoCarrito.descontarStockAlComponente(id, 1);
             productoBuscado.setCantidad(productoBuscado.getCantidad() + 1);
 
             response.put("cantidad", productoBuscado.getCantidad());
@@ -169,17 +169,17 @@ public class CarritoController {
             String totalFormateadoPorProducto = this.servicioPrecios.conversionDolarAPeso(totalPorProducto);
             response.put("precioTotalDelProducto", totalFormateadoPorProducto);
 
-            Double totalGeneral = this.productoService.calcularValorTotalDeLosProductos();
+            Double totalGeneral = this.servicioProductoCarrito.calcularValorTotalDeLosProductos();
             String totalGeneralFormateado = this.servicioPrecios.conversionDolarAPeso(totalGeneral);
             response.put("valorTotal", totalGeneralFormateado);
 
-            response.put("cantidadEnCarrito", this.productoService.calcularCantidadTotalDeProductos());
+            response.put("cantidadEnCarrito", this.servicioProductoCarrito.calcularCantidadTotalDeProductos());
         } else {
             response.put("success", false);
             response.put("mensaje", "No hay stock suficiente!");
         }
 
-        session.setAttribute("carritoSesion", this.productoService.getProductos());
+        session.setAttribute("carritoSesion", this.servicioProductoCarrito.getProductos());
         return response;
     }
 
@@ -189,13 +189,13 @@ public class CarritoController {
         Map<String, Object> response = new HashMap<>();
 
         List<ProductoCarritoDto> carritoSesion = obtenerCarritoDeSesion(session);
-        this.productoService.setProductos(carritoSesion);
+        this.servicioProductoCarrito.setProductos(carritoSesion);
 
-        ProductoCarritoDto productoBuscado = this.productoService.buscarPorId(id);
+        ProductoCarritoDto productoBuscado = this.servicioProductoCarrito.buscarPorId(id);
 
         if (productoBuscado != null && productoBuscado.getCantidad() > 1) {
             productoBuscado.setCantidad(productoBuscado.getCantidad() - 1);
-            this.productoService.devolverStockAlComponente(id, 1);
+            this.servicioProductoCarrito.devolverStockAlComponente(id, 1);
 
             response.put("cantidad", productoBuscado.getCantidad());
 
@@ -205,26 +205,26 @@ public class CarritoController {
 
             response.put("eliminado", false);
 
-            Double totalGeneral = this.productoService.calcularValorTotalDeLosProductos();
+            Double totalGeneral = this.servicioProductoCarrito.calcularValorTotalDeLosProductos();
             String totalGeneralFormateado = this.servicioPrecios.conversionDolarAPeso(totalGeneral);
             response.put("valorTotal", totalGeneralFormateado);
 
-            response.put("cantidadEnCarrito", this.productoService.calcularCantidadTotalDeProductos());
+            response.put("cantidadEnCarrito", this.servicioProductoCarrito.calcularCantidadTotalDeProductos());
 
         } else if (productoBuscado != null) {
-            this.productoService.getProductos().remove(productoBuscado);
-            this.productoService.devolverStockAlComponente(id, 1);
+            this.servicioProductoCarrito.getProductos().remove(productoBuscado);
+            this.servicioProductoCarrito.devolverStockAlComponente(id, 1);
 
             response.put("eliminado", true);
 
-            Double totalGeneral = this.productoService.calcularValorTotalDeLosProductos();
+            Double totalGeneral = this.servicioProductoCarrito.calcularValorTotalDeLosProductos();
             String totalGeneralFormateado = this.servicioPrecios.conversionDolarAPeso(totalGeneral);
             response.put("valorTotal", totalGeneralFormateado);
 
-            response.put("cantidadEnCarrito", this.productoService.calcularCantidadTotalDeProductos());
+            response.put("cantidadEnCarrito", this.servicioProductoCarrito.calcularCantidadTotalDeProductos());
         }
 
-        session.setAttribute("carritoSesion", this.productoService.getProductos());
+        session.setAttribute("carritoSesion", this.servicioProductoCarrito.getProductos());
         return response;
     }
 
@@ -239,6 +239,11 @@ public class CarritoController {
             return response;
         }
         if (metodoDePago.equalsIgnoreCase("tarjetaCredito")) {
+            if (this.envioActual == null || this.codigoPostalActual == null) {
+                response.put("success", false);
+                response.put("error", "Debes agregar un codigo postal");
+                return response;
+            }
             response.put("success", true);
             response.put("redirect", "/tarjetaDeCredito");
             return response;
@@ -313,7 +318,7 @@ public class CarritoController {
         Map<String, Object> response = new HashMap<>();
 
         List<ProductoCarritoDto> carritoSesion = obtenerCarritoDeSesion(session);
-        this.productoService.setProductos(carritoSesion);
+        this.servicioProductoCarrito.setProductos(carritoSesion);
 
         try {
             EnvioDto envio = servicioDeEnvios.calcularEnvio(codigoPostal);
@@ -327,7 +332,7 @@ public class CarritoController {
                 response.put("costo", envio.getCosto());
                 response.put("tiempo", envio.getTiempo());
                 response.put("destino", envio.getDestino());
-                response.put("valorTotal", this.productoService.valorTotal);
+                response.put("valorTotal", this.servicioProductoCarrito.valorTotal);
             } else {
                 this.envioActual = null;
                 response.put("success", false);
@@ -345,7 +350,7 @@ public class CarritoController {
     @ResponseBody
     public Map<String, Object> obtenerCantidadCarrito() {
         Map<String, Object> response = new HashMap<>();
-        Integer cantidadTotal = this.productoService.calcularCantidadTotalDeProductos();
+        Integer cantidadTotal = this.servicioProductoCarrito.calcularCantidadTotalDeProductos();
         response.put("cantidadEnCarrito", cantidadTotal);
         return response;
     }
@@ -360,16 +365,16 @@ public class CarritoController {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            if (!productoService.verificarStock(componenteId)) {
+            if (!servicioProductoCarrito.verificarStock(componenteId)) {
                 response.put("success", false);
                 response.put("mensaje", "Stock insuficiente");
             } else {
                 List<ProductoCarritoDto> carritoSesion = obtenerCarritoDeSesion(session);
 
-                productoService.setProductos(carritoSesion);
+                servicioProductoCarrito.setProductos(carritoSesion);
 
-                ProductoCarritoDto existente = productoService.buscarPorId(componenteId);
-                productoService.agregarProducto(componenteId, cantidad);
+                ProductoCarritoDto existente = servicioProductoCarrito.buscarPorId(componenteId);
+                servicioProductoCarrito.agregarProducto(componenteId, cantidad);
 
                 if (existente != null) {
                     int cantidadFinal = existente.getCantidad();
@@ -378,11 +383,11 @@ public class CarritoController {
                     response.put("mensaje", "Producto agregado al carrito!");
                 }
 
-                session.setAttribute("carritoSesion", productoService.getProductos());
+                session.setAttribute("carritoSesion", servicioProductoCarrito.getProductos());
                 response.put("success", true);
             }
 
-            Integer cantidadTotal = productoService.calcularCantidadTotalDeProductos();
+            Integer cantidadTotal = servicioProductoCarrito.calcularCantidadTotalDeProductos();
             response.put("cantidadEnCarrito", cantidadTotal != null ? cantidadTotal : 0);
 
         } catch (Exception e) {

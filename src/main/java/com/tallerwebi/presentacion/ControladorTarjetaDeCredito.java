@@ -20,7 +20,7 @@ public class ControladorTarjetaDeCredito {
     ServicioTarjetaDeCredito servicioTarjeta;
 
     @Autowired
-    ServicioProductoCarritoImpl productoService;
+    ServicioProductoCarritoImpl servicioProductoCarritoImpl;
 
     @PostMapping("/tarjetaDeCredito/validar")
     public ModelAndView validar(@RequestParam String numeroTarjeta,
@@ -55,6 +55,7 @@ public class ControladorTarjetaDeCredito {
         } else {
             String fechaCompra = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
             modelo.addAttribute("fechaCompra", fechaCompra);
+            servicioProductoCarritoImpl.limpiarCarrito();
             return new ModelAndView("pagoExitoso", modelo);
         }
     }

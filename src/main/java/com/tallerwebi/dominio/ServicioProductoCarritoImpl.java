@@ -22,7 +22,7 @@ public class ServicioProductoCarritoImpl {
     @Autowired
     private RepositorioComponente repositorioComponente;
 
-    public void init(){
+    public void init() {
         this.productos = new ArrayList<>();
 //        this.productos.add(new ProductoCarritoDto(1L,"Mouse inalambrico", 8000.000,2,"teclado mecanico"));
 //        this.productos.add(new ProductoCarritoDto(2L,"Teclado mecanico", 15000.00,2,"teclado mecanico"));
@@ -52,12 +52,12 @@ public class ServicioProductoCarritoImpl {
     }
 
     public void agregarProducto(Long componenteId, Integer cantidad) {
-        if(this.productos == null){
+        if (this.productos == null) {
             this.productos = new ArrayList<>();
         }
 
         ProductoCarritoDto existente = this.buscarPorId(componenteId);
-        if(existente != null){
+        if (existente != null) {
             existente.setCantidad(existente.getCantidad() + cantidad);
         } else {
             Componente componente = repositorioComponente.obtenerComponentePorId(componenteId);
@@ -81,16 +81,11 @@ public class ServicioProductoCarritoImpl {
         }
 
         Double total = 0.0;
-        for(ProductoCarritoDto producto : this.productos){
+        for (ProductoCarritoDto producto : this.productos) {
             if (producto.getPrecio() != null && producto.getCantidad() != null) {
                 total += producto.getPrecio() * producto.getCantidad();
             }
         }
-
-//        BigDecimal valorTotalConDosDecimales = new BigDecimal(total);
-//        valorTotalConDosDecimales = valorTotalConDosDecimales.setScale(2, RoundingMode.UP);
-//        this.valorTotal = valorTotalConDosDecimales.doubleValue();
-
         return total;
     }
 
@@ -115,7 +110,7 @@ public class ServicioProductoCarritoImpl {
                 break;
         }
 
-        BigDecimal valorTotalConDosDecimales = new BigDecimal( this.valorTotalConDescuento);
+        BigDecimal valorTotalConDosDecimales = new BigDecimal(this.valorTotalConDescuento);
         valorTotalConDosDecimales = valorTotalConDosDecimales.setScale(2, RoundingMode.UP);
         this.valorTotalConDescuento = valorTotalConDosDecimales.doubleValue();
 
@@ -127,7 +122,9 @@ public class ServicioProductoCarritoImpl {
     }
 
     public void limpiarCarrito() {
-        this.setProductos(null);
+        this.productos.clear();
+        valorTotal = 0.0;
+        valorTotalConDescuento = 0.0;
     }
 
     public Integer calcularCantidadTotalDeProductos() {

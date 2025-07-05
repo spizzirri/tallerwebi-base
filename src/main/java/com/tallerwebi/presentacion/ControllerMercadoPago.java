@@ -1,6 +1,5 @@
 package com.tallerwebi.presentacion;
 
-
 import com.mercadopago.MercadoPagoConfig;
 import com.mercadopago.client.common.IdentificationRequest;
 import com.mercadopago.client.common.PhoneRequest;
@@ -25,10 +24,6 @@ public class ControllerMercadoPago {
     //ServicioProductoCarrito sabe los productos que estan en el carrito
     private final ServicioProductoCarritoImpl servicioProductoCarritoImpl;
     private final ServicioPrecios servicioPrecios;
-
-
-//    @Value("${mercadoPago.accessToken}")
-//    private String mercadoPagoAccessToken = "APP_USR-3784718513902185-053117-353d2d4a3d09f6e4ff6bd5750e1b6878-2465514854";
 
     public ControllerMercadoPago(ServicioProductoCarritoImpl servicioProductoCarritoImpl, ServicioPrecios servicioPrecios) {
         this.servicioProductoCarritoImpl = servicioProductoCarritoImpl;
@@ -115,9 +110,9 @@ public class ControllerMercadoPago {
 
         //Donde redireccionar depues de hacer el pago (arreglarlo para que me devuelva a la vista de nuestra app)
         PreferenceBackUrlsRequest backUrls = PreferenceBackUrlsRequest.builder()
-                .success("http://localhost:8080/pagoExitoso")
-                .failure("http://localhost:8080/pagoExitoso")
-                .pending("http://localhost:8080/pagoExitoso")
+                .success("http://localhost:8080/checkout/pagoExitoso")
+                .failure("http://localhost:8080/checkout/pagoExitoso")
+                .pending("http://localhost:8080/checkout/pagoExitoso")
                 .build();
 
         // Creo la preferencia final que va a ser mandada a mercado pago para la redireccion a su pagina
@@ -133,6 +128,7 @@ public class ControllerMercadoPago {
         try {
             Preference preference = client.create(preferenceRequest);
             response.sendRedirect(preference.getSandboxInitPoint());
+            servicioProductoCarritoImpl.limpiarCarrito();
             return null;
         } catch (MPApiException e) {
             String errorMsg = e.getApiResponse() != null ? e.getApiResponse().getContent() : "Sin contenido de error";
@@ -154,7 +150,6 @@ public class ControllerMercadoPago {
 
         double precioFinal = precioOriginal * factorDescuento;
 
-        // número válido y positivo
         if (Double.isNaN(precioFinal) || precioFinal <= 0) {
             precioFinal = precioOriginal;
         }

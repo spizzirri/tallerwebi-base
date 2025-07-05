@@ -27,7 +27,7 @@ public class ControladorTarjetaDeCreditoTest {
         MockitoAnnotations.openMocks(this);
         controlador = new ControladorTarjetaDeCredito();
         controlador.servicioTarjeta = servicioTarjetaMock;
-        controlador.productoService = productoServiceMock;
+        controlador.servicioProductoCarritoImpl = productoServiceMock;
     }
 
     @Test
