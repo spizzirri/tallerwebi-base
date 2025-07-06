@@ -3,56 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <title>¡Gracias por tu compra!</title>
-    <link rel="stylesheet" th:href="@{/core/css/main.css}" />
+    <link rel="stylesheet" th:href="@{/core/css/main.css}"/>
     <style>
-        body { background: #f5f6fa; }
+        body {
+            background: #f5f6fa;
+        }
+
         .exito-container {
             max-width: 800px;
             margin: 40px auto;
             background: #fff;
             border-radius: 14px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
             padding: 40px 32px 32px 32px;
         }
+
         .exito-check {
             color: #43b324;
             font-size: 4rem;
             margin-bottom: 18px;
         }
+
         .exito-titulo {
             font-size: 2rem;
             font-weight: 700;
             margin-bottom: 8px;
         }
+
         .exito-sub {
             font-size: 1.1rem;
             color: #444;
             margin-bottom: 18px;
         }
+
         .exito-pedido {
             font-weight: 600;
             margin-bottom: 6px;
         }
+
         .exito-fecha {
             font-size: 0.98rem;
             color: #666;
             margin-bottom: 24px;
         }
+
         .exito-resumen {
             background: #f7f9fa;
             border-radius: 10px;
             padding: 18px 20px;
             margin-bottom: 28px;
         }
+
         .exito-resumen-row {
             display: flex;
             justify-content: space-between;
             gap: 24px;
             margin-bottom: 10px;
         }
+
         .exito-resumen-col {
             flex: 1;
         }
+
         .exito-volver {
             display: block;
             margin: 0 auto;
@@ -67,15 +79,23 @@
             text-align: center;
             transition: background 0.2s;
         }
+
         .exito-volver:hover {
             background: #1256a3;
             color: #fff;
         }
+
         @media (max-width: 900px) {
-            .exito-container { padding: 18px 4px; }
+            .exito-container {
+                padding: 18px 4px;
+            }
         }
+
         @media (max-width: 600px) {
-            .exito-resumen-row { flex-direction: column; gap: 0; }
+            .exito-resumen-row {
+                flex-direction: column;
+                gap: 0;
+            }
         }
     </style>
 </head>
@@ -88,7 +108,9 @@
         </div>
         <div class="exito-titulo">¡Gracias por tu compra!</div>
         <div class="exito-sub">Tu solicitud de compra fue recibida</div>
-        <div style="color: #666; margin-bottom: 18px;">Tu pedido se encuentra en proceso de validación, en breve recibirás un correo con el detalle de tu compra.</div>
+        <div style="color: #666; margin-bottom: 18px;">Tu pedido se encuentra en proceso de validación, en breve
+            recibirás un correo con el detalle de tu compra.
+        </div>
         <div class="exito-pedido">Pedido: <span style="color:#1976d2;">OV01-00000001</span></div>
         <div class="exito-fecha">
             Fecha de Solicitud de compra: <span th:text="${fechaCompra}"></span>
@@ -106,12 +128,13 @@
             <div class="exito-resumen-col">
                 <b>Medio de Pago</b><br>
                 Número de tarjeta<br>
-                <span th:if="${tarjeta != null}" th:text="'**** **** **** ' + ${#strings.substring(tarjeta.numeroDeTarjeta, tarjeta.numeroDeTarjeta.length() - 4)}"></span>
+                <span th:if="${tarjeta != null}"
+                      th:text="'**** **** **** ' + ${#strings.substring(tarjeta.numeroDeTarjeta, tarjeta.numeroDeTarjeta.length() - 4)}"></span>
                 <span th:if="${tarjeta == null}">No disponible</span>
             </div>
             <div class="exito-resumen-col">
                 <b>Resumen</b><br>
-                Subtotal: <span style="float:right" >$22.835,15</span><br>
+                Subtotal: <span style="float:right">$22.835,15</span><br>
 
                 Costo del envío: <span style="float:right">$1.500</span><br>
                 <hr style="margin: 8px 0;">
@@ -119,6 +142,24 @@
             </div>
         </div>
     </div>
+    <div th:if="${comprasUsuario != null && !comprasUsuario.isEmpty()}">
+        <h4>Tus compras anteriores:</h4>
+        <div th:each="compra : ${comprasUsuario}" style="border: 1px solid #ccc; padding: 10px; margin: 10px 0;">
+            <p><strong>Fecha:</strong> <span th:text="${compra.fecha}"></span></p>
+            <span th:text="'$' + ${#numbers.formatDecimal(compra.total, 1, 'POINT', 2, 'COMMA')}"></span>
+            <p><strong>Método de pago:</strong> <span th:text="${compra.metodoDePago}"></span></p>
+            <div th:if="${compra.productosComprados != null && !compra.productosComprados.isEmpty()}">
+                <strong>Productos:</strong>
+                <ul th:each="producto : ${compra.productosComprados}">
+                    <li> - Producto: <span th:text="${producto.componente.nombre}"></span></li>
+                    <li> - Cantidad: <span th:text="${producto.cantidad}"></span></li>
+                    <li> - Precio unitario: <span th:text="'$' + ${#numbers.formatDecimal(producto.precioUnitario, 1, 'POINT', 2, 'COMMA')}"></span></li>
+
+                </ul>
+            </div>
+        </div>
+    </div>
+
     <a th:href="@{/index.html}" class="exito-volver">Volver al inicio</a>
 </div>
 <div th:replace="fragments/fragments :: footer"></div>

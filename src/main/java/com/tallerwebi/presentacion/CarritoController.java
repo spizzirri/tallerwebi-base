@@ -1,14 +1,16 @@
 package com.tallerwebi.presentacion;
 
+import com.tallerwebi.dominio.ServicioCompra;
 import com.tallerwebi.dominio.ServicioDeEnviosImpl;
 import com.tallerwebi.dominio.ServicioPrecios;
 import com.tallerwebi.dominio.ServicioProductoCarritoImpl;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-
+import java.time.LocalDate;
 import javax.servlet.http.HttpSession;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 public class CarritoController {
@@ -16,14 +18,17 @@ public class CarritoController {
     private final ServicioProductoCarritoImpl servicioProductoCarrito;
     private final ServicioDeEnviosImpl servicioDeEnvios;
     private final ServicioPrecios servicioPrecios;
+    private final ServicioCompra servicioCompra;
+
 
     public String codigoPostalActual;
     public EnvioDto envioActual;
 
-    public CarritoController(ServicioProductoCarritoImpl servicioProductoCarritoImpl, ServicioDeEnviosImpl servicioDeEnvios, ServicioPrecios servicioPrecios) {
+    public CarritoController(ServicioProductoCarritoImpl servicioProductoCarritoImpl, ServicioDeEnviosImpl servicioDeEnvios, ServicioPrecios servicioPrecios, ServicioCompra servicioCompra) {
         this.servicioProductoCarrito = servicioProductoCarritoImpl;
         this.servicioDeEnvios = servicioDeEnvios;
         this.servicioPrecios = servicioPrecios;
+        this.servicioCompra = servicioCompra;
         servicioProductoCarritoImpl.init();
     }
 
@@ -144,7 +149,7 @@ public class CarritoController {
         String valorTotalFormateado = this.servicioPrecios.conversionDolarAPeso(valorTotalConDescuento);
 
         response.put("mensaje", "Descuento aplicado! Nuevo total: $" + valorTotalFormateado);
-        response.put("valorTotal", valorTotalFormateado); // Ahora envías el String formateado
+        response.put("valorTotal", valorTotalFormateado);
 
         return response;
     }
@@ -230,33 +235,40 @@ public class CarritoController {
 
     @PostMapping(path = "/carritoDeCompras/formularioPago")
     @ResponseBody
-    public Map<String, Object> procesarCompra(@RequestParam(value = "metodoPago") String metodoDePago) {
+    public Map<String, Object> procesarCompra(@RequestParam(value = "metodoPago") String metodoDePago, HttpSession session) {
         Map<String, Object> response = new HashMap<>();
+        // para obtener el usuario que esta logueado
+        UsuarioDto usuarioLogueado = (UsuarioDto) session.getAttribute("usuario");
 
         if (metodoDePago == null || metodoDePago.isEmpty()) {
             response.put("success", false);
             response.put("error", "Debes seleccionar un metodo de pago");
             return response;
         }
+
+        if(usuarioLogueado == null) {
+            response.put("success", false);
+            response.put("error", "Debes iniciar sesion");
+            response.put("redirect", "/login");
+            return response;
+        }
+
+        if (this.envioActual == null || this.codigoPostalActual == null) {
+            response.put("success", false);
+            response.put("error", "Debes agregar un codigo postal");
+            return response;
+        }
+
         if (metodoDePago.equalsIgnoreCase("tarjetaCredito")) {
-            if (this.envioActual == null || this.codigoPostalActual == null) {
-                response.put("success", false);
-                response.put("error", "Debes agregar un codigo postal");
-                return response;
-            }
             response.put("success", true);
             response.put("redirect", "/tarjetaDeCredito");
             return response;
         }
         if ("mercadoPago".equalsIgnoreCase(metodoDePago)) {
-            if (this.envioActual == null || this.codigoPostalActual == null) {
-                response.put("success", false);
-                response.put("error", "Debes agregar un codigo postal");
-                return response;
-            }
             response.put("success", true);
             response.put("metodoPago", "mercadoPago");
             response.put("costoEnvio", envioActual.getCosto());
+            return response;
         } else {
             response.put("success", false);
             response.put("error", "Método de pago no soportado: " + metodoDePago);
@@ -264,53 +276,6 @@ public class CarritoController {
         return response;
     }
 
-//    @PostMapping(path = "/carritoDeCompras/calcularEnvio")
-//    public ModelAndView calcularEnvio(@RequestParam(value = "codigoPostal", required = false) String codigoPostal, HttpSession session) {
-//
-//        ModelMap model = new ModelMap();
-//        List<ProductoCarritoDto> carritoSesion = obtenerCarritoDeSesion(session);
-//        this.productoService.setProductos(carritoSesion);
-//
-//        this.codigoPostalActual = codigoPostal;
-//
-//        model.put("productos", this.productoService.getProductos());
-//
-//        Double total = this.productoService.calcularValorTotalDeLosProductos();
-//
-//        model.put("valorTotal", total);
-//        model.put("codigoPostal", codigoPostal);
-//
-//        try {
-//            if (codigoPostal != null && !codigoPostal.trim().isEmpty()) {
-//                if (!codigoPostal.matches("\\d{4}")) {
-//                    model.put("errorEnvio", "El código postal debe tener 4 dígitos");
-//                    model.put("envioCalculado", false);
-//                    model.put("sinCobertura", false);
-//                } else {
-//                    EnvioDto envio = servicioDeEnvios.calcularEnvio(codigoPostal);
-//
-//                    if (envio != null) {
-//                        this.envioActual = envio;
-//                        model.put("envio", envio);
-//                        Double totalConEnvio = total + envio.getCosto();
-//
-//                        model.put("totalConEnvio", totalConEnvio);
-//                        model.put("envioCalculado", true);
-//                        model.put("sinCobertura", false);
-//                    } else {
-//                        model.put("envioCalculado", false);
-//                        model.put("sinCobertura", true);
-//                        model.put("mensajeEnvio", "No disponemos de envío Andreani para este código postal");
-//                    }
-//                }
-//            }
-//        } catch (Exception e) {
-//            model.put("errorEnvio", "Error al calcular envío. Intenta nuevamente.");
-//            model.put("envioCalculado", false);
-//            model.put("sinCobertura", false);
-//        }
-//        return new ModelAndView("carritoDeCompras", model);
-//    }
 
     @GetMapping(path = "/carritoDeCompras/calcularEnvio")
     @ResponseBody
@@ -406,4 +371,6 @@ public class CarritoController {
         }
         return carritoSesion;
     }
+
+
 }

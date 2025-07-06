@@ -34,6 +34,9 @@ public class ControladorCarritoTest {
     private ServicioPrecios servicioPreciosMock;
     @Mock
     private HttpSession httpSessionMock;
+    @Mock
+    private ServicioCompraImpl servicioCompraMock;
+
 
     private CarritoController carritoController;
     private List<ProductoCarritoDto> carritoSesion;
@@ -41,7 +44,7 @@ public class ControladorCarritoTest {
     @BeforeEach
     public void init() {
         MockitoAnnotations.openMocks(this);
-        carritoController = new CarritoController(servicioProductoCarritoImplMock, servicioEnviosMock, servicioPreciosMock);
+        carritoController = new CarritoController(servicioProductoCarritoImplMock, servicioEnviosMock, servicioPreciosMock, servicioCompraMock);
         carritoSesion = new ArrayList<>();
 
     }
@@ -338,7 +341,7 @@ public class ControladorCarritoTest {
 
         String metodoPagoValido = "mercadoPago";
 
-        Map<String, Object> response = carritoController.procesarCompra(metodoPagoValido);
+        Map<String, Object> response = carritoController.procesarCompra(metodoPagoValido, httpSessionMock);
 
         assertFalse((Boolean) response.get("success"));
         assertEquals("Debes agregar un codigo postal", response.get("error"));
@@ -356,7 +359,7 @@ public class ControladorCarritoTest {
         carritoController.envioActual = envioDto;
         carritoController.codigoPostalActual = "1704";
 
-        Map<String, Object> response = carritoController.procesarCompra(metodoPagoValido);
+        Map<String, Object> response = carritoController.procesarCompra(metodoPagoValido, httpSessionMock);
 
         assertTrue((Boolean) response.get("success"));
         assertEquals("mercadoPago", response.get("metodoPago"));
@@ -367,7 +370,7 @@ public class ControladorCarritoTest {
     public void cuandoElMetodoDePagoEsNullDebeRetornarError() {
         String metodoPagoNull = null;
 
-        Map<String, Object> response = carritoController.procesarCompra(metodoPagoNull);
+        Map<String, Object> response = carritoController.procesarCompra(metodoPagoNull, httpSessionMock);
 
         assertEquals(false, response.get("success"));
         assertEquals("Debes seleccionar un metodo de pago", response.get("error"));
@@ -379,191 +382,12 @@ public class ControladorCarritoTest {
     public void cuandoElMetodoDePagoEsVacioDebeRetornarError() {
         String metodoPagoVacio = "";
 
-        Map<String, Object> response = carritoController.procesarCompra(metodoPagoVacio);
+        Map<String, Object> response = carritoController.procesarCompra(metodoPagoVacio, httpSessionMock);
 
         assertEquals(false, response.get("success"));
         assertEquals("Debes seleccionar un metodo de pago", response.get("error"));
         assertNull(response.get("metodoPago"));
     }
-
-    // calcularEnvio
-//    @Test
-//    public void cuandoIngresoUnCodigoPostalValidoObtengoLaVistaDelCarritoConSusValores() {
-//        String codigoPostalValido = "1704";
-//        Double costoEnvio = 1500.0;
-//        Double totalCarrito = 10000.0;
-//
-//        EnvioDto envioDto = new EnvioDto();
-//        envioDto.setCosto(costoEnvio);
-//        envioDto.setDestino("Ramos Mejia");
-//        envioDto.setTiempo("1-2 dias habiles");
-//
-//        when(httpSessionMock.getAttribute("carritoSesion")).thenReturn(carritoSesion);
-//
-//        when(servicioEnviosMock.calcularEnvio(codigoPostalValido)).thenReturn(envioDto);
-//        when(servicioProductoCarritoImplMock.getProductos()).thenReturn(List.of());
-//        when(servicioProductoCarritoImplMock.calcularValorTotalDeLosProductos()).thenReturn(totalCarrito);
-//
-//        ModelAndView modelAndView = carritoController.calcularEnvio(codigoPostalValido, httpSessionMock);
-//        ModelMap modelMap = (ModelMap) modelAndView.getModel();
-//
-//        assertThat(modelAndView.getViewName(), equalTo("carritoDeCompras"));
-//        assertThat(modelMap.get("envioCalculado"), equalTo(true));
-//        assertThat(modelMap.get("sinCobertura"), equalTo(false));
-//        assertThat(modelMap.get("totalConEnvio"), equalTo(totalCarrito + costoEnvio));
-//        assertThat(modelMap.get("envio"), equalTo(envioDto));
-//
-//        verify(servicioProductoCarritoImplMock, times(1)).getProductos();
-//        verify(servicioProductoCarritoImplMock, times(1)).calcularValorTotalDeLosProductos();
-//        verify(servicioEnviosMock, times(1)).calcularEnvio(codigoPostalValido);
-//    }
-//
-//    @Test
-//    public void cuandoIngresoUnCodigoPostalNoValidoObtengoErrorEnElEnvio() {
-//        String codigoPostalInvalido = "12";
-//
-//        ModelAndView modelAndView = carritoController.calcularEnvio(codigoPostalInvalido, httpSessionMock);
-//
-//        ModelMap modelMap = (ModelMap) modelAndView.getModel();
-//
-//        assertThat(modelAndView.getViewName(), equalTo("carritoDeCompras"));
-//        assertThat(modelMap.get("envioCalculado"), equalTo(false));
-//        assertThat(modelMap.get("sinCobertura"), equalTo(false));
-//        assertThat(modelMap.get("codigoPostal"), equalTo(codigoPostalInvalido));
-//        assertThat(modelMap.get("errorEnvio"), equalTo("El código postal debe tener 4 dígitos"));
-//    }
-//
-//    @Test
-//    public void cuandoElCodigoPostalTieneMasDeCuatroNumerosDevuelveError() {
-//        String codigoPostalInvalido = "12345";
-//
-//        when(servicioProductoCarritoImplMock.getProductos()).thenReturn(List.of());
-//        when(servicioProductoCarritoImplMock.calcularValorTotalDeLosProductos()).thenReturn(0.0);
-//
-//        ModelAndView modelAndView = carritoController.calcularEnvio(codigoPostalInvalido, httpSessionMock);
-//        ModelMap modelMap = modelAndView.getModelMap();
-//
-//        assertThat(modelAndView.getViewName(), equalTo("carritoDeCompras"));
-//        assertThat(modelMap.get("envioCalculado"), equalTo(false));
-//        assertThat(modelMap.get("sinCobertura"), equalTo(false));
-//        assertThat(modelMap.get("errorEnvio"), equalTo("El código postal debe tener 4 dígitos"));
-//
-//        verify(servicioProductoCarritoImplMock, times(1)).getProductos();
-//        verify(servicioProductoCarritoImplMock, times(1)).calcularValorTotalDeLosProductos();
-//    }
-//
-//    @Test
-//    public void cuandoElCodigoPostalTieneLetrasDevuelveError() {
-//        String codigoPostalInvalido = "aa15";
-//        when(servicioProductoCarritoImplMock.getProductos()).thenReturn(List.of());
-//        when(servicioProductoCarritoImplMock.calcularValorTotalDeLosProductos()).thenReturn(0.0);
-//
-//        ModelAndView modelAndView = carritoController.calcularEnvio(codigoPostalInvalido, httpSessionMock);
-//        ModelMap modelMap = modelAndView.getModelMap();
-//
-//        assertThat(modelAndView.getViewName(), equalTo("carritoDeCompras"));
-//        assertThat(modelMap.get("envioCalculado"), equalTo(false));
-//        assertThat(modelMap.get("sinCobertura"), equalTo(false));
-//        assertThat(modelMap.get("errorEnvio"), equalTo("El código postal debe tener 4 dígitos"));
-//
-//        verify(servicioProductoCarritoImplMock, times(1)).getProductos();
-//        verify(servicioProductoCarritoImplMock, times(1)).calcularValorTotalDeLosProductos();
-//    }
-//
-//    @Test
-//    public void cuandoNoHayCoberturaParaElCodigoPostalMuestraMensaje() {
-//        String codigoPostalSinCobertura = "9999";
-//        when(servicioEnviosMock.calcularEnvio(codigoPostalSinCobertura)).thenReturn(null);
-//        when(servicioProductoCarritoImplMock.getProductos()).thenReturn(List.of());
-//        when(servicioProductoCarritoImplMock.calcularValorTotalDeLosProductos()).thenReturn(0.0);
-//
-//        ModelAndView modelAndView = carritoController.calcularEnvio(codigoPostalSinCobertura, httpSessionMock);
-//        ModelMap modelMap = modelAndView.getModelMap();
-//
-//        assertThat(modelAndView.getViewName(), equalTo("carritoDeCompras"));
-//        assertThat(modelMap.get("envioCalculado"), equalTo(false));
-//        assertThat(modelMap.get("sinCobertura"), equalTo(true));
-//        assertThat(modelMap.get("codigoPostal"), equalTo(codigoPostalSinCobertura));
-//        assertThat(modelMap.get("mensajeEnvio"), equalTo("No disponemos de envío Andreani para este código postal"));
-//
-//        verify(servicioProductoCarritoImplMock, times(1)).getProductos();
-//        verify(servicioProductoCarritoImplMock, times(1)).calcularValorTotalDeLosProductos();
-//        verify(servicioEnviosMock,  times(1)).calcularEnvio(codigoPostalSinCobertura);
-//    }
-//
-//    @Test
-//    public void cuandoElCodigoPostalEsNuloNoCalculaEnvio() {
-//        when(servicioProductoCarritoImplMock.getProductos()).thenReturn(List.of());
-//        when(servicioProductoCarritoImplMock.calcularValorTotalDeLosProductos()).thenReturn(0.0);
-//
-//        ModelAndView modelAndView = carritoController.calcularEnvio("", httpSessionMock);
-//        ModelMap modelMap = modelAndView.getModelMap();
-//
-//        assertThat(modelAndView.getViewName(), equalTo("carritoDeCompras"));
-//        assertThat(modelMap.get("envioCalculado"), equalTo(null));
-//        assertThat(modelMap.get("codigoPostal"), equalTo(""));
-//
-//        verify(servicioProductoCarritoImplMock, times(1)).getProductos();
-//        verify(servicioProductoCarritoImplMock, times(1)).calcularValorTotalDeLosProductos();
-//    }
-//
-//    @Test
-//    public void cuandoElCodigoPostalSoloTieneEspaciosNoSeCalculaElEnvio() {
-//        when(servicioProductoCarritoImplMock.getProductos()).thenReturn(List.of());
-//        when(servicioProductoCarritoImplMock.calcularValorTotalDeLosProductos()).thenReturn(0.0);
-//
-//        ModelAndView modelAndView = carritoController.calcularEnvio(" ", httpSessionMock);
-//        ModelMap modelMap = modelAndView.getModelMap();
-//
-//        assertThat(modelAndView.getViewName(), equalTo("carritoDeCompras"));
-//        assertThat(modelMap.get("envioCalculado"), equalTo(null));
-//        assertThat(modelMap.get("codigoPostal"), equalTo(" "));
-//
-//        verify(servicioProductoCarritoImplMock, times(1)).getProductos();
-//        verify(servicioProductoCarritoImplMock, times(1)).calcularValorTotalDeLosProductos();
-//    }
-//
-//    @Test
-//    public void cuandoElServicioDeEnviosLanzaExcepcionDevuelveError() {
-//        String codigoPostal = "1704";
-//
-//        when(servicioEnviosMock.calcularEnvio(codigoPostal)).thenThrow(new RuntimeException("Error"));
-//        when(servicioProductoCarritoImplMock.getProductos()).thenReturn(List.of());
-//        when(servicioProductoCarritoImplMock.calcularValorTotalDeLosProductos()).thenReturn(0.0);
-//
-//        ModelAndView modelAndView = carritoController.calcularEnvio(codigoPostal, httpSessionMock);
-//        ModelMap modelMap = modelAndView.getModelMap();
-//
-//        assertThat(modelAndView.getViewName(), equalTo("carritoDeCompras"));
-//        assertThat(modelMap.get("envioCalculado"), equalTo(false));
-//        assertThat(modelMap.get("sinCobertura"), equalTo(false));
-//        assertThat(modelMap.get("errorEnvio"), equalTo("Error al calcular envío. Intenta nuevamente."));
-//
-//        verify(servicioProductoCarritoImplMock, times(1)).getProductos();
-//        verify(servicioProductoCarritoImplMock, times(1)).calcularValorTotalDeLosProductos();
-//        verify(servicioEnviosMock, times(1)).calcularEnvio(codigoPostal);
-//    }
-//
-//    @Test
-//    public void siempreDevuelveLaVistaCorrectaConProductosYTotal() {
-//        String codigoPostal = "1704";
-//        List<ProductoCarritoDto> productos = Arrays.asList(new ProductoCarritoDto(1L, "Motherboard", 50000.0, 1));
-//        Double total = productos.get(0).getPrecio();
-//
-//        when(servicioProductoCarritoImplMock.getProductos()).thenReturn(productos);
-//        when(servicioProductoCarritoImplMock.calcularValorTotalDeLosProductos()).thenReturn(total);
-//
-//        ModelAndView modelAndView = carritoController.calcularEnvio(codigoPostal, httpSessionMock);
-//        ModelMap modelMap = modelAndView.getModelMap();
-//
-//        assertThat(modelAndView.getViewName(), equalTo("carritoDeCompras"));
-//        assertThat(modelMap.get("valorTotal"), equalTo(total));
-//        assertThat(modelMap.get("productos"), equalTo(productos));
-//        assertThat(modelMap.get("codigoPostal"), equalTo(codigoPostal));
-//
-//        verify(servicioProductoCarritoImplMock, times(1)).getProductos();
-//        verify(servicioProductoCarritoImplMock, times(1)).calcularValorTotalDeLosProductos();
-//    }
 
     // calcularEnvioAjax
     @Test

@@ -1,0 +1,64 @@
+package com.tallerwebi.presentacion;
+
+import com.tallerwebi.dominio.entidades.CompraComponente;
+import com.tallerwebi.presentacion.dto.ComponenteDto;
+
+public class CompraComponenteDto {
+
+    private Long id;
+    private Long compra;
+    private ComponenteDto componente;
+    private Integer cantidad;
+    private Double precioUnitario;
+
+    public CompraComponenteDto(CompraComponente compraComponente) {
+        this.id = compraComponente.getId();
+        this.compra = compraComponente.getCompra().getIdCompra();
+        this.componente = new ComponenteDto(compraComponente.getComponente());
+        this.cantidad = compraComponente.getCantidad();
+        this.precioUnitario = compraComponente.getPrecioUnitario();
+    }
+
+    public CompraComponenteDto() {}
+
+    public Long getId() {
+        return id;
+    }
+
+    public Long getCompra() {
+        return compra;
+    }
+
+    public ComponenteDto getComponente() {
+        return componente;
+    }
+
+    public Integer getCantidad() {
+        return cantidad;
+    }
+
+    public Double getPrecioUnitario() {
+        return precioUnitario;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setCompra(Long compra) {
+        this.compra = compra;
+    }
+
+    public void setComponente(ComponenteDto componente) {
+        this.componente = componente;
+    }
+
+    public void setCantidad(Integer cantidad) {
+        this.cantidad = cantidad;
+    }
+
+    public void setPrecioUnitario(Double precioUnitario) {
+        this.precioUnitario = precioUnitario;
+    }
+
+}

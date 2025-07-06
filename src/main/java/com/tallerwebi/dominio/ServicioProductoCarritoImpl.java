@@ -1,6 +1,7 @@
 package com.tallerwebi.dominio;
 
 import com.tallerwebi.dominio.entidades.Componente;
+import com.tallerwebi.dominio.entidades.Compra;
 import com.tallerwebi.presentacion.ProductoCarritoDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -138,4 +139,5 @@ public class ServicioProductoCarritoImpl {
         }
         return cantidadTotal;
     }
+
 }
