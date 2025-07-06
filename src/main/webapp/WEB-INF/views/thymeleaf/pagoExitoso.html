@@ -151,10 +151,9 @@
             <div th:if="${compra.productosComprados != null && !compra.productosComprados.isEmpty()}">
                 <strong>Productos:</strong>
                 <ul th:each="producto : ${compra.productosComprados}">
-                    <li> - Producto: <span th:text="${producto.componente.nombre}"></span></li>
-                    <li> - Cantidad: <span th:text="${producto.cantidad}"></span></li>
-                    <li> - Precio unitario: <span th:text="'$' + ${#numbers.formatDecimal(producto.precioUnitario, 1, 'POINT', 2, 'COMMA')}"></span></li>
-
+                    <li> Producto: <span th:text="${producto.componente.nombre}"></span></li>
+                    <li> Cantidad: <span th:text="${producto.cantidad}"></span></li>
+                    <li> Precio unitario: <span th:text="'$' + ${#numbers.formatDecimal(producto.precioUnitario, 1, 'POINT', 2, 'COMMA')}"></span></li>
                 </ul>
             </div>
         </div>

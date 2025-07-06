@@ -63,18 +63,18 @@ public class ServicioCompraImpl implements ServicioCompra {
     public List<Compra> obtenerCompraComponenteDeUnUsuarioLogueado(UsuarioDto usuarioLogueado) {
         List<Compra> comprasUsuarioLogueado = this.repositorioCompra.obtenerCompraDeUsuarioLogueado(usuarioLogueado);
 
-        for(Compra compra : comprasUsuarioLogueado){
-            Double totalEnPesos = this.servicioPrecios.conversionDolarAPesoDouble(compra.getTotal());
-            compra.setTotal(totalEnPesos);
-
-            if(compra.getProductosComprados() != null){
-                for (CompraComponente compraComponente : compra.getProductosComprados()) {
-                    Double precioUnitarioEnPesos = this.servicioPrecios.conversionDolarAPesoDouble(compraComponente.getPrecioUnitario());
-
-                    compraComponente.setPrecioUnitario(precioUnitarioEnPesos);
-                }
-            }
-        }
+//        for(Compra compra : comprasUsuarioLogueado){
+//            Double totalEnPesos = this.servicioPrecios.conversionDolarAPesoDouble(compra.getTotal());
+//            compra.setTotal(totalEnPesos);
+//
+//            if(compra.getProductosComprados() != null){
+//                for (CompraComponente compraComponente : compra.getProductosComprados()) {
+//                    Double precioUnitarioEnPesos = this.servicioPrecios.conversionDolarAPesoDouble(compraComponente.getPrecioUnitario());
+//
+//                    compraComponente.setPrecioUnitario(precioUnitarioEnPesos);
+//                }
+//            }
+//        }
 
         return comprasUsuarioLogueado;
     }

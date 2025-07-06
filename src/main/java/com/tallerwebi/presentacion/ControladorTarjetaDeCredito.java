@@ -33,15 +33,18 @@ public class ControladorTarjetaDeCredito {
     ServicioProductoCarritoImpl servicioProductoCarritoImpl;
     private ServicioProductoCarritoImpl servicioProductoCarrito;
     private ServicioCompra servicioCompra;
+    private ServicioPrecios servicioPrecios;
 
     public ControladorTarjetaDeCredito(ServicioTarjetaDeCredito servicioTarjeta,
                                        ServicioProductoCarritoImpl  servicioProductoCarritoImpl,
                                        ServicioCompra servicioCompra,
-                                       ServicioProductoCarritoImpl servicioProductoCarrito) {
+                                       ServicioProductoCarritoImpl servicioProductoCarrito,
+                                       ServicioPrecios servicioPrecios) {
         this.servicioTarjeta = servicioTarjeta;
         this.servicioProductoCarritoImpl = servicioProductoCarritoImpl;
         this.servicioCompra = servicioCompra;
         this.servicioProductoCarrito = servicioProductoCarrito;
+        this.servicioPrecios = servicioPrecios;
     }
 
     @PostMapping("/tarjetaDeCredito/validar")
@@ -84,10 +87,13 @@ public class ControladorTarjetaDeCredito {
 
             List<ProductoCarritoDto> carritoSesion = obtenerCarritoDeSesion(session);
 
+            Double totalCompraEnDolares = this.servicioProductoCarrito.calcularValorTotalDeLosProductos();
+            Double totalCompraEnPesos = this.servicioPrecios.conversionDolarAPesoDouble(totalCompraEnDolares);
+
             CompraDto compraDto = new CompraDto();
             compraDto.setFecha(LocalDate.now());
             compraDto.setMetodoDePago(metodoDePago);
-            compraDto.setTotal(this.servicioProductoCarrito.calcularValorTotalDeLosProductos());
+            compraDto.setTotal(totalCompraEnPesos);
             compraDto.setProductosComprados(convertirACompraComponenteDto(carritoSesion));
 
             servicioCompra.guardarCompraConUsuarioLogueado(compraDto, usuarioLogueado);
@@ -111,7 +117,8 @@ public class ControladorTarjetaDeCredito {
         return productosCarritoDto.stream().map(productosCarrito -> {
             CompraComponenteDto compraComponenteDto = new CompraComponenteDto();
             compraComponenteDto.setCantidad(productosCarrito.getCantidad());
-            compraComponenteDto.setPrecioUnitario(productosCarrito.getPrecio() * productosCarrito.getCantidad());
+            Double precioEnPesos = this.servicioPrecios.conversionDolarAPesoDouble(productosCarrito.getPrecio() * productosCarrito.getCantidad());
+            compraComponenteDto.setPrecioUnitario(precioEnPesos);
             compraComponenteDto.setId(productosCarrito.getId());
             return compraComponenteDto;
         }).collect(Collectors.toList());

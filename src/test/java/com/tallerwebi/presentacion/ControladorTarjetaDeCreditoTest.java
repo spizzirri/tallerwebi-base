@@ -1,6 +1,7 @@
 package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.ServicioCompra;
+import com.tallerwebi.dominio.ServicioPrecios;
 import com.tallerwebi.dominio.ServicioProductoCarritoImpl;
 import com.tallerwebi.dominio.ServicioTarjetaDeCredito;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,13 +29,16 @@ public class ControladorTarjetaDeCreditoTest {
     private ServicioProductoCarritoImpl servicioProductoCarritoMock;
     @Mock
     private HttpSession sessionMock;
+    @Mock
+    private ServicioPrecios servicioPreciosMock;
+
     private ControladorTarjetaDeCredito controladorTarjetaDeCredito;
 
 
     @BeforeEach
     public void init() {
         MockitoAnnotations.openMocks(this);
-        controladorTarjetaDeCredito = new ControladorTarjetaDeCredito(servicioTarjetaMock, productoServiceMock, servicioCompraMock, servicioProductoCarritoMock);
+        controladorTarjetaDeCredito = new ControladorTarjetaDeCredito(servicioTarjetaMock, productoServiceMock, servicioCompraMock, servicioProductoCarritoMock, servicioPreciosMock);
 
     }
 
