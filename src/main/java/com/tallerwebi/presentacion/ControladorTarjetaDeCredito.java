@@ -98,8 +98,6 @@ public class ControladorTarjetaDeCredito {
 
             servicioCompra.guardarCompraConUsuarioLogueado(compraDto, usuarioLogueado);
             servicioProductoCarritoImpl.limpiarCarrito();
-            agregarComprasAlModelo(modelo, session);
-
             return new ModelAndView("pagoExitoso", modelo);
         }
     }
@@ -128,43 +126,5 @@ public class ControladorTarjetaDeCredito {
     public ModelAndView mostrarFormularioTarjeta() {
         ModelMap modelo = new ModelMap();
         return new ModelAndView("tarjetaDeCredito", modelo);
-    }
-
-    @GetMapping("/comprasUsuario")
-    @ResponseBody
-    public Map<String, Object> mostrarComprasUsuario(HttpSession session) {
-        Map<String, Object> response = new HashMap<>();
-        UsuarioDto usuarioLogueado = (UsuarioDto) session.getAttribute("usuario");
-
-        if (usuarioLogueado == null) {
-            response.put("mensaje", "Usuario no logueado");
-            return response;
-        }
-
-        List<Compra> comprasUsuario = this.servicioCompra.obtenerCompraComponenteDeUnUsuarioLogueado(usuarioLogueado);
-        response.put("success", true);
-        response.put("comprasUsuario", comprasUsuario);
-        return response;
-    }
-
-    private void agregarComprasAlModelo(ModelMap modelo, HttpSession session) {
-        try {
-            UsuarioDto usuarioLogueado = (UsuarioDto) session.getAttribute("usuario");
-
-            if (usuarioLogueado != null) {
-                List<Compra> comprasUsuario = this.servicioCompra.obtenerCompraComponenteDeUnUsuarioLogueado(usuarioLogueado);
-
-                modelo.addAttribute("comprasUsuario", comprasUsuario);
-                modelo.addAttribute("cantidadDeCompras", comprasUsuario.size());
-            } else {
-                modelo.addAttribute("comprasUsuario", new ArrayList<>());
-                modelo.addAttribute("cantidadDeCompras", 0);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            modelo.addAttribute("comprasUsuario", new ArrayList<>());
-            modelo.addAttribute("cantidadDeCompras", 0);
-        }
     }
 }

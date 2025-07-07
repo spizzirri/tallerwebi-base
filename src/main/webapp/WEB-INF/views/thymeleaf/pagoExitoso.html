@@ -142,23 +142,6 @@
             </div>
         </div>
     </div>
-    <div th:if="${comprasUsuario != null && !comprasUsuario.isEmpty()}">
-        <h4>Tus compras anteriores:</h4>
-        <div th:each="compra : ${comprasUsuario}" style="border: 1px solid #ccc; padding: 10px; margin: 10px 0;">
-            <p><strong>Fecha:</strong> <span th:text="${compra.fecha}"></span></p>
-            <span th:text="'$' + ${#numbers.formatDecimal(compra.total, 1, 'POINT', 2, 'COMMA')}"></span>
-            <p><strong>Método de pago:</strong> <span th:text="${compra.metodoDePago}"></span></p>
-            <div th:if="${compra.productosComprados != null && !compra.productosComprados.isEmpty()}">
-                <strong>Productos:</strong>
-                <ul th:each="producto : ${compra.productosComprados}">
-                    <li> Producto: <span th:text="${producto.componente.nombre}"></span></li>
-                    <li> Cantidad: <span th:text="${producto.cantidad}"></span></li>
-                    <li> Precio unitario: <span th:text="'$' + ${#numbers.formatDecimal(producto.precioUnitario, 1, 'POINT', 2, 'COMMA')}"></span></li>
-                </ul>
-            </div>
-        </div>
-    </div>
-
     <a th:href="@{/index.html}" class="exito-volver">Volver al inicio</a>
 </div>
 <div th:replace="fragments/fragments :: footer"></div>

@@ -1,7 +1,6 @@
 package com.tallerwebi.dominio;
 
 import com.tallerwebi.dominio.entidades.Compra;
-import com.tallerwebi.dominio.entidades.CompraComponente;
 import com.tallerwebi.presentacion.CompraDto;
 import com.tallerwebi.presentacion.UsuarioDto;
 
