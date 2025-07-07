@@ -40,6 +40,10 @@ public class CompraComponente {
         return id;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public Compra getCompra() {
         return compra;
     }
@@ -72,6 +76,7 @@ public class CompraComponente {
         this.precioUnitario = precioUnitario;
     }
 
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -84,4 +89,6 @@ public class CompraComponente {
     public int hashCode() {
         return Objects.hash(id);
     }
+
+
 }

@@ -14,14 +14,12 @@ import java.util.List;
 @Transactional
 public class ServicioCompraImpl implements ServicioCompra {
 
-    private final RepositorioUsuario repositorioUsuario;
+    private RepositorioUsuario repositorioUsuario;
     private RepositorioCompra repositorioCompra;
-    private ServicioPrecios servicioPrecios;
 
-    public ServicioCompraImpl(RepositorioCompra repositorioCompra, RepositorioUsuario repositorioUsuario, ServicioPrecios servicioPrecios) {
+    public ServicioCompraImpl(RepositorioCompra repositorioCompra, RepositorioUsuario repositorioUsuario) {
         this.repositorioCompra = repositorioCompra;
         this.repositorioUsuario = repositorioUsuario;
-        this.servicioPrecios = servicioPrecios;
     }
 
     @Override
