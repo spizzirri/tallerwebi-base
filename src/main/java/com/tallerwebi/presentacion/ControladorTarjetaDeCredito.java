@@ -17,10 +17,10 @@ import java.time.format.DateTimeFormatter;
 public class ControladorTarjetaDeCredito {
 
     @Autowired
-    private ServicioTarjetaDeCredito servicioTarjeta;
+    ServicioTarjetaDeCredito servicioTarjeta;
 
     @Autowired
-    private ServicioProductoCarritoImpl productoService;
+    ServicioProductoCarritoImpl productoService;
 
     @PostMapping("/tarjetaDeCredito/validar")
     public ModelAndView validar(@RequestParam String numeroTarjeta,
