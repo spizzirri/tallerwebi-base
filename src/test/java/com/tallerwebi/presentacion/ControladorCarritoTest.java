@@ -138,7 +138,7 @@ public class ControladorCarritoTest {
 
         when(servicioPreciosMock.conversionDolarAPeso(130.0)).thenReturn("$159.250,0");
 
-        Map<String, Object> response = carritoController.eliminarProductoDelCarrito(1L, httpSessionMock);
+        Map<String, Object> response = carritoController.eliminarProductoDelCarrito(1L, null, httpSessionMock);
 
         assertThat(response.get("eliminado"), equalTo(true));
         assertThat(response.get("productos"), equalTo(productosSinUno));
@@ -279,7 +279,7 @@ public class ControladorCarritoTest {
 
         when(servicioPreciosMock.conversionDolarAPeso(precioTotalDolar)).thenReturn(precioTotalFormateado);
 
-        Map<String, Object> response = carritoController.agregarMasCantidadDeUnProducto(productoId, httpSessionMock);
+        Map<String, Object> response = carritoController.agregarMasCantidadDeUnProducto(productoId,null, httpSessionMock);
 
         assertNotNull(response.get("cantidadEnCarrito"));
         assertThat(response.get("cantidad"), equalTo(cantidadFinal));
@@ -322,7 +322,7 @@ public class ControladorCarritoTest {
 
         when(servicioPreciosMock.conversionDolarAPeso(totalPorProductoDolar)).thenReturn(precioTotalPorProducoFormateado);
 
-        Map<String, Object> response = carritoController.restarCantidadDeUnProducto(productoId, httpSessionMock);
+        Map<String, Object> response = carritoController.restarCantidadDeUnProducto(productoId, null, httpSessionMock);
 
         assertNotNull(response.get("cantidadEnCarrito"));
         assertThat(response.get("cantidad"), equalTo(cantidadFinal));
