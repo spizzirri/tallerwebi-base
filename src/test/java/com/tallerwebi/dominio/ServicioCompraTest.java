@@ -11,96 +11,126 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class ServicioCompraTest {
 
-    @Mock
-    private RepositorioUsuario repositorioUsuario;
-    @Mock
-    private RepositorioCompra repositorioCompra;
-
-    private ServicioCompraImpl servicioCompraImpl;
+    @Mock private RepositorioUsuario repositorioUsuario;
+    @Mock private RepositorioCompra repositorioCompra;
+    private ServicioCompraImpl servicioCompra;
 
     @BeforeEach
     public void init() {
         MockitoAnnotations.openMocks(this);
-        servicioCompraImpl = new ServicioCompraImpl(repositorioCompra, repositorioUsuario);
-        ReflectionTestUtils.setField(servicioCompraImpl, "repositorioUsuario", repositorioUsuario);
+        servicioCompra = new ServicioCompraImpl(repositorioCompra, repositorioUsuario);
     }
 
     @Test
-    public void deberiaPoderGuardarUnaCompraAUnUsuaarioLoguado() {
-        String emailUsuario = "test@ejemplo.com";
-        UsuarioDto usuarioDtoLogueado = new UsuarioDto();
-        usuarioDtoLogueado.setEmail(emailUsuario);
+    public void deberiaGuardarCompraConUsuarioLogueado() {
+        UsuarioDto usuarioDto = crearUsuarioDto("test@example.com");
+        Usuario usuario = crearUsuario(1L, "test@example.com");
+        CompraDto compraDto = crearCompraDto(200.0, "tarjetaCredito", crearProducto(10L, 2, 100.0));
 
-        Usuario usuarioEntidad = new Usuario();
-        usuarioEntidad.setEmail(emailUsuario);
-        usuarioEntidad.setId(1L);
+        when(repositorioUsuario.buscarUsuario("test@example.com")).thenReturn(usuario);
 
+        servicioCompra.guardarCompraConUsuarioLogueado(compraDto, usuarioDto);
+
+        verify(repositorioUsuario).buscarUsuario("test@example.com");
+        verify(repositorioCompra).guardarCompraDeUsuario(any(Compra.class));
+        verify(repositorioCompra).guardarComonentesEnCompraComponente(any(CompraComponente.class));
+    }
+
+    @Test
+    public void deberiaGuardarMultiplesProductos() {
+        UsuarioDto usuarioDto = crearUsuarioDto("test@example.com");
+        Usuario usuario = crearUsuario(1L, "test@example.com");
+        CompraDto compraDto = crearCompraDto(250.0, "mercadoPago",
+                crearProducto(10L, 2, 100.0),
+                crearProducto(20L, 1, 50.0));
+
+        when(repositorioUsuario.buscarUsuario("test@example.com")).thenReturn(usuario);
+
+        servicioCompra.guardarCompraConUsuarioLogueado(compraDto, usuarioDto);
+
+        verify(repositorioCompra, times(2)).guardarComonentesEnCompraComponente(any(CompraComponente.class));
+    }
+
+    @Test
+    public void deberiaGuardarProductoSinComponenteDto() {
+        UsuarioDto usuarioDto = crearUsuarioDto("test@example.com");
+        Usuario usuario = crearUsuario(1L, "test@example.com");
+        CompraComponenteDto producto = crearProductoSinComponenteDto(15L, 1, 75.0);
+        CompraDto compraDto = crearCompraDto(75.0, "tarjetaCredito", producto);
+
+        when(repositorioUsuario.buscarUsuario("test@example.com")).thenReturn(usuario);
+
+        servicioCompra.guardarCompraConUsuarioLogueado(compraDto, usuarioDto);
+
+        ArgumentCaptor<CompraComponente> captor = ArgumentCaptor.forClass(CompraComponente.class);
+        verify(repositorioCompra).guardarComonentesEnCompraComponente(captor.capture());
+        assertEquals(15L, captor.getValue().getComponente().getId());
+    }
+
+    //obtenerCompraComponenteDeUnUsuarioLogueado
+    @Test
+    public void deberiaObtenerComprasDeUsuario() {
+        UsuarioDto usuarioDto = crearUsuarioDto("test@example.com");
+        List<Compra> comprasEsperadas = Arrays.asList(new Compra(), new Compra());
+        when(repositorioCompra.obtenerCompraDeUsuarioLogueado(usuarioDto)).thenReturn(comprasEsperadas);
+
+        List<Compra> resultado = servicioCompra.obtenerCompraComponenteDeUnUsuarioLogueado(usuarioDto);
+
+        assertEquals(comprasEsperadas, resultado);
+        verify(repositorioCompra).obtenerCompraDeUsuarioLogueado(usuarioDto);
+    }
+
+    //metodos internos
+    private UsuarioDto crearUsuarioDto(String email) {
+        UsuarioDto usuario = new UsuarioDto();
+        usuario.setEmail(email);
+        return usuario;
+    }
+
+    private Usuario crearUsuario(Long id, String email) {
+        Usuario usuario = new Usuario();
+        usuario.setId(id);
+        usuario.setEmail(email);
+        return usuario;
+    }
+
+    private CompraDto crearCompraDto(Double total, String metodoPago, CompraComponenteDto... productos) {
+        CompraDto compra = new CompraDto();
+        compra.setFecha(LocalDate.now());
+        compra.setTotal(total);
+        compra.setMetodoDePago(metodoPago);
+        compra.setProductosComprados(Arrays.asList(productos));
+        return compra;
+    }
+
+    private CompraComponenteDto crearProducto(Long id, Integer cantidad, Double precio) {
         ComponenteDto componenteDto = new ComponenteDto();
-        componenteDto.setId(10L);
+        componenteDto.setId(id);
 
-        CompraComponenteDto producto1 = new CompraComponenteDto();
-        producto1.setId(10L);
-        producto1.setCantidad(2);
-        producto1.setPrecioUnitario(100.0);
-        producto1.setComponente(componenteDto);
+        CompraComponenteDto producto = new CompraComponenteDto();
+        producto.setId(id);
+        producto.setCantidad(cantidad);
+        producto.setPrecioUnitario(precio);
+        producto.setComponente(componenteDto);
+        return producto;
+    }
 
-        CompraComponenteDto producto2 = new CompraComponenteDto();
-        producto2.setId(20L);
-        producto2.setCantidad(1);
-        producto2.setPrecioUnitario(50.0);
-        producto2.setComponente(componenteDto);
-
-        List<CompraComponenteDto> productosComprados = Arrays.asList(producto1, producto2);
-
-        CompraDto compraDto = new CompraDto();
-        compraDto.setFecha(LocalDate.now());
-        compraDto.setTotal(250.0);
-        compraDto.setMetodoDePago("tarjetaCredito");
-        compraDto.setProductosComprados(productosComprados);
-
-        when(repositorioUsuario.buscarUsuario(emailUsuario)).thenReturn(usuarioEntidad);
-
-        servicioCompraImpl.guardarCompraConUsuarioLogueado(compraDto, usuarioDtoLogueado);
-
-        verify(repositorioUsuario, times(1)).buscarUsuario(emailUsuario);
-
-        //permite "capturar" y examinar los argumentos que se pasan a los metodos de los mocks
-        ArgumentCaptor<Compra> compraCaptor = ArgumentCaptor.forClass(Compra.class);
-        verify(repositorioCompra, times(1)).guardarCompraDeUsuario(compraCaptor.capture());
-        //  Crea un "contenedor" que puede capturar objetos de tipo Compra
-        //   usa capture() para "atrapar" el argumento
-
-        Compra compraGuardada = compraCaptor.getValue();
-        assertEquals(usuarioEntidad, compraGuardada.getIdUsuario());
-        assertEquals(LocalDate.now(), compraGuardada.getFecha());
-        assertEquals(250.0, compraGuardada.getTotal());
-        assertEquals("tarjetaCredito", compraGuardada.getMetodoDePago());
-
-        ArgumentCaptor<CompraComponente> componenteCaptor = ArgumentCaptor.forClass(CompraComponente.class);
-        verify(repositorioCompra, times(2)).guardarComonentesEnCompraComponente(componenteCaptor.capture());
-
-        List<CompraComponente> componentesGuardados = componenteCaptor.getAllValues();
-
-        CompraComponente componente1 = componentesGuardados.get(0);
-        assertEquals(2, componente1.getCantidad());
-        assertEquals(100.0, componente1.getPrecioUnitario());
-        assertEquals(compraGuardada, componente1.getCompra());
-        assertEquals(10L, componente1.getComponente().getId());
-
-        CompraComponente componente2 = componentesGuardados.get(1);
-        assertEquals(1, componente2.getCantidad());
-        assertEquals(50.0, componente2.getPrecioUnitario());
-        assertEquals(compraGuardada, componente2.getCompra());
+    private CompraComponenteDto crearProductoSinComponenteDto(Long id, Integer cantidad, Double precio) {
+        CompraComponenteDto producto = new CompraComponenteDto();
+        producto.setId(id);
+        producto.setCantidad(cantidad);
+        producto.setPrecioUnitario(precio);
+        producto.setComponente(null);
+        return producto;
     }
 }

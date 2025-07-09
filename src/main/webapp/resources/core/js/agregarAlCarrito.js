@@ -441,7 +441,7 @@ window.asignarEventosDelResumenCarrito = function () {
     });
 }
 
-// Resto del código para abrir/cerrar el resumen
+// abrir/cerrar el resumen del carrito
 document.addEventListener('DOMContentLoaded', function() {
     const abrirBtn = document.getElementById('abrirResumenCarrito');
     if (abrirBtn) {

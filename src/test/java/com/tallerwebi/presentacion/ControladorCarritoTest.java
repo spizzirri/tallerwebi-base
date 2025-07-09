@@ -3,6 +3,7 @@ package com.tallerwebi.presentacion;
 import com.tallerwebi.dominio.*;
 
 import com.tallerwebi.dominio.entidades.Componente;
+import com.tallerwebi.presentacion.dto.ProductoCarritoArmadoDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -27,6 +28,9 @@ public class ControladorCarritoTest {
     @Mock
     private ProductoCarritoDto productoMock2;
     @Mock
+    private ProductoCarritoArmadoDto productoArmadoMock;
+
+    @Mock
     private ServicioProductoCarritoImpl servicioProductoCarritoImplMock;
     @Mock
     private ServicioDeEnviosImpl servicioEnviosMock;
@@ -36,7 +40,8 @@ public class ControladorCarritoTest {
     private HttpSession httpSessionMock;
     @Mock
     private ServicioCompraImpl servicioCompraMock;
-
+    @Mock
+    private ProductoCarritoArmadoDto productoCarritoArmadoDto;
 
     private CarritoController carritoController;
     private List<ProductoCarritoDto> carritoSesion;
@@ -54,25 +59,32 @@ public class ControladorCarritoTest {
     public void cuandoQuieroVerElCarritoDeComprasObtengoLaVistaDelCarrito() {
         carritoSesion.add(productoMock1);
         carritoSesion.add(productoMock2);
+        carritoSesion.add(productoArmadoMock);
 
         when(productoMock1.getPrecio()).thenReturn(100.0);
         when(productoMock2.getPrecio()).thenReturn(130.0);
+        when(productoArmadoMock.getPrecio()).thenReturn(150.0);
 
         when(httpSessionMock.getAttribute("carritoSesion")).thenReturn(carritoSesion);
-
         when(servicioProductoCarritoImplMock.getProductos()).thenReturn(carritoSesion);
-        when(servicioProductoCarritoImplMock.calcularValorTotalDeLosProductos()).thenReturn(230.0);
-        when(servicioProductoCarritoImplMock.calcularCantidadTotalDeProductos()).thenReturn(2);
+        when(servicioProductoCarritoImplMock.calcularValorTotalDeLosProductos()).thenReturn(380.0);
+        when(servicioProductoCarritoImplMock.calcularCantidadTotalDeProductos()).thenReturn(3);
 
-        when(servicioPreciosMock.conversionDolarAPeso(230.0)).thenReturn("$230.0");
+        when(productoCarritoArmadoDto.getPrecio()).thenReturn(150.0);
+        when(productoCarritoArmadoDto.getCantidad()).thenReturn(1);
+        when(servicioPreciosMock.conversionDolarAPeso(380.0)).thenReturn("$276.000,00");
 
         ModelAndView mostrarvista = carritoController.mostrarVistaCarritoDeCompras(httpSessionMock);
         ModelMap model = (ModelMap) mostrarvista.getModel();
 
+        List<?> productos = (List<?>) model.get("productos");
+        List<?> productosArmados = (List<?>) model.get("productosArmados");
+
         assertThat(mostrarvista.getViewName(), equalTo("carritoDeCompras"));
-        assertThat(model.get("cantidadEnCarrito"), equalTo(2));
-        assertThat(model.get("productos"), equalTo(carritoSesion));
-        assertThat(model.get("valorTotal"), equalTo("$230.0"));
+        assertThat(model.get("cantidadEnCarrito"), equalTo(3));
+        assertThat(model.get("valorTotal"), equalTo("$276.000,00"));
+        assertThat(productos.size(), equalTo(2));
+        assertThat(productosArmados.size(), equalTo(1));
 
         verify(servicioProductoCarritoImplMock, times(1)).calcularValorTotalDeLosProductos();
         verify(servicioProductoCarritoImplMock, times(1)).calcularCantidadTotalDeProductos();
@@ -85,25 +97,31 @@ public class ControladorCarritoTest {
     public void cuandoQuieroVerElResumenDelCarritoDeComprasObtengoElResumenCarrito() {
         carritoSesion.add(productoMock1);
         carritoSesion.add(productoMock2);
+        carritoSesion.add(productoArmadoMock);
 
         when(productoMock1.getPrecio()).thenReturn(100.0);
         when(productoMock2.getPrecio()).thenReturn(130.0);
+        when(productoArmadoMock.getPrecio()).thenReturn(150.0);
 
         when(httpSessionMock.getAttribute("carritoSesion")).thenReturn(carritoSesion);
 
         when(servicioProductoCarritoImplMock.getProductos()).thenReturn(carritoSesion);
-        when(servicioProductoCarritoImplMock.calcularValorTotalDeLosProductos()).thenReturn(230.0);
-        when(servicioProductoCarritoImplMock.calcularCantidadTotalDeProductos()).thenReturn(2);
+        when(servicioProductoCarritoImplMock.calcularValorTotalDeLosProductos()).thenReturn(380.0);
+        when(servicioProductoCarritoImplMock.calcularCantidadTotalDeProductos()).thenReturn(3);
 
-        when(servicioPreciosMock.conversionDolarAPeso(230.0)).thenReturn("$230.0");
+        when(servicioPreciosMock.conversionDolarAPeso(380.0)).thenReturn("$276.000,00");
 
         ModelAndView mostrarResumen = carritoController.mostrarResumenCarritoDeCompras(httpSessionMock);
         ModelMap model = (ModelMap) mostrarResumen.getModel();
 
+        List<?> productos = (List<?>) model.get("productos");
+        List<?> productosArmados = (List<?>) model.get("productosArmados");
+
         assertThat(mostrarResumen.getViewName(), equalTo("fragments/fragments :: resumenCarrito"));
-        assertThat(model.get("cantidadEnCarrito"), equalTo(2));
-        assertThat(model.get("productos"), equalTo(carritoSesion));
-        assertThat(model.get("valorTotal"), equalTo("$230.0"));
+        assertThat(model.get("cantidadEnCarrito"), equalTo(3));
+        assertThat(model.get("valorTotal"), equalTo("$276.000,00"));
+        assertThat(productos.size(), equalTo(2));
+        assertThat(productosArmados.size(), equalTo(1));
 
         verify(servicioProductoCarritoImplMock, times(1)).calcularValorTotalDeLosProductos();
         verify(servicioProductoCarritoImplMock, times(1)).calcularCantidadTotalDeProductos();
@@ -338,8 +356,14 @@ public class ControladorCarritoTest {
     public void cuandoSeleccionoElMetodoDePagoValidoSinEnvioObtengoUnMensajeDeError() {
         carritoController.envioActual = null;
         carritoController.codigoPostalActual = null;
-
         String metodoPagoValido = "mercadoPago";
+
+        carritoSesion.add(productoMock1);
+        when(httpSessionMock.getAttribute("carritoSesion")).thenReturn(carritoSesion);
+
+        UsuarioDto usuarioLogueado = new UsuarioDto();
+        usuarioLogueado.setEmail("test@example.com");
+        when(httpSessionMock.getAttribute("usuario")).thenReturn(usuarioLogueado);
 
         Map<String, Object> response = carritoController.procesarCompra(metodoPagoValido, httpSessionMock);
 
@@ -351,6 +375,13 @@ public class ControladorCarritoTest {
     @Test
     public void cuandoSeleccionoElMetodoDePagoValidoConEnvioIncluyeCostoDeEnvio() {
         String metodoPagoValido = "mercadoPago";
+
+        carritoSesion.add(productoMock1);
+        when(httpSessionMock.getAttribute("carritoSesion")).thenReturn(carritoSesion);
+
+        UsuarioDto usuarioLogueado = new UsuarioDto();
+        usuarioLogueado.setEmail("test@example.com");
+        when(httpSessionMock.getAttribute("usuario")).thenReturn(usuarioLogueado);
 
         EnvioDto envioDto = new EnvioDto();
         envioDto.setCosto(1500.0);
@@ -368,9 +399,10 @@ public class ControladorCarritoTest {
 
     @Test
     public void cuandoElMetodoDePagoEsNullDebeRetornarError() {
-        String metodoPagoNull = null;
+        carritoSesion.add(productoMock1);
+        when(httpSessionMock.getAttribute("carritoSesion")).thenReturn(carritoSesion);
 
-        Map<String, Object> response = carritoController.procesarCompra(metodoPagoNull, httpSessionMock);
+        Map<String, Object> response = carritoController.procesarCompra(null, httpSessionMock);
 
         assertEquals(false, response.get("success"));
         assertEquals("Debes seleccionar un metodo de pago", response.get("error"));
@@ -379,14 +411,66 @@ public class ControladorCarritoTest {
     }
 
     @Test
+    public void cuandoNoEstoyLogueadoObtengoErrorYRedirect() {
+        String metodoPagoValido = "mercadoPago";
+        when(httpSessionMock.getAttribute("usuario")).thenReturn(null);
+
+        carritoSesion.add(productoMock1);
+        when(httpSessionMock.getAttribute("carritoSesion")).thenReturn(carritoSesion);
+
+        Map<String, Object> response = carritoController.procesarCompra(metodoPagoValido, httpSessionMock);
+
+        assertFalse((Boolean) response.get("success"));
+        assertEquals("Debes iniciar sesion", response.get("error"));
+        assertEquals("/login", response.get("redirect"));
+    }
+
+    @Test
+    public void cuandoNoHayProductosEnElCarritoObtengoErrorYRedirect() {
+        String metodoPago = "tarjetaCredito";
+
+        when(httpSessionMock.getAttribute("carritoSesion")).thenReturn(carritoSesion);
+
+        Map<String, Object> response = carritoController.procesarCompra(metodoPago, httpSessionMock);
+
+        assertFalse((Boolean) response.get("success"));
+        assertEquals("No hay productos en el carrito", response.get("error"));
+    }
+
+    @Test
     public void cuandoElMetodoDePagoEsVacioDebeRetornarError() {
         String metodoPagoVacio = "";
+
+        carritoSesion.add(productoMock1);
+        when(httpSessionMock.getAttribute("carritoSesion")).thenReturn(carritoSesion);
 
         Map<String, Object> response = carritoController.procesarCompra(metodoPagoVacio, httpSessionMock);
 
         assertEquals(false, response.get("success"));
         assertEquals("Debes seleccionar un metodo de pago", response.get("error"));
         assertNull(response.get("metodoPago"));
+    }
+
+    @Test
+    public void cuandoSeleccionoTarjetaDeCreditoObtengoRedirectCorrecto() {
+        String metodoPago = "tarjetaCredito";
+
+        carritoSesion.add(productoMock1);
+        when(httpSessionMock.getAttribute("carritoSesion")).thenReturn(carritoSesion);
+
+        UsuarioDto usuarioLogueado = new UsuarioDto();
+        usuarioLogueado.setEmail("test@example.com");
+        when(httpSessionMock.getAttribute("usuario")).thenReturn(usuarioLogueado);
+
+        EnvioDto envioDto = new EnvioDto();
+        envioDto.setCosto(1000.0);
+        carritoController.envioActual = envioDto;
+        carritoController.codigoPostalActual = "1704";
+
+        Map<String, Object> response = carritoController.procesarCompra(metodoPago, httpSessionMock);
+
+        assertTrue((Boolean) response.get("success"));
+        assertEquals("/tarjetaDeCredito", response.get("redirect"));
     }
 
     // calcularEnvioAjax
