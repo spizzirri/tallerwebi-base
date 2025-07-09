@@ -250,6 +250,7 @@ public class CarritoController {
             response.put("success", false);
             response.put("error", "Debes iniciar sesion");
             response.put("redirect", "/login");
+//            response.put("redirect", "/login?redirectUrl=/carritoDeCompras/formularioPago");
             return response;
         }
 

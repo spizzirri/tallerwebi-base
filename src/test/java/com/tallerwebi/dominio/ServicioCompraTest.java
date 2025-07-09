@@ -14,7 +14,6 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -35,7 +34,6 @@ public class ServicioCompraTest {
         MockitoAnnotations.openMocks(this);
         servicioCompraImpl = new ServicioCompraImpl(repositorioCompra, repositorioUsuario);
         ReflectionTestUtils.setField(servicioCompraImpl, "repositorioUsuario", repositorioUsuario);
-
     }
 
     @Test
@@ -77,6 +75,7 @@ public class ServicioCompraTest {
 
         verify(repositorioUsuario, times(1)).buscarUsuario(emailUsuario);
 
+        //permite "capturar" y examinar los argumentos que se pasan a los metodos de los mocks
         ArgumentCaptor<Compra> compraCaptor = ArgumentCaptor.forClass(Compra.class);
         verify(repositorioCompra, times(1)).guardarCompraDeUsuario(compraCaptor.capture());
         //  Crea un "contenedor" que puede capturar objetos de tipo Compra
@@ -103,6 +102,5 @@ public class ServicioCompraTest {
         assertEquals(1, componente2.getCantidad());
         assertEquals(50.0, componente2.getPrecioUnitario());
         assertEquals(compraGuardada, componente2.getCompra());
-
     }
 }

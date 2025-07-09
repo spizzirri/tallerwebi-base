@@ -118,6 +118,8 @@ public class ControladorTarjetaDeCredito {
             Double precioEnPesos = this.servicioPrecios.conversionDolarAPesoDouble(productosCarrito.getPrecio() * productosCarrito.getCantidad());
             compraComponenteDto.setPrecioUnitario(precioEnPesos);
             compraComponenteDto.setId(productosCarrito.getId());
+            //if productosCarrito instance of ArmadoDto
+            //compraComponenteDto.setArmado(productoCarrito.getArmado());
             return compraComponenteDto;
         }).collect(Collectors.toList());
     }

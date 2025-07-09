@@ -29,12 +29,12 @@
                         <th scope="col">Precio</th>
                         <th scope="col">Acciones</th>
                     </tr>
+
                     </thead>
                     <tbody th:if="${productos != null and !productos.isEmpty()}">
                     <tr class="text-center" th:each="producto : ${productos}">
                         <td>  <img th:src="'http://www.imagenestaller.free.nf/' + ${producto.imagen}" style="height: 30px; width: 30px"></td>
                         <td th:text="${producto.nombre}"></td>
-<!--                        <td class="precioTotalDelProducto" th:text="'$' + ${producto.precio * producto.getCantidad()}"></td>-->
                         <td class="precioTotalDelProducto" th:text="'$' + ${producto.precioFormateado}"></td>
 
                         <td class="text-center" th:data-id="${producto.id}">

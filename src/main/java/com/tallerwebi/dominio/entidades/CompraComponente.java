@@ -26,6 +26,9 @@ public class CompraComponente {
     @Column(nullable = false)
     private Double precioUnitario;
 
+    // armado boolean
+    // numeroDeArmado para mostrar en el thymeleaf
+
     public CompraComponente() {
     }
 

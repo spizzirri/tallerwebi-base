@@ -13,6 +13,8 @@ public class ProductoCarritoDto {
     private String imagen;
     private String precioFormateado;
 
+    // private Boolean armado = false;
+
     public ProductoCarritoDto() {}
 
     public ProductoCarritoDto(Componente componente, Integer cantidad) {
