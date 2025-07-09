@@ -1,12 +1,14 @@
 package com.tallerwebi.presentacion;
 import com.tallerwebi.dominio.ServicioArmaTuPc;
 import com.tallerwebi.dominio.ServicioPrecios;
+import com.tallerwebi.dominio.ServicioProductoCarritoImpl;
 import com.tallerwebi.dominio.excepcion.ComponenteDeterminateDelArmadoEnNullException;
 import com.tallerwebi.dominio.excepcion.LimiteDeComponenteSobrepasadoEnElArmadoException;
 import com.tallerwebi.dominio.excepcion.QuitarComponenteInvalidoException;
 import com.tallerwebi.dominio.excepcion.QuitarStockDemasDeComponenteException;
 import com.tallerwebi.presentacion.dto.ArmadoPcDto;
 import com.tallerwebi.presentacion.dto.ComponenteDto;
+import com.tallerwebi.presentacion.dto.ProductoCarritoArmadoDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
@@ -33,15 +35,17 @@ public class ControladorArmaTuPcTest {
     private ComponenteDto componenteDtoMock;
     private ControladorArmaTuPc controladorArmaTuPc;
     private ServicioPrecios servicioPreciosMock;
+    private ServicioProductoCarritoImpl servicioProductoCarritoMock;
 
     @BeforeEach
     public void init() {
         servicioArmaTuPcMock = mock(ServicioArmaTuPc.class);
         servicioPreciosMock = mock(ServicioPrecios.class);
+        servicioProductoCarritoMock = mock(ServicioProductoCarritoImpl.class);
         sessionMock = mock(HttpSession.class);
         armadoPcDtoMock = mock(ArmadoPcDto.class);
         componenteDtoMock = mock(ComponenteDto.class);
-        controladorArmaTuPc = new ControladorArmaTuPc(servicioArmaTuPcMock, servicioPreciosMock);
+        controladorArmaTuPc = new ControladorArmaTuPc(servicioArmaTuPcMock, servicioPreciosMock, servicioProductoCarritoMock);
     }
 
     // Tests para obtenerArmadoPcDtoDeLaSession (Lógica interna)
@@ -428,9 +432,9 @@ public class ControladorArmaTuPcTest {
     public void alSumarArmadoAlCarritoSeAgreganLosProductosALaSessionYRedirige() {
         // Preparación
         // Mocks para los DTOs que se agregarán al carrito
-        ProductoCarritoDto producto1 = mock(ProductoCarritoDto.class);
-        ProductoCarritoDto producto2 = mock(ProductoCarritoDto.class);
-        List<ProductoCarritoDto> productosDelArmado = List.of(producto1, producto2);
+        ProductoCarritoArmadoDto producto1 = mock(ProductoCarritoArmadoDto.class);
+        ProductoCarritoArmadoDto producto2 = mock(ProductoCarritoArmadoDto.class);
+        List<ProductoCarritoArmadoDto> productosDelArmado = List.of(producto1, producto2);
 
         // Simular que ya hay un item en el carrito de la sesión
         ProductoCarritoDto productoExistente = mock(ProductoCarritoDto.class);
@@ -439,14 +443,14 @@ public class ControladorArmaTuPcTest {
 
         when(sessionMock.getAttribute("armadoPcDto")).thenReturn(armadoPcDtoMock);
         when(sessionMock.getAttribute("carritoSesion")).thenReturn(carritoActual);
-        when(servicioArmaTuPcMock.pasajeAProductoDtoParaAgregarAlCarrito(armadoPcDtoMock)).thenReturn(productosDelArmado);
+        when(servicioArmaTuPcMock.pasajeAProductoArmadoDtoParaAgregarAlCarrito(armadoPcDtoMock)).thenReturn(productosDelArmado);
 
         // Ejecución
         ModelAndView mav = controladorArmaTuPc.sumarArmadoAlCarrito(sessionMock);
 
         // Verificación
 
-        verify(servicioArmaTuPcMock, times(1)).pasajeAProductoDtoParaAgregarAlCarrito(armadoPcDtoMock);
+        verify(servicioArmaTuPcMock, times(1)).pasajeAProductoArmadoDtoParaAgregarAlCarrito(armadoPcDtoMock);
         // Verificar que la lista final en la sesión contiene todos los productos (los existentes + los nuevos)
         // El tamaño de la lista ahora debería ser 3
         assertThat(carritoActual, hasSize(3));

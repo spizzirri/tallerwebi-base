@@ -8,6 +8,7 @@ import com.tallerwebi.dominio.excepcion.QuitarStockDemasDeComponenteException;
 import com.tallerwebi.presentacion.ProductoCarritoDto;
 import com.tallerwebi.presentacion.dto.ArmadoPcDto;
 import com.tallerwebi.presentacion.dto.ComponenteDto;
+import com.tallerwebi.presentacion.dto.ProductoCarritoArmadoDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -60,16 +61,16 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
     }
 
     @Override
-    public List<ProductoCarritoDto> pasajeAProductoDtoParaAgregarAlCarrito(ArmadoPcDto armadoPcDto) {
+    public List<ProductoCarritoArmadoDto> pasajeAProductoArmadoDtoParaAgregarAlCarrito(ArmadoPcDto armadoPcDto) {
 
-        List<ProductoCarritoDto> productoCarritoDtos = new ArrayList<>();
+        List<ProductoCarritoArmadoDto> productoCarritoDtos = new ArrayList<>();
 
         Map<Long, Integer> idDeComponentesDelArmadoYCantidades = armadoPcDto.getIdYCantidadComponentes();
 
         for(Map.Entry<Long, Integer> componente : idDeComponentesDelArmadoYCantidades.entrySet()){
 
             Componente componenteEntidad = this.repositorioComponente.obtenerComponentePorId(componente.getKey());
-            ProductoCarritoDto productoCarritoDto = new ProductoCarritoDto(componenteEntidad , componente.getValue());
+            ProductoCarritoArmadoDto productoCarritoDto = new ProductoCarritoArmadoDto(componenteEntidad , componente.getValue());
             productoCarritoDtos.add(productoCarritoDto);
         }
 

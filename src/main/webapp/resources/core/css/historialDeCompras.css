@@ -1,0 +1,24 @@
+.productos-lista {
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    word-wrap: break-word;
+    word-break: break-word;
+
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.productos-lista::-webkit-scrollbar {
+    width: 6px;
+}
+
+.productos-lista::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.productos-lista::-webkit-scrollbar-thumb {
+    background: #8b8b89;
+    border-radius: 10px;
+}
