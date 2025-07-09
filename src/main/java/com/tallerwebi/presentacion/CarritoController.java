@@ -3,6 +3,7 @@ package com.tallerwebi.presentacion;
 import com.tallerwebi.dominio.ServicioDeEnviosImpl;
 import com.tallerwebi.dominio.ServicioPrecios;
 import com.tallerwebi.dominio.ServicioProductoCarritoImpl;
+import com.tallerwebi.presentacion.dto.ProductoCarritoArmadoDto;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -24,7 +25,6 @@ public class CarritoController {
         this.productoService = servicioProductoCarritoImpl;
         this.servicioDeEnvios = servicioDeEnvios;
         this.servicioPrecios = servicioPrecios;
-        servicioProductoCarritoImpl.init();
     }
 
     @GetMapping(path = "/carritoDeCompras/index")
@@ -35,13 +35,20 @@ public class CarritoController {
         this.productoService.setProductos(carritoSesion);
         List<ProductoCarritoDto> productosGuardados = this.productoService.getProductos();
 
+        List<ProductoCarritoArmadoDto> productosDeArmados = new ArrayList<>();
+        List<ProductoCarritoDto> productosFueraDeArmado = new ArrayList<>();
+
         for (ProductoCarritoDto producto : productosGuardados) {
             Double totalPorProducto = producto.getPrecio() * producto.getCantidad();
             String totalProductoFormateado = this.servicioPrecios.conversionDolarAPeso(totalPorProducto);
             producto.setPrecioFormateado(totalProductoFormateado);
+
+            if(producto instanceof ProductoCarritoArmadoDto) productosDeArmados.add((ProductoCarritoArmadoDto)producto);
+            else productosFueraDeArmado.add(producto);
         }
 
-        model.put("productos", productosGuardados);
+        model.put("productos", productosFueraDeArmado);
+        model.put("productosArmados", productosDeArmados);
 
         Double total = this.productoService.calcularValorTotalDeLosProductos();
         String totalFormateado = this.servicioPrecios.conversionDolarAPeso(total);
@@ -153,6 +160,8 @@ public class CarritoController {
     @ResponseBody
     public Map<String, Object> agregarMasCantidadDeUnProducto(@PathVariable Long id, HttpSession session) {
         Map<String, Object> response = new HashMap<>();
+
+        // agregar casos de armados
 
         List<ProductoCarritoDto> carritoSesion = obtenerCarritoDeSesion(session);
         this.productoService.setProductos(carritoSesion);

@@ -28,7 +28,7 @@ public class SesionDestruidaListener implements HttpSessionListener {
             if (ctx == null) {
                 System.out.println("ERROR: el WebApplicationContext es null");
                 try {
-                    // Pausa de 5 segundos (10,000 milisegundos)
+                    // Pausa de 5 segundos (5,000 milisegundos)
                     Thread.sleep(5000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
