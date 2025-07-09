@@ -40,6 +40,11 @@ public class ControladorArmaTuPc {
         return (ArmadoPcDto) session.getAttribute("armadoPcDto");
     }
 
+    @GetMapping("/arma-tu-pc/armaTuPc")
+    public String elegirTipoDeArmado() {
+        return "arma-tu-pc/armaTuPc";
+    }
+
     @RequestMapping(path = "arma-tu-pc/tradicional/{tipoComponente}", method = RequestMethod.GET)
     public ModelAndView cargarComponentes(@PathVariable("tipoComponente") String tipoComponente,
                                           @RequestParam(value = "q", required = false) String query,
