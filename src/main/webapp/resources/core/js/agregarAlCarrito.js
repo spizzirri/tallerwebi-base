@@ -100,6 +100,8 @@ function asignarEventosVistaCarrito() {
 
                 const idProducto = tdConId.dataset.id;
 
+                // agregar casos de armados
+
                 fetch(`/carritoDeCompras/agregarMasCantidadDeUnProducto/${idProducto}`, {
                     method: 'POST'
                 })

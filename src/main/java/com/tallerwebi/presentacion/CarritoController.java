@@ -4,13 +4,13 @@ import com.tallerwebi.dominio.ServicioCompra;
 import com.tallerwebi.dominio.ServicioDeEnviosImpl;
 import com.tallerwebi.dominio.ServicioPrecios;
 import com.tallerwebi.dominio.ServicioProductoCarritoImpl;
+import com.tallerwebi.presentacion.dto.ProductoCarritoArmadoDto;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-import java.time.LocalDate;
+
 import javax.servlet.http.HttpSession;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RestController
 public class CarritoController {
@@ -18,8 +18,6 @@ public class CarritoController {
     private final ServicioProductoCarritoImpl servicioProductoCarrito;
     private final ServicioDeEnviosImpl servicioDeEnvios;
     private final ServicioPrecios servicioPrecios;
-    private final ServicioCompra servicioCompra;
-
 
     public String codigoPostalActual;
     public EnvioDto envioActual;
@@ -28,7 +26,6 @@ public class CarritoController {
         this.servicioProductoCarrito = servicioProductoCarritoImpl;
         this.servicioDeEnvios = servicioDeEnvios;
         this.servicioPrecios = servicioPrecios;
-        this.servicioCompra = servicioCompra;
         servicioProductoCarritoImpl.init();
     }
 
@@ -40,13 +37,20 @@ public class CarritoController {
         this.servicioProductoCarrito.setProductos(carritoSesion);
         List<ProductoCarritoDto> productosGuardados = this.servicioProductoCarrito.getProductos();
 
+        List<ProductoCarritoArmadoDto> productosDeArmados = new ArrayList<>();
+        List<ProductoCarritoDto> productosFueraDeArmado = new ArrayList<>();
+
         for (ProductoCarritoDto producto : productosGuardados) {
             Double totalPorProducto = producto.getPrecio() * producto.getCantidad();
             String totalProductoFormateado = this.servicioPrecios.conversionDolarAPeso(totalPorProducto);
             producto.setPrecioFormateado(totalProductoFormateado);
+
+            if(producto instanceof ProductoCarritoArmadoDto) productosDeArmados.add((ProductoCarritoArmadoDto)producto);
+            else productosFueraDeArmado.add(producto);
         }
 
-        model.put("productos", productosGuardados);
+        model.put("productos", productosFueraDeArmado);
+        model.put("productosArmados", productosDeArmados);
 
         Double total = this.servicioProductoCarrito.calcularValorTotalDeLosProductos();
         String totalFormateado = this.servicioPrecios.conversionDolarAPeso(total);
