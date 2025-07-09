@@ -26,17 +26,21 @@ public class CompraComponente {
     @Column(nullable = false)
     private Double precioUnitario;
 
-    // armado boolean
-    // numeroDeArmado para mostrar en el thymeleaf
+    @Column(nullable = false)
+    private Boolean esArmado = false;
 
-    public CompraComponente() {
-    }
+    @Column
+    private Integer numeroDeArmado;
 
-    public CompraComponente(Compra compra, Componente componente, Integer cantidad, Double precioUnitario) {
+    public CompraComponente() {}
+
+    public CompraComponente(Compra compra, Componente componente, Integer cantidad, Double precioUnitario, Boolean esArmado, Integer numeroDeArmado) {
         this.compra = compra;
         this.componente = componente;
         this.cantidad = cantidad;
         this.precioUnitario = precioUnitario;
+        this.esArmado = esArmado;
+        this.numeroDeArmado = numeroDeArmado;
     }
 
     public Long getId() {
@@ -79,6 +83,21 @@ public class CompraComponente {
         this.precioUnitario = precioUnitario;
     }
 
+    public Boolean getEsArmado() {
+        return esArmado;
+    }
+
+    public void setEsArmado(Boolean esArmado) {
+        this.esArmado = esArmado;
+    }
+
+    public Integer getNumeroDeArmado() {
+        return numeroDeArmado;
+    }
+
+    public void setNumeroDeArmado(Integer numeroDeArmado) {
+        this.numeroDeArmado = numeroDeArmado;
+    }
 
     @Override
     public boolean equals(Object o) {

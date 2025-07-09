@@ -5,6 +5,7 @@ import com.tallerwebi.dominio.entidades.Componente;
 import com.tallerwebi.dominio.entidades.Compra;
 import com.tallerwebi.dominio.entidades.CompraComponente;
 import com.tallerwebi.presentacion.dto.ComponenteDto;
+import com.tallerwebi.presentacion.dto.ProductoCarritoArmadoDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -118,8 +119,15 @@ public class ControladorTarjetaDeCredito {
             Double precioEnPesos = this.servicioPrecios.conversionDolarAPesoDouble(productosCarrito.getPrecio() * productosCarrito.getCantidad());
             compraComponenteDto.setPrecioUnitario(precioEnPesos);
             compraComponenteDto.setId(productosCarrito.getId());
-            //if productosCarrito instance of ArmadoDto
-            //compraComponenteDto.setArmado(productoCarrito.getArmado());
+
+            if (productosCarrito instanceof ProductoCarritoArmadoDto){
+                ProductoCarritoArmadoDto productoCarritoArmadoDto =  (ProductoCarritoArmadoDto) productosCarrito;
+                compraComponenteDto.setEsArmado(true);
+                compraComponenteDto.setNumeroDeArmado(productoCarritoArmadoDto.getNumeroDeArmadoAlQuePertenece());
+            } else {
+                compraComponenteDto.setEsArmado(false);
+            }
+
             return compraComponenteDto;
         }).collect(Collectors.toList());
     }

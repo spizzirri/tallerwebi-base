@@ -28,7 +28,6 @@
                                 </span>
                             </div>
 
-
                             <div th:if="${compra.productosComprados != null && !compra.productosComprados.isEmpty()}">
                                 <h6 class="fw-bold mb-2">Productos comprados:</h6>
                                 <div class="productos-lista" style="max-height: 200px; overflow-y: auto; overflow-x: hidden; word-wrap: break-word;">
@@ -37,6 +36,7 @@
                                         <div class="row">
                                             <div class="col-8">
                                                 <small class="fw-bold text-truncate d-block" th:text="${producto.componente.nombre}"></small>
+                                                <p th:if="${producto.esArmado == true}" th:text="|Armado ${producto.numeroDeArmado}|" style="color: #1976d2"></p>
                                             </div>
                                             <div class="col-4 text-end">
                                                 <small class="text-muted">x<span th:text="${producto.cantidad}"></span></small>

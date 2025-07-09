@@ -55,7 +55,8 @@ public class ServicioCompraImpl implements ServicioCompra {
         compraComponenteEntidad.setComponente(componenteEntidad);
         compraComponenteEntidad.setCantidad(dtoComponente.getCantidad());
         compraComponenteEntidad.setPrecioUnitario(dtoComponente.getPrecioUnitario());
-        //compraComponenteEntidad.setArmado(dtoComponente.getArmado());
+        compraComponenteEntidad.setEsArmado(dtoComponente.getEsArmado());
+        compraComponenteEntidad.setNumeroDeArmado(dtoComponente.getNumeroDeArmado());
         return compraComponenteEntidad;
     }
 

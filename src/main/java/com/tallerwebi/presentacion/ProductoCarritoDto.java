@@ -41,7 +41,6 @@ public class ProductoCarritoDto {
         this.imagen = "imagen-generica.jpg";
     }
 
-
     public Long getId() {
         return id;
     }
