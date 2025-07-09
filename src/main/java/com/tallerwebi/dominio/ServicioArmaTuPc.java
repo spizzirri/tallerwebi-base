@@ -31,4 +31,6 @@ public interface ServicioArmaTuPc {
     ComponenteDto obtenerComponenteDtoPorId(Long idComponente);
 
     List<ProductoCarritoArmadoDto> pasajeAProductoArmadoDtoParaAgregarAlCarrito(ArmadoPcDto armadoPcDto);
+
+    Integer obtenerWattsTotalesDeArmado(ArmadoPcDto armadoPcDto);
 }

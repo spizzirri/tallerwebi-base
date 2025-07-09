@@ -58,6 +58,10 @@ public class ControladorArmaTuPc {
         } catch (ComponenteDeterminateDelArmadoEnNullException e) {
             model.put("errorLista", e.getMessage());
         }
+
+        Integer wattsDeArmado = this.servicioArmaTuPc.obtenerWattsTotalesDeArmado(armadoPcDto);
+
+        model.put("wattsArmado", wattsDeArmado);
         model.put("armadoPcDto", armadoPcDto);
         model.put("idsDeComponentesSeleccionados", obtenerIdsDeArmadoDeSession(armadoPcDto));
 
@@ -133,6 +137,8 @@ public class ControladorArmaTuPc {
                 this.servicioPrecios.conversionDolarAPeso(armadoPcDtoConComponenteAgregado.getPrecioTotal())
                 );
 
+        // agregar a la sesion una variable que sea reservaDeArmado o algo asi que se vayan sumando ProductoCarritoArmadoDtos
+
         session.setAttribute("armadoPcDto", armadoPcDtoConComponenteAgregado);
 
         String siguienteVista = determinarSiguienteVista(tipoComponente, armadoPcDtoConComponenteAgregado);
@@ -161,6 +167,8 @@ public class ControladorArmaTuPc {
             model.put("errorQuitado", "No es posible quitar una cantidad del componente que no posee el armado.");
             return new ModelAndView("redirect:/arma-tu-pc/tradicional/" + tipoComponente, model);
         }
+
+        // quitar de la sesion una variable que sea reservaDeArmado o algo asi que se vayan restando ProductoCarritoArmadoDtos
 
         session.setAttribute("armadoPcDto", armadoPcDtoConComponenteQuitado);
 

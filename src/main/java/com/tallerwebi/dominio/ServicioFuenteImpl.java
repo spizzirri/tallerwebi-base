@@ -14,7 +14,7 @@ public class ServicioFuenteImpl implements ServicioFuente {
         return armadoPc != null && fuenteDeAlimentacion != null && obtenerConsumoFormateado(fuenteDeAlimentacion) > obtenerWatsTotales(armadoPc); // se le puede sumar un margen
     }
 
-    private Integer obtenerWatsTotales(ArmadoPc armadoPc) {
+    public Integer obtenerWatsTotales(ArmadoPc armadoPc) {
         Integer watsTotales = 0;
 
         if(armadoPc.getProcesador() != null) watsTotales += this.obtenerConsumoFormateado(armadoPc.getProcesador());

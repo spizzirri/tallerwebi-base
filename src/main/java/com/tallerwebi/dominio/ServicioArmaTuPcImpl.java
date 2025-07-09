@@ -78,6 +78,12 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
     }
 
     @Override
+    public Integer obtenerWattsTotalesDeArmado(ArmadoPcDto armadoPcDto) {
+        ArmadoPc armadoPc = this.servicioCompatibilidades.completarEntidadArmadoPcParaEvaluarFuente(armadoPcDto.obtenerEntidad());
+        return this.servicioCompatibilidades.obtenerWattsDeArmado(armadoPc);
+    }
+
+    @Override
     public List<ComponenteDto> obtenerListaDeComponentesCompatiblesDto(String tipoComponente, ArmadoPcDto armadoPcDto) throws ComponenteDeterminateDelArmadoEnNullException {
 
         String tablaDelTipoDeComponente = this.correspondenciaDeVistaConTablasEnLaBD.get(tipoComponente);

@@ -62,6 +62,7 @@ public class ArmadoPcDto {
         this.rams = new ArrayList<>();
         this.almacenamiento = new ArrayList<>();
         this.perifericos = new ArrayList<>();
+        this.precioFormateado = "0.0";
     }
 
     private List<ComponenteDto> convertirListaDeComponentesEntidadADtos(List<? extends Componente> listaEntidades) {
