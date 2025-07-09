@@ -69,14 +69,20 @@ public class CarritoController {
         List<ProductoCarritoDto> carritoSesion = obtenerCarritoDeSesion(session);
         this.servicioProductoCarrito.setProductos(carritoSesion);
         List<ProductoCarritoDto> productos = this.servicioProductoCarrito.getProductos();
+        List<ProductoCarritoArmadoDto> productosDeArmados = new ArrayList<>();
+        List<ProductoCarritoDto> productosFueraDeArmado = new ArrayList<>();
 
         for (ProductoCarritoDto producto : productos) {
             Double totalPorProducto = producto.getPrecio() * producto.getCantidad();
             String totalProductoFormateado = this.servicioPrecios.conversionDolarAPeso(totalPorProducto);
             producto.setPrecioFormateado(totalProductoFormateado);
+
+            if(producto instanceof ProductoCarritoArmadoDto) productosDeArmados.add((ProductoCarritoArmadoDto)producto);
+            else productosFueraDeArmado.add(producto);
         }
 
-        model.put("productos", productos);
+        model.put("productos", productosFueraDeArmado);
+        model.put("productosArmados", productosDeArmados);
 
         Double total = this.servicioProductoCarrito.calcularValorTotalDeLosProductos();
         String totalFormateado = this.servicioPrecios.conversionDolarAPeso(total != null ? total : 0.0);
