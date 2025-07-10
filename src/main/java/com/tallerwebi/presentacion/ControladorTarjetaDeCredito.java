@@ -77,7 +77,7 @@ public class ControladorTarjetaDeCredito {
             hayError = true;
         }
         modelo.addAttribute("tarjeta", tarjeta);
-
+        session.setAttribute("tarjeta", tarjeta);
         if (hayError) {
             return new ModelAndView("tarjetaDeCredito", modelo);
         } else {

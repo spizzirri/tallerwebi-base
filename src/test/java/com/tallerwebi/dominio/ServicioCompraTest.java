@@ -2,6 +2,7 @@ package com.tallerwebi.dominio;
 
 import com.tallerwebi.dominio.entidades.Compra;
 import com.tallerwebi.dominio.entidades.CompraComponente;
+import com.tallerwebi.infraestructura.RepositorioComponenteImpl;
 import com.tallerwebi.presentacion.CompraComponenteDto;
 import com.tallerwebi.presentacion.CompraDto;
 import com.tallerwebi.presentacion.UsuarioDto;
@@ -30,10 +31,13 @@ public class ServicioCompraTest {
     private HttpSession session;
     private ServicioCompraImpl servicioCompraImpl;
 
+    @Mock
+    private RepositorioComponenteImpl repositorioComponente;
+
     @BeforeEach
     public void init() {
         MockitoAnnotations.openMocks(this);
-        servicioCompraImpl = new ServicioCompraImpl(repositorioCompra, repositorioUsuario);
+        servicioCompraImpl = new ServicioCompraImpl(repositorioCompra, repositorioUsuario, repositorioComponente);
         ReflectionTestUtils.setField(servicioCompraImpl, "repositorioUsuario", repositorioUsuario);
     }
 
