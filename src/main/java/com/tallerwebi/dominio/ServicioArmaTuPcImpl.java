@@ -13,10 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 // agregar transaccional
 // agregar service
@@ -83,6 +80,8 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
         return this.servicioCompatibilidades.obtenerWattsDeArmado(armadoPc);
     }
 
+
+
     @Override
     public List<ComponenteDto> obtenerListaDeComponentesCompatiblesDto(String tipoComponente, ArmadoPcDto armadoPcDto) throws ComponenteDeterminateDelArmadoEnNullException {
 
@@ -142,12 +141,19 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
         List<ComponenteDto> perifericosPrecargados = armadoPcDto.getPerifericos();
         ComponenteDto monitorPrecargado = armadoPcDto.getMonitor();
 
+
         ComponenteDto componenteSolicitadoDto = new ComponenteDto(componenteSolicitado);
         String precioFormateado = this.servicioPrecios.conversionDolarAPeso(componenteSolicitadoDto.getPrecio());
         componenteSolicitadoDto.setPrecioFormateado(precioFormateado);
 
+
         switch(tipoComponente.toLowerCase()){
-            case "procesador":
+            case "procesador":{
+
+                Map<Long, Integer> idYCantidadAEliminar = this.obtenerIdsYCantidadDeComponentesAEliminar(armadoPcDto, Set.of("procesador", "motherboard", "coolercpu", "memoriaram", "placadevideo", "almacenamiento", "fuentedealimentacion", "gabinete"));
+
+                for (Long id : idYCantidadAEliminar.keySet())
+                    this.repositorioComponente.devolverStockDeUnComponente(id, idYCantidadAEliminar.get(id));
 
                 armadoPcDto = new ArmadoPcDto();
                 armadoPcDto.setProcesador(componenteSolicitadoDto);
@@ -155,7 +161,13 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
                 armadoPcDto.setMonitor(monitorPrecargado);
 
                 break;
-            case "motherboard":
+            }
+            case "motherboard": {
+
+                Map<Long, Integer> idYCantidadAEliminar = this.obtenerIdsYCantidadDeComponentesAEliminar(armadoPcDto, Set.of("motherboard", "coolercpu", "memoriaram", "placadevideo", "almacenamiento", "fuentedealimentacion", "gabinete"));
+
+                for (Long id : idYCantidadAEliminar.keySet())
+                    this.repositorioComponente.devolverStockDeUnComponente(id, idYCantidadAEliminar.get(id));
 
                 ComponenteDto procesadorPrecargado = armadoPcDto.getProcesador();
                 armadoPcDto = new ArmadoPcDto();
@@ -165,49 +177,115 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
                 armadoPcDto.setMotherboard(componenteSolicitadoDto);
 
                 break;
-            case "cooler":
+            }
+            case "cooler": {
+
+                Map<Long, Integer> idYCantidadAEliminar = this.obtenerIdsYCantidadDeComponentesAEliminar(armadoPcDto, Set.of("coolercpu", "fuentedealimentacion", "gabinete"));
+
+                for (Long id : idYCantidadAEliminar.keySet())
+                    this.repositorioComponente.devolverStockDeUnComponente(id, idYCantidadAEliminar.get(id));
+
                 armadoPcDto.setCooler(componenteSolicitadoDto);
                 armadoPcDto.setFuente(null);
                 armadoPcDto.setGabinete(null);
 
                 break;
-            case "memoria":
+            }
+            case "memoria": {
 
-                for(int i = 0; i<cantidad;i++) armadoPcDto.getRams().add(componenteSolicitadoDto);
+                Map<Long, Integer> idYCantidadAEliminar = this.obtenerIdsYCantidadDeComponentesAEliminar(armadoPcDto, Set.of("fuentedealimentacion"));
+
+                for (Long id : idYCantidadAEliminar.keySet())
+                    this.repositorioComponente.devolverStockDeUnComponente(id, idYCantidadAEliminar.get(id));
+
+                for (int i = 0; i < cantidad; i++) armadoPcDto.getRams().add(componenteSolicitadoDto);
                 armadoPcDto.setFuente(null);
 
                 break;
-            case "gpu":
+            }
+            case "gpu": {
+
+                Map<Long, Integer> idYCantidadAEliminar = this.obtenerIdsYCantidadDeComponentesAEliminar(armadoPcDto, Set.of("gpu", "fuentedealimentacion"));
+
+                for (Long id : idYCantidadAEliminar.keySet())
+                    this.repositorioComponente.devolverStockDeUnComponente(id, idYCantidadAEliminar.get(id));
 
                 armadoPcDto.setGpu(componenteSolicitadoDto);
                 armadoPcDto.setFuente(null);
 
                 break;
-            case "almacenamiento":
+            }
+            case "almacenamiento": {
 
-                for(int i = 0; i<cantidad;i++) armadoPcDto.getAlmacenamiento().add(componenteSolicitadoDto);
+                Map<Long, Integer> idYCantidadAEliminar = this.obtenerIdsYCantidadDeComponentesAEliminar(armadoPcDto, Set.of("fuentedealimentacion"));
+
+                for (Long id : idYCantidadAEliminar.keySet())
+                    this.repositorioComponente.devolverStockDeUnComponente(id, idYCantidadAEliminar.get(id));
+
+                for (int i = 0; i < cantidad; i++) armadoPcDto.getAlmacenamiento().add(componenteSolicitadoDto);
                 armadoPcDto.setFuente(null);
 
                 break;
-            case "fuente":
+            }
+            case "fuente": {
+
+                Map<Long, Integer> idYCantidadAEliminar = this.obtenerIdsYCantidadDeComponentesAEliminar(armadoPcDto, Set.of("fuentedealimentacion"));
+
+                for (Long id : idYCantidadAEliminar.keySet())
+                    this.repositorioComponente.devolverStockDeUnComponente(id, idYCantidadAEliminar.get(id));
 
                 armadoPcDto.setFuente(componenteSolicitadoDto);
 
                 break;
-            case "gabinete":
+            }
+            case "gabinete": {
+
+                Map<Long, Integer> idYCantidadAEliminar = this.obtenerIdsYCantidadDeComponentesAEliminar(armadoPcDto, Set.of("gabinete"));
+
+                for (Long id : idYCantidadAEliminar.keySet())
+                    this.repositorioComponente.devolverStockDeUnComponente(id, idYCantidadAEliminar.get(id));
 
                 armadoPcDto.setGabinete(componenteSolicitadoDto);
 
                 break;
-            case "monitor":
+            }
+            case "monitor": {
+
+                Map<Long, Integer> idYCantidadAEliminar = this.obtenerIdsYCantidadDeComponentesAEliminar(armadoPcDto, Set.of("monitor"));
+
+                for (Long id : idYCantidadAEliminar.keySet())
+                    this.repositorioComponente.devolverStockDeUnComponente(id, idYCantidadAEliminar.get(id));
+
                 armadoPcDto.setMonitor(componenteSolicitadoDto);
                 break;
-            case "periferico":
+            }
+            case "periferico": {
                 armadoPcDto.getPerifericos().add(componenteSolicitadoDto);
                 break;
+            }
         }
 
+        // descuento el stock del componente solicitado con la cantidad
+        this.repositorioComponente.descontarStockDeUnComponente(componenteSolicitado.getId(), cantidad);
+
         return armadoPcDto;
+    }
+
+    private Map<Long, Integer> obtenerIdsYCantidadDeComponentesAEliminar(ArmadoPcDto armadoPcDto, Set<String> tiposABorrar) {
+
+        Map<Long, Integer> idYCantidadesAEliminar = new HashMap<>();
+
+        for(ComponenteDto componenteDto : armadoPcDto.getComponentesDto()){
+            if (tiposABorrar.contains(componenteDto.getTipoComponente().toLowerCase()))
+
+                if (idYCantidadesAEliminar.containsKey(componenteDto.getId()))
+                    idYCantidadesAEliminar.put(componenteDto.getId(), idYCantidadesAEliminar.get(componenteDto.getId()) + 1);
+                else
+                    idYCantidadesAEliminar.put(componenteDto.getId(), 1);
+
+        }
+
+        return idYCantidadesAEliminar;
     }
 
     @Override
@@ -219,15 +297,25 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
         ComponenteDto monitorPrecargado = armadoPcDto.getMonitor();
 
         switch(tipoComponente.toLowerCase()){
-            case "procesador":
+            case "procesador": {
+
+                Map<Long, Integer> idYCantidadAEliminar = this.obtenerIdsYCantidadDeComponentesAEliminar(armadoPcDto, Set.of("motherboard", "coolercpu", "memoriaram", "placadevideo", "almacenamiento", "fuentedealimentacion", "gabinete"));
+
+                for (Long id : idYCantidadAEliminar.keySet())
+                    this.repositorioComponente.devolverStockDeUnComponente(id, idYCantidadAEliminar.get(id));
 
                 armadoPcDto = new ArmadoPcDto();
                 armadoPcDto.setPerifericos(perifericosPrecargados);
                 armadoPcDto.setMonitor(monitorPrecargado);
 
                 break;
+            }
+            case "motherboard": {
 
-            case "motherboard":
+                Map<Long, Integer> idYCantidadAEliminar = this.obtenerIdsYCantidadDeComponentesAEliminar(armadoPcDto, Set.of("coolercpu", "memoriaram", "placadevideo", "almacenamiento", "fuentedealimentacion", "gabinete"));
+
+                for (Long id : idYCantidadAEliminar.keySet())
+                    this.repositorioComponente.devolverStockDeUnComponente(id, idYCantidadAEliminar.get(id));
 
                 ComponenteDto procesadorPrecargado = armadoPcDto.getProcesador();
                 armadoPcDto = new ArmadoPcDto();
@@ -236,40 +324,74 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
                 armadoPcDto.setProcesador(procesadorPrecargado);
 
                 break;
+            }
+            case "cooler": {
 
-            case "cooler":
+                Map<Long, Integer> idYCantidadAEliminar = this.obtenerIdsYCantidadDeComponentesAEliminar(armadoPcDto, Set.of("fuentedealimentacion", "gabinete"));
+
+                for (Long id : idYCantidadAEliminar.keySet())
+                    this.repositorioComponente.devolverStockDeUnComponente(id, idYCantidadAEliminar.get(id));
 
                 armadoPcDto.setCooler(null);
                 armadoPcDto.setFuente(null);
                 armadoPcDto.setGabinete(null);
 
                 break;
-            case "memoria":
+            }
+            case "memoria": {
+
                 this.eliminarComponenteDeLaListaDeDtosPorId(armadoPcDto.getRams(), idComponente, cantidad);
+
+                Map<Long, Integer> idYCantidadAEliminar = this.obtenerIdsYCantidadDeComponentesAEliminar(armadoPcDto, Set.of("fuentedealimentacion"));
+
+                for (Long id : idYCantidadAEliminar.keySet())
+                    this.repositorioComponente.devolverStockDeUnComponente(id, idYCantidadAEliminar.get(id));
+
                 armadoPcDto.setFuente(null);
                 break;
-            case "gpu":
+            }
+            case "gpu": {
+
+                Map<Long, Integer> idYCantidadAEliminar = this.obtenerIdsYCantidadDeComponentesAEliminar(armadoPcDto, Set.of("fuentedealimentacion"));
+
+                for (Long id : idYCantidadAEliminar.keySet())
+                    this.repositorioComponente.devolverStockDeUnComponente(id, idYCantidadAEliminar.get(id));
+
                 armadoPcDto.setGpu(null);
                 armadoPcDto.setFuente(null);
                 break;
-            case "almacenamiento":
+            }
+            case "almacenamiento": {
                 this.eliminarComponenteDeLaListaDeDtosPorId(armadoPcDto.getAlmacenamiento(), idComponente, cantidad);
+
+                Map<Long, Integer> idYCantidadAEliminar = this.obtenerIdsYCantidadDeComponentesAEliminar(armadoPcDto, Set.of("fuentedealimentacion"));
+
+                for (Long id : idYCantidadAEliminar.keySet())
+                    this.repositorioComponente.devolverStockDeUnComponente(id, idYCantidadAEliminar.get(id));
+
                 armadoPcDto.setFuente(null);
                 break;
-            case "fuente":
+            }
+            case "fuente": {
                 armadoPcDto.setFuente(null);
                 break;
-            case "gabinete":
+            }
+            case "gabinete": {
                 armadoPcDto.setGabinete(null);
                 break;
-            case "monitor":
+            }
+            case "monitor": {
                 armadoPcDto.setMonitor(null);
                 break;
-            case "periferico":
+            }
+            case "periferico": {
                 this.eliminarComponenteDeLaListaDeDtosPorId(armadoPcDto.getPerifericos(), idComponente, cantidad);
                 break;
-
+            }
         }
+
+        // descuento el stock del componente que quito
+        this.repositorioComponente.devolverStockDeUnComponente(idComponente, cantidad);
 
         return armadoPcDto;
     }

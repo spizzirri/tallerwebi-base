@@ -137,7 +137,7 @@ public class ControladorArmaTuPc {
                 this.servicioPrecios.conversionDolarAPeso(armadoPcDtoConComponenteAgregado.getPrecioTotal())
                 );
 
-        // agregar a la sesion una variable que sea reservaDeArmado o algo asi que se vayan sumando ProductoCarritoArmadoDtos
+        session.setAttribute("reservaArmado", this.servicioArmaTuPc.pasajeAProductoArmadoDtoParaAgregarAlCarrito(armadoPcDtoConComponenteAgregado));
 
         session.setAttribute("armadoPcDto", armadoPcDtoConComponenteAgregado);
 
@@ -149,6 +149,7 @@ public class ControladorArmaTuPc {
 
         return new ModelAndView("redirect:/arma-tu-pc/tradicional/" + siguienteVista, model);
     }
+
 
     public ModelAndView quitarComponenteDelArmado(@PathVariable("tipoComponente")String tipoComponente,
                                                   @RequestParam("id") Long idComponente,
@@ -168,7 +169,7 @@ public class ControladorArmaTuPc {
             return new ModelAndView("redirect:/arma-tu-pc/tradicional/" + tipoComponente, model);
         }
 
-        // quitar de la sesion una variable que sea reservaDeArmado o algo asi que se vayan restando ProductoCarritoArmadoDtos
+        session.setAttribute("reservaArmado", this.servicioArmaTuPc.pasajeAProductoArmadoDtoParaAgregarAlCarrito(armadoPcDtoConComponenteQuitado));
 
         session.setAttribute("armadoPcDto", armadoPcDtoConComponenteQuitado);
 
@@ -215,7 +216,7 @@ public class ControladorArmaTuPc {
             carritoSesion = new ArrayList<>();
         }
 
-        List<ProductoCarritoArmadoDto> productoCarritoArmadoDtos = servicioArmaTuPc.pasajeAProductoArmadoDtoParaAgregarAlCarrito(obtenerArmadoPcDtoDeLaSession(session));
+        List<ProductoCarritoArmadoDto> productoCarritoArmadoDtos = this.obtenerReservaArmadoDeLaSession(session);
 
         Integer numeroDeUltimoArmadoEnElCarrito = obtenerElNumeroDelUltimoArmadoDelCarritoDeSesion(carritoSesion);
 
@@ -226,9 +227,18 @@ public class ControladorArmaTuPc {
 
         carritoSesion.addAll(productoCarritoArmadoDtos);
 
-        // controlar el stock con servicio ServicioProductoCarritoImpl
+        session.removeAttribute("armadoPcDto");
+        session.removeAttribute("reservaArmado");
 
         return new ModelAndView("redirect:/carritoDeCompras/index");
+    }
+
+    private List<ProductoCarritoArmadoDto> obtenerReservaArmadoDeLaSession(HttpSession session) {
+
+        return (session.getAttribute("reservaArmado") != null)
+                ? (List<ProductoCarritoArmadoDto>)session.getAttribute("reservaArmado")
+                : new ArrayList<>();
+
     }
 
     private Integer obtenerElNumeroDelUltimoArmadoDelCarritoDeSesion(List<ProductoCarritoDto> carritoSesion) {
