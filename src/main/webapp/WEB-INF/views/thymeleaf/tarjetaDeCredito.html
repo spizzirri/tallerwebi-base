@@ -70,6 +70,7 @@
     </div>
 
     <form class="tarjeta-form" method="post" th:action="@{/tarjetaDeCredito/validar}">
+        <input type="hidden" name="metodoDePago" value="tarjetaCredito">
         <label for="numeroTarjeta">Número de tarjeta</label>
         <input type="number" id="numeroTarjeta" name="numeroTarjeta" maxlength="19" placeholder="1234 1234 1234 1234" autocomplete="cc-number" required />
         <p th:if="${mensajeTarjeta != null}" class="alert alert-danger" th:text="'Error ' + ${mensajeTarjeta}">
@@ -91,7 +92,6 @@
                 <input type="number" id="codigoSeguridad" name="codigoSeguridad" maxlength="4" placeholder="Ej.: 123" autocomplete="cc-csc" required />
                 <p th:if="${mensajeCodigo != null}" class="alert alert-danger" th:text="'Error ' + ${mensajeCodigo}">
                 </p>
-
             </div>
         </div>
 
