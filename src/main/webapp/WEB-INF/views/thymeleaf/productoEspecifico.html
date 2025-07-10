@@ -225,7 +225,6 @@
                          style="max-height: 199px;">
                 </a>
                 <div class="row col-md-12 mt-2 d-flex justify-content-center align-items-center">
-                    <!-- Contenedor de nombre y enlace -->
                     <div class="col-md-10 d-flex align-items-center">
                         <a th:href="@{/productoEspecifico/{id}(id=${componente.id})}"
                            class="text-decoration-none w-100">
@@ -233,7 +232,6 @@
                         </a>
                     </div>
 
-                    <!-- Contenedor del botón -->
                     <div class="col-md-1 d-flex justify-content-center align-items-center">
                         <button th:onclick="|agregarAlCarrito(${componente.id}, 1)|"
                                 class="btn btn-warning btn-sm">
