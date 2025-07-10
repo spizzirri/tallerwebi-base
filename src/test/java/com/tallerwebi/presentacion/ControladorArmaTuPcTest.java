@@ -119,7 +119,7 @@ public class ControladorArmaTuPcTest {
     }
 
     @Test
-    public void cuandoSeCargaLaPaginaDeMemoriasSeAgreganLosSlotsDeLaMotherboardAlModelo() throws Exception {
+    public void cuandoSeCargaLaPaginaDeMemoriasSeAgreganLosSlotsDeLaMotherboardAlModelo(){
         // Preparación (Arrange)
         String tipoComponente = "memoria";
         when(servicioArmaTuPcMock.obtenerSlotsRamDeMotherboard(any())).thenReturn(4);
@@ -132,7 +132,7 @@ public class ControladorArmaTuPcTest {
     }
 
     @Test
-    public void cuandoSeCargaLaPaginaDeAlmacenamientoSeAgreganLosSlotsDeLaMotherboardAlModelo() throws Exception {
+    public void cuandoSeCargaLaPaginaDeAlmacenamientoSeAgreganLosSlotsDeLaMotherboardAlModelo(){
         // Preparación (Arrange)
         String tipoComponente = "almacenamiento";
         when(servicioArmaTuPcMock.obtenerSlotsSataDeMotherboard(any())).thenReturn(6);
@@ -199,7 +199,7 @@ public class ControladorArmaTuPcTest {
     //region Tests para agregarComponenteAlArmado
 
     @Test
-    public void cuandoAgregoUnComponenteYNoSePuedenAgregarMasUnidadesSeRedirigeAlSiguientePaso() throws Exception {
+    public void cuandoAgregoUnComponenteYNoSePuedenAgregarMasUnidadesSeRedirigeAlSiguientePaso() throws LimiteDeComponenteSobrepasadoEnElArmadoException, ComponenteSinStockPedidoException {
         // Preparación (Arrange)
         String tipoComponente = "procesador";
         Long idComponente = 1L;
@@ -218,7 +218,7 @@ public class ControladorArmaTuPcTest {
     }
 
     @Test
-    public void cuandoAgregoUnComponenteYSePuedenAgregarMasUnidadesSeRedirigeAlMismoPaso() throws Exception {
+    public void cuandoAgregoUnComponenteYSePuedenAgregarMasUnidadesSeRedirigeAlMismoPaso() throws LimiteDeComponenteSobrepasadoEnElArmadoException, ComponenteSinStockPedidoException {
         // Preparación (Arrange)
         String tipoComponente = "memoria";
         Long idComponente = 2L;
@@ -237,7 +237,7 @@ public class ControladorArmaTuPcTest {
     }
 
     @Test
-    public void cuandoIntentoAgregarComponenteYSeSuperaElLimiteSeMuestraError() throws Exception {
+    public void cuandoIntentoAgregarComponenteYSeSuperaElLimiteSeMuestraError() throws LimiteDeComponenteSobrepasadoEnElArmadoException, ComponenteSinStockPedidoException {
         // Preparación (Arrange)
         String tipoComponente = "memoria";
         when(servicioArmaTuPcMock.agregarComponenteAlArmado(anyLong(), anyString(), anyInt(), ArgumentMatchers.any(ArmadoPcDto.class)))
@@ -253,7 +253,7 @@ public class ControladorArmaTuPcTest {
     }
 
     @Test
-    public void cuandoIntentoAgregarComponenteSinStockSeMuestraError() throws Exception {
+    public void cuandoIntentoAgregarComponenteSinStockSeMuestraError() throws LimiteDeComponenteSobrepasadoEnElArmadoException, ComponenteSinStockPedidoException {
         // Preparación (Arrange)
         String tipoComponente = "procesador";
         String mensajeError = "No hay stock suficiente para el componente pedido";
@@ -274,7 +274,7 @@ public class ControladorArmaTuPcTest {
     //region Tests para quitarComponenteDelArmado
 
     @Test
-    public void cuandoQuitoUnComponenteExitosamenteSeRedirigeAlMismoPaso() throws Exception {
+    public void cuandoQuitoUnComponenteExitosamenteSeRedirigeAlMismoPaso() throws QuitarComponenteInvalidoException, QuitarStockDemasDeComponenteException {
         // Preparación (Arrange)
         String tipoComponente = "gpu";
         Long idComponente = 5L;
@@ -387,4 +387,42 @@ public class ControladorArmaTuPcTest {
     }
 
     //endregion
+
+    @Test
+    public void cuandoIntentoQuitarComponenteInvalidoSeMuestraError() throws QuitarComponenteInvalidoException, QuitarStockDemasDeComponenteException {
+        // Preparación
+        String tipoComponente = "gpu";
+        Long idComponente = 5L;
+        Integer cantidad = 1;
+
+        when(servicioArmaTuPcMock.quitarComponenteAlArmado(idComponente, tipoComponente, cantidad, armadoPcDtoMock))
+                .thenThrow(new QuitarComponenteInvalidoException());
+
+        // Ejecución
+        ModelAndView mav = controladorArmaTuPc.quitarComponenteDelArmado(tipoComponente, idComponente, cantidad, sessionMock);
+
+        // Verificación
+        assertThat(mav.getViewName(), equalTo("redirect:/arma-tu-pc/tradicional/" + tipoComponente));
+        assertThat(mav.getModelMap().get("errorQuitado"), equalTo("No es posible quitar un componente que no fue agregado al armado."));
+        verify(sessionMock, never()).setAttribute(eq("armadoPcDto"), any());
+    }
+
+    @Test
+    public void cuandoIntentoQuitarMasStockDelDisponibleSeMuestraError() throws QuitarComponenteInvalidoException, QuitarStockDemasDeComponenteException {
+        // Preparación
+        String tipoComponente = "gpu";
+        Long idComponente = 5L;
+        Integer cantidad = 2;
+
+        when(servicioArmaTuPcMock.quitarComponenteAlArmado(idComponente, tipoComponente, cantidad, armadoPcDtoMock))
+                .thenThrow(new QuitarStockDemasDeComponenteException());
+
+        // Ejecución
+        ModelAndView mav = controladorArmaTuPc.quitarComponenteDelArmado(tipoComponente, idComponente, cantidad, sessionMock);
+
+        // Verificación
+        assertThat(mav.getViewName(), equalTo("redirect:/arma-tu-pc/tradicional/" + tipoComponente));
+        assertThat(mav.getModelMap().get("errorQuitado"), equalTo("No es posible quitar una cantidad del componente que no posee el armado."));
+        verify(sessionMock, never()).setAttribute(eq("armadoPcDto"), any());
+    }
 }

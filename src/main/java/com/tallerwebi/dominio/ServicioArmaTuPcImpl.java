@@ -239,7 +239,7 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
             }
             case "gpu": {
 
-                Map<Long, Integer> idYCantidadAEliminar = this.obtenerIdsYCantidadDeComponentesAEliminar(armadoPcDto, Set.of("gpu", "fuentedealimentacion"));
+                Map<Long, Integer> idYCantidadAEliminar = this.obtenerIdsYCantidadDeComponentesAEliminar(armadoPcDto, Set.of("placadevideo", "fuentedealimentacion"));
 
                 for (Long id : idYCantidadAEliminar.keySet())
                     this.repositorioComponente.devolverStockDeUnComponente(id, idYCantidadAEliminar.get(id));
