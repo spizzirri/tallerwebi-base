@@ -246,11 +246,87 @@ public class ServicioArmaTuPcTest {
         });
     }
 
+    @Test
+    public void cuandoIntentoAgregarMasAlmacenamientoSATADelPermitidoLanzaExcepcion() {
+        // Preparación
+        ArmadoPcDto armado = new ArmadoPcDto();
+        Motherboard motherboard = crearMotherboard(10L, "Mother B450", 4, 2, 1); // Solo 2 slots SATA
+        armado.setMotherboard(new ComponenteDto(motherboard));
+
+        Almacenamiento sataExistente1 = crearAlmacenamiento(30L, "HDD SATA 1TB", "SATA", 10);
+        Almacenamiento sataExistente2 = crearAlmacenamiento(31L, "HDD SATA 2TB", "SATA", 10);
+        Almacenamiento sataNuevo = crearAlmacenamiento(32L, "SSD SATA 512GB", "SATA", 10);
+
+        armado.getAlmacenamiento().add(new ComponenteDto(sataExistente1));
+        armado.getAlmacenamiento().add(new ComponenteDto(sataExistente2));
+
+        when(repositorioComponenteMock.obtenerComponentePorId(10L)).thenReturn(motherboard);
+        when(repositorioComponenteMock.obtenerComponentePorId(30L)).thenReturn(sataExistente1);
+        when(repositorioComponenteMock.obtenerComponentePorId(31L)).thenReturn(sataExistente2);
+        when(repositorioComponenteMock.obtenerComponentePorId(32L)).thenReturn(sataNuevo);
+
+        // Ejecución y Verificación
+        assertThrows(LimiteDeComponenteSobrepasadoEnElArmadoException.class, () -> {
+            servicioArmaTuPc.agregarComponenteAlArmado(32L, "almacenamiento", 1, armado);
+        });
+    }
+
+    @Test
+    public void cuandoAgregoAlmacenamientoSATADentroDelLimiteNoLanzaExcepcion() {
+        // Preparación
+        ArmadoPcDto armado = new ArmadoPcDto();
+        Motherboard motherboard = crearMotherboard(10L, "Mother B450", 4, 1, 3); // 3 slots SATA disponibles
+        armado.setMotherboard(new ComponenteDto(motherboard));
+
+        Almacenamiento sataExistente1 = crearAlmacenamiento(30L, "HDD SATA 1TB", "SATA", 10);
+        Almacenamiento sataExistente2 = crearAlmacenamiento(31L, "HDD SATA 2TB", "SATA", 10);
+        Almacenamiento sataNuevo = crearAlmacenamiento(32L, "SSD SATA 512GB", "SATA", 10);
+
+        armado.getAlmacenamiento().add(new ComponenteDto(sataExistente1));
+        armado.getAlmacenamiento().add(new ComponenteDto(sataExistente2));
+
+        when(repositorioComponenteMock.obtenerComponentePorId(10L)).thenReturn(motherboard);
+        when(repositorioComponenteMock.obtenerComponentePorId(30L)).thenReturn(sataExistente1);
+        when(repositorioComponenteMock.obtenerComponentePorId(31L)).thenReturn(sataExistente2);
+        when(repositorioComponenteMock.obtenerComponentePorId(32L)).thenReturn(sataNuevo);
+
+        // Ejecución y Verificación
+        assertDoesNotThrow(() -> {
+            servicioArmaTuPc.agregarComponenteAlArmado(32L, "almacenamiento", 1, armado);
+        });
+        assertEquals(3, armado.getAlmacenamiento().size());
+    }
+
+    @Test
+    public void cuandoAgregoAlmacenamientoM2DentroDelLimiteNoLanzaExcepcion() {
+        // Preparación
+        ArmadoPcDto armado = new ArmadoPcDto();
+        Motherboard motherboard = crearMotherboard(10L, "Mother X570", 4, 2, 2); // 2 slots M.2 disponibles
+        armado.setMotherboard(new ComponenteDto(motherboard));
+
+        Almacenamiento m2Existente = crearAlmacenamiento(20L, "SSD M.2 1TB", "M2", 10);
+        Almacenamiento m2Nuevo = crearAlmacenamiento(21L, "SSD M.2 2TB", "M2", 10);
+
+        armado.getAlmacenamiento().add(new ComponenteDto(m2Existente));
+
+        when(repositorioComponenteMock.obtenerComponentePorId(10L)).thenReturn(motherboard);
+        when(repositorioComponenteMock.obtenerComponentePorId(20L)).thenReturn(m2Existente);
+        when(repositorioComponenteMock.obtenerComponentePorId(21L)).thenReturn(m2Nuevo);
+
+        // Ejecución y Verificación
+        assertDoesNotThrow(() -> {
+            servicioArmaTuPc.agregarComponenteAlArmado(21L, "almacenamiento", 1, armado);
+        });
+        assertEquals(2, armado.getAlmacenamiento().size());
+    }
+
+
+
     //endregion
 
     //region Tests para quitarComponenteAlArmado
     @Test
-    public void cuandoQuitoUnCoolerSeAnulanFuenteYGabineteYSeDevuelveStock() throws Exception {
+    public void cuandoQuitoUnCoolerSeAnulanFuenteYGabineteYSeDevuelveStock() throws QuitarComponenteInvalidoException, QuitarStockDemasDeComponenteException {
         // Preparación
         ArmadoPcDto armado = new ArmadoPcDto();
         Componente cooler = crearComponente(40L, "Cooler Master", "CoolerCPU");
@@ -275,7 +351,7 @@ public class ServicioArmaTuPcTest {
     }
 
     @Test
-    public void cuandoQuitoUnProcesadorSeDevuelveElStockDeTodosLosComponentesReseteados() throws Exception {
+    public void cuandoQuitoUnProcesadorSeDevuelveElStockDeTodosLosComponentesReseteados() throws QuitarComponenteInvalidoException, QuitarStockDemasDeComponenteException {
         // Preparación
         ArmadoPcDto armado = new ArmadoPcDto();
         Componente procesador = crearComponente(1L, "CPU", "Procesador");
@@ -335,6 +411,63 @@ public class ServicioArmaTuPcTest {
     }
 
     @Test
+    public void sePuedeAgregarMasUnidadesDevuelveTrueParaAlmacenamientoSiHaySlotsLibres() {
+        // Preparación
+        ArmadoPcDto armadoPcDto = new ArmadoPcDto();
+        Motherboard motherboard = crearMotherboard(10L, "Mother con slots", 4, 2, 1); // 2 SATA + 1 M2 = 3 slots total
+        armadoPcDto.setMotherboard(new ComponenteDto(motherboard));
+
+        // Actualmente hay 2 unidades de almacenamiento usadas
+        armadoPcDto.getAlmacenamiento().add(new ComponenteDto(crearAlmacenamiento(20L, "HDD", "SATA", 10)));
+        armadoPcDto.getAlmacenamiento().add(new ComponenteDto(crearAlmacenamiento(21L, "SSD M2", "M2", 10)));
+
+        when(repositorioComponenteMock.obtenerComponentePorId(10L)).thenReturn(motherboard);
+
+        // Ejecución y Verificación
+        assertTrue(servicioArmaTuPc.sePuedeAgregarMasUnidades("almacenamiento", armadoPcDto));
+    }
+
+    @Test
+    public void sePuedeAgregarMasUnidadesDevuelveFalseParaAlmacenamientoSiNoHaySlotsDisponibles() {
+        // Preparación
+        ArmadoPcDto armadoPcDto = new ArmadoPcDto();
+        Motherboard motherboard = crearMotherboard(10L, "Mother sin espacio", 4, 1, 1); // 1 SATA + 1 M2 = 2 slots total
+        armadoPcDto.setMotherboard(new ComponenteDto(motherboard));
+
+        armadoPcDto.getAlmacenamiento().add(new ComponenteDto(crearAlmacenamiento(20L, "HDD", "SATA", 10)));
+        armadoPcDto.getAlmacenamiento().add(new ComponenteDto(crearAlmacenamiento(21L, "SSD M2", "M2", 10)));
+
+        when(repositorioComponenteMock.obtenerComponentePorId(10L)).thenReturn(motherboard);
+
+        // Ejecución y Verificación
+        assertFalse(servicioArmaTuPc.sePuedeAgregarMasUnidades("almacenamiento", armadoPcDto));
+    }
+
+    @Test
+    public void sePuedeAgregarMasUnidadesDevuelveTrueParaPerifericoSiHayMenosDe10() {
+        // Preparación
+        ArmadoPcDto armadoPcDto = new ArmadoPcDto();
+        for (int i = 0; i < 9; i++) {
+            armadoPcDto.getPerifericos().add(new ComponenteDto(crearComponente((long) i, "Periférico " + i, "Periferico")));
+        }
+
+        // Ejecución y Verificación
+        assertTrue(servicioArmaTuPc.sePuedeAgregarMasUnidades("periferico", armadoPcDto));
+    }
+
+    @Test
+    public void sePuedeAgregarMasUnidadesDevuelveFalseParaPerifericoSiYaHay10() {
+        // Preparación
+        ArmadoPcDto armadoPcDto = new ArmadoPcDto();
+        for (int i = 0; i < 10; i++) {
+            armadoPcDto.getPerifericos().add(new ComponenteDto(crearComponente((long) i, "Periférico " + i, "Periferico")));
+        }
+
+        // Ejecución y Verificación
+        assertFalse(servicioArmaTuPc.sePuedeAgregarMasUnidades("periferico", armadoPcDto));
+    }
+
+    @Test
     public void sePuedeAgregarMasUnidadesDevuelveFalseParaComponentesUnicosComoProcesador() {
         // Preparación
         ArmadoPcDto armadoPcDto = new ArmadoPcDto();
@@ -355,6 +488,16 @@ public class ServicioArmaTuPcTest {
 
         // Ejecución y Verificación
         assertTrue(servicioArmaTuPc.armadoCompleto(armadoPcDto));
+    }
+
+    @Test
+    public void armadoCompletoDevuelveFalseCuandoTieneLosComponentesEsenciales() {
+        // Preparación
+        ArmadoPcDto armadoPcDto = new ArmadoPcDto();
+        armadoPcDto.setGabinete(new ComponenteDto());
+
+        // Ejecución y Verificación
+        assertFalse(servicioArmaTuPc.armadoCompleto(armadoPcDto));
     }
 
     @Test
