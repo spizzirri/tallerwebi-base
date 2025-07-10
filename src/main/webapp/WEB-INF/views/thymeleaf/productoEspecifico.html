@@ -72,6 +72,8 @@
             </div>
         </div>
         <br><br>
+
+
         <div class="container">
             <div class="row row-cols-2">
                 <div class="col" th:each="caracteristicas : ${componenteEspecificoDto.getCaracteristicas()}">
@@ -87,6 +89,151 @@
                 </div>
             </div>
         </div>
+
+
+
+<style>
+    .comparativa-flex {
+        display: flex;
+        gap: 1.5rem;
+        align-items: flex-start;
+    }
+    .articulo-fijo {
+        min-width: 500px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px #0001;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        flex-shrink: 0;
+    }
+
+    .centrado-superior {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    .carrousel-comparativa {
+        display: flex;
+        overflow-x: auto;
+        gap: 1.5rem;
+        padding-bottom: 1rem;
+        flex: 1;
+    }
+    .carrousel-item {
+        min-width: 500px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px #0001;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        flex-shrink: 0;
+    }
+    .etiqueta-articulo {
+        background:#198754 ;
+        color: #fff;
+        border-radius: 4px;
+        padding: 2px 8px;
+        font-size: 0.9em;
+        margin-bottom: 0.5em;
+        display: inline-block;
+    }
+
+    .etiqueta-recomendacion {
+        background:#011aff;
+        color: #fff;
+        border-radius: 4px;
+        padding: 2px 8px;
+        font-size: 0.9em;
+        margin-bottom: 0.5em;
+        display: inline-block;
+    }
+     .centrado-superior {
+         display: flex;
+         flex-direction: column;
+         align-items: center;
+         text-align: center;
+     }
+
+
+.carrousel-comparativa::-webkit-scrollbar {
+        height: 8px;
+    }
+    .carrousel-comparativa::-webkit-scrollbar-thumb {
+        background: #ddd;
+        border-radius: 4px;
+    }
+
+</style>
+
+<div class="mx-5">
+    <h1>Comparar con productos similares</h1>
+
+    <div class="comparativa-flex">
+        <div class="articulo-fijo">
+            <div class="centrado-superior">
+                <div class="etiqueta-articulo">Este artículo</div>
+                <img th:src="'http://www.imagenestaller.free.nf/' + ${componenteEspecificoDto.imagenes[0]}"
+                     class="img-fluid img-thumbnail"
+                     alt="Imagen principal"
+                     style="max-height: 199px;">
+            </div>
+
+            <h5 class="mb-2 text-center" th:text="${componenteEspecificoDto.nombre}"></h5>
+
+            <div class="col" th:each="caracteristicas : ${componentesEspecifico[0].caracteristicas}">
+                <table class="table table-striped table-borderless mt-3">
+                    <thead>
+                    <th th:text="${caracteristicas.getKey()}" style="border-bottom: 1px solid red"></th>
+                    </thead>
+                    <tr class="row m-0" th:each="subCaracteristicas : ${caracteristicas.getValue()}">
+                        <td class="col-md-7" th:text="${subCaracteristicas.getKey()}"></td>
+                        <td class="col-md-5 text-end" th:text="${#objects.nullSafe(subCaracteristicas.getValue(), '-')}"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+
+        <div class="carrousel-comparativa">
+            <div th:each="componente, iterStat : ${componentesEspecifico}"
+                 th:if="${iterStat.index > 0}"
+                 class="carrousel-item">
+                 <a th:href="@{/productoEspecifico/{id}(id=${componente.id})}"   class="centrado-superior text-decoration-none">
+                    <div class="etiqueta-recomendacion">Recomendación</div>
+                    <img th:src="'http://www.imagenestaller.free.nf/' + ${componente.imagenes[0]}"
+                         class="img-fluid img-thumbnail"
+                         alt="Imagen principal"
+                         style="max-height: 199px;">
+                     <div class="d-flex justify-content-center align-items-center gap-2 mb-2">
+                         <h5 class="mb-2 text-center" th:text="${componente.nombre}"></h5>
+                         <button th:onclick="|agregarAlCarrito(${componente.id}, 1)|"
+                                 class="btn btn-warning btn-sm">
+                             <i class="bi bi-cart3 fs-4"></i>
+                         </button>
+                     </div>
+
+                 </a>
+                <div class="col" th:each="caracteristicas : ${componente.caracteristicas}">
+                    <table class="table table-striped table-borderless mt-3">
+                        <thead>
+                        <th th:text="${caracteristicas.getKey()}" style="border-bottom: 1px solid red"></th>
+                        </thead>
+                        <tr class="row m-2" th:each="subCaracteristicas : ${caracteristicas.getValue()}">
+                            <td class="col-md-7" th:text="${subCaracteristicas.getKey()}"></td>
+                            <td class="col-md-5 text-end" th:text="${#objects.nullSafe(subCaracteristicas.getValue(), '-')}"></td>
+                        </tr>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
         <footer th:replace="fragments/fragments :: footer"></footer>
         <!-- Modal -->
         <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -119,13 +266,3 @@
                 </div>
             </div>
         </div>
-<!--        <script th:src="@{/js/productoEspecifico.js}"></script>-->
-<!--        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>-->
-<!--        <script type="text/javascript" th:src="@{webjars/bootstrap/5.2.0/js/bootstrap.min.js}"></script>-->
-<!--        <script type="text/javascript" th:src="@{/js/main.js}"></script>-->
-<!--        <script type="text/javascript" th:src="@{/js/agregarAlCarrito.js}"></script>-->
-<!--        <script th:src="@{/webjars/bootstrap/5.2.0/js/bootstrap.bundle.min.js}"></script>-->
-<!--        <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>-->
-<!--        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>-->
-<!--    </body>-->
-<!--</html>-->
