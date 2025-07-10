@@ -2,6 +2,8 @@ package com.tallerwebi.dominio;
 
 import com.tallerwebi.dominio.entidades.Compra;
 import com.tallerwebi.dominio.entidades.CompraComponente;
+import com.tallerwebi.dominio.entidades.Componente;
+import com.tallerwebi.dominio.entidades.Imagen;
 import com.tallerwebi.infraestructura.RepositorioComponenteImpl;
 import com.tallerwebi.presentacion.CompraComponenteDto;
 import com.tallerwebi.presentacion.CompraDto;
@@ -23,25 +25,21 @@ import static org.mockito.Mockito.*;
 
 public class ServicioCompraTest {
 
-
     @Mock
     private RepositorioUsuario repositorioUsuario;
     @Mock
     private RepositorioCompra repositorioCompra;
+    @Mock
     private HttpSession session;
-    private ServicioCompraImpl servicioCompra;
-
-
     @Mock
     private RepositorioComponenteImpl repositorioComponente;
+
+    private ServicioCompraImpl servicioCompra;
 
     @BeforeEach
     public void init() {
         MockitoAnnotations.openMocks(this);
-
         servicioCompra = new ServicioCompraImpl(repositorioCompra, repositorioUsuario, repositorioComponente);
-//        ReflectionTestUtils.setField(servicioCompraImpl, "repositorioUsuario", repositorioUsuario);
-
     }
 
     @Test
@@ -50,15 +48,18 @@ public class ServicioCompraTest {
         Usuario usuario = crearUsuario(1L, "test@example.com");
         CompraDto compraDto = crearCompraDto(200.0, "tarjetaCredito", crearProducto(10L, 2, 100.0));
 
+        Componente componenteMock = crearComponenteConImagenes(10L, "url-imagen.jpg");
+
         when(repositorioUsuario.buscarUsuario("test@example.com")).thenReturn(usuario);
+        when(repositorioComponente.obtenerComponentePorId(10L)).thenReturn(componenteMock);
+        when(session.getAttribute("cp")).thenReturn("1440");
 
-
-        servicioCompra.guardarCompraConUsuarioLogueado(compraDto, usuarioDto,session);
+        servicioCompra.guardarCompraConUsuarioLogueado(compraDto, usuarioDto, session);
 
         verify(repositorioUsuario).buscarUsuario("test@example.com");
         verify(repositorioCompra).guardarCompraDeUsuario(any(Compra.class));
         verify(repositorioCompra).guardarComonentesEnCompraComponente(any(CompraComponente.class));
-
+        verify(repositorioComponente).obtenerComponentePorId(10L);
     }
 
     @Test
@@ -69,11 +70,19 @@ public class ServicioCompraTest {
                 crearProducto(10L, 2, 100.0),
                 crearProducto(20L, 1, 50.0));
 
-        when(repositorioUsuario.buscarUsuario("test@example.com")).thenReturn(usuario);
+        Componente componente1 = crearComponenteConImagenes(10L, "url1.jpg");
+        Componente componente2 = crearComponenteConImagenes(20L, "url2.jpg");
 
-        servicioCompra.guardarCompraConUsuarioLogueado(compraDto, usuarioDto,session);
+        when(repositorioUsuario.buscarUsuario("test@example.com")).thenReturn(usuario);
+        when(repositorioComponente.obtenerComponentePorId(10L)).thenReturn(componente1);
+        when(repositorioComponente.obtenerComponentePorId(20L)).thenReturn(componente2);
+        when(session.getAttribute("cp")).thenReturn("1440");
+
+        servicioCompra.guardarCompraConUsuarioLogueado(compraDto, usuarioDto, session);
 
         verify(repositorioCompra, times(2)).guardarComonentesEnCompraComponente(any(CompraComponente.class));
+        verify(repositorioComponente).obtenerComponentePorId(10L);
+        verify(repositorioComponente).obtenerComponentePorId(20L);
     }
 
     @Test
@@ -83,16 +92,114 @@ public class ServicioCompraTest {
         CompraComponenteDto producto = crearProductoSinComponenteDto(15L, 1, 75.0);
         CompraDto compraDto = crearCompraDto(75.0, "tarjetaCredito", producto);
 
-        when(repositorioUsuario.buscarUsuario("test@example.com")).thenReturn(usuario);
+        Componente componenteMock = crearComponenteConImagenes(15L, "url-imagen.jpg");
 
-        servicioCompra.guardarCompraConUsuarioLogueado(compraDto, usuarioDto,session);
+        when(repositorioUsuario.buscarUsuario("test@example.com")).thenReturn(usuario);
+        when(repositorioComponente.obtenerComponentePorId(15L)).thenReturn(componenteMock);
+        when(session.getAttribute("cp")).thenReturn("1440");
+
+        servicioCompra.guardarCompraConUsuarioLogueado(compraDto, usuarioDto, session);
 
         ArgumentCaptor<CompraComponente> captor = ArgumentCaptor.forClass(CompraComponente.class);
         verify(repositorioCompra).guardarComonentesEnCompraComponente(captor.capture());
         assertEquals(15L, captor.getValue().getComponente().getId());
+        verify(repositorioComponente).obtenerComponentePorId(15L);
     }
 
-    //obtenerCompraComponenteDeUnUsuarioLogueado
+    @Test
+    public void deberiaGuardarCompraConCpDeSesion() {
+        UsuarioDto usuarioDto = crearUsuarioDto("test@example.com");
+        Usuario usuario = crearUsuario(1L, "test@example.com");
+        CompraDto compraDto = crearCompraDto(200.0, "tarjetaCredito", crearProducto(10L, 2, 100.0));
+
+        Componente componenteMock = crearComponenteConImagenes(10L, "url-imagen.jpg");
+
+        when(repositorioUsuario.buscarUsuario("test@example.com")).thenReturn(usuario);
+        when(repositorioComponente.obtenerComponentePorId(10L)).thenReturn(componenteMock);
+        when(session.getAttribute("cp")).thenReturn("5000"); // CP diferente
+
+        servicioCompra.guardarCompraConUsuarioLogueado(compraDto, usuarioDto, session);
+
+        ArgumentCaptor<Compra> compraCaptor = ArgumentCaptor.forClass(Compra.class);
+        verify(repositorioCompra).guardarCompraDeUsuario(compraCaptor.capture());
+
+        verify(session).getAttribute("cp");
+    }
+
+    @Test
+    public void deberiaUsarCpPorDefectoSiNoHayEnSesion() {
+        UsuarioDto usuarioDto = crearUsuarioDto("test@example.com");
+        Usuario usuario = crearUsuario(1L, "test@example.com");
+        CompraDto compraDto = crearCompraDto(200.0, "tarjetaCredito", crearProducto(10L, 2, 100.0));
+
+        Componente componenteMock = crearComponenteConImagenes(10L, "url-imagen.jpg");
+
+        when(repositorioUsuario.buscarUsuario("test@example.com")).thenReturn(usuario);
+        when(repositorioComponente.obtenerComponentePorId(10L)).thenReturn(componenteMock);
+        when(session.getAttribute("cp")).thenReturn(null); // No hay CP en sesión
+
+        servicioCompra.guardarCompraConUsuarioLogueado(compraDto, usuarioDto, session);
+
+        verify(repositorioCompra).guardarCompraDeUsuario(any(Compra.class));
+        verify(session).getAttribute("cp");
+    }
+
+    @Test
+    public void deberiaSetearUrlImagenDeComponente() {
+        UsuarioDto usuarioDto = crearUsuarioDto("test@example.com");
+        Usuario usuario = crearUsuario(1L, "test@example.com");
+        CompraDto compraDto = crearCompraDto(200.0, "tarjetaCredito", crearProducto(10L, 2, 100.0));
+
+        Componente componenteMock = crearComponenteConImagenes(10L, "url-imagen-test.jpg");
+
+        when(repositorioUsuario.buscarUsuario("test@example.com")).thenReturn(usuario);
+        when(repositorioComponente.obtenerComponentePorId(10L)).thenReturn(componenteMock);
+        when(session.getAttribute("cp")).thenReturn("1440");
+
+        servicioCompra.guardarCompraConUsuarioLogueado(compraDto, usuarioDto, session);
+
+        ArgumentCaptor<CompraComponente> captor = ArgumentCaptor.forClass(CompraComponente.class);
+        verify(repositorioCompra).guardarComonentesEnCompraComponente(captor.capture());
+        assertEquals("url-imagen-test.jpg", captor.getValue().getUrlImagen());
+    }
+
+    @Test
+    public void deberiaSetearUrlImagenVaciaSiNoHayImagenes() {
+        UsuarioDto usuarioDto = crearUsuarioDto("test@example.com");
+        Usuario usuario = crearUsuario(1L, "test@example.com");
+        CompraDto compraDto = crearCompraDto(200.0, "tarjetaCredito", crearProducto(10L, 2, 100.0));
+
+        Componente componenteMock = crearComponenteSinImagenes(10L);
+
+        when(repositorioUsuario.buscarUsuario("test@example.com")).thenReturn(usuario);
+        when(repositorioComponente.obtenerComponentePorId(10L)).thenReturn(componenteMock);
+        when(session.getAttribute("cp")).thenReturn("1440");
+
+        servicioCompra.guardarCompraConUsuarioLogueado(compraDto, usuarioDto, session);
+
+        ArgumentCaptor<CompraComponente> captor = ArgumentCaptor.forClass(CompraComponente.class);
+        verify(repositorioCompra).guardarComonentesEnCompraComponente(captor.capture());
+        assertEquals("", captor.getValue().getUrlImagen());
+    }
+
+    @Test
+    public void deberiaCrearNuevoComponenteSiNoExisteEnRepositorio() {
+        UsuarioDto usuarioDto = crearUsuarioDto("test@example.com");
+        Usuario usuario = crearUsuario(1L, "test@example.com");
+        CompraDto compraDto = crearCompraDto(200.0, "tarjetaCredito", crearProducto(999L, 2, 100.0));
+
+        when(repositorioUsuario.buscarUsuario("test@example.com")).thenReturn(usuario);
+        when(repositorioComponente.obtenerComponentePorId(999L)).thenReturn(null); // No existe
+        when(session.getAttribute("cp")).thenReturn("1440");
+
+        servicioCompra.guardarCompraConUsuarioLogueado(compraDto, usuarioDto, session);
+
+        ArgumentCaptor<CompraComponente> captor = ArgumentCaptor.forClass(CompraComponente.class);
+        verify(repositorioCompra).guardarComonentesEnCompraComponente(captor.capture());
+        assertEquals(999L, captor.getValue().getComponente().getId());
+        assertEquals("", captor.getValue().getUrlImagen()); // Sin imagen porque es nuevo
+    }
+
     @Test
     public void deberiaObtenerComprasDeUsuario() {
         UsuarioDto usuarioDto = crearUsuarioDto("test@example.com");
@@ -105,7 +212,18 @@ public class ServicioCompraTest {
         verify(repositorioCompra).obtenerCompraDeUsuarioLogueado(usuarioDto);
     }
 
-    //metodos internos
+    @Test
+    public void deberiaObtenerUltimaCompraDeUsuario() {
+        UsuarioDto usuarioDto = crearUsuarioDto("test@example.com");
+        Compra compraEsperada = new Compra();
+        when(repositorioCompra.obtenerUltimaCompraDeUsuarioLogueado(usuarioDto)).thenReturn(compraEsperada);
+
+        Compra resultado = servicioCompra.obtenerUltimaCompraComponenteDeUnUsuarioLogueado(usuarioDto);
+
+        assertEquals(compraEsperada, resultado);
+        verify(repositorioCompra).obtenerUltimaCompraDeUsuarioLogueado(usuarioDto);
+    }
+
     private UsuarioDto crearUsuarioDto(String email) {
         UsuarioDto usuario = new UsuarioDto();
         usuario.setEmail(email);
@@ -124,6 +242,7 @@ public class ServicioCompraTest {
         compra.setFecha(LocalDate.now());
         compra.setTotal(total);
         compra.setMetodoDePago(metodoPago);
+        compra.setCp("1440"); // CP por defecto
         compra.setProductosComprados(Arrays.asList(productos));
         return compra;
     }
@@ -137,6 +256,8 @@ public class ServicioCompraTest {
         producto.setCantidad(cantidad);
         producto.setPrecioUnitario(precio);
         producto.setComponente(componenteDto);
+        producto.setEsArmado(false);
+        producto.setNumeroDeArmado(null);
         return producto;
     }
 
@@ -146,6 +267,26 @@ public class ServicioCompraTest {
         producto.setCantidad(cantidad);
         producto.setPrecioUnitario(precio);
         producto.setComponente(null);
+        producto.setEsArmado(false);
+        producto.setNumeroDeArmado(null);
         return producto;
+    }
+
+    private Componente crearComponenteConImagenes(Long id, String urlImagen) {
+        Componente componente = new Componente();
+        componente.setId(id);
+
+        Imagen imagen = new Imagen();
+        imagen.setUrlImagen(urlImagen);
+
+        componente.setImagenes(Arrays.asList(imagen));
+        return componente;
+    }
+
+    private Componente crearComponenteSinImagenes(Long id) {
+        Componente componente = new Componente();
+        componente.setId(id);
+        componente.setImagenes(Arrays.asList()); // Lista vacía
+        return componente;
     }
 }
