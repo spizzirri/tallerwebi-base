@@ -15,9 +15,9 @@ import java.util.*;
 @RestController
 public class CarritoController {
 
-    private final ServicioProductoCarritoImpl servicioProductoCarrito;
-    private final ServicioDeEnviosImpl servicioDeEnvios;
-    private final ServicioPrecios servicioPrecios;
+    private ServicioProductoCarritoImpl servicioProductoCarrito;
+    private ServicioDeEnviosImpl servicioDeEnvios;
+    private ServicioPrecios servicioPrecios;
 
     public String codigoPostalActual;
     public EnvioDto envioActual;
@@ -291,6 +291,13 @@ public class CarritoController {
         Map<String, Object> response = new HashMap<>();
         // para obtener el usuario que esta logueado
         UsuarioDto usuarioLogueado = (UsuarioDto) session.getAttribute("usuario");
+        List<ProductoCarritoDto> carritoSesion = obtenerCarritoDeSesion(session);
+
+        if( carritoSesion == null || carritoSesion.isEmpty()) {
+            response.put("success", false);
+            response.put("error", "No hay productos en el carrito");
+            return response;
+        }
 
         if (metodoDePago == null || metodoDePago.isEmpty()) {
             response.put("success", false);

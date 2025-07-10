@@ -123,4 +123,42 @@ public class ServicioFuenteTest {
         Boolean resultado = servicio.verificarCompatibilidadDeFuenteConWatsDelArmado(new FuenteDeAlimentacion(), armado);
         assertFalse(resultado);
     }
+
+    @Test
+    public void debeCalcularCorrectamenteLosWattsTotalesDelArmado() {
+        Procesador cpu = new Procesador();
+        cpu.setConsumo("65 W");
+
+        PlacaDeVideo gpu = new PlacaDeVideo();
+        gpu.setConsumo("150 W");
+
+        CoolerCPU cooler = new CoolerCPU();
+        cooler.setConsumo("20 W");
+
+        Motherboard mother = new Motherboard();
+        mother.setConsumo("40 W");
+
+        Gabinete gabinete = new Gabinete(); // 10W hardcodeado
+
+        Almacenamiento ssd = new Almacenamiento();
+        ssd.setConsumo("10 W");
+        Almacenamiento hdd = new Almacenamiento();
+        hdd.setConsumo("15 W");
+
+        MemoriaRAM ram1 = new MemoriaRAM(); // 5W hardcodeado
+        MemoriaRAM ram2 = new MemoriaRAM(); // 5W hardcodeado
+
+        ArmadoPc armado = new ArmadoPc();
+        armado.setProcesador(cpu);         // 65
+        armado.setPlacaDeVideo(gpu);       // 150
+        armado.setCoolerCPU(cooler);       // 20
+        armado.setMotherboard(mother);     // 40
+        armado.setGabinete(gabinete);      // 10
+        armado.setAlmacenamiento(List.of(ssd, hdd)); // 25
+        armado.setMemoriaRAM(List.of(ram1, ram2));   // 10
+
+        Integer watsTotales = servicio.obtenerWatsTotales(armado);
+
+        assertEquals(320, watsTotales); // 65 + 150 + 20 + 40 + 10 + 25 + 10 = 320
+    }
 }

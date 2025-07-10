@@ -10,7 +10,9 @@ public class ProductoCarritoArmadoDto extends ProductoCarritoDto {
 
     public ProductoCarritoArmadoDto() {}
 
-    public ProductoCarritoArmadoDto(Long id, String nombre, Double precio, Integer cantidad) {}
+    public ProductoCarritoArmadoDto(Long id, String nombre, Double precio, Integer cantidad) {
+    super(id, nombre, precio, cantidad);
+    }
 
     public ProductoCarritoArmadoDto(Componente componente, Integer cantidad) {
         super(componente, cantidad);

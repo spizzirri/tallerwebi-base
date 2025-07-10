@@ -25,10 +25,10 @@ import java.util.stream.Collectors;
 public class ControllerMercadoPago {
 
     //ServicioProductoCarrito sabe los productos que estan en el carrito
-    private final ServicioProductoCarritoImpl servicioProductoCarritoImpl;
-    private final ServicioPrecios servicioPrecios;
-    private final ServicioProductoCarritoImpl servicioProductoCarrito;
-    private final ServicioCompra servicioCompra;
+    private ServicioProductoCarritoImpl servicioProductoCarritoImpl;
+    private ServicioPrecios servicioPrecios;
+    private ServicioProductoCarritoImpl servicioProductoCarrito;
+    private ServicioCompra servicioCompra;
 
     public ControllerMercadoPago(ServicioProductoCarritoImpl servicioProductoCarritoImpl, ServicioPrecios servicioPrecios, ServicioProductoCarritoImpl servicioProductoCarrito, ServicioCompra servicioCompra) {
         this.servicioProductoCarritoImpl = servicioProductoCarritoImpl;

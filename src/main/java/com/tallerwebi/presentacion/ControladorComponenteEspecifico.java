@@ -33,6 +33,7 @@ public class ControladorComponenteEspecifico {
 
         ModelMap model = new ModelMap();
 
+        model.put("componentesEspecifico", servicioProductoEspecifico.obtenerComponentesAcomparar(id));
         model.put("componenteEspecificoDto", componenteEspecificoDto);
         model.put("precioFormateado", servicioPrecios.obtenerPrecioFormateado(componenteEspecificoDto.getPrecio()));
         model.put("precioEnPesos", servicioPrecios.conversionDolarAPeso(componenteEspecificoDto.getPrecio()));

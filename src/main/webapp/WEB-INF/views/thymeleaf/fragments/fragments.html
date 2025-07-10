@@ -128,8 +128,8 @@
                                 <th scope="col">Acciones</th>
                             </tr>
                             </thead>
-                            <tbody th:if="${productos != null and !productos.isEmpty()}">
-                            <tr class="text-center" th:each="producto : ${productos}">
+                            <tbody >
+                            <tr th:if="${productos != null and !productos.isEmpty()}" class="text-center" th:each="producto : ${productos}">
                                 <td><img th:src="'http://www.imagenestaller.free.nf/' + ${producto.imagen}"
                                          style="height: 30px; width: 30px"></td>
                                 <td th:text="${producto.nombre}"
@@ -160,12 +160,12 @@
                                 <td class="precioTotalDelProducto" th:text="'$' + ${productoArmado.precioFormateado}"></td>
                                 <td class="text-center" th:data-id="${productoArmado.id}" th:data-numeroDeArmado="${productoArmado.numeroDeArmadoAlQuePertenece}">
                                     <div class="d-flex justify-content-center align-items-center gap-2">
-                                        <button type="button"
-                                                class="btn btn-outline-secondary btn-sm btnRestarCantidad">-
+                                        <button type="button" class="btn btn-outline-secondary btn-sm btnRestarCantidad"
+                                                th:if="${productoArmado.precio > 0.0}">-
                                         </button>
                                         <span th:text="${productoArmado.cantidad}" class="mx-2 productoCantidad"></span>
-                                        <button type="button" class="btn btn-outline-secondary btn-sm btnSumarCantidad">
-                                            +
+                                        <button type="button" class="btn btn-outline-secondary btn-sm btnSumarCantidad"
+                                                th:if="${productoArmado.precio > 0.0}">+
                                         </button>
                                         <button type="button" th:data-id="${productoArmado.id}"
                                                 class="btn btn-outline-danger btn-sm ms-2 btnEliminarProducto">

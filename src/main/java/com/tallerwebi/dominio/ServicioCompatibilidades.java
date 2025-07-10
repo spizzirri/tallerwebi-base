@@ -7,4 +7,6 @@ import com.tallerwebi.dominio.excepcion.ComponenteDeterminateDelArmadoEnNullExce
 public interface ServicioCompatibilidades {
 
     Boolean esCompatibleConElArmado(Componente componente, ArmadoPc armadoPc) throws ComponenteDeterminateDelArmadoEnNullException;
+    ArmadoPc completarEntidadArmadoPcParaEvaluarFuente(ArmadoPc armadoPcEntidad);
+    Integer obtenerWattsDeArmado(ArmadoPc armadoPc);
 }

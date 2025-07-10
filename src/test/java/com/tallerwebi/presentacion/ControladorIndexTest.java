@@ -47,9 +47,6 @@ public class ControladorIndexTest {
         MockitoAnnotations.openMocks(this);
         this.controladorIndex = new ControladorIndex(this.productoServiceMock, this.categoriasServiceMock, this.servicioPreciosMock);
         this.productos = new ArrayList<>();
-
-
-
     }
     @Test
     public void cuandoQuieroVerElIndexObtengoLaVistaDelIndex() {
