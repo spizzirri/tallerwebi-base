@@ -351,6 +351,7 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
                 && armadoPcDto.getGabinete() != null;
     }
 
+
     @Override
     public Map<String, Double> obtenerMapaDeRequisitosMinimosSeleccionados(List<String> seleccionados) {
         RequisitosProgramas[] requisitosProgramas = restTemplate.getForObject(URLProgramas, RequisitosProgramas[].class);
@@ -370,7 +371,7 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
         //Comparacion para los Programas
         for (String programa : programaSeleccionado) {
             for (RequisitosProgramas requisitosPrograma : requisitosProgramas) {
-                if (programa.equals(requisitosPrograma.getNombre())) {
+                if (programa.equals(requisitosPrograma.getId())) {
                     //Comparacion Procesador AMD
                     if (requisitosMinimosSeleccionados.containsKey("ProcesadorAMD")) {
                         if (requisitosPrograma.getRequisitosMinimos().get("ProcesadorAMD") > requisitosMinimosSeleccionados.get("ProcesadorAMD")) {
@@ -417,7 +418,7 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
         //Comparacion para los Juegos
         for (String juego : juegoSeleccionado) {
             for (RequisitosJuegos requisitosJuego : requisitosJuegos) {
-                if (juego.equals(requisitosJuego.getNombre())) {
+                if (juego.equals(requisitosJuego.getId())) {
                     //Comparacion Procesador AMD
                     if (requisitosMinimosSeleccionados.containsKey("ProcesadorAMD")) {
                         if (requisitosJuego.getRequisitosMinimos().get("ProcesadorAMD") > requisitosMinimosSeleccionados.get("ProcesadorAMD")) {
@@ -470,20 +471,24 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
         RequisitosJuegos[] requisitosJuegos = restTemplate.getForObject(URLJuegos, RequisitosJuegos[].class);
         List<String> programaSeleccionado = new ArrayList<>();
         List<String> juegoSeleccionado = new ArrayList<>();
-        Map<String, Double> requisitosRecomendadosSeleccionados = new HashMap<>(); //NO SE LLENA
+        Map<String, Double> requisitosRecomendadosSeleccionados = new HashMap<>();
         for (String app : seleccionados) {
+            Boolean esPrograma = false;
             for(RequisitosProgramas programa : requisitosProgramas) {
                 if (app.equals(programa.getNombre())) {
                     programaSeleccionado.add(app);
-                } else {
-                    juegoSeleccionado.add(app);
+                    esPrograma = true;
+                    break;
                 }
+            }
+            if (!esPrograma) {
+                juegoSeleccionado.add(app);
             }
         }
         //Comparacion para los Programas
         for (String programa : programaSeleccionado) {
             for (RequisitosProgramas requisitosPrograma : requisitosProgramas) {
-                if (programa.equals(requisitosPrograma.getNombre())) {
+                if (programa.equals(requisitosPrograma.getId())) {
                     //Comparacion Procesador AMD
                     if (requisitosRecomendadosSeleccionados.containsKey("ProcesadorAMD")) {
                         if (requisitosPrograma.getRequisitosRecomendados().get("ProcesadorAMD") > requisitosRecomendadosSeleccionados.get("ProcesadorAMD")) {
@@ -530,7 +535,7 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
         //Comparacion para los Juegos
         for (String juego : juegoSeleccionado) {
             for (RequisitosJuegos requisitosJuego : requisitosJuegos) {
-                if (juego.equals(requisitosJuego.getNombre())) {
+                if (juego.equals(requisitosJuego.getId())) {
                     //Comparacion Procesador AMD
                     if (requisitosRecomendadosSeleccionados.containsKey("ProcesadorAMD")) {
                         if (requisitosJuego.getRequisitosRecomendados().get("ProcesadorAMD") > requisitosRecomendadosSeleccionados.get("ProcesadorAMD")) {
@@ -590,6 +595,11 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
             if (esCompatibleConElArmado) componentesCompatibles.add(componente);
         }
 
+        if (!tablaDelTipoDeComponente.equals("Procesador") && !tablaDelTipoDeComponente.equals("MemoriaRAM") && !tablaDelTipoDeComponente.equals("PlacaDeVideo") && !tablaDelTipoDeComponente.equals("Almacenamiento")) {
+            List<ComponenteDto> listaDeComponentesDto = transformarComponentesADtos(componentesCompatibles);
+            return listaDeComponentesDto;
+        }
+
         List<Componente> componentesCompatiblesRequisitosMinimos = new ArrayList<>();
         for (Componente componente : componentesCompatibles) {
             if (componente instanceof Procesador) {
@@ -629,7 +639,6 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
         }
 
         List<ComponenteDto> listaDeComponentesDto = transformarComponentesADtos(componentesCompatiblesRequisitosMinimos);
-
         return listaDeComponentesDto;
     }
 
@@ -645,6 +654,11 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
             if (esCompatibleConElArmado) componentesCompatibles.add(componente);
         }
 
+        if (!tablaDelTipoDeComponente.equals("Procesador") && !tablaDelTipoDeComponente.equals("MemoriaRAM") && !tablaDelTipoDeComponente.equals("PlacaDeVideo") && !tablaDelTipoDeComponente.equals("Almacenamiento")) {
+            List<ComponenteDto> listaDeComponentesDto = transformarComponentesADtos(componentesCompatibles);
+            return listaDeComponentesDto;
+        }
+
         List<Componente> componentesCompatiblesRequisitosMinimos = new ArrayList<>();
         for (Componente componente : componentesCompatibles) {
             if (componente instanceof Procesador) {
@@ -684,7 +698,6 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
         }
 
         List<ComponenteDto> listaDeComponentesDto = transformarComponentesADtos(componentesCompatiblesRequisitosMinimos);
-
         return listaDeComponentesDto;
     }
 
@@ -700,16 +713,12 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
             if (esCompatibleConElArmado) componentesCompatibles.add(componente);
         }
 
-        List<Componente> componentesCompatiblesRequisitosRecomendados = new ArrayList<>();
-
-        System.out.println(seleccionados.toString());
-        try {
-            // Pausa de 5 segundos (5,000 milisegundos)
-            System.out.println(seleccionados.toString());
-            Thread.sleep(10000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        if (!tablaDelTipoDeComponente.equals("Procesador") && !tablaDelTipoDeComponente.equals("MemoriaRAM") && !tablaDelTipoDeComponente.equals("PlacaDeVideo") && !tablaDelTipoDeComponente.equals("Almacenamiento")) {
+            List<ComponenteDto> listaDeComponentesDto = transformarComponentesADtos(componentesCompatibles);
+            return listaDeComponentesDto;
         }
+
+        List<Componente> componentesCompatiblesRequisitosRecomendados = new ArrayList<>();
 
         for (Componente componente : componentesCompatibles) {
             if (componente instanceof Procesador) {
@@ -763,47 +772,8 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
                 }
             }
         }
-//        for (Componente componente : componentesCompatibles) {
-//            if (componente instanceof Procesador) {
-//                String familia = ((Procesador) componente).getFamilia();
-//                Double ultimoCaracter = (double) familia.charAt(familia.length() - 1);
-//                if (ultimoCaracter >= seleccionados.get("ProcesadorAMD") || ultimoCaracter >= seleccionados.get("ProcesadorINTEL")) {
-//                    componentesCompatiblesRequisitosRecomendados.add(componente);
-//                }
-//            }
-//            if (componente instanceof MemoriaRAM) {
-//                String capacidad = ((MemoriaRAM) componente).getCapacidad();
-//                String[] partes = capacidad.split(" ");
-//                String numeroEnString = partes[0];
-//                Double capacidadEnDouble = (double) numeroEnString.charAt(0);
-//                if (capacidadEnDouble >= seleccionados.get("RAM")) {
-//                    componentesCompatiblesRequisitosRecomendados.add(componente);
-//                }
-//            }
-//            if (componente instanceof PlacaDeVideo) {
-//                String vram = ((PlacaDeVideo) componente).getCapacidadRAM();
-//                String[] partes = vram.split(" ");
-//                String numeroEnString = partes[0];
-//                Double capacidadEnDouble = (double) numeroEnString.charAt(0);
-//                if (capacidadEnDouble >= seleccionados.get("GPU")) {
-//                    componentesCompatiblesRequisitosRecomendados.add(componente);
-//                }
-//            }
-//            if (componente instanceof Almacenamiento) {
-//                String capacidad = ((Almacenamiento) componente).getCapacidad();
-//                String[] partes = capacidad.split(" ");
-//                String numeroEnString = partes[0];
-//                Double capacidadEnDouble = (double) numeroEnString.charAt(0);
-//                if (capacidadEnDouble >= seleccionados.get("EspacioDisco")) {
-//                    componentesCompatiblesRequisitosRecomendados.add(componente);
-//                }
-//            }
-//        }
-
-        //componentesCompatiblesRequisitosRecomendados.add(obtenerComponentePorId(1L));
 
         List<ComponenteDto> listaDeComponentesDto = transformarComponentesADtos(componentesCompatiblesRequisitosRecomendados);
-
         return listaDeComponentesDto;
     }
 
@@ -817,6 +787,11 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
         for (Componente componente : componentesDeTipo) {
             Boolean esCompatibleConElArmado = this.servicioCompatibilidades.esCompatibleConElArmado(componente, armadoPcDto.obtenerEntidad());
             if (esCompatibleConElArmado) componentesCompatibles.add(componente);
+        }
+
+        if (!tablaDelTipoDeComponente.equals("Procesador") && !tablaDelTipoDeComponente.equals("MemoriaRAM") && !tablaDelTipoDeComponente.equals("PlacaDeVideo") && !tablaDelTipoDeComponente.equals("Almacenamiento")) {
+            List<ComponenteDto> listaDeComponentesDto = transformarComponentesADtos(componentesCompatibles);
+            return listaDeComponentesDto;
         }
 
         List<Componente> componentesCompatiblesRequisitosRecomendados = new ArrayList<>();
@@ -856,9 +831,7 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
                 }
             }
         }
-
         List<ComponenteDto> listaDeComponentesDto = transformarComponentesADtos(componentesCompatiblesRequisitosRecomendados);
-
         return listaDeComponentesDto;
     }
 

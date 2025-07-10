@@ -205,7 +205,7 @@
                     <div class="row g-3">
                         <!-- Card ejemplo -->
                         <div class="col-md-6 col-lg-4 mt-2 h-100" th:classappend="${idsDeComponentesSeleccionados.contains(componente.id)} ? ' order-first' : ''" th:each ="componente : ${componentesLista}">
-                            <form method="POST" th:action="@{'/arma-tu-pc/custom/' + ${pasoActual} + '/accion'}" class="h-100">
+                            <form method="POST" th:action="@{'/arma-tu-pc/custom/' + ${pasoActual} + '/accionCustom'}" class="h-100">
                                 <div class="card h-75">
                                     <div>
                                         <img th:src="'http://www.imagenestaller.free.nf/' +  ${componente.imagen}" class="card-img-top img-fluid" th:alt="${componente.modelo}">
@@ -230,8 +230,8 @@
                                             <option value="5">5</option>
                                             <option value="6">6</option>
                                         </select>
-                                        <button type="submit" name="accion" class="btn btn-outline-primary" value="agregar">Agregar</button>
-                                        <button th:if="${idsDeComponentesSeleccionados.contains(componente.id)}" type="submit" name="accion" class="btn btn-outline-primary" value="quitar">Quitar</button>
+                                        <button type="submit" name="accionCustom" class="btn btn-outline-primary" value="agregar">Agregar</button>
+                                        <button th:if="${idsDeComponentesSeleccionados.contains(componente.id)}" type="submit" name="accionCustom" class="btn btn-outline-primary" value="quitar">Quitar</button>
                                     </div>
                                 </div>
                             </form>

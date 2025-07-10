@@ -73,24 +73,66 @@ public class ControladorArmaTuPc {
 
     @RequestMapping(path = "/arma-tu-pc/custom/{tipoComponente}", method = RequestMethod.GET)
     public ModelAndView cargarComponenteArmadoCustom(@PathVariable("tipoComponente") String tipoComponente,
-                                                        @RequestParam(name = "appSeleccionada[]", required = true) List<String> seleccionados,
-                                                        @RequestParam(name = "selectorRequisitos", required = true) String selectorRequisitos,
+                                                        @RequestParam(name = "appSeleccionada[]", required = false) List<String> seleccionados,
+                                                        @RequestParam(name = "selectorRequisitos", required = false) String selectorRequisitos,
                                                         @RequestParam(value = "q", required = false) String query,
                                                         HttpSession sesion) {
         ModelMap model = new ModelMap();
         ArmadoPcDto armadoPcDto = obtenerArmadoPcDtoDeLaSession(sesion);
 
+        String selectorRequisitosSesion;
+        List<String> seleccionadosSesion;
+
+        if (sesion.getAttribute("selectorRequisitos") == null) {
+            sesion.setAttribute("selectorRequisitos", selectorRequisitos);
+            selectorRequisitosSesion = (String) sesion.getAttribute("selectorRequisitos");
+        } else {
+            selectorRequisitosSesion = (String) sesion.getAttribute("selectorRequisitos");
+        }
+
+        if (sesion.getAttribute("appSeleccionada") == null) {
+            sesion.setAttribute("appSeleccionada", seleccionados);
+            seleccionadosSesion = (List<String>) sesion.getAttribute("appSeleccionada");
+        } else {
+            seleccionadosSesion = (List<String>) sesion.getAttribute("appSeleccionada");
+        }
+
+        //sesion.setAttribute("appSelecionada", seleccionados);
+
         try {
             List<ComponenteDto> componentesCompatiblesADevolver;
 
-            if (selectorRequisitos.equals("requisitosMinimos")){
-                componentesCompatiblesADevolver = (query != null)
-                        ? this.servicioArmaTuPc.obtenerListaDeComponentesCompatiblesFiltradosDtoCustomRequisitosMinimos(tipoComponente, query, armadoPcDto, this.servicioArmaTuPc.obtenerMapaDeRequisitosMinimosSeleccionados(seleccionados))
-                        : this.servicioArmaTuPc.obtenerListaDeComponentesCompatiblesDtoCustomRequisitosMinimos(tipoComponente, armadoPcDto, this.servicioArmaTuPc.obtenerMapaDeRequisitosMinimosSeleccionados(seleccionados));
+            //List<String> appSeleccionadaSesion = (List<String>) sesion.getAttribute("appSeleccionada");
+
+            try {
+                // Pausa de 5 segundos (5,000 milisegundos)
+                Thread.sleep(5000);
+                System.out.println(selectorRequisitosSesion);
+                System.out.println(seleccionadosSesion);
+                //System.out.println(appSeleccionadaSesion.get(0));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            if (seleccionadosSesion != null) {
+                if (selectorRequisitosSesion.equals("requisitosMinimos")){
+                    componentesCompatiblesADevolver = (query != null)
+                            ? this.servicioArmaTuPc.obtenerListaDeComponentesCompatiblesFiltradosDtoCustomRequisitosMinimos(tipoComponente, query, armadoPcDto, this.servicioArmaTuPc.obtenerMapaDeRequisitosMinimosSeleccionados(seleccionadosSesion))
+                            : this.servicioArmaTuPc.obtenerListaDeComponentesCompatiblesDtoCustomRequisitosMinimos(tipoComponente, armadoPcDto, this.servicioArmaTuPc.obtenerMapaDeRequisitosMinimosSeleccionados(seleccionadosSesion));
+                } else {
+                    componentesCompatiblesADevolver = (query != null)
+                            ? this.servicioArmaTuPc.obtenerListaDeComponentesCompatiblesFiltradosDtoCustomRequisitosRecomendados(tipoComponente, query, armadoPcDto, this.servicioArmaTuPc.obtenerMapaDeRequisitosRecomendadosSeleccionados(seleccionadosSesion))
+                            : this.servicioArmaTuPc.obtenerListaDeComponentesCompatiblesDtoCustomRequisitosRecomendados(tipoComponente, armadoPcDto, this.servicioArmaTuPc.obtenerMapaDeRequisitosRecomendadosSeleccionados(seleccionadosSesion));
+                    try {
+                        // Pausa de 5 segundos (5,000 milisegundos)
+                        Thread.sleep(5000);
+                        System.out.println(componentesCompatiblesADevolver);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
             } else {
-                componentesCompatiblesADevolver = (query != null)
-                        ? this.servicioArmaTuPc.obtenerListaDeComponentesCompatiblesFiltradosDtoCustomRequisitosRecomendados(tipoComponente, query, armadoPcDto, this.servicioArmaTuPc.obtenerMapaDeRequisitosRecomendadosSeleccionados(seleccionados))
-                        : this.servicioArmaTuPc.obtenerListaDeComponentesCompatiblesDtoCustomRequisitosRecomendados(tipoComponente, armadoPcDto, this.servicioArmaTuPc.obtenerMapaDeRequisitosRecomendadosSeleccionados(seleccionados));
+                return new ModelAndView("redirect:/index");
             }
 
             model.put("componentesLista", this.pasarPreciosAPesos(componentesCompatiblesADevolver));
@@ -108,6 +150,81 @@ public class ControladorArmaTuPc {
         model.put("pasoSiguiente", obtenerPasoSiguiente(tipoComponente));
 
         return new ModelAndView("arma-tu-pc/custom/" + tipoComponente, model);
+    }
+
+    @RequestMapping(path = "arma-tu-pc/custom/{tipoComponente}/accionCustom", method = RequestMethod.POST)
+    public ModelAndView procesarAccionCustom(@PathVariable("tipoComponente")String tipoComponente,
+                                       @RequestParam("accionCustom")String accionCustom,
+                                       @RequestParam("id")Long idComponente,
+                                       @RequestParam("cantidad")Integer cantidad,
+                                       HttpSession session){
+
+        switch(accionCustom.toLowerCase()){
+            case "agregar":
+                return this.agregarComponenteAlArmadoCustom(tipoComponente, idComponente, cantidad, session);
+            case "quitar":
+                return this.quitarComponenteDelArmadoCustom(tipoComponente, idComponente, cantidad, session);
+        }
+
+        ModelMap model = new ModelMap();
+        model.put("accionInvalida", "Ingreso una accion invalida.");
+
+        return new ModelAndView("redirect:/arma-tu-pc/custom/" + tipoComponente, model);
+    }
+
+    public ModelAndView agregarComponenteAlArmadoCustom(@PathVariable("tipoComponente")String tipoComponente,
+                                                  @RequestParam("id") Long idComponente,
+                                                  @RequestParam("cantidad") Integer cantidad,
+                                                  HttpSession session) {
+        ModelMap model = new ModelMap();
+        ArmadoPcDto armadoPcDtoConComponenteAgregado = null;
+        try {
+            armadoPcDtoConComponenteAgregado = this.servicioArmaTuPc.agregarComponenteAlArmado(idComponente, tipoComponente, cantidad, obtenerArmadoPcDtoDeLaSession(session));
+        } catch (LimiteDeComponenteSobrepasadoEnElArmadoException e) {
+            model.put("errorLimite", "Supero el limite de "+tipoComponente+" de su armado");
+            return new ModelAndView("redirect:/arma-tu-pc/custom/" + tipoComponente, model);
+        }
+
+        armadoPcDtoConComponenteAgregado.setPrecioFormateado(
+                this.servicioPrecios.conversionDolarAPeso(armadoPcDtoConComponenteAgregado.getPrecioTotal())
+        );
+
+        session.setAttribute("armadoPcDto", armadoPcDtoConComponenteAgregado);
+
+        String siguienteVista = determinarSiguienteVista(tipoComponente, armadoPcDtoConComponenteAgregado);
+
+        ComponenteDto componenteAgregado = this.servicioArmaTuPc.obtenerComponenteDtoPorId(idComponente);
+
+        model.put("agregado", "x"+cantidad +" "+ componenteAgregado.getModelo() + " agregado correctamente al armado!");
+
+        return new ModelAndView("redirect:/arma-tu-pc/custom/" + siguienteVista, model);
+    }
+
+    public ModelAndView quitarComponenteDelArmadoCustom(@PathVariable("tipoComponente")String tipoComponente,
+                                                  @RequestParam("id") Long idComponente,
+                                                  @RequestParam("cantidad") Integer cantidad,
+                                                  HttpSession session){
+        ModelMap model = new ModelMap();
+
+        ArmadoPcDto armadoPcDtoConComponenteQuitado = null;
+
+        try {
+            armadoPcDtoConComponenteQuitado = this.servicioArmaTuPc.quitarComponenteAlArmado(idComponente, tipoComponente, cantidad, obtenerArmadoPcDtoDeLaSession(session));
+        } catch (QuitarComponenteInvalidoException e) {
+            model.put("errorQuitado", "No es posible quitar un componente que no fue agregado al armado.");
+            return new ModelAndView("redirect:/arma-tu-pc/custom/" + tipoComponente, model);
+        } catch (QuitarStockDemasDeComponenteException e) {
+            model.put("errorQuitado", "No es posible quitar una cantidad del componente que no posee el armado.");
+            return new ModelAndView("redirect:/arma-tu-pc/custom/" + tipoComponente, model);
+        }
+
+        session.setAttribute("armadoPcDto", armadoPcDtoConComponenteQuitado);
+
+        ComponenteDto componenteQuitado = this.servicioArmaTuPc.obtenerComponenteDtoPorId(idComponente);
+
+        model.put("quitado", "x"+cantidad +" "+ componenteQuitado.getModelo() + " fue quitado del armado.");
+
+        return new ModelAndView("redirect:/arma-tu-pc/custom/" + tipoComponente, model);
     }
 
     private List<ComponenteDto> pasarPreciosAPesos(List<ComponenteDto> componentesCompatiblesADevolver) {
@@ -234,6 +351,12 @@ public class ControladorArmaTuPc {
     public ModelAndView reiniciarArmado(HttpSession session) {
         session.removeAttribute("armadoPcDto");
         return new ModelAndView("redirect:/arma-tu-pc/tradicional/procesador");
+    }
+
+    @RequestMapping(path = "arma-tu-pc/custom/reiniciar-armado", method = RequestMethod.POST)
+    public ModelAndView reiniciarArmadoCustom(HttpSession session) {
+        session.removeAttribute("armadoPcDto");
+        return new ModelAndView("redirect:/arma-tu-pc/custom/procesador");
     }
 
     @RequestMapping(path = "arma-tu-pc/carrito", method = RequestMethod.POST)

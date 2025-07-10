@@ -51,4 +51,14 @@ public class RequisitosProgramas {
     public void setRequisitosRecomendados(Map<String, Double> requisitosRecomendados) {
         this.requisitosRecomendados = requisitosRecomendados;
     }
+
+    @Override
+    public String toString() {
+        return "RequisitosProgramas{" +
+                "id='" + id + '\'' +
+                ", nombre='" + nombre + '\'' +
+                ", requisitosMinimos=" + requisitosMinimos +
+                ", requisitosRecomendados=" + requisitosRecomendados +
+                '}';
+    }
 }
