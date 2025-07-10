@@ -15,9 +15,9 @@ import java.util.*;
 @RestController
 public class CarritoController {
 
-    private final ServicioProductoCarritoImpl servicioProductoCarrito;
-    private final ServicioDeEnviosImpl servicioDeEnvios;
-    private final ServicioPrecios servicioPrecios;
+    private ServicioProductoCarritoImpl servicioProductoCarrito;
+    private ServicioDeEnviosImpl servicioDeEnvios;
+    private ServicioPrecios servicioPrecios;
 
     public String codigoPostalActual;
     public EnvioDto envioActual;

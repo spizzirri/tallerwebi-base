@@ -139,7 +139,7 @@ public class RepositorioComponenteImpl implements RepositorioComponente {
         Class<?> tipoClase = Class.forName("com.tallerwebi.dominio.entidades." + tipo);
         String hql = "FROM " + tipo + " c WHERE lower(c.nombre) LIKE lower(:nombre) AND c.precio > 0";
         Query query = sessionFactory.getCurrentSession().createQuery(hql);
-        query.setParameter("tipo", tipoClase);
+//        query.setParameter("tipo", tipoClase);
         query.setParameter("nombre", "%" + nombre + "%");
         return query.getResultList();
     }
