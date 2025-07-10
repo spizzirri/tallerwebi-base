@@ -232,6 +232,7 @@
                                         </select>
                                         <button type="submit" name="accion" class="btn btn-outline-primary" value="agregar">Agregar</button>
                                         <button th:if="${idsDeComponentesSeleccionados.contains(componente.id)}" type="submit" name="accion" class="btn btn-outline-primary" value="quitar">Quitar</button>
+                                        <a th:if="${componente.precio > 0.0}" th:href="@{/productoEspecifico/{id}(id=${componente.id})}" target="_blank" class="ms-2 fs-3"><i class="bi bi-info-circle"></i></a>
                                     </div>
                                 </div>
                             </form>

@@ -22,7 +22,7 @@ public class RepositorioComponenteImpl implements RepositorioComponente {
     @Override
     public List<Componente> obtenerComponentesPorTipo(String tipo) {
 
-        String hql = "FROM " + tipo;
+        String hql = "FROM " + tipo + " c WHERE c.precio > 0";
 
         Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
 
@@ -76,10 +76,9 @@ public class RepositorioComponenteImpl implements RepositorioComponente {
 
     @Override
     public List<Componente> obtenerComponentesEnStock() {
-        String hql = "FROM Componente where stock > 0 ";
+        String hql = "FROM Componente where stock > 0 AND precio > 0";
 
         Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
-
 
         return query.getResultList();
     }
@@ -117,7 +116,7 @@ public class RepositorioComponenteImpl implements RepositorioComponente {
 
     @Override
     public List<Componente> obtenerComponentesPorQuery(String nombre) {
-        String hql = "FROM Componente WHERE lower(nombre) LIKE lower(:nombre)";
+        String hql = "FROM Componente WHERE lower(nombre) LIKE lower(:nombre) AND precio > 0";
 
         Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
         query.setParameter("nombre", "%" + nombre + "%");
@@ -138,12 +137,10 @@ public class RepositorioComponenteImpl implements RepositorioComponente {
     @Override
     public List<Componente> obtenerComponentesPorTipoYPorQuery(String tipo, String nombre) throws ClassNotFoundException {
         Class<?> tipoClase = Class.forName("com.tallerwebi.dominio.entidades." + tipo);
-        String hql = "FROM Componente c WHERE TYPE(c) = :tipo AND lower(c.nombre) LIKE lower(:nombre)";
+        String hql = "FROM " + tipo + " c WHERE lower(c.nombre) LIKE lower(:nombre) AND c.precio > 0";
         Query query = sessionFactory.getCurrentSession().createQuery(hql);
-        query.setParameter("tipo", tipoClase);
+//        query.setParameter("tipo", tipoClase);
         query.setParameter("nombre", "%" + nombre + "%");
         return query.getResultList();
     }
-
-
 }

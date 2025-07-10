@@ -30,11 +30,12 @@
                         <th scope="col">Acciones</th>
                     </tr>
                     </thead>
-                    <tbody th:if="${productos != null and !productos.isEmpty()}">
-                    <tr class="text-center" th:each="producto : ${productos}">
-                        <td>  <img th:src="'http://www.imagenestaller.free.nf/' + ${producto.imagen}" style="height: 30px; width: 30px"></td>
+                    <tbody>
+                    <tr th:if="${productos != null and !productos.isEmpty()}" class="text-center"
+                        th:each="producto : ${productos}">
+                        <td><img th:src="'http://www.imagenestaller.free.nf/' + ${producto.imagen}"
+                                 style="height: 30px; width: 30px"></td>
                         <td th:text="${producto.nombre}"></td>
-<!--                        <td class="precioTotalDelProducto" th:text="'$' + ${producto.precio * producto.getCantidad()}"></td>-->
                         <td class="precioTotalDelProducto" th:text="'$' + ${producto.precioFormateado}"></td>
 
                         <td class="text-center" th:data-id="${producto.id}">
@@ -49,10 +50,33 @@
                             </div>
                         </td>
                     </tr>
-                    </tbody>
-                    <tbody th:if="${productos == null or productos.isEmpty()}">
-                    <tr>
-                        <td colspan="3" class="text-center py-4">No hay productos en el carrito.</td>
+
+                    <tr th:if="${productosArmados != null and !productosArmados.isEmpty()}" class="text-center"
+                        th:each="productoArmado : ${productosArmados}">
+                        <td><img th:src="'http://www.imagenestaller.free.nf/' + ${productoArmado.imagen}"
+                                 style="height: 30px; width: 30px"></td>
+                        <td th:utext="${productoArmado.nombre} + '<br><b> Armado ' + ${productoArmado.numeroDeArmadoAlQuePertenece} + '</b>'"></td>
+                        <td class="precioTotalDelProducto" th:text="'$' + ${productoArmado.precioFormateado}"></td>
+
+                        <td class="text-center" th:data-id="${productoArmado.id}" th:data-numeroDeArmado="${productoArmado.numeroDeArmadoAlQuePertenece}">
+                            <div class="d-flex justify-content-center align-items-center gap-2">
+                                <button type="button" class="btn btn-outline-secondary btn-sm btnRestarCantidad"
+                                        th:if="${productoArmado.precio > 0.0}">-
+                                </button>
+                                <span th:text="${productoArmado.cantidad}" class="mx-2 productoCantidad"></span>
+                                <button type="button" class="btn btn-outline-secondary btn-sm btnSumarCantidad"
+                                        th:if="${productoArmado.precio > 0.0}">+
+                                </button>
+                                <button type="button" th:data-id="${productoArmado.id}"
+                                        class="btn btn-outline-danger btn-sm ms-2 btnEliminarProducto">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr th:if="${(productos == null or productos.isEmpty()) && (productosArmados == null or productosArmados.isEmpty())}">
+                        <td colspan="4" class="text-center py-4">No hay productos en el carrito.</td>
                     </tr>
                     </tbody>
                 </table>
@@ -119,8 +143,10 @@
                         </div>
                         <div id="alertaSinCobertura" class="alert alert-warning alert-dismissible fade show d-none">
                             <i class="fa-solid fa-exclamation-triangle me-2"></i>
-                            <strong>Sin cobertura:</strong> Sin cobertura para este código postal. Intente con zonas cercanas o códigos postales vecinos.
-                            <button type="button" class="btn-close" onclick="document.getElementById('alertaSinCobertura').classList.add('d-none')"></button>
+                            <strong>Sin cobertura:</strong> Sin cobertura para este código postal. Intente con zonas
+                            cercanas o códigos postales vecinos.
+                            <button type="button" class="btn-close"
+                                    onclick="document.getElementById('alertaSinCobertura').classList.add('d-none')"></button>
                         </div>
 
                         <!-- Mensajes de error del envío -->

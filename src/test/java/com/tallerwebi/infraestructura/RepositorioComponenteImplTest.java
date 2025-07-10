@@ -186,14 +186,22 @@ public class RepositorioComponenteImplTest {
     @Test
     @Rollback
     public void CuandoLePidoObtenerComponentesPorTipoYPorQueryMeDevuelveComponenteDeEseTipoYEsaQuery() throws ClassNotFoundException {
+        String tipoEsperado = "Procesador";
+        String nombreBuscado = "Intel";
 
-        Componente claseEsperado = new Procesador();
-        List<Componente> resultado = repositorioComponente.obtenerComponentesPorTipoYPorQuery("Procesador","Intel");
-        String nombreEsperado = "Intel";
+        List<Componente> resultado = repositorioComponente.obtenerComponentesPorTipoYPorQuery(tipoEsperado, nombreBuscado);
 
-        assertFalse(resultado.isEmpty());
-        assertTrue(resultado.get(0).getNombre().contains(nombreEsperado));
-        assertEquals(resultado.get(0).getClass(), claseEsperado.getClass());
+        assertNotNull(resultado, "La lista no debe ser null");
+        assertFalse(resultado.isEmpty(), "La lista no debe estar vacía");
+
+        for (Componente componente : resultado) {
+            assertEquals(Procesador.class, componente.getClass(),
+                    "Todos los componentes deben ser de tipo Procesador");
+            assertTrue(componente.getNombre().toLowerCase().contains(nombreBuscado.toLowerCase()),
+                    "El nombre debe contener 'Intel': " + componente.getNombre());
+            assertTrue(componente.getPrecio() > 0,
+                    "El precio debe ser mayor a 0: " + componente.getPrecio());
+        }
     }
 
 

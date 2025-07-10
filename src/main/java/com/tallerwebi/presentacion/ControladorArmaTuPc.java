@@ -2,13 +2,14 @@ package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.ServicioArmaTuPc;
 import com.tallerwebi.dominio.ServicioPrecios;
-import com.tallerwebi.dominio.entidades.Componente;
+import com.tallerwebi.dominio.ServicioProductoCarritoImpl;
 import com.tallerwebi.dominio.excepcion.ComponenteDeterminateDelArmadoEnNullException;
 import com.tallerwebi.dominio.excepcion.LimiteDeComponenteSobrepasadoEnElArmadoException;
 import com.tallerwebi.dominio.excepcion.QuitarComponenteInvalidoException;
 import com.tallerwebi.dominio.excepcion.QuitarStockDemasDeComponenteException;
 import com.tallerwebi.presentacion.dto.ArmadoPcDto;
 import com.tallerwebi.presentacion.dto.ComponenteDto;
+import com.tallerwebi.presentacion.dto.ProductoCarritoArmadoDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -16,9 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.ParseException;
 import java.util.*;
 
 @Controller
@@ -26,10 +24,11 @@ public class ControladorArmaTuPc {
 
     private ServicioArmaTuPc servicioArmaTuPc;
     private ServicioPrecios servicioPrecios;
+    private ServicioProductoCarritoImpl servicioProductoCarrito;
     private List<String> pasos = Arrays.asList("procesador", "motherboard", "cooler", "memoria", "gpu", "almacenamiento", "fuente", "gabinete", "monitor", "periferico", "resumen");
 
     @Autowired
-    public ControladorArmaTuPc(ServicioArmaTuPc servicioArmaTuPc, ServicioPrecios servicioPrecios) {this.servicioArmaTuPc =  servicioArmaTuPc;this.servicioPrecios = servicioPrecios;}
+    public ControladorArmaTuPc(ServicioArmaTuPc servicioArmaTuPc, ServicioPrecios servicioPrecios, ServicioProductoCarritoImpl servicioProductoCarrito) {this.servicioArmaTuPc =  servicioArmaTuPc;this.servicioPrecios = servicioPrecios;this.servicioProductoCarrito = servicioProductoCarrito;}
     public ControladorArmaTuPc() {}
 
      private ArmadoPcDto obtenerArmadoPcDtoDeLaSession(HttpSession session) {
@@ -208,11 +207,35 @@ public class ControladorArmaTuPc {
             carritoSesion = new ArrayList<>();
         }
 
-        carritoSesion.addAll(this.servicioArmaTuPc.pasajeAProductoDtoParaAgregarAlCarrito(obtenerArmadoPcDtoDeLaSession(session)));
+        List<ProductoCarritoArmadoDto> productoCarritoArmadoDtos = servicioArmaTuPc.pasajeAProductoArmadoDtoParaAgregarAlCarrito(obtenerArmadoPcDtoDeLaSession(session));
+
+        Integer numeroDeUltimoArmadoEnElCarrito = obtenerElNumeroDelUltimoArmadoDelCarritoDeSesion(carritoSesion);
+
+        for (ProductoCarritoArmadoDto producto : productoCarritoArmadoDtos) {
+            servicioProductoCarrito.descontarStockAlComponente(producto.getId(), producto.getCantidad());
+            producto.setNumeroDeArmadoAlQuePertenece(numeroDeUltimoArmadoEnElCarrito + 1);
+        }
+
+        carritoSesion.addAll(productoCarritoArmadoDtos);
 
         // controlar el stock con servicio ServicioProductoCarritoImpl
 
         return new ModelAndView("redirect:/carritoDeCompras/index");
+    }
+
+    private Integer obtenerElNumeroDelUltimoArmadoDelCarritoDeSesion(List<ProductoCarritoDto> carritoSesion) {
+
+        Integer numeroMasAlto = 0;
+
+        for (ProductoCarritoDto producto : carritoSesion) {
+            if (producto instanceof ProductoCarritoArmadoDto){
+                int numeroDeProductoActual = ((ProductoCarritoArmadoDto)producto).getNumeroDeArmadoAlQuePertenece();
+                if (numeroDeProductoActual > numeroMasAlto) numeroMasAlto = numeroDeProductoActual;
+            }
+        }
+
+        return numeroMasAlto;
+
     }
 
 }

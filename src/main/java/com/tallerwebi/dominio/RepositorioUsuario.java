@@ -1,6 +1,7 @@
 package com.tallerwebi.dominio;
 
-import com.tallerwebi.dominio.entidades.Componente;
+import com.tallerwebi.dominio.entidades.Compra;
+import com.tallerwebi.dominio.entidades.CompraComponente;
 
 public interface RepositorioUsuario {
 
@@ -13,7 +14,5 @@ public interface RepositorioUsuario {
     Usuario buscar(String email);
 
     void modificar(Usuario usuario);
-
-    void eliminarUsuario(Long idUsuario);
 }
 

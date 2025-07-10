@@ -13,6 +13,8 @@ public class ProductoCarritoDto {
     private String imagen;
     private String precioFormateado;
 
+    // private Boolean armado = false;
+
     public ProductoCarritoDto() {}
 
     public ProductoCarritoDto(Componente componente, Integer cantidad) {
@@ -38,7 +40,6 @@ public class ProductoCarritoDto {
         this.stock = 10;
         this.imagen = "imagen-generica.jpg";
     }
-
 
     public Long getId() {
         return id;

@@ -21,6 +21,7 @@
         <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.2.0/css/bootstrap.min.css}"/>
         <link rel="stylesheet" th:href="@{/css/fragments.css}">
         <link rel="stylesheet" th:href="@{/css/main.css}"/>
+        <link rel="stylesheet" th:href="@{/css/historialDeCompras.css}"/>
     </head>
 
     <body style="margin: 0px;padding: 0px;">
@@ -80,6 +81,11 @@
                             </a>
                         </li>
                         <li>
+                            <a class="dropdown-item" href="/historialDeCompras">
+                                <i class="bi bi-card-list me-2"></i> Historial compras
+                            </a>
+                        </li>
+                        <li>
                             <a class="dropdown-item" href="/logout">
                                 <i class="bi bi-box-arrow-right me-2"></i> Cerrar sesion
                             </a>
@@ -122,8 +128,8 @@
                                 <th scope="col">Acciones</th>
                             </tr>
                             </thead>
-                            <tbody th:if="${productos != null and !productos.isEmpty()}">
-                            <tr class="text-center" th:each="producto : ${productos}">
+                            <tbody >
+                            <tr th:if="${productos != null and !productos.isEmpty()}" class="text-center" th:each="producto : ${productos}">
                                 <td><img th:src="'http://www.imagenestaller.free.nf/' + ${producto.imagen}"
                                          style="height: 30px; width: 30px"></td>
                                 <td th:text="${producto.nombre}"
@@ -145,10 +151,31 @@
                                     </div>
                                 </td>
                             </tr>
-                            </tbody>
-                            <tbody th:if="${productos == null or productos.isEmpty()}">
-                            <tr>
-                                <td colspan="3" class="text-center py-4">No hay productos en el carrito.</td>
+                            <tr class="text-center" th:if="${productosArmados != null and !productosArmados.isEmpty()}"
+                                th:each="productoArmado : ${productosArmados}">
+                                <td><img th:src="'http://www.imagenestaller.free.nf/' + ${productoArmado.imagen}"
+                                         style="height: 30px; width: 30px"></td>
+                                <td th:utext="${productoArmado.nombre} + '<br><b> Armado ' + ${productoArmado.numeroDeArmadoAlQuePertenece} + '</b>'"
+                                    style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></td>
+                                <td class="precioTotalDelProducto" th:text="'$' + ${productoArmado.precioFormateado}"></td>
+                                <td class="text-center" th:data-id="${productoArmado.id}" th:data-numeroDeArmado="${productoArmado.numeroDeArmadoAlQuePertenece}">
+                                    <div class="d-flex justify-content-center align-items-center gap-2">
+                                        <button type="button" class="btn btn-outline-secondary btn-sm btnRestarCantidad"
+                                                th:if="${productoArmado.precio > 0.0}">-
+                                        </button>
+                                        <span th:text="${productoArmado.cantidad}" class="mx-2 productoCantidad"></span>
+                                        <button type="button" class="btn btn-outline-secondary btn-sm btnSumarCantidad"
+                                                th:if="${productoArmado.precio > 0.0}">+
+                                        </button>
+                                        <button type="button" th:data-id="${productoArmado.id}"
+                                                class="btn btn-outline-danger btn-sm ms-2 btnEliminarProducto">
+                                            <i class="bi bi-trash3"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${(productos == null or productos.isEmpty()) && (productosArmados == null or productosArmados.isEmpty())}">
+                                <td colspan="4" class="text-center py-4">No hay productos en el carrito.</td>
                             </tr>
                             </tbody>
                         </table>

@@ -2,6 +2,8 @@ package com.tallerwebi.infraestructura;
 
 import com.tallerwebi.dominio.RepositorioUsuario;
 import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.entidades.Compra;
+import com.tallerwebi.dominio.entidades.CompraComponente;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
@@ -67,12 +69,4 @@ public class RepositorioUsuarioImpl implements RepositorioUsuario {
 
         sessionFactory.getCurrentSession().update(usuario);
     }
-
-    @Override
-    public void eliminarUsuario(Long idUsuario) {
-        Session session = sessionFactory.getCurrentSession();
-    }
-
-
-
 }
