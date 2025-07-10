@@ -334,7 +334,7 @@ public class CarritoController {
     @ResponseBody
     public Map<String, Object> calcularEnvioAjax(@RequestParam String codigoPostal, HttpSession session) {
         Map<String, Object> response = new HashMap<>();
-
+        session.setAttribute("cp", codigoPostal);
         List<ProductoCarritoDto> carritoSesion = obtenerCarritoDeSesion(session);
         this.servicioProductoCarrito.setProductos(carritoSesion);
 
@@ -350,6 +350,9 @@ public class CarritoController {
                 response.put("costo", envio.getCosto());
                 response.put("tiempo", envio.getTiempo());
                 response.put("destino", envio.getDestino());
+                session.setAttribute("costo", envio.getCosto());
+                session.setAttribute("tiempo",envio.getTiempo());
+                session.setAttribute("destino", envio.getDestino());
                 response.put("valorTotal", this.servicioProductoCarrito.valorTotal);
             } else {
                 this.envioActual = null;

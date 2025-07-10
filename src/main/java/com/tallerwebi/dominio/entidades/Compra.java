@@ -23,6 +23,9 @@ public class Compra {
     @Column(length = 100)
     private String metodoDePago;
 
+    @Column(length = 100)
+    private String cp;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idUsuario")
     private Usuario idUsuario;
@@ -33,6 +36,10 @@ public class Compra {
     public void setIdCompra(Long idCompra) {
         this.idCompra = idCompra;
     }
+
+    public String getCp() {return cp;}
+
+    public void setCp(String cp) {this.cp = cp;}
 
     public Long getIdCompra() {
         return idCompra;
@@ -77,5 +84,6 @@ public class Compra {
     public List<CompraComponente> getProductosComprados() {
         return productosComprados;
     }
+
 
 }

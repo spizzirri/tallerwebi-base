@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import javax.servlet.http.HttpSession;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
@@ -26,7 +27,7 @@ public class ServicioCompraTest {
     private RepositorioUsuario repositorioUsuario;
     @Mock
     private RepositorioCompra repositorioCompra;
-
+    private HttpSession session;
     private ServicioCompraImpl servicioCompraImpl;
 
     @BeforeEach
@@ -71,7 +72,7 @@ public class ServicioCompraTest {
 
         when(repositorioUsuario.buscarUsuario(emailUsuario)).thenReturn(usuarioEntidad);
 
-        servicioCompraImpl.guardarCompraConUsuarioLogueado(compraDto, usuarioDtoLogueado);
+        servicioCompraImpl.guardarCompraConUsuarioLogueado(compraDto, usuarioDtoLogueado, session);
 
         verify(repositorioUsuario, times(1)).buscarUsuario(emailUsuario);
 

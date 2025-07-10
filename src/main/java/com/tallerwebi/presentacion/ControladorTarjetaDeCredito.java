@@ -97,9 +97,9 @@ public class ControladorTarjetaDeCredito {
             compraDto.setTotal(totalCompraEnPesos);
             compraDto.setProductosComprados(convertirACompraComponenteDto(carritoSesion));
 
-            servicioCompra.guardarCompraConUsuarioLogueado(compraDto, usuarioLogueado);
+            servicioCompra.guardarCompraConUsuarioLogueado(compraDto, usuarioLogueado, session );
             servicioProductoCarritoImpl.limpiarCarrito();
-            return new ModelAndView("pagoExitoso", modelo);
+            return new ModelAndView("redirect:/pagoExitoso");
         }
     }
 
