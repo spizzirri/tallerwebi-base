@@ -6,6 +6,7 @@ import com.tallerwebi.presentacion.UsuarioDto;
 
 import java.util.List;
 
+
 public interface RepositorioCompra {
 
     void guardarCompraDeUsuario(Compra compra);
@@ -13,4 +14,6 @@ public interface RepositorioCompra {
     void guardarComonentesEnCompraComponente(CompraComponente compraComponente);
 
     List<Compra> obtenerCompraDeUsuarioLogueado(UsuarioDto usuarioLogueado);
+
+    Compra obtenerUltimaCompraDeUsuarioLogueado(UsuarioDto usuarioLogueado);
 }

@@ -150,7 +150,7 @@ public class ControllerMercadoPago {
             compraDto.setTotal(totalCompraEnPesos);
             compraDto.setProductosComprados(convertirACompraComponenteDto(carritoSesion));
 
-            servicioCompra.guardarCompraConUsuarioLogueado(compraDto, usuarioLogueado);
+            servicioCompra.guardarCompraConUsuarioLogueado(compraDto, usuarioLogueado, session);
             servicioProductoCarritoImpl.limpiarCarrito();
             return null;
         } catch (MPApiException e) {

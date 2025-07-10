@@ -77,7 +77,7 @@ public class ControladorTarjetaDeCredito {
             hayError = true;
         }
         modelo.addAttribute("tarjeta", tarjeta);
-
+        session.setAttribute("tarjeta", tarjeta);
         if (hayError) {
             return new ModelAndView("tarjetaDeCredito", modelo);
         } else {
@@ -97,9 +97,9 @@ public class ControladorTarjetaDeCredito {
             compraDto.setTotal(totalCompraEnPesos);
             compraDto.setProductosComprados(convertirACompraComponenteDto(carritoSesion));
 
-            servicioCompra.guardarCompraConUsuarioLogueado(compraDto, usuarioLogueado);
+            servicioCompra.guardarCompraConUsuarioLogueado(compraDto, usuarioLogueado, session );
             servicioProductoCarritoImpl.limpiarCarrito();
-            return new ModelAndView("pagoExitoso", modelo);
+            return new ModelAndView("redirect:/pagoExitoso");
         }
     }
 

@@ -2,6 +2,7 @@ package com.tallerwebi.dominio;
 
 import com.tallerwebi.dominio.entidades.Compra;
 import com.tallerwebi.dominio.entidades.CompraComponente;
+import com.tallerwebi.infraestructura.RepositorioComponenteImpl;
 import com.tallerwebi.presentacion.CompraComponenteDto;
 import com.tallerwebi.presentacion.CompraDto;
 import com.tallerwebi.presentacion.UsuarioDto;
@@ -12,6 +13,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import javax.servlet.http.HttpSession;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
@@ -21,14 +23,25 @@ import static org.mockito.Mockito.*;
 
 public class ServicioCompraTest {
 
-    @Mock private RepositorioUsuario repositorioUsuario;
-    @Mock private RepositorioCompra repositorioCompra;
+
+    @Mock
+    private RepositorioUsuario repositorioUsuario;
+    @Mock
+    private RepositorioCompra repositorioCompra;
+    private HttpSession session;
     private ServicioCompraImpl servicioCompra;
+
+
+    @Mock
+    private RepositorioComponenteImpl repositorioComponente;
 
     @BeforeEach
     public void init() {
         MockitoAnnotations.openMocks(this);
-        servicioCompra = new ServicioCompraImpl(repositorioCompra, repositorioUsuario);
+
+        servicioCompra = new ServicioCompraImpl(repositorioCompra, repositorioUsuario, repositorioComponente);
+//        ReflectionTestUtils.setField(servicioCompraImpl, "repositorioUsuario", repositorioUsuario);
+
     }
 
     @Test
@@ -39,11 +52,13 @@ public class ServicioCompraTest {
 
         when(repositorioUsuario.buscarUsuario("test@example.com")).thenReturn(usuario);
 
-        servicioCompra.guardarCompraConUsuarioLogueado(compraDto, usuarioDto);
+
+        servicioCompra.guardarCompraConUsuarioLogueado(compraDto, usuarioDto,session);
 
         verify(repositorioUsuario).buscarUsuario("test@example.com");
         verify(repositorioCompra).guardarCompraDeUsuario(any(Compra.class));
         verify(repositorioCompra).guardarComonentesEnCompraComponente(any(CompraComponente.class));
+
     }
 
     @Test
@@ -56,7 +71,7 @@ public class ServicioCompraTest {
 
         when(repositorioUsuario.buscarUsuario("test@example.com")).thenReturn(usuario);
 
-        servicioCompra.guardarCompraConUsuarioLogueado(compraDto, usuarioDto);
+        servicioCompra.guardarCompraConUsuarioLogueado(compraDto, usuarioDto,session);
 
         verify(repositorioCompra, times(2)).guardarComonentesEnCompraComponente(any(CompraComponente.class));
     }
@@ -70,7 +85,7 @@ public class ServicioCompraTest {
 
         when(repositorioUsuario.buscarUsuario("test@example.com")).thenReturn(usuario);
 
-        servicioCompra.guardarCompraConUsuarioLogueado(compraDto, usuarioDto);
+        servicioCompra.guardarCompraConUsuarioLogueado(compraDto, usuarioDto,session);
 
         ArgumentCaptor<CompraComponente> captor = ArgumentCaptor.forClass(CompraComponente.class);
         verify(repositorioCompra).guardarComonentesEnCompraComponente(captor.capture());

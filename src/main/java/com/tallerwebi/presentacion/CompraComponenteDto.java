@@ -12,6 +12,7 @@ public class CompraComponenteDto {
     private Double precioUnitario;
     private Boolean esArmado;
     private Integer numeroDeArmado;
+    private String urlImagen;
 
     public CompraComponenteDto(CompraComponente compraComponente) {
         this.id = compraComponente.getId();
@@ -21,6 +22,7 @@ public class CompraComponenteDto {
         this.precioUnitario = compraComponente.getPrecioUnitario();
         this.esArmado = compraComponente.getEsArmado();
         this.numeroDeArmado = compraComponente.getNumeroDeArmado();
+        this.urlImagen = compraComponente.getUrlImagen();
     }
 
     public CompraComponenteDto() {}
@@ -32,6 +34,8 @@ public class CompraComponenteDto {
     public Long getCompra() {
         return compra;
     }
+    public String getUrlImagen() {return urlImagen;}
+    public void setUrlImagen(String urlImagen) {this.urlImagen = urlImagen;}
 
     public ComponenteDto getComponente() {
         return componente;
@@ -80,4 +84,6 @@ public class CompraComponenteDto {
     public void setNumeroDeArmado(Integer numeroDeArmado) {
         this.numeroDeArmado = numeroDeArmado;
     }
+
+
 }

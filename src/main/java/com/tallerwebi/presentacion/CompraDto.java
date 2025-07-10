@@ -14,6 +14,7 @@ public class CompraDto {
     private String metodoDePago;
     private Long idUsuario;
     private List<CompraComponenteDto> productosComprados;
+    private String cp;
 
     public CompraDto(Compra compra) {
         this.id = compra.getIdCompra();
@@ -21,6 +22,7 @@ public class CompraDto {
         this.total = compra.getTotal();
         this.metodoDePago = compra.getMetodoDePago();
         this.idUsuario = compra.getIdUsuario().getId();
+        this.cp = compra.getCp();
         this.productosComprados = compra.getProductosComprados().stream()
                 .map(CompraComponenteDto::new)
                 .collect(Collectors.toList());
@@ -75,4 +77,8 @@ public class CompraDto {
     public void setProductosComprados(List<CompraComponenteDto> productosComprados) {
         this.productosComprados = productosComprados;
     }
+
+    public String getCp() { return this.cp;
+    }
+    public void setCp(String cp) {this.cp = cp;}
 }

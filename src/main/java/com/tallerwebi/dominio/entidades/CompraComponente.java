@@ -26,6 +26,9 @@ public class CompraComponente {
     @Column(nullable = false)
     private Double precioUnitario;
 
+    @Column(length = 250)
+    private String urlImagen;
+
     @Column(nullable = false)
     private Boolean esArmado = false;
 
@@ -34,13 +37,14 @@ public class CompraComponente {
 
     public CompraComponente() {}
 
-    public CompraComponente(Compra compra, Componente componente, Integer cantidad, Double precioUnitario, Boolean esArmado, Integer numeroDeArmado) {
+    public CompraComponente(Compra compra, Componente componente, Integer cantidad, Double precioUnitario, Boolean esArmado, Integer numeroDeArmado, String urlImagen) {
         this.compra = compra;
         this.componente = componente;
         this.cantidad = cantidad;
         this.precioUnitario = precioUnitario;
         this.esArmado = esArmado;
         this.numeroDeArmado = numeroDeArmado;
+        this.urlImagen = urlImagen;
     }
 
     public Long getId() {
@@ -49,6 +53,14 @@ public class CompraComponente {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getUrlImagen() {
+        return urlImagen;
+    }
+
+    public void setUrlImagen(String urlImagen) {
+        this.urlImagen = urlImagen;
     }
 
     public Compra getCompra() {

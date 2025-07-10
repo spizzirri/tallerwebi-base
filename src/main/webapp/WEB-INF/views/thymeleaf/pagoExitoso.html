@@ -102,50 +102,157 @@
 <body>
 <div th:replace="fragments/fragments :: header"></div>
 <div class="exito-container">
-    <div class="text-center">
-        <div class="exito-check">
-            <i class="fa fa-check-circle"></i>
-        </div>
-        <div class="exito-titulo">¡Gracias por tu compra!</div>
-        <div class="exito-sub">Tu solicitud de compra fue recibida</div>
-        <div style="color: #666; margin-bottom: 18px;">Tu pedido se encuentra en proceso de validación, en breve
-            recibirás un correo con el detalle de tu compra.
-        </div>
-        <div class="exito-pedido">Pedido: <span style="color:#1976d2;">OV01-00000001</span></div>
-        <div class="exito-fecha">
-            Fecha de Solicitud de compra: <span th:text="${fechaCompra}"></span>
+    <div id="contenido-imprimible">
+        <div class="text-center">
+            <div class="exito-check">
+                <i class="fa fa-check-circle"></i>
+            </div>
+            <div class="exito-titulo">Gracias por tu compra!</div>
+            <div class="exito-sub">Tu solicitud de compra fue recibida</div>
+            <!--                Quiero hacer como la lista del carrito pero todavia no salio &#45;&#45; A mejorar-->
+            <!--            <div class="card mb-4" th:if="${comprasUsuario != null && !comprasUsuario.isEmpty()}">-->
+            <!--                <div th:if="${compra.productosComprados != null && !compra.productosComprados.isEmpty()}">-->
+            <!--                    <h3 class="card-title m-3">Productos</h3>-->
+            <!--                    <div class="card-body" th:each="compra : ${comprasUsuario}">-->
+            <!--                        <h5 class="mb-0">-->
+            <!--                            <i class="bi bi-calendar3"></i>-->
+            <!--                            <span th:text="${compra.fecha}"></span>-->
+            <!--                        </h5>-->
+            <!--                        <div class="mb-3">-->
+            <!--                                <span class="badge bg-secondary mb-2">-->
+            <!--                                    <i class="bi bi-credit-card me-1"></i>-->
+            <!--                                    <span th:text="${compra.metodoDePago}"></span>-->
+            <!--                                </span>-->
+            <!--                        </div>-->
+            <!--                        <table class="table vista-carrito">-->
+            <!--                            <thead>-->
+            <!--                            <tr class="text-center">-->
+            <!--                                <th scope="col">Foto</th>-->
+            <!--                                <th scope="col">Nombre</th>-->
+            <!--                                <th scope="col">Precio</th>-->
+            <!--                                <th scope="col">Cantidad</th>-->
+            <!--                            </tr>-->
+            <!--                            </thead>-->
+            <!--                            <tbody>-->
+            <!--                            <tr th:each="producto : ${compra.productosComprados}" class="text-center">-->
+
+            <!--                                <td><img th:src="'http://www.imagenestaller.free.nf/' + ${producto.urlImagen}"-->
+            <!--                                         style="height: 30px; width: 30px"></td>-->
+            <!--                                <td th:text="${producto.nombre}"></td>-->
+
+
+            <!--                                <td class="precioTotalDelProducto"-->
+            <!--                                    th:text="'$' + ${#numbers.formatDecimal(producto.precioUnitario, 1, 'POINT', 2, 'COMMA')}"></td>-->
+            <!--                                <td class="text-muted">x<span th:text="${producto.cantidad}"></span></td>-->
+            <!--                            </tr>-->
+            <!--                            </tbody>-->
+            <!--                        </table>-->
+
+            <!--                </div>-->
+            <!--        div viejo y andando debajo-->
+            <div th:if="${comprasUsuario != null && !comprasUsuario.isEmpty()}">
+                <div class="row g-4">
+                    <div class="col-12 col-lg-10 mx-auto" th:each="compra : ${comprasUsuario}">
+                        <div class="card h-100 shadow border-0">
+                            <div class="card-header bg-warning text-dark">
+                                <h5 class="mb-0">
+                                    <i class="bi bi-calendar3"></i>
+                                    <span th:text="${compra.fecha}"></span>
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div th:if="${compra.productosComprados != null && !compra.productosComprados.isEmpty()}">
+                                    <h6 class="fw-bold mb-2">Productos comprados:</h6>
+                                    <div class="productos-lista" style="word-wrap: break-word;">
+                                        <div class="border-bottom pb-2 mb-2"
+                                             th:each="producto : ${compra.productosComprados}">
+                                            <div class="d-flex align-items-center gap-3">
+                                                <!-- Imagen -->
+                                                <div>
+                                                    <img th:src="'http://www.imagenestaller.free.nf/' + ${producto.urlImagen}"
+                                                         style="width: 50px; height: 50px; object-fit: contain;">
+                                                </div>
+
+                                                <!-- Nombre y detalle -->
+                                                <div class="flex-grow-1" style="min-width: 0;">
+                                                    <small class="fw-bold text-truncate d-block"
+                                                           style="max-width: 100%;"
+                                                           th:text="${producto.componente.nombre}"></small>
+                                                    <small th:if="${producto.esArmado == true}"
+                                                           th:text="|Armado ${producto.numeroDeArmado}|"
+                                                           style="color: #1976d2;"></small>
+                                                </div>
+
+                                                <!-- Cantidad y precio -->
+                                                <div class="text-end">
+                                                    <div>
+                                                        <small class="text-muted">x<span
+                                                                th:text="${producto.cantidad}"></span></small>
+                                                    </div>
+                                                    <div>
+                                                        <small class="text-success">
+                                                            <span th:text="'$' + ${#numbers.formatDecimal(producto.precioUnitario, 1, 'POINT', 2, 'COMMA')}"></span>
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="exito-pedido">Pedido: <span style="color:#1976d2;">OV01-00000001</span>
+                                </div>
+                                <div class="exito-fecha">
+                                    Fecha de Solicitud de compra: <span th:text="${fechaCompra}"></span>
+                                </div>
+                            </div>
+
+                            <div class="exito-resumen">
+                                <div class="exito-resumen-row">
+                                    <div class="exito-resumen-col">
+                                        <b>Entrega</b><br>
+                                        <p>Fecha Entrega Estimada:
+                                        <div th:text="${tiempo}"></div>
+                                        </p>
+                                        <p>
+                                        <div th:text="${destino}"></div>
+                                        </p>
+                                    </div>
+                                    <div class="exito-resumen-col">
+                                        Metodo de pago:
+                                        <span class="badge bg-secondary mb-2">
+                                <i class="bi bi-credit-card me-1"></i>
+                                <span th:text="${compra.metodoDePago}"></span>
+                                <br>
+                                <span th:if="${tarjeta != null}"
+                                      th:text="' **** ' + ${#strings.substring(tarjeta.numeroDeTarjeta, tarjeta.numeroDeTarjeta.length() - 4)}"></span>
+                                <span th:if="${tarjeta == null}">No disponible</span>
+                            </span>
+                                    </div>
+                                    <div class="exito-resumen-col">
+                                        <b>Resumen</b><br>
+                                        Costo del envío: <span th:text="${costoEnvio}" style="float:right"></span><br>
+                                        <hr style="margin: 8px 0;">
+                                        <b>Total</b>: <span
+                                            th:text="'$' + ${#numbers.formatDecimal(compra.total, 1, 'POINT', 2, 'COMMA')}"
+                                            style="float:right; color:#1976d2; font-size:1.1em;"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="exito-resumen">
-        <div class="exito-resumen-row">
-            <div class="exito-resumen-col">
-                <b>Entrega</b><br>
-                Fecha Entrega Estimada: <b>05/07/2025</b><br>
-                Argentina<br>
-                Ramos Mejia<br>
-
-            </div>
-            <div class="exito-resumen-col">
-                <b>Medio de Pago</b><br>
-                Número de tarjeta<br>
-                <span th:if="${tarjeta != null}"
-                      th:text="'**** **** **** ' + ${#strings.substring(tarjeta.numeroDeTarjeta, tarjeta.numeroDeTarjeta.length() - 4)}"></span>
-                <span th:if="${tarjeta == null}">No disponible</span>
-            </div>
-            <div class="exito-resumen-col">
-                <b>Resumen</b><br>
-                Subtotal: <span style="float:right">$22.835,15</span><br>
-
-                Costo del envío: <span style="float:right">$1.500</span><br>
-                <hr style="margin: 8px 0;">
-                <b>Total</b>: <span style="float:right; color:#1976d2; font-size:1.1em;">$24.335,15</span>
-            </div>
-        </div>
-    </div>
-    <a th:href="@{/index.html}" class="exito-volver">Volver al inicio</a>
+</div>
+<a th:href="@{/index.html}" class="exito-volver">Volver al inicio</a>
+<button class="btn btn-primary mt-3 col-md-4" id="btn-imprimir">Exportar PDF</button>
 </div>
 <div th:replace="fragments/fragments :: footer"></div>
 <!-- FontAwesome para el icono de check -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
 </body>
 </html>
