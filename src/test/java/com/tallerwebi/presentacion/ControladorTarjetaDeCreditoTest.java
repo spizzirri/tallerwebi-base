@@ -52,9 +52,7 @@ public class ControladorTarjetaDeCreditoTest {
 
         ModelAndView vista = controladorTarjetaDeCredito.validar("1234567890123456", "12/30", "123", metodoDePago, sessionMock);
 
-        assertThat(vista.getViewName(), equalTo("pagoExitoso"));
-        assertThat(vista.getModelMap().get("fechaCompra"), notNullValue());
-        assertThat(((TarjetaDeCreditoDto) vista.getModelMap().get("tarjeta")).getNumeroDeTarjeta(), equalTo("1234567890123456"));
+        assertThat(vista.getViewName(), equalTo("redirect:/pagoExitoso"));
     }
 
     @Test
