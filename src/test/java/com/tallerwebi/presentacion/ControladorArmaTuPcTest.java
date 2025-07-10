@@ -1,11 +1,9 @@
 package com.tallerwebi.presentacion;
 import com.tallerwebi.dominio.ServicioArmaTuPc;
+import com.tallerwebi.dominio.ServicioMotherboard;
 import com.tallerwebi.dominio.ServicioPrecios;
 import com.tallerwebi.dominio.ServicioProductoCarritoImpl;
-import com.tallerwebi.dominio.excepcion.ComponenteDeterminateDelArmadoEnNullException;
-import com.tallerwebi.dominio.excepcion.LimiteDeComponenteSobrepasadoEnElArmadoException;
-import com.tallerwebi.dominio.excepcion.QuitarComponenteInvalidoException;
-import com.tallerwebi.dominio.excepcion.QuitarStockDemasDeComponenteException;
+import com.tallerwebi.dominio.excepcion.*;
 import com.tallerwebi.presentacion.dto.ArmadoPcDto;
 import com.tallerwebi.presentacion.dto.ComponenteDto;
 import com.tallerwebi.presentacion.dto.ProductoCarritoArmadoDto;
@@ -35,17 +33,17 @@ public class ControladorArmaTuPcTest {
     private ComponenteDto componenteDtoMock;
     private ControladorArmaTuPc controladorArmaTuPc;
     private ServicioPrecios servicioPreciosMock;
-    private ServicioProductoCarritoImpl servicioProductoCarritoMock;
+    private ServicioMotherboard servicioMotherboardMock;
 
     @BeforeEach
     public void init() {
         servicioArmaTuPcMock = mock(ServicioArmaTuPc.class);
         servicioPreciosMock = mock(ServicioPrecios.class);
-        servicioProductoCarritoMock = mock(ServicioProductoCarritoImpl.class);
+        servicioMotherboardMock = mock(ServicioMotherboard.class);
         sessionMock = mock(HttpSession.class);
         armadoPcDtoMock = mock(ArmadoPcDto.class);
         componenteDtoMock = mock(ComponenteDto.class);
-        controladorArmaTuPc = new ControladorArmaTuPc(servicioArmaTuPcMock, servicioPreciosMock, servicioProductoCarritoMock);
+        controladorArmaTuPc = new ControladorArmaTuPc(servicioArmaTuPcMock, servicioPreciosMock, servicioMotherboardMock);
     }
 
     // Tests para obtenerArmadoPcDtoDeLaSession (Lógica interna)
@@ -85,7 +83,7 @@ public class ControladorArmaTuPcTest {
         String tipoComponente = "motherboard";
         when(sessionMock.getAttribute("armadoPcDto")).thenReturn(armadoPcDtoMock);
         when(servicioArmaTuPcMock.obtenerListaDeComponentesCompatiblesDto(tipoComponente, armadoPcDtoMock))
-                .thenReturn(List.of(componenteDtoMock));
+                .thenReturn((Set<ComponenteDto>) List.of(componenteDtoMock));
         when(armadoPcDtoMock.getComponentesDto()).thenReturn(Collections.emptyList());
 
         // Ejecución
@@ -109,7 +107,7 @@ public class ControladorArmaTuPcTest {
         String query = "Nvidia";
         when(sessionMock.getAttribute("armadoPcDto")).thenReturn(armadoPcDtoMock);
         when(servicioArmaTuPcMock.obtenerListaDeComponentesCompatiblesFiltradosDto(tipoComponente, query, armadoPcDtoMock))
-                .thenReturn(List.of(componenteDtoMock));
+                .thenReturn((Set<ComponenteDto>) List.of(componenteDtoMock));
         when(armadoPcDtoMock.getComponentesDto()).thenReturn(Collections.emptyList());
 
         // Ejecución
@@ -137,7 +135,7 @@ public class ControladorArmaTuPcTest {
         when(armadoPcDtoMock.getComponentesDto()).thenReturn(componentesSeleccionados);
         when(sessionMock.getAttribute("armadoPcDto")).thenReturn(armadoPcDtoMock);
         when(servicioArmaTuPcMock.obtenerListaDeComponentesCompatiblesDto(tipoComponente, armadoPcDtoMock))
-                .thenReturn(List.of(componenteDtoMock));
+                .thenReturn((Set<ComponenteDto>) List.of(componenteDtoMock));
 
         // Ejecución
         ModelAndView mav = controladorArmaTuPc.cargarComponentes(tipoComponente, null, sessionMock);
@@ -181,7 +179,7 @@ public class ControladorArmaTuPcTest {
     }
 
     @Test
-    public void cuandoLaAccionEsAgregarSeLlamaAlMetodoDeAgregarComponenteYRedirigeConSiguientePaso() throws LimiteDeComponenteSobrepasadoEnElArmadoException {
+    public void cuandoLaAccionEsAgregarSeLlamaAlMetodoDeAgregarComponenteYRedirigeConSiguientePaso() throws LimiteDeComponenteSobrepasadoEnElArmadoException, ComponenteSinStockPedidoException {
         // Preparación
         String tipoComponente = "procesador";
 
@@ -224,7 +222,7 @@ public class ControladorArmaTuPcTest {
 
     // Tests para agregarComponenteAlArmado
     @Test
-    public void cuandoAgregoUnComponenteExitosamenteSeActualizaLaSessionYSeRedirige() throws LimiteDeComponenteSobrepasadoEnElArmadoException {
+    public void cuandoAgregoUnComponenteExitosamenteSeActualizaLaSessionYSeRedirige() throws LimiteDeComponenteSobrepasadoEnElArmadoException, ComponenteSinStockPedidoException {
         // Preparación
         String tipoComponente = "procesador";
         Long idComponente = 1L;
@@ -247,7 +245,7 @@ public class ControladorArmaTuPcTest {
     }
 
     @Test
-    public void cuandoIntentoAgregarMasComponentesDelLimiteSeMuestraUnError() throws LimiteDeComponenteSobrepasadoEnElArmadoException {
+    public void cuandoIntentoAgregarMasComponentesDelLimiteSeMuestraUnError() throws LimiteDeComponenteSobrepasadoEnElArmadoException, ComponenteSinStockPedidoException {
         // Preparación
         String tipoComponente = "memoria";
         Long idComponente = 1L;
@@ -387,7 +385,7 @@ public class ControladorArmaTuPcTest {
 
         when(sessionMock.getAttribute("armadoPcDto")).thenReturn(armadoPcDtoMock);
         when(servicioArmaTuPcMock.obtenerListaDeComponentesCompatiblesDto(tipoComponente, armadoPcDtoMock))
-                .thenReturn(listaComponentes);
+                .thenReturn((Set<ComponenteDto>) listaComponentes);
         when(servicioPreciosMock.conversionDolarAPeso(100.0)).thenReturn("$ 100.000,00");
         when(servicioPreciosMock.conversionDolarAPeso(200.0)).thenReturn("$ 200.000,00");
 
@@ -403,7 +401,7 @@ public class ControladorArmaTuPcTest {
     }
 
     @Test
-    public void cuandoSeAgregaUnComponenteSeActualizaElPrecioTotalDelArmadoEnPesos() throws LimiteDeComponenteSobrepasadoEnElArmadoException {
+    public void cuandoSeAgregaUnComponenteSeActualizaElPrecioTotalDelArmadoEnPesos() throws LimiteDeComponenteSobrepasadoEnElArmadoException, ComponenteSinStockPedidoException {
         // Preparación
         Long idComponente = 1L;
         String tipoComponente = "procesador";

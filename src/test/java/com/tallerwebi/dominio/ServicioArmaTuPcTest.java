@@ -2,10 +2,7 @@ package com.tallerwebi.dominio;
 
 import com.tallerwebi.dominio.entidades.Componente;
 import com.tallerwebi.dominio.entidades.Procesador;
-import com.tallerwebi.dominio.excepcion.ComponenteDeterminateDelArmadoEnNullException;
-import com.tallerwebi.dominio.excepcion.LimiteDeComponenteSobrepasadoEnElArmadoException;
-import com.tallerwebi.dominio.excepcion.QuitarComponenteInvalidoException;
-import com.tallerwebi.dominio.excepcion.QuitarStockDemasDeComponenteException;
+import com.tallerwebi.dominio.excepcion.*;
 import com.tallerwebi.presentacion.dto.ArmadoPcDto;
 import com.tallerwebi.presentacion.dto.ComponenteDto;
 import org.junit.jupiter.api.BeforeEach;
@@ -57,7 +54,7 @@ public class ServicioArmaTuPcTest {
         when(servicioCompatibilidadesMock.esCompatibleConElArmado(any(Componente.class), any())).thenReturn(true);
 
         // Ejecución
-        List<ComponenteDto> resultado = servicioArmaTuPc.obtenerListaDeComponentesCompatiblesDto(tipoComponente, armadoPcDto);
+        List<ComponenteDto> resultado = (List<ComponenteDto>) servicioArmaTuPc.obtenerListaDeComponentesCompatiblesDto(tipoComponente, armadoPcDto);
 
         // Verificación
         assertThat(resultado, hasSize(2));
@@ -78,7 +75,7 @@ public class ServicioArmaTuPcTest {
         when(servicioCompatibilidadesMock.esCompatibleConElArmado(any(Componente.class), any())).thenReturn(false);
 
         // Ejecución
-        List<ComponenteDto> resultado = servicioArmaTuPc.obtenerListaDeComponentesCompatiblesDto(tipoComponente, armadoPcDto);
+        List<ComponenteDto> resultado = (List<ComponenteDto>) servicioArmaTuPc.obtenerListaDeComponentesCompatiblesDto(tipoComponente, armadoPcDto);
 
         // Verificación
         assertTrue(resultado.isEmpty());
@@ -115,7 +112,7 @@ public class ServicioArmaTuPcTest {
         when(servicioCompatibilidadesMock.esCompatibleConElArmado(any(Componente.class), any())).thenReturn(true);
 
         // Ejecución
-        List<ComponenteDto> resultado = servicioArmaTuPc.obtenerListaDeComponentesCompatiblesFiltradosDto(tipoComponente, filtro, armadoPcDto);
+        List<ComponenteDto> resultado = (List<ComponenteDto>) servicioArmaTuPc.obtenerListaDeComponentesCompatiblesFiltradosDto(tipoComponente, filtro, armadoPcDto);
 
         // Verificación
         assertThat(resultado, hasSize(1));
@@ -126,7 +123,7 @@ public class ServicioArmaTuPcTest {
 
     // Tests para agregarComponenteAlArmado
     @Test
-    public void cuandoAgregoUnProcesadorSeReiniciaElArmadoPeroSeConservanPerifericosYMonitor() throws LimiteDeComponenteSobrepasadoEnElArmadoException {
+    public void cuandoAgregoUnProcesadorSeReiniciaElArmadoPeroSeConservanPerifericosYMonitor() throws LimiteDeComponenteSobrepasadoEnElArmadoException, ComponenteSinStockPedidoException {
         // Preparación
         ArmadoPcDto armadoPcDtoInicial = new ArmadoPcDto();
         armadoPcDtoInicial.setMotherboard(new ComponenteDto(crearComponente(10L, "Mother Vieja", "Motherboard")));
@@ -222,7 +219,7 @@ public class ServicioArmaTuPcTest {
     }
 
     @Test
-    public void cuandoAgregoUnaMemoriaRAMSeAgregaALaLista() throws LimiteDeComponenteSobrepasadoEnElArmadoException {
+    public void cuandoAgregoUnaMemoriaRAMSeAgregaALaLista() throws LimiteDeComponenteSobrepasadoEnElArmadoException, ComponenteSinStockPedidoException {
         // Preparación
         ArmadoPcDto armadoPcDto = new ArmadoPcDto();
         armadoPcDto.setProcesador(new ComponenteDto(crearComponente(1L, "Intel i5", "Procesador")));
@@ -469,7 +466,7 @@ public class ServicioArmaTuPcTest {
     }
 
     @Test
-    public void cuandoAgregoUnComponenteSeFormateaSuPrecioEnPesos() throws LimiteDeComponenteSobrepasadoEnElArmadoException {
+    public void cuandoAgregoUnComponenteSeFormateaSuPrecioEnPesos() throws LimiteDeComponenteSobrepasadoEnElArmadoException, ComponenteSinStockPedidoException {
         // Preparación
         Long idComponente = 1L;
         String tipoComponente = "procesador";

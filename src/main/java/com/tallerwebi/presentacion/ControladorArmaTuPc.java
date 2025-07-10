@@ -1,12 +1,9 @@
 package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.ServicioArmaTuPc;
+import com.tallerwebi.dominio.ServicioMotherboard;
 import com.tallerwebi.dominio.ServicioPrecios;
-import com.tallerwebi.dominio.ServicioProductoCarritoImpl;
-import com.tallerwebi.dominio.excepcion.ComponenteDeterminateDelArmadoEnNullException;
-import com.tallerwebi.dominio.excepcion.LimiteDeComponenteSobrepasadoEnElArmadoException;
-import com.tallerwebi.dominio.excepcion.QuitarComponenteInvalidoException;
-import com.tallerwebi.dominio.excepcion.QuitarStockDemasDeComponenteException;
+import com.tallerwebi.dominio.excepcion.*;
 import com.tallerwebi.presentacion.dto.ArmadoPcDto;
 import com.tallerwebi.presentacion.dto.ComponenteDto;
 import com.tallerwebi.presentacion.dto.ProductoCarritoArmadoDto;
@@ -24,11 +21,11 @@ public class ControladorArmaTuPc {
 
     private ServicioArmaTuPc servicioArmaTuPc;
     private ServicioPrecios servicioPrecios;
-    private ServicioProductoCarritoImpl servicioProductoCarrito;
     private List<String> pasos = Arrays.asList("procesador", "motherboard", "cooler", "memoria", "gpu", "almacenamiento", "fuente", "gabinete", "monitor", "periferico", "resumen");
+    private ServicioMotherboard servicioMotherboard;
 
     @Autowired
-    public ControladorArmaTuPc(ServicioArmaTuPc servicioArmaTuPc, ServicioPrecios servicioPrecios, ServicioProductoCarritoImpl servicioProductoCarrito) {this.servicioArmaTuPc =  servicioArmaTuPc;this.servicioPrecios = servicioPrecios;this.servicioProductoCarrito = servicioProductoCarrito;}
+    public ControladorArmaTuPc(ServicioArmaTuPc servicioArmaTuPc, ServicioPrecios servicioPrecios, ServicioMotherboard servicioMotherboard) {this.servicioArmaTuPc =  servicioArmaTuPc;this.servicioPrecios = servicioPrecios;this.servicioMotherboard = servicioMotherboard;}
     public ControladorArmaTuPc() {}
 
      private ArmadoPcDto obtenerArmadoPcDtoDeLaSession(HttpSession session) {
@@ -50,14 +47,25 @@ public class ControladorArmaTuPc {
             List<ComponenteDto> componentesCompatiblesADevolver;
 
             componentesCompatiblesADevolver = (query != null)
-                    ? this.servicioArmaTuPc.obtenerListaDeComponentesCompatiblesFiltradosDto(tipoComponente, query, armadoPcDto)
-                    : this.servicioArmaTuPc.obtenerListaDeComponentesCompatiblesDto(tipoComponente, armadoPcDto);
+                    ? new ArrayList<>(this.servicioArmaTuPc.obtenerListaDeComponentesCompatiblesFiltradosDto(tipoComponente, query, armadoPcDto))
+                    : new ArrayList<>(this.servicioArmaTuPc.obtenerListaDeComponentesCompatiblesDto(tipoComponente, armadoPcDto));
 
             model.put("componentesLista", this.pasarPreciosAPesos(componentesCompatiblesADevolver));
+
+            if (tipoComponente.equals("memoria")) model.put("slotsRamMotherboardElegida", this.servicioArmaTuPc.obtenerSlotsRamDeMotherboard(armadoPcDto.getMotherboard()));
+            if (tipoComponente.equals("almacenamiento")){
+                model.put("slotsSataMotherboardElegida", this.servicioArmaTuPc.obtenerSlotsSataDeMotherboard(armadoPcDto.getMotherboard()));
+                model.put("slotsM2MotherboardElegida", this.servicioArmaTuPc.obtenerSlotsM2DeMotherboard(armadoPcDto.getMotherboard()));
+            }
 
         } catch (ComponenteDeterminateDelArmadoEnNullException e) {
             model.put("errorLista", e.getMessage());
         }
+
+        if ((tipoComponente.equals("procesador") && armadoPcDto.getProcesador() == null)
+            || (tipoComponente.equals("motherboard") && armadoPcDto.getMotherboard() == null)
+            || (tipoComponente.equals("cooler") && armadoPcDto.getCooler() == null)
+            || (tipoComponente.equals("gabinete") && armadoPcDto.getGabinete() == null)) model.put("componenteEscencialFaltante", "Este componente es obligatorio para completar el armado.");
 
         Integer wattsDeArmado = this.servicioArmaTuPc.obtenerWattsTotalesDeArmado(armadoPcDto);
 
@@ -128,6 +136,9 @@ public class ControladorArmaTuPc {
         ArmadoPcDto armadoPcDtoConComponenteAgregado = null;
         try {
             armadoPcDtoConComponenteAgregado = this.servicioArmaTuPc.agregarComponenteAlArmado(idComponente, tipoComponente, cantidad, obtenerArmadoPcDtoDeLaSession(session));
+        }catch (ComponenteSinStockPedidoException e) {
+            model.put("errorLimite", e.getMessage());
+            return new ModelAndView("redirect:/arma-tu-pc/tradicional/" + tipoComponente, model);
         } catch (LimiteDeComponenteSobrepasadoEnElArmadoException e) {
             model.put("errorLimite", "Supero el limite de "+tipoComponente+" de su armado");
             return new ModelAndView("redirect:/arma-tu-pc/tradicional/" + tipoComponente, model);
@@ -201,6 +212,9 @@ public class ControladorArmaTuPc {
 
     @RequestMapping(path = "arma-tu-pc/tradicional/reiniciar-armado", method = RequestMethod.POST)
     public ModelAndView reiniciarArmado(HttpSession session) {
+
+        this.servicioArmaTuPc.devolverStockDeArmado(obtenerArmadoPcDtoDeLaSession(session));
+
         session.removeAttribute("armadoPcDto");
         return new ModelAndView("redirect:/arma-tu-pc/tradicional/procesador");
     }
@@ -220,10 +234,9 @@ public class ControladorArmaTuPc {
 
         Integer numeroDeUltimoArmadoEnElCarrito = obtenerElNumeroDelUltimoArmadoDelCarritoDeSesion(carritoSesion);
 
-        for (ProductoCarritoArmadoDto producto : productoCarritoArmadoDtos) {
-            servicioProductoCarrito.descontarStockAlComponente(producto.getId(), producto.getCantidad());
+        for (ProductoCarritoArmadoDto producto : productoCarritoArmadoDtos) // para que los armados se puedan distinguir entre ellos en el carrito y las compras
             producto.setNumeroDeArmadoAlQuePertenece(numeroDeUltimoArmadoEnElCarrito + 1);
-        }
+
 
         carritoSesion.addAll(productoCarritoArmadoDtos);
 
