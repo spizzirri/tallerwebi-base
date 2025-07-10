@@ -279,6 +279,23 @@ public class ServicioCompatibilidadesTest {
         verify(repositorioComponenteMock, times(1)).obtenerComponentePorId(2L);
     }
 
+    @Test
+    public void cuandoSeObtienenLosWattsDelArmadoDevuelveElValorCorrecto() {
+        // Preparación
+        ArmadoPc armadoPc = new ArmadoPc();
+        armadoPc.setProcesador(procesador);
+        armadoPc.setPlacaDeVideo(gpu);
+
+        when(servicioFuenteMock.obtenerWatsTotales(armadoPc)).thenReturn(450);
+
+        // Ejecución
+        Integer watts = servicioCompatibilidades.obtenerWattsDeArmado(armadoPc);
+
+        // Verificación
+        assertEquals(450, watts);
+        verify(servicioFuenteMock, times(1)).obtenerWatsTotales(armadoPc);
+    }
+
     // Métodos helper para crear entidades de prueba
     private Procesador crearProcesador(Long id, String nombre) {
         Procesador p = new Procesador();

@@ -22,10 +22,9 @@ public class ControladorArmaTuPc {
     private ServicioArmaTuPc servicioArmaTuPc;
     private ServicioPrecios servicioPrecios;
     private List<String> pasos = Arrays.asList("procesador", "motherboard", "cooler", "memoria", "gpu", "almacenamiento", "fuente", "gabinete", "monitor", "periferico", "resumen");
-    private ServicioMotherboard servicioMotherboard;
 
     @Autowired
-    public ControladorArmaTuPc(ServicioArmaTuPc servicioArmaTuPc, ServicioPrecios servicioPrecios, ServicioMotherboard servicioMotherboard) {this.servicioArmaTuPc =  servicioArmaTuPc;this.servicioPrecios = servicioPrecios;this.servicioMotherboard = servicioMotherboard;}
+    public ControladorArmaTuPc(ServicioArmaTuPc servicioArmaTuPc, ServicioPrecios servicioPrecios) {this.servicioArmaTuPc =  servicioArmaTuPc;this.servicioPrecios = servicioPrecios;}
     public ControladorArmaTuPc() {}
 
      private ArmadoPcDto obtenerArmadoPcDtoDeLaSession(HttpSession session) {
