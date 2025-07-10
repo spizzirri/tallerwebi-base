@@ -1,0 +1,245 @@
+
+<div th:fragment="cargarPaso">
+    <div class="container-xxl py-4">
+        <p th:if="${param.errorLimite!=null}" th:text="${param.errorLimite}" class="alert alert-danger banners-info"></p>
+        <p th:if="${param.errorQuitado!=null}" th:text="${param.errorQuitado}" class="alert alert-danger banners-info"></p>
+        <p th:if="${param.accionInvalida!=null}" th:text="${param.accionInvalida}" class="alert alert-danger banners-info"></p>
+        <p th:if="${param.agregado!=null}" th:text="${param.agregado}" class="alert alert-success banners-info"></p>
+        <p th:if="${param.quitado!=null}" th:text="${param.quitado}" class="alert alert-warning banners-info"></p>
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-lg-4 mb-3">
+                <div class="border rounded p-2 bg-white mb-3">
+                    <div class="row g-2 text-center">
+                        <!-- Placeholder icons -->
+                        <div class="col-6">
+                            <div th:if="${armadoPcDto.procesador != null}" class="h-100">
+                                <div class="border rounded bg-light py-3 h-100">
+                                    <img th:src="'http://www.imagenestaller.free.nf/' + ${armadoPcDto.procesador.imagen}" th:alt="${armadoPcDto.procesador.modelo}" class="img-fluid w-50 m-auto my-3">
+                                    <p th:text="'x1 '+ ${armadoPcDto.procesador.modelo}"></p>
+                                </div>
+                            </div>
+                            <div th:unless="${armadoPcDto.procesador != null}" class="h-100">
+                                <div class="border rounded bg-light py-3 h-100">
+                                    <img th:src="'http://www.imagenestaller.free.nf/procesadorVacio.png'" alt="procesadorVacio" class="w-25 m-auto my-3">
+                                    <p>Procesador</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div th:if="${armadoPcDto.motherboard != null}" class="h-100">
+                                <div class="border rounded bg-light py-3 h-100">
+                                    <img th:src="'http://www.imagenestaller.free.nf/' + ${armadoPcDto.motherboard.imagen}" th:alt="${armadoPcDto.motherboard.modelo}" class="img-fluid w-50 m-auto my-3">
+                                    <p th:text="'x1 '+ ${armadoPcDto.motherboard.modelo}"></p>
+                                </div>
+                            </div>
+                            <div th:unless="${armadoPcDto.motherboard != null}" class="h-100">
+                                <div class="border rounded bg-light py-3 h-100">
+                                    <img th:src="'http://www.imagenestaller.free.nf/motherboardVacia.png'" alt="motherboardVacia" class="w-25 m-auto my-3">
+                                    <p>Motherboard</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div th:if="${armadoPcDto.cooler != null}" class="h-100">
+                                <div class="border rounded bg-light py-3 h-100">
+                                    <img th:src="'http://www.imagenestaller.free.nf/' + ${armadoPcDto.cooler.imagen}" th:alt="${armadoPcDto.cooler.modelo}" class="img-fluid w-50 m-auto my-3">
+                                    <p th:text="'x1 '+ ${armadoPcDto.cooler.modelo}"></p>
+                                </div>
+                            </div>
+                            <div th:unless="${armadoPcDto.cooler != null}" class="h-100">
+                                <div class="border rounded bg-light py-3 h-100">
+                                    <img th:src="'http://www.imagenestaller.free.nf/coolerVacio.png'" alt="coolerVacia" class="w-25 m-auto my-3">
+                                    <p>Cooler</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div th:if="${armadoPcDto.rams.size() > 0}" class="h-100">
+                                <div class="border rounded bg-light py-3 h-100 d-flex flex-column justify-content-between">
+                                    <div th:each="entry: ${armadoPcDto.ramsDetalladas}" class="w-100 m-0">
+                                        <img th:src="'http://www.imagenestaller.free.nf/' +  ${entry.key.imagen}" style='height: 20px; width: 20px' class="w-25 m-auto my-3">
+                                        <p th:text="'x'+ ${entry.value} +' '+ ${entry.key.modelo} " class="m-0"></p>
+                                    </div>
+                                    <p>Memoria</p>
+                                </div>
+
+                            </div>
+                            <div th:unless="${armadoPcDto.rams.size() > 0}" class="h-100">
+                                <div class="border rounded bg-light py-3 h-100">
+                                    <img th:src="'http://www.imagenestaller.free.nf/memoriaVacia.png'" alt="memoriaVacia" class="w-25 m-auto my-3">
+                                    <p>Memoria</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div th:if="${armadoPcDto.gpu != null}" class="h-100">
+                                <div class="border rounded bg-light py-3 h-100">
+                                    <img th:src="'http://www.imagenestaller.free.nf/' + ${armadoPcDto.gpu.imagen}" th:alt="${armadoPcDto.gpu.modelo}" class="img-fluid w-50 m-auto my-3">
+                                    <p th:text="'x1 '+ ${armadoPcDto.gpu.modelo}"></p>
+                                </div>
+                            </div>
+                            <div th:unless="${armadoPcDto.gpu != null}" class="h-100">
+                                <div class="border rounded bg-light py-3 h-100">
+                                    <img th:src="'http://www.imagenestaller.free.nf/gpuVacio.png'" alt="gpuVacio" class="w-25 m-auto my-3">
+                                    <p>Placa de Video</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div th:if="${armadoPcDto.almacenamiento.size() > 0}" class="h-100">
+                                <div class="border rounded bg-light py-3 h-100 d-flex flex-column justify-content-between">
+                                    <div th:each="entry: ${armadoPcDto.almacenamientoDetallado}" class="w-100 m-0">
+                                        <img th:src="'http://www.imagenestaller.free.nf/' +  ${entry.key.imagen}" style='height: 20px; width: 20px' class="w-25 m-auto my-3">
+                                        <p th:text="'x'+ ${entry.value} +' '+ ${entry.key.modelo} " class="m-0"></p>
+                                    </div>
+                                    <p>Almacenamiento</p>
+                                </div>
+                            </div>
+                            <div th:unless="${armadoPcDto.almacenamiento.size() > 0}" class="h-100">
+                                <div class="border rounded bg-light py-3 h-100">
+                                    <img th:src="'http://www.imagenestaller.free.nf/almacenamientoVacio.png'" alt="almacenamientoVacio" class="w-25 m-auto my-3">
+                                    <p>Almacenamiento</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div th:if="${armadoPcDto.fuente != null}" class="h-100">
+                                <div class="border rounded bg-light py-3 h-100">
+                                    <img th:src="'http://www.imagenestaller.free.nf/' + ${armadoPcDto.fuente.imagen}" th:alt="${armadoPcDto.fuente.modelo}" class="img-fluid w-50 m-auto my-3">
+                                    <p th:text="'x1 '+ ${armadoPcDto.fuente.modelo}"></p>
+                                </div>
+                            </div>
+                            <div th:unless="${armadoPcDto.fuente != null}" class="h-100">
+                                <div class="border rounded bg-light py-3 h-100">
+                                    <img th:src="'http://www.imagenestaller.free.nf/fuenteVacia.png'" alt="fuenteVacia" class="w-25 m-auto my-3">
+                                    <p>Fuente</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div th:if="${armadoPcDto.gabinete != null}" class="h-100">
+                                <div class="border rounded bg-light py-3 h-100">
+                                    <img th:src="'http://www.imagenestaller.free.nf/' + ${armadoPcDto.gabinete.imagen}" th:alt="${armadoPcDto.gabinete.modelo}" class="img-fluid w-50 m-auto my-3">
+                                    <p th:text="'x1 '+ ${armadoPcDto.gabinete.modelo}"></p>
+                                </div>
+                            </div>
+                            <div th:unless="${armadoPcDto.gabinete != null}" class="h-100">
+                                <div class="border rounded bg-light py-3 h-100">
+                                    <img th:src="'http://www.imagenestaller.free.nf/gabineteVacio.png'" alt="gabineteVacio" class="w-25 m-auto my-3">
+                                    <p>Gabinete</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div th:if="${armadoPcDto.monitor != null}" class="h-100">
+                                <div class="border rounded bg-light py-3 h-100">
+                                    <img th:src="'http://www.imagenestaller.free.nf/' + ${armadoPcDto.monitor.imagen}" th:alt="${armadoPcDto.monitor.modelo}" class="img-fluid w-50 m-auto my-3">
+                                    <p th:text="'x1 '+ ${armadoPcDto.monitor.modelo}"></p>
+                                </div>
+                            </div>
+                            <div th:unless="${armadoPcDto.monitor != null}" class="h-100">
+                                <div class="border rounded bg-light py-3 h-100">
+                                    <img th:src="'http://www.imagenestaller.free.nf/monitorVacio.png'" alt="monitorVacio" class="w-25 m-auto my-3">
+                                    <p>Monitor</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div th:if="${armadoPcDto.perifericos.size() > 0}" class="h-100">
+                                <div class="border rounded bg-light py-3 h-100 d-flex flex-column justify-content-between">
+                                    <div th:each="entry: ${armadoPcDto.perifericosDetallados}" class="w-100 m-0">
+                                        <img th:src="'http://www.imagenestaller.free.nf/' +  ${entry.key.imagen}" style='height: 20px; width: 20px' class="w-25 m-auto my-3">
+                                        <p th:text="'x'+ ${entry.value} +' '+ ${entry.key.modelo} " class="m-0"></p>
+                                    </div>
+                                    <p>Perifericos</p>
+                                </div>
+                            </div>
+                            <div th:unless="${armadoPcDto.perifericos.size() > 0}" class="h-100">
+                                <div class="border rounded bg-light py-3 h-100">
+                                    <img th:src="'http://www.imagenestaller.free.nf/perifericoVacio.png'" alt="perifericoVacio" class="w-25 m-auto my-3">
+                                    <p>Perifericos</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="border rounded p-3 bg-white text-center">
+                    <p class="fw-bold" th:text="${'$ ' + armadoPcDto.precioFormateado}"></p> <!-- aca deberia entrar la sumatoria del armadoPcDto-->
+                    <div class="d-flex justify-content-between">
+                        <a th:if="${pasoActual != 'procesador'}" th:href="${pasoAnterior}" class="btn btn-outline-primary btn-sm">Anterior paso</a>
+                        <form th:action="@{/arma-tu-pc/custom/reiniciar-armado}" method="POST">
+                            <input type="submit" class="btn btn-outline-danger btn-sm" value="Reiniciar Armado">
+                        </form>
+                        <a th:if="${pasoActual != 'periferico'}" th:href="${pasoSiguiente}" class="btn btn-outline-primary btn-sm">Siguiente paso</a>
+                        <a th:if="${pasoActual == 'periferico'}" th:href="@{/arma-tu-pc/custom/resumen}" class="btn btn-outline-success btn-sm">Finalizar Armado</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main content -->
+            <div class="col-lg-8">
+                <h3 th:if="${errorLista!=null}" th:text="${errorLista}" class="alert alert-danger fw-semibold"></h3>
+
+
+                <!-- Cards -->
+                <div th:if="${errorLista == null}">
+                    <!-- Filtros -->
+                    <div th:if="${pasoActual == 'procesador'}" class="mb-4"> <!--Si no es un procesador no mostramos AMD y INTEL-->
+                        <a th:href="@{'/arma-tu-pc/custom/procesador?q=AMD'}" class="btn btn-outline-dark me-2">AMD</a>
+                        <a th:href="@{'/arma-tu-pc/custom/procesador?q=INTEL'}" class="btn btn-outline-primary me-2">Intel</a>
+                        <a th:href="@{'/arma-tu-pc/custom/procesador'}" class="btn btn-outline-success">Todos</a>
+                    </div>
+                    <div th:if="${pasoActual == 'almacenamiento'}" class="mb-4"> <!--Si no es un procesador no mostramos AMD y INTEL-->
+                        <a th:href="@{'/arma-tu-pc/custom/almacenamiento?q=SOLIDO'}" class="btn btn-outline-dark me-2">Solido</a>
+                        <a th:href="@{'/arma-tu-pc/custom/almacenamiento?q=RIGIDO'}" class="btn btn-outline-primary me-2">Rigido</a>
+                        <a th:href="@{'/arma-tu-pc/custom/almacenamiento'}" class="btn btn-outline-success">Todos</a>
+                    </div>
+                    <div th:if="${pasoActual == 'periferico'}" class="mb-4"> <!--Si no es un procesador no mostramos AMD y INTEL-->
+                        <a th:href="@{'/arma-tu-pc/custom/periferico?q=TECLADO'}" class="btn btn-outline-dark me-2">Teclado</a>
+                        <a th:href="@{'/arma-tu-pc/custom/periferico?q=MOUSE'}" class="btn btn-outline-primary me-2">Mouse</a>
+                        <a th:href="@{'/arma-tu-pc/custom/periferico?q=AURICULARES'}" class="btn btn-outline-warning">Auriculares</a>
+                        <a th:href="@{'/arma-tu-pc/custom/periferico'}" class="btn btn-outline-success">Todos</a>
+                    </div>
+
+                    <div class="row g-3">
+                        <!-- Card ejemplo -->
+                        <div class="col-md-6 col-lg-4 mt-2 h-100" th:classappend="${idsDeComponentesSeleccionados.contains(componente.id)} ? ' order-first' : ''" th:each ="componente : ${componentesLista}">
+                            <form method="POST" th:action="@{'/arma-tu-pc/custom/' + ${pasoActual} + '/accion'}" class="h-100">
+                                <div class="card h-75">
+                                    <div>
+                                        <img th:src="'http://www.imagenestaller.free.nf/' +  ${componente.imagen}" class="card-img-top img-fluid" th:alt="${componente.modelo}">
+                                    </div>
+                                    <div class="card-body">
+                                        <h6 class="card-title" th:text="${componente.modelo}"></h6>
+                                        <p class="card-text text-muted" th:text="'$'+${componente.precioFormateado}"></p>
+                                        <span class="badge bg-success">Compatible</span>
+                                        <input type="hidden" name="id" th:value="${componente.id}">
+                                        <input th:if="${pasoActual != 'memoria' && pasoActual != 'almacenamiento'}" type="hidden" name="cantidad" value="1">
+                                        <select th:if="${pasoActual == 'memoria'}" name="cantidad">
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                        </select>
+                                        <select th:if="${pasoActual == 'almacenamiento'}" name="cantidad">
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                            <option value="5">5</option>
+                                            <option value="6">6</option>
+                                        </select>
+                                        <button type="submit" name="accion" class="btn btn-outline-primary" value="agregar">Agregar</button>
+                                        <button th:if="${idsDeComponentesSeleccionados.contains(componente.id)}" type="submit" name="accion" class="btn btn-outline-primary" value="quitar">Quitar</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/js/armaTuPc.js}"></script>
+</div>

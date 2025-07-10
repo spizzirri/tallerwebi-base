@@ -1,0 +1,27 @@
+<div th:replace="fragments/fragments :: header"></div>
+
+<form th:action="@{/arma-tu-pc/custom/procesador}" method="GET">
+    <div class="container">
+        <h4>Selecciona categoría:</h4>
+        <select id="selectorCategoria" class="form-select" aria-label="Default select example">
+            <option value="todos">Todos</option>
+            <option value="programas">Programas</option>
+            <option value="juegos">Juegos</option>
+        </select>
+        <select id="selectorRequisitos" name="selectorRequisitos" class="form-select" aria-label="Default select example">
+            <option value="">Seleccione</option>
+            <option value="requisitosMinimos">Requisitos Minimos</option>
+            <option value="requisitosRecomendados">Requisitos Recomendados</option>
+        </select>
+        <div class="row justify-content-evenly">
+            <div class="container my-4">
+                <div class="row" id="contenedorOpciones"></div>
+                <div class="d-flex justify-content-end">
+                    <button type="submit" id="filtrarBtn" class="btn btn-primary mt-3">Filtrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<div th:replace="fragments/fragments :: footer"></div>

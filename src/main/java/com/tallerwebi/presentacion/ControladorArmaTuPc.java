@@ -40,11 +40,6 @@ public class ControladorArmaTuPc {
         return (ArmadoPcDto) session.getAttribute("armadoPcDto");
     }
 
-    @GetMapping("/arma-tu-pc/armaTuPc")
-    public String elegirTipoDeArmado() {
-        return "arma-tu-pc/armaTuPc";
-    }
-
     @RequestMapping(path = "arma-tu-pc/tradicional/{tipoComponente}", method = RequestMethod.GET)
     public ModelAndView cargarComponentes(@PathVariable("tipoComponente") String tipoComponente,
                                           @RequestParam(value = "q", required = false) String query,
@@ -74,6 +69,45 @@ public class ControladorArmaTuPc {
         model.put("pasoSiguiente", obtenerPasoSiguiente(tipoComponente));
 
         return new ModelAndView("arma-tu-pc/tradicional/" + tipoComponente, model);
+    }
+
+    @RequestMapping(path = "/arma-tu-pc/custom/{tipoComponente}", method = RequestMethod.GET)
+    public ModelAndView cargarComponenteArmadoCustom(@PathVariable("tipoComponente") String tipoComponente,
+                                                        @RequestParam(name = "appSeleccionada[]", required = true) List<String> seleccionados,
+                                                        @RequestParam(name = "selectorRequisitos", required = true) String selectorRequisitos,
+                                                        @RequestParam(value = "q", required = false) String query,
+                                                        HttpSession sesion) {
+        ModelMap model = new ModelMap();
+        ArmadoPcDto armadoPcDto = obtenerArmadoPcDtoDeLaSession(sesion);
+
+        try {
+            List<ComponenteDto> componentesCompatiblesADevolver;
+
+            if (selectorRequisitos.equals("requisitosMinimos")){
+                componentesCompatiblesADevolver = (query != null)
+                        ? this.servicioArmaTuPc.obtenerListaDeComponentesCompatiblesFiltradosDtoCustomRequisitosMinimos(tipoComponente, query, armadoPcDto, this.servicioArmaTuPc.obtenerMapaDeRequisitosMinimosSeleccionados(seleccionados))
+                        : this.servicioArmaTuPc.obtenerListaDeComponentesCompatiblesDtoCustomRequisitosMinimos(tipoComponente, armadoPcDto, this.servicioArmaTuPc.obtenerMapaDeRequisitosMinimosSeleccionados(seleccionados));
+            } else {
+                componentesCompatiblesADevolver = (query != null)
+                        ? this.servicioArmaTuPc.obtenerListaDeComponentesCompatiblesFiltradosDtoCustomRequisitosRecomendados(tipoComponente, query, armadoPcDto, this.servicioArmaTuPc.obtenerMapaDeRequisitosRecomendadosSeleccionados(seleccionados))
+                        : this.servicioArmaTuPc.obtenerListaDeComponentesCompatiblesDtoCustomRequisitosRecomendados(tipoComponente, armadoPcDto, this.servicioArmaTuPc.obtenerMapaDeRequisitosRecomendadosSeleccionados(seleccionados));
+            }
+
+            model.put("componentesLista", this.pasarPreciosAPesos(componentesCompatiblesADevolver));
+
+        } catch (ComponenteDeterminateDelArmadoEnNullException e) {
+            model.put("errorLista", e.getMessage());
+        }
+        model.put("armadoPcDto", armadoPcDto);
+        model.put("idsDeComponentesSeleccionados", obtenerIdsDeArmadoDeSession(armadoPcDto));
+
+        //falta determinar si ingresa a un paso que no existe
+
+        model.put("pasoActual", tipoComponente);
+        model.put("pasoAnterior", obtenerPasoAnterior(tipoComponente));
+        model.put("pasoSiguiente", obtenerPasoSiguiente(tipoComponente));
+
+        return new ModelAndView("arma-tu-pc/custom/" + tipoComponente, model);
     }
 
     private List<ComponenteDto> pasarPreciosAPesos(List<ComponenteDto> componentesCompatiblesADevolver) {
@@ -218,6 +252,16 @@ public class ControladorArmaTuPc {
         // controlar el stock con servicio ServicioProductoCarritoImpl
 
         return new ModelAndView("redirect:/carritoDeCompras/index");
+    }
+
+    @GetMapping("/arma-tu-pc/armaTuPc")
+    public String elegirTipoDeArmado() {
+        return "arma-tu-pc/armaTuPc";
+    }
+
+    @GetMapping("/arma-tu-pc/armadoCustom")
+    public String seleccionCustom() {
+        return "arma-tu-pc/armadoCustom";
     }
 
 }

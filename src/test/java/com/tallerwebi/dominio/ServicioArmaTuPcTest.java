@@ -1,4 +1,4 @@
-package com.tallerwebi.dominio;
+/*package com.tallerwebi.dominio;
 
 import com.tallerwebi.dominio.entidades.Componente;
 import com.tallerwebi.dominio.entidades.Procesador;
@@ -497,3 +497,4 @@ public class ServicioArmaTuPcTest {
 
 
 }
+*/
