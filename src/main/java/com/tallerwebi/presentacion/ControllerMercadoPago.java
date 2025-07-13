@@ -8,6 +8,7 @@ import com.mercadopago.exceptions.MPApiException;
 
 import com.mercadopago.resources.preference.Preference;
 import com.tallerwebi.dominio.*;
+import com.tallerwebi.presentacion.dto.ProductoCarritoArmadoDto;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -119,7 +120,7 @@ public class ControllerMercadoPago {
         //Donde redireccionar depues de hacer el pago (arreglarlo para que me devuelva a la vista de nuestra app)
         PreferenceBackUrlsRequest backUrls = PreferenceBackUrlsRequest.builder()
 
-                .success("http://localhost:8080/checkout/pagoExitoso")
+                .success("http://localhost:8080/pagoExitoso?status=success")
                 .failure("http://localhost:8080/checkout/pagoExitoso")
                 .pending("http://localhost:8080/checkout/pagoExitoso")
                 .build();
@@ -136,7 +137,7 @@ public class ControllerMercadoPago {
         // Envio el pedido a mercado pago y me devuelve un link de pago, donde redirige al usuario
         try {
             Preference preference = client.create(preferenceRequest);
-            response.sendRedirect(preference.getSandboxInitPoint());
+
             UsuarioDto usuarioLogueado = (UsuarioDto) session.getAttribute("usuario");
 
             List<ProductoCarritoDto> carritoSesion = obtenerCarritoDeSesion(session);
@@ -151,17 +152,61 @@ public class ControllerMercadoPago {
             compraDto.setProductosComprados(convertirACompraComponenteDto(carritoSesion));
 
             servicioCompra.guardarCompraConUsuarioLogueado(compraDto, usuarioLogueado, session);
+            response.sendRedirect(preference.getSandboxInitPoint());
             servicioProductoCarritoImpl.limpiarCarrito();
+
             return null;
         } catch (MPApiException e) {
             String errorMsg = e.getApiResponse() != null ? e.getApiResponse().getContent() : "Sin contenido de error";
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error al crear la preferencia de pago. Detalle: " + errorMsg);
             return null;
-        } catch (Exception ex) {
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error inesperado al procesar el pago.");
+        }  catch (Exception ex) {
+            ex.printStackTrace(); // Esto imprimirá el error en la consola
+            try {
+                System.out.println("Error específico: " + ex.getMessage());
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error inesperado al procesar el pago: " + ex.getMessage());
+
             return null;
         }
     }
+
+//    @GetMapping("/pagoExitoso")
+//    public ModelAndView procesarPagoExitoso(@RequestParam(value = "status", required = false) String status,
+//                                            HttpSession session) {
+//
+//        String metodoDePagoPendiente = (String) session.getAttribute("metodoDePagoPendiente");
+//        UsuarioDto usuarioCompraPendiente = (UsuarioDto) session.getAttribute("usuarioCompraPendiente");
+//
+//        if (metodoDePagoPendiente != null && usuarioCompraPendiente != null) {
+//            try {
+//                List<ProductoCarritoDto> carritoSesion = obtenerCarritoDeSesion(session);
+//
+//                Double totalCompraEnDolares = this.servicioProductoCarrito.calcularValorTotalDeLosProductos();
+//                Double totalCompraEnPesos = this.servicioPrecios.conversionDolarAPesoDouble(totalCompraEnDolares);
+//
+//                CompraDto compraDto = new CompraDto();
+//                compraDto.setFecha(LocalDate.now());
+//                compraDto.setMetodoDePago(metodoDePagoPendiente);
+//                compraDto.setTotal(totalCompraEnPesos);
+//                compraDto.setProductosComprados(convertirACompraComponenteDto(carritoSesion));
+//
+//                servicioCompra.guardarCompraConUsuarioLogueado(compraDto, usuarioCompraPendiente, session);
+//
+//                servicioProductoCarritoImpl.limpiarCarrito();
+//
+//                session.removeAttribute("metodoDePagoPendiente");
+//                session.removeAttribute("usuarioCompraPendiente");
+//            } catch (Exception e) {
+//                return new ModelAndView("redirect:/pagoFallido?error=procesamiento");
+//            }
+//        }
+//
+//        return new ModelAndView("redirect:/pagoExitoso");
+//    }
 
     private List<ProductoCarritoDto> obtenerCarritoDeSesion(HttpSession session) {
         List<ProductoCarritoDto> carritoSesion = (List<ProductoCarritoDto>) session.getAttribute("carritoSesion");
@@ -179,6 +224,13 @@ public class ControllerMercadoPago {
             Double precioEnPesos = this.servicioPrecios.conversionDolarAPesoDouble(productosCarrito.getPrecio() * productosCarrito.getCantidad());
             compraComponenteDto.setPrecioUnitario(precioEnPesos);
             compraComponenteDto.setId(productosCarrito.getId());
+            if (productosCarrito instanceof ProductoCarritoArmadoDto){
+                ProductoCarritoArmadoDto productoCarritoArmadoDto =  (ProductoCarritoArmadoDto) productosCarrito;
+                compraComponenteDto.setEsArmado(true);
+                compraComponenteDto.setNumeroDeArmado(productoCarritoArmadoDto.getNumeroDeArmadoAlQuePertenece());
+            } else {
+                compraComponenteDto.setEsArmado(false);
+            }
             return compraComponenteDto;
         }).collect(Collectors.toList());
     }

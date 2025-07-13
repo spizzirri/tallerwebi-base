@@ -28,28 +28,29 @@ public class ServicioProductoEspecificoImpl implements ServicioProductoEspecific
     @Override
     public List<ComponenteEspecificoDto> obtenerComponentesAcomparar(Long idComponente) {
         //componente
-         Componente componenteActual = this.obtenerComponentePorId(idComponente);
-         // si es procesador
-          if (componenteActual instanceof Procesador) {
-              List<ComponenteEspecificoDto> componentesADevolver = new ArrayList<>();
-              String familia =  ((Procesador) componenteActual).getFamilia(); // ryzen 5
-              //primer componente PAPA
-              componentesADevolver.add(new ComponenteEspecificoDto(componenteActual));
-              List <Componente> componentesAComparar = repositorioComponente.obtenerComponentesPorTipoEnStock(componenteActual.getClass().getSimpleName());
-              for (Componente componente : componentesAComparar) {
-                  if ( componente instanceof Procesador) {
-                     if ( !componente.equals(componenteActual) &&((Procesador) componente).getFamilia().equals(familia)) {
-                         componentesADevolver.add( new ComponenteEspecificoDto(componente));
-                     }
-                  }
-              }
-              return componentesADevolver;
-          }
+        Componente componenteActual = this.obtenerComponentePorId(idComponente);
 
-        // si es perifericos
+        // si es Procesador
+        if (componenteActual instanceof Procesador) {
+            List<ComponenteEspecificoDto> componentesADevolver = new ArrayList<>();
+            String familia = ((Procesador) componenteActual).getFamilia(); // ryzen 5
+            //primer componente PAPA
+            componentesADevolver.add(new ComponenteEspecificoDto(componenteActual));
+            List<Componente> componentesAComparar = repositorioComponente.obtenerComponentesPorTipoEnStock(componenteActual.getClass().getSimpleName());
+            for (Componente componente : componentesAComparar) {
+                if (componente instanceof Procesador) {
+                    if (!componente.equals(componenteActual) && ((Procesador) componente).getFamilia().equals(familia)) {
+                        componentesADevolver.add(new ComponenteEspecificoDto(componente));
+                    }
+                }
+            }
+            return componentesADevolver;
+        }
+
+        // si es Periferico
         if (componenteActual instanceof Periferico) {
             List<ComponenteEspecificoDto> componentesADevolver = new ArrayList<>();
-            String tipoDeConexion =  ((Periferico) componenteActual).getTipoDeConexion();
+            String tipoDeConexion = ((Periferico) componenteActual).getTipoDeConexion();
 
             String[] partesNombreActual = componenteActual.getNombre().split(" ");
             String nombrePeriferico = partesNombreActual.length > 0 ? partesNombreActual[0].toLowerCase() : "";
@@ -71,121 +72,135 @@ public class ServicioProductoEspecificoImpl implements ServicioProductoEspecific
             return componentesADevolver;
         }
 
-        // si es fuente de alimentacion
+        // si es FuenteDeAlimentacion
         if (componenteActual instanceof FuenteDeAlimentacion) {
             List<ComponenteEspecificoDto> componentesADevolver = new ArrayList<>();
-            String wattsNominales =  ((FuenteDeAlimentacion) componenteActual).getWattsNominales();
+            String wattsNominales = ((FuenteDeAlimentacion) componenteActual).getWattsNominales();
             componentesADevolver.add(new ComponenteEspecificoDto(componenteActual));
-            List <Componente> componentesAComparar = repositorioComponente.obtenerComponentesPorTipoEnStock(componenteActual.getClass().getSimpleName());
+            List<Componente> componentesAComparar = repositorioComponente.obtenerComponentesPorTipoEnStock(componenteActual.getClass().getSimpleName());
             for (Componente componente : componentesAComparar) {
-                if ( !componente.equals(componenteActual) && componente instanceof FuenteDeAlimentacion) {
-                    if ( ((FuenteDeAlimentacion) componente).getWattsNominales().equals(wattsNominales)) {
-                        componentesADevolver.add( new ComponenteEspecificoDto(componente));
+                if (!componente.equals(componenteActual) && componente instanceof FuenteDeAlimentacion) {
+                    if (((FuenteDeAlimentacion) componente).getWattsNominales().equals(wattsNominales)) {
+                        componentesADevolver.add(new ComponenteEspecificoDto(componente));
                     }
                 }
             }
             return componentesADevolver;
         }
 
-        // si es memoria ram
+        // si es MemoriaRAM
         if (componenteActual instanceof MemoriaRAM) {
             List<ComponenteEspecificoDto> componentesADevolver = new ArrayList<>();
-            String capacidad =  ((MemoriaRAM) componenteActual).getCapacidad();
-            String tecnologia =  ((MemoriaRAM) componenteActual).getTecnologiaRAM();
+            String capacidad = ((MemoriaRAM) componenteActual).getCapacidad();
+            String tecnologia = ((MemoriaRAM) componenteActual).getTecnologiaRAM();
             componentesADevolver.add(new ComponenteEspecificoDto(componenteActual));
-            List <Componente> componentesAComparar = repositorioComponente.obtenerComponentesPorTipoEnStock(componenteActual.getClass().getSimpleName());
+            List<Componente> componentesAComparar = repositorioComponente.obtenerComponentesPorTipoEnStock(componenteActual.getClass().getSimpleName());
             for (Componente componente : componentesAComparar) {
-                if ( !componente.equals(componenteActual) && componente instanceof MemoriaRAM) {
-                    if ( ((MemoriaRAM) componente).getCapacidad().equals(capacidad) && ((MemoriaRAM) componente).getTecnologiaRAM().equals(tecnologia)) {
-                        componentesADevolver.add( new ComponenteEspecificoDto(componente));
+                if (!componente.equals(componenteActual) && componente instanceof MemoriaRAM) {
+                    if (((MemoriaRAM) componente).getCapacidad().equals(capacidad) && ((MemoriaRAM) componente).getTecnologiaRAM().equals(tecnologia)) {
+                        componentesADevolver.add(new ComponenteEspecificoDto(componente));
                     }
                 }
             }
             return componentesADevolver;
         }
 
-        // si es placa de video
+        // si es PlacaDeVideo
         if (componenteActual instanceof PlacaDeVideo) {
             List<ComponenteEspecificoDto> componentesADevolver = new ArrayList<>();
-            String capacidadRAM =  ((PlacaDeVideo) componenteActual).getCapacidadRAM();
+            String capacidadRAM = ((PlacaDeVideo) componenteActual).getCapacidadRAM();
             componentesADevolver.add(new ComponenteEspecificoDto(componenteActual));
-            List <Componente> componentesAComparar = repositorioComponente.obtenerComponentesPorTipoEnStock(componenteActual.getClass().getSimpleName());
+            List<Componente> componentesAComparar = repositorioComponente.obtenerComponentesPorTipoEnStock(componenteActual.getClass().getSimpleName());
             for (Componente componente : componentesAComparar) {
-                if ( !componente.equals(componenteActual) && componente instanceof PlacaDeVideo) {
+                if (!componente.equals(componenteActual) && componente instanceof PlacaDeVideo) {
                     if (((PlacaDeVideo) componente).getCapacidadRAM() != null && (((PlacaDeVideo) componente).getCapacidadRAM().equals(capacidadRAM))) {
-                        componentesADevolver.add( new ComponenteEspecificoDto(componente));
+                        componentesADevolver.add(new ComponenteEspecificoDto(componente));
                     }
                 }
             }
             return componentesADevolver;
         }
 
-        // si es almacenamiento
+        // si es Almacenamiento
         if (componenteActual instanceof Almacenamiento) {
             List<ComponenteEspecificoDto> componentesADevolver = new ArrayList<>();
-            String capacidad =  ((Almacenamiento) componenteActual).getCapacidad();
+            String capacidad = ((Almacenamiento) componenteActual).getCapacidad();
             componentesADevolver.add(new ComponenteEspecificoDto(componenteActual));
-            List <Componente> componentesAComparar = repositorioComponente.obtenerComponentesPorTipoEnStock(componenteActual.getClass().getSimpleName());
+            List<Componente> componentesAComparar = repositorioComponente.obtenerComponentesPorTipoEnStock(componenteActual.getClass().getSimpleName());
             for (Componente componente : componentesAComparar) {
-                if ( !componente.equals(componenteActual) && componente instanceof Almacenamiento) {
-                    if ( ((Almacenamiento) componente).getCapacidad().equals(capacidad)) {
-                        componentesADevolver.add( new ComponenteEspecificoDto(componente));
+                if (!componente.equals(componenteActual) && componente instanceof Almacenamiento) {
+                    if (((Almacenamiento) componente).getCapacidad().equals(capacidad)) {
+                        componentesADevolver.add(new ComponenteEspecificoDto(componente));
                     }
                 }
             }
             return componentesADevolver;
         }
 
-        // si es motherboard
+        // si es Motherboard
         if (componenteActual instanceof Motherboard) {
             List<ComponenteEspecificoDto> componentesADevolver = new ArrayList<>();
-            String chipsetPrincipal =  ((Motherboard) componenteActual).getChipsetPrincipal();
+            String chipsetPrincipal = ((Motherboard) componenteActual).getChipsetPrincipal();
             componentesADevolver.add(new ComponenteEspecificoDto(componenteActual));
-            List <Componente> componentesAComparar = repositorioComponente.obtenerComponentesPorTipoEnStock(componenteActual.getClass().getSimpleName());
+            List<Componente> componentesAComparar = repositorioComponente.obtenerComponentesPorTipoEnStock(componenteActual.getClass().getSimpleName());
             for (Componente componente : componentesAComparar) {
-                if ( !componente.equals(componenteActual) && componente instanceof Motherboard) {
-                    if ( ((Motherboard) componente).getChipsetPrincipal().equals(chipsetPrincipal)) {
-                        componentesADevolver.add( new ComponenteEspecificoDto(componente));
+                if (!componente.equals(componenteActual) && componente instanceof Motherboard) {
+                    if (((Motherboard) componente).getChipsetPrincipal().equals(chipsetPrincipal)) {
+                        componentesADevolver.add(new ComponenteEspecificoDto(componente));
                     }
                 }
             }
             return componentesADevolver;
         }
 
-        // si son monitores
+        // si es Gabinete
+        if (componenteActual instanceof Gabinete) {
+            List<ComponenteEspecificoDto> componentesADevolver = new ArrayList<>();
+            String tamanio = ((Gabinete) componenteActual).getTamanioGabinete();
+            componentesADevolver.add(new ComponenteEspecificoDto(componenteActual));
+            List<Componente> componentesAComparar = repositorioComponente.obtenerComponentesPorTipoEnStock(componenteActual.getClass().getSimpleName());
+            for (Componente componente : componentesAComparar) {
+                if (!componente.equals(componenteActual) && componente instanceof Gabinete) {
+                    if (((Gabinete) componente).getTamanioGabinete().equals(tamanio)) {
+                        componentesADevolver.add(new ComponenteEspecificoDto(componente));
+                    }
+                }
+            }
+            return componentesADevolver;
+        }
+
+        // si son Monitor
         if (componenteActual instanceof Monitor) {
             List<ComponenteEspecificoDto> componentesADevolver = new ArrayList<>();
-            String tipoDePanel =  ((Monitor) componenteActual).getTipoDePanel();
+            String tipoDePanel = ((Monitor) componenteActual).getTipoDePanel();
             componentesADevolver.add(new ComponenteEspecificoDto(componenteActual));
-            List <Componente> componentesAComparar = repositorioComponente.obtenerComponentesPorTipoEnStock(componenteActual.getClass().getSimpleName());
+            List<Componente> componentesAComparar = repositorioComponente.obtenerComponentesPorTipoEnStock(componenteActual.getClass().getSimpleName());
             for (Componente componente : componentesAComparar) {
-                if ( !componente.equals(componenteActual) && componente instanceof Monitor) {
-                    if ( ((Monitor) componente).getTipoDePanel().equals(tipoDePanel)) {
-                        componentesADevolver.add( new ComponenteEspecificoDto(componente));
+                if (!componente.equals(componenteActual) && componente instanceof Monitor) {
+                    if (((Monitor) componente).getTipoDePanel().equals(tipoDePanel)) {
+                        componentesADevolver.add(new ComponenteEspecificoDto(componente));
                     }
                 }
             }
             return componentesADevolver;
         }
 
-        // si son collers
+        // si son CoolerCPU
         if (componenteActual instanceof CoolerCPU) {
             List<ComponenteEspecificoDto> componentesADevolver = new ArrayList<>();
             String tipoDeDisipacion = ((CoolerCPU) componenteActual).getTipoDeDisipacion();
             componentesADevolver.add(new ComponenteEspecificoDto(componenteActual));
-            List <Componente> componentesAComparar = repositorioComponente.obtenerComponentesPorTipoEnStock(componenteActual.getClass().getSimpleName());
+            List<Componente> componentesAComparar = repositorioComponente.obtenerComponentesPorTipoEnStock(componenteActual.getClass().getSimpleName());
             for (Componente componente : componentesAComparar) {
-                if ( !componente.equals(componenteActual) && componente instanceof CoolerCPU && componente.getPrecio() > 0.0) {
-                    if ( ((CoolerCPU) componente).getTipoDeDisipacion().equals(tipoDeDisipacion)) {
-                        componentesADevolver.add( new ComponenteEspecificoDto(componente));
+                if (!componente.equals(componenteActual) && componente instanceof CoolerCPU && componente.getPrecio() > 0.0) {
+                    if (((CoolerCPU) componente).getTipoDeDisipacion().equals(tipoDeDisipacion)) {
+                        componentesADevolver.add(new ComponenteEspecificoDto(componente));
                     }
                 }
             }
             return componentesADevolver;
         }
 
-       return List.of();
+        return List.of();
     }
-
-
 }

@@ -23,6 +23,7 @@ public class ServicioCategorias {
         this.categorias.add(new CategoriaDto("Motherboard", "Mothers","mother.jpg"));
         this.categorias.add(new CategoriaDto("Monitor", "Monitores", "monitor.jpg"));
         this.categorias.add(new CategoriaDto("CoolerCPU", "Coolers", "impresora.jpg"));
+        this.categorias.add(new CategoriaDto("Gabinete", "Gabinetes", "gabinete.jpg"));
     }
 
     public List<CategoriaDto> getCategorias() {
