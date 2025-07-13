@@ -97,7 +97,7 @@ public class ControladorTarjetaDeCredito {
             compraDto.setTotal(totalCompraEnPesos);
             compraDto.setProductosComprados(convertirACompraComponenteDto(carritoSesion));
             compraDto.setFormaEntrega((String) session.getAttribute("formaEntrega"));
-
+            compraDto.setCostoDeEnvio((Double) session.getAttribute("costo"));
 
             servicioCompra.guardarCompraConUsuarioLogueado(compraDto, usuarioLogueado, session );
             servicioProductoCarritoImpl.limpiarCarrito();

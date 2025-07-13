@@ -29,6 +29,9 @@ public class Compra {
     @Column(length = 100)
     private String formaEntrega;
 
+    @Column(length = 100)
+    private Double costoDeEnvio;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idUsuario")
     private Usuario idUsuario;
@@ -98,5 +101,13 @@ public class Compra {
 
     public String getFormaEntrega() {
         return formaEntrega;
+    }
+
+    public void setCostoDeEnvio(Double costoDeEnvio) {
+        this.costoDeEnvio = costoDeEnvio;
+    }
+
+    public Double getCostoDeEnvio() {
+        return costoDeEnvio;
     }
 }

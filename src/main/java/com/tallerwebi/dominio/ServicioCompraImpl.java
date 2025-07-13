@@ -45,6 +45,7 @@ public class ServicioCompraImpl implements ServicioCompra {
         compraEntidad.setMetodoDePago(compradto.getMetodoDePago());
         compraEntidad.setCp(compradto.getCp());
         compraEntidad.setFormaEntrega(compradto.getFormaEntrega());
+        compraEntidad.setCostoDeEnvio(compradto.getCostoDeEnvio());
 
         this.repositorioCompra.guardarCompraDeUsuario(compraEntidad);
 

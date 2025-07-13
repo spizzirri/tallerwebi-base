@@ -2,6 +2,7 @@ package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.entidades.Compra;
 
+import javax.persistence.Column;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,6 +17,7 @@ public class CompraDto {
     private List<CompraComponenteDto> productosComprados;
     private String cp;
     private String formaEntrega;
+    private Double costoDeEnvio;
 
     public CompraDto(Compra compra) {
         this.id = compra.getIdCompra();
@@ -28,6 +30,7 @@ public class CompraDto {
                 .map(CompraComponenteDto::new)
                 .collect(Collectors.toList());
         this.formaEntrega = compra.getFormaEntrega();
+        this.costoDeEnvio = compra.getCostoDeEnvio();
     }
 
     public CompraDto() {
@@ -95,5 +98,13 @@ public class CompraDto {
 
     public void setCp(String cp) {
         this.cp = cp;
+    }
+
+    public Double getCostoDeEnvio() {
+        return costoDeEnvio;
+    }
+
+    public void setCostoDeEnvio(Double costoDeEnvio) {
+        this.costoDeEnvio = costoDeEnvio;
     }
 }
