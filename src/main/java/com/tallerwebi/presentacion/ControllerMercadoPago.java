@@ -150,6 +150,7 @@ public class ControllerMercadoPago {
             compraDto.setMetodoDePago(metodoDePago);
             compraDto.setTotal(totalCompraEnPesos);
             compraDto.setProductosComprados(convertirACompraComponenteDto(carritoSesion));
+            compraDto.setFormaEntrega((String) session.getAttribute("formaEntrega"));
 
             servicioCompra.guardarCompraConUsuarioLogueado(compraDto, usuarioLogueado, session);
             response.sendRedirect(preference.getSandboxInitPoint());

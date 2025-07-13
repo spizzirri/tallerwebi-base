@@ -39,6 +39,7 @@ public class ControladorPagoExitoso {
         model.put("costoEnvio", session.getAttribute("costo"));
         model.put("tiempo", session.getAttribute("tiempo"));
         model.put("destino", session.getAttribute("destino"));
+        model.put("formaEntrega", session.getAttribute("formaEntrega"));
 
 
 

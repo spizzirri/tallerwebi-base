@@ -153,21 +153,21 @@ public class ServicioProductoEspecificoImpl implements ServicioProductoEspecific
             return componentesADevolver;
         }
 
-        // si es Gabinete
-        if (componenteActual instanceof Gabinete) {
-            List<ComponenteEspecificoDto> componentesADevolver = new ArrayList<>();
-            String tamanio = ((Gabinete) componenteActual).getTamanioGabinete();
-            componentesADevolver.add(new ComponenteEspecificoDto(componenteActual));
-            List<Componente> componentesAComparar = repositorioComponente.obtenerComponentesPorTipoEnStock(componenteActual.getClass().getSimpleName());
-            for (Componente componente : componentesAComparar) {
-                if (!componente.equals(componenteActual) && componente instanceof Gabinete) {
-                    if (((Gabinete) componente).getTamanioGabinete().equals(tamanio)) {
-                        componentesADevolver.add(new ComponenteEspecificoDto(componente));
-                    }
-                }
-            }
-            return componentesADevolver;
-        }
+//        // si es Gabinete
+//        if (componenteActual instanceof Gabinete) {
+//            List<ComponenteEspecificoDto> componentesADevolver = new ArrayList<>();
+//            String tamanio = ((Gabinete) componenteActual).getTamanioGabinete();
+//            componentesADevolver.add(new ComponenteEspecificoDto(componenteActual));
+//            List<Componente> componentesAComparar = repositorioComponente.obtenerComponentesPorTipoEnStock(componenteActual.getClass().getSimpleName());
+//            for (Componente componente : componentesAComparar) {
+//                if (!componente.equals(componenteActual) && componente instanceof Gabinete) {
+//                    if (((Gabinete) componente).getTamanioGabinete().equals(tamanio)) {
+//                        componentesADevolver.add(new ComponenteEspecificoDto(componente));
+//                    }
+//                }
+//            }
+//            return componentesADevolver;
+//        }
 
         // si son Monitor
         if (componenteActual instanceof Monitor) {

@@ -26,6 +26,9 @@ public class Compra {
     @Column(length = 100)
     private String cp;
 
+    @Column(length = 100)
+    private String formaEntrega;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idUsuario")
     private Usuario idUsuario;
@@ -37,9 +40,13 @@ public class Compra {
         this.idCompra = idCompra;
     }
 
-    public String getCp() {return cp;}
+    public String getCp() {
+        return cp;
+    }
 
-    public void setCp(String cp) {this.cp = cp;}
+    public void setCp(String cp) {
+        this.cp = cp;
+    }
 
     public Long getIdCompra() {
         return idCompra;
@@ -85,5 +92,11 @@ public class Compra {
         return productosComprados;
     }
 
+    public void setFormaEntrega(String formaEntrega) {
+        this.formaEntrega = formaEntrega;
+    }
 
+    public String getFormaEntrega() {
+        return formaEntrega;
+    }
 }

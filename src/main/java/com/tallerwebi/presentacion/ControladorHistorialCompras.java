@@ -45,6 +45,7 @@ public class ControladorHistorialCompras {
         List<Compra> comprasUsuario = this.servicioCompra.obtenerCompraComponenteDeUnUsuarioLogueado(usuarioLogueado);
         response.put("success", true);
         response.put("comprasUsuario", comprasUsuario);
+        response.put("costo", session.getAttribute("costo"));
         return response;
     }
 

@@ -209,7 +209,7 @@
 
                             <div class="exito-resumen">
                                 <div class="exito-resumen-row">
-                                    <div class="exito-resumen-col">
+                                    <div class="exito-resumen-col" th:if="${formaEntrega == 'envio'}">
                                         <b>Entrega</b><br>
                                         <p>Fecha Entrega Estimada:
                                         <div th:text="${tiempo}"></div>
@@ -217,6 +217,13 @@
                                         <p>
                                         <div th:text="${destino}"></div>
                                         </p>
+                                    </div>
+                                    <div class="exito-resumen-col" th:if="${formaEntrega == 'retiro'}">
+                                        <b>Entrega</b><br>
+                                        <p>Retiro en deposito
+                                        <div>
+                                        <p>Direccion</p>
+                                        </div>
                                     </div>
                                     <div class="exito-resumen-col">
                                         Metodo de pago:
@@ -231,7 +238,9 @@
                                     </div>
                                     <div class="exito-resumen-col">
                                         <b>Resumen</b><br>
+                                        <div th:if="${formaEntrega == 'envio'}">
                                         Costo del envío: <span th:text="${costoEnvio}" style="float:right"></span><br>
+                                        </div>
                                         <hr style="margin: 8px 0;">
                                         <b>Total</b>: <span
                                             th:text="'$' + ${#numbers.formatDecimal(compra.total, 1, 'POINT', 2, 'COMMA')}"
