@@ -7,5 +7,19 @@
     <session-config>
         <session-timeout>15</session-timeout>
     </session-config>
+    <context-param>
+        <param-name>throwExceptionIfNoHandlerFound</param-name>
+        <param-value>true</param-value>
+    </context-param>
+    <error-page>
+        <error-code>404</error-code>
+        <location>/error404</location>
+    </error-page>
+
+    <error-page>
+        <error-code>500</error-code>
+        <location>/error500</location>
+    </error-page>
+
 
 </web-app>
