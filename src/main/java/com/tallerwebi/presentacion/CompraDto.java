@@ -4,13 +4,14 @@ import com.tallerwebi.dominio.entidades.Compra;
 
 import javax.persistence.Column;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class CompraDto {
 
     private Long id;
-    private LocalDate fecha;
+    private LocalDateTime fecha;
     private Double total;
     private String metodoDePago;
     private Long idUsuario;
@@ -21,7 +22,7 @@ public class CompraDto {
 
     public CompraDto(Compra compra) {
         this.id = compra.getIdCompra();
-        this.fecha = LocalDate.now();
+        this.fecha = LocalDateTime.now();
         this.total = compra.getTotal();
         this.metodoDePago = compra.getMetodoDePago();
         this.idUsuario = compra.getIdUsuario().getId();
@@ -52,7 +53,7 @@ public class CompraDto {
         return total;
     }
 
-    public LocalDate getFecha() {
+    public LocalDateTime getFecha() {
         return fecha;
     }
 
@@ -64,7 +65,7 @@ public class CompraDto {
         this.id = id;
     }
 
-    public void setFecha(LocalDate fecha) {
+    public void setFecha(LocalDateTime fecha) {
         this.fecha = fecha;
     }
 

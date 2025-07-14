@@ -18,6 +18,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -45,8 +46,6 @@ public class ControllerMercadoPago {
     public ModelAndView crearPago(HttpServletResponse response,
                                   @RequestParam(value = "metodoDePago", required = false) String metodoDePago,
                                   @RequestParam(value = "costoEnvio", required = false) Double costoEnvio,
-                                  @RequestParam(value = "totalOriginal", required = false) Double totalOriginal,
-                                  @RequestParam(value = "totalConDescuento", required = false) Double totalConDescuento,
                                   HttpSession session)
                                     throws IOException {
 
@@ -146,7 +145,7 @@ public class ControllerMercadoPago {
             Double totalCompraEnPesos = this.servicioPrecios.conversionDolarAPesoDouble(totalCompraEnDolares);
 
             CompraDto compraDto = new CompraDto();
-            compraDto.setFecha(LocalDate.now());
+            compraDto.setFecha(LocalDateTime.now());
             compraDto.setMetodoDePago(metodoDePago);
             compraDto.setTotal(totalCompraEnPesos);
             compraDto.setProductosComprados(convertirACompraComponenteDto(carritoSesion));
