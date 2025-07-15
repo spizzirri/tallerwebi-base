@@ -41,6 +41,16 @@
             margin-bottom: 6px;
         }
 
+        .nombre-producto {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.2;
+            max-height: 2.4em; /* 2 líneas * 1.2 line-height */
+            word-wrap: break-word;
+        }
+
         .exito-fecha {
             font-size: 0.98rem;
             color: #666;
@@ -57,12 +67,16 @@
         .exito-resumen-row {
             display: flex;
             justify-content: space-between;
-            gap: 24px;
-            margin-bottom: 10px;
+            /*gap: 24px;*/
+            /*margin-bottom: 10px;*/
         }
 
         .exito-resumen-col {
             flex: 1;
+        }
+
+        .entrega-item {
+            margin-bottom: 10px;
         }
 
         .exito-volver {
@@ -157,7 +171,7 @@
                             <div class="card-header bg-warning text-dark">
                                 <h5 class="mb-0">
                                     <i class="bi bi-calendar3"></i>
-                                    <span th:text="${compra.fecha}"></span>
+                                    <span th:text="${compra.fecha.toLocalDate()}"></span>
                                 </h5>
                             </div>
                             <div class="card-body">
@@ -167,15 +181,13 @@
                                         <div class="border-bottom pb-2 mb-2"
                                              th:each="producto : ${compra.productosComprados}">
                                             <div class="d-flex align-items-center gap-3">
-                                                <!-- Imagen -->
                                                 <div>
                                                     <img th:src="'http://www.imagenestaller.free.nf/' + ${producto.urlImagen}"
                                                          style="width: 50px; height: 50px; object-fit: contain;">
                                                 </div>
 
-                                                <!-- Nombre y detalle -->
                                                 <div class="flex-grow-1" style="min-width: 0;">
-                                                    <small class="fw-bold text-truncate d-block"
+                                                    <small class="fw-bold d-block nombre-producto"
                                                            style="max-width: 100%;"
                                                            th:text="${producto.componente.nombre}"></small>
                                                     <small th:if="${producto.esArmado == true}"
@@ -183,63 +195,57 @@
                                                            style="color: #1976d2;"></small>
                                                 </div>
 
-                                                <!-- Cantidad y precio -->
-                                                <div class="text-end">
-                                                    <div>
-                                                        <small class="text-muted">x<span
-                                                                th:text="${producto.cantidad}"></span></small>
-                                                    </div>
-                                                    <div>
-                                                        <small class="text-success">
-                                                            <span th:text="'$' + ${#numbers.formatDecimal(producto.precioUnitario, 1, 'POINT', 2, 'COMMA')}"></span>
-                                                        </small>
-                                                    </div>
+                                                <div class="text-end" style="white-space: nowrap;">
+                                                    <small class="text-muted">x<span
+                                                            th:text="${producto.cantidad}"></span></small>
+                                                    <br>
+                                                    <small class="text-success">
+                                                        <span th:text="'$' + ${#numbers.formatDecimal(producto.precioUnitario, 1, 'POINT', 2, 'COMMA')}"></span>
+                                                    </small>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="exito-pedido">Pedido: <span style="color:#1976d2;">OV01-00000001</span>
+                                <div class="exito-pedido">Pedido: <span style="color:#1976d2;"
+                                                                        th:text="'OV01-1240' + ${compra.idCompra}"></span>
                                 </div>
                                 <div class="exito-fecha">
-                                    Fecha de Solicitud de compra: <span th:text="${fechaCompra}"></span>
+                                    Fecha de solicitud de compra: <span th:text="${compra.fecha.toLocalDate()}"></span>
                                 </div>
                             </div>
 
                             <div class="exito-resumen">
                                 <div class="exito-resumen-row">
                                     <div class="exito-resumen-col" th:if="${formaEntrega == 'envio'}">
-                                        <b>Entrega</b><br>
-                                        <p>Fecha Entrega Estimada:
-                                        <div th:text="${tiempo}"></div>
-                                        </p>
-                                        <p>
-                                        <div th:text="${destino}"></div>
-                                        </p>
+                                        <div class="entrega-item"><b>Entrega</b></div>
+                                        <div class="entrega-item">Entrega estimada: <span th:text="${tiempo}"></span>
+                                        </div>
+                                        <div th:text="${destino}" style="white-space: nowrap;"></div>
                                     </div>
                                     <div class="exito-resumen-col" th:if="${formaEntrega == 'retiro'}">
                                         <b>Entrega</b><br>
-                                        <p>Retiro en deposito
-                                        <div>
-                                        <p>Direccion</p>
-                                        </div>
+                                        <div>Retiro en depósito</div>
+                                        <div>Av. Gamer 123, CABA</div>
                                     </div>
                                     <div class="exito-resumen-col">
                                         Metodo de pago:
                                         <span class="badge bg-secondary mb-2">
-                                <i class="bi bi-credit-card me-1"></i>
-                                <span th:text="${compra.metodoDePago}"></span>
-                                <br>
-                                <span th:if="${tarjeta != null}"
-                                      th:text="' **** ' + ${#strings.substring(tarjeta.numeroDeTarjeta, tarjeta.numeroDeTarjeta.length() - 4)}"></span>
-                                <span th:if="${tarjeta == null}">No disponible</span>
-                            </span>
+                                            <i class="bi bi-credit-card me-1"></i>
+                                                <span th:if="${compra.metodoDePago == 'tarjetaCredito'}">Tarjeta de crédito</span>
+                                                <span th:if="${compra.metodoDePago == 'mercadoPago'}">Mercado Pago</span>                                            <br>
+                                            <span th:if="${tarjeta != null}"
+                                                  th:text="' **** ' + ${#strings.substring(tarjeta.numeroDeTarjeta, tarjeta.numeroDeTarjeta.length() - 4)}"></span>
+                                            <span th:if="${tarjeta == null}">No disponible</span>
+                                        </span>
                                     </div>
                                     <div class="exito-resumen-col">
                                         <b>Resumen</b><br>
                                         <div th:if="${formaEntrega == 'envio'}">
-                                        Costo del envío: <span th:text="${compra.costoDeEnvio}" style="float:right"></span><br>
+                                            Valor envío: <span
+                                                th:text="'$' + ${#numbers.formatDecimal(compra.costoDeEnvio, 1, 'POINT', 2, 'COMMA')}"
+                                                style="float:right"></span><br>
                                         </div>
                                         <hr style="margin: 8px 0;">
                                         <b>Total</b>: <span
