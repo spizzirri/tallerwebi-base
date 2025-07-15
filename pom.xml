@@ -165,7 +165,6 @@
             <artifactId>jackson-annotations</artifactId>
             <version>2.13.0</version>
         </dependency>
-
         <!-- compile only, deployed container will provide this -->
         <!--
         <dependency>

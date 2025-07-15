@@ -4,6 +4,7 @@ import com.tallerwebi.dominio.Usuario;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +16,7 @@ public class Compra {
     private Long idCompra;
 
     @Column(length = 100)
-    private LocalDate fecha;
+    private LocalDateTime fecha;
 
     @Column(length = 100)
     private Double total;
@@ -25,6 +26,12 @@ public class Compra {
 
     @Column(length = 100)
     private String cp;
+
+    @Column(length = 100)
+    private String formaEntrega;
+
+    @Column(length = 100)
+    private Double costoDeEnvio;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idUsuario")
@@ -37,19 +44,23 @@ public class Compra {
         this.idCompra = idCompra;
     }
 
-    public String getCp() {return cp;}
+    public String getCp() {
+        return cp;
+    }
 
-    public void setCp(String cp) {this.cp = cp;}
+    public void setCp(String cp) {
+        this.cp = cp;
+    }
 
     public Long getIdCompra() {
         return idCompra;
     }
 
-    public void setFecha(LocalDate fecha) {
+    public void setFecha(LocalDateTime fecha) {
         this.fecha = fecha;
     }
 
-    public LocalDate getFecha() {
+    public LocalDateTime getFecha() {
         return fecha;
     }
 
@@ -85,5 +96,19 @@ public class Compra {
         return productosComprados;
     }
 
+    public void setFormaEntrega(String formaEntrega) {
+        this.formaEntrega = formaEntrega;
+    }
 
+    public String getFormaEntrega() {
+        return formaEntrega;
+    }
+
+    public void setCostoDeEnvio(Double costoDeEnvio) {
+        this.costoDeEnvio = costoDeEnvio;
+    }
+
+    public Double getCostoDeEnvio() {
+        return costoDeEnvio;
+    }
 }
