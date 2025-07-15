@@ -96,11 +96,26 @@ function asignarEventosVistaCarrito() {
 
                 const spanCantidad = fila.querySelector(".productoCantidad");
                 const precioTotalDelProducto = fila.querySelector(".precioTotalDelProducto");
-                const tdConId = fila.querySelector('[data-id]');
+                const tdConId = fila ? fila.querySelector('[data-id]') : null;
+
+                const tdConNumeroDeArmado = fila ? fila.querySelector('[data-numeroDeArmado]') : null;
+
+                const numeroDeArmado = tdConNumeroDeArmado ? tdConNumeroDeArmado.dataset.numerodearmado : null;
+                console.log("numeroArmado " + numeroDeArmado);
 
                 const idProducto = tdConId.dataset.id;
+                console.log("id " + idProducto);
 
-                fetch(`/carritoDeCompras/agregarMasCantidadDeUnProducto/${idProducto}`, {
+                let url = "";
+                if(numeroDeArmado != null && idProducto != null){
+                    url = `/carritoDeCompras/agregarMasCantidadDeUnProducto/${idProducto}/${numeroDeArmado}`;
+                    console.log("entro al numero de armado");
+                } else if (idProducto != null){
+                    url = `/carritoDeCompras/agregarMasCantidadDeUnProducto/${idProducto}`;
+                    console.log("entro al id");
+                }
+
+                fetch(url, {
                     method: 'POST'
                 })
                     .then(response => response.json())
@@ -149,16 +164,30 @@ function asignarEventosVistaCarrito() {
 
                 const spanCantidad = fila.querySelector(".productoCantidad");
                 const precioTotalDelProducto = fila.querySelector(".precioTotalDelProducto");
-                const tdConId = fila.querySelector('[data-id]');
+                const tdConId = fila ? fila.querySelector('[data-id]') : null;
+                const tdConNumeroDeArmado = fila ? fila.querySelector('[data-numeroDeArmado]') : null;
 
                 if (!tdConId) {
                     console.error("No se pudo encontrar el data-id del producto");
                     return;
                 }
 
-                const idProducto = tdConId.dataset.id;
 
-                fetch(`/carritoDeCompras/restarCantidadDeUnProducto/${idProducto}`, {
+                const numeroDeArmado = tdConNumeroDeArmado ? tdConNumeroDeArmado.dataset.numerodearmado : null;
+                console.log("numeroArmado " + numeroDeArmado);
+                const idProducto = tdConId.dataset.id;
+                console.log("id " + idProducto);
+
+                let url = "";
+                if(numeroDeArmado != null && idProducto != null){
+                    url = `/carritoDeCompras/restarCantidadDeUnProducto/${idProducto}/${numeroDeArmado}`;
+                    console.log("entro al numero de armado");
+                } else if (idProducto != null){
+                    url = `/carritoDeCompras/restarCantidadDeUnProducto/${idProducto}`;
+                    console.log("entro al id");
+                }
+
+                fetch(url, {
                     method: 'POST'
                 })
                     .then(response => response.json())
@@ -199,15 +228,37 @@ function asignarEventosVistaCarrito() {
                 event.preventDefault();
 
                 const btn = event.target;
-                const idProductoAEliminar = btn.dataset.id;
                 const fila = btn.closest('tr');
+
+                if (!fila) {
+                    console.error("No se pudo encontrar la fila del producto");
+                    return;
+                }
+
+                const tdConId = fila ? fila.querySelector('[data-id]') : null;
+                const tdConNumeroDeArmado = fila ? fila.querySelector('[data-numeroDeArmado]') : null;
+
+                const idProductoAEliminar = tdConId.dataset.id;
+                console.log("id " + idProductoAEliminar);
 
                 if (!idProductoAEliminar) {
                     console.error("No se pudo encontrar el ID del producto a eliminar");
                     return;
                 }
 
-                fetch(`/carritoDeCompras/eliminarProducto/${idProductoAEliminar}`, {
+                const numeroDeArmado = tdConNumeroDeArmado ? tdConNumeroDeArmado.dataset.numerodearmado : null;
+                console.log("numeroArmado " + numeroDeArmado);
+
+                let url = "";
+                if(numeroDeArmado != null){
+                    url = `/carritoDeCompras/eliminarProducto/${idProductoAEliminar}/${numeroDeArmado}`;
+                    console.log("entro al numero de armado");
+                } else if (true){
+                    url = `/carritoDeCompras/eliminarProducto/${idProductoAEliminar}`;
+                    console.log("entro al id");
+                }
+
+                fetch(url, {
                     method: 'POST'
                 })
                     .then(response => response.json())
@@ -242,11 +293,39 @@ window.asignarEventosDelResumenCarrito = function () {
             btn.addEventListener('click', (event) => {
                 event.preventDefault();
 
-                const fila = btn.closest('tr');
-                const tdConId = fila ? fila.querySelector('[data-id]') : null;
-                const id = tdConId ? tdConId.dataset.id : null;
 
-                fetch(`/carritoDeCompras/restarCantidadDeUnProducto/${id}`, {method: 'POST'})
+                const btn = event.target;
+                const fila = btn.closest('tr');
+
+                if (!fila) {
+                    console.error("No se pudo encontrar la fila del producto");
+                    return;
+                }
+
+                const tdConId = fila ? fila.querySelector('[data-id]') : null;
+                const tdConNumeroDeArmado = fila ? fila.querySelector('[data-numeroDeArmado]') : null;
+
+                if (!tdConId) {
+                    console.error("No se pudo encontrar el data-id del producto");
+                    return;
+                }
+
+                const numeroDeArmado = tdConNumeroDeArmado ? tdConNumeroDeArmado.dataset.numerodearmado : null;
+                console.log("numeroArmado " + numeroDeArmado);
+                const id = tdConId ? tdConId.dataset.id : null;
+                console.log("id " + id);
+
+                let url = "";
+                if(numeroDeArmado != null && id != null){
+                    url = `/carritoDeCompras/restarCantidadDeUnProducto/${id}/${numeroDeArmado}`;
+                    console.log("entro al numero de armado");
+                } else if (id != null){
+                    url = `/carritoDeCompras/restarCantidadDeUnProducto/${id}`;
+                    console.log("entro al id");
+                }
+
+
+                fetch(url, {method: 'POST'})
                     .then(res => res.json())
                     .then(data => {
                         actualizarResumenCarrito();
@@ -267,11 +346,34 @@ window.asignarEventosDelResumenCarrito = function () {
             btn.addEventListener('click', (event) => {
                 event.preventDefault();
 
+                const btn = event.target;
                 const fila = btn.closest('tr');
-                const tdConId = fila ? fila.querySelector('[data-id]') : null;
-                const id = tdConId ? tdConId.dataset.id : null;
 
-                fetch(`/carritoDeCompras/agregarMasCantidadDeUnProducto/${id}`, {method: 'POST'})
+                if (!fila) {
+                    console.error("No se pudo encontrar la fila del producto");
+                    return;
+                }
+
+                const tdConId = fila ? fila.querySelector('[data-id]') : null;
+                const tdConNumeroDeArmado = fila ? fila.querySelector('[data-numeroDeArmado]') : null;
+
+                const numeroDeArmado = tdConNumeroDeArmado ? tdConNumeroDeArmado.dataset.numerodearmado : null;
+                console.log("numeroArmado " + numeroDeArmado);
+
+                const id = tdConId ? tdConId.dataset.id : null;
+                console.log("id " + id);
+
+                let url = "";
+                if(numeroDeArmado != null && id != null){
+                    url = `/carritoDeCompras/agregarMasCantidadDeUnProducto/${id}/${numeroDeArmado}`;
+                    console.log("entro al numero de armado");
+                } else if (id != null){
+                    url = `/carritoDeCompras/agregarMasCantidadDeUnProducto/${id}`;
+                    console.log("entro al id");
+                }
+
+
+                fetch(url, {method: 'POST'})
                     .then(res => res.json())
                     .then(data => {
                         actualizarResumenCarrito();
@@ -292,9 +394,38 @@ window.asignarEventosDelResumenCarrito = function () {
             btn.addEventListener('click', (event) => {
                 event.preventDefault();
 
-                const id = btn.dataset.id;
+                const btn = event.target;
+                const fila = btn.closest('tr');
 
-                fetch(`/carritoDeCompras/eliminarProducto/${id}`, {method: 'POST'})
+                if (!fila) {
+                    console.error("No se pudo encontrar la fila del producto");
+                    return;
+                }
+
+                const tdConId = fila ? fila.querySelector('[data-id]') : null;
+                const tdConNumeroDeArmado = fila ? fila.querySelector('[data-numeroDeArmado]') : null;
+
+                const idProductoAEliminar = tdConId.dataset.id;
+                console.log("id " + idProductoAEliminar);
+
+                if (!idProductoAEliminar) {
+                    console.error("No se pudo encontrar el ID del producto a eliminar");
+                    return;
+                }
+
+                const numeroDeArmado = tdConNumeroDeArmado ? tdConNumeroDeArmado.dataset.numerodearmado : null;
+                console.log("numeroArmado " + numeroDeArmado);
+
+                let url = "";
+                if(numeroDeArmado != null){
+                    url = `/carritoDeCompras/eliminarProducto/${idProductoAEliminar}/${numeroDeArmado}`;
+                    console.log("entro al numero de armado");
+                } else if (true){
+                    url = `/carritoDeCompras/eliminarProducto/${idProductoAEliminar}`;
+                    console.log("entro al id");
+                }
+
+                fetch(url, {method: 'POST'})
                     .then(res => res.json())
                     .then(data => {
                         actualizarResumenCarrito();
@@ -310,7 +441,7 @@ window.asignarEventosDelResumenCarrito = function () {
     });
 }
 
-// Resto del código para abrir/cerrar el resumen
+// abrir/cerrar el resumen del carrito
 document.addEventListener('DOMContentLoaded', function() {
     const abrirBtn = document.getElementById('abrirResumenCarrito');
     if (abrirBtn) {

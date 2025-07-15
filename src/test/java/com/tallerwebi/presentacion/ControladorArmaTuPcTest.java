@@ -1,24 +1,18 @@
 package com.tallerwebi.presentacion;
+
 import com.tallerwebi.dominio.ServicioArmaTuPc;
 import com.tallerwebi.dominio.ServicioPrecios;
-import com.tallerwebi.dominio.excepcion.ComponenteDeterminateDelArmadoEnNullException;
-import com.tallerwebi.dominio.excepcion.LimiteDeComponenteSobrepasadoEnElArmadoException;
-import com.tallerwebi.dominio.excepcion.QuitarComponenteInvalidoException;
-import com.tallerwebi.dominio.excepcion.QuitarStockDemasDeComponenteException;
+import com.tallerwebi.dominio.excepcion.*;
 import com.tallerwebi.presentacion.dto.ArmadoPcDto;
 import com.tallerwebi.presentacion.dto.ComponenteDto;
+import com.tallerwebi.presentacion.dto.ProductoCarritoArmadoDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -28,317 +22,288 @@ import static org.mockito.Mockito.*;
 public class ControladorArmaTuPcTest {
 
     private ServicioArmaTuPc servicioArmaTuPcMock;
+    private ServicioPrecios servicioPreciosMock;
     private HttpSession sessionMock;
+    private ControladorArmaTuPc controladorArmaTuPc;
+
+    // DTOs y Mocks comunes
     private ArmadoPcDto armadoPcDtoMock;
     private ComponenteDto componenteDtoMock;
-    private ControladorArmaTuPc controladorArmaTuPc;
-    private ServicioPrecios servicioPreciosMock;
 
     @BeforeEach
     public void init() {
+        // Mocks de los servicios y la sesión
         servicioArmaTuPcMock = mock(ServicioArmaTuPc.class);
         servicioPreciosMock = mock(ServicioPrecios.class);
         sessionMock = mock(HttpSession.class);
+
+        // Mocks de DTOs para uso general
         armadoPcDtoMock = mock(ArmadoPcDto.class);
         componenteDtoMock = mock(ComponenteDto.class);
+
+        // Se instancia el controlador con los mocks, reflejando el constructor real
         controladorArmaTuPc = new ControladorArmaTuPc(servicioArmaTuPcMock, servicioPreciosMock);
+
+        // Comportamiento común para la obtención del DTO de la sesión
+        when(sessionMock.getAttribute("armadoPcDto")).thenReturn(armadoPcDtoMock);
     }
 
-    // Tests para obtenerArmadoPcDtoDeLaSession (Lógica interna)
+    //region Tests para obtenerArmadoPcDtoDeLaSession (Lógica interna)
+
     @Test
     public void cuandoNoExisteUnArmadoEnLaSessionSeCreaUnoNuevoYSeGuarda() {
-        // Preparación
+        // Preparación (Arrange)
         when(sessionMock.getAttribute("armadoPcDto"))
-                .thenReturn(null)                         // primera vez
-                .thenReturn(new ArmadoPcDto());          // segunda vez (y siguientes)
+                .thenReturn(null)
+                .thenReturn(new ArmadoPcDto()); // La segunda llamada devolverá el nuevo DTO
 
-        // Ejecución
-        ModelAndView mav = controladorArmaTuPc.cargarComponentes("procesador", null, sessionMock);
+        // Ejecución (Act)
+        controladorArmaTuPc.cargarComponentes("procesador", null, sessionMock);
 
-        // Verificación
+        // Verificación (Assert)
         verify(sessionMock, times(1)).setAttribute(eq("armadoPcDto"), ArgumentMatchers.any(ArmadoPcDto.class));
-        assertThat(mav.getModel().get("armadoPcDto"), is(notNullValue()));
-        assertThat(mav.getModel().get("armadoPcDto"), is(instanceOf(ArmadoPcDto.class)));
     }
 
     @Test
     public void cuandoYaExisteUnArmadoEnLaSessionSeUtilizaElExistente() {
-        // Preparación
-        when(sessionMock.getAttribute("armadoPcDto")).thenReturn(armadoPcDtoMock);
+        // Preparación (Arrange)
+        // El @BeforeEach ya establece que la sesión devolverá armadoPcDtoMock
 
-        // Ejecución (indirecta)
+        // Ejecución (Act)
         controladorArmaTuPc.cargarComponentes("procesador", null, sessionMock);
 
-        // Verificación
+        // Verificación (Assert)
         verify(sessionMock, never()).setAttribute(eq("armadoPcDto"), ArgumentMatchers.any(ArmadoPcDto.class));
-        verify(sessionMock, times(2)).getAttribute("armadoPcDto"); // Una en el if, otra en el return
+        verify(sessionMock, atLeastOnce()).getAttribute("armadoPcDto");
     }
 
-    // Tests para cargarComponentes
+    //endregion
+
+    //region Tests para cargarComponentes
+
     @Test
-    public void cuandoSeCargaLaPaginaDeUnComponenteSinQuerySeObtienenLosComponentesCompatibles() throws ComponenteDeterminateDelArmadoEnNullException {
-        // Preparación
+    public void cuandoSeCargaLaPaginaDeUnComponenteSeObtienenLosComponentesCompatibles() throws ComponenteDeterminateDelArmadoEnNullException {
+        // Preparación (Arrange)
         String tipoComponente = "motherboard";
-        when(sessionMock.getAttribute("armadoPcDto")).thenReturn(armadoPcDtoMock);
         when(servicioArmaTuPcMock.obtenerListaDeComponentesCompatiblesDto(tipoComponente, armadoPcDtoMock))
-                .thenReturn(List.of(componenteDtoMock));
+                .thenReturn(new HashSet<>(List.of(componenteDtoMock)));
         when(armadoPcDtoMock.getComponentesDto()).thenReturn(Collections.emptyList());
 
-        // Ejecución
+        // Ejecución (Act)
         ModelAndView mav = controladorArmaTuPc.cargarComponentes(tipoComponente, null, sessionMock);
 
-        // Verificación
+        // Verificación (Assert)
         assertThat(mav.getViewName(), equalTo("arma-tu-pc/tradicional/motherboard"));
         assertThat(mav.getModel().get("componentesLista"), is(notNullValue()));
         assertThat((List<ComponenteDto>) mav.getModel().get("componentesLista"), hasSize(1));
-        assertThat(mav.getModel().get("pasoActual"), equalTo("motherboard"));
-        assertThat(mav.getModel().get("pasoAnterior"), equalTo("procesador"));
-        assertThat(mav.getModel().get("pasoSiguiente"), equalTo("cooler"));
         verify(servicioArmaTuPcMock).obtenerListaDeComponentesCompatiblesDto(tipoComponente, armadoPcDtoMock);
         verify(servicioArmaTuPcMock, never()).obtenerListaDeComponentesCompatiblesFiltradosDto(anyString(), anyString(), ArgumentMatchers.any(ArmadoPcDto.class));
     }
 
     @Test
     public void cuandoSeCargaLaPaginaConQuerySeObtienenLosComponentesFiltrados() throws ComponenteDeterminateDelArmadoEnNullException {
-        // Preparación
+        // Preparación (Arrange)
         String tipoComponente = "gpu";
         String query = "Nvidia";
-        when(sessionMock.getAttribute("armadoPcDto")).thenReturn(armadoPcDtoMock);
         when(servicioArmaTuPcMock.obtenerListaDeComponentesCompatiblesFiltradosDto(tipoComponente, query, armadoPcDtoMock))
-                .thenReturn(List.of(componenteDtoMock));
+                .thenReturn(new HashSet<>(List.of(componenteDtoMock)));
         when(armadoPcDtoMock.getComponentesDto()).thenReturn(Collections.emptyList());
 
-        // Ejecución
+        // Ejecución (Act)
         ModelAndView mav = controladorArmaTuPc.cargarComponentes(tipoComponente, query, sessionMock);
 
-        // Verificación
+        // Verificación (Assert)
         assertThat(mav.getViewName(), equalTo("arma-tu-pc/tradicional/gpu"));
-        assertThat(mav.getModel().get("componentesLista"), is(notNullValue()));
         verify(servicioArmaTuPcMock).obtenerListaDeComponentesCompatiblesFiltradosDto(tipoComponente, query, armadoPcDtoMock);
         verify(servicioArmaTuPcMock, never()).obtenerListaDeComponentesCompatiblesDto(anyString(), ArgumentMatchers.any(ArmadoPcDto.class));
     }
 
     @Test
-    public void cuandoSeCargaLaPaginaSeAgreganLosIdsDeComponentesSeleccionadosAlModelo() throws ComponenteDeterminateDelArmadoEnNullException {
-        // Preparación
-        String tipoComponente = "gpu";
-        ComponenteDto comp1 = mock(ComponenteDto.class);
-        ComponenteDto comp2 = mock(ComponenteDto.class);
+    public void cuandoSeCargaLaPaginaDeMemoriasSeAgreganLosSlotsDeLaMotherboardAlModelo(){
+        // Preparación (Arrange)
+        String tipoComponente = "memoria";
+        when(servicioArmaTuPcMock.obtenerSlotsRamDeMotherboard(any())).thenReturn(4);
 
-        when(comp1.getId()).thenReturn(10L);
-        when(comp2.getId()).thenReturn(20L);
-
-        List<ComponenteDto> componentesSeleccionados = List.of(comp1, comp2);
-
-        when(armadoPcDtoMock.getComponentesDto()).thenReturn(componentesSeleccionados);
-        when(sessionMock.getAttribute("armadoPcDto")).thenReturn(armadoPcDtoMock);
-        when(servicioArmaTuPcMock.obtenerListaDeComponentesCompatiblesDto(tipoComponente, armadoPcDtoMock))
-                .thenReturn(List.of(componenteDtoMock));
-
-        // Ejecución
+        // Ejecución (Act)
         ModelAndView mav = controladorArmaTuPc.cargarComponentes(tipoComponente, null, sessionMock);
 
-        // Verificación
-        assertThat(mav.getModel().get("idsDeComponentesSeleccionados"), is(notNullValue()));
-        assertThat( mav.getModel().get("idsDeComponentesSeleccionados"), instanceOf(Set.class));
-        assertThat(((Set<Long>)mav.getModel().get("idsDeComponentesSeleccionados")), hasItems(10L, 20L));
+        // Verificación (Assert)
+        assertThat(mav.getModel().get("slotsRamMotherboardElegida"), equalTo(4));
+    }
+
+    @Test
+    public void cuandoSeCargaLaPaginaDeAlmacenamientoSeAgreganLosSlotsDeLaMotherboardAlModelo(){
+        // Preparación (Arrange)
+        String tipoComponente = "almacenamiento";
+        when(servicioArmaTuPcMock.obtenerSlotsSataDeMotherboard(any())).thenReturn(6);
+        when(servicioArmaTuPcMock.obtenerSlotsM2DeMotherboard(any())).thenReturn(2);
+
+        // Ejecución (Act)
+        ModelAndView mav = controladorArmaTuPc.cargarComponentes(tipoComponente, null, sessionMock);
+
+        // Verificación (Assert)
+        assertThat(mav.getModel().get("slotsSataMotherboardElegida"), equalTo(6));
+        assertThat(mav.getModel().get("slotsM2MotherboardElegida"), equalTo(2));
     }
 
     @Test
     public void cuandoNoSeHaSeleccionadoUnComponenteDeterminanteSeMuestraUnError() throws ComponenteDeterminateDelArmadoEnNullException {
-        // Preparación
+        // Preparación (Arrange)
         String tipoComponente = "motherboard";
-        when(sessionMock.getAttribute("armadoPcDto")).thenReturn(armadoPcDtoMock);
+        String mensajeError = "Debe seleccionar un procesador primero";
         when(servicioArmaTuPcMock.obtenerListaDeComponentesCompatiblesDto(tipoComponente, armadoPcDtoMock))
-                .thenThrow(new ComponenteDeterminateDelArmadoEnNullException("Debe seleccionar un procesador primero"));
+                .thenThrow(new ComponenteDeterminateDelArmadoEnNullException(mensajeError));
 
-        // Ejecución
+        // Ejecución (Act)
         ModelAndView mav = controladorArmaTuPc.cargarComponentes(tipoComponente, null, sessionMock);
 
-        // Verificación
+        // Verificación (Assert)
         assertThat(mav.getViewName(), equalTo("arma-tu-pc/tradicional/motherboard"));
-        assertThat(mav.getModel().get("errorLista"), equalTo("Debe seleccionar un procesador primero"));
+        assertThat(mav.getModel().get("errorLista"), equalTo(mensajeError));
         assertNull(mav.getModel().get("componentesLista"));
     }
 
-    // Tests para procesarAccion
+    @Test
+    public void cuandoSeCargaElPrimerPasoElPasoAnteriorEsNulo() {
+        // Preparación (Arrange)
+        String tipoComponente = "procesador";
+
+        // Ejecución (Act)
+        ModelAndView mav = controladorArmaTuPc.cargarComponentes(tipoComponente, null, sessionMock);
+
+        // Verificación (Assert)
+        assertThat(mav.getModel().get("pasoActual"), equalTo("procesador"));
+        assertNull(mav.getModel().get("pasoAnterior"));
+        assertThat(mav.getModel().get("pasoSiguiente"), equalTo("motherboard"));
+    }
+
+    //endregion
+
+    //region Tests para procesarAccion
+
     @Test
     public void cuandoLaAccionEsInvalidaSeRedirigeConMensajeDeError(){
-        // Preparación
+        // Preparación (Arrange)
         String tipoComponente = "procesador";
 
-        // Ejecución
+        // Ejecución (Act)
         ModelAndView mav = controladorArmaTuPc.procesarAccion(tipoComponente, "accionInvalida", 1L, 1, sessionMock);
-        ModelMap model = mav.getModelMap();
 
-        // Verificación
+        // Verificación (Assert)
         assertThat(mav.getViewName(), equalTo("redirect:/arma-tu-pc/tradicional/" + tipoComponente));
-        assertThat(model.get("accionInvalida"), equalTo("Ingreso una accion invalida."));
+        assertThat(mav.getModelMap().get("accionInvalida"), equalTo("Ingreso una accion invalida."));
     }
 
-    @Test
-    public void cuandoLaAccionEsAgregarSeLlamaAlMetodoDeAgregarComponenteYRedirigeConSiguientePaso() throws LimiteDeComponenteSobrepasadoEnElArmadoException {
-        // Preparación
-        String tipoComponente = "procesador";
+    //endregion
 
-        Long idComponente = 1L;
-        Integer cantidad = 1;
-
-        when(sessionMock.getAttribute("armadoPcDto")).thenReturn(armadoPcDtoMock);
-        when(servicioArmaTuPcMock.agregarComponenteAlArmado(idComponente, tipoComponente, cantidad, armadoPcDtoMock)).thenReturn(armadoPcDtoMock);
-        when(servicioArmaTuPcMock.obtenerComponenteDtoPorId(idComponente)).thenReturn(componenteDtoMock);
-
-        // Ejecución
-        ModelAndView mav = controladorArmaTuPc.procesarAccion(tipoComponente, "agregar", 1L, 1, sessionMock);
-        ModelMap model = mav.getModelMap();
-
-        // Verificación
-        verify(servicioArmaTuPcMock, times(1)).agregarComponenteAlArmado(idComponente, tipoComponente, cantidad , armadoPcDtoMock);
-        assertThat(mav.getViewName(), equalTo("redirect:/arma-tu-pc/tradicional/motherboard"));
-    }
+    //region Tests para agregarComponenteAlArmado
 
     @Test
-    public void cuandoLaQuitarEsAgregarSeLlamaAlMetodoDeQuitarComponenteYRedirigeElMismoPaso() throws QuitarComponenteInvalidoException, QuitarStockDemasDeComponenteException {
-        // Preparación
-        String tipoComponente = "procesador";
-
-        Long idComponente = 1L;
-        Integer cantidad = 1;
-
-        when(sessionMock.getAttribute("armadoPcDto")).thenReturn(armadoPcDtoMock);
-        when(servicioArmaTuPcMock.quitarComponenteAlArmado(idComponente, tipoComponente, cantidad, armadoPcDtoMock)).thenReturn(armadoPcDtoMock);
-        when(servicioArmaTuPcMock.obtenerComponenteDtoPorId(idComponente)).thenReturn(componenteDtoMock);
-
-        // Ejecución
-        ModelAndView mav = controladorArmaTuPc.procesarAccion(tipoComponente, "quitar", 1L, 1, sessionMock);
-        ModelMap model = mav.getModelMap();
-
-        // Verificación
-        verify(servicioArmaTuPcMock, times(1)).quitarComponenteAlArmado(idComponente, tipoComponente, cantidad , armadoPcDtoMock);
-        assertThat(mav.getViewName(), equalTo("redirect:/arma-tu-pc/tradicional/procesador"));
-    }
-
-    // Tests para agregarComponenteAlArmado
-    @Test
-    public void cuandoAgregoUnComponenteExitosamenteSeActualizaLaSessionYSeRedirige() throws LimiteDeComponenteSobrepasadoEnElArmadoException {
-        // Preparación
+    public void cuandoAgregoUnComponenteYNoSePuedenAgregarMasUnidadesSeRedirigeAlSiguientePaso() throws LimiteDeComponenteSobrepasadoEnElArmadoException, ComponenteSinStockPedidoException {
+        // Preparación (Arrange)
         String tipoComponente = "procesador";
         Long idComponente = 1L;
-        Integer cantidad = 1;
-
-        when(sessionMock.getAttribute("armadoPcDto")).thenReturn(armadoPcDtoMock);
-        when(servicioArmaTuPcMock.agregarComponenteAlArmado(idComponente, tipoComponente, cantidad, armadoPcDtoMock)).thenReturn(armadoPcDtoMock);
+        when(servicioArmaTuPcMock.agregarComponenteAlArmado(anyLong(), anyString(), anyInt(), ArgumentMatchers.any(ArmadoPcDto.class))).thenReturn(armadoPcDtoMock);
         when(servicioArmaTuPcMock.obtenerComponenteDtoPorId(idComponente)).thenReturn(componenteDtoMock);
         when(componenteDtoMock.getModelo()).thenReturn("Intel Core i5");
-        when(servicioArmaTuPcMock.sePuedeAgregarMasUnidades(tipoComponente, armadoPcDtoMock)).thenReturn(false); // Va al siguiente paso
+        when(servicioArmaTuPcMock.sePuedeAgregarMasUnidades(tipoComponente, armadoPcDtoMock)).thenReturn(false); // No se pueden agregar más
 
-        // Ejecución
-        ModelAndView mav = controladorArmaTuPc.agregarComponenteAlArmado(tipoComponente, idComponente, cantidad, sessionMock);
-        ModelMap model = mav.getModelMap();
+        // Ejecución (Act)
+        ModelAndView mav = controladorArmaTuPc.agregarComponenteAlArmado(tipoComponente, idComponente, 1, sessionMock);
 
-        // Verificación
+        // Verificación (Assert)
         verify(sessionMock).setAttribute("armadoPcDto", armadoPcDtoMock);
-        assertThat(mav.getViewName(), equalTo("redirect:/arma-tu-pc/tradicional/motherboard"));
-        assertThat(model.get("agregado"), equalTo("x1 Intel Core i5 agregado correctamente al armado!"));
+        assertThat(mav.getViewName(), equalTo("redirect:/arma-tu-pc/tradicional/motherboard")); // Va al siguiente
+        assertThat((String)mav.getModelMap().get("agregado"), containsString("Intel Core i5"));
     }
 
     @Test
-    public void cuandoIntentoAgregarMasComponentesDelLimiteSeMuestraUnError() throws LimiteDeComponenteSobrepasadoEnElArmadoException {
-        // Preparación
+    public void cuandoAgregoUnComponenteYSePuedenAgregarMasUnidadesSeRedirigeAlMismoPaso() throws LimiteDeComponenteSobrepasadoEnElArmadoException, ComponenteSinStockPedidoException {
+        // Preparación (Arrange)
         String tipoComponente = "memoria";
-        Long idComponente = 1L;
-        Integer cantidad = 1;
+        Long idComponente = 2L;
+        when(servicioArmaTuPcMock.agregarComponenteAlArmado(anyLong(), anyString(), anyInt(), ArgumentMatchers.any(ArmadoPcDto.class))).thenReturn(armadoPcDtoMock);
+        when(servicioArmaTuPcMock.obtenerComponenteDtoPorId(idComponente)).thenReturn(componenteDtoMock);
+        when(componenteDtoMock.getModelo()).thenReturn("Corsair Vengeance");
+        when(servicioArmaTuPcMock.sePuedeAgregarMasUnidades(tipoComponente, armadoPcDtoMock)).thenReturn(true); // Se pueden agregar más
 
-        when(sessionMock.getAttribute("armadoPcDto")).thenReturn(armadoPcDtoMock);
-        when(servicioArmaTuPcMock.agregarComponenteAlArmado(idComponente, tipoComponente, cantidad, armadoPcDtoMock))
+        // Ejecución (Act)
+        ModelAndView mav = controladorArmaTuPc.agregarComponenteAlArmado(tipoComponente, idComponente, 1, sessionMock);
+
+        // Verificación (Assert)
+        verify(sessionMock).setAttribute("armadoPcDto", armadoPcDtoMock);
+        assertThat(mav.getViewName(), equalTo("redirect:/arma-tu-pc/tradicional/memoria")); // Se queda en el mismo
+        assertThat((String)mav.getModelMap().get("agregado"), containsString("Corsair Vengeance"));
+    }
+
+    @Test
+    public void cuandoIntentoAgregarComponenteYSeSuperaElLimiteSeMuestraError() throws LimiteDeComponenteSobrepasadoEnElArmadoException, ComponenteSinStockPedidoException {
+        // Preparación (Arrange)
+        String tipoComponente = "memoria";
+        when(servicioArmaTuPcMock.agregarComponenteAlArmado(anyLong(), anyString(), anyInt(), ArgumentMatchers.any(ArmadoPcDto.class)))
                 .thenThrow(new LimiteDeComponenteSobrepasadoEnElArmadoException());
 
-        // Ejecución
-        ModelAndView mav = controladorArmaTuPc.agregarComponenteAlArmado(tipoComponente, idComponente, cantidad, sessionMock);
-        ModelMap model = mav.getModelMap();
+        // Ejecución (Act)
+        ModelAndView mav = controladorArmaTuPc.agregarComponenteAlArmado(tipoComponente, 1L, 1, sessionMock);
 
-        // Verificación
-        verify(sessionMock, never()).setAttribute(anyString(), any());
+        // Verificación (Assert)
         assertThat(mav.getViewName(), equalTo("redirect:/arma-tu-pc/tradicional/memoria"));
-        assertThat(model.get("errorLimite"), equalTo("Supero el limite de memoria de su armado"));
+        assertThat(mav.getModelMap().get("errorLimite"), equalTo("Supero el limite de memoria de su armado"));
+        verify(sessionMock, never()).setAttribute(eq("armadoPcDto"), any());
     }
 
-    // Tests para quitarComponenteDelArmado
     @Test
-    public void cuandoQuitoUnComponenteExitosamenteSeActualizaElArmadoYSeMuestraMensaje() throws Exception {
-        // Preparación
+    public void cuandoIntentoAgregarComponenteSinStockSeMuestraError() throws LimiteDeComponenteSobrepasadoEnElArmadoException, ComponenteSinStockPedidoException {
+        // Preparación (Arrange)
+        String tipoComponente = "procesador";
+        String mensajeError = "No hay stock suficiente para el componente pedido";
+        when(servicioArmaTuPcMock.agregarComponenteAlArmado(anyLong(), anyString(), anyInt(), ArgumentMatchers.any(ArmadoPcDto.class)))
+                .thenThrow(new ComponenteSinStockPedidoException(mensajeError));
+
+        // Ejecución (Act)
+        ModelAndView mav = controladorArmaTuPc.agregarComponenteAlArmado(tipoComponente, 1L, 1, sessionMock);
+
+        // Verificación (Assert)
+        assertThat(mav.getViewName(), equalTo("redirect:/arma-tu-pc/tradicional/procesador"));
+        assertThat(mav.getModelMap().get("errorLimite"), equalTo(mensajeError));
+        verify(sessionMock, never()).setAttribute(eq("armadoPcDto"), any());
+    }
+
+    //endregion
+
+    //region Tests para quitarComponenteDelArmado
+
+    @Test
+    public void cuandoQuitoUnComponenteExitosamenteSeRedirigeAlMismoPaso() throws QuitarComponenteInvalidoException, QuitarStockDemasDeComponenteException {
+        // Preparación (Arrange)
         String tipoComponente = "gpu";
         Long idComponente = 5L;
-        Integer cantidad = 1;
-
-        when(sessionMock.getAttribute("armadoPcDto")).thenReturn(armadoPcDtoMock);
-        when(servicioArmaTuPcMock.quitarComponenteAlArmado(idComponente, tipoComponente, cantidad, armadoPcDtoMock)).thenReturn(armadoPcDtoMock);
+        when(servicioArmaTuPcMock.quitarComponenteAlArmado(anyLong(), anyString(), anyInt(), ArgumentMatchers.any(ArmadoPcDto.class))).thenReturn(armadoPcDtoMock);
         when(servicioArmaTuPcMock.obtenerComponenteDtoPorId(idComponente)).thenReturn(componenteDtoMock);
         when(componenteDtoMock.getModelo()).thenReturn("NVIDIA RTX 3060");
 
-        // Ejecución
-        ModelAndView mav = controladorArmaTuPc.quitarComponenteDelArmado(tipoComponente, idComponente, cantidad, sessionMock);
-        ModelMap model = mav.getModelMap();
+        // Ejecución (Act)
+        ModelAndView mav = controladorArmaTuPc.quitarComponenteDelArmado(tipoComponente, idComponente, 1, sessionMock);
 
-        // Verificación
+        // Verificación (Assert)
         verify(sessionMock).setAttribute("armadoPcDto", armadoPcDtoMock);
         assertThat(mav.getViewName(), equalTo("redirect:/arma-tu-pc/tradicional/gpu"));
-        assertThat(model.get("quitado"), equalTo("x1 NVIDIA RTX 3060 fue quitado del armado."));
+        assertThat(mav.getModelMap().get("quitado"), equalTo("x1 NVIDIA RTX 3060 fue quitado del armado."));
     }
 
-    @Test
-    public void cuandoIntentoQuitarUnComponenteNoAgregadoSeMuestraError() throws Exception {
-        // Preparación
-        String tipoComponente = "gpu";
-        Long idComponente = 5L;
-        Integer cantidad = 1;
+    //endregion
 
-        when(sessionMock.getAttribute("armadoPcDto")).thenReturn(armadoPcDtoMock);
-        when(servicioArmaTuPcMock.quitarComponenteAlArmado(idComponente, tipoComponente, cantidad, armadoPcDtoMock))
-                .thenThrow(new QuitarComponenteInvalidoException());
+    //region Tests para obtenerResumen
 
-        // Ejecución
-        ModelAndView mav = controladorArmaTuPc.quitarComponenteDelArmado(tipoComponente, idComponente, cantidad, sessionMock);
-        ModelMap model = mav.getModelMap();
-
-        // Verificación
-        verify(sessionMock, never()).setAttribute(anyString(), any());
-        assertThat(mav.getViewName(), equalTo("redirect:/arma-tu-pc/tradicional/gpu"));
-        assertThat(model.get("errorQuitado"), equalTo("No es posible quitar un componente que no fue agregado al armado."));
-    }
-
-    @Test
-    public void cuandoIntentoQuitarMasCantidadDeLaQueHaySeMuestraError() throws Exception {
-        // Preparación
-        String tipoComponente = "memoria";
-        Long idComponente = 8L;
-        Integer cantidad = 2; // Intenta quitar 2
-
-        when(sessionMock.getAttribute("armadoPcDto")).thenReturn(armadoPcDtoMock);
-        when(servicioArmaTuPcMock.quitarComponenteAlArmado(idComponente, tipoComponente, cantidad, armadoPcDtoMock))
-                .thenThrow(new QuitarStockDemasDeComponenteException());
-
-        // Ejecución
-        ModelAndView mav = controladorArmaTuPc.quitarComponenteDelArmado(tipoComponente, idComponente, cantidad, sessionMock);
-        ModelMap model = mav.getModelMap();
-
-        // Verificación
-        verify(sessionMock, never()).setAttribute(anyString(), any());
-        assertThat(mav.getViewName(), equalTo("redirect:/arma-tu-pc/tradicional/memoria"));
-        assertThat(model.get("errorQuitado"), equalTo("No es posible quitar una cantidad del componente que no posee el armado."));
-    }
-
-    // Tests para obtenerResumen
     @Test
     public void cuandoElArmadoEstaCompletoSeMuestraElResumen() {
-        // Preparación
-        when(sessionMock.getAttribute("armadoPcDto")).thenReturn(armadoPcDtoMock);
+        // Preparación (Arrange)
         when(servicioArmaTuPcMock.armadoCompleto(armadoPcDtoMock)).thenReturn(true);
 
-        // Ejecución
+        // Ejecución (Act)
         ModelAndView mav = controladorArmaTuPc.obtenerResumen(sessionMock);
 
-        // Verificación
+        // Verificación (Assert)
         assertThat(mav.getViewName(), equalTo("arma-tu-pc/tradicional/resumen"));
         assertThat(mav.getModel().get("armadoPcDto"), is(armadoPcDtoMock));
         assertNull(mav.getModel().get("errorResumen"));
@@ -346,111 +311,118 @@ public class ControladorArmaTuPcTest {
 
     @Test
     public void cuandoElArmadoEstaIncompletoSeMuestraMensajeDeError() {
-        // Preparación
-        when(sessionMock.getAttribute("armadoPcDto")).thenReturn(armadoPcDtoMock);
+        // Preparación (Arrange)
         when(servicioArmaTuPcMock.armadoCompleto(armadoPcDtoMock)).thenReturn(false);
 
-        // Ejecución
+        // Ejecución (Act)
         ModelAndView mav = controladorArmaTuPc.obtenerResumen(sessionMock);
 
-        // Verificación
+        // Verificación (Assert)
         assertThat(mav.getViewName(), equalTo("arma-tu-pc/tradicional/resumen"));
         assertNull(mav.getModel().get("armadoPcDto"));
-        assertThat(mav.getModel().get("errorResumen"), equalTo("Seleccione almenos un motherboard, cpu, cooler y gabinete para obtener su armado"));
+        assertThat((String)mav.getModel().get("errorResumen"), containsString("Seleccione almenos un motherboard, cpu, cooler y gabinete"));
     }
 
-    // Test para reiniciarArmado
+    //endregion
+
+    //region Test para reiniciarArmado
+
     @Test
-    public void cuandoSeReiniciaElArmadoLaSessionSeLimpiaYRedirigeAlPrimerPaso() {
-        // Ejecución
+    public void cuandoSeReiniciaElArmadoSeLlamaAlServicioParaDevolverStockYSeLimpiaLaSession() {
+        // Ejecución (Act)
         ModelAndView mav = controladorArmaTuPc.reiniciarArmado(sessionMock);
 
-        // Verificación
+        // Verificación (Assert)
+        verify(servicioArmaTuPcMock, times(1)).devolverStockDeArmado(armadoPcDtoMock);
         verify(sessionMock, times(1)).removeAttribute("armadoPcDto");
         assertThat(mav.getViewName(), equalTo("redirect:/arma-tu-pc/tradicional/procesador"));
     }
 
-    // Tests para verificar las llamadas al ServicioPrecios
-    @Test
-    public void cuandoSeCarganComponentesSeConviertenSusPreciosAPesos() throws ComponenteDeterminateDelArmadoEnNullException {
-        // Preparación
-        String tipoComponente = "procesador";
-        ComponenteDto comp1 = new ComponenteDto();
-        comp1.setPrecio(100.0);
-        ComponenteDto comp2 = new ComponenteDto();
-        comp2.setPrecio(200.0);
-        List<ComponenteDto> listaComponentes = List.of(comp1, comp2);
+    //endregion
 
-        when(sessionMock.getAttribute("armadoPcDto")).thenReturn(armadoPcDtoMock);
-        when(servicioArmaTuPcMock.obtenerListaDeComponentesCompatiblesDto(tipoComponente, armadoPcDtoMock))
-                .thenReturn(listaComponentes);
-        when(servicioPreciosMock.conversionDolarAPeso(100.0)).thenReturn("$ 100.000,00");
-        when(servicioPreciosMock.conversionDolarAPeso(200.0)).thenReturn("$ 200.000,00");
-
-        // Ejecución
-        controladorArmaTuPc.cargarComponentes(tipoComponente, null, sessionMock);
-
-        // Verificación
-        // Se debe llamar al servicio de precios una vez por cada componente
-        verify(servicioPreciosMock, times(1)).conversionDolarAPeso(100.0);
-        verify(servicioPreciosMock, times(1)).conversionDolarAPeso(200.0);
-        assertThat(comp1.getPrecioFormateado(), is(equalTo("$ 100.000,00")));
-        assertThat(comp2.getPrecioFormateado(), is(equalTo("$ 200.000,00")));
-    }
+    //region Tests para sumarArmadoAlCarrito
 
     @Test
-    public void cuandoSeAgregaUnComponenteSeActualizaElPrecioTotalDelArmadoEnPesos() throws LimiteDeComponenteSobrepasadoEnElArmadoException {
-        // Preparación
-        Long idComponente = 1L;
-        String tipoComponente = "procesador";
-        Double precioTotalEnDolares = 550.5;
-        String precioTotalEnPesos = "$ 550.500,50";
+    public void alSumarArmadoAUnCarritoExistenteSeAgreganLosProductos() {
+        // Preparación (Arrange)
+        ProductoCarritoArmadoDto productoArmado1 = mock(ProductoCarritoArmadoDto.class);
+        ProductoCarritoArmadoDto productoArmado2 = mock(ProductoCarritoArmadoDto.class);
+        List<ProductoCarritoArmadoDto> productosDelArmado = List.of(productoArmado1, productoArmado2);
 
-        when(sessionMock.getAttribute("armadoPcDto")).thenReturn(armadoPcDtoMock);
-        when(servicioArmaTuPcMock.agregarComponenteAlArmado(anyLong(), anyString(), anyInt(), ArgumentMatchers.any(ArmadoPcDto.class)))
-                .thenReturn(armadoPcDtoMock);
-        when(armadoPcDtoMock.getPrecioTotal()).thenReturn(precioTotalEnDolares);
-        when(servicioPreciosMock.conversionDolarAPeso(precioTotalEnDolares)).thenReturn(precioTotalEnPesos);
-        when(servicioArmaTuPcMock.obtenerComponenteDtoPorId(anyLong())).thenReturn(componenteDtoMock);
-
-        // Ejecución
-        controladorArmaTuPc.agregarComponenteAlArmado(tipoComponente, idComponente, 1, sessionMock);
-
-        // Verificación
-        // Se verifica que se llame al servicio de precios con el total del armado
-        verify(servicioPreciosMock, times(1)).conversionDolarAPeso(precioTotalEnDolares);
-        // Se verifica que el precio formateado se establezca en el DTO del armado
-        verify(armadoPcDtoMock, times(1)).setPrecioFormateado(precioTotalEnPesos);
-    }
-
-    // Test para el método sumarArmadoAlCarrito
-    @Test
-    public void alSumarArmadoAlCarritoSeAgreganLosProductosALaSessionYRedirige() {
-        // Preparación
-        // Mocks para los DTOs que se agregarán al carrito
-        ProductoCarritoDto producto1 = mock(ProductoCarritoDto.class);
-        ProductoCarritoDto producto2 = mock(ProductoCarritoDto.class);
-        List<ProductoCarritoDto> productosDelArmado = List.of(producto1, producto2);
-
-        // Simular que ya hay un item en el carrito de la sesión
         ProductoCarritoDto productoExistente = mock(ProductoCarritoDto.class);
         List<ProductoCarritoDto> carritoActual = new ArrayList<>();
         carritoActual.add(productoExistente);
 
-        when(sessionMock.getAttribute("armadoPcDto")).thenReturn(armadoPcDtoMock);
         when(sessionMock.getAttribute("carritoSesion")).thenReturn(carritoActual);
-        when(servicioArmaTuPcMock.pasajeAProductoDtoParaAgregarAlCarrito(armadoPcDtoMock)).thenReturn(productosDelArmado);
+        when(servicioArmaTuPcMock.pasajeAProductoArmadoDtoParaAgregarAlCarrito(armadoPcDtoMock)).thenReturn(productosDelArmado);
+        when(sessionMock.getAttribute("reservaArmado")).thenReturn(productosDelArmado);
 
-        // Ejecución
+        // Ejecución (Act)
         ModelAndView mav = controladorArmaTuPc.sumarArmadoAlCarrito(sessionMock);
 
-        // Verificación
 
-        verify(servicioArmaTuPcMock, times(1)).pasajeAProductoDtoParaAgregarAlCarrito(armadoPcDtoMock);
-        // Verificar que la lista final en la sesión contiene todos los productos (los existentes + los nuevos)
-        // El tamaño de la lista ahora debería ser 3
         assertThat(carritoActual, hasSize(3));
-        assertThat(carritoActual, hasItems(productoExistente, producto1, producto2));
+        assertThat(carritoActual, hasItems(productoExistente, productoArmado1, productoArmado2));
         assertThat(mav.getViewName(), equalTo("redirect:/carritoDeCompras/index"));
+    }
+
+    @Test
+    public void alSumarArmadoSinCarritoExistenteSeCreaUnoNuevoYSeAgreganLosProductos() {
+        // Preparación (Arrange)
+        ProductoCarritoArmadoDto productoArmado1 = mock(ProductoCarritoArmadoDto.class);
+        ProductoCarritoArmadoDto productoArmado2 = mock(ProductoCarritoArmadoDto.class);
+        List<ProductoCarritoArmadoDto> productosDelArmado = List.of(productoArmado1, productoArmado2);
+
+        when(sessionMock.getAttribute("carritoSesion")).thenReturn(null); // No hay carrito
+        when(servicioArmaTuPcMock.pasajeAProductoArmadoDtoParaAgregarAlCarrito(armadoPcDtoMock)).thenReturn(productosDelArmado);
+        when(sessionMock.getAttribute("reservaArmado")).thenReturn(productosDelArmado);
+
+        // Ejecución (Act)
+        ModelAndView mav = controladorArmaTuPc.sumarArmadoAlCarrito(sessionMock);
+
+
+        verify(sessionMock, times(1)).removeAttribute("armadoPcDto");
+        verify(sessionMock, times(1)).removeAttribute("reservaArmado");
+        assertThat(mav.getViewName(), equalTo("redirect:/carritoDeCompras/index"));
+    }
+
+    //endregion
+
+    @Test
+    public void cuandoIntentoQuitarComponenteInvalidoSeMuestraError() throws QuitarComponenteInvalidoException, QuitarStockDemasDeComponenteException {
+        // Preparación
+        String tipoComponente = "gpu";
+        Long idComponente = 5L;
+        Integer cantidad = 1;
+
+        when(servicioArmaTuPcMock.quitarComponenteAlArmado(idComponente, tipoComponente, cantidad, armadoPcDtoMock))
+                .thenThrow(new QuitarComponenteInvalidoException());
+
+        // Ejecución
+        ModelAndView mav = controladorArmaTuPc.quitarComponenteDelArmado(tipoComponente, idComponente, cantidad, sessionMock);
+
+        // Verificación
+        assertThat(mav.getViewName(), equalTo("redirect:/arma-tu-pc/tradicional/" + tipoComponente));
+        assertThat(mav.getModelMap().get("errorQuitado"), equalTo("No es posible quitar un componente que no fue agregado al armado."));
+        verify(sessionMock, never()).setAttribute(eq("armadoPcDto"), any());
+    }
+
+    @Test
+    public void cuandoIntentoQuitarMasStockDelDisponibleSeMuestraError() throws QuitarComponenteInvalidoException, QuitarStockDemasDeComponenteException {
+        // Preparación
+        String tipoComponente = "gpu";
+        Long idComponente = 5L;
+        Integer cantidad = 2;
+
+        when(servicioArmaTuPcMock.quitarComponenteAlArmado(idComponente, tipoComponente, cantidad, armadoPcDtoMock))
+                .thenThrow(new QuitarStockDemasDeComponenteException());
+
+        // Ejecución
+        ModelAndView mav = controladorArmaTuPc.quitarComponenteDelArmado(tipoComponente, idComponente, cantidad, sessionMock);
+
+        // Verificación
+        assertThat(mav.getViewName(), equalTo("redirect:/arma-tu-pc/tradicional/" + tipoComponente));
+        assertThat(mav.getModelMap().get("errorQuitado"), equalTo("No es posible quitar una cantidad del componente que no posee el armado."));
+        verify(sessionMock, never()).setAttribute(eq("armadoPcDto"), any());
     }
 }

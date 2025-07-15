@@ -115,7 +115,8 @@ public class ServicioCompatibilidadesImpl implements ServicioCompatibilidades {
         return esCompatible;
     }
 
-        private ArmadoPc completarEntidadArmadoPcParaEvaluarFuente(ArmadoPc armadoPcEntidad) {
+    @Override
+    public ArmadoPc completarEntidadArmadoPcParaEvaluarFuente(ArmadoPc armadoPcEntidad) {
 
         armadoPcEntidad.setProcesador((armadoPcEntidad.getProcesador() != null) ? (Procesador)this.repositorioComponente.obtenerComponentePorId(armadoPcEntidad.getProcesador().getId()) : null);
         armadoPcEntidad.setMotherboard((armadoPcEntidad.getMotherboard() != null) ? (Motherboard)this.repositorioComponente.obtenerComponentePorId(armadoPcEntidad.getMotherboard().getId()) : null);
@@ -125,6 +126,11 @@ public class ServicioCompatibilidadesImpl implements ServicioCompatibilidades {
         if (armadoPcEntidad.getAlmacenamiento() != null && !armadoPcEntidad.getAlmacenamiento().isEmpty()) armadoPcEntidad.setAlmacenamiento(this.obtenerListaDeComponentesEntidadConInformacionCompleta(armadoPcEntidad.getAlmacenamiento(), Almacenamiento.class));
 
         return armadoPcEntidad;
+    }
+
+    @Override
+    public Integer obtenerWattsDeArmado(ArmadoPc armadoPc) {
+        return this.servicioFuente.obtenerWatsTotales(armadoPc);
     }
 
     private <T extends Componente> List<T>  obtenerListaDeComponentesEntidadConInformacionCompleta(List<T> componentesACompletar, Class<T> tipoDeDato) {

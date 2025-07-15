@@ -1,0 +1,87 @@
+<div th:replace="fragments/fragments :: header"></div>
+
+<div class="container-fluid">
+    <div class="mt-4 mb-4">
+        <h2 class="text-dark mb-4">Tu <strong>historial de compras</strong></h2>
+
+        <div th:if="${comprasUsuario != null && !comprasUsuario.isEmpty()}">
+            <div class="row g-4">
+
+                <div class="col-12 col-md-6 col-lg-4" th:each="compra : ${comprasUsuario}">
+                    <div class="card h-100 shadow border-0">
+                        <div class="card-header bg-warning text-dark">
+                            <h5 class="mb-0">
+                                <i class="bi bi-calendar3"></i>
+                                <span th:text="${compra.fecha}"></span>
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="text-center mb-3">
+                                <h3 class="text-success fw-bold">
+                                    <span th:text="'$' + ${#numbers.formatDecimal(compra.total, 1, 'POINT', 2, 'COMMA')}"></span>
+                                </h3>
+                            </div>
+                            <div class="mb-3">
+                                <span class="badge bg-secondary mb-2">
+                                    <i class="bi bi-credit-card me-1"></i>
+                                    <span th:text="${compra.metodoDePago}"></span>
+                                </span>
+                            </div>
+
+                            <div th:if="${compra.productosComprados != null && !compra.productosComprados.isEmpty()}">
+                                <h6 class="fw-bold mb-2">Productos comprados:</h6>
+                                <div class="productos-lista"
+                                     style="max-height: 200px; overflow-y: auto; overflow-x: hidden; word-wrap: break-word;">
+                                    <div class="border-bottom pb-2 mb-2"
+                                         th:each="producto : ${compra.productosComprados}">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <!-- Imagen -->
+                                            <div>
+                                                <img th:src="'http://www.imagenestaller.free.nf/' + ${producto.urlImagen}"
+                                                     style="width: 50px; height: 50px; object-fit: contain;">
+                                            </div>
+
+                                            <!-- Nombre y detalle -->
+                                            <div class="flex-grow-1" style="min-width: 0;">
+                                                <small class="fw-bold text-truncate d-block" style="max-width: 100%;"
+                                                       th:text="${producto.componente.nombre}"></small>
+                                                <small th:if="${producto.esArmado == true}"
+                                                       th:text="|Armado ${producto.numeroDeArmado}|"
+                                                       style="color: #1976d2;"></small>
+                                            </div>
+
+                                            <!-- Cantidad y precio -->
+                                            <div class="text-end">
+                                                <div>
+                                                    <small class="text-muted">x<span
+                                                            th:text="${producto.cantidad}"></span></small>
+                                                </div>
+                                                <div>
+                                                    <small class="text-success">
+                                                        <span th:text="'$' + ${#numbers.formatDecimal(producto.precioUnitario, 1, 'POINT', 2, 'COMMA')}"></span>
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div th:if="${comprasUsuario == null || comprasUsuario.isEmpty()}">
+                                <div class="card shadow border-0" style="max-width: 500px; margin: 0 auto;">
+                                    <div class="card-body py-5">
+                                        <h4 class="text-muted">El historial de compras está vacío</h4>
+                                        <p class="text-muted">Cuando realices tu primera compra, aparecerá aquí.</p>
+                                        <a style="text-decoration: none; color: red" href="/index"> Volver al inicio</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+                    <div th:replace="fragments/fragments :: footer"></div>

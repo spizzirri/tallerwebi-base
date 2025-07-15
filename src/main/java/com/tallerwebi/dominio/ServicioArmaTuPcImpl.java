@@ -1,6 +1,7 @@
 package com.tallerwebi.dominio;
 
 import com.tallerwebi.dominio.entidades.*;
+import com.tallerwebi.dominio.excepcion.*;
 import com.tallerwebi.dominio.excepcion.ComponenteDeterminateDelArmadoEnNullException;
 import com.tallerwebi.dominio.excepcion.LimiteDeComponenteSobrepasadoEnElArmadoException;
 import com.tallerwebi.dominio.excepcion.QuitarComponenteInvalidoException;
@@ -10,6 +11,7 @@ import com.tallerwebi.presentacion.RequisitosJuegos;
 import com.tallerwebi.presentacion.RequisitosProgramas;
 import com.tallerwebi.presentacion.dto.ArmadoPcDto;
 import com.tallerwebi.presentacion.dto.ComponenteDto;
+import com.tallerwebi.presentacion.dto.ProductoCarritoArmadoDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -64,16 +66,16 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
     }
 
     @Override
-    public List<ProductoCarritoDto> pasajeAProductoDtoParaAgregarAlCarrito(ArmadoPcDto armadoPcDto) {
+    public List<ProductoCarritoArmadoDto> pasajeAProductoArmadoDtoParaAgregarAlCarrito(ArmadoPcDto armadoPcDto) {
 
-        List<ProductoCarritoDto> productoCarritoDtos = new ArrayList<>();
+        List<ProductoCarritoArmadoDto> productoCarritoDtos = new ArrayList<>();
 
         Map<Long, Integer> idDeComponentesDelArmadoYCantidades = armadoPcDto.getIdYCantidadComponentes();
 
         for(Map.Entry<Long, Integer> componente : idDeComponentesDelArmadoYCantidades.entrySet()){
 
             Componente componenteEntidad = this.repositorioComponente.obtenerComponentePorId(componente.getKey());
-            ProductoCarritoDto productoCarritoDto = new ProductoCarritoDto(componenteEntidad , componente.getValue());
+            ProductoCarritoArmadoDto productoCarritoDto = new ProductoCarritoArmadoDto(componenteEntidad , componente.getValue());
             productoCarritoDtos.add(productoCarritoDto);
         }
 
@@ -81,7 +83,37 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
     }
 
     @Override
-    public List<ComponenteDto> obtenerListaDeComponentesCompatiblesDto(String tipoComponente, ArmadoPcDto armadoPcDto) throws ComponenteDeterminateDelArmadoEnNullException {
+    public Integer obtenerWattsTotalesDeArmado(ArmadoPcDto armadoPcDto) {
+        ArmadoPc armadoPc = this.servicioCompatibilidades.completarEntidadArmadoPcParaEvaluarFuente(armadoPcDto.obtenerEntidad());
+        return this.servicioCompatibilidades.obtenerWattsDeArmado(armadoPc);
+    }
+
+    @Override
+    public void devolverStockDeArmado(ArmadoPcDto armadoPcDto) {
+        Map<Long, Integer> idYCantidadesDeComponentesADevolver = armadoPcDto.getIdYCantidadComponentes();
+
+        for (Long id : idYCantidadesDeComponentesADevolver.keySet()) {
+            this.repositorioComponente.devolverStockDeUnComponente(id, idYCantidadesDeComponentesADevolver.get(id));
+        }
+    }
+
+    @Override
+    public Integer obtenerSlotsRamDeMotherboard(ComponenteDto motherboard) {
+        return ((Motherboard)this.repositorioComponente.obtenerComponentePorId(motherboard.getId())).getCantSlotsRAM();
+    }
+
+    @Override
+    public Integer obtenerSlotsSataDeMotherboard(ComponenteDto motherboard) {
+        return ((Motherboard)this.repositorioComponente.obtenerComponentePorId(motherboard.getId())).getCantPuertosSata();
+    }
+
+    @Override
+    public Integer obtenerSlotsM2DeMotherboard(ComponenteDto motherboard) {
+        return ((Motherboard)this.repositorioComponente.obtenerComponentePorId(motherboard.getId())).getCantSlotsM2();
+    }
+
+    @Override
+    public Set<ComponenteDto> obtenerListaDeComponentesCompatiblesDto(String tipoComponente, ArmadoPcDto armadoPcDto) throws ComponenteDeterminateDelArmadoEnNullException {
 
         String tablaDelTipoDeComponente = this.correspondenciaDeVistaConTablasEnLaBD.get(tipoComponente);
         List<Componente> componentesDeTipo = this.repositorioComponente.obtenerComponentesPorTipoEnStockOrdenadosPorPrecio(tablaDelTipoDeComponente);
@@ -92,14 +124,16 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
             if (esCompatibleConElArmado) componentesCompatibles.add(componente);
         }
 
+        Set<ComponenteDto> listaDeComponentesDto = new LinkedHashSet<>(transformarComponentesADtos(componentesCompatibles));
 
-        List<ComponenteDto> listaDeComponentesDto = transformarComponentesADtos(componentesCompatibles);
+        // agrego los componentes que ya tiene en el armado si es que no estan por falta de stock de la base de datos
+        listaDeComponentesDto.addAll(this.obtenerComponentesQueYaEstanDelArmadoDelTipoPedido(armadoPcDto.getComponentesDto(), tablaDelTipoDeComponente));
 
         return listaDeComponentesDto;
     }
 
     @Override
-    public List<ComponenteDto> obtenerListaDeComponentesCompatiblesFiltradosDto(String tipoComponente, String nombreFiltro, ArmadoPcDto armadoPcDto) throws ComponenteDeterminateDelArmadoEnNullException {
+    public Set<ComponenteDto> obtenerListaDeComponentesCompatiblesFiltradosDto(String tipoComponente, String nombreFiltro, ArmadoPcDto armadoPcDto) throws ComponenteDeterminateDelArmadoEnNullException {
         String tablaDelTipoDeComponente = this.correspondenciaDeVistaConTablasEnLaBD.get(tipoComponente);
 
         List<Componente> componentesDeTipo = this.repositorioComponente.obtenerComponentesPorTipoYFiltradosPorNombreEnStockOrdenadosPorPrecio(tablaDelTipoDeComponente, nombreFiltro);
@@ -111,9 +145,21 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
             if (esCompatibleConElArmado) componentesCompatibles.add(componente);
         }
 
-        List<ComponenteDto> listaDeComponentesDto = transformarComponentesADtos(componentesCompatibles);
+        Set<ComponenteDto> listaDeComponentesDto = new LinkedHashSet<>(transformarComponentesADtos(componentesCompatibles));
+
+        // agrego los componentes que ya tiene en el armado si es que no estan por falta de stock de la base de datos
+        listaDeComponentesDto.addAll(this.obtenerComponentesQueYaEstanDelArmadoDelTipoPedido(armadoPcDto.getComponentesDto(), tablaDelTipoDeComponente));
 
         return listaDeComponentesDto;
+    }
+
+    private List<ComponenteDto> obtenerComponentesQueYaEstanDelArmadoDelTipoPedido(List<ComponenteDto> componentesDtoDelArmado, String tipoDeComponente) {
+
+        List<ComponenteDto> componentesDeTipo = new ArrayList<>();
+        for (ComponenteDto componenteDto : componentesDtoDelArmado)
+            if (componenteDto.getTipoComponente().equals(tipoDeComponente))
+                componentesDeTipo.add(new ComponenteDto(this.obtenerComponentePorId(componenteDto.getId())));
+        return componentesDeTipo;
     }
 
     private List<ComponenteDto> transformarComponentesADtos(List<Componente> componentesDeTipo) {
@@ -128,23 +174,32 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
     // LOS SWITCH DE AGREGAR Y QUITAR PODRIAN ESTAR EN UN SOLO METODO QUE DEPENDIENDO EL PARAMETRO DE AGREGAR O QUITAR EJECUTE LO CORRESPONDIENTE (esto para mantener un solo switch y que no sea tan engorroso)
 
     @Override
-    public ArmadoPcDto agregarComponenteAlArmado(Long idComponente, String tipoComponente, Integer cantidad, ArmadoPcDto armadoPcDto) throws LimiteDeComponenteSobrepasadoEnElArmadoException {
+    public ArmadoPcDto agregarComponenteAlArmado(Long idComponente, String tipoComponente, Integer cantidad, ArmadoPcDto armadoPcDto) throws LimiteDeComponenteSobrepasadoEnElArmadoException, ComponenteSinStockPedidoException {
 
         Componente componenteSolicitado = obtenerComponentePorId(idComponente);
 
-        seExcedeDeLimite(tipoComponente, cantidad, armadoPcDto);
+        if (componenteSolicitado.getStock() < cantidad) throw new ComponenteSinStockPedidoException("El componente "+ componenteSolicitado.getNombre() +" no posee el stock pedido, porfavor, intentelo mas tarde.");
+
+        seExcedeDeLimite(tipoComponente, cantidad, armadoPcDto, idComponente);
 
         // determinar un metodo de componente que diga cuando un componente es compatible con el armado
 
         List<ComponenteDto> perifericosPrecargados = armadoPcDto.getPerifericos();
         ComponenteDto monitorPrecargado = armadoPcDto.getMonitor();
 
+
         ComponenteDto componenteSolicitadoDto = new ComponenteDto(componenteSolicitado);
         String precioFormateado = this.servicioPrecios.conversionDolarAPeso(componenteSolicitadoDto.getPrecio());
         componenteSolicitadoDto.setPrecioFormateado(precioFormateado);
 
+
         switch(tipoComponente.toLowerCase()){
-            case "procesador":
+            case "procesador":{
+
+                Map<Long, Integer> idYCantidadAEliminar = this.obtenerIdsYCantidadDeComponentesAEliminar(armadoPcDto, Set.of("procesador", "motherboard", "coolercpu", "memoriaram", "placadevideo", "almacenamiento", "fuentedealimentacion", "gabinete"));
+
+                for (Long id : idYCantidadAEliminar.keySet())
+                    this.repositorioComponente.devolverStockDeUnComponente(id, idYCantidadAEliminar.get(id));
 
                 armadoPcDto = new ArmadoPcDto();
                 armadoPcDto.setProcesador(componenteSolicitadoDto);
@@ -152,7 +207,13 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
                 armadoPcDto.setMonitor(monitorPrecargado);
 
                 break;
-            case "motherboard":
+            }
+            case "motherboard": {
+
+                Map<Long, Integer> idYCantidadAEliminar = this.obtenerIdsYCantidadDeComponentesAEliminar(armadoPcDto, Set.of("motherboard", "coolercpu", "memoriaram", "placadevideo", "almacenamiento", "fuentedealimentacion", "gabinete"));
+
+                for (Long id : idYCantidadAEliminar.keySet())
+                    this.repositorioComponente.devolverStockDeUnComponente(id, idYCantidadAEliminar.get(id));
 
                 ComponenteDto procesadorPrecargado = armadoPcDto.getProcesador();
                 armadoPcDto = new ArmadoPcDto();
@@ -162,49 +223,115 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
                 armadoPcDto.setMotherboard(componenteSolicitadoDto);
 
                 break;
-            case "cooler":
+            }
+            case "cooler": {
+
+                Map<Long, Integer> idYCantidadAEliminar = this.obtenerIdsYCantidadDeComponentesAEliminar(armadoPcDto, Set.of("coolercpu", "fuentedealimentacion", "gabinete"));
+
+                for (Long id : idYCantidadAEliminar.keySet())
+                    this.repositorioComponente.devolverStockDeUnComponente(id, idYCantidadAEliminar.get(id));
+
                 armadoPcDto.setCooler(componenteSolicitadoDto);
                 armadoPcDto.setFuente(null);
                 armadoPcDto.setGabinete(null);
 
                 break;
-            case "memoria":
+            }
+            case "memoria": {
 
-                for(int i = 0; i<cantidad;i++) armadoPcDto.getRams().add(componenteSolicitadoDto);
+                Map<Long, Integer> idYCantidadAEliminar = this.obtenerIdsYCantidadDeComponentesAEliminar(armadoPcDto, Set.of("fuentedealimentacion"));
+
+                for (Long id : idYCantidadAEliminar.keySet())
+                    this.repositorioComponente.devolverStockDeUnComponente(id, idYCantidadAEliminar.get(id));
+
+                for (int i = 0; i < cantidad; i++) armadoPcDto.getRams().add(componenteSolicitadoDto);
                 armadoPcDto.setFuente(null);
 
                 break;
-            case "gpu":
+            }
+            case "gpu": {
+
+                Map<Long, Integer> idYCantidadAEliminar = this.obtenerIdsYCantidadDeComponentesAEliminar(armadoPcDto, Set.of("placadevideo", "fuentedealimentacion"));
+
+                for (Long id : idYCantidadAEliminar.keySet())
+                    this.repositorioComponente.devolverStockDeUnComponente(id, idYCantidadAEliminar.get(id));
 
                 armadoPcDto.setGpu(componenteSolicitadoDto);
                 armadoPcDto.setFuente(null);
 
                 break;
-            case "almacenamiento":
+            }
+            case "almacenamiento": {
 
-                for(int i = 0; i<cantidad;i++) armadoPcDto.getAlmacenamiento().add(componenteSolicitadoDto);
+                Map<Long, Integer> idYCantidadAEliminar = this.obtenerIdsYCantidadDeComponentesAEliminar(armadoPcDto, Set.of("fuentedealimentacion"));
+
+                for (Long id : idYCantidadAEliminar.keySet())
+                    this.repositorioComponente.devolverStockDeUnComponente(id, idYCantidadAEliminar.get(id));
+
+                for (int i = 0; i < cantidad; i++) armadoPcDto.getAlmacenamiento().add(componenteSolicitadoDto);
                 armadoPcDto.setFuente(null);
 
                 break;
-            case "fuente":
+            }
+            case "fuente": {
+
+                Map<Long, Integer> idYCantidadAEliminar = this.obtenerIdsYCantidadDeComponentesAEliminar(armadoPcDto, Set.of("fuentedealimentacion"));
+
+                for (Long id : idYCantidadAEliminar.keySet())
+                    this.repositorioComponente.devolverStockDeUnComponente(id, idYCantidadAEliminar.get(id));
 
                 armadoPcDto.setFuente(componenteSolicitadoDto);
 
                 break;
-            case "gabinete":
+            }
+            case "gabinete": {
+
+                Map<Long, Integer> idYCantidadAEliminar = this.obtenerIdsYCantidadDeComponentesAEliminar(armadoPcDto, Set.of("gabinete"));
+
+                for (Long id : idYCantidadAEliminar.keySet())
+                    this.repositorioComponente.devolverStockDeUnComponente(id, idYCantidadAEliminar.get(id));
 
                 armadoPcDto.setGabinete(componenteSolicitadoDto);
 
                 break;
-            case "monitor":
+            }
+            case "monitor": {
+
+                Map<Long, Integer> idYCantidadAEliminar = this.obtenerIdsYCantidadDeComponentesAEliminar(armadoPcDto, Set.of("monitor"));
+
+                for (Long id : idYCantidadAEliminar.keySet())
+                    this.repositorioComponente.devolverStockDeUnComponente(id, idYCantidadAEliminar.get(id));
+
                 armadoPcDto.setMonitor(componenteSolicitadoDto);
                 break;
-            case "periferico":
+            }
+            case "periferico": {
                 armadoPcDto.getPerifericos().add(componenteSolicitadoDto);
                 break;
+            }
         }
 
+        // descuento el stock del componente solicitado con la cantidad
+        this.repositorioComponente.descontarStockDeUnComponente(componenteSolicitado.getId(), cantidad);
+
         return armadoPcDto;
+    }
+
+    private Map<Long, Integer> obtenerIdsYCantidadDeComponentesAEliminar(ArmadoPcDto armadoPcDto, Set<String> tiposABorrar) {
+
+        Map<Long, Integer> idYCantidadesAEliminar = new HashMap<>();
+
+        for(ComponenteDto componenteDto : armadoPcDto.getComponentesDto()){
+            if (tiposABorrar.contains(componenteDto.getTipoComponente().toLowerCase()))
+
+                if (idYCantidadesAEliminar.containsKey(componenteDto.getId()))
+                    idYCantidadesAEliminar.put(componenteDto.getId(), idYCantidadesAEliminar.get(componenteDto.getId()) + 1);
+                else
+                    idYCantidadesAEliminar.put(componenteDto.getId(), 1);
+
+        }
+
+        return idYCantidadesAEliminar;
     }
 
     @Override
@@ -216,15 +343,25 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
         ComponenteDto monitorPrecargado = armadoPcDto.getMonitor();
 
         switch(tipoComponente.toLowerCase()){
-            case "procesador":
+            case "procesador": {
+
+                Map<Long, Integer> idYCantidadAEliminar = this.obtenerIdsYCantidadDeComponentesAEliminar(armadoPcDto, Set.of("motherboard", "coolercpu", "memoriaram", "placadevideo", "almacenamiento", "fuentedealimentacion", "gabinete"));
+
+                for (Long id : idYCantidadAEliminar.keySet())
+                    this.repositorioComponente.devolverStockDeUnComponente(id, idYCantidadAEliminar.get(id));
 
                 armadoPcDto = new ArmadoPcDto();
                 armadoPcDto.setPerifericos(perifericosPrecargados);
                 armadoPcDto.setMonitor(monitorPrecargado);
 
                 break;
+            }
+            case "motherboard": {
 
-            case "motherboard":
+                Map<Long, Integer> idYCantidadAEliminar = this.obtenerIdsYCantidadDeComponentesAEliminar(armadoPcDto, Set.of("coolercpu", "memoriaram", "placadevideo", "almacenamiento", "fuentedealimentacion", "gabinete"));
+
+                for (Long id : idYCantidadAEliminar.keySet())
+                    this.repositorioComponente.devolverStockDeUnComponente(id, idYCantidadAEliminar.get(id));
 
                 ComponenteDto procesadorPrecargado = armadoPcDto.getProcesador();
                 armadoPcDto = new ArmadoPcDto();
@@ -233,40 +370,74 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
                 armadoPcDto.setProcesador(procesadorPrecargado);
 
                 break;
+            }
+            case "cooler": {
 
-            case "cooler":
+                Map<Long, Integer> idYCantidadAEliminar = this.obtenerIdsYCantidadDeComponentesAEliminar(armadoPcDto, Set.of("fuentedealimentacion", "gabinete"));
+
+                for (Long id : idYCantidadAEliminar.keySet())
+                    this.repositorioComponente.devolverStockDeUnComponente(id, idYCantidadAEliminar.get(id));
 
                 armadoPcDto.setCooler(null);
                 armadoPcDto.setFuente(null);
                 armadoPcDto.setGabinete(null);
 
                 break;
-            case "memoria":
+            }
+            case "memoria": {
+
                 this.eliminarComponenteDeLaListaDeDtosPorId(armadoPcDto.getRams(), idComponente, cantidad);
+
+                Map<Long, Integer> idYCantidadAEliminar = this.obtenerIdsYCantidadDeComponentesAEliminar(armadoPcDto, Set.of("fuentedealimentacion"));
+
+                for (Long id : idYCantidadAEliminar.keySet())
+                    this.repositorioComponente.devolverStockDeUnComponente(id, idYCantidadAEliminar.get(id));
+
                 armadoPcDto.setFuente(null);
                 break;
-            case "gpu":
+            }
+            case "gpu": {
+
+                Map<Long, Integer> idYCantidadAEliminar = this.obtenerIdsYCantidadDeComponentesAEliminar(armadoPcDto, Set.of("fuentedealimentacion"));
+
+                for (Long id : idYCantidadAEliminar.keySet())
+                    this.repositorioComponente.devolverStockDeUnComponente(id, idYCantidadAEliminar.get(id));
+
                 armadoPcDto.setGpu(null);
                 armadoPcDto.setFuente(null);
                 break;
-            case "almacenamiento":
+            }
+            case "almacenamiento": {
                 this.eliminarComponenteDeLaListaDeDtosPorId(armadoPcDto.getAlmacenamiento(), idComponente, cantidad);
+
+                Map<Long, Integer> idYCantidadAEliminar = this.obtenerIdsYCantidadDeComponentesAEliminar(armadoPcDto, Set.of("fuentedealimentacion"));
+
+                for (Long id : idYCantidadAEliminar.keySet())
+                    this.repositorioComponente.devolverStockDeUnComponente(id, idYCantidadAEliminar.get(id));
+
                 armadoPcDto.setFuente(null);
                 break;
-            case "fuente":
+            }
+            case "fuente": {
                 armadoPcDto.setFuente(null);
                 break;
-            case "gabinete":
+            }
+            case "gabinete": {
                 armadoPcDto.setGabinete(null);
                 break;
-            case "monitor":
+            }
+            case "monitor": {
                 armadoPcDto.setMonitor(null);
                 break;
-            case "periferico":
+            }
+            case "periferico": {
                 this.eliminarComponenteDeLaListaDeDtosPorId(armadoPcDto.getPerifericos(), idComponente, cantidad);
                 break;
-
+            }
         }
+
+        // descuento el stock del componente que quito
+        this.repositorioComponente.devolverStockDeUnComponente(idComponente, cantidad);
 
         return armadoPcDto;
     }
@@ -303,15 +474,46 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
     }
 
 
-    private void seExcedeDeLimite(String tipoComponente, Integer cantidad, ArmadoPcDto armadoPcDto) throws LimiteDeComponenteSobrepasadoEnElArmadoException {
-        if ((tipoComponente.equalsIgnoreCase("memoria") && armadoPcDto.getRams().size() + cantidad > 4) ||
-                // verificar cantidad de slots de memoria de entidad y cantidad de cada tipo de almacenamiento(SATA y M.2)
-                (tipoComponente.equalsIgnoreCase("almacenamiento") && armadoPcDto.getAlmacenamiento().size() + cantidad > 6) ||
-                (tipoComponente.equalsIgnoreCase("periferico") && armadoPcDto.getPerifericos().size() + cantidad > 10)) {
+    private void seExcedeDeLimite(String tipoComponente, Integer cantidad, ArmadoPcDto armadoPcDto, Long idComponente) throws LimiteDeComponenteSobrepasadoEnElArmadoException {
+
+        Boolean seExcedeDeRams = tipoComponente.equalsIgnoreCase("memoria")
+                                        && armadoPcDto.getRams().size() + cantidad > this.obtenerSlotsRamDeMotherboard(armadoPcDto.getMotherboard());
+
+        Boolean seExcedeDePerifericos = tipoComponente.equalsIgnoreCase("periferico") && armadoPcDto.getPerifericos().size() + cantidad > 10;
+
+        Boolean seExcedeDeAlmacenamiento = false;
+
+        if(tipoComponente.equalsIgnoreCase("almacenamiento")){
+
+            Almacenamiento almacenamiento = (Almacenamiento) this.repositorioComponente.obtenerComponentePorId(idComponente);
 
 
-            throw new LimiteDeComponenteSobrepasadoEnElArmadoException();
+            if (almacenamiento.getTipoDeConexion().equals("M2")){
+
+                Integer contadorDeM2Actuales = 0;
+
+                for (ComponenteDto componenteDto : armadoPcDto.getAlmacenamiento()) {
+                    Almacenamiento almacenamientoDeArmado = (Almacenamiento) this.repositorioComponente.obtenerComponentePorId(componenteDto.getId());
+                    if (almacenamientoDeArmado.getTipoDeConexion().equals("M2")) contadorDeM2Actuales++;
+                }
+                seExcedeDeAlmacenamiento = contadorDeM2Actuales + cantidad > this.obtenerSlotsM2DeMotherboard(armadoPcDto.getMotherboard());
+
+            } else if(almacenamiento.getTipoDeConexion().equals("SATA")){
+
+                Integer contadorDeSataActuales = 0;
+
+                for (ComponenteDto componenteDto : armadoPcDto.getAlmacenamiento()) {
+                    Almacenamiento almacenamientoDeArmado = (Almacenamiento) this.repositorioComponente.obtenerComponentePorId(componenteDto.getId());
+                    if (almacenamientoDeArmado.getTipoDeConexion().equals("SATA")) contadorDeSataActuales++;
+                }
+                seExcedeDeAlmacenamiento = contadorDeSataActuales + cantidad > this.obtenerSlotsSataDeMotherboard(armadoPcDto.getMotherboard());
+
+            }
+
         }
+
+        if (seExcedeDeRams || seExcedeDeAlmacenamiento || seExcedeDePerifericos) throw new LimiteDeComponenteSobrepasadoEnElArmadoException();
+
     }
 
     @Override
@@ -320,10 +522,10 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
         switch (tipoComponente.toLowerCase()) {
 
             case "memoria":
-                return armadoPcDto.getRams().size() < 4;
+                return armadoPcDto.getRams().size() < this.obtenerSlotsRamDeMotherboard(armadoPcDto.getMotherboard());
 
             case "almacenamiento":
-                return armadoPcDto.getAlmacenamiento().size() < 6;
+                return armadoPcDto.getAlmacenamiento().size() < this.obtenerSlotsSataDeMotherboard(armadoPcDto.getMotherboard()) + this.obtenerSlotsM2DeMotherboard(armadoPcDto.getMotherboard());
 
             case "periferico":
                 return armadoPcDto.getPerifericos().size() < 10;

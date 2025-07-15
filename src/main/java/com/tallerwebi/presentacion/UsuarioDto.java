@@ -19,7 +19,6 @@ public class UsuarioDto {
         this.telefono = telefono;
         this.dni = dni;
         this.rol = "user";
-
     }
 
     public UsuarioDto(){};

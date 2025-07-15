@@ -1,16 +1,15 @@
-/*package com.tallerwebi.dominio;
+package com.tallerwebi.dominio;
 
-import com.tallerwebi.dominio.entidades.Componente;
-import com.tallerwebi.dominio.entidades.Procesador;
-import com.tallerwebi.dominio.excepcion.ComponenteDeterminateDelArmadoEnNullException;
-import com.tallerwebi.dominio.excepcion.LimiteDeComponenteSobrepasadoEnElArmadoException;
-import com.tallerwebi.dominio.excepcion.QuitarComponenteInvalidoException;
-import com.tallerwebi.dominio.excepcion.QuitarStockDemasDeComponenteException;
+import com.tallerwebi.dominio.entidades.*;
+import com.tallerwebi.dominio.excepcion.*;
 import com.tallerwebi.presentacion.dto.ArmadoPcDto;
 import com.tallerwebi.presentacion.dto.ComponenteDto;
+import com.tallerwebi.presentacion.dto.ProductoCarritoArmadoDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.lang.IllegalArgumentException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -34,15 +33,77 @@ public class ServicioArmaTuPcTest {
         servicioArmaTuPc = new ServicioArmaTuPcImpl(repositorioComponenteMock, servicioPreciosMock, servicioCompatibilidadesMock);
     }
 
-    // con este metodo hago componentes mas facil
+    //region Métodos de Ayuda para crear Mocks
     private Componente crearComponente(Long id, String nombre, String tipo) {
-        Componente componente = new Procesador();
+        Componente componente;
+
+        switch (tipo) {
+            case "Procesador":
+                componente = new Procesador();
+                break;
+            case "Motherboard":
+                componente = new Motherboard();
+                break;
+            case "FuenteDeAlimentacion":
+                componente = new FuenteDeAlimentacion();
+                break;
+            case "CoolerCPU":
+                componente = new CoolerCPU();
+                break;
+            case "MemoriaRAM":
+                componente = new MemoriaRAM();
+                break;
+            case "PlacaDeVideo":
+                componente = new PlacaDeVideo();
+                break;
+            case "Gabinete":
+                componente = new Gabinete();
+                break;
+            case "Monitor":
+                componente = new Monitor();
+                break;
+            case "Periferico":
+                componente = new Periferico();
+                break;
+            case "Almacenamiento":
+                componente = new Almacenamiento();
+                break;
+            default:
+                throw new IllegalArgumentException("Tipo de componente no reconocido: " + tipo);
+        }
+
         componente.setId(id);
         componente.setNombre(nombre);
+        componente.setStock(10);
+        componente.setPrecio(100.0);
         return componente;
     }
 
-    // Tests para obtenerListaDeComponentesCompatiblesDto
+    // Sobrecarga para Almacenamiento
+    private Almacenamiento crearAlmacenamiento(Long id, String nombre, String tipoConexion, Integer stock) {
+        Almacenamiento almacenamiento = new Almacenamiento();
+        almacenamiento.setId(id);
+        almacenamiento.setNombre(nombre);
+        almacenamiento.setTipoDeConexion(tipoConexion);
+        almacenamiento.setStock(stock);
+        almacenamiento.setPrecio(100.0);
+        return almacenamiento;
+    }
+
+    // Sobrecarga para Motherboard con slots
+    private Motherboard crearMotherboard(Long id, String nombre, int slotsRam, int slotsM2, int slotsSata) {
+        Motherboard motherboard = new Motherboard();
+        motherboard.setId(id);
+        motherboard.setNombre(nombre);
+        motherboard.setCantSlotsRAM(slotsRam);
+        motherboard.setCantSlotsM2(slotsM2);
+        motherboard.setCantPuertosSata(slotsSata);
+        return motherboard;
+    }
+
+    //endregion
+
+    //region Tests para obtenerListaDeComponentesCompatiblesDto
     @Test
     public void cuandoPidoComponentesCompatiblesYTodosLoSonDevuelveListaCompletaDeDtos() throws ComponenteDeterminateDelArmadoEnNullException {
         // Preparación
@@ -52,36 +113,17 @@ public class ServicioArmaTuPcTest {
                 crearComponente(1L, "Mother A", "Motherboard"),
                 crearComponente(2L, "Mother B", "Motherboard")
         );
-
         when(repositorioComponenteMock.obtenerComponentesPorTipoEnStockOrdenadosPorPrecio("Motherboard")).thenReturn(componentesDelRepo);
         when(servicioCompatibilidadesMock.esCompatibleConElArmado(any(Componente.class), any())).thenReturn(true);
 
         // Ejecución
-        List<ComponenteDto> resultado = servicioArmaTuPc.obtenerListaDeComponentesCompatiblesDto(tipoComponente, armadoPcDto);
+        List<ComponenteDto> resultado = new ArrayList<>(servicioArmaTuPc.obtenerListaDeComponentesCompatiblesDto(tipoComponente, armadoPcDto));
 
         // Verificación
         assertThat(resultado, hasSize(2));
         assertThat(resultado.get(0).getId(), equalTo(1L));
-        assertThat(resultado.get(1).getId(), equalTo(2L));
-        verify(repositorioComponenteMock, times(1)).obtenerComponentesPorTipoEnStockOrdenadosPorPrecio("Motherboard");
+        verify(repositorioComponenteMock).obtenerComponentesPorTipoEnStockOrdenadosPorPrecio("Motherboard");
         verify(servicioCompatibilidadesMock, times(2)).esCompatibleConElArmado(any(Componente.class), any());
-    }
-
-    @Test
-    public void cuandoPidoComponentesPeroNingunoEsCompatibleDevuelveListaVacia() throws ComponenteDeterminateDelArmadoEnNullException {
-        // Preparación
-        String tipoComponente = "motherboard";
-        ArmadoPcDto armadoPcDto = new ArmadoPcDto();
-        List<Componente> componentesDelRepo = List.of(crearComponente(1L, "Mother A", "Motherboard"));
-
-        when(repositorioComponenteMock.obtenerComponentesPorTipoEnStockOrdenadosPorPrecio("Motherboard")).thenReturn(componentesDelRepo);
-        when(servicioCompatibilidadesMock.esCompatibleConElArmado(any(Componente.class), any())).thenReturn(false);
-
-        // Ejecución
-        List<ComponenteDto> resultado = servicioArmaTuPc.obtenerListaDeComponentesCompatiblesDto(tipoComponente, armadoPcDto);
-
-        // Verificación
-        assertTrue(resultado.isEmpty());
     }
 
     @Test
@@ -89,271 +131,244 @@ public class ServicioArmaTuPcTest {
         // Preparación
         String tipoComponente = "motherboard";
         ArmadoPcDto armadoPcDto = new ArmadoPcDto();
-        List<Componente> componentesDelRepo = List.of(crearComponente(1L, "Mother A", "Motherboard"));
-
-        when(repositorioComponenteMock.obtenerComponentesPorTipoEnStockOrdenadosPorPrecio("Motherboard")).thenReturn(componentesDelRepo);
-        when(servicioCompatibilidadesMock.esCompatibleConElArmado(any(Componente.class), any()))
-                .thenThrow(new ComponenteDeterminateDelArmadoEnNullException("Se necesita un procesador"));
+        when(repositorioComponenteMock.obtenerComponentesPorTipoEnStockOrdenadosPorPrecio(anyString())).thenReturn(List.of(crearComponente(1L, "Mother A", "Motherboard")));
+        when(servicioCompatibilidadesMock.esCompatibleConElArmado(any(), any())).thenThrow(new ComponenteDeterminateDelArmadoEnNullException("Se necesita un procesador"));
 
         // Ejecución y Verificación
         assertThrows(ComponenteDeterminateDelArmadoEnNullException.class, () -> {
             servicioArmaTuPc.obtenerListaDeComponentesCompatiblesDto(tipoComponente, armadoPcDto);
         });
     }
+    //endregion
 
-    // Tests para obtenerListaDeComponentesCompatiblesFiltradosDto
+    //region Tests para agregarComponenteAlArmado
+
+
     @Test
-    public void cuandoPidoComponentesFiltradosYCompatiblesDevuelveLaListaCorrecta() throws ComponenteDeterminateDelArmadoEnNullException {
+    public void cuandoAgregoUnProcesadorSeReiniciaElArmadoYSeGestionaElStock() throws Exception {
         // Preparación
-        String tipoComponente = "procesador";
-        String filtro = "Intel";
-        ArmadoPcDto armadoPcDto = new ArmadoPcDto();
-        List<Componente> componentesFiltradosRepo = List.of(crearComponente(1L, "Intel i5", "Procesador"));
-
-        when(repositorioComponenteMock.obtenerComponentesPorTipoYFiltradosPorNombreEnStockOrdenadosPorPrecio("Procesador", filtro))
-                .thenReturn(componentesFiltradosRepo);
-        when(servicioCompatibilidadesMock.esCompatibleConElArmado(any(Componente.class), any())).thenReturn(true);
-
-        // Ejecución
-        List<ComponenteDto> resultado = servicioArmaTuPc.obtenerListaDeComponentesCompatiblesFiltradosDto(tipoComponente, filtro, armadoPcDto);
-
-        // Verificación
-        assertThat(resultado, hasSize(1));
-        assertThat(resultado.get(0).getModelo(), equalTo("Intel i5"));
-        verify(repositorioComponenteMock, times(1))
-                .obtenerComponentesPorTipoYFiltradosPorNombreEnStockOrdenadosPorPrecio("Procesador", filtro);
-    }
-
-    // Tests para agregarComponenteAlArmado
-    @Test
-    public void cuandoAgregoUnProcesadorSeReiniciaElArmadoPeroSeConservanPerifericosYMonitor() throws LimiteDeComponenteSobrepasadoEnElArmadoException {
-        // Preparación
-        ArmadoPcDto armadoPcDtoInicial = new ArmadoPcDto();
-        armadoPcDtoInicial.setMotherboard(new ComponenteDto(crearComponente(10L, "Mother Vieja", "Motherboard")));
-        armadoPcDtoInicial.setMonitor(new ComponenteDto(crearComponente(11L, "Monitor A", "Monitor")));
+        ArmadoPcDto armadoInicial = new ArmadoPcDto();
+        armadoInicial.setMotherboard(new ComponenteDto(crearComponente(10L, "Mother Vieja", "Motherboard")));
+        armadoInicial.setMonitor(new ComponenteDto(crearComponente(11L, "Monitor A", "Monitor")));
 
         Componente nuevoProcesador = crearComponente(1L, "Intel i9", "Procesador");
         when(repositorioComponenteMock.obtenerComponentePorId(1L)).thenReturn(nuevoProcesador);
 
         // Ejecución
-        ArmadoPcDto armadoResultante = servicioArmaTuPc.agregarComponenteAlArmado(1L, "procesador", 1, armadoPcDtoInicial);
+        ArmadoPcDto armadoResultante = servicioArmaTuPc.agregarComponenteAlArmado(1L, "procesador", 1, armadoInicial);
 
         // Verificación
         assertNotNull(armadoResultante.getProcesador());
-        assertEquals(1L, armadoResultante.getProcesador().getId());
         assertNull(armadoResultante.getMotherboard()); // La motherboard vieja debe desaparecer
         assertNotNull(armadoResultante.getMonitor()); // El monitor debe conservarse
-        assertEquals(11L, armadoResultante.getMonitor().getId());
+
+        // Verificación de Stock
+        verify(repositorioComponenteMock, times(1)).devolverStockDeUnComponente(10L, 1); // Devuelve stock de la mother vieja
+        verify(repositorioComponenteMock, times(1)).descontarStockDeUnComponente(1L, 1); // Descuenta stock del nuevo CPU
     }
 
     @Test
-    public void cuandoAgregoUnaMotherboardSeReiniciaElArmadoPeroConservaProcesadorMonitorYPerifericos() throws Exception {
-        ArmadoPcDto armadoPcDtoInicial = new ArmadoPcDto();
-        armadoPcDtoInicial.setProcesador(new ComponenteDto(crearComponente(1L, "Procesador Viejo", "Procesador")));
-        armadoPcDtoInicial.setMonitor(new ComponenteDto(crearComponente(2L, "Monitor A", "Monitor")));
-        armadoPcDtoInicial.getPerifericos().add(new ComponenteDto(crearComponente(3L, "Mouse", "Periferico")));
-
-        Componente nuevaMother = crearComponente(10L, "Mother Nueva", "Motherboard");
-        when(repositorioComponenteMock.obtenerComponentePorId(10L)).thenReturn(nuevaMother);
-
-        ArmadoPcDto armadoResultante = servicioArmaTuPc.agregarComponenteAlArmado(10L, "motherboard", 1, armadoPcDtoInicial);
-
-        assertNotNull(armadoResultante.getMotherboard());
-        assertEquals(10L, armadoResultante.getMotherboard().getId());
-        assertNotNull(armadoResultante.getProcesador());
-        assertEquals(1L, armadoResultante.getProcesador().getId());
-        assertNotNull(armadoResultante.getMonitor());
-        assertEquals(2L, armadoResultante.getMonitor().getId());
-        assertEquals(1, armadoResultante.getPerifericos().size());
-    }
-
-    @Test
-    public void cuandoAgregoUnCoolerSeAnulanFuenteYGabinete() throws Exception {
-        ArmadoPcDto armado = new ArmadoPcDto();
-        armado.setFuente(new ComponenteDto(crearComponente(1L, "Fuente", "Fuente")));
-        armado.setGabinete(new ComponenteDto(crearComponente(2L, "Gabinete", "Gabinete")));
-
-        when(repositorioComponenteMock.obtenerComponentePorId(3L)).thenReturn(crearComponente(3L, "Cooler", "Cooler"));
-
-        ArmadoPcDto armadoResultante = servicioArmaTuPc.agregarComponenteAlArmado(3L, "cooler", 1, armado);
-
-        assertNotNull(armadoResultante.getCooler());
-        assertNull(armadoResultante.getFuente());
-        assertNull(armadoResultante.getGabinete());
-    }
-
-    @Test
-    public void cuandoAgregoMemoriasSeBorraFuente() throws Exception {
-        ArmadoPcDto armado = new ArmadoPcDto();
-        armado.setFuente(new ComponenteDto(crearComponente(1L, "Fuente", "Fuente")));
-
-        when(repositorioComponenteMock.obtenerComponentePorId(2L)).thenReturn(crearComponente(2L, "RAM", "Memoria"));
-
-        ArmadoPcDto armadoResultante = servicioArmaTuPc.agregarComponenteAlArmado(2L, "memoria", 2, armado);
-
-        assertEquals(2, armadoResultante.getRams().size());
-        assertNull(armadoResultante.getFuente());
-    }
-
-    @Test
-    public void cuandoAgregoGpuSeBorraFuente() throws Exception {
-        ArmadoPcDto armado = new ArmadoPcDto();
-        armado.setFuente(new ComponenteDto(crearComponente(1L, "Fuente", "Fuente")));
-
-        when(repositorioComponenteMock.obtenerComponentePorId(2L)).thenReturn(crearComponente(2L, "Placa", "GPU"));
-
-        ArmadoPcDto armadoResultante = servicioArmaTuPc.agregarComponenteAlArmado(2L, "gpu", 1, armado);
-
-        assertNotNull(armadoResultante.getGpu());
-        assertNull(armadoResultante.getFuente());
-    }
-
-    @Test
-    public void cuandoAgregoAlmacenamientoSeBorraFuente() throws Exception {
-        ArmadoPcDto armado = new ArmadoPcDto();
-        armado.setFuente(new ComponenteDto(crearComponente(1L, "Fuente", "Fuente")));
-
-        when(repositorioComponenteMock.obtenerComponentePorId(2L)).thenReturn(crearComponente(2L, "SSD", "Almacenamiento"));
-
-        ArmadoPcDto armadoResultante = servicioArmaTuPc.agregarComponenteAlArmado(2L, "almacenamiento", 1, armado);
-
-        assertEquals(1, armadoResultante.getAlmacenamiento().size());
-        assertNull(armadoResultante.getFuente());
-    }
-
-    @Test
-    public void cuandoAgregoUnaMemoriaRAMSeAgregaALaLista() throws LimiteDeComponenteSobrepasadoEnElArmadoException {
+    public void cuandoAgregoGpuSeBorraFuenteYSeGestionaStock() throws Exception {
         // Preparación
-        ArmadoPcDto armadoPcDto = new ArmadoPcDto();
-        armadoPcDto.setProcesador(new ComponenteDto(crearComponente(1L, "Intel i5", "Procesador")));
+        ArmadoPcDto armado = new ArmadoPcDto();
+        Componente fuente = crearComponente(1L, "Fuente", "FuenteDeAlimentacion");
+        Componente gpu = crearComponente(2L, "Placa", "PlacaDeVideo");
 
-        Componente nuevaRam = crearComponente(20L, "Corsair Vengeance", "MemoriaRAM");
-        when(repositorioComponenteMock.obtenerComponentePorId(20L)).thenReturn(nuevaRam);
+        armado.setFuente(new ComponenteDto(fuente));
+        when(repositorioComponenteMock.obtenerComponentePorId(2L)).thenReturn(gpu);
 
         // Ejecución
-        ArmadoPcDto armadoResultante = servicioArmaTuPc.agregarComponenteAlArmado(20L, "memoria", 2, armadoPcDto);
+        ArmadoPcDto armadoResultante = servicioArmaTuPc.agregarComponenteAlArmado(2L, "gpu", 1, armado);
 
         // Verificación
-        assertThat(armadoResultante.getRams(), hasSize(2));
-        assertEquals(20L, armadoResultante.getRams().get(0).getId());
+        assertNotNull(armadoResultante.getGpu());
+        assertNull(armadoResultante.getFuente());
+        verify(repositorioComponenteMock, times(1)).devolverStockDeUnComponente(1L, 1);
+        verify(repositorioComponenteMock, times(1)).descontarStockDeUnComponente(2L, 1);
     }
 
     @Test
-    public void cuandoIntentoAgregarUnaQuintaMemoriaRAMLanzaExcepcion() {
+    public void cuandoIntentoAgregarUnComponenteSinStockSuficienteLanzaExcepcion() {
         // Preparación
         ArmadoPcDto armadoPcDto = new ArmadoPcDto();
-        List<ComponenteDto> rams = List.of(
-                new ComponenteDto(crearComponente(20L, "RAM 1", "MemoriaRAM")),
-                new ComponenteDto(crearComponente(21L, "RAM 2", "MemoriaRAM")),
-                new ComponenteDto(crearComponente(22L, "RAM 3", "MemoriaRAM")),
-                new ComponenteDto(crearComponente(23L, "RAM 4", "MemoriaRAM"))
-        );
-        armadoPcDto.setRams(rams);
+        Componente componenteSinStock = crearComponente(1L, "CPU Sin Stock", "Procesador");
+        componenteSinStock.setStock(1);
+        when(repositorioComponenteMock.obtenerComponentePorId(1L)).thenReturn(componenteSinStock);
 
-        when(repositorioComponenteMock.obtenerComponentePorId(24L)).thenReturn(crearComponente(24L, "RAM 5", "MemoriaRAM"));
+        // Ejecución y Verificación
+        assertThrows(ComponenteSinStockPedidoException.class, () -> {
+            servicioArmaTuPc.agregarComponenteAlArmado(1L, "procesador", 2, armadoPcDto);
+        });
+        verify(repositorioComponenteMock, never()).descontarStockDeUnComponente(anyLong(), anyInt());
+    }
+
+    @Test
+    public void cuandoIntentoAgregarMasMemoriasDeLosSlotsDisponiblesLanzaExcepcion() {
+        // Preparación
+        ArmadoPcDto armado = new ArmadoPcDto();
+        Motherboard motherboard = crearMotherboard(10L, "Mother B450", 2, 2, 4); // 2 slots RAM
+        armado.setMotherboard(new ComponenteDto(motherboard));
+
+        armado.getRams().addAll(List.of(
+                new ComponenteDto(crearComponente(20L, "RAM 1", "MemoriaRAM")),
+                new ComponenteDto(crearComponente(21L, "RAM 2", "MemoriaRAM"))
+        ));
+
+        Componente terceraRam = crearComponente(22L, "RAM 3", "MemoriaRAM");
+        when(repositorioComponenteMock.obtenerComponentePorId(22L)).thenReturn(terceraRam);
+        when(repositorioComponenteMock.obtenerComponentePorId(10L)).thenReturn(motherboard);
 
         // Ejecución y Verificación
         assertThrows(LimiteDeComponenteSobrepasadoEnElArmadoException.class, () -> {
-            servicioArmaTuPc.agregarComponenteAlArmado(24L, "memoria", 1, armadoPcDto);
+            servicioArmaTuPc.agregarComponenteAlArmado(22L, "memoria", 1, armado);
         });
     }
 
-    // Tests para quitarComponenteAlArmado
     @Test
-    public void cuandoQuitoUnComponenteExitosamenteEsteDesapareceDelArmado() throws Exception {
+    public void cuandoIntentoAgregarMasAlmacenamientoM2DelPermitidoLanzaExcepcion() {
         // Preparación
-        ArmadoPcDto armadoPcDto = new ArmadoPcDto();
-        armadoPcDto.setGpu(new ComponenteDto(crearComponente(30L, "RTX 3080", "PlacaDeVideo")));
+        ArmadoPcDto armado = new ArmadoPcDto();
+        Motherboard motherboard = crearMotherboard(10L, "Mother X570", 4, 1, 1); // Solo 1 slot M.2
+        armado.setMotherboard(new ComponenteDto(motherboard));
+
+        Almacenamiento m2Existente = crearAlmacenamiento(20L, "SSD M.2 1TB", "M2", 10);
+        Almacenamiento m2Nuevo = crearAlmacenamiento(21L, "SSD M.2 2TB", "M2", 10);
+
+        armado.getAlmacenamiento().add(new ComponenteDto(m2Existente));
+
+        when(repositorioComponenteMock.obtenerComponentePorId(10L)).thenReturn(motherboard);
+        when(repositorioComponenteMock.obtenerComponentePorId(20L)).thenReturn(m2Existente);
+        when(repositorioComponenteMock.obtenerComponentePorId(21L)).thenReturn(m2Nuevo);
+
+        // Ejecución y Verificación
+        assertThrows(LimiteDeComponenteSobrepasadoEnElArmadoException.class, () -> {
+            servicioArmaTuPc.agregarComponenteAlArmado(21L, "almacenamiento", 1, armado);
+        });
+    }
+
+    @Test
+    public void cuandoIntentoAgregarMasAlmacenamientoSATADelPermitidoLanzaExcepcion() {
+        // Preparación
+        ArmadoPcDto armado = new ArmadoPcDto();
+        Motherboard motherboard = crearMotherboard(10L, "Mother B450", 4, 2, 1); // Solo 2 slots SATA
+        armado.setMotherboard(new ComponenteDto(motherboard));
+
+        Almacenamiento sataExistente1 = crearAlmacenamiento(30L, "HDD SATA 1TB", "SATA", 10);
+        Almacenamiento sataExistente2 = crearAlmacenamiento(31L, "HDD SATA 2TB", "SATA", 10);
+        Almacenamiento sataNuevo = crearAlmacenamiento(32L, "SSD SATA 512GB", "SATA", 10);
+
+        armado.getAlmacenamiento().add(new ComponenteDto(sataExistente1));
+        armado.getAlmacenamiento().add(new ComponenteDto(sataExistente2));
+
+        when(repositorioComponenteMock.obtenerComponentePorId(10L)).thenReturn(motherboard);
+        when(repositorioComponenteMock.obtenerComponentePorId(30L)).thenReturn(sataExistente1);
+        when(repositorioComponenteMock.obtenerComponentePorId(31L)).thenReturn(sataExistente2);
+        when(repositorioComponenteMock.obtenerComponentePorId(32L)).thenReturn(sataNuevo);
+
+        // Ejecución y Verificación
+        assertThrows(LimiteDeComponenteSobrepasadoEnElArmadoException.class, () -> {
+            servicioArmaTuPc.agregarComponenteAlArmado(32L, "almacenamiento", 1, armado);
+        });
+    }
+
+    @Test
+    public void cuandoAgregoAlmacenamientoSATADentroDelLimiteNoLanzaExcepcion() {
+        // Preparación
+        ArmadoPcDto armado = new ArmadoPcDto();
+        Motherboard motherboard = crearMotherboard(10L, "Mother B450", 4, 1, 3); // 3 slots SATA disponibles
+        armado.setMotherboard(new ComponenteDto(motherboard));
+
+        Almacenamiento sataExistente1 = crearAlmacenamiento(30L, "HDD SATA 1TB", "SATA", 10);
+        Almacenamiento sataExistente2 = crearAlmacenamiento(31L, "HDD SATA 2TB", "SATA", 10);
+        Almacenamiento sataNuevo = crearAlmacenamiento(32L, "SSD SATA 512GB", "SATA", 10);
+
+        armado.getAlmacenamiento().add(new ComponenteDto(sataExistente1));
+        armado.getAlmacenamiento().add(new ComponenteDto(sataExistente2));
+
+        when(repositorioComponenteMock.obtenerComponentePorId(10L)).thenReturn(motherboard);
+        when(repositorioComponenteMock.obtenerComponentePorId(30L)).thenReturn(sataExistente1);
+        when(repositorioComponenteMock.obtenerComponentePorId(31L)).thenReturn(sataExistente2);
+        when(repositorioComponenteMock.obtenerComponentePorId(32L)).thenReturn(sataNuevo);
+
+        // Ejecución y Verificación
+        assertDoesNotThrow(() -> {
+            servicioArmaTuPc.agregarComponenteAlArmado(32L, "almacenamiento", 1, armado);
+        });
+        assertEquals(3, armado.getAlmacenamiento().size());
+    }
+
+    @Test
+    public void cuandoAgregoAlmacenamientoM2DentroDelLimiteNoLanzaExcepcion() {
+        // Preparación
+        ArmadoPcDto armado = new ArmadoPcDto();
+        Motherboard motherboard = crearMotherboard(10L, "Mother X570", 4, 2, 2); // 2 slots M.2 disponibles
+        armado.setMotherboard(new ComponenteDto(motherboard));
+
+        Almacenamiento m2Existente = crearAlmacenamiento(20L, "SSD M.2 1TB", "M2", 10);
+        Almacenamiento m2Nuevo = crearAlmacenamiento(21L, "SSD M.2 2TB", "M2", 10);
+
+        armado.getAlmacenamiento().add(new ComponenteDto(m2Existente));
+
+        when(repositorioComponenteMock.obtenerComponentePorId(10L)).thenReturn(motherboard);
+        when(repositorioComponenteMock.obtenerComponentePorId(20L)).thenReturn(m2Existente);
+        when(repositorioComponenteMock.obtenerComponentePorId(21L)).thenReturn(m2Nuevo);
+
+        // Ejecución y Verificación
+        assertDoesNotThrow(() -> {
+            servicioArmaTuPc.agregarComponenteAlArmado(21L, "almacenamiento", 1, armado);
+        });
+        assertEquals(2, armado.getAlmacenamiento().size());
+    }
+
+
+
+    //endregion
+
+    //region Tests para quitarComponenteAlArmado
+    @Test
+    public void cuandoQuitoUnCoolerSeAnulanFuenteYGabineteYSeDevuelveStock() throws QuitarComponenteInvalidoException, QuitarStockDemasDeComponenteException {
+        // Preparación
+        ArmadoPcDto armado = new ArmadoPcDto();
+        Componente cooler = crearComponente(40L, "Cooler Master", "CoolerCPU");
+        Componente fuente = crearComponente(41L, "Fuente 850W", "FuenteDeAlimentacion");
+        Componente gabinete = crearComponente(42L, "Gabinete ATX", "Gabinete");
+
+        armado.setCooler(new ComponenteDto(cooler));
+        armado.setFuente(new ComponenteDto(fuente));
+        armado.setGabinete(new ComponenteDto(gabinete));
 
         // Ejecución
-        ArmadoPcDto armadoResultante = servicioArmaTuPc.quitarComponenteAlArmado(30L, "gpu", 1, armadoPcDto);
-
-        // Verificación
-        assertNull(armadoResultante.getGpu());
-    }
-
-    @Test
-    public void cuandoQuitoProcesadorSeReiniciaArmadoYConservaPerifericosYMonitor() throws Exception {
-        ArmadoPcDto armado = new ArmadoPcDto();
-        armado.setProcesador(new ComponenteDto(crearComponente(1L, "Proc", "Procesador")));
-        armado.setMonitor(new ComponenteDto(crearComponente(2L, "Monitor", "Monitor")));
-        armado.getPerifericos().add(new ComponenteDto(crearComponente(3L, "Teclado", "Periferico")));
-
-        ArmadoPcDto armadoResultante = servicioArmaTuPc.quitarComponenteAlArmado(1L, "procesador", 1, armado);
-
-        assertNull(armadoResultante.getProcesador());
-        assertNotNull(armadoResultante.getMonitor());
-        assertEquals(1, armadoResultante.getPerifericos().size());
-    }
-
-    @Test
-    public void cuandoQuitoMotherboardSeReiniciaPeroConservaProcesadorMonitorYPerifericos() throws Exception {
-        ArmadoPcDto armado = new ArmadoPcDto();
-        armado.setMotherboard(new ComponenteDto(crearComponente(1L, "Mother", "Motherboard")));
-        armado.setProcesador(new ComponenteDto(crearComponente(2L, "Proc", "Procesador")));
-        armado.setMonitor(new ComponenteDto(crearComponente(3L, "Monitor", "Monitor")));
-        armado.getPerifericos().add(new ComponenteDto(crearComponente(4L, "Teclado", "Periferico")));
-
-        ArmadoPcDto armadoResultante = servicioArmaTuPc.quitarComponenteAlArmado(1L, "motherboard", 1, armado);
-
-        assertNull(armadoResultante.getMotherboard());
-        assertNotNull(armadoResultante.getProcesador());
-        assertNotNull(armadoResultante.getMonitor());
-        assertEquals(1, armadoResultante.getPerifericos().size());
-    }
-
-    @Test
-    public void cuandoQuitoMemoriaSeBorraFuente() throws Exception {
-        ArmadoPcDto armado = new ArmadoPcDto();
-        armado.setFuente(new ComponenteDto(crearComponente(1L, "Fuente", "Fuente")));
-        armado.getRams().add(new ComponenteDto(crearComponente(2L, "RAM", "Memoria")));
-
-        ArmadoPcDto armadoResultante = servicioArmaTuPc.quitarComponenteAlArmado(2L, "memoria", 1, armado);
-
-        assertTrue(armadoResultante.getRams().isEmpty());
-        assertNull(armadoResultante.getFuente());
-    }
-
-    @Test
-    public void cuandoQuitoGpuSeBorraFuente() throws Exception {
-        ArmadoPcDto armado = new ArmadoPcDto();
-        armado.setGpu(new ComponenteDto(crearComponente(2L, "GPU", "GPU")));
-        armado.setFuente(new ComponenteDto(crearComponente(1L, "Fuente", "Fuente")));
-
-        ArmadoPcDto armadoResultante = servicioArmaTuPc.quitarComponenteAlArmado(2L, "gpu", 1, armado);
-
-        assertNull(armadoResultante.getGpu());
-        assertNull(armadoResultante.getFuente());
-    }
-
-    @Test
-    public void cuandoQuitoAlmacenamientoSeBorraFuente() throws Exception {
-        ArmadoPcDto armado = new ArmadoPcDto();
-        armado.getAlmacenamiento().add(new ComponenteDto(crearComponente(2L, "SSD", "Almacenamiento")));
-        armado.setFuente(new ComponenteDto(crearComponente(1L, "Fuente", "Fuente")));
-
-        ArmadoPcDto armadoResultante = servicioArmaTuPc.quitarComponenteAlArmado(2L, "almacenamiento", 1, armado);
-
-        assertTrue(armadoResultante.getAlmacenamiento().isEmpty());
-        assertNull(armadoResultante.getFuente());
-    }
-
-
-    @Test
-    public void cuandoQuitoUnCoolerSeAnulanTambienLaFuenteYElGabinete() throws Exception {
-        // Preparación
-        ArmadoPcDto armadoPcDto = new ArmadoPcDto();
-        armadoPcDto.setCooler(new ComponenteDto(crearComponente(40L, "Cooler Master", "CoolerCPU")));
-        armadoPcDto.setFuente(new ComponenteDto(crearComponente(41L, "Fuente 850W", "FuenteDeAlimentacion")));
-        armadoPcDto.setGabinete(new ComponenteDto(crearComponente(42L, "Gabinete ATX", "Gabinete")));
-
-        // Ejecución
-        ArmadoPcDto armadoResultante = servicioArmaTuPc.quitarComponenteAlArmado(40L, "cooler", 1, armadoPcDto);
+        ArmadoPcDto armadoResultante = servicioArmaTuPc.quitarComponenteAlArmado(40L, "cooler", 1, armado);
 
         // Verificación
         assertNull(armadoResultante.getCooler());
         assertNull(armadoResultante.getFuente());
         assertNull(armadoResultante.getGabinete());
+
+        verify(repositorioComponenteMock, times(1)).devolverStockDeUnComponente(40L, 1);
+        verify(repositorioComponenteMock, times(1)).devolverStockDeUnComponente(41L, 1);
+        verify(repositorioComponenteMock, times(1)).devolverStockDeUnComponente(42L, 1);
+    }
+
+    @Test
+    public void cuandoQuitoUnProcesadorSeDevuelveElStockDeTodosLosComponentesReseteados() throws QuitarComponenteInvalidoException, QuitarStockDemasDeComponenteException {
+        // Preparación
+        ArmadoPcDto armado = new ArmadoPcDto();
+        Componente procesador = crearComponente(1L, "CPU", "Procesador");
+        Componente mother = crearComponente(2L, "Mother", "Motherboard");
+        Componente ram = crearComponente(3L, "RAM", "MemoriaRAM");
+
+        armado.setProcesador(new ComponenteDto(procesador));
+        armado.setMotherboard(new ComponenteDto(mother));
+        armado.getRams().add(new ComponenteDto(ram));
+
+        // Ejecución
+        servicioArmaTuPc.quitarComponenteAlArmado(1L, "procesador", 1, armado);
+
+        // Verificación
+        verify(repositorioComponenteMock, times(1)).devolverStockDeUnComponente(1L, 1); // El que se quita
+        verify(repositorioComponenteMock, times(1)).devolverStockDeUnComponente(2L, 1); // El reseteado
+        verify(repositorioComponenteMock, times(1)).devolverStockDeUnComponente(3L, 1); // El reseteado
     }
 
     @Test
@@ -375,126 +390,160 @@ public class ServicioArmaTuPcTest {
 
         // Ejecución y Verificación
         assertThrows(QuitarStockDemasDeComponenteException.class, () -> {
-            // Intenta quitar 2, pero solo hay 1
             servicioArmaTuPc.quitarComponenteAlArmado(50L, "almacenamiento", 2, armadoPcDto);
         });
     }
+    //endregion
 
-    // Tests para sePuedeAgregarMasUnidades
+    //region Tests para Métodos de Utilería y Flujo
     @Test
-    public void sePuedeAgregarMasUnidadesDevuelveTrueParaMemoriaCuandoHayMenosDeCuatro() {
+    public void sePuedeAgregarMasUnidadesDevuelveTrueParaMemoriaSiHaySlotsLibres() {
+        // Preparación
         ArmadoPcDto armadoPcDto = new ArmadoPcDto();
-        armadoPcDto.getRams().add(new ComponenteDto());
+        Motherboard motherboard = crearMotherboard(10L, "Mother B450", 4, 2, 4); // 4 slots RAM
+        armadoPcDto.setMotherboard(new ComponenteDto(motherboard));
+        armadoPcDto.getRams().add(new ComponenteDto(crearComponente(20L, "RAM", "MemoriaRAM")));
+
+        when(repositorioComponenteMock.obtenerComponentePorId(10L)).thenReturn(motherboard);
+
+        // Ejecución y Verificación
         assertTrue(servicioArmaTuPc.sePuedeAgregarMasUnidades("memoria", armadoPcDto));
     }
 
     @Test
-    public void sePuedeAgregarMasUnidadesDevuelveFalseParaMemoriaCuandoHayCuatro() {
+    public void sePuedeAgregarMasUnidadesDevuelveTrueParaAlmacenamientoSiHaySlotsLibres() {
+        // Preparación
         ArmadoPcDto armadoPcDto = new ArmadoPcDto();
-        armadoPcDto.setRams(List.of(
-                new ComponenteDto(), new ComponenteDto(), new ComponenteDto(), new ComponenteDto() // 4 unidades
-        ));
-        assertFalse(servicioArmaTuPc.sePuedeAgregarMasUnidades("memoria", armadoPcDto));
-    }
+        Motherboard motherboard = crearMotherboard(10L, "Mother con slots", 4, 2, 1); // 2 SATA + 1 M2 = 3 slots total
+        armadoPcDto.setMotherboard(new ComponenteDto(motherboard));
 
-    @Test
-    public void sePuedeAgregarMasUnidadesDevuelveTrueParaAlmacenamientoCuandoHayMenosDeSeis() {
-        ArmadoPcDto armadoPcDto = new ArmadoPcDto();
-        armadoPcDto.setAlmacenamiento(List.of(
-                new ComponenteDto(), new ComponenteDto(), new ComponenteDto(),
-                new ComponenteDto(), new ComponenteDto() // 5 unidades
-        ));
+        // Actualmente hay 2 unidades de almacenamiento usadas
+        armadoPcDto.getAlmacenamiento().add(new ComponenteDto(crearAlmacenamiento(20L, "HDD", "SATA", 10)));
+        armadoPcDto.getAlmacenamiento().add(new ComponenteDto(crearAlmacenamiento(21L, "SSD M2", "M2", 10)));
+
+        when(repositorioComponenteMock.obtenerComponentePorId(10L)).thenReturn(motherboard);
+
+        // Ejecución y Verificación
         assertTrue(servicioArmaTuPc.sePuedeAgregarMasUnidades("almacenamiento", armadoPcDto));
     }
 
     @Test
-    public void sePuedeAgregarMasUnidadesDevuelveFalseParaAlmacenamientoCuandoHaySeis() {
+    public void sePuedeAgregarMasUnidadesDevuelveFalseParaAlmacenamientoSiNoHaySlotsDisponibles() {
+        // Preparación
         ArmadoPcDto armadoPcDto = new ArmadoPcDto();
-        armadoPcDto.setAlmacenamiento(List.of(
-                new ComponenteDto(), new ComponenteDto(), new ComponenteDto(),
-                new ComponenteDto(), new ComponenteDto(), new ComponenteDto() // 6 unidades
-        ));
+        Motherboard motherboard = crearMotherboard(10L, "Mother sin espacio", 4, 1, 1); // 1 SATA + 1 M2 = 2 slots total
+        armadoPcDto.setMotherboard(new ComponenteDto(motherboard));
+
+        armadoPcDto.getAlmacenamiento().add(new ComponenteDto(crearAlmacenamiento(20L, "HDD", "SATA", 10)));
+        armadoPcDto.getAlmacenamiento().add(new ComponenteDto(crearAlmacenamiento(21L, "SSD M2", "M2", 10)));
+
+        when(repositorioComponenteMock.obtenerComponentePorId(10L)).thenReturn(motherboard);
+
+        // Ejecución y Verificación
         assertFalse(servicioArmaTuPc.sePuedeAgregarMasUnidades("almacenamiento", armadoPcDto));
     }
 
     @Test
-    public void sePuedeAgregarMasUnidadesDevuelveTrueParaPerifericosCuandoHayMenosDeDiez() {
+    public void sePuedeAgregarMasUnidadesDevuelveTrueParaPerifericoSiHayMenosDe10() {
+        // Preparación
         ArmadoPcDto armadoPcDto = new ArmadoPcDto();
-        // 9 periféricos
         for (int i = 0; i < 9; i++) {
-            armadoPcDto.getPerifericos().add(new ComponenteDto());
+            armadoPcDto.getPerifericos().add(new ComponenteDto(crearComponente((long) i, "Periférico " + i, "Periferico")));
         }
+
+        // Ejecución y Verificación
         assertTrue(servicioArmaTuPc.sePuedeAgregarMasUnidades("periferico", armadoPcDto));
     }
 
     @Test
-    public void sePuedeAgregarMasUnidadesDevuelveFalseParaPerifericosCuandoHayDiez() {
+    public void sePuedeAgregarMasUnidadesDevuelveFalseParaPerifericoSiYaHay10() {
+        // Preparación
         ArmadoPcDto armadoPcDto = new ArmadoPcDto();
-        // 10 periféricos
         for (int i = 0; i < 10; i++) {
-            armadoPcDto.getPerifericos().add(new ComponenteDto());
+            armadoPcDto.getPerifericos().add(new ComponenteDto(crearComponente((long) i, "Periférico " + i, "Periferico")));
         }
+
+        // Ejecución y Verificación
         assertFalse(servicioArmaTuPc.sePuedeAgregarMasUnidades("periferico", armadoPcDto));
     }
 
     @Test
     public void sePuedeAgregarMasUnidadesDevuelveFalseParaComponentesUnicosComoProcesador() {
+        // Preparación
         ArmadoPcDto armadoPcDto = new ArmadoPcDto();
+
+        // Ejecución y Verificación
         assertFalse(servicioArmaTuPc.sePuedeAgregarMasUnidades("procesador", armadoPcDto));
         assertFalse(servicioArmaTuPc.sePuedeAgregarMasUnidades("gpu", armadoPcDto));
     }
 
-    // Tests para armadoCompleto
-    // POSIBLEMENTE ESTOS CAMBIEN SEGUN AVANCE EL FLUJO DEL ARMADO PASO A PASO
     @Test
     public void armadoCompletoDevuelveTrueCuandoTieneLosComponentesEsenciales() {
+        // Preparación
         ArmadoPcDto armadoPcDto = new ArmadoPcDto();
         armadoPcDto.setProcesador(new ComponenteDto());
         armadoPcDto.setMotherboard(new ComponenteDto());
         armadoPcDto.setCooler(new ComponenteDto());
         armadoPcDto.setGabinete(new ComponenteDto());
 
+        // Ejecución y Verificación
         assertTrue(servicioArmaTuPc.armadoCompleto(armadoPcDto));
     }
 
     @Test
-    public void armadoCompletoDevuelveFalseCuandoFaltaAlMenosUnComponenteEsencial() {
+    public void armadoCompletoDevuelveFalseCuandoTieneLosComponentesEsenciales() {
+        // Preparación
         ArmadoPcDto armadoPcDto = new ArmadoPcDto();
-        armadoPcDto.setProcesador(new ComponenteDto());
-        armadoPcDto.setMotherboard(new ComponenteDto());
-        armadoPcDto.setCooler(new ComponenteDto());
-        // Falta el gabinete
+        armadoPcDto.setGabinete(new ComponenteDto());
 
+        // Ejecución y Verificación
         assertFalse(servicioArmaTuPc.armadoCompleto(armadoPcDto));
     }
 
     @Test
-    public void cuandoAgregoUnComponenteSeFormateaSuPrecioEnPesos() throws LimiteDeComponenteSobrepasadoEnElArmadoException {
+    public void alDevolverStockDeArmadoSeLlamaAlRepositorioConLasCantidadesCorrectas() {
         // Preparación
-        Long idComponente = 1L;
-        String tipoComponente = "procesador";
-        ArmadoPcDto armadoPcDtoInicial = new ArmadoPcDto();
-        Componente componenteAAgregar = crearComponente(idComponente, "Intel i5", "Procesador");
-        componenteAAgregar.setPrecio(250.0);
-        String precioFormateadoEsperado = "$ 250.000,00";
+        ArmadoPcDto armado = new ArmadoPcDto();
+        Componente procesador = crearComponente(1L, "CPU", "Procesador");
+        Componente ram = crearComponente(2L, "RAM", "MemoriaRAM");
 
-        when(repositorioComponenteMock.obtenerComponentePorId(idComponente)).thenReturn(componenteAAgregar);
-        when(servicioPreciosMock.conversionDolarAPeso(250.0)).thenReturn(precioFormateadoEsperado);
+        armado.setProcesador(new ComponenteDto(procesador));
+        armado.getRams().add(new ComponenteDto(ram));
+        armado.getRams().add(new ComponenteDto(ram));
 
         // Ejecución
-        ArmadoPcDto armadoResultante = servicioArmaTuPc.agregarComponenteAlArmado(idComponente, tipoComponente, 1, armadoPcDtoInicial);
+        servicioArmaTuPc.devolverStockDeArmado(armado);
 
         // Verificación
-        // Verificar que el servicio de precios fue llamado con el precio correcto en dólares
-        verify(servicioPreciosMock, times(1)).conversionDolarAPeso(250.0);
-
-        // Verificar que el DTO del componente agregado tiene el precio formateado
-        ComponenteDto componenteAgregadoDto = armadoResultante.getProcesador();
-        assertNotNull(componenteAgregadoDto);
-        assertEquals(precioFormateadoEsperado, componenteAgregadoDto.getPrecioFormateado());
+        verify(repositorioComponenteMock, times(1)).devolverStockDeUnComponente(1L, 1);
+        verify(repositorioComponenteMock, times(1)).devolverStockDeUnComponente(2L, 2);
     }
 
+    @Test
+    public void pasajeAProductoArmadoDtoParaAgregarAlCarritoConvierteCorrectamente() {
+        // Preparación
+        ArmadoPcDto armado = new ArmadoPcDto();
+        Componente cpu = crearComponente(1L, "CPU", "Procesador");
+        Componente ram = crearComponente(2L, "RAM", "MemoriaRAM");
+        armado.setProcesador(new ComponenteDto(cpu));
+        armado.getRams().add(new ComponenteDto(ram));
+        armado.getRams().add(new ComponenteDto(ram));
 
+        when(repositorioComponenteMock.obtenerComponentePorId(1L)).thenReturn(cpu);
+        when(repositorioComponenteMock.obtenerComponentePorId(2L)).thenReturn(ram);
 
+        // Ejecución
+        List<ProductoCarritoArmadoDto> resultado = servicioArmaTuPc.pasajeAProductoArmadoDtoParaAgregarAlCarrito(armado);
+
+        // Verificación
+        assertThat(resultado, hasSize(2));
+        ProductoCarritoArmadoDto dtoCpu = resultado.stream().filter(r -> r.getId().equals(1L)).findFirst().orElse(null);
+        ProductoCarritoArmadoDto dtoRam = resultado.stream().filter(r -> r.getId().equals(2L)).findFirst().orElse(null);
+
+        assertNotNull(dtoCpu);
+        assertNotNull(dtoRam);
+        assertEquals(1, dtoCpu.getCantidad());
+        assertEquals(2, dtoRam.getCantidad());
+    }
+    //endregion
 }
-*/

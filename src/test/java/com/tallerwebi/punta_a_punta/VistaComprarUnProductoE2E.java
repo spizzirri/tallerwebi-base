@@ -28,7 +28,7 @@ public class VistaComprarUnProductoE2E {
     static void abrirNavegador() {
         playwright = Playwright.create();
         browser = playwright.chromium().launch();
-        browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false).setSlowMo(500));
+        browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false).setSlowMo(800));
     }
 
     @AfterAll
@@ -92,7 +92,7 @@ public class VistaComprarUnProductoE2E {
 
     public void deberiaIniciarSesionCorrectamenteDespuesDeRegistrarUnUsuarioYcompletarElFormulario() {
         loginValidoDeUsuarioGustavoNarancio();
-        vistaRegistrarme.escribirEMAIL("Huesos12@gmail.com");
+        vistaRegistrarme.escribirEMAIL("Huesos123456@gmail.com");
         vistaRegistrarme.escribirClave("123");
         vistaRegistrarme.darClickEnIniciarSesion();
     }
@@ -100,7 +100,7 @@ public class VistaComprarUnProductoE2E {
     public void loginValidoDeUsuarioGustavoNarancio() {
         vistaNuevoUsuario.escribirNOMBRE("Gustavo");
         vistaNuevoUsuario.escribirAPELLIDO("Narancio");
-        vistaNuevoUsuario.escribirEMAIL("Huesos12@gmail.com");
+        vistaNuevoUsuario.escribirEMAIL("Huesos123456@gmail.com");
         vistaNuevoUsuario.escribirClave("123");
         vistaNuevoUsuario.escribirTELEFONO("11425123112");
         vistaNuevoUsuario.escribirDNI("39.022.123");

@@ -54,3 +54,4 @@ CREATE TABLE procesadorMemoria (
     FOREIGN KEY (idProcesador) REFERENCES procesadores(idProcesador) ON DELETE CASCADE
 );
 
+

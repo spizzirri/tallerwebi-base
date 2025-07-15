@@ -3,12 +3,10 @@ package com.tallerwebi.presentacion;
 import com.tallerwebi.dominio.ServicioArmaTuPc;
 import com.tallerwebi.dominio.ServicioPrecios;
 import com.tallerwebi.dominio.entidades.Componente;
-import com.tallerwebi.dominio.excepcion.ComponenteDeterminateDelArmadoEnNullException;
-import com.tallerwebi.dominio.excepcion.LimiteDeComponenteSobrepasadoEnElArmadoException;
-import com.tallerwebi.dominio.excepcion.QuitarComponenteInvalidoException;
-import com.tallerwebi.dominio.excepcion.QuitarStockDemasDeComponenteException;
+import com.tallerwebi.dominio.excepcion.*;
 import com.tallerwebi.presentacion.dto.ArmadoPcDto;
 import com.tallerwebi.presentacion.dto.ComponenteDto;
+import com.tallerwebi.presentacion.dto.ProductoCarritoArmadoDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -51,14 +49,29 @@ public class ControladorArmaTuPc {
             List<ComponenteDto> componentesCompatiblesADevolver;
 
             componentesCompatiblesADevolver = (query != null)
-                    ? this.servicioArmaTuPc.obtenerListaDeComponentesCompatiblesFiltradosDto(tipoComponente, query, armadoPcDto)
-                    : this.servicioArmaTuPc.obtenerListaDeComponentesCompatiblesDto(tipoComponente, armadoPcDto);
+                    ? new ArrayList<>(this.servicioArmaTuPc.obtenerListaDeComponentesCompatiblesFiltradosDto(tipoComponente, query, armadoPcDto))
+                    : new ArrayList<>(this.servicioArmaTuPc.obtenerListaDeComponentesCompatiblesDto(tipoComponente, armadoPcDto));
 
             model.put("componentesLista", this.pasarPreciosAPesos(componentesCompatiblesADevolver));
+
+            if (tipoComponente.equals("memoria")) model.put("slotsRamMotherboardElegida", this.servicioArmaTuPc.obtenerSlotsRamDeMotherboard(armadoPcDto.getMotherboard()));
+            if (tipoComponente.equals("almacenamiento")){
+                model.put("slotsSataMotherboardElegida", this.servicioArmaTuPc.obtenerSlotsSataDeMotherboard(armadoPcDto.getMotherboard()));
+                model.put("slotsM2MotherboardElegida", this.servicioArmaTuPc.obtenerSlotsM2DeMotherboard(armadoPcDto.getMotherboard()));
+            }
 
         } catch (ComponenteDeterminateDelArmadoEnNullException e) {
             model.put("errorLista", e.getMessage());
         }
+
+        if ((tipoComponente.equals("procesador") && armadoPcDto.getProcesador() == null)
+            || (tipoComponente.equals("motherboard") && armadoPcDto.getMotherboard() == null)
+            || (tipoComponente.equals("cooler") && armadoPcDto.getCooler() == null)
+            || (tipoComponente.equals("gabinete") && armadoPcDto.getGabinete() == null)) model.put("componenteEscencialFaltante", "Este componente es obligatorio para completar el armado.");
+
+        Integer wattsDeArmado = this.servicioArmaTuPc.obtenerWattsTotalesDeArmado(armadoPcDto);
+
+        model.put("wattsArmado", wattsDeArmado);
         model.put("armadoPcDto", armadoPcDto);
         model.put("idsDeComponentesSeleccionados", obtenerIdsDeArmadoDeSession(armadoPcDto));
 
@@ -161,7 +174,7 @@ public class ControladorArmaTuPc {
         ArmadoPcDto armadoPcDtoConComponenteAgregado = null;
         try {
             armadoPcDtoConComponenteAgregado = this.servicioArmaTuPc.agregarComponenteAlArmado(idComponente, tipoComponente, cantidad, obtenerArmadoPcDtoDeLaSession(session));
-        } catch (LimiteDeComponenteSobrepasadoEnElArmadoException e) {
+        } catch (LimiteDeComponenteSobrepasadoEnElArmadoException | ComponenteSinStockPedidoException e) {
             model.put("errorLimite", "Supero el limite de "+tipoComponente+" de su armado");
             return new ModelAndView("redirect:/arma-tu-pc/custom/" + tipoComponente, model);
         }
@@ -262,6 +275,9 @@ public class ControladorArmaTuPc {
         ArmadoPcDto armadoPcDtoConComponenteAgregado = null;
         try {
             armadoPcDtoConComponenteAgregado = this.servicioArmaTuPc.agregarComponenteAlArmado(idComponente, tipoComponente, cantidad, obtenerArmadoPcDtoDeLaSession(session));
+        }catch (ComponenteSinStockPedidoException e) {
+            model.put("errorLimite", e.getMessage());
+            return new ModelAndView("redirect:/arma-tu-pc/tradicional/" + tipoComponente, model);
         } catch (LimiteDeComponenteSobrepasadoEnElArmadoException e) {
             model.put("errorLimite", "Supero el limite de "+tipoComponente+" de su armado");
             return new ModelAndView("redirect:/arma-tu-pc/tradicional/" + tipoComponente, model);
@@ -270,6 +286,8 @@ public class ControladorArmaTuPc {
         armadoPcDtoConComponenteAgregado.setPrecioFormateado(
                 this.servicioPrecios.conversionDolarAPeso(armadoPcDtoConComponenteAgregado.getPrecioTotal())
                 );
+
+        session.setAttribute("reservaArmado", this.servicioArmaTuPc.pasajeAProductoArmadoDtoParaAgregarAlCarrito(armadoPcDtoConComponenteAgregado));
 
         session.setAttribute("armadoPcDto", armadoPcDtoConComponenteAgregado);
 
@@ -281,6 +299,7 @@ public class ControladorArmaTuPc {
 
         return new ModelAndView("redirect:/arma-tu-pc/tradicional/" + siguienteVista, model);
     }
+
 
     public ModelAndView quitarComponenteDelArmado(@PathVariable("tipoComponente")String tipoComponente,
                                                   @RequestParam("id") Long idComponente,
@@ -299,6 +318,8 @@ public class ControladorArmaTuPc {
             model.put("errorQuitado", "No es posible quitar una cantidad del componente que no posee el armado.");
             return new ModelAndView("redirect:/arma-tu-pc/tradicional/" + tipoComponente, model);
         }
+
+        session.setAttribute("reservaArmado", this.servicioArmaTuPc.pasajeAProductoArmadoDtoParaAgregarAlCarrito(armadoPcDtoConComponenteQuitado));
 
         session.setAttribute("armadoPcDto", armadoPcDtoConComponenteQuitado);
 
@@ -342,6 +363,9 @@ public class ControladorArmaTuPc {
 
     @RequestMapping(path = "arma-tu-pc/tradicional/reiniciar-armado", method = RequestMethod.POST)
     public ModelAndView reiniciarArmado(HttpSession session) {
+
+        this.servicioArmaTuPc.devolverStockDeArmado(obtenerArmadoPcDtoDeLaSession(session));
+
         session.removeAttribute("armadoPcDto");
         return new ModelAndView("redirect:/arma-tu-pc/tradicional/procesador");
     }
@@ -363,11 +387,43 @@ public class ControladorArmaTuPc {
             carritoSesion = new ArrayList<>();
         }
 
-        carritoSesion.addAll(this.servicioArmaTuPc.pasajeAProductoDtoParaAgregarAlCarrito(obtenerArmadoPcDtoDeLaSession(session)));
+        List<ProductoCarritoArmadoDto> productoCarritoArmadoDtos = this.obtenerReservaArmadoDeLaSession(session);
 
-        // controlar el stock con servicio ServicioProductoCarritoImpl
+        Integer numeroDeUltimoArmadoEnElCarrito = obtenerElNumeroDelUltimoArmadoDelCarritoDeSesion(carritoSesion);
+
+        for (ProductoCarritoArmadoDto producto : productoCarritoArmadoDtos) // para que los armados se puedan distinguir entre ellos en el carrito y las compras
+            producto.setNumeroDeArmadoAlQuePertenece(numeroDeUltimoArmadoEnElCarrito + 1);
+
+
+        carritoSesion.addAll(productoCarritoArmadoDtos);
+
+        session.removeAttribute("armadoPcDto");
+        session.removeAttribute("reservaArmado");
 
         return new ModelAndView("redirect:/carritoDeCompras/index");
+    }
+
+    private List<ProductoCarritoArmadoDto> obtenerReservaArmadoDeLaSession(HttpSession session) {
+
+        return (session.getAttribute("reservaArmado") != null)
+                ? (List<ProductoCarritoArmadoDto>)session.getAttribute("reservaArmado")
+                : new ArrayList<>();
+
+    }
+
+    private Integer obtenerElNumeroDelUltimoArmadoDelCarritoDeSesion(List<ProductoCarritoDto> carritoSesion) {
+
+        Integer numeroMasAlto = 0;
+
+        for (ProductoCarritoDto producto : carritoSesion) {
+            if (producto instanceof ProductoCarritoArmadoDto){
+                int numeroDeProductoActual = ((ProductoCarritoArmadoDto)producto).getNumeroDeArmadoAlQuePertenece();
+                if (numeroDeProductoActual > numeroMasAlto) numeroMasAlto = numeroDeProductoActual;
+            }
+        }
+
+        return numeroMasAlto;
+
     }
 
     @GetMapping("/arma-tu-pc/armaTuPc")

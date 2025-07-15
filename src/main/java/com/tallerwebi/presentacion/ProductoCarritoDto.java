@@ -2,6 +2,8 @@ package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.entidades.Componente;
 
+import java.util.Objects;
+
 public class ProductoCarritoDto {
 
     private Long id;
@@ -12,6 +14,8 @@ public class ProductoCarritoDto {
     private Integer cantidad = 1;
     private String imagen;
     private String precioFormateado;
+
+    // private Boolean armado = false;
 
     public ProductoCarritoDto() {}
 
@@ -38,7 +42,6 @@ public class ProductoCarritoDto {
         this.stock = 10;
         this.imagen = "imagen-generica.jpg";
     }
-
 
     public Long getId() {
         return id;
@@ -88,5 +91,17 @@ public class ProductoCarritoDto {
 
     public void setPrecioFormateado(String precioFormateado) {
         this.precioFormateado = precioFormateado;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        ProductoCarritoDto that = (ProductoCarritoDto) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
     }
 }

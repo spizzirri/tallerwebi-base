@@ -62,6 +62,7 @@ public class ArmadoPcDto {
         this.rams = new ArrayList<>();
         this.almacenamiento = new ArrayList<>();
         this.perifericos = new ArrayList<>();
+        this.precioFormateado = "0.0";
     }
 
     private List<ComponenteDto> convertirListaDeComponentesEntidadADtos(List<? extends Componente> listaEntidades) {
@@ -229,16 +230,16 @@ public class ArmadoPcDto {
     // deberia tener test esto?
     public List<ComponenteDto> getComponentesDto() {
         List<ComponenteDto> componentesDto = new ArrayList<>();
-        componentesDto.add(this.procesador);
-        componentesDto.add(this.motherboard);
-        componentesDto.add(this.cooler);
-        componentesDto.add(this.gpu);
-        componentesDto.add(this.fuente);
-        componentesDto.add(this.gabinete);
-        componentesDto.add(this.monitor);
-        componentesDto.addAll(this.rams);
-        componentesDto.addAll(this.almacenamiento);
-        componentesDto.addAll(this.perifericos);
+        if (this.procesador != null) componentesDto.add(this.procesador);
+        if (this.motherboard != null) componentesDto.add(this.motherboard);
+        if (this.cooler != null) componentesDto.add(this.cooler);
+        if (this.gpu != null) componentesDto.add(this.gpu);
+        if (this.fuente != null) componentesDto.add(this.fuente);
+        if (this.gabinete != null) componentesDto.add(this.gabinete);
+        if (this.monitor != null) componentesDto.add(this.monitor);
+        if (this.rams != null && !this.rams.isEmpty()) componentesDto.addAll(this.rams);
+        if (this.almacenamiento != null && !this.almacenamiento.isEmpty())  componentesDto.addAll(this.almacenamiento);
+        if (this.perifericos != null && !this.perifericos.isEmpty()) componentesDto.addAll(this.perifericos);
         return componentesDto;
     }
 
@@ -258,4 +259,5 @@ public class ArmadoPcDto {
         }
         return idYCantidad;
     }
+
 }

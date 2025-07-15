@@ -122,6 +122,14 @@ document.addEventListener("DOMContentLoaded", function () {
             })
                 .then(response => response.json())
                 .then(data => {
+                    console.log('Respuesta del servidor:', data); // Debug
+
+                    if (data.redirect) {
+                        console.log('Redirigiendo a:', data.redirect);
+                        window.location.href = data.redirect;
+                        return;
+                    }
+
                     if (data.success && metodoSeleccionado.value === "mercadoPago") {
                         crearFormularioMercadoPago(data);
                         btnComprar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Redirigiendo a MercadoPago...';
@@ -132,6 +140,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         btnComprar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Redirigiendo a Tarjeta de credito...';
                         btnComprar.disabled = true;
                     }
+
                     else if (!data.success && data.error) {
                         btnComprar.innerHTML = 'Finalizar compra';
                         btnComprar.disabled = false;
