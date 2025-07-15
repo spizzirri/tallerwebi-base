@@ -7,6 +7,7 @@ import com.tallerwebi.presentacion.dto.ComponenteDto;
 import com.tallerwebi.presentacion.dto.ProductoCarritoArmadoDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.web.client.RestTemplate;
 
 import java.lang.IllegalArgumentException;
 import java.util.ArrayList;
@@ -24,13 +25,15 @@ public class ServicioArmaTuPcTest {
     private ServicioCompatibilidades servicioCompatibilidadesMock;
     private ServicioPrecios servicioPreciosMock;
     private ServicioArmaTuPcImpl servicioArmaTuPc;
+    private RestTemplate restTemplateMock;
 
     @BeforeEach
     public void init() {
         repositorioComponenteMock = mock(RepositorioComponente.class);
         servicioCompatibilidadesMock = mock(ServicioCompatibilidades.class);
         servicioPreciosMock = mock(ServicioPrecios.class);
-        servicioArmaTuPc = new ServicioArmaTuPcImpl(repositorioComponenteMock, servicioPreciosMock, servicioCompatibilidadesMock);
+        restTemplateMock = mock(RestTemplate.class);
+        servicioArmaTuPc = new ServicioArmaTuPcImpl(repositorioComponenteMock, servicioPreciosMock, servicioCompatibilidadesMock, restTemplateMock);
     }
 
     //region Métodos de Ayuda para crear Mocks
