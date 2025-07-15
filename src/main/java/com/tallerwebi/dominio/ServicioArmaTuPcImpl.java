@@ -360,12 +360,16 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
         List<String> juegoSeleccionado = new ArrayList<>();
         Map<String, Double> requisitosMinimosSeleccionados = new HashMap<>();
         for (String app : seleccionados) {
+            Boolean esPrograma = false;
             for(RequisitosProgramas programa : requisitosProgramas) {
-                if (app.equals(programa.getNombre())) {
+                if (app.equals(programa.getId())) {
                     programaSeleccionado.add(app);
-                } else {
-                    juegoSeleccionado.add(app);
+                    esPrograma = true;
+                    break;
                 }
+            }
+            if (!esPrograma) {
+                juegoSeleccionado.add(app);
             }
         }
         //Comparacion para los Programas
@@ -475,7 +479,7 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
         for (String app : seleccionados) {
             Boolean esPrograma = false;
             for(RequisitosProgramas programa : requisitosProgramas) {
-                if (app.equals(programa.getNombre())) {
+                if (app.equals(programa.getId())) {
                     programaSeleccionado.add(app);
                     esPrograma = true;
                     break;
@@ -601,39 +605,63 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
         }
 
         List<Componente> componentesCompatiblesRequisitosMinimos = new ArrayList<>();
+
         for (Componente componente : componentesCompatibles) {
             if (componente instanceof Procesador) {
                 String familia = ((Procesador) componente).getFamilia();
-                Double ultimoCaracter = (double) familia.charAt(familia.length() - 1);
-                if (ultimoCaracter >= seleccionados.get("ProcesadorAMD") || ultimoCaracter >= seleccionados.get("ProcesadorINTEL")) {
-                    componentesCompatiblesRequisitosMinimos.add(componente);
+                Double amd = seleccionados.get("ProcesadorAMD");
+                Double intel = seleccionados.get("ProcesadorINTEL");
+
+                if (familia != null && !familia.isEmpty()) {
+                    // Buscar último número completo en el string
+                    String[] partes = familia.split(" ");
+                    String ultimaParte = partes[partes.length - 1].replaceAll("[^0-9]", "");
+                    if (!ultimaParte.isEmpty()) {
+                        Double numeroFamilia = Double.parseDouble(ultimaParte);
+                        if ((amd != null && numeroFamilia >= amd) || (intel != null && numeroFamilia >= intel)) {
+                            componentesCompatiblesRequisitosMinimos.add(componente);
+                        }
+                    }
                 }
             }
+
             if (componente instanceof MemoriaRAM) {
                 String capacidad = ((MemoriaRAM) componente).getCapacidad();
                 String[] partes = capacidad.split(" ");
-                String numeroEnString = partes[0];
-                Double capacidadEnDouble = (double) numeroEnString.charAt(0);
-                if (capacidadEnDouble >= seleccionados.get("RAM")) {
+                Double capacidadEnDouble = Double.parseDouble(partes[0]);
+                Double requisito = seleccionados.get("RAM");
+
+                if (requisito != null && capacidadEnDouble >= requisito) {
                     componentesCompatiblesRequisitosMinimos.add(componente);
                 }
             }
+
             if (componente instanceof PlacaDeVideo) {
-                String vram = ((PlacaDeVideo) componente).getCapacidadRAM();
-                String[] partes = vram.split(" ");
-                String numeroEnString = partes[0];
-                Double capacidadEnDouble = (double) numeroEnString.charAt(0);
-                if (capacidadEnDouble >= seleccionados.get("GPU")) {
-                    componentesCompatiblesRequisitosMinimos.add(componente);
+                if (((PlacaDeVideo) componente).getCapacidadRAM() != null) {
+                    String vram = ((PlacaDeVideo) componente).getCapacidadRAM();
+                    String[] partes = vram.split(" ");
+                    Double capacidadEnDouble = Double.parseDouble(partes[0]);
+                    Double requisito = seleccionados.get("GPU");
+
+                    if (requisito != null && capacidadEnDouble >= requisito) {
+                        componentesCompatiblesRequisitosMinimos.add(componente);
+                    }
                 }
             }
+
             if (componente instanceof Almacenamiento) {
                 String capacidad = ((Almacenamiento) componente).getCapacidad();
                 String[] partes = capacidad.split(" ");
-                String numeroEnString = partes[0];
-                Double capacidadEnDouble = (double) numeroEnString.charAt(0);
-                if (capacidadEnDouble >= seleccionados.get("EspacioDisco")) {
+                Double capacidadEnDouble = Double.parseDouble(partes[0]);
+                Double requisito = seleccionados.get("EspacioDisco");
+
+                if (requisito != null && capacidadEnDouble >= requisito) {
                     componentesCompatiblesRequisitosMinimos.add(componente);
+                }
+                if (partes[1].equals("TB")) {
+                    if (capacidadEnDouble * 1000 >= requisito){
+                        componentesCompatiblesRequisitosMinimos.add(componente);
+                    }
                 }
             }
         }
@@ -663,36 +691,59 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
         for (Componente componente : componentesCompatibles) {
             if (componente instanceof Procesador) {
                 String familia = ((Procesador) componente).getFamilia();
-                Double ultimoCaracter = (double) familia.charAt(familia.length() - 1);
-                if (ultimoCaracter >= seleccionados.get("ProcesadorAMD") || ultimoCaracter >= seleccionados.get("ProcesadorINTEL")) {
-                    componentesCompatiblesRequisitosMinimos.add(componente);
+                Double amd = seleccionados.get("ProcesadorAMD");
+                Double intel = seleccionados.get("ProcesadorINTEL");
+
+                if (familia != null && !familia.isEmpty()) {
+                    // Buscar último número completo en el string
+                    String[] partes = familia.split(" ");
+                    String ultimaParte = partes[partes.length - 1].replaceAll("[^0-9]", "");
+                    if (!ultimaParte.isEmpty()) {
+                        Double numeroFamilia = Double.parseDouble(ultimaParte);
+                        if ((amd != null && numeroFamilia >= amd) || (intel != null && numeroFamilia >= intel)) {
+                            componentesCompatiblesRequisitosMinimos.add(componente);
+                        }
+                    }
                 }
             }
+
             if (componente instanceof MemoriaRAM) {
                 String capacidad = ((MemoriaRAM) componente).getCapacidad();
                 String[] partes = capacidad.split(" ");
-                String numeroEnString = partes[0];
-                Double capacidadEnDouble = (double) numeroEnString.charAt(0);
-                if (capacidadEnDouble >= seleccionados.get("RAM")) {
+                Double capacidadEnDouble = Double.parseDouble(partes[0]);
+                Double requisito = seleccionados.get("RAM");
+
+                if (requisito != null && capacidadEnDouble >= requisito) {
                     componentesCompatiblesRequisitosMinimos.add(componente);
                 }
             }
+
             if (componente instanceof PlacaDeVideo) {
-                String vram = ((PlacaDeVideo) componente).getCapacidadRAM();
-                String[] partes = vram.split(" ");
-                String numeroEnString = partes[0];
-                Double capacidadEnDouble = (double) numeroEnString.charAt(0);
-                if (capacidadEnDouble >= seleccionados.get("GPU")) {
-                    componentesCompatiblesRequisitosMinimos.add(componente);
+                if (((PlacaDeVideo) componente).getCapacidadRAM() != null) {
+                    String vram = ((PlacaDeVideo) componente).getCapacidadRAM();
+                    String[] partes = vram.split(" ");
+                    Double capacidadEnDouble = Double.parseDouble(partes[0]);
+                    Double requisito = seleccionados.get("GPU");
+
+                    if (requisito != null && capacidadEnDouble >= requisito) {
+                        componentesCompatiblesRequisitosMinimos.add(componente);
+                    }
                 }
             }
+
             if (componente instanceof Almacenamiento) {
                 String capacidad = ((Almacenamiento) componente).getCapacidad();
                 String[] partes = capacidad.split(" ");
-                String numeroEnString = partes[0];
-                Double capacidadEnDouble = (double) numeroEnString.charAt(0);
-                if (capacidadEnDouble >= seleccionados.get("EspacioDisco")) {
+                Double capacidadEnDouble = Double.parseDouble(partes[0]);
+                Double requisito = seleccionados.get("EspacioDisco");
+
+                if (requisito != null && capacidadEnDouble >= requisito) {
                     componentesCompatiblesRequisitosMinimos.add(componente);
+                }
+                if (partes[1].equals("TB")) {
+                    if (capacidadEnDouble * 1000 >= requisito){
+                        componentesCompatiblesRequisitosMinimos.add(componente);
+                    }
                 }
             }
         }
@@ -751,13 +802,15 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
             }
 
             if (componente instanceof PlacaDeVideo) {
-                String vram = ((PlacaDeVideo) componente).getCapacidadRAM();
-                String[] partes = vram.split(" ");
-                Double capacidadEnDouble = Double.parseDouble(partes[0]);
-                Double requisito = seleccionados.get("GPU");
+                if (((PlacaDeVideo) componente).getCapacidadRAM() != null) {
+                    String vram = ((PlacaDeVideo) componente).getCapacidadRAM();
+                    String[] partes = vram.split(" ");
+                    Double capacidadEnDouble = Double.parseDouble(partes[0]);
+                    Double requisito = seleccionados.get("GPU");
 
-                if (requisito != null && capacidadEnDouble >= requisito) {
-                    componentesCompatiblesRequisitosRecomendados.add(componente);
+                    if (requisito != null && capacidadEnDouble >= requisito) {
+                        componentesCompatiblesRequisitosRecomendados.add(componente);
+                    }
                 }
             }
 
@@ -769,6 +822,11 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
 
                 if (requisito != null && capacidadEnDouble >= requisito) {
                     componentesCompatiblesRequisitosRecomendados.add(componente);
+                }
+                if (partes[1].equals("TB")) {
+                    if (capacidadEnDouble * 1000 >= requisito){
+                        componentesCompatiblesRequisitosRecomendados.add(componente);
+                    }
                 }
             }
         }
@@ -798,36 +856,59 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
         for (Componente componente : componentesCompatibles) {
             if (componente instanceof Procesador) {
                 String familia = ((Procesador) componente).getFamilia();
-                Double ultimoCaracter = (double) familia.charAt(familia.length() - 1);
-                if (ultimoCaracter >= seleccionados.get("ProcesadorAMD") || ultimoCaracter >= seleccionados.get("ProcesadorINTEL")) {
-                    componentesCompatiblesRequisitosRecomendados.add(componente);
+                Double amd = seleccionados.get("ProcesadorAMD");
+                Double intel = seleccionados.get("ProcesadorINTEL");
+
+                if (familia != null && !familia.isEmpty()) {
+                    // Buscar último número completo en el string
+                    String[] partes = familia.split(" ");
+                    String ultimaParte = partes[partes.length - 1].replaceAll("[^0-9]", "");
+                    if (!ultimaParte.isEmpty()) {
+                        Double numeroFamilia = Double.parseDouble(ultimaParte);
+                        if ((amd != null && numeroFamilia >= amd) || (intel != null && numeroFamilia >= intel)) {
+                            componentesCompatiblesRequisitosRecomendados.add(componente);
+                        }
+                    }
                 }
             }
+
             if (componente instanceof MemoriaRAM) {
                 String capacidad = ((MemoriaRAM) componente).getCapacidad();
                 String[] partes = capacidad.split(" ");
-                String numeroEnString = partes[0];
-                Double capacidadEnDouble = (double) numeroEnString.charAt(0);
-                if (capacidadEnDouble >= seleccionados.get("RAM")) {
+                Double capacidadEnDouble = Double.parseDouble(partes[0]);
+                Double requisito = seleccionados.get("RAM");
+
+                if (requisito != null && capacidadEnDouble >= requisito) {
                     componentesCompatiblesRequisitosRecomendados.add(componente);
                 }
             }
+
             if (componente instanceof PlacaDeVideo) {
-                String vram = ((PlacaDeVideo) componente).getCapacidadRAM();
-                String[] partes = vram.split(" ");
-                String numeroEnString = partes[0];
-                Double capacidadEnDouble = (double) numeroEnString.charAt(0);
-                if (capacidadEnDouble >= seleccionados.get("GPU")) {
-                    componentesCompatiblesRequisitosRecomendados.add(componente);
+                if (((PlacaDeVideo) componente).getCapacidadRAM() != null) {
+                    String vram = ((PlacaDeVideo) componente).getCapacidadRAM();
+                    String[] partes = vram.split(" ");
+                    Double capacidadEnDouble = Double.parseDouble(partes[0]);
+                    Double requisito = seleccionados.get("GPU");
+
+                    if (requisito != null && capacidadEnDouble >= requisito) {
+                        componentesCompatiblesRequisitosRecomendados.add(componente);
+                    }
                 }
             }
+
             if (componente instanceof Almacenamiento) {
                 String capacidad = ((Almacenamiento) componente).getCapacidad();
                 String[] partes = capacidad.split(" ");
-                String numeroEnString = partes[0];
-                Double capacidadEnDouble = (double) numeroEnString.charAt(0);
-                if (capacidadEnDouble >= seleccionados.get("EspacioDisco")) {
+                Double capacidadEnDouble = Double.parseDouble(partes[0]);
+                Double requisito = seleccionados.get("EspacioDisco");
+
+                if (requisito != null && capacidadEnDouble >= requisito) {
                     componentesCompatiblesRequisitosRecomendados.add(componente);
+                }
+                if (partes[1].equals("TB")) {
+                    if (capacidadEnDouble * 1000 >= requisito){
+                        componentesCompatiblesRequisitosRecomendados.add(componente);
+                    }
                 }
             }
         }

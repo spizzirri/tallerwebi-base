@@ -26,7 +26,7 @@
         </div>
 
         <div class="m-auto d-flex justify-content-center gap-2">
-            <a th:href="@{/arma-tu-pc/tradicional/procesador}" class="btn btn-outline-secondary">Volver al armado</a>
+            <a th:href="@{/arma-tu-pc/custom/procesador}" class="btn btn-outline-secondary">Volver al armado</a>
             <form class="m-0" method="POST" th:action="@{/arma-tu-pc/carrito}">
                 <input type="submit" class="btn btn-outline-primary" value="Sumar al carrito">
             </form>
@@ -38,7 +38,7 @@
     <div th:if="${errorResumen != null}">
         <h2 class="alert alert-danger" th:text="${errorResumen}"></h2>
         <div class="m-auto d-flex justify-content-center">
-            <a th:href="@{/arma-tu-pc/tradicional/procesador}" class="btn btn-outline-secondary">Volver al armado</a>
+            <a th:href="@{/arma-tu-pc/custom/procesador}" class="btn btn-outline-secondary">Volver al armado</a>
         </div>
     </div>
 

@@ -97,39 +97,20 @@ public class ControladorArmaTuPc {
             seleccionadosSesion = (List<String>) sesion.getAttribute("appSeleccionada");
         }
 
-        //sesion.setAttribute("appSelecionada", seleccionados);
-
         try {
             List<ComponenteDto> componentesCompatiblesADevolver;
-
-            //List<String> appSeleccionadaSesion = (List<String>) sesion.getAttribute("appSeleccionada");
-
-            try {
-                // Pausa de 5 segundos (5,000 milisegundos)
-                Thread.sleep(5000);
-                System.out.println(selectorRequisitosSesion);
-                System.out.println(seleccionadosSesion);
-                //System.out.println(appSeleccionadaSesion.get(0));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
 
             if (seleccionadosSesion != null) {
                 if (selectorRequisitosSesion.equals("requisitosMinimos")){
                     componentesCompatiblesADevolver = (query != null)
                             ? this.servicioArmaTuPc.obtenerListaDeComponentesCompatiblesFiltradosDtoCustomRequisitosMinimos(tipoComponente, query, armadoPcDto, this.servicioArmaTuPc.obtenerMapaDeRequisitosMinimosSeleccionados(seleccionadosSesion))
                             : this.servicioArmaTuPc.obtenerListaDeComponentesCompatiblesDtoCustomRequisitosMinimos(tipoComponente, armadoPcDto, this.servicioArmaTuPc.obtenerMapaDeRequisitosMinimosSeleccionados(seleccionadosSesion));
+                    model.put("mapaRequisitos", this.servicioArmaTuPc.obtenerMapaDeRequisitosMinimosSeleccionados(seleccionadosSesion));
                 } else {
                     componentesCompatiblesADevolver = (query != null)
                             ? this.servicioArmaTuPc.obtenerListaDeComponentesCompatiblesFiltradosDtoCustomRequisitosRecomendados(tipoComponente, query, armadoPcDto, this.servicioArmaTuPc.obtenerMapaDeRequisitosRecomendadosSeleccionados(seleccionadosSesion))
                             : this.servicioArmaTuPc.obtenerListaDeComponentesCompatiblesDtoCustomRequisitosRecomendados(tipoComponente, armadoPcDto, this.servicioArmaTuPc.obtenerMapaDeRequisitosRecomendadosSeleccionados(seleccionadosSesion));
-                    try {
-                        // Pausa de 5 segundos (5,000 milisegundos)
-                        Thread.sleep(5000);
-                        System.out.println(componentesCompatiblesADevolver);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                    model.put("mapaRequisitos", this.servicioArmaTuPc.obtenerMapaDeRequisitosRecomendadosSeleccionados(seleccionadosSesion));
                 }
             } else {
                 return new ModelAndView("redirect:/index");
@@ -335,6 +316,18 @@ public class ControladorArmaTuPc {
         return obtenerPasoSiguiente(tipoComponente);
     }
 
+    @RequestMapping(path = "arma-tu-pc/custom/resumen", method = RequestMethod.GET)
+    public ModelAndView obtenerResumenCustom(HttpSession session) {
+        ModelMap model = new ModelMap();
+
+        ArmadoPcDto armadoPcDto = obtenerArmadoPcDtoDeLaSession(session);
+
+        if(this.servicioArmaTuPc.armadoCompleto(armadoPcDto)) model.put("armadoPcDto", armadoPcDto);
+        else model.put("errorResumen", "Seleccione almenos un motherboard, cpu, cooler y gabinete para obtener su armado");
+
+        return new ModelAndView("arma-tu-pc/custom/resumen", model);
+    }
+
     @RequestMapping(path = "arma-tu-pc/tradicional/resumen", method = RequestMethod.GET)
     public ModelAndView obtenerResumen(HttpSession session) {
         ModelMap model = new ModelMap();
@@ -383,7 +376,9 @@ public class ControladorArmaTuPc {
     }
 
     @GetMapping("/arma-tu-pc/armadoCustom")
-    public String seleccionCustom() {
+    public String seleccionCustom(HttpSession sesion) {
+        sesion.removeAttribute("selectorRequisitos");
+        sesion.removeAttribute("appSeleccionada");
         return "arma-tu-pc/armadoCustom";
     }
 

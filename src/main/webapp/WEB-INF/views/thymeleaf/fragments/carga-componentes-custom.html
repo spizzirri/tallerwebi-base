@@ -7,6 +7,16 @@
         <p th:if="${param.agregado!=null}" th:text="${param.agregado}" class="alert alert-success banners-info"></p>
         <p th:if="${param.quitado!=null}" th:text="${param.quitado}" class="alert alert-warning banners-info"></p>
         <div class="row">
+
+            <div>
+                <p>En base a la eleccion de rendimiento y de Programas/Juegos que hiciste, aca te dejamos nuestra recomendacion de componentes</p>
+                <button th:text="'Procesador AMD ' + ${mapaRequisitos['ProcesadorAMD'].intValue()}"></button>
+                <button th:text="'Procesador Intel ' + ${mapaRequisitos['ProcesadorINTEL'].intValue()}"></button>
+                <button th:text="'Memoria RAM ' + ${mapaRequisitos['RAM'].intValue()} + ' GB'"></button>
+                <button th:text="'Memoria VRAM ' + ${mapaRequisitos['GPU'].intValue()} + ' GB'"></button>
+                <button th:text="'Espacio en Disco ' + ${mapaRequisitos['EspacioDisco'].intValue()} + ' GB'"></button>
+            </div>
+
             <!-- Sidebar -->
             <div class="col-lg-4 mb-3">
                 <div class="border rounded p-2 bg-white mb-3">
