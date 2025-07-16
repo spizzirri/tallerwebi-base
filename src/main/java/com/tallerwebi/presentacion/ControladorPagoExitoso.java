@@ -3,6 +3,7 @@ package com.tallerwebi.presentacion;
 import com.tallerwebi.dominio.ServicioCompra;
 import com.tallerwebi.dominio.ServicioDeEnviosImpl;
 import com.tallerwebi.dominio.entidades.Compra;
+import com.tallerwebi.dominio.entidades.CompraComponente;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,11 +37,12 @@ public class ControladorPagoExitoso {
         model.put("tarjeta", session.getAttribute("tarjeta"));
         model.put("tiempo", session.getAttribute("tiempo"));
         model.put("destino", session.getAttribute("destino"));
-        model.put("totalCompraEnPesos", session.getAttribute("totalCompraEnPesos"));
+        model.put("moneda", session.getAttribute("moneda"));
+
         model.put("totalCompraEnDolares", session.getAttribute("totalCompraEnDolares"));
 
         model.put("comprasUsuario", comprasUsuario);
 
-        return new ModelAndView("pagoExitoso",model);
+        return new ModelAndView("pagoExitoso", model);
     }
 }

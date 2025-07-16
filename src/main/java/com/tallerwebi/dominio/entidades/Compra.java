@@ -40,6 +40,12 @@ public class Compra {
     @OneToMany(mappedBy = "compra", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CompraComponente> productosComprados = new ArrayList<>();
 
+    @Column(length = 20)
+    private String moneda;
+
+    @Column(length = 100)
+    private Double totalDolar;
+
     public void setIdCompra(Long idCompra) {
         this.idCompra = idCompra;
     }
@@ -110,5 +116,21 @@ public class Compra {
 
     public Double getCostoDeEnvio() {
         return costoDeEnvio;
+    }
+
+    public void setMoneda(String moneda) {
+        this.moneda = moneda;
+    }
+
+    public String getMoneda() {
+        return moneda;
+    }
+
+    public void setTotalDolar(Double totalDolar) {
+        this.totalDolar = totalDolar;
+    }
+
+    public Double getTotalDolar() {
+        return totalDolar;
     }
 }

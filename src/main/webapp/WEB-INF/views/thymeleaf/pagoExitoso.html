@@ -10,7 +10,7 @@
         }
 
         .exito-container {
-            max-width: 800px;
+            max-width: 1200px;
             margin: 40px auto;
             background: #fff;
             border-radius: 14px;
@@ -163,8 +163,11 @@
                                                     <small class="text-muted">x<span
                                                             th:text="${producto.cantidad}"></span></small>
                                                     <br>
-                                                    <small class="text-success">
+                                                    <small class="text-success" th:if="${compra.moneda == null || compra.moneda == 'pesos'}">
                                                         <span th:text="'$' + ${#numbers.formatDecimal(producto.precioUnitario, 1, 'POINT', 2, 'COMMA')}"></span>
+                                                    </small>
+                                                    <small class="text-success" th:if="${compra.moneda == 'dolares'}">
+                                                        <span th:text="'USD $' + ${producto.precioDolar}"></span>
                                                     </small>
                                                 </div>
                                             </div>
@@ -180,35 +183,34 @@
                                 </div>
                             </div>
 
-                            <div class="exito-resumen">
-                                <div class="exito-resumen-row">
-                                    <div class="exito-resumen-col" th:if="${formaEntrega == 'envio'}">
+                            <div class="exito-resumen container">
+                                <div class="row">
+
+                                    <div class="col-md-4 mb-3" th:if="${formaEntrega == 'envio'}">
                                         <div class="entrega-item"><b>Entrega</b></div>
                                         <div class="entrega-item">Entrega estimada: <span th:text="${tiempo}"></span>
                                         </div>
                                         <div th:text="${destino}" style="white-space: nowrap;"></div>
                                     </div>
-                                    <div class="exito-resumen-col" th:if="${formaEntrega == 'retiro'}">
+
+                                    <div class="col-md-4 mb-3" th:if="${formaEntrega == 'retiro'}">
                                         <b>Entrega</b><br>
                                         <div>Retiro en depósito</div>
                                         <div>Av. Gamer 123, CABA</div>
                                     </div>
-                                    <div class="exito-resumen-col">
+
+                                    <div class="col-md-4 mb-3">
                                         Metodo de pago:
-                                        <span class="badge bg-secondary mb-2">
+                                        <span class="badge bg-secondary mb-2 w-100 d-block text-center">
                                             <i class="bi bi-credit-card me-1"></i>
-                                                <span th:if="${compra.metodoDePago == 'tarjetaCredito'}">Tarjeta de crédito</span>
-                                                <span th:if="${compra.metodoDePago == 'mercadoPago'}">Mercado Pago</span>
-                                                <span th:if="${compra.metodoDePago == 'efectivo'}">Efectivo</span>
-                                            <br>
-                                            <br>
-                                            <span th:if="${tarjeta != null}"
-                                                  th:text="' **** ' + ${#strings.substring(tarjeta.numeroDeTarjeta, tarjeta.numeroDeTarjeta.length() - 4)}">
-                                            </span>
-                                            <span th:if="${tarjeta == null}"></span>
+                                            <span th:if="${compra.metodoDePago == 'tarjetaCredito'}">Tarjeta de crédito</span>
+                                            <span th:if="${compra.metodoDePago == 'mercadoPago'}">Mercado Pago</span>
+                                            <span th:if="${compra.metodoDePago == 'efectivo'}">Efectivo</span>
+                                            <span th:if="${tarjeta != null}" th:text="' **** ' + ${#strings.substring(tarjeta.numeroDeTarjeta, tarjeta.numeroDeTarjeta.length() - 4)}"></span>
                                         </span>
                                     </div>
-                                    <div class="exito-resumen-col">
+
+                                    <div class="col-md-4 mb-3">
                                         <b>Resumen</b><br>
                                         <div th:if="${formaEntrega == 'envio'}">
                                             Valor envío: <span
@@ -217,15 +219,13 @@
                                         </div>
                                         <hr style="margin: 8px 0;">
                                         <b>Total</b>:
-                                        <span th:if="${moneda == 'pesos'}"
-                                            th:text="'$' + ${#numbers.formatDecimal(compra.total, 1, 'POINT', 2, 'COMMA')}"
-                                            style="float:right; color:#1976d2; font-size:1.1em;">
-                                        </span>
-                                        <span th:if="${moneda == 'dolares'}"
+                                        <span th:if="${compra.moneda == null || compra.moneda == 'pesos'}"
                                               th:text="'$' + ${#numbers.formatDecimal(compra.total, 1, 'POINT', 2, 'COMMA')}"
-                                              style="float:right; color:#1976d2; font-size:1.1em;">
-                                        </span>
+                                              style="float:right; color:#1976d2; font-size:1.1em;"></span>
+                                        <span th:if="${compra.moneda == 'dolares'}" th:text="'$' + ${compra.totalDolar}"
+                                              style="float:right; color:#1976d2; font-size:1.1em;"></span>
                                     </div>
+
                                 </div>
                             </div>
                         </div>
@@ -234,10 +234,14 @@
             </div>
         </div>
     </div>
+
+    <div class="d-flex justify-content-center gap-3">
+        <a th:href="@{/index.html}" class="btn btn-primary mt-3 col-md-4">Volver al inicio</a>
+        <button class="btn btn-primary mt-3 col-md-4" id="btn-imprimir">Exportar PDF</button>
+    </div>
 </div>
-<a th:href="@{/index.html}" class="exito-volver">Volver al inicio</a>
-<button class="btn btn-primary mt-3 col-md-4" id="btn-imprimir">Exportar PDF</button>
-</div>
+
+
 <div th:replace="fragments/fragments :: footer"></div>
 <!-- FontAwesome para el icono de check -->
 <link rel="stylesheet"

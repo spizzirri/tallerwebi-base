@@ -46,6 +46,9 @@ public class ServicioCompraImpl implements ServicioCompra {
         compraEntidad.setCp(compradto.getCp());
         compraEntidad.setFormaEntrega(compradto.getFormaEntrega());
         compraEntidad.setCostoDeEnvio(compradto.getCostoDeEnvio());
+        compraEntidad.setMoneda(compradto.getMoneda());
+        compraEntidad.setTotalDolar(compradto.getTotalDolar());
+
 
         this.repositorioCompra.guardarCompraDeUsuario(compraEntidad);
 
@@ -82,6 +85,7 @@ public class ServicioCompraImpl implements ServicioCompra {
 
         compraComponenteEntidad.setCantidad(dtoComponente.getCantidad());
         compraComponenteEntidad.setPrecioUnitario(dtoComponente.getPrecioUnitario());
+        compraComponenteEntidad.setPrecioDolar(dtoComponente.getPrecioDolar());
         compraComponenteEntidad.setEsArmado(dtoComponente.getEsArmado());
         compraComponenteEntidad.setNumeroDeArmado(dtoComponente.getNumeroDeArmado());
 

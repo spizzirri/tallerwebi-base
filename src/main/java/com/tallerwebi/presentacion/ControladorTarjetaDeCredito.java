@@ -50,6 +50,7 @@ public class ControladorTarjetaDeCredito {
                                 @RequestParam String vencimiento,
                                 @RequestParam String codigoSeguridad,
                                 @RequestParam String metodoDePago,
+                                @RequestParam String moneda,
                                 HttpSession session) {
 
         ModelMap modelo = new ModelMap();
@@ -81,6 +82,7 @@ public class ControladorTarjetaDeCredito {
             UsuarioDto usuarioLogueado = (UsuarioDto) session.getAttribute("usuario");
 
             List<ProductoCarritoDto> carritoSesion = obtenerCarritoDeSesion(session);
+            session.setAttribute("moneda", moneda);
 
             Double totalCompraEnDolares = this.servicioProductoCarrito.calcularValorTotalDeLosProductos();
             Double totalCompraEnPesos = this.servicioPrecios.conversionDolarAPesoDouble(totalCompraEnDolares);
@@ -92,6 +94,8 @@ public class ControladorTarjetaDeCredito {
             compraDto.setProductosComprados(convertirACompraComponenteDto(carritoSesion));
             compraDto.setFormaEntrega((String) session.getAttribute("formaEntrega"));
             compraDto.setCostoDeEnvio((Double) session.getAttribute("costo"));
+            compraDto.setMoneda(moneda);
+            compraDto.setTotalDolar(totalCompraEnDolares);
 
             servicioCompra.guardarCompraConUsuarioLogueado(compraDto, usuarioLogueado, session );
             servicioProductoCarrito.limpiarCarrito();
@@ -114,6 +118,7 @@ public class ControladorTarjetaDeCredito {
             compraComponenteDto.setCantidad(productosCarrito.getCantidad());
             Double precioEnPesos = this.servicioPrecios.conversionDolarAPesoDouble(productosCarrito.getPrecio() * productosCarrito.getCantidad());
             compraComponenteDto.setPrecioUnitario(precioEnPesos);
+            compraComponenteDto.setPrecioDolar(productosCarrito.getPrecio() * productosCarrito.getCantidad());
             compraComponenteDto.setId(productosCarrito.getId());
 
             if (productosCarrito instanceof ProductoCarritoArmadoDto){
@@ -133,9 +138,6 @@ public class ControladorTarjetaDeCredito {
         ModelMap modelo = new ModelMap();
         Double totalCompraEnDolares = this.servicioProductoCarrito.calcularValorTotalDeLosProductos();
         Double totalCompraEnPesos = this.servicioPrecios.conversionDolarAPesoDouble(totalCompraEnDolares);
-        session.setAttribute("totalCompraEnPesos", totalCompraEnPesos);
-        session.setAttribute("totalCompraEnDolares", totalCompraEnDolares);
-
         modelo.put("precioDolar", this.servicioPrecios.obtenerPrecioFormateado(totalCompraEnDolares));
         modelo.put("precioPesos", totalCompraEnPesos);
         return new ModelAndView("tarjetaDeCredito", modelo);
