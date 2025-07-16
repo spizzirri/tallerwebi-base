@@ -22,8 +22,6 @@ public class ControladorTarjetaDeCreditoTest {
     @Mock
     private ServicioTarjetaDeCredito servicioTarjetaMock;
     @Mock
-    private ServicioProductoCarritoImpl productoServiceMock;
-    @Mock
     private ServicioCompra servicioCompraMock;
     @Mock
     private ServicioProductoCarritoImpl servicioProductoCarritoMock;
@@ -38,7 +36,7 @@ public class ControladorTarjetaDeCreditoTest {
     @BeforeEach
     public void init() {
         MockitoAnnotations.openMocks(this);
-        controladorTarjetaDeCredito = new ControladorTarjetaDeCredito(servicioTarjetaMock, productoServiceMock, servicioCompraMock, servicioProductoCarritoMock, servicioPreciosMock);
+        controladorTarjetaDeCredito = new ControladorTarjetaDeCredito(servicioTarjetaMock, servicioCompraMock, servicioProductoCarritoMock, servicioPreciosMock);
 
     }
 

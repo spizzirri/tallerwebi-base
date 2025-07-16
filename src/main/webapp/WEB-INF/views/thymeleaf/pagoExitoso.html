@@ -123,47 +123,6 @@
             </div>
             <div class="exito-titulo">Gracias por tu compra!</div>
             <div class="exito-sub">Tu solicitud de compra fue recibida</div>
-            <!--                Quiero hacer como la lista del carrito pero todavia no salio &#45;&#45; A mejorar-->
-            <!--            <div class="card mb-4" th:if="${comprasUsuario != null && !comprasUsuario.isEmpty()}">-->
-            <!--                <div th:if="${compra.productosComprados != null && !compra.productosComprados.isEmpty()}">-->
-            <!--                    <h3 class="card-title m-3">Productos</h3>-->
-            <!--                    <div class="card-body" th:each="compra : ${comprasUsuario}">-->
-            <!--                        <h5 class="mb-0">-->
-            <!--                            <i class="bi bi-calendar3"></i>-->
-            <!--                            <span th:text="${compra.fecha}"></span>-->
-            <!--                        </h5>-->
-            <!--                        <div class="mb-3">-->
-            <!--                                <span class="badge bg-secondary mb-2">-->
-            <!--                                    <i class="bi bi-credit-card me-1"></i>-->
-            <!--                                    <span th:text="${compra.metodoDePago}"></span>-->
-            <!--                                </span>-->
-            <!--                        </div>-->
-            <!--                        <table class="table vista-carrito">-->
-            <!--                            <thead>-->
-            <!--                            <tr class="text-center">-->
-            <!--                                <th scope="col">Foto</th>-->
-            <!--                                <th scope="col">Nombre</th>-->
-            <!--                                <th scope="col">Precio</th>-->
-            <!--                                <th scope="col">Cantidad</th>-->
-            <!--                            </tr>-->
-            <!--                            </thead>-->
-            <!--                            <tbody>-->
-            <!--                            <tr th:each="producto : ${compra.productosComprados}" class="text-center">-->
-
-            <!--                                <td><img th:src="'http://www.imagenestaller.free.nf/' + ${producto.urlImagen}"-->
-            <!--                                         style="height: 30px; width: 30px"></td>-->
-            <!--                                <td th:text="${producto.nombre}"></td>-->
-
-
-            <!--                                <td class="precioTotalDelProducto"-->
-            <!--                                    th:text="'$' + ${#numbers.formatDecimal(producto.precioUnitario, 1, 'POINT', 2, 'COMMA')}"></td>-->
-            <!--                                <td class="text-muted">x<span th:text="${producto.cantidad}"></span></td>-->
-            <!--                            </tr>-->
-            <!--                            </tbody>-->
-            <!--                        </table>-->
-
-            <!--                </div>-->
-            <!--        div viejo y andando debajo-->
             <div th:if="${comprasUsuario != null && !comprasUsuario.isEmpty()}">
                 <div class="row g-4">
                     <div class="col-12 col-lg-10 mx-auto" th:each="compra : ${comprasUsuario}">
@@ -173,6 +132,11 @@
                                     <i class="bi bi-calendar3"></i>
                                     <span th:text="${compra.fecha.toLocalDate()}"></span>
                                 </h5>
+
+                                <div th:if="${compra.metodoDePago == 'efectivo'}" class="text-nowrap small">
+                                    El pago debe recibirse en los proximos diez días habiles o la compra sera cancelada
+                                </div>
+
                             </div>
                             <div class="card-body">
                                 <div th:if="${compra.productosComprados != null && !compra.productosComprados.isEmpty()}">
@@ -234,10 +198,13 @@
                                         <span class="badge bg-secondary mb-2">
                                             <i class="bi bi-credit-card me-1"></i>
                                                 <span th:if="${compra.metodoDePago == 'tarjetaCredito'}">Tarjeta de crédito</span>
-                                                <span th:if="${compra.metodoDePago == 'mercadoPago'}">Mercado Pago</span>                                            <br>
+                                                <span th:if="${compra.metodoDePago == 'mercadoPago'}">Mercado Pago</span>
+                                                <span th:if="${compra.metodoDePago == 'efectivo'}">Efectivo</span>
+                                            <br>
+                                            <br>
                                             <span th:if="${tarjeta != null}"
                                                   th:text="' **** ' + ${#strings.substring(tarjeta.numeroDeTarjeta, tarjeta.numeroDeTarjeta.length() - 4)}"></span>
-                                            <span th:if="${tarjeta == null}">No disponible</span>
+                                            <span th:if="${tarjeta == null}"> </span>
                                         </span>
                                     </div>
                                     <div class="exito-resumen-col">

@@ -38,8 +38,6 @@ public class ControladorCarritoTest {
     @Mock
     private HttpSession httpSessionMock;
     @Mock
-    private ServicioCompraImpl servicioCompraMock;
-    @Mock
     private ProductoCarritoArmadoDto productoCarritoArmadoDto;
 
     private CarritoController carritoController;
@@ -48,7 +46,7 @@ public class ControladorCarritoTest {
     @BeforeEach
     public void init() {
         MockitoAnnotations.openMocks(this);
-        carritoController = new CarritoController(servicioProductoCarritoImplMock, servicioEnviosMock, servicioPreciosMock, servicioCompraMock);
+        carritoController = new CarritoController(servicioProductoCarritoImplMock, servicioEnviosMock, servicioPreciosMock);
         carritoSesion = new ArrayList<>();
 
     }

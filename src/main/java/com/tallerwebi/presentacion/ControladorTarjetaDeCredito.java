@@ -31,18 +31,15 @@ public class ControladorTarjetaDeCredito {
     @Autowired
     ServicioTarjetaDeCredito servicioTarjeta;
     @Autowired
-    ServicioProductoCarritoImpl servicioProductoCarritoImpl;
     private ServicioProductoCarritoImpl servicioProductoCarrito;
     private ServicioCompra servicioCompra;
     private ServicioPrecios servicioPrecios;
 
     public ControladorTarjetaDeCredito(ServicioTarjetaDeCredito servicioTarjeta,
-                                       ServicioProductoCarritoImpl  servicioProductoCarritoImpl,
                                        ServicioCompra servicioCompra,
                                        ServicioProductoCarritoImpl servicioProductoCarrito,
                                        ServicioPrecios servicioPrecios) {
         this.servicioTarjeta = servicioTarjeta;
-        this.servicioProductoCarritoImpl = servicioProductoCarritoImpl;
         this.servicioCompra = servicioCompra;
         this.servicioProductoCarrito = servicioProductoCarrito;
         this.servicioPrecios = servicioPrecios;
@@ -81,9 +78,6 @@ public class ControladorTarjetaDeCredito {
         if (hayError) {
             return new ModelAndView("tarjetaDeCredito", modelo);
         } else {
-            String fechaCompra = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
-            modelo.addAttribute("fechaCompra", fechaCompra);
-
             UsuarioDto usuarioLogueado = (UsuarioDto) session.getAttribute("usuario");
 
             List<ProductoCarritoDto> carritoSesion = obtenerCarritoDeSesion(session);
@@ -100,7 +94,7 @@ public class ControladorTarjetaDeCredito {
             compraDto.setCostoDeEnvio((Double) session.getAttribute("costo"));
 
             servicioCompra.guardarCompraConUsuarioLogueado(compraDto, usuarioLogueado, session );
-            servicioProductoCarritoImpl.limpiarCarrito();
+            servicioProductoCarrito.limpiarCarrito();
             return new ModelAndView("redirect:/pagoExitoso");
         }
     }
@@ -138,5 +132,12 @@ public class ControladorTarjetaDeCredito {
     public ModelAndView mostrarFormularioTarjeta() {
         ModelMap modelo = new ModelMap();
         return new ModelAndView("tarjetaDeCredito", modelo);
+    }
+
+    @GetMapping("/efectivo")
+    public ModelAndView mostrarPagoExitosoEfectivo() {
+        ModelMap modelo = new ModelMap();
+
+        return new ModelAndView("pagoExitoso", modelo);
     }
 }

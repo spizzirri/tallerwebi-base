@@ -9,21 +9,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
 public class ControladorPagoExitoso {
 
     private ServicioCompra servicioCompra;
-    private ServicioDeEnviosImpl servicioDeEnvios;
 
-    public ControladorPagoExitoso(ServicioCompra servicioCompra, ServicioDeEnviosImpl servicioDeEnvios) {
+    public ControladorPagoExitoso(ServicioCompra servicioCompra) {
         this.servicioCompra = servicioCompra;
-        this.servicioDeEnvios = servicioDeEnvios;
     }
 
     @GetMapping("/pagoExitoso")
