@@ -99,6 +99,53 @@
             color: #fff;
         }
 
+        /*#factura-imprimible {*/
+        /*    width: 794px; !* Ancho de A4 en px a 96dpi *!*/
+        /*    margin: auto;*/
+        /*    background: white;*/
+        /*    padding: 32px;*/
+        /*}*/
+
+        .factura-body {
+            width: 21cm;
+            min-height: 27cm;
+            max-height: 29.7cm;
+            font-size: 13px;
+            background-color: white;
+            color: black;
+            padding: 10px;
+            margin: auto;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        .wrapper {
+            border: 1.5px solid #333;
+            padding: 5px;
+        }
+
+        .text-left { text-align: left; }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .bold { font-weight: bold; }
+        .italic { font-style: italic; }
+        .inline-block { display: inline-block; }
+        .flex { display: flex; flex-wrap: wrap; }
+        .no-margin { margin: 0; }
+        .relative { position: relative; }
+        .floating-mid {
+            left: 0; right: 0; margin-left: auto; margin-right: auto;
+            width: 75px; position: absolute; top: 1px; background: #fff;
+        }
+        .space-around { justify-content: space-around; }
+        .space-between { justify-content: space-between; }
+        .w50 { width: 50%; }
+        th { border: 1px solid #000; background: #ccc; padding: 5px; }
+        td { padding: 5px; font-size: 11px; }
+        table { border-collapse: collapse; width: 100%; }
+        .text-20 { font-size: 20px; }
+
+
         @media (max-width: 900px) {
             .exito-container {
                 padding: 18px 4px;
@@ -163,7 +210,8 @@
                                                     <small class="text-muted">x<span
                                                             th:text="${producto.cantidad}"></span></small>
                                                     <br>
-                                                    <small class="text-success" th:if="${compra.moneda == null || compra.moneda == 'pesos'}">
+                                                    <small class="text-success"
+                                                           th:if="${compra.moneda == null || compra.moneda == 'pesos'}">
                                                         <span th:text="'$' + ${#numbers.formatDecimal(producto.precioUnitario, 1, 'POINT', 2, 'COMMA')}"></span>
                                                     </small>
                                                     <small class="text-success" th:if="${compra.moneda == 'dolares'}">
@@ -206,7 +254,8 @@
                                             <span th:if="${compra.metodoDePago == 'tarjetaCredito'}">Tarjeta de crédito</span>
                                             <span th:if="${compra.metodoDePago == 'mercadoPago'}">Mercado Pago</span>
                                             <span th:if="${compra.metodoDePago == 'efectivo'}">Efectivo</span>
-                                            <span th:if="${tarjeta != null}" th:text="' **** ' + ${#strings.substring(tarjeta.numeroDeTarjeta, tarjeta.numeroDeTarjeta.length() - 4)}"></span>
+                                            <span th:if="${tarjeta != null}"
+                                                  th:text="' **** ' + ${#strings.substring(tarjeta.numeroDeTarjeta, tarjeta.numeroDeTarjeta.length() - 4)}"></span>
                                         </span>
                                     </div>
 
@@ -217,14 +266,16 @@
                                                 th:text="'$' + ${#numbers.formatDecimal(compra.costoDeEnvio, 1, 'POINT', 2, 'COMMA')}"
                                                 style="float:right"></span>
                                             <br>
-                                            <p th:if="${compra.moneda == 'dolares'}">Precio de envio sujeto a Andreani</p>
+                                            <p th:if="${compra.moneda == 'dolares'}">Precio de envio sujeto a
+                                                Andreani</p>
                                         </div>
                                         <hr style="margin: 8px 0;">
                                         <b>Total</b>:
                                         <span th:if="${compra.moneda == null || compra.moneda == 'pesos'}"
                                               th:text="'$' + ${#numbers.formatDecimal(compra.total, 1, 'POINT', 2, 'COMMA')}"
                                               style="float:right; color:#1976d2; font-size:1.1em;"></span>
-                                        <span th:if="${compra.moneda == 'dolares'}" th:text="'USD $' + ${compra.totalDolar}"
+                                        <span th:if="${compra.moneda == 'dolares'}"
+                                              th:text="'USD $' + ${compra.totalDolar}"
                                               style="float:right; color:#1976d2; font-size:1.1em;"></span>
                                     </div>
 
@@ -244,10 +295,162 @@
 </div>
 
 
-<div th:replace="fragments/fragments :: footer"></div>
-<!-- FontAwesome para el icono de check -->
-<link rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <!-- FACTURA C PARA IMPRIMIR (invisible) -->
+<!--    <div id="factura-imprimible" style="display: none;">-->
+
+<!--            <div style="padding: 40px; font-family: sans-serif; max-width: 800px; margin: auto;"-->
+<!--                 th:each="compra : ${comprasUsuario}">-->
+<!--                <h1 style="text-align: center;">Factura C</h1>-->
+<!--                <hr>-->
+<!--                <p><strong>Fecha:</strong> <span th:text="${compra.fecha.toLocalDate()}"></span></p>-->
+<!--                <p><strong>Número de factura:</strong> <span th:text="'FC-000' + ${compra.idCompra}"></span></p>-->
+<!--                <p><strong>Cliente:</strong> <span th:text="${compra.nombreTitular}"></span></p>-->
+<!--                <p><strong>CUIT/DNI:</strong> <span th:text="${compra.documento}"></span></p>-->
+<!--                <hr>-->
+<!--                <h3>Detalle de productos</h3>-->
+<!--                <table style="width: 100%; border-collapse: collapse;" border="1">-->
+<!--                    <thead>-->
+<!--                    <tr>-->
+<!--                        <th>Producto</th>-->
+<!--                        <th>Cantidad</th>-->
+<!--                        <th>Precio Unitario</th>-->
+<!--                        <th>Total</th>-->
+<!--                    </tr>-->
+<!--                    </thead>-->
+<!--                    <tbody>-->
+<!--                    <tr th:each="producto : ${compra.productosComprados}">-->
+<!--                        <td th:text="${producto.componente.nombre}"></td>-->
+<!--                        <td th:text="${producto.cantidad}"></td>-->
+<!--                        <td th:text="'$' + ${#numbers.formatDecimal(producto.precioUnitario, 1, 'POINT', 2, 'COMMA')}"></td>-->
+<!--                        <td th:text="'$' + ${#numbers.formatDecimal(producto.precioUnitario * producto.cantidad, 1, 'POINT', 2, 'COMMA')}"></td>-->
+<!--                    </tr>-->
+<!--                    </tbody>-->
+<!--                </table>-->
+<!--                <hr>-->
+<!--                <p style="text-align: right;"><strong>Total:</strong> -->
+<!--                      <span  th:text="'$' + ${#numbers.formatDecimal(compra.total, 1, 'POINT', 2, 'COMMA')}"></span></p>-->
+<!--                <p style="text-align: right;"><strong>Condición frente al IVA:</strong> Monotributista</p>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+
+
+
+
+
+<div id="factura-imprimible" style="display: none;">
+    <div class="factura-body" th:if="${comprasUsuario != null && !comprasUsuario.isEmpty()}">
+    <div th:each="compra : ${comprasUsuario}">
+        <div class="wrapper text-center bold text-20" style="width:100%;border-bottom: 0;">
+            ORIGINAL
+        </div>
+
+        <div class="flex relative" >
+            <div class="wrapper inline-block w50 flex" style="border-right: 0">
+                    <h3 class="text-center" style="font-size:24px;margin-bottom: 3px;width: 100%;">COMPRA GAMER 2</h3>
+                <p style="font-size: 13px;line-height: 1.5;margin-bottom: 0;align-self: flex-end;">
+                    <b>Razón Social:</b> Compra Gamer 2
+                    <br><b>Domicilio Comercial:</b> Av. Gamer 123 - CABA
+                    <br><b>Condición frente al IVA: Responsable Monotributo</b>
+                </p>
+            </div>
+            <div class="wrapper inline-block w50">
+                <h3 class="text-center" style="font-size:24px;margin-bottom: 3px;">FACTURA</h3>
+                <p style="font-size: 13px;line-height: 1.5;margin-bottom: 0;">
+                    <b>Punto de Venta: 00001 Comp. Nro: <span th:text="'FC-000' + ${compra.idCompra}"></span></b>
+                    <br><b>Fecha de Emisión: <span th:text="${compra.fecha.toLocalDate()}"></span></b>
+                    <br><b>CUIT:</b> 20-38052312-0
+                    <br><b>Ingresos Brutos:</b> Exento
+                    <br><b>Fecha de Inicio de Actividades:</b> 18/04/2023
+                </p>
+            </div>
+            <div class="wrapper floating-mid">
+                <h3 class="no-margin text-center" style="font-size: 36px;">C</h3>
+                <h5 class="no-margin text-center">COD. 007</h5>
+            </div>
+        </div>
+
+        <div class="wrapper flex space-around" style="margin-top: 1px;">
+            <span><b>Período Facturado Desde:</b> 01/01/2025</span>
+            <span><b>Hasta:</b> 01/01/2026</span>
+
+        </div>
+
+        <div class="wrapper" style="margin-top: 2px;font-size: 12px;">
+            <div class="flex" style="margin-bottom: 15px;">
+                <span style="width:30%"><b>CUIT: </b><span th:text="${compra.documento}"></span></span>
+                <span><b>Apellido y Nombre / Razón Social: </b><span th:text="${compra.nombreTitular}"></span></span>
+            </div>
+            <div class="flex" style="flex-wrap: nowrap;margin-bottom: 5px;">
+                <span style="width:70%"><b>Condición frente al IVA:</b> <span th:text="${iva}"></span></span>
+                <span><b>Domicilio:</b> Av.Rivadavia 9851 - Capital Federal, Ciudad de Buenos Aires</span>
+            </div>
+        </div>
+
+        <table style="margin-top: 5px;">
+            <thead>
+
+            <th class="text-left">Producto</th>
+            <th>Cantidad</th>
+            <th>Precio Unit.</th>
+<!--            <th>% Bonif</th>-->
+<!--            <th>Subtotal</th>-->
+<!--            <th>Alicuota IVA</th>-->
+            <th>Total</th>
+            </thead>
+            <tbody>
+            <tr th:each="producto : ${compra.productosComprados}">
+
+                <td th:text="${producto.componente.nombre}" class="text-left"></td>
+                <td th:text="${producto.cantidad}" class="text-right"></td>
+                <td th:text="'$' + ${#numbers.formatDecimal(producto.precioUnitario, 1, 'POINT', 2, 'COMMA')}" class="text-right">100,00</td>
+<!--                <td class="text-center">0,00</td>-->
+<!--                <td class="text-center">100,00</td>-->
+<!--                <td class="text-right">1,21</td>-->
+                <td th:text="'$' + ${#numbers.formatDecimal(producto.precioUnitario * producto.cantidad, 1, 'POINT', 2, 'COMMA')}" class="text-right"></td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="footer" style="margin-top: 100px;">
+            <div class="flex wrapper space-between">
+                <div style="width:55%">
+
+                </div>
+                <div style="width:40%;margin-top: 40px;" class="flex wrapper">
+
+<!--                    <span class="text-right" style="width:60%"><b>IVA 21%: $</b></span><span class="text-right" style="width:40%"><b>0,00</b></span>-->
+<!--                  -->
+                    <span class="text-right" style="width:60%"><b>Importe Total: $</b></span><span class="text-right" style="width:40%"><b> <span  th:text="'$' + ${#numbers.formatDecimal(compra.total, 1, 'POINT', 2, 'COMMA')}"></span></b></span>
+                </div>
+            </div>
+
+            <div class="flex relative" style="margin-top: 20px;">
+                <div class="qr-container" style="padding: 0 20px 20px 20px;width: 20%;">
+                    <img th:src="@{/uploads/qrArca.png}" style="max-width: 100%;"></div>
+                <div style="padding-left: 10px;width: 45%;">
+                    <img th:src="@{/uploads/Arca-logo.png}" style="max-width:130px">
+                    <h4 class="italic bold">Comprobante Autorizado</h4>
+                    <p class="small italic bold" style="font-size: 9px;">Esta Administracion Federal no se responsabiliza por los datos ingresados en el detalle de la operacion</p>
+                </div>
+                <div class="flex" style="align-self: flex-start;width: 35%;">
+                    <span class="text-right" style="width:50%"><b>CAE N°:</b></span><span class="text-left" style="padding-left: 10px;">12345678901234</span>
+                    <span class="text-right" style="width:50%"><b>Fecha de Vto. de CAE:</b></span><span class="text-left" style="padding-left: 10px;">01/01/1930</span>
+                </div>
+                <span class="floating-mid bold">Pág 1/1</span>
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+
+
+
+    <div th:replace="fragments/fragments :: footer"></div>
+
+    <!-- FontAwesome para el icono de check -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 
 </body>
 </html>

@@ -41,7 +41,7 @@ public class ControladorPagoExitoso {
         model.put("moneda", session.getAttribute("moneda"));
 
         model.put("totalCompraEnDolares", session.getAttribute("totalCompraEnDolares"));
-
+        model.put("iva", session.getAttribute("iva"));
         model.put("comprasUsuario", comprasUsuario);
 
         return new ModelAndView("pagoExitoso", model);
