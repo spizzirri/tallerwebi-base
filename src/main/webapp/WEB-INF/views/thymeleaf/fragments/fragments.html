@@ -22,6 +22,7 @@
         <link rel="stylesheet" th:href="@{/css/fragments.css}">
         <link rel="stylesheet" th:href="@{/css/main.css}"/>
         <link rel="stylesheet" th:href="@{/css/historialDeCompras.css}"/>
+        <link rel="stylesheet" th:href="@{/css/arma-tu-pc.css}"/>
     </head>
 
     <body style="margin: 0px;padding: 0px;  min-height: 100vh">
@@ -154,7 +155,7 @@
                                 <td th:utext="${productoArmado.nombre} + '<br><b> Armado ' + ${productoArmado.numeroDeArmadoAlQuePertenece} + '</b>'"
                                     style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></td>
                                 <td class="precioTotalDelProducto" th:text="'$' + ${productoArmado.precioFormateado}"></td>
-                                <td class="text-center" th:data-id="${productoArmado.id}" th:data-numeroDeArmado="${productoArmado.numeroDeArmadoAlQuePertenece}">
+                                <td class="text-center" th:data-id="${productoArmado.id}" th:data-numeroDeArmado="${productoArmado.numeroDeArmadoAlQuePertenece}" th:data-esEscencial="${productoArmado.esEscencialParaElArmado}">
                                     <div class="d-flex justify-content-center align-items-center gap-2">
                                         <button type="button" class="btn btn-outline-secondary btn-sm btnRestarCantidad"
                                                 th:if="${productoArmado.precio > 0.0}">-

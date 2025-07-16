@@ -154,4 +154,17 @@ public class ServicioProductoCarritoImpl {
         return cantidadTotal;
     }
 
+    public List<ProductoCarritoArmadoDto> obtenerProductosCarritoArmadoDtoPorNumeroDeArmado(Integer numeroDeArmadoAlQuePertenece) {
+        List<ProductoCarritoArmadoDto> productosDelArmado = new ArrayList<>();
+
+        for (ProductoCarritoDto producto : this.productos) {
+            if(producto != null
+                    && producto instanceof ProductoCarritoArmadoDto
+                    && ((ProductoCarritoArmadoDto) producto).getNumeroDeArmadoAlQuePertenece().equals(numeroDeArmadoAlQuePertenece)){
+                productosDelArmado.add((ProductoCarritoArmadoDto) producto);
+            }
+        }
+
+        return productosDelArmado;
+    }
 }

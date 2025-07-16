@@ -44,6 +44,8 @@ public class ServicioCompraImpl implements ServicioCompra {
         compraEntidad.setTotal(compradto.getTotal());
         compraEntidad.setMetodoDePago(compradto.getMetodoDePago());
         compraEntidad.setCp(compradto.getCp());
+        compraEntidad.setFormaEntrega(compradto.getFormaEntrega());
+        compraEntidad.setCostoDeEnvio(compradto.getCostoDeEnvio());
 
         this.repositorioCompra.guardarCompraDeUsuario(compraEntidad);
 
@@ -55,26 +57,6 @@ public class ServicioCompraImpl implements ServicioCompra {
         }
     }
 
-    //    private CompraComponente getCompraComponente(CompraComponenteDto dtoComponente, Compra compraEntidad) {
-//        CompraComponente compraComponenteEntidad = new CompraComponente();
-//
-//        Componente componenteEntidad = new Componente();
-//        if (dtoComponente.getComponente() != null) {
-//            componenteEntidad.setId(dtoComponente.getComponente().getId());
-//            componenteEntidad.setImagenes(dtoComponente.g);
-//        } else {
-//            componenteEntidad.setId(dtoComponente.getId());
-//        }
-//        compraComponenteEntidad.setCompra(compraEntidad);
-//        compraComponenteEntidad.setComponente(componenteEntidad);
-//        compraComponenteEntidad.setCantidad(dtoComponente.getCantidad());
-//        compraComponenteEntidad.setPrecioUnitario(dtoComponente.getPrecioUnitario());
-//        compraComponenteEntidad.setEsArmado(dtoComponente.getEsArmado());
-//        compraComponenteEntidad.setNumeroDeArmado(dtoComponente.getNumeroDeArmado());
-//        compraComponenteEntidad.setUrlImagen(dtoComponente.getUrlImagen());
-//
-//        return compraComponenteEntidad;
-//    }
     private CompraComponente getCompraComponente(CompraComponenteDto dtoComponente, Compra compraEntidad) {
         CompraComponente compraComponenteEntidad = new CompraComponente();
 

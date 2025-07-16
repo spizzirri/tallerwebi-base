@@ -387,13 +387,11 @@ public class ControladorArmaTuPc {
             carritoSesion = new ArrayList<>();
         }
 
-        List<ProductoCarritoArmadoDto> productoCarritoArmadoDtos = this.obtenerReservaArmadoDeLaSession(session);
-
         Integer numeroDeUltimoArmadoEnElCarrito = obtenerElNumeroDelUltimoArmadoDelCarritoDeSesion(carritoSesion);
 
-        for (ProductoCarritoArmadoDto producto : productoCarritoArmadoDtos) // para que los armados se puedan distinguir entre ellos en el carrito y las compras
-            producto.setNumeroDeArmadoAlQuePertenece(numeroDeUltimoArmadoEnElCarrito + 1);
+        List<ProductoCarritoArmadoDto> productoCarritoArmadoDtos = this.obtenerReservaArmadoDeLaSession(session);
 
+        productoCarritoArmadoDtos = this.servicioArmaTuPc.configurarNumeroDeArmadoYEscencialidadAProductosCarritoArmadoDto(numeroDeUltimoArmadoEnElCarrito, productoCarritoArmadoDtos);
 
         carritoSesion.addAll(productoCarritoArmadoDtos);
 

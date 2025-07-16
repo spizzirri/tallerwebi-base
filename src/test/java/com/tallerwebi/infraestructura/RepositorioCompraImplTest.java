@@ -19,6 +19,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -56,7 +57,7 @@ public class RepositorioCompraImplTest {
 
         Compra compra = new Compra();
         compra.setIdUsuario(usuario);
-        compra.setFecha(LocalDate.now());
+        compra.setFecha(LocalDateTime.now());
         compra.setTotal(999.0);
         compra.setMetodoDePago("tarjetaCredito");
 

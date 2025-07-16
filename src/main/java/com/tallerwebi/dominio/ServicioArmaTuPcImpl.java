@@ -113,6 +113,30 @@ public class ServicioArmaTuPcImpl implements ServicioArmaTuPc {
     }
 
     @Override
+    public List<ProductoCarritoArmadoDto> configurarNumeroDeArmadoYEscencialidadAProductosCarritoArmadoDto(Integer numeroDeUltimoArmadoEnElCarrito, List<ProductoCarritoArmadoDto> productoCarritoArmadoDtos) {
+
+        for (ProductoCarritoArmadoDto producto : productoCarritoArmadoDtos){
+            producto.setNumeroDeArmadoAlQuePertenece(numeroDeUltimoArmadoEnElCarrito + 1); // para que los armados se puedan distinguir entre ellos en el carrito y las compras
+            producto.setEsEscencialParaElArmado(this.esTipoEscencialParaElArmado(producto.getTipoComponente()));
+        }
+
+        return productoCarritoArmadoDtos;
+    }
+
+    private Boolean esTipoEscencialParaElArmado(String tipoComponente) {
+        switch (tipoComponente) {
+            case "Procesador":
+            case "Motherboard":
+            case "CoolerCPU":
+            case "Gabinete":
+                return true;
+
+            default:
+                return false;
+        }
+    }
+
+    @Override
     public Set<ComponenteDto> obtenerListaDeComponentesCompatiblesDto(String tipoComponente, ArmadoPcDto armadoPcDto) throws ComponenteDeterminateDelArmadoEnNullException {
 
         String tablaDelTipoDeComponente = this.correspondenciaDeVistaConTablasEnLaBD.get(tipoComponente);

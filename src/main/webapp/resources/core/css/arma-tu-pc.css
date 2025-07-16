@@ -1,0 +1,14 @@
+.card {
+    min-height: 368px; /* Ajustá este valor según lo que necesites */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  
+  .card-img-top {
+    height: 180px; /* Ajustá la altura deseada */
+    object-fit: contain; /* O 'cover' si preferís recortar la imagen */
+    width: 100%;
+    background: #fff; /* Opcional: fondo blanco para imágenes transparentes */
+    padding: 10px;    /* Opcional: espacio alrededor de la imagen */
+  }

@@ -40,9 +40,11 @@
 
                         <td class="text-center" th:data-id="${producto.id}">
                             <div class="d-flex justify-content-center align-items-center gap-2">
-                                <button type="button" class="btn btn-outline-secondary btn-sm btnRestarCantidad">-</button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm btnRestarCantidad">-
+                                </button>
                                 <span th:text="${producto.cantidad}" class="mx-2 productoCantidad"></span>
-                                <button type="button" class="btn btn-outline-secondary btn-sm btnSumarCantidad">+</button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm btnSumarCantidad">+
+                                </button>
                                 <button type="button" th:data-id="${producto.id}"
                                         class="btn btn-outline-danger btn-sm ms-2 btnEliminarProducto">
                                     <i class="fa-solid fa-trash"></i>
@@ -58,7 +60,7 @@
                         <td th:utext="${productoArmado.nombre} + '<br><b> Armado ' + ${productoArmado.numeroDeArmadoAlQuePertenece} + '</b>'"></td>
                         <td class="precioTotalDelProducto" th:text="'$' + ${productoArmado.precioFormateado}"></td>
 
-                        <td class="text-center" th:data-id="${productoArmado.id}" th:data-numeroDeArmado="${productoArmado.numeroDeArmadoAlQuePertenece}">
+                        <td class="text-center" th:data-id="${productoArmado.id}" th:data-numeroDeArmado="${productoArmado.numeroDeArmadoAlQuePertenece}" th:data-esEscencial="${productoArmado.esEscencialParaElArmado}">
                             <div class="d-flex justify-content-center align-items-center gap-2">
                                 <button type="button" class="btn btn-outline-secondary btn-sm btnRestarCantidad"
                                         th:if="${productoArmado.precio > 0.0}">-
@@ -92,8 +94,22 @@
         <!-- SECCIÓN DE ENVÍO Y PAGO -->
         <div class="card">
             <div class="card-body p-4">
+                <div class="mb-4">
+                    <h3 class="card-title mb-3">¿Cómo querés recibir tu compra?</h3>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="tipoEntrega" id="retiro" value="retiro"
+                               checked>
+                        <label class="form-check-label" for="retiro">Retiro en depósito - Av. Gamer 123, CABA</label>
+                    </div>
 
-                <div class="mb-5">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="tipoEntrega" id="envio" value="envio">
+                        <label class="form-check-label" for="envio">Envío a correo</label>
+                    </div>
+
+                </div>
+
+                <div class="mb-5" id="seccion-envio" style="display: none;">
                     <h3 class="card-title mb-4">Envío</h3>
                     <form method="post" th:action="@{/carritoDeCompras/calcularEnvio}" id="formulario-envio">
                         <div class="row mb-3">
@@ -112,6 +128,7 @@
                                 </button>
                             </div>
                         </div>
+
 
                         <div id="loading" class="text-center mb-3 d-none">
                             <div class="spinner-border spinner-border-sm" role="status"></div>
@@ -157,6 +174,7 @@
                             <small th:text="${mensajeEnvio}"></small>
                         </div>
                     </form>
+
                 </div>
 
                 <hr class="my-5">

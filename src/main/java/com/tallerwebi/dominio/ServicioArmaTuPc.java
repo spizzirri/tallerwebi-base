@@ -45,6 +45,8 @@ public interface ServicioArmaTuPc {
     Integer obtenerSlotsSataDeMotherboard(ComponenteDto motherboard);
 
     Integer obtenerSlotsM2DeMotherboard(ComponenteDto motherboard);
+
+    List<ProductoCarritoArmadoDto> configurarNumeroDeArmadoYEscencialidadAProductosCarritoArmadoDto(Integer numeroDeUltimoArmadoEnElCarrito, List<ProductoCarritoArmadoDto> productoCarritoArmadoDtos);
     List<ComponenteDto> obtenerListaDeComponentesCompatiblesDtoCustomRequisitosRecomendados(String tipoComponente, ArmadoPcDto armadoPcDto, Map<String, Double> seleccionados) throws ComponenteDeterminateDelArmadoEnNullException;
 
     List<ComponenteDto> obtenerListaDeComponentesCompatiblesFiltradosDtoCustomRequisitosRecomendados(String tipoComponente, String nombreFiltro, ArmadoPcDto armadoPcDto, Map<String, Double> seleccionados) throws ComponenteDeterminateDelArmadoEnNullException;

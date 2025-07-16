@@ -3,6 +3,8 @@ package com.tallerwebi.presentacion.dto;
 import com.tallerwebi.dominio.entidades.Componente;
 import com.tallerwebi.presentacion.ProductoCarritoDto;
 
+import java.util.Objects;
+
 public class ProductoCarritoArmadoDto extends ProductoCarritoDto {
 
     private Boolean esEscencialParaElArmado;
@@ -34,5 +36,18 @@ public class ProductoCarritoArmadoDto extends ProductoCarritoDto {
 
     public void setNumeroDeArmadoAlQuePertenece(Integer numeroDeArmadoAlQuePertenece) {
         this.numeroDeArmadoAlQuePertenece = numeroDeArmadoAlQuePertenece;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        ProductoCarritoArmadoDto that = (ProductoCarritoArmadoDto) o;
+        return Objects.equals(numeroDeArmadoAlQuePertenece, that.numeroDeArmadoAlQuePertenece);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), numeroDeArmadoAlQuePertenece);
     }
 }

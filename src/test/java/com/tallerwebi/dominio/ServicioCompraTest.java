@@ -17,6 +17,7 @@ import org.mockito.MockitoAnnotations;
 
 import javax.servlet.http.HttpSession;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -239,7 +240,7 @@ public class ServicioCompraTest {
 
     private CompraDto crearCompraDto(Double total, String metodoPago, CompraComponenteDto... productos) {
         CompraDto compra = new CompraDto();
-        compra.setFecha(LocalDate.now());
+        compra.setFecha(LocalDateTime.now());
         compra.setTotal(total);
         compra.setMetodoDePago(metodoPago);
         compra.setCp("1440"); // CP por defecto
