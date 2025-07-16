@@ -1,188 +1,152 @@
 
 <div th:fragment="cargarPaso">
+    <h6 th:if="${componenteEscencialFaltante != null}" class="alert-info text-warning border rounded bg-white p-2 d-inline" th:text="${componenteEscencialFaltante}"></h6>
     <div class="container-xxl py-4">
         <p th:if="${param.errorLimite!=null}" th:text="${param.errorLimite}" class="alert alert-danger banners-info"></p>
         <p th:if="${param.errorQuitado!=null}" th:text="${param.errorQuitado}" class="alert alert-danger banners-info"></p>
         <p th:if="${param.accionInvalida!=null}" th:text="${param.accionInvalida}" class="alert alert-danger banners-info"></p>
         <p th:if="${param.agregado!=null}" th:text="${param.agregado}" class="alert alert-success banners-info"></p>
         <p th:if="${param.quitado!=null}" th:text="${param.quitado}" class="alert alert-warning banners-info"></p>
+
+        <div>
+            <p>En base a la eleccion de rendimiento y de Programas/Juegos que hiciste, aca te dejamos nuestra recomendacion de componentes</p>
+            <button th:text="'Procesador AMD ' + ${mapaRequisitos['ProcesadorAMD'].intValue()}"></button>
+            <button th:text="'Procesador Intel ' + ${mapaRequisitos['ProcesadorINTEL'].intValue()}"></button>
+            <button th:text="'Memoria RAM ' + ${mapaRequisitos['RAM'].intValue()} + ' GB'"></button>
+            <button th:text="'Memoria VRAM ' + ${mapaRequisitos['GPU'].intValue()} + ' GB'"></button>
+            <button th:text="'Espacio en Disco ' + ${mapaRequisitos['EspacioDisco'].intValue()} + ' GB'"></button>
+        </div>
+
         <div class="row">
-
-            <div>
-                <p>En base a la eleccion de rendimiento y de Programas/Juegos que hiciste, aca te dejamos nuestra recomendacion de componentes</p>
-                <button th:text="'Procesador AMD ' + ${mapaRequisitos['ProcesadorAMD'].intValue()}"></button>
-                <button th:text="'Procesador Intel ' + ${mapaRequisitos['ProcesadorINTEL'].intValue()}"></button>
-                <button th:text="'Memoria RAM ' + ${mapaRequisitos['RAM'].intValue()} + ' GB'"></button>
-                <button th:text="'Memoria VRAM ' + ${mapaRequisitos['GPU'].intValue()} + ' GB'"></button>
-                <button th:text="'Espacio en Disco ' + ${mapaRequisitos['EspacioDisco'].intValue()} + ' GB'"></button>
-            </div>
-
             <!-- Sidebar -->
             <div class="col-lg-4 mb-3">
                 <div class="border rounded p-2 bg-white mb-3">
                     <div class="row g-2 text-center">
-                        <!-- Placeholder icons -->
-                        <div class="col-6">
-                            <div th:if="${armadoPcDto.procesador != null}" class="h-100">
-                                <div class="border rounded bg-light py-3 h-100">
-                                    <img th:src="'http://www.imagenestaller.free.nf/' + ${armadoPcDto.procesador.imagen}" th:alt="${armadoPcDto.procesador.modelo}" class="img-fluid w-50 m-auto my-3">
-                                    <p th:text="'x1 '+ ${armadoPcDto.procesador.modelo}"></p>
-                                </div>
+                        <a href="procesador" class="col-6 d-flex flex-column align-items-center justify-content-center text-decoration-none text-body border rounded bg-light py-3 h-100" th:classappend="${pasoActual == 'procesador'} ? 'border-3 border-warning' : ''">
+                            <div th:if="${armadoPcDto.procesador != null}" class="w-100 d-flex flex-column align-items-center">
+                                <img th:src="'http://www.imagenestaller.free.nf/' + ${armadoPcDto.procesador.imagen}" th:alt="${armadoPcDto.procesador.modelo}" class="img-componente">
+                                <p class="nombre-componente" th:text="'x1 '+ ${armadoPcDto.procesador.modelo}"></p>
                             </div>
-                            <div th:unless="${armadoPcDto.procesador != null}" class="h-100">
-                                <div class="border rounded bg-light py-3 h-100">
-                                    <img th:src="'http://www.imagenestaller.free.nf/procesadorVacio.png'" alt="procesadorVacio" class="w-25 m-auto my-3">
-                                    <p>Procesador</p>
-                                </div>
+                            <div th:unless="${armadoPcDto.procesador != null}" class="w-100 d-flex flex-column align-items-center">
+                                <img th:src="'http://www.imagenestaller.free.nf/procesadorVacio.png'" alt="procesadorVacio" class="w-25 my-3">
+                                <p>Procesador</p>
                             </div>
-                        </div>
-                        <div class="col-6">
-                            <div th:if="${armadoPcDto.motherboard != null}" class="h-100">
-                                <div class="border rounded bg-light py-3 h-100">
-                                    <img th:src="'http://www.imagenestaller.free.nf/' + ${armadoPcDto.motherboard.imagen}" th:alt="${armadoPcDto.motherboard.modelo}" class="img-fluid w-50 m-auto my-3">
-                                    <p th:text="'x1 '+ ${armadoPcDto.motherboard.modelo}"></p>
-                                </div>
+                        </a>
+                        <a href="motherboard" class="col-6 d-flex flex-column align-items-center justify-content-center text-decoration-none text-body border rounded bg-light py-3 h-100" th:classappend="${pasoActual == 'motherboard'} ? 'border-3 border-warning' : ''">
+                            <div th:if="${armadoPcDto.motherboard != null}" class="w-100 d-flex flex-column align-items-center">
+                                <img th:src="'http://www.imagenestaller.free.nf/' + ${armadoPcDto.motherboard.imagen}" th:alt="${armadoPcDto.motherboard.modelo}" class="img-componente">
+                                <p class="nombre-componente" th:text="'x1 '+ ${armadoPcDto.motherboard.modelo}"></p>
                             </div>
-                            <div th:unless="${armadoPcDto.motherboard != null}" class="h-100">
-                                <div class="border rounded bg-light py-3 h-100">
-                                    <img th:src="'http://www.imagenestaller.free.nf/motherboardVacia.png'" alt="motherboardVacia" class="w-25 m-auto my-3">
-                                    <p>Motherboard</p>
-                                </div>
+                            <div th:unless="${armadoPcDto.motherboard != null}" class="w-100 d-flex flex-column align-items-center">
+                                <img th:src="'http://www.imagenestaller.free.nf/motherboardVacia.png'" alt="motherboardVacia" class="w-25 my-3">
+                                <p>Motherboard</p>
                             </div>
-                        </div>
-                        <div class="col-6">
-                            <div th:if="${armadoPcDto.cooler != null}" class="h-100">
-                                <div class="border rounded bg-light py-3 h-100">
-                                    <img th:src="'http://www.imagenestaller.free.nf/' + ${armadoPcDto.cooler.imagen}" th:alt="${armadoPcDto.cooler.modelo}" class="img-fluid w-50 m-auto my-3">
-                                    <p th:text="'x1 '+ ${armadoPcDto.cooler.modelo}"></p>
-                                </div>
+                        </a>
+                        <a href="cooler" class="col-6 d-flex flex-column align-items-center justify-content-center text-decoration-none text-body border rounded bg-light py-3 h-100" th:classappend="${pasoActual == 'cooler'} ? 'border-3 border-warning' : ''">
+                            <div th:if="${armadoPcDto.cooler != null}" class="w-100 d-flex flex-column align-items-center">
+                                <img th:src="'http://www.imagenestaller.free.nf/' + ${armadoPcDto.cooler.imagen}" th:alt="${armadoPcDto.cooler.modelo}" class="img-componente">
+                                <p class="nombre-componente" th:text="'x1 '+ ${armadoPcDto.cooler.modelo}"></p>
                             </div>
-                            <div th:unless="${armadoPcDto.cooler != null}" class="h-100">
-                                <div class="border rounded bg-light py-3 h-100">
-                                    <img th:src="'http://www.imagenestaller.free.nf/coolerVacio.png'" alt="coolerVacia" class="w-25 m-auto my-3">
-                                    <p>Cooler</p>
-                                </div>
+                            <div th:unless="${armadoPcDto.cooler != null}" class="w-100 d-flex flex-column align-items-center">
+                                <img th:src="'http://www.imagenestaller.free.nf/coolerVacio.png'" alt="coolerVacia" class="w-25 my-3">
+                                <p>Cooler</p>
                             </div>
-                        </div>
-                        <div class="col-6">
-                            <div th:if="${armadoPcDto.rams.size() > 0}" class="h-100">
-                                <div class="border rounded bg-light py-3 h-100 d-flex flex-column justify-content-between">
-                                    <div th:each="entry: ${armadoPcDto.ramsDetalladas}" class="w-100 m-0">
-                                        <img th:src="'http://www.imagenestaller.free.nf/' +  ${entry.key.imagen}" style='height: 20px; width: 20px' class="w-25 m-auto my-3">
-                                        <p th:text="'x'+ ${entry.value} +' '+ ${entry.key.modelo} " class="m-0"></p>
+                        </a>
+                        <a href="memoria" class="col-6 d-flex flex-column align-items-center justify-content-center text-decoration-none text-body border rounded bg-light py-3 h-100" th:classappend="${pasoActual == 'memoria'} ? 'border-3 border-warning' : ''">
+                            <div th:if="${armadoPcDto.rams.size() > 0}" class="w-100 d-flex flex-column align-items-center">
+                                <div style="max-height: 125px; overflow-y: auto; width: 100%;">
+                                    <div th:each="entry: ${armadoPcDto.ramsDetalladas}" class="w-100 d-flex flex-column align-items-center">
+                                        <img th:src="'http://www.imagenestaller.free.nf/' +  ${entry.key.imagen}" class="img-componente">
+                                        <p class="nombre-componente" th:text="'x'+ ${entry.value} +' '+ ${entry.key.modelo}"></p>
                                     </div>
-                                    <p>Memoria</p>
-                                </div>
-
-                            </div>
-                            <div th:unless="${armadoPcDto.rams.size() > 0}" class="h-100">
-                                <div class="border rounded bg-light py-3 h-100">
-                                    <img th:src="'http://www.imagenestaller.free.nf/memoriaVacia.png'" alt="memoriaVacia" class="w-25 m-auto my-3">
-                                    <p>Memoria</p>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-6">
-                            <div th:if="${armadoPcDto.gpu != null}" class="h-100">
-                                <div class="border rounded bg-light py-3 h-100">
-                                    <img th:src="'http://www.imagenestaller.free.nf/' + ${armadoPcDto.gpu.imagen}" th:alt="${armadoPcDto.gpu.modelo}" class="img-fluid w-50 m-auto my-3">
-                                    <p th:text="'x1 '+ ${armadoPcDto.gpu.modelo}"></p>
-                                </div>
+                            <div th:unless="${armadoPcDto.rams.size() > 0}" class="w-100 d-flex flex-column align-items-center">
+                                <img th:src="'http://www.imagenestaller.free.nf/memoriaVacia.png'" alt="memoriaVacia" class="w-25 my-3">
+                                <p>Memoria</p>
                             </div>
-                            <div th:unless="${armadoPcDto.gpu != null}" class="h-100">
-                                <div class="border rounded bg-light py-3 h-100">
-                                    <img th:src="'http://www.imagenestaller.free.nf/gpuVacio.png'" alt="gpuVacio" class="w-25 m-auto my-3">
-                                    <p>Placa de Video</p>
-                                </div>
+                        </a>
+                        <a href="gpu" class="col-6 d-flex flex-column align-items-center justify-content-center text-decoration-none text-body border rounded bg-light py-3 h-100" th:classappend="${pasoActual == 'gpu'} ? 'border-3 border-warning' : ''">
+                            <div th:if="${armadoPcDto.gpu != null}" class="w-100 d-flex flex-column align-items-center">
+                                <img th:src="'http://www.imagenestaller.free.nf/' + ${armadoPcDto.gpu.imagen}" th:alt="${armadoPcDto.gpu.modelo}" class="img-componente">
+                                <p class="nombre-componente" th:text="'x1 '+ ${armadoPcDto.gpu.modelo}"></p>
                             </div>
-                        </div>
-                        <div class="col-6">
-                            <div th:if="${armadoPcDto.almacenamiento.size() > 0}" class="h-100">
-                                <div class="border rounded bg-light py-3 h-100 d-flex flex-column justify-content-between">
-                                    <div th:each="entry: ${armadoPcDto.almacenamientoDetallado}" class="w-100 m-0">
-                                        <img th:src="'http://www.imagenestaller.free.nf/' +  ${entry.key.imagen}" style='height: 20px; width: 20px' class="w-25 m-auto my-3">
-                                        <p th:text="'x'+ ${entry.value} +' '+ ${entry.key.modelo} " class="m-0"></p>
+                            <div th:unless="${armadoPcDto.gpu != null}" class="w-100 d-flex flex-column align-items-center">
+                                <img th:src="'http://www.imagenestaller.free.nf/gpuVacio.png'" alt="gpuVacio" class="w-25 my-3">
+                                <p>Placa de Video</p>
+                            </div>
+                        </a>
+                        <a href="almacenamiento" class="col-6 d-flex flex-column align-items-center justify-content-center text-decoration-none text-body border rounded bg-light py-3 h-100" th:classappend="${pasoActual == 'almacenamiento'} ? 'border-3 border-warning' : ''">
+                            <div th:if="${armadoPcDto.almacenamiento.size() > 0}" class="w-100 d-flex flex-column align-items-center">
+                                <div style="max-height: 125px; overflow-y: auto; width: 100%;">
+                                    <div th:each="entry: ${armadoPcDto.almacenamientoDetallado}" class="w-100 d-flex flex-column align-items-center">
+                                        <img th:src="'http://www.imagenestaller.free.nf/' +  ${entry.key.imagen}" class="img-componente">
+                                        <p class="nombre-componente" th:text="'x'+ ${entry.value} +' '+ ${entry.key.modelo}"></p>
                                     </div>
-                                    <p>Almacenamiento</p>
                                 </div>
                             </div>
-                            <div th:unless="${armadoPcDto.almacenamiento.size() > 0}" class="h-100">
-                                <div class="border rounded bg-light py-3 h-100">
-                                    <img th:src="'http://www.imagenestaller.free.nf/almacenamientoVacio.png'" alt="almacenamientoVacio" class="w-25 m-auto my-3">
-                                    <p>Almacenamiento</p>
-                                </div>
+                            <div th:unless="${armadoPcDto.almacenamiento.size() > 0}" class="w-100 d-flex flex-column align-items-center">
+                                <img th:src="'http://www.imagenestaller.free.nf/almacenamientoVacio.png'" alt="almacenamientoVacio" class="w-25 my-3">
+                                <p>Almacenamiento</p>
                             </div>
-                        </div>
-                        <div class="col-6">
-                            <div th:if="${armadoPcDto.fuente != null}" class="h-100">
-                                <div class="border rounded bg-light py-3 h-100">
-                                    <img th:src="'http://www.imagenestaller.free.nf/' + ${armadoPcDto.fuente.imagen}" th:alt="${armadoPcDto.fuente.modelo}" class="img-fluid w-50 m-auto my-3">
-                                    <p th:text="'x1 '+ ${armadoPcDto.fuente.modelo}"></p>
-                                </div>
+                        </a>
+                        <a href="fuente" class="col-6 d-flex flex-column align-items-center justify-content-center text-decoration-none text-body border rounded bg-light py-3 h-100" th:classappend="${pasoActual == 'fuente'} ? 'border-3 border-warning' : ''">
+                            <div th:if="${armadoPcDto.fuente != null}" class="w-100 d-flex flex-column align-items-center">
+                                <img th:src="'http://www.imagenestaller.free.nf/' + ${armadoPcDto.fuente.imagen}" th:alt="${armadoPcDto.fuente.modelo}" class="img-componente">
+                                <p class="nombre-componente" th:text="'x1 '+ ${armadoPcDto.fuente.modelo}"></p>
                             </div>
-                            <div th:unless="${armadoPcDto.fuente != null}" class="h-100">
-                                <div class="border rounded bg-light py-3 h-100">
-                                    <img th:src="'http://www.imagenestaller.free.nf/fuenteVacia.png'" alt="fuenteVacia" class="w-25 m-auto my-3">
-                                    <p>Fuente</p>
-                                </div>
+                            <div th:unless="${armadoPcDto.fuente != null}" class="w-100 d-flex flex-column align-items-center">
+                                <img th:src="'http://www.imagenestaller.free.nf/fuenteVacia.png'" alt="fuenteVacia" class="w-25 my-3">
+                                <p>Fuente</p>
                             </div>
-                        </div>
-                        <div class="col-6">
-                            <div th:if="${armadoPcDto.gabinete != null}" class="h-100">
-                                <div class="border rounded bg-light py-3 h-100">
-                                    <img th:src="'http://www.imagenestaller.free.nf/' + ${armadoPcDto.gabinete.imagen}" th:alt="${armadoPcDto.gabinete.modelo}" class="img-fluid w-50 m-auto my-3">
-                                    <p th:text="'x1 '+ ${armadoPcDto.gabinete.modelo}"></p>
-                                </div>
+                        </a>
+                        <a href="gabinete" class="col-6 d-flex flex-column align-items-center justify-content-center text-decoration-none text-body border rounded bg-light py-3 h-100" th:classappend="${pasoActual == 'gabinete'} ? 'border-3 border-warning' : ''">
+                            <div th:if="${armadoPcDto.gabinete != null}" class="w-100 d-flex flex-column align-items-center">
+                                <img th:src="'http://www.imagenestaller.free.nf/' + ${armadoPcDto.gabinete.imagen}" th:alt="${armadoPcDto.gabinete.modelo}" class="img-componente">
+                                <p class="nombre-componente" th:text="'x1 '+ ${armadoPcDto.gabinete.modelo}"></p>
                             </div>
-                            <div th:unless="${armadoPcDto.gabinete != null}" class="h-100">
-                                <div class="border rounded bg-light py-3 h-100">
-                                    <img th:src="'http://www.imagenestaller.free.nf/gabineteVacio.png'" alt="gabineteVacio" class="w-25 m-auto my-3">
-                                    <p>Gabinete</p>
-                                </div>
+                            <div th:unless="${armadoPcDto.gabinete != null}" class="w-100 d-flex flex-column align-items-center">
+                                <img th:src="'http://www.imagenestaller.free.nf/gabineteVacio.png'" alt="gabineteVacio" class="w-25 my-3">
+                                <p>Gabinete</p>
                             </div>
-                        </div>
-                        <div class="col-6">
-                            <div th:if="${armadoPcDto.monitor != null}" class="h-100">
-                                <div class="border rounded bg-light py-3 h-100">
-                                    <img th:src="'http://www.imagenestaller.free.nf/' + ${armadoPcDto.monitor.imagen}" th:alt="${armadoPcDto.monitor.modelo}" class="img-fluid w-50 m-auto my-3">
-                                    <p th:text="'x1 '+ ${armadoPcDto.monitor.modelo}"></p>
-                                </div>
+                        </a>
+                        <a href="monitor" class="col-6 d-flex flex-column align-items-center justify-content-center text-decoration-none text-body border rounded bg-light py-3 h-100" th:classappend="${pasoActual == 'monitor'} ? 'border-3 border-warning' : ''">
+                            <div th:if="${armadoPcDto.monitor != null}" class="w-100 d-flex flex-column align-items-center">
+                                <img th:src="'http://www.imagenestaller.free.nf/' + ${armadoPcDto.monitor.imagen}" th:alt="${armadoPcDto.monitor.modelo}" class="img-componente">
+                                <p class="nombre-componente" th:text="'x1 '+ ${armadoPcDto.monitor.modelo}"></p>
                             </div>
-                            <div th:unless="${armadoPcDto.monitor != null}" class="h-100">
-                                <div class="border rounded bg-light py-3 h-100">
-                                    <img th:src="'http://www.imagenestaller.free.nf/monitorVacio.png'" alt="monitorVacio" class="w-25 m-auto my-3">
-                                    <p>Monitor</p>
-                                </div>
+                            <div th:unless="${armadoPcDto.monitor != null}" class="w-100 d-flex flex-column align-items-center">
+                                <img th:src="'http://www.imagenestaller.free.nf/monitorVacio.png'" alt="monitorVacio" class="w-25 my-3">
+                                <p>Monitor</p>
                             </div>
-                        </div>
-                        <div class="col-6">
-                            <div th:if="${armadoPcDto.perifericos.size() > 0}" class="h-100">
-                                <div class="border rounded bg-light py-3 h-100 d-flex flex-column justify-content-between">
-                                    <div th:each="entry: ${armadoPcDto.perifericosDetallados}" class="w-100 m-0">
-                                        <img th:src="'http://www.imagenestaller.free.nf/' +  ${entry.key.imagen}" style='height: 20px; width: 20px' class="w-25 m-auto my-3">
-                                        <p th:text="'x'+ ${entry.value} +' '+ ${entry.key.modelo} " class="m-0"></p>
+                        </a>
+                        <a href="periferico" class="col-6 d-flex flex-column align-items-center justify-content-center text-decoration-none text-body border rounded bg-light py-3 h-100" th:classappend="${pasoActual == 'periferico'} ? 'border-3 border-warning' : ''">
+                            <div th:if="${armadoPcDto.perifericos.size() > 0}" class="w-100 d-flex flex-column align-items-center">
+                                <div style="max-height: 125px; overflow-y: auto; width: 100%;">
+                                    <div th:each="entry: ${armadoPcDto.perifericosDetallados}" class="w-100 d-flex flex-column align-items-center">
+                                        <img th:src="'http://www.imagenestaller.free.nf/' +  ${entry.key.imagen}" class="img-componente">
+                                        <p class="nombre-componente" th:text="'x'+ ${entry.value} +' '+ ${entry.key.modelo}"></p>
                                     </div>
-                                    <p>Perifericos</p>
                                 </div>
                             </div>
-                            <div th:unless="${armadoPcDto.perifericos.size() > 0}" class="h-100">
-                                <div class="border rounded bg-light py-3 h-100">
-                                    <img th:src="'http://www.imagenestaller.free.nf/perifericoVacio.png'" alt="perifericoVacio" class="w-25 m-auto my-3">
-                                    <p>Perifericos</p>
-                                </div>
+                            <div th:unless="${armadoPcDto.perifericos.size() > 0}" class="w-100 d-flex flex-column align-items-center">
+                                <img th:src="'http://www.imagenestaller.free.nf/perifericoVacio.png'" alt="perifericoVacio" class="w-25 my-3">
+                                <p>Perifericos</p>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 </div>
-                <div class="border rounded p-3 bg-white text-center">
-                    <p class="fw-bold" th:text="${'$ ' + armadoPcDto.precioFormateado}"></p> <!-- aca deberia entrar la sumatoria del armadoPcDto-->
-                    <div class="d-flex justify-content-between">
-                        <a th:if="${pasoActual != 'procesador'}" th:href="${pasoAnterior}" class="btn btn-outline-primary btn-sm">Anterior paso</a>
+                <div class="border rounded p-1 py-3 bg-white text-center">
+                    <p class="d-inline" th:text="${'(' + wattsArmado +' watts)'}"></p>
+                    <p class="d-inline fw-bold ms-3" th:text="${'Total: $ ' + armadoPcDto.precioFormateado}"></p> <!-- aca deberia entrar la sumatoria del armadoPcDto-->
+                    <div class="d-flex justify-content-between mt-3">
+                        <a th:if="${pasoActual != 'procesador'}" th:href="${pasoAnterior}" class="btn btn-outline-primary btn-sm"><i class="bi bi-arrow-left"></i> Anterior paso</a>
                         <form th:action="@{/arma-tu-pc/custom/reiniciar-armado}" method="POST">
-                            <input type="submit" class="btn btn-outline-danger btn-sm" value="Reiniciar Armado">
+                            <input id="reiniciarArmado" type="submit" class="d-none" value="Reiniciar Armado">
+                            <label for="reiniciarArmado" class="btn btn-outline-danger btn-sm"><i class="bi bi-arrow-repeat"></i> Reiniciar Armado</label>
                         </form>
-                        <a th:if="${pasoActual != 'periferico'}" th:href="${pasoSiguiente}" class="btn btn-outline-primary btn-sm">Siguiente paso</a>
-                        <a th:if="${pasoActual == 'periferico'}" th:href="@{/arma-tu-pc/custom/resumen}" class="btn btn-outline-success btn-sm">Finalizar Armado</a>
+                        <a th:if="${pasoActual != 'periferico'}" th:href="${pasoSiguiente}" class="btn btn-outline-primary btn-sm">Siguiente paso <i class="bi bi-arrow-right"></i></a>
+                        <a th:if="${pasoActual == 'periferico'}" th:href="@{/arma-tu-pc/custom/resumen}" class="btn btn-outline-success btn-sm"><i class="bi bi-check2-all"></i> Fin del Armado</a>
                     </div>
                 </div>
             </div>
@@ -207,8 +171,8 @@
                     </div>
                     <div th:if="${pasoActual == 'periferico'}" class="mb-4"> <!--Si no es un procesador no mostramos AMD y INTEL-->
                         <a th:href="@{'/arma-tu-pc/custom/periferico?q=TECLADO'}" class="btn btn-outline-dark me-2">Teclado</a>
-                        <a th:href="@{'/arma-tu-pc/custom/periferico?q=MOUSE'}" class="btn btn-outline-primary me-2">Mouse</a>
-                        <a th:href="@{'/arma-tu-pc/custom/periferico?q=AURICULARES'}" class="btn btn-outline-warning">Auriculares</a>
+                        <a th:href="@{'/arma-tu-pc/custom/periferico?q=MOUSE'}" class="btn btn-outline-dark me-2">Mouse</a>
+                        <a th:href="@{'/arma-tu-pc/custom/periferico?q=AURICULARES'}" class="btn btn-outline-dark me-2">Auriculares</a>
                         <a th:href="@{'/arma-tu-pc/custom/periferico'}" class="btn btn-outline-success">Todos</a>
                     </div>
 
@@ -216,32 +180,44 @@
                         <!-- Card ejemplo -->
                         <div class="col-md-6 col-lg-4 mt-2 h-100" th:classappend="${idsDeComponentesSeleccionados.contains(componente.id)} ? ' order-first' : ''" th:each ="componente : ${componentesLista}">
                             <form method="POST" th:action="@{'/arma-tu-pc/custom/' + ${pasoActual} + '/accionCustom'}" class="h-100">
-                                <div class="card h-75">
+                                <div class="card h-75 position-relative">
+                                    <div class="position-absolute top-0 end-0 p-2">
+                                        <a th:if="${componente.precio > 0.0}" th:href="@{/productoEspecifico/{id}(id=${componente.id})}" target="_blank" class="fs-3 text-primary"><i class="bi bi-info-circle"></i></a>
+                                    </div>
                                     <div>
                                         <img th:src="'http://www.imagenestaller.free.nf/' +  ${componente.imagen}" class="card-img-top img-fluid" th:alt="${componente.modelo}">
                                     </div>
-                                    <div class="card-body">
-                                        <h6 class="card-title" th:text="${componente.modelo}"></h6>
-                                        <p class="card-text text-muted" th:text="'$'+${componente.precioFormateado}"></p>
-                                        <span class="badge bg-success">Compatible</span>
+                                    <div class="card-body d-flex flex-column h-100">
+                                        <p class="card-title" th:text="${componente.modelo}"></p>
+                                        <div class="d-flex align-items-center justify-content-between mb-2 gap-2">
+                                            <h6 class="card-text mb-0" th:text="'$'+${componente.precioFormateado}"></h6>
+                                            <span class="badge bg-success">Compatible</span>
+                                        </div>
                                         <input type="hidden" name="id" th:value="${componente.id}">
                                         <input th:if="${pasoActual != 'memoria' && pasoActual != 'almacenamiento'}" type="hidden" name="cantidad" value="1">
-                                        <select th:if="${pasoActual == 'memoria'}" name="cantidad">
-                                            <option value="1">1</option>
-                                            <option value="2">2</option>
-                                            <option value="3">3</option>
-                                            <option value="4">4</option>
-                                        </select>
-                                        <select th:if="${pasoActual == 'almacenamiento'}" name="cantidad">
-                                            <option value="1">1</option>
-                                            <option value="2">2</option>
-                                            <option value="3">3</option>
-                                            <option value="4">4</option>
-                                            <option value="5">5</option>
-                                            <option value="6">6</option>
-                                        </select>
-                                        <button type="submit" name="accionCustom" class="btn btn-outline-primary" value="agregar">Agregar</button>
-                                        <button th:if="${idsDeComponentesSeleccionados.contains(componente.id)}" type="submit" name="accionCustom" class="btn btn-outline-primary" value="quitar">Quitar</button>
+
+                                        <div class="botones-card mt-auto">
+                                            <button th:if="${componente.stock > 0}" type="submit" name="accionCustom" class="btn btn-primary" value="agregar">Agregar</button>
+                                            <select class="form-select w-auto" th:if="${pasoActual == 'memoria' && slotsRamMotherboardElegida != null}" name="cantidad">
+                                                <option th:each="i : ${#numbers.sequence(1, slotsRamMotherboardElegida)}"
+                                                        th:value="${i}"
+                                                        th:text="${i}">
+                                                </option>
+                                            </select>
+                                            <select class="form-select w-auto" th:if="${pasoActual == 'almacenamiento' && slotsM2MotherboardElegida != null && slotsSataMotherboardElegida != null}" name="cantidad">
+                                                <option th:if="${componente.modelo.toUpperCase().contains('M.2')}"
+                                                        th:each="i : ${#numbers.sequence(1, slotsM2MotherboardElegida)}"
+                                                        th:value="${i}"
+                                                        th:text="${i}">
+                                                </option>
+                                                <option th:unless="${componente.modelo.toUpperCase().contains('M.2')}"
+                                                        th:each="i : ${#numbers.sequence(1, slotsSataMotherboardElegida)}"
+                                                        th:value="${i}"
+                                                        th:text="${i}">
+                                                </option>
+                                            </select>
+                                            <button th:if="${idsDeComponentesSeleccionados.contains(componente.id)}" type="submit" name="accionCustom" class="btn btn-danger" value="quitar">Quitar</button>
+                                        </div>
                                     </div>
                                 </div>
                             </form>
