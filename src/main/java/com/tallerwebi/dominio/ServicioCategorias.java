@@ -15,7 +15,7 @@ public class ServicioCategorias {
     public ServicioCategorias() {
         this.categorias = new ArrayList<>();
         this.categorias.add(new CategoriaDto("Procesador", "Procesadores", "procesador.jpg"));
-        this.categorias.add(new CategoriaDto("Periferico", "perifericos", "perifericos.jpg"));
+        this.categorias.add(new CategoriaDto("Periferico", "Perifericos", "perifericos.jpg"));
         this.categorias.add(new CategoriaDto("FuenteDeAlimentacion","Fuentes de alimentacion", "fuentes.jpg"));
         this.categorias.add(new CategoriaDto("MemoriaRAM","Memoria ram", "ram.jpg"));
         this.categorias.add(new CategoriaDto("PlacaDeVideo", "Placa de video", "placadevideo.jpg"));
@@ -23,6 +23,7 @@ public class ServicioCategorias {
         this.categorias.add(new CategoriaDto("Motherboard", "Mothers","mother.jpg"));
         this.categorias.add(new CategoriaDto("Monitor", "Monitores", "monitor.jpg"));
         this.categorias.add(new CategoriaDto("CoolerCPU", "Coolers", "impresora.jpg"));
+        this.categorias.add(new CategoriaDto("Gabinete", "Gabinetes", "gabinete.jpg"));
     }
 
     public List<CategoriaDto> getCategorias() {

@@ -92,10 +92,12 @@ public class ControladorTarjetaDeCredito {
             Double totalCompraEnPesos = this.servicioPrecios.conversionDolarAPesoDouble(totalCompraEnDolares);
 
             CompraDto compraDto = new CompraDto();
-            compraDto.setFecha(LocalDate.now());
+            compraDto.setFecha(LocalDateTime.now());
             compraDto.setMetodoDePago(metodoDePago);
             compraDto.setTotal(totalCompraEnPesos);
             compraDto.setProductosComprados(convertirACompraComponenteDto(carritoSesion));
+            compraDto.setFormaEntrega((String) session.getAttribute("formaEntrega"));
+            compraDto.setCostoDeEnvio((Double) session.getAttribute("costo"));
 
             servicioCompra.guardarCompraConUsuarioLogueado(compraDto, usuarioLogueado, session );
             servicioProductoCarritoImpl.limpiarCarrito();

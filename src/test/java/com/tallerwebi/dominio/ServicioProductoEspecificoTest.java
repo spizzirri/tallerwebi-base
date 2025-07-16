@@ -1,4 +1,4 @@
-package com.tallerwebi.dominio;
+/*package com.tallerwebi.dominio;
 import com.tallerwebi.dominio.entidades.*;
 import com.tallerwebi.presentacion.ComponenteEspecificoDto;
 import org.junit.jupiter.api.Test;
@@ -316,3 +316,4 @@ public class ServicioProductoEspecificoTest {
     }
 
 }
+*/

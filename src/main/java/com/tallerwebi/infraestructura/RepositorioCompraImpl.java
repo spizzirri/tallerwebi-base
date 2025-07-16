@@ -37,6 +37,7 @@ public class RepositorioCompraImpl implements RepositorioCompra {
 
     public Compra obtenerUltimaCompraDeUsuarioLogueado(UsuarioDto usuarioLogueado) {
         Usuario usuario = repositorioUsuario.buscarUsuario(usuarioLogueado.getEmail());
+        sessionFactory.getCurrentSession().clear();
 
         String hql = "SELECT DISTINCT C FROM Compra C " +
                 "LEFT JOIN FETCH C.productosComprados pc " +
@@ -46,18 +47,19 @@ public class RepositorioCompraImpl implements RepositorioCompra {
 
         return this.sessionFactory.getCurrentSession()
                 .createQuery(hql, Compra.class)
-                .setParameter("usuario", usuario.getId())
+                .setParameter("usuario", usuario)
                 .setMaxResults(1)
                 .uniqueResult(); // o getSingleResult() con try-catch si preferís
     }
 
     public List<Compra> obtenerCompraDeUsuarioLogueado(UsuarioDto usuarioLogueado) {
         Usuario usuario = repositorioUsuario.buscarUsuario(usuarioLogueado.getEmail());
+        sessionFactory.getCurrentSession().clear();
+
         String hql = "SELECT DISTINCT C FROM Compra C " +
                 "LEFT JOIN FETCH C.productosComprados pc " +
                 "LEFT JOIN FETCH pc.componente " +
                 " WHERE C.idUsuario = :usuario ORDER BY C.fecha DESC";
-
 
         Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
         query.setParameter("usuario", usuario);

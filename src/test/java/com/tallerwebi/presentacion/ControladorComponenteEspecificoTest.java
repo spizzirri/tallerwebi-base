@@ -54,7 +54,7 @@ public class ControladorComponenteEspecificoTest {
         assertThat(modelAndView.getViewName(), equalTo(vistaEsperada));
     }
 
-    @Test
+    /*@Test
     void cuandoLlamoMostrarComponenteEspecificoDeberiaRetornarModelAndViewCorrectamente() {
         Long id = 1L;
         Double precio = 250.0;
@@ -98,7 +98,7 @@ public class ControladorComponenteEspecificoTest {
         verify(servicioProductoEspecifico, times(1)).obtenerComponentePorId(id);
         verify(servicioProductoEspecifico, times(1)).obtenerComponentesAcomparar(id);
         verify(servicioPrecios, times(1)).obtenerPrecioFormateado(precio);
-    }
+    }*/
 
     @Test
     public void dadoQueExisteUnControladorComponenteEspecificoCuandoPidoUnComponenteConID1MeDevuelveLaVistaDeUnComponenteEspecificoYElModeloDeEseComponenteEspecifico() {

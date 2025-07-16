@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,18 +36,14 @@ public class ControladorPagoExitoso {
         List<Compra> comprasUsuarioObtenidas = this.servicioCompra.obtenerCompraComponenteDeUnUsuarioLogueado(usuarioLogueado);
 
         List<Compra> comprasUsuario = comprasUsuarioObtenidas.stream().limit(1).collect(Collectors.toList());
+
         model.put("tarjeta", session.getAttribute("tarjeta"));
-        model.put("costoEnvio", session.getAttribute("costo"));
         model.put("tiempo", session.getAttribute("tiempo"));
         model.put("destino", session.getAttribute("destino"));
-
-
-
+        model.put("formaEntrega", session.getAttribute("formaEntrega"));
 
         model.put("comprasUsuario", comprasUsuario);
 
         return new ModelAndView("pagoExitoso",model);
     }
-
-
 }
