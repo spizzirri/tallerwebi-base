@@ -224,7 +224,7 @@
                                         <span th:if="${compra.moneda == null || compra.moneda == 'pesos'}"
                                               th:text="'$' + ${#numbers.formatDecimal(compra.total, 1, 'POINT', 2, 'COMMA')}"
                                               style="float:right; color:#1976d2; font-size:1.1em;"></span>
-                                        <span th:if="${compra.moneda == 'dolares'}" th:text="'$' + ${compra.totalDolar}"
+                                        <span th:if="${compra.moneda == 'dolares'}" th:text="'USD $' + ${compra.totalDolar}"
                                               style="float:right; color:#1976d2; font-size:1.1em;"></span>
                                     </div>
 

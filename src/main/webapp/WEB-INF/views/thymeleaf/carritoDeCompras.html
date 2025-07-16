@@ -212,12 +212,18 @@
                 <!-- SECCIÓN DE DESCUENTO Y PAGO -->
                 <div class="row">
                     <div class="col-md-6 mb-4">
-                        <h3 class="card-title mb-3">Código de descuento</h3>
-                        <div class="d-flex align-items-center mb-3">
-                            <input type="text" class="form-control me-2" name="codigoInput" id="codigoInput"
+                        <h3 class="card-title mb-3 d-flex align-items-center">
+                            <i class="bi bi-percent me-2"></i>
+                            Código de descuento
+                        </h3>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">
+                                <i class="bi bi-tag"></i>
+                            </span>
+                            <input type="text" class="form-control" name="codigoInput" id="codigoInput"
                                    placeholder="¿Tenés un código?">
                             <button type="button" class="btn btn-success" id="btnAplicarDescuento">
-                                <i class="fa-solid fa-check"></i>
+                                <i class="bi bi-check-lg"></i>
                             </button>
                         </div>
                         <div id="mensajeDescuento" class="alert alert-info py-2 px-3 d-none"
@@ -228,34 +234,47 @@
 
                     <!-- FORMULARIO DE METODO DE PAGO -->
                     <div class="col-md-6">
-                        <h3 class="card-title mb-3">Método de pago</h3>
+                        <h3 class="card-title mb-3 d-flex align-items-center">
+                            <i class="bi bi-credit-card me-2"></i>
+                            Método de pago
+                        </h3>
                         <form method="POST" action="/checkout/create-payment" id="formulario-pago">
                             <div id="campos-productos"></div>
-                            <div class="form-check mb-3">
-                                <input class="form-check-input" type="radio" id="mercadoPago" name="metodoPago"
-                                       value="mercadoPago">
-                                <label class="form-check-label" for="mercadoPago">
-                                    Mercado pago - Usás tu cuenta de MP
-                                </label>
+                            <div class="d-flex flex-column gap-3">
+                                <div class="form-check p-3 border rounded">
+                                    <input class="form-check-input" type="radio" id="mercadoPago" name="metodoPago"
+                                           value="mercadoPago">
+                                    <label class="form-check-label" for="mercadoPago">
+                                        <i class="bi bi-wallet2 me-2"></i>
+                                        <strong>Mercado Pago</strong> - Usás tu cuenta de MP
+                                    </label>
+                                </div>
+                                <div class="form-check p-3 border rounded">
+                                    <input class="form-check-input" type="radio" id="tarjetaCredito" name="metodoPago" value="tarjetaCredito">
+                                    <label class="form-check-label" for="tarjetaCredito">
+                                        <i class="bi bi-credit-card-2-front me-2"></i>
+                                        <strong>Tarjeta de crédito</strong> - (Pesos o Dólares)
+                                    </label>
+                                </div>
+                                <div class="form-check p-3 border rounded">
+                                    <input class="form-check-input" type="radio" id="efectivo" name="metodoPago" value="efectivo">
+                                    <label class="form-check-label" for="efectivo">
+                                        <i class="bi bi-cash me-2"></i>
+                                        <strong>Efectivo</strong> - Pago fácil
+                                    </label>
+                                </div>
                             </div>
-                            <!-- Nueva opción: Tarjeta de crédito -->
-                            <div class="form-check mb-3">
-                                <input class="form-check-input" type="radio" id="tarjetaCredito" name="metodoPago"
-                                       value="tarjetaCredito">
-                                <label class="form-check-label" for="tarjetaCredito">
-                                    Abonar con tarjeta de crédito
-                                </label>
-                            </div>
-
 
                             <!-- Alertas y botón -->
                             <div id="errorMetodoPago" class="alert alert-danger d-none" role="alert"></div>
                             <div th:if="${error}" class="alert alert-danger" role="alert">
+                                <i class="bi bi-x-circle me-2"></i>
                                 <span th:text="${error}"></span>
                             </div>
 
                             <div class="d-grid">
                                 <button id="btnComprar" class="btn btn-dark btn-lg">
+                                    <i class="bi bi-bag-check me-2"></i>
                                     Finalizar compra
                                 </button>
                             </div>
