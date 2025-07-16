@@ -4,6 +4,7 @@ import com.tallerwebi.dominio.Usuario;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +16,7 @@ public class Compra {
     private Long idCompra;
 
     @Column(length = 100)
-    private LocalDate fecha;
+    private LocalDateTime fecha;
 
     @Column(length = 100)
     private Double total;
@@ -45,11 +46,11 @@ public class Compra {
         return idCompra;
     }
 
-    public void setFecha(LocalDate fecha) {
+    public void setFecha(LocalDateTime fecha) {
         this.fecha = fecha;
     }
 
-    public LocalDate getFecha() {
+    public LocalDateTime getFecha() {
         return fecha;
     }
 
