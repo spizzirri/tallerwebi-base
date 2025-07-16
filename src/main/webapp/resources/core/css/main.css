@@ -92,3 +92,45 @@ h2{
 .swiper-slide small {
     font-size: 0.75rem;
 }
+
+.nombre-componente {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 95%;
+    min-height: 2.5em;
+    font-size: 0.95em;
+    line-height: 1.2em;
+    margin: 0;
+    text-align: center;
+    word-break: break-word;
+}
+
+.img-componente {
+    width: 80px;      /* Puedes ajustar este valor */
+    height: 80px;     /* Puedes ajustar este valor */
+    object-fit: contain;
+    display: block;
+    margin: 0 auto 0.5em auto;
+  }
+
+  .img-popover {
+    max-width: 80px;
+    width: 100%;
+    height: auto;
+    display: block;
+    margin: auto;
+  }
+
+.botones-card {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 0;
+}
+.botones-card > * {
+  flex: 0 1 auto;
+}

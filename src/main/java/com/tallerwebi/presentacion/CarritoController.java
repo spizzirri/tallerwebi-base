@@ -118,11 +118,24 @@ public class CarritoController {
 
         if (numeroDeArmado != null) {
             productoBuscado = this.servicioProductoCarrito.buscarPorIdYNumeroDeArmado(id, numeroDeArmado);
+
+            // aca habria que ver si el producto es escencial, si lo es habria que devolver una lista de productos a eliminar y devolver el stock
         } else {
             productoBuscado = this.servicioProductoCarrito.buscarPorId(id);
         }
 
-        if (productoBuscado != null) {
+        if(productoBuscado != null
+                && productoBuscado instanceof ProductoCarritoArmadoDto
+                && ((ProductoCarritoArmadoDto)productoBuscado).getEsEscencialParaElArmado()){
+
+            List<ProductoCarritoArmadoDto> productosDelArmado = this.servicioProductoCarrito.obtenerProductosCarritoArmadoDtoPorNumeroDeArmado(((ProductoCarritoArmadoDto)productoBuscado).getNumeroDeArmadoAlQuePertenece());
+
+            for (ProductoCarritoArmadoDto productoDeArmado : productosDelArmado) {
+                this.servicioProductoCarrito.devolverStockAlComponente(productoDeArmado.getId(), productoDeArmado.getCantidad());
+                this.servicioProductoCarrito.getProductos().remove(productoDeArmado);
+            }
+            response.put("eliminado", true);
+        } else if (productoBuscado != null) {
             this.servicioProductoCarrito.devolverStockAlComponente(id, productoBuscado.getCantidad());
             this.servicioProductoCarrito.getProductos().remove(productoBuscado);
             response.put("eliminado", true);
@@ -185,7 +198,7 @@ public class CarritoController {
 
     @RequestMapping(
             value = {
-                    "/carritoDeCompras/agregarMasCantidadDeUnProducto/{id}",
+                    "/carritoDeCompras/agr=egarMasCantidadDeUnProducto/{id}",
                     "/carritoDeCompras/agregarMasCantidadDeUnProducto/{id}/{numeroDeArmado}"
             },
             method = RequestMethod.POST
@@ -253,6 +266,7 @@ public class CarritoController {
 
         if (numeroDeArmado != null) {
             productoBuscado = this.servicioProductoCarrito.buscarPorIdYNumeroDeArmado(id, numeroDeArmado);
+            // aca si el producto que resta es de armado y es escencial debe eliminar todos los productos que son de tal armado y devolver su stock
         } else {
             productoBuscado = this.servicioProductoCarrito.buscarPorId(id);
         }
@@ -268,6 +282,24 @@ public class CarritoController {
             response.put("precioTotalDelProducto", totalFormateadoPorProducto);
 
             response.put("eliminado", false);
+
+            Double totalGeneral = this.servicioProductoCarrito.calcularValorTotalDeLosProductos();
+            String totalGeneralFormateado = this.servicioPrecios.conversionDolarAPeso(totalGeneral);
+            response.put("valorTotal", totalGeneralFormateado);
+
+            response.put("cantidadEnCarrito", this.servicioProductoCarrito.calcularCantidadTotalDeProductos());
+
+        } else if(productoBuscado != null
+                && productoBuscado instanceof ProductoCarritoArmadoDto
+                && ((ProductoCarritoArmadoDto)productoBuscado).getEsEscencialParaElArmado()) {
+
+            List<ProductoCarritoArmadoDto> productosDelArmado = this.servicioProductoCarrito.obtenerProductosCarritoArmadoDtoPorNumeroDeArmado(((ProductoCarritoArmadoDto) productoBuscado).getNumeroDeArmadoAlQuePertenece());
+
+            for (ProductoCarritoArmadoDto productoDeArmado : productosDelArmado) {
+                this.servicioProductoCarrito.devolverStockAlComponente(productoDeArmado.getId(), productoDeArmado.getCantidad());
+                this.servicioProductoCarrito.getProductos().remove(productoDeArmado);
+            }
+            response.put("eliminado", true);
 
             Double totalGeneral = this.servicioProductoCarrito.calcularValorTotalDeLosProductos();
             String totalGeneralFormateado = this.servicioPrecios.conversionDolarAPeso(totalGeneral);

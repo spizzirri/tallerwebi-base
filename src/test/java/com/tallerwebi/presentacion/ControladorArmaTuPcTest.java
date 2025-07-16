@@ -355,6 +355,7 @@ public class ControladorArmaTuPcTest {
 
         when(sessionMock.getAttribute("carritoSesion")).thenReturn(carritoActual);
         when(servicioArmaTuPcMock.pasajeAProductoArmadoDtoParaAgregarAlCarrito(armadoPcDtoMock)).thenReturn(productosDelArmado);
+        when(servicioArmaTuPcMock.configurarNumeroDeArmadoYEscencialidadAProductosCarritoArmadoDto(anyInt(), anyList())).thenReturn(productosDelArmado);
         when(sessionMock.getAttribute("reservaArmado")).thenReturn(productosDelArmado);
 
         // Ejecución (Act)
