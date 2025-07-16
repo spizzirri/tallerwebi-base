@@ -78,74 +78,82 @@
 
 <div class="tarjeta-container">
     <div class="tarjeta-header">Agrega una nueva tarjeta</div>
-    <form class="tarjeta-form" method="post" th:action="@{/tarjetaDeCredito/validar}">
-        <div style="margin-bottom: 18px;">
+    <form  method="post" th:action="@{/tarjetaDeCredito/validar}">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 18px; flex-wrap: nowrap;">
             <button type="button"
-                    style="background: #f3f4f6; border: none; border-radius: 20px; padding: 8px 18px; font-weight: 500; display: flex; align-items: center; gap: 8px;">
+                    style="background: #f3f4f6; border: none; border-radius: 20px; padding: 8px 18px; font-weight: 500; display: flex; align-items: center; gap: 8px; white-space: nowrap;">
                 <span style="font-size: 1.2em;">&#128179;</span> Nueva tarjeta de crédito
             </button>
-            <div class="form-check mb-3">
+
+            <div class="form-check" style="display: flex; align-items: center; gap: 3px; margin: 0;">
                 <input class="form-check-input" type="radio" id="pesos" name="moneda"
-                       value="pesos">
-                <label class="form-check-label" for="pesos"
-                       th:text="'Pesos: $' + ${#numbers.formatDecimal(precioPesos, 1, 'POINT', 2, 'COMMA')}">
+                       value="pesos" checked>
+                <label class="form-check-label" for="dolares" style="display: flex; flex-direction: column; line-height: 1.2;">
+                    <span>Pesos: </span>
+                    <span th:text="${#numbers.formatDecimal(precioPesos, 1, 'POINT', 2, 'COMMA')}"></span>
                 </label>
             </div>
-            <div class="form-check mb-3">
-                <input class="form-check-input" type="radio" id="dolares" name="moneda"
-                       value="dolares">
-                <label class="form-check-label" for="dolares" th:text="'Dólares: USD $' + ${precioDolar}">
+
+            <div class="form-check" style="display: flex; align-items: center; gap: 3px; margin: 0;">
+                <input class="form-check-input" type="radio" id="dolares" name="moneda" value="dolares">
+                <label class="form-check-label" for="dolares" style="display: flex; flex-direction: column; line-height: 1.2;">
+                    <span>Dólares:</span>
+                    <span th:text="'USD $' + ${precioDolar}"></span>
                 </label>
             </div>
         </div>
 
+        <div class="tarjeta-form">
+            <input type="hidden" name="metodoDePago" value="tarjetaCredito">
+            <label for="numeroTarjeta">Número de tarjeta</label>
+            <input type="number" id="numeroTarjeta" name="numeroTarjeta" maxlength="19"
+                   placeholder="1234 1234 1234 1234"
+                   autocomplete="cc-number" required/>
+            <p th:if="${mensajeTarjeta != null}" class="alert alert-danger" th:text="${mensajeTarjeta}">
+            </p>
+            <label for="nombreTitular">Nombre del titular</label>
+            <input type="text" id="nombreTitular" name="nombreTitular" placeholder="Ej.: María López"
+                   autocomplete="cc-name"
+                   required/>
+            <small style="color: #888; margin-bottom: 12px; display: block;">Como aparece en la tarjeta.</small>
 
-        <input type="hidden" name="metodoDePago" value="tarjetaCredito">
-        <label for="numeroTarjeta">Número de tarjeta</label>
-        <input type="number" id="numeroTarjeta" name="numeroTarjeta" maxlength="19" placeholder="1234 1234 1234 1234"
-               autocomplete="cc-number" required/>
-        <p th:if="${mensajeTarjeta != null}" class="alert alert-danger" th:text="'Error ' + ${mensajeTarjeta}">
-        </p>
-        <label for="nombreTitular">Nombre del titular</label>
-        <input type="text" id="nombreTitular" name="nombreTitular" placeholder="Ej.: María López" autocomplete="cc-name"
-               required/>
-        <small style="color: #888; margin-bottom: 12px; display: block;">Como aparece en la tarjeta.</small>
+            <div class="row">
+                <div>
+                    <label for="vencimiento">Vencimiento</label>
+                    <input type="text" id="vencimiento" name="vencimiento" maxlength="5" pattern="\d{2}/\d{2}"
+                           placeholder="MM/AA" required/>
 
-        <div class="row">
-            <div>
-                <label for="vencimiento">Vencimiento</label>
-                <input type="text" id="vencimiento" name="vencimiento" maxlength="5" pattern="\d{2}/\d{2}"
-                       placeholder="MM/AA" required/>
-
-                <p th:if="${mensajeVencimiento != null}" class="alert alert-danger"
-                   th:text="'Error ' + ${mensajeVencimiento}">
-                </p>
+                    <p th:if="${mensajeVencimiento != null}" class="alert alert-danger"
+                       th:text="${mensajeVencimiento}">
+                    </p>
+                </div>
+                <div>
+                    <label for="codigoSeguridad">Código de seguridad</label>
+                    <input type="number" id="codigoSeguridad" name="codigoSeguridad" maxlength="4"
+                           placeholder="Ej.: 123"
+                           autocomplete="cc-csc" required/>
+                    <p th:if="${mensajeCodigo != null}" class="alert alert-danger" th:text="${mensajeCodigo}">
+                    </p>
+                </div>
             </div>
-            <div>
-                <label for="codigoSeguridad">Código de seguridad</label>
-                <input type="number" id="codigoSeguridad" name="codigoSeguridad" maxlength="4" placeholder="Ej.: 123"
-                       autocomplete="cc-csc" required/>
-                <p th:if="${mensajeCodigo != null}" class="alert alert-danger" th:text="'Error ' + ${mensajeCodigo}">
-                </p>
+
+            <label for="documento">Documento del titular</label>
+            <div class="row">
+                <div style="max-width: 120px;">
+                    <select id="tipoDocumento" name="tipoDocumento" required>
+                        <option value="DNI">DNI</option>
+                        <option value="CUIT">CUIT</option>
+                        <option value="LC">LC</option>
+                        <option value="LE">LE</option>
+                    </select>
+                </div>
+                <div>
+                    <input type="number" id="documento" name="documento" placeholder="99.999.999" required/>
+                </div>
             </div>
+
+            <button type="submit" id="continuar" class="btn-continuar">Continuar</button>
         </div>
-
-        <label for="documento">Documento del titular</label>
-        <div class="row">
-            <div style="max-width: 120px;">
-                <select id="tipoDocumento" name="tipoDocumento" required>
-                    <option value="DNI">DNI</option>
-                    <option value="CUIT">CUIT</option>
-                    <option value="LC">LC</option>
-                    <option value="LE">LE</option>
-                </select>
-            </div>
-            <div>
-                <input type="number" id="documento" name="documento" placeholder="99.999.999" required/>
-            </div>
-        </div>
-
-        <button type="submit" id="continuar" class="btn-continuar">Continuar</button>
     </form>
 </div>
 <div th:replace="fragments/fragments :: footer"></div>

@@ -34,6 +34,7 @@ public class ControladorPagoExitoso {
 
         List<Compra> comprasUsuario = comprasUsuarioObtenidas.stream().limit(1).collect(Collectors.toList());
 
+
         model.put("tarjeta", session.getAttribute("tarjeta"));
         model.put("tiempo", session.getAttribute("tiempo"));
         model.put("destino", session.getAttribute("destino"));

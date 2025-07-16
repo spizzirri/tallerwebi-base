@@ -186,14 +186,14 @@
                             <div class="exito-resumen container">
                                 <div class="row">
 
-                                    <div class="col-md-4 mb-3" th:if="${formaEntrega == 'envio'}">
+                                    <div class="col-md-4 mb-3" th:if="${compra.formaEntrega == 'envio'}">
                                         <div class="entrega-item"><b>Entrega</b></div>
                                         <div class="entrega-item">Entrega estimada: <span th:text="${tiempo}"></span>
                                         </div>
                                         <div th:text="${destino}" style="white-space: nowrap;"></div>
                                     </div>
 
-                                    <div class="col-md-4 mb-3" th:if="${formaEntrega == 'retiro'}">
+                                    <div class="col-md-4 mb-3" th:if="${compra.formaEntrega == 'retiro'}">
                                         <b>Entrega</b><br>
                                         <div>Retiro en depósito</div>
                                         <div>Av. Gamer 123, CABA</div>
@@ -212,10 +212,12 @@
 
                                     <div class="col-md-4 mb-3">
                                         <b>Resumen</b><br>
-                                        <div th:if="${formaEntrega == 'envio'}">
+                                        <div th:if="${compra.formaEntrega == 'envio'}">
                                             Valor envío: <span
                                                 th:text="'$' + ${#numbers.formatDecimal(compra.costoDeEnvio, 1, 'POINT', 2, 'COMMA')}"
-                                                style="float:right"></span><br>
+                                                style="float:right"></span>
+                                            <br>
+                                            <p th:if="${compra.moneda == 'dolares'}">Precio de envio sujeto a Andreani</p>
                                         </div>
                                         <hr style="margin: 8px 0;">
                                         <b>Total</b>:
