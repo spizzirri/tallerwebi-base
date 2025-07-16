@@ -313,7 +313,7 @@
                                             <span th:if="${compra.metodoDePago == 'tarjetaCredito'}">Tarjeta de crédito</span>
                                             <span th:if="${compra.metodoDePago == 'mercadoPago'}">Mercado Pago</span>
                                             <span th:if="${compra.metodoDePago == 'efectivo'}">Efectivo</span>
-                                            <span th:if="${tarjeta != null}"
+                                            <span th:if="${tarjeta != null || compra.metodoDePago == 'tarjetaCredito'}"
                                                   th:text="' **** ' + ${#strings.substring(tarjeta.numeroDeTarjeta, tarjeta.numeroDeTarjeta.length() - 4)}"></span>
                                         </span>
                                     </div>
