@@ -37,4 +37,6 @@ public interface ServicioArmaTuPc {
     Integer obtenerSlotsSataDeMotherboard(ComponenteDto motherboard);
 
     Integer obtenerSlotsM2DeMotherboard(ComponenteDto motherboard);
+
+    List<ProductoCarritoArmadoDto> configurarNumeroDeArmadoYEscencialidadAProductosCarritoArmadoDto(Integer numeroDeUltimoArmadoEnElCarrito, List<ProductoCarritoArmadoDto> productoCarritoArmadoDtos);
 }

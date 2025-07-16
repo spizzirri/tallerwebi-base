@@ -36,7 +36,6 @@ public class ControladorMostrarProductos {
         this.productoService = productoService;
         this.categoriasService = categoriasService;
         this.servicioPrecios = servicioPrecios;
-
     }
 
 

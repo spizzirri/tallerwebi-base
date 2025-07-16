@@ -1,140 +1,186 @@
-<!--<!DOCTYPE html>-->
-<!--<html lang="en">-->
-<!--<head>-->
-<!--    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">-->
-<!--    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css"/>-->
-<!--    <meta charset="UTF-8">-->
-<!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"-->
-<!--          integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">-->
-<!--    <title>Carrito de compras</title>-->
-<!--    <link rel="stylesheet" th:href="@{/css/fragments.css}">-->
-
-<!--</head>-->
-<!--<body>-->
 <div th:replace="fragments/fragments :: header"></div>
 
-
-<div class="container d-flex justify-content-center py-4">
-    <div class="col-12 col-lg-10 col-xl-8">
+<div class="container d-flex justify-content-center py-4" style="max-width: 1600px;">
+    <div class="col-12" style="max-width: 1400px; width: 100%;">
 
         <!-- TABLA DE PRODUCTOS AGREGADOS AL CARRITO -->
-        <div class="card mb-4">
-            <h3 class="card-title m-3">Productos</h3>
-            <div class="card-body">
-                <table class="table vista-carrito">
-                    <thead>
-                    <tr class="text-center">
-                        <th scope="col">Foto</th>
-                        <th scope="col">Nombre</th>
-                        <th scope="col">Precio</th>
-                        <th scope="col">Acciones</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:if="${productos != null and !productos.isEmpty()}" class="text-center"
-                        th:each="producto : ${productos}">
-                        <td><img th:src="'http://www.imagenestaller.free.nf/' + ${producto.imagen}"
-                                 style="height: 30px; width: 30px"></td>
-                        <td th:text="${producto.nombre}"></td>
-                        <td class="precioTotalDelProducto" th:text="'$' + ${producto.precioFormateado}"></td>
-
-                        <td class="text-center" th:data-id="${producto.id}">
-                            <div class="d-flex justify-content-center align-items-center gap-2">
-                                <button type="button" class="btn btn-outline-secondary btn-sm btnRestarCantidad">-</button>
-                                <span th:text="${producto.cantidad}" class="mx-2 productoCantidad"></span>
-                                <button type="button" class="btn btn-outline-secondary btn-sm btnSumarCantidad">+</button>
-                                <button type="button" th:data-id="${producto.id}"
-                                        class="btn btn-outline-danger btn-sm ms-2 btnEliminarProducto">
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <tr th:if="${productosArmados != null and !productosArmados.isEmpty()}" class="text-center"
-                        th:each="productoArmado : ${productosArmados}">
-                        <td><img th:src="'http://www.imagenestaller.free.nf/' + ${productoArmado.imagen}"
-                                 style="height: 30px; width: 30px"></td>
-                        <td th:utext="${productoArmado.nombre} + '<br><b> Armado ' + ${productoArmado.numeroDeArmadoAlQuePertenece} + '</b>'"></td>
-                        <td class="precioTotalDelProducto" th:text="'$' + ${productoArmado.precioFormateado}"></td>
-
-                        <td class="text-center" th:data-id="${productoArmado.id}" th:data-numeroDeArmado="${productoArmado.numeroDeArmadoAlQuePertenece}">
-                            <div class="d-flex justify-content-center align-items-center gap-2">
-                                <button type="button" class="btn btn-outline-secondary btn-sm btnRestarCantidad"
-                                        th:if="${productoArmado.precio > 0.0}">-
-                                </button>
-                                <span th:text="${productoArmado.cantidad}" class="mx-2 productoCantidad"></span>
-                                <button type="button" class="btn btn-outline-secondary btn-sm btnSumarCantidad"
-                                        th:if="${productoArmado.precio > 0.0}">+
-                                </button>
-                                <button type="button" th:data-id="${productoArmado.id}"
-                                        class="btn btn-outline-danger btn-sm ms-2 btnEliminarProducto">
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <tr th:if="${(productos == null or productos.isEmpty()) && (productosArmados == null or productosArmados.isEmpty())}">
-                        <td colspan="4" class="text-center py-4">No hay productos en el carrito.</td>
-                    </tr>
-                    </tbody>
-                </table>
+        <div class="card mb-4 h-auto shadow-sm" style="width: 100%;">
+            <div class="card-header bg-light">
+                <h3 class="card-title mb-0 d-flex align-items-center">
+                    <i class="bi bi-cart3 me-2"></i>
+                    Productos
+                </h3>
             </div>
-            <div class="card-footer">
-                <h3 class="card-title m-2 text-end">
-                    Total: <span class="valorTotalDelCarrito" th:text="'$' + ${valorTotal}"></span>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table vista-carrito mb-0" style="width: 100%;">
+                        <thead class="table-dark">
+                        <tr class="text-center">
+                            <th scope="col" class="align-middle">Foto</th>
+                            <th scope="col" class="align-middle">Nombre</th>
+                            <th scope="col" class="align-middle">Precio</th>
+                            <th scope="col" class="align-middle">Acciones</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:if="${productos != null and !productos.isEmpty()}"
+                            th:each="producto : ${productos}"
+                            class="border-bottom">
+                            <td class="text-center align-middle py-3">
+                                <img th:src="'http://www.imagenestaller.free.nf/' + ${producto.imagen}"
+                                     class="rounded border" style="height: 50px; width: 50px; object-fit: cover;">
+                            </td>
+                            <td class="align-middle py-3" th:text="${producto.nombre}" style="text-align: left;"></td>
+                            <td class="precioTotalDelProducto text-center align-middle py-3 fw-bold"
+                                th:text="'$' + ${producto.precioFormateado}"></td>
+
+                            <td class="text-center align-middle py-3" th:data-id="${producto.id}">
+                                <div class="d-flex justify-content-center align-items-center gap-2">
+                                    <button type="button" class="btn btn-outline-secondary btn-sm btnRestarCantidad">
+                                        <i class="bi bi-dash"></i>
+                                    </button>
+                                    <span th:text="${producto.cantidad}" class="mx-2 productoCantidad badge bg-light text-dark px-2 py-1"></span>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm btnSumarCantidad">
+                                        <i class="bi bi-plus"></i>
+                                    </button>
+                                    <button type="button" th:data-id="${producto.id}"
+                                            class="btn btn-outline-danger btn-sm ms-2 btnEliminarProducto">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr th:if="${productosArmados != null and !productosArmados.isEmpty()}"
+                            th:each="productoArmado : ${productosArmados}"
+                            class="border-bottom">
+                            <td class="text-center align-middle py-3">
+                                <img th:src="'http://www.imagenestaller.free.nf/' + ${productoArmado.imagen}"
+                                     class="rounded border" style="height: 50px; width: 50px; object-fit: cover;">
+                            </td>
+                            <td class="align-middle py-3" style="text-align: left;">
+                                <div th:utext="${productoArmado.nombre} + '<br><small class=&quot;text-muted&quot;><i class=&quot;bi bi-gear me-1&quot;></i>Armado ' + ${productoArmado.numeroDeArmadoAlQuePertenece} + '</small>'"></div>
+                            </td>
+                            <td class="precioTotalDelProducto text-center align-middle py-3 fw-bold"
+                                th:text="'$' + ${productoArmado.precioFormateado}"></td>
+
+                        <td class="text-center" th:data-id="${productoArmado.id}" th:data-numeroDeArmado="${productoArmado.numeroDeArmadoAlQuePertenece}" th:data-esEscencial="${productoArmado.esEscencialParaElArmado}">
+
+                        <div class="d-flex justify-content-center align-items-center gap-2">
+                                    <button type="button" class="btn btn-outline-secondary btn-sm btnRestarCantidad"
+                                            th:if="${productoArmado.precio > 0.0}">
+                                        <i class="bi bi-dash"></i>
+                                    </button>
+                                    <span th:text="${productoArmado.cantidad}" class="mx-2 productoCantidad badge bg-light text-dark px-2 py-1"></span>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm btnSumarCantidad"
+                                            th:if="${productoArmado.precio > 0.0}">
+                                        <i class="bi bi-plus"></i>
+                                    </button>
+                                    <button type="button" th:data-id="${productoArmado.id}"
+                                            class="btn btn-outline-danger btn-sm ms-2 btnEliminarProducto">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr th:if="${(productos == null or productos.isEmpty()) && (productosArmados == null or productosArmados.isEmpty())}">
+                            <td colspan="4" class="text-center py-5 text-muted">
+                                <i class="bi bi-cart-x display-4 mb-3"></i>
+                                <p class="mb-0">No hay productos en el carrito.</p>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer bg-light">
+                <h3 class="card-title mb-0 text-end">
+                    Total: <span class="valorTotalDelCarrito fw-bold" th:text="'$' + ${valorTotal}"></span>
                     <input type="hidden" id="totalOriginal" name="totalOriginal" th:value="${valorTotal}">
                 </h3>
             </div>
         </div>
 
         <!-- SECCIÓN DE ENVÍO Y PAGO -->
-        <div class="card">
-            <div class="card-body p-4">
+        <div class="card d-flex flex-column shadow-sm" style="width: 100%; min-height: 500px;">
+            <div class="card-body p-4 flex-grow-1">
+                <div class="mb-4">
+                    <h3 class="card-title mb-3 d-flex align-items-center">
+                        <i class="bi bi-truck me-2"></i>
+                        ¿Cómo querés recibir tu compra?
+                    </h3>
+                    <div class="form-check mb-3 p-3 border rounded">
+                        <input class="form-check-input" type="radio" name="tipoEntrega" id="retiro" value="retiro"
+                               checked>
+                        <label class="form-check-label" for="retiro">
+                            <i class="bi bi-shop me-2"></i>
+                            <strong>Retiro en depósito</strong> - Av. Gamer 123, CABA
+                        </label>
+                    </div>
+                    <div class="form-check p-3 border rounded">
+                        <input class="form-check-input" type="radio" name="tipoEntrega" id="envio" value="envio">
+                        <label class="form-check-label" for="envio">
+                            <i class="bi bi-box-seam me-2"></i>
+                            <strong>Envío a correo</strong>
+                        </label>
+                    </div>
+                </div>
 
-                <div class="mb-5">
-                    <h3 class="card-title mb-4">Envío</h3>
+                <div class="mb-5" id="seccion-envio" style="display: none;">
+                    <h3 class="card-title mb-4 d-flex align-items-center">
+                        <i class="bi bi-geo-alt me-2"></i>
+                        Envío
+                    </h3>
                     <form method="post" th:action="@{/carritoDeCompras/calcularEnvio}" id="formulario-envio">
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <input type="text"
-                                       class="form-control"
-                                       name="codigoPostal"
-                                       id="codigoPostal"
-                                       th:value="${codigoPostal}"
-                                       placeholder="Código postal"
-                                       maxlength="4">
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-mailbox"></i>
+                                    </span>
+                                    <input type="text"
+                                           class="form-control"
+                                           name="codigoPostal"
+                                           id="codigoPostal"
+                                           th:value="${codigoPostal}"
+                                           placeholder="Código postal"
+                                           maxlength="4">
+                                </div>
                             </div>
                             <div class="col-md-6">
                                 <button type="submit" class="btn btn-primary w-100" id="btnCalcular">
+                                    <i class="bi bi-calculator me-2"></i>
                                     Calcular Envío
                                 </button>
                             </div>
                         </div>
 
                         <div id="loading" class="text-center mb-3 d-none">
-                            <div class="spinner-border spinner-border-sm" role="status"></div>
+                            <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
                             <small class="ms-2">Calculando...</small>
                         </div>
 
                         <div class="row g-3 mb-3">
                             <div class="col-md-4">
-                                <div class="border rounded p-3 text-center">
+                                <div class="border rounded p-3 text-center bg-light">
+                                    <i class="bi bi-currency-dollar text-success mb-2"></i>
                                     <small class="text-muted d-block">Costo estimado</small>
                                     <span id="costo" class="fw-bold"
                                           th:text="${envioCalculado} ? ('$' + ${envio.costo}) : '-'">-</span>
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="border rounded p-3 text-center">
+                                <div class="border rounded p-3 text-center bg-light">
+                                    <i class="bi bi-clock text-info mb-2"></i>
                                     <small class="text-muted d-block">Tiempo estimado</small>
                                     <span id="tiempo" class="fw-bold"
                                           th:text="${envioCalculado} ? ${envio.tiempo} : '-'">-</span>
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="border rounded p-3 text-center">
+                                <div class="border rounded p-3 text-center bg-light">
+                                    <i class="bi bi-pin-map text-warning mb-2"></i>
                                     <small class="text-muted d-block">Zona de entrega</small>
                                     <span id="zona" class="fw-bold"
                                           th:text="${envioCalculado} ? ${envio.destino} : '-'">-</span>
@@ -142,7 +188,7 @@
                             </div>
                         </div>
                         <div id="alertaSinCobertura" class="alert alert-warning alert-dismissible fade show d-none">
-                            <i class="fa-solid fa-exclamation-triangle me-2"></i>
+                            <i class="bi bi-exclamation-triangle me-2"></i>
                             <strong>Sin cobertura:</strong> Sin cobertura para este código postal. Intente con zonas
                             cercanas o códigos postales vecinos.
                             <button type="button" class="btn-close"
@@ -151,9 +197,11 @@
 
                         <!-- Mensajes de error del envío -->
                         <div th:if="${errorEnvio}" class="alert alert-danger">
+                            <i class="bi bi-x-circle me-2"></i>
                             <small th:text="${errorEnvio}"></small>
                         </div>
                         <div th:if="${sinCobertura}" class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
                             <small th:text="${mensajeEnvio}"></small>
                         </div>
                     </form>
@@ -164,12 +212,18 @@
                 <!-- SECCIÓN DE DESCUENTO Y PAGO -->
                 <div class="row">
                     <div class="col-md-6 mb-4">
-                        <h3 class="card-title mb-3">Código de descuento</h3>
-                        <div class="d-flex align-items-center mb-3">
-                            <input type="text" class="form-control me-2" name="codigoInput" id="codigoInput"
+                        <h3 class="card-title mb-3 d-flex align-items-center">
+                            <i class="bi bi-percent me-2"></i>
+                            Código de descuento
+                        </h3>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">
+                                <i class="bi bi-tag"></i>
+                            </span>
+                            <input type="text" class="form-control" name="codigoInput" id="codigoInput"
                                    placeholder="¿Tenés un código?">
                             <button type="button" class="btn btn-success" id="btnAplicarDescuento">
-                                <i class="fa-solid fa-check"></i>
+                                <i class="bi bi-check-lg"></i>
                             </button>
                         </div>
                         <div id="mensajeDescuento" class="alert alert-info py-2 px-3 d-none"
@@ -180,34 +234,47 @@
 
                     <!-- FORMULARIO DE METODO DE PAGO -->
                     <div class="col-md-6">
-                        <h3 class="card-title mb-3">Método de pago</h3>
+                        <h3 class="card-title mb-3 d-flex align-items-center">
+                            <i class="bi bi-credit-card me-2"></i>
+                            Método de pago
+                        </h3>
                         <form method="POST" action="/checkout/create-payment" id="formulario-pago">
                             <div id="campos-productos"></div>
-                            <div class="form-check mb-3">
-                                <input class="form-check-input" type="radio" id="mercadoPago" name="metodoPago"
-                                       value="mercadoPago">
-                                <label class="form-check-label" for="mercadoPago">
-                                    Mercado pago - Usás tu cuenta de MP
-                                </label>
+                            <div class="d-flex flex-column gap-3">
+                                <div class="form-check p-3 border rounded">
+                                    <input class="form-check-input" type="radio" id="mercadoPago" name="metodoPago"
+                                           value="mercadoPago">
+                                    <label class="form-check-label" for="mercadoPago">
+                                        <i class="bi bi-wallet2 me-2"></i>
+                                        <strong>Mercado Pago</strong> - Usás tu cuenta de MP
+                                    </label>
+                                </div>
+                                <div class="form-check p-3 border rounded">
+                                    <input class="form-check-input" type="radio" id="tarjetaCredito" name="metodoPago" value="tarjetaCredito">
+                                    <label class="form-check-label" for="tarjetaCredito">
+                                        <i class="bi bi-credit-card-2-front me-2"></i>
+                                        <strong>Tarjeta de crédito</strong> - (Pesos o Dólares)
+                                    </label>
+                                </div>
+                                <div class="form-check p-3 border rounded mb-2">
+                                    <input class="form-check-input" type="radio" id="efectivo" name="metodoPago" value="efectivo">
+                                    <label class="form-check-label" for="efectivo">
+                                        <i class="bi bi-cash me-2"></i>
+                                        <strong>Efectivo</strong> - Pago fácil
+                                    </label>
+                                </div>
                             </div>
-                            <!-- Nueva opción: Tarjeta de crédito -->
-                            <div class="form-check mb-3">
-                                <input class="form-check-input" type="radio" id="tarjetaCredito" name="metodoPago"
-                                       value="tarjetaCredito">
-                                <label class="form-check-label" for="tarjetaCredito">
-                                    Abonar con tarjeta de crédito
-                                </label>
-                            </div>
-
 
                             <!-- Alertas y botón -->
                             <div id="errorMetodoPago" class="alert alert-danger d-none" role="alert"></div>
                             <div th:if="${error}" class="alert alert-danger" role="alert">
+                                <i class="bi bi-x-circle me-2"></i>
                                 <span th:text="${error}"></span>
                             </div>
 
                             <div class="d-grid">
                                 <button id="btnComprar" class="btn btn-dark btn-lg">
+                                    <i class="bi bi-bag-check me-2"></i>
                                     Finalizar compra
                                 </button>
                             </div>
@@ -221,14 +288,3 @@
 </div>
 
 <div th:replace="fragments/fragments :: footer"></div>
-
-<!--<script type="text/javascript" th:src="@{/webjars/bootstrap/5.2.0/js/bootstrap.min.js}"></script>-->
-<!--<script th:src="@{/webjars/bootstrap/5.2.0/js/bootstrap.bundle.min.js}"></script>-->
-<!--<script type="text/javascript" th:src="@{/js/agregarAlCarrito.js}"></script>-->
-<!--<script type="text/javascript" th:src="@{/js/carritoDeCompras.js}"></script>-->
-<!--<script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>-->
-<!--<script type="text/javascript"-->
-<!--        src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>-->
-<!--<script src="https://kit.fontawesome.com/36c2602d92.js" crossorigin="anonymous"></script>-->
-<!--</body>-->
-<!--</html>-->

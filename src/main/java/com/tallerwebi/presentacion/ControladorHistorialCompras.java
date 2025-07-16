@@ -1,6 +1,7 @@
 package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.ServicioCompra;
+import com.tallerwebi.dominio.ServicioPrecios;
 import com.tallerwebi.dominio.entidades.Compra;
 import org.dom4j.rule.Mode;
 import org.springframework.stereotype.Controller;
@@ -10,6 +11,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,8 +46,10 @@ public class ControladorHistorialCompras {
         }
 
         List<Compra> comprasUsuario = this.servicioCompra.obtenerCompraComponenteDeUnUsuarioLogueado(usuarioLogueado);
+
         response.put("success", true);
         response.put("comprasUsuario", comprasUsuario);
+
         return response;
     }
 
@@ -57,9 +62,6 @@ public class ControladorHistorialCompras {
 
                 modelo.addAttribute("comprasUsuario", comprasUsuario);
                 modelo.addAttribute("cantidadDeCompras", comprasUsuario.size());
-            } else {
-                modelo.addAttribute("comprasUsuario", new ArrayList<>());
-                modelo.addAttribute("cantidadDeCompras", 0);
             }
 
         } catch (Exception e) {

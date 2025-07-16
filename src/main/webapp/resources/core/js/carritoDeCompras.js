@@ -94,6 +94,9 @@ document.addEventListener("DOMContentLoaded", function () {
         formularioPago.addEventListener("submit", function (e) {
             e.preventDefault();
 
+            const formaDeEntrega = document.querySelector('input[name="tipoEntrega"]:checked')?.value;
+            const codigoPostal = document.getElementById("codigoPostal");
+
             let metodoSeleccionado = document.querySelector('input[name="metodoPago"]:checked');
             if (metodoSeleccionado === null) {
                 const errorDiv = document.getElementById("errorMetodoPago");
@@ -110,6 +113,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const params = new URLSearchParams();
             params.append('metodoPago', metodoSeleccionado.value);
+            params.append('formaEntrega', formaDeEntrega);
+            params.append('codigoPostal', codigoPostal.value);
+
             const valorTotalElement = document.querySelector('.valorTotalDelCarrito');
             params.append('totalConDescuento',valorTotalElement.dataset.valorConDescuento);
 
@@ -132,12 +138,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     if (data.success && metodoSeleccionado.value === "mercadoPago") {
                         crearFormularioMercadoPago(data);
-                        btnComprar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Redirigiendo a MercadoPago...';
+                        btnComprar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Redirigiendo a mercado pago...';
                         btnComprar.disabled = true;
                     }
                     if ( data.success && metodoSeleccionado.value === "tarjetaCredito" && data.redirect ) {
                         window.location.href = data.redirect;
                         btnComprar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Redirigiendo a Tarjeta de credito...';
+                        btnComprar.disabled = true;
+                    }
+
+                    if ( data.success && metodoSeleccionado.value === "efectivo" && data.redirect ) {
+                        window.location.href = data.redirect;
+                        btnComprar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Redirigiendo';
                         btnComprar.disabled = true;
                     }
 
@@ -282,3 +294,22 @@ function formatearPrecio(valor) {
         minimumFractionDigits: 2
     }).format(valor);
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+    const radioRetiro = document.getElementById("retiro");
+    const radioEnvio = document.getElementById("envio");
+    const seccionEnvio = document.getElementById("seccion-envio");
+
+    function actualizarVisibilidadEnvio() {
+        if (radioEnvio.checked) {
+            seccionEnvio.style.display = "block";
+        } else {
+            seccionEnvio.style.display = "none";
+        }
+    }
+
+    radioRetiro.addEventListener("change", actualizarVisibilidadEnvio);
+    radioEnvio.addEventListener("change", actualizarVisibilidadEnvio);
+
+    actualizarVisibilidadEnvio(); // Para que tome el estado inicial
+});

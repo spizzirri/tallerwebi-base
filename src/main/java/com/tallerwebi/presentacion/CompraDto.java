@@ -2,6 +2,7 @@ package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.entidades.Compra;
 
+import javax.persistence.Column;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,6 +17,10 @@ public class CompraDto {
     private Long idUsuario;
     private List<CompraComponenteDto> productosComprados;
     private String cp;
+    private String formaEntrega;
+    private Double costoDeEnvio;
+    private String moneda;
+    private Double totalDolar;
 
     public CompraDto(Compra compra) {
         this.id = compra.getIdCompra();
@@ -27,9 +32,14 @@ public class CompraDto {
         this.productosComprados = compra.getProductosComprados().stream()
                 .map(CompraComponenteDto::new)
                 .collect(Collectors.toList());
+        this.formaEntrega = compra.getFormaEntrega();
+        this.costoDeEnvio = compra.getCostoDeEnvio();
+        this.moneda = compra.getMoneda();
+        this.totalDolar = compra.getTotalDolar();
     }
 
-    public CompraDto() {}
+    public CompraDto() {
+    }
 
     public List<CompraComponenteDto> getProductosComprados() {
         return productosComprados;
@@ -79,7 +89,43 @@ public class CompraDto {
         this.productosComprados = productosComprados;
     }
 
-    public String getCp() { return this.cp;
+    public void setFormaEntrega(String formaEntrega) {
+        this.formaEntrega = formaEntrega;
     }
-    public void setCp(String cp) {this.cp = cp;}
+
+    public String getFormaEntrega() {
+        return formaEntrega;
+    }
+
+    public String getCp() {
+        return this.cp;
+    }
+
+    public void setCp(String cp) {
+        this.cp = cp;
+    }
+
+    public Double getCostoDeEnvio() {
+        return costoDeEnvio;
+    }
+
+    public void setCostoDeEnvio(Double costoDeEnvio) {
+        this.costoDeEnvio = costoDeEnvio;
+    }
+
+    public String getMoneda() {
+        return moneda;
+    }
+
+    public void setMoneda(String moneda) {
+        this.moneda = moneda;
+    }
+
+    public void setTotalDolar(Double totalCompraEnDolares) {
+        this.totalDolar = totalCompraEnDolares;
+    }
+
+    public Double getTotalDolar() {
+        return totalDolar;
+    }
 }

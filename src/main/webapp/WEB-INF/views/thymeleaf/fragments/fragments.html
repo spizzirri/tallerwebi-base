@@ -22,6 +22,7 @@
         <link rel="stylesheet" th:href="@{/css/fragments.css}">
         <link rel="stylesheet" th:href="@{/css/main.css}"/>
         <link rel="stylesheet" th:href="@{/css/historialDeCompras.css}"/>
+        <link rel="stylesheet" th:href="@{/css/arma-tu-pc.css}"/>
     </head>
 
     <body style="margin: 0px;padding: 0px;  min-height: 100vh">
@@ -112,75 +113,103 @@
                 <button id="cerrarResumenCarrito">X</button>
             </div>
             <div class="carrito-body" id="carritoContenido">
-                <div class="card mb-4">
-                    <h3 class="card-title m-3">Productos</h3>
-                    <div class="card-body">
-                        <table class="table">
-                            <thead>
-                            <tr class="text-center">
-                                <th scope="col">Foto</th>
-                                <th scope="col">Nombre</th>
-                                <th scope="col">Precio</th>
-                                <th scope="col">Acciones</th>
-                            </tr>
-                            </thead>
-                            <tbody >
-                            <tr th:if="${productos != null and !productos.isEmpty()}" class="text-center" th:each="producto : ${productos}">
-                                <td><img th:src="'http://www.imagenestaller.free.nf/' + ${producto.imagen}"
-                                         style="height: 30px; width: 30px"></td>
-                                <td th:text="${producto.nombre}"
-                                    style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></td>
-                                <td class="precioTotalDelProducto" th:text="'$' + ${producto.precioFormateado}"></td>
-                                <td class="text-center" th:data-id="${producto.id}">
-                                    <div class="d-flex justify-content-center align-items-center gap-2">
-                                        <button type="button"
-                                                class="btn btn-outline-secondary btn-sm btnRestarCantidad">-
-                                        </button>
-                                        <span th:text="${producto.cantidad}" class="mx-2 productoCantidad"></span>
-                                        <button type="button" class="btn btn-outline-secondary btn-sm btnSumarCantidad">
-                                            +
-                                        </button>
-                                        <button type="button" th:data-id="${producto.id}"
-                                                class="btn btn-outline-danger btn-sm ms-2 btnEliminarProducto">
-                                            <i class="bi bi-trash3"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr class="text-center" th:if="${productosArmados != null and !productosArmados.isEmpty()}"
-                                th:each="productoArmado : ${productosArmados}">
-                                <td><img th:src="'http://www.imagenestaller.free.nf/' + ${productoArmado.imagen}"
-                                         style="height: 30px; width: 30px"></td>
-                                <td th:utext="${productoArmado.nombre} + '<br><b> Armado ' + ${productoArmado.numeroDeArmadoAlQuePertenece} + '</b>'"
-                                    style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></td>
-                                <td class="precioTotalDelProducto" th:text="'$' + ${productoArmado.precioFormateado}"></td>
-                                <td class="text-center" th:data-id="${productoArmado.id}" th:data-numeroDeArmado="${productoArmado.numeroDeArmadoAlQuePertenece}">
-                                    <div class="d-flex justify-content-center align-items-center gap-2">
-                                        <button type="button" class="btn btn-outline-secondary btn-sm btnRestarCantidad"
-                                                th:if="${productoArmado.precio > 0.0}">-
-                                        </button>
-                                        <span th:text="${productoArmado.cantidad}" class="mx-2 productoCantidad"></span>
-                                        <button type="button" class="btn btn-outline-secondary btn-sm btnSumarCantidad"
-                                                th:if="${productoArmado.precio > 0.0}">+
-                                        </button>
-                                        <button type="button" th:data-id="${productoArmado.id}"
-                                                class="btn btn-outline-danger btn-sm ms-2 btnEliminarProducto">
-                                            <i class="bi bi-trash3"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr th:if="${(productos == null or productos.isEmpty()) && (productosArmados == null or productosArmados.isEmpty())}">
-                                <td colspan="4" class="text-center py-4">No hay productos en el carrito.</td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="card-footer">
-                        <h3 class="card-title m-2 text-end">
-                            Total: <span class="valorTotalDelCarrito" th:text="'$' + ${valorTotal}"></span>
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-header bg-light">
+                        <h3 class="card-title mb-0 d-flex align-items-center">
+                            <i class="bi bi-cart3 me-2"></i>
+                            Productos
                         </h3>
-                        <a href="/carritoDeCompras/index" id="resumen-carrito" class="btn btn-warning w-100">Ir al pago</a>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table mb-0">
+                                <thead class="table-dark">
+                                <tr class="text-center">
+                                    <th scope="col" class="align-middle">Foto</th>
+                                    <th scope="col" class="align-middle">Nombre</th>
+                                    <th scope="col" class="align-middle">Precio</th>
+                                    <th scope="col" class="align-middle">Acciones</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:if="${productos != null and !productos.isEmpty()}"
+                                    th:each="producto : ${productos}"
+                                    class="border-bottom">
+                                    <td class="text-center align-middle py-3">
+                                        <img th:src="'http://www.imagenestaller.free.nf/' + ${producto.imagen}"
+                                             class="rounded border" style="height: 40px; width: 40px; object-fit: cover;">
+                                    </td>
+                                    <td class="align-middle py-3" th:text="${producto.nombre}"
+                                        style="max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left;"></td>
+                                    <td class="precioTotalDelProducto text-center align-middle py-3 fw-bold"
+                                        th:text="'$' + ${producto.precioFormateado}"></td>
+                                    <td class="text-center align-middle py-3" th:data-id="${producto.id}">
+                                        <div class="d-flex justify-content-center align-items-center gap-1">
+                                            <button type="button"
+                                                    class="btn btn-outline-secondary btn-sm btnRestarCantidad">
+                                                <i class="bi bi-dash"></i>
+                                            </button>
+                                            <span th:text="${producto.cantidad}" class="mx-1 productoCantidad badge bg-light text-dark px-2 py-1"></span>
+                                            <button type="button" class="btn btn-outline-secondary btn-sm btnSumarCantidad">
+                                                <i class="bi bi-plus"></i>
+                                            </button>
+                                            <button type="button" th:data-id="${producto.id}"
+                                                    class="btn btn-outline-danger btn-sm ms-1 btnEliminarProducto">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr th:if="${productosArmados != null and !productosArmados.isEmpty()}"
+                                    th:each="productoArmado : ${productosArmados}"
+                                    class="border-bottom">
+                                    <td class="text-center align-middle py-3">
+                                        <img th:src="'http://www.imagenestaller.free.nf/' + ${productoArmado.imagen}"
+                                             class="rounded border" style="height: 40px; width: 40px; object-fit: cover;">
+                                    </td>
+                                    <td class="align-middle py-3" style="max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left;">
+                                        <div th:utext="${productoArmado.nombre} + '<br><small class=&quot;text-muted&quot;><i class=&quot;bi bi-gear me-1&quot;></i>Armado ' + ${productoArmado.numeroDeArmadoAlQuePertenece} + '</small>'"></div>
+                                    </td>
+                                    <td class="precioTotalDelProducto text-center align-middle py-3 fw-bold"
+                                        th:text="'$' + ${productoArmado.precioFormateado}"></td>
+                                    <td class="text-center align-middle py-3" th:data-id="${productoArmado.id}"
+                                        th:data-numeroDeArmado="${productoArmado.numeroDeArmadoAlQuePertenece}"
+                                        th:data-esEscencial="${productoArmado.esEscencialParaElArmado}">
+                                        <div class="d-flex justify-content-center align-items-center gap-1">
+                                            <button type="button" class="btn btn-outline-secondary btn-sm btnRestarCantidad"
+                                                    th:if="${productoArmado.precio > 0.0}">
+                                                <i class="bi bi-dash"></i>
+                                            </button>
+                                            <span th:text="${productoArmado.cantidad}" class="mx-1 productoCantidad badge bg-light text-dark px-2 py-1"></span>
+                                            <button type="button" class="btn btn-outline-secondary btn-sm btnSumarCantidad"
+                                                    th:if="${productoArmado.precio > 0.0}">
+                                                <i class="bi bi-plus"></i>
+                                            </button>
+                                            <button type="button" th:data-id="${productoArmado.id}"
+                                                    class="btn btn-outline-danger btn-sm ms-1 btnEliminarProducto">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr th:if="${(productos == null or productos.isEmpty()) && (productosArmados == null or productosArmados.isEmpty())}">
+                                    <td colspan="4" class="text-center py-5 text-muted">
+                                        <i class="bi bi-cart-x display-6 mb-3"></i>
+                                        <p class="mb-0">No hay productos en el carrito.</p>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-light">
+                        <h3 class="card-title mb-3 text-end">
+                            Total: <span class="valorTotalDelCarrito fw-bold" th:text="'$' + ${valorTotal}"></span>
+                        </h3>
+                        <a href="/carritoDeCompras/index" id="resumen-carrito" class="btn btn-warning w-100">
+                            <i class="bi bi-bag-check me-2"></i>
+                            Ir al pago
+                        </a>
                     </div>
                 </div>
             </div>
@@ -244,6 +273,8 @@
     <script type="text/javascript" th:src="@{/js/armaTuPc.js}"></script>
     <script type="text/javascript" th:src="@{/js/agregarAlCarrito.js}"></script>
     <script type="text/javascript" th:src="@{/js/carritoDeCompras.js}"></script>
+    <script type="text/javascript" th:src="@{/js/historialDeCompra.js}"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
