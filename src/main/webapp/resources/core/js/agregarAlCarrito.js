@@ -166,6 +166,7 @@ function asignarEventosVistaCarrito() {
                 const precioTotalDelProducto = fila.querySelector(".precioTotalDelProducto");
                 const tdConId = fila ? fila.querySelector('[data-id]') : null;
                 const tdConNumeroDeArmado = fila ? fila.querySelector('[data-numeroDeArmado]') : null;
+                const tdConEsEscencial = fila ? fila.querySelector('[data-esEscencial]') : null;
 
                 if (!tdConId) {
                     console.error("No se pudo encontrar el data-id del producto");
@@ -178,45 +179,59 @@ function asignarEventosVistaCarrito() {
                 const idProducto = tdConId.dataset.id;
                 console.log("id " + idProducto);
 
+                let reiniciarPagina;
                 let url = "";
                 if(numeroDeArmado != null && idProducto != null){
-                    url = `/carritoDeCompras/restarCantidadDeUnProducto/${idProducto}/${numeroDeArmado}`;
-                    console.log("entro al numero de armado");
+                    if(spanCantidad.textContent == "1" && tdConEsEscencial && tdConEsEscencial.dataset.esescencial === "true"){
+                        if(confirm(`Este componente es escencial para el Armado ${numeroDeArmado} si lo elimina el armado entero se borrara. ¿Quiere eliminarlo igualmente?`)){
+                            url = `/carritoDeCompras/restarCantidadDeUnProducto/${idProducto}/${numeroDeArmado}`;
+                            console.log("entro al numero de armado");
+                            reiniciarPagina = true;
+                        }
+                    }else{
+                        url = `/carritoDeCompras/restarCantidadDeUnProducto/${idProducto}/${numeroDeArmado}`;
+                        console.log("entro al numero de armado");
+                    }
+
                 } else if (idProducto != null){
                     url = `/carritoDeCompras/restarCantidadDeUnProducto/${idProducto}`;
                     console.log("entro al id");
                 }
 
-                fetch(url, {
-                    method: 'POST'
-                })
-                    .then(response => response.json())
-                    .then(data => {
-
-                        if (data.eliminado) {
-                            fila.remove();
-                        } else {
-                            if (data.cantidad !== undefined && spanCantidad) {
-                                spanCantidad.textContent = data.cantidad;
-                            }
-                            if (data.precioTotalDelProducto !== undefined && precioTotalDelProducto) {
-                                precioTotalDelProducto.textContent = `$${data.precioTotalDelProducto}`;
-                            }
-                        }
-
-                        if (data.valorTotal !== undefined) {
-                            document.querySelectorAll(".valorTotalDelCarrito").forEach(el => {
-                                el.textContent = `$${data.valorTotal}`;
-                            });
-                        }
-
-                        if (data.cantidadEnCarrito !== undefined) {
-                            actualizarContadorCarrito(data.cantidadEnCarrito);
-                        }
+                if (url != ""){
+                    fetch(url, {
+                        method: 'POST'
                     })
-                    .catch(error => {
-                        console.error("Error:", error);
-                    });
+                        .then(response => response.json())
+                        .then(data => {
+
+                            if (data.eliminado) {
+                                fila.remove();
+                            } else {
+                                if (data.cantidad !== undefined && spanCantidad) {
+                                    spanCantidad.textContent = data.cantidad;
+                                }
+                                if (data.precioTotalDelProducto !== undefined && precioTotalDelProducto) {
+                                    precioTotalDelProducto.textContent = `$${data.precioTotalDelProducto}`;
+                                }
+                            }
+
+                            if (data.valorTotal !== undefined) {
+                                document.querySelectorAll(".valorTotalDelCarrito").forEach(el => {
+                                    el.textContent = `$${data.valorTotal}`;
+                                });
+                            }
+
+                            if (data.cantidadEnCarrito !== undefined) {
+                                actualizarContadorCarrito(data.cantidadEnCarrito);
+                            }
+
+                            if (reiniciarPagina) location.reload();
+                        })
+                        .catch(error => {
+                            console.error("Error:", error);
+                        });
+                }
             });
         }
     });
@@ -237,6 +252,7 @@ function asignarEventosVistaCarrito() {
 
                 const tdConId = fila ? fila.querySelector('[data-id]') : null;
                 const tdConNumeroDeArmado = fila ? fila.querySelector('[data-numeroDeArmado]') : null;
+                const tdConEsEscencial = fila ? fila.querySelector('[data-esEscencial]') : null;
 
                 const idProductoAEliminar = tdConId.dataset.id;
                 console.log("id " + idProductoAEliminar);
@@ -251,36 +267,49 @@ function asignarEventosVistaCarrito() {
 
                 let url = "";
                 if(numeroDeArmado != null){
-                    url = `/carritoDeCompras/eliminarProducto/${idProductoAEliminar}/${numeroDeArmado}`;
-                    console.log("entro al numero de armado");
+                    if(tdConEsEscencial && tdConEsEscencial.dataset.esescencial === "true"){
+                        if(confirm(`Este componente es escencial para el Armado ${numeroDeArmado} si lo elimina el armado entero se borrara. ¿Quiere eliminarlo igualmente?`)){
+                            url = `/carritoDeCompras/eliminarProducto/${idProductoAEliminar}/${numeroDeArmado}`;
+                            console.log("entro al numero de armado");
+                            reiniciarPagina = true;
+                        }
+                    }else{
+                        url = `/carritoDeCompras/eliminarProducto/${idProductoAEliminar}/${numeroDeArmado}`;
+                        console.log("entro al numero de armado");
+                    }
                 } else if (true){
                     url = `/carritoDeCompras/eliminarProducto/${idProductoAEliminar}`;
                     console.log("entro al id");
                 }
 
-                fetch(url, {
-                    method: 'POST'
-                })
-                    .then(response => response.json())
-                    .then(data => {
-
-                        if (data.eliminado && fila) {
-                            fila.remove();
-                        }
-
-                        if (data.valorTotal !== undefined) {
-                            document.querySelectorAll(".valorTotalDelCarrito").forEach(el => {
-                                el.textContent = `$${data.valorTotal}`;
-                            });
-                        }
-
-                        if (data.cantidadEnCarrito !== undefined) {
-                            actualizarContadorCarrito(data.cantidadEnCarrito);
-                        }
+                if (url != ""){
+                    fetch(url, {
+                        method: 'POST'
                     })
-                    .catch(error => {
-                        console.error("Error:", error);
-                    });
+                        .then(response => response.json())
+                        .then(data => {
+
+                            if (data.eliminado && fila) {
+                                fila.remove();
+                            }
+
+                            if (data.valorTotal !== undefined) {
+                                document.querySelectorAll(".valorTotalDelCarrito").forEach(el => {
+                                    el.textContent = `$${data.valorTotal}`;
+                                });
+                            }
+
+                            if (data.cantidadEnCarrito !== undefined) {
+                                actualizarContadorCarrito(data.cantidadEnCarrito);
+                            }
+
+                            if (reiniciarPagina) location.reload();
+                        })
+                        .catch(error => {
+                            console.error("Error:", error);
+                        });
+                }
+
             });
         }
     });
@@ -304,6 +333,7 @@ window.asignarEventosDelResumenCarrito = function () {
 
                 const tdConId = fila ? fila.querySelector('[data-id]') : null;
                 const tdConNumeroDeArmado = fila ? fila.querySelector('[data-numeroDeArmado]') : null;
+                const tdConEsEscencial = fila ? fila.querySelector('[data-esEscencial]') : null;
 
                 if (!tdConId) {
                     console.error("No se pudo encontrar el data-id del producto");
@@ -317,25 +347,36 @@ window.asignarEventosDelResumenCarrito = function () {
 
                 let url = "";
                 if(numeroDeArmado != null && id != null){
-                    url = `/carritoDeCompras/restarCantidadDeUnProducto/${id}/${numeroDeArmado}`;
-                    console.log("entro al numero de armado");
+                    const spanCantidad = fila.querySelector(".productoCantidad");
+                    if(spanCantidad.textContent == "1" && tdConEsEscencial && tdConEsEscencial.dataset.esescencial === "true") {
+                        if (confirm(`Este componente es escencial para el Armado ${numeroDeArmado} si lo elimina el armado entero se borrara. ¿Quiere eliminarlo igualmente?`)) {
+                            url = `/carritoDeCompras/restarCantidadDeUnProducto/${id}/${numeroDeArmado}`;
+                            console.log("entro al numero de armado");
+                        }
+                    } else {
+                        url = `/carritoDeCompras/restarCantidadDeUnProducto/${id}/${numeroDeArmado}`;
+                        console.log("entro al numero de armado");
+                    }
+
                 } else if (id != null){
                     url = `/carritoDeCompras/restarCantidadDeUnProducto/${id}`;
                     console.log("entro al id");
                 }
 
+                if (url != ""){
+                    fetch(url, {method: 'POST'})
+                        .then(res => res.json())
+                        .then(data => {
+                            actualizarResumenCarrito();
+                            if (data.cantidadEnCarrito !== undefined) {
+                                actualizarContadorCarrito(data.cantidadEnCarrito);
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error:", error);
+                        });
+                }
 
-                fetch(url, {method: 'POST'})
-                    .then(res => res.json())
-                    .then(data => {
-                        actualizarResumenCarrito();
-                        if (data.cantidadEnCarrito !== undefined) {
-                            actualizarContadorCarrito(data.cantidadEnCarrito);
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Error:", error);
-                    });
             });
         }
     });
@@ -404,6 +445,7 @@ window.asignarEventosDelResumenCarrito = function () {
 
                 const tdConId = fila ? fila.querySelector('[data-id]') : null;
                 const tdConNumeroDeArmado = fila ? fila.querySelector('[data-numeroDeArmado]') : null;
+                const tdConEsEscencial = fila ? fila.querySelector('[data-esEscencial]') : null;
 
                 const idProductoAEliminar = tdConId.dataset.id;
                 console.log("id " + idProductoAEliminar);
@@ -418,24 +460,33 @@ window.asignarEventosDelResumenCarrito = function () {
 
                 let url = "";
                 if(numeroDeArmado != null){
-                    url = `/carritoDeCompras/eliminarProducto/${idProductoAEliminar}/${numeroDeArmado}`;
-                    console.log("entro al numero de armado");
+                    if(tdConEsEscencial && tdConEsEscencial.dataset.esescencial === "true") {
+                        if (confirm(`Este componente es escencial para el Armado ${numeroDeArmado} si lo elimina el armado entero se borrara. ¿Quiere eliminarlo igualmente?`)) {
+                            url = `/carritoDeCompras/eliminarProducto/${idProductoAEliminar}/${numeroDeArmado}`;
+                            console.log("entro al numero de armado");
+                        }
+                    }else{
+                        url = `/carritoDeCompras/eliminarProducto/${idProductoAEliminar}/${numeroDeArmado}`;
+                        console.log("entro al numero de armado");
+                    }
                 } else if (true){
                     url = `/carritoDeCompras/eliminarProducto/${idProductoAEliminar}`;
                     console.log("entro al id");
                 }
 
-                fetch(url, {method: 'POST'})
-                    .then(res => res.json())
-                    .then(data => {
-                        actualizarResumenCarrito();
-                        if (data.cantidadEnCarrito !== undefined) {
-                            actualizarContadorCarrito(data.cantidadEnCarrito);
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Error:", error);
-                    });
+                if (url != ""){
+                    fetch(url, {method: 'POST'})
+                        .then(res => res.json())
+                        .then(data => {
+                            actualizarResumenCarrito();
+                            if (data.cantidadEnCarrito !== undefined) {
+                                actualizarContadorCarrito(data.cantidadEnCarrito);
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error:", error);
+                        });
+                }
             });
         }
     });
