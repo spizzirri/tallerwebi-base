@@ -39,7 +39,13 @@ public class ServicioCompraImpl implements ServicioCompra {
         } else {
             compraEntidad.setCp("1440");
         }
-
+        if (compradto.getDocumento()==null || compradto.getDocumento().trim().equals("")) {
+            compraEntidad.setDocumento(usuario.getDni());
+        } else { compraEntidad.setDocumento(compradto.getDocumento()); }
+        if (compradto.getNombreTitular()==null || compradto.getNombreTitular().trim().equals("")) {
+            String nombreYApellido = usuario.getNombre() + " " + usuario.getApellido();
+            compraEntidad.setNombreTitular(nombreYApellido);
+        } else { compraEntidad.setNombreTitular(compradto.getNombreTitular()); }
         compraEntidad.setFecha(compradto.getFecha());
         compraEntidad.setTotal(compradto.getTotal());
         compraEntidad.setMetodoDePago(compradto.getMetodoDePago());

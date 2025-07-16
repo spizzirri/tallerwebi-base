@@ -198,7 +198,7 @@ public class CarritoController {
 
     @RequestMapping(
             value = {
-                    "/carritoDeCompras/agr=egarMasCantidadDeUnProducto/{id}",
+                    "/carritoDeCompras/agregarMasCantidadDeUnProducto/{id}",
                     "/carritoDeCompras/agregarMasCantidadDeUnProducto/{id}/{numeroDeArmado}"
             },
             method = RequestMethod.POST

@@ -31,6 +31,12 @@ public class Compra {
     private String formaEntrega;
 
     @Column(length = 100)
+    private String nombreTitular;
+
+    @Column(length = 100)
+    private String documento;
+
+    @Column(length = 100)
     private Double costoDeEnvio;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -72,6 +78,22 @@ public class Compra {
 
     public void setTotal(Double total) {
         this.total = total;
+    }
+
+    public String getDocumento() {
+        return documento;
+    }
+
+    public String getNombreTitular() {
+        return nombreTitular;
+    }
+
+    public void setNombreTitular(String nombreTitular) {
+        this.nombreTitular = nombreTitular;
+    }
+
+    public void setDocumento(String documento) {
+        this.documento = documento;
     }
 
     public Double getTotal() {

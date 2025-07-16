@@ -151,6 +151,23 @@
                     <input type="number" id="documento" name="documento" placeholder="99.999.999" required/>
                 </div>
             </div>
+            <fieldset style="margin-top: 24px;">
+                <legend>Datos para la factura</legend>
+
+                <label for="nombreCliente">Nombre o Razón Social</label>
+                <input type="text" id="nombreCliente" name="nombreCliente" placeholder="Ej: Juan Pérez" required>
+
+                <label for="ivaCliente">Condición frente al IVA</label>
+                <select id="ivaCliente" name="ivaCliente" required>
+                    <option>Consumidor Final</option>
+                    <option>Monotributista</option>
+                    <option>Responsable Inscripto</option>
+                    <option>Exento</option>
+                </select>
+
+                <label for="emailCliente">Email</label>
+                <input type="email" id="emailCliente" name="emailCliente" placeholder="Ej: juan@mail.com">
+            </fieldset>
 
             <button type="submit" id="continuar" class="btn-continuar">Continuar</button>
         </div>

@@ -51,6 +51,9 @@ public class ControladorTarjetaDeCredito {
                                 @RequestParam String codigoSeguridad,
                                 @RequestParam String metodoDePago,
                                 @RequestParam String moneda,
+                                @RequestParam String nombreCliente,
+                                @RequestParam String ivaCliente,
+                                @RequestParam String documento,
                                 HttpSession session) {
 
         ModelMap modelo = new ModelMap();
@@ -61,7 +64,7 @@ public class ControladorTarjetaDeCredito {
         Boolean codigoDeSeguridad = servicioTarjeta.codigoDeSeguridad(tarjeta);
 
         boolean hayError = false;
-
+        session.setAttribute("iva", ivaCliente);
         if (!tarjetaValida) {
             modelo.addAttribute("mensajeTarjeta", "Número de tarjeta inválido");
             hayError = true;
@@ -88,6 +91,8 @@ public class ControladorTarjetaDeCredito {
             Double totalCompraEnPesos = this.servicioPrecios.conversionDolarAPesoDouble(totalCompraEnDolares);
 
             CompraDto compraDto = new CompraDto();
+            compraDto.setDocumento(documento);
+            compraDto.setNombreTitular(nombreCliente);
             compraDto.setFecha(LocalDateTime.now());
             compraDto.setMetodoDePago(metodoDePago);
             compraDto.setTotal(totalCompraEnPesos);
