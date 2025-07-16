@@ -170,12 +170,12 @@
                         <!-- Card ejemplo -->
                         <div class="col-md-6 col-lg-4 mt-2 h-100" th:classappend="${idsDeComponentesSeleccionados.contains(componente.id)} ? ' order-first' : ''" th:each ="componente : ${componentesLista}">
                             <form method="POST" th:action="@{'/arma-tu-pc/tradicional/' + ${pasoActual} + '/accion'}" class="h-100">
-                                <div class="card h-75 position-relative">
+                                <div class="card card-armado h-75 position-relative">
                                     <div class="position-absolute top-0 end-0 p-2">
                                         <a th:if="${componente.precio > 0.0}" th:href="@{/productoEspecifico/{id}(id=${componente.id})}" target="_blank" class="fs-3 text-primary"><i class="bi bi-info-circle"></i></a>
                                     </div>
                                     <div>
-                                        <img th:src="'http://www.imagenestaller.free.nf/' +  ${componente.imagen}" class="card-img-top img-fluid" th:alt="${componente.modelo}">
+                                        <img th:src="'http://www.imagenestaller.free.nf/' +  ${componente.imagen}" class="card-img-top card-img-top-armado" th:alt="${componente.modelo}">
                                     </div>
                                     <div class="card-body d-flex flex-column h-100">
                                         <p class="card-title" th:text="${componente.modelo}"></p>
