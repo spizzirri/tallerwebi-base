@@ -35,6 +35,9 @@ public class CompraComponente {
     @Column
     private Integer numeroDeArmado;
 
+    @Column
+    private Double precioDolar;
+
     public CompraComponente() {}
 
     public CompraComponente(Compra compra, Componente componente, Integer cantidad, Double precioUnitario, Boolean esArmado, Integer numeroDeArmado, String urlImagen) {
@@ -109,6 +112,14 @@ public class CompraComponente {
 
     public void setNumeroDeArmado(Integer numeroDeArmado) {
         this.numeroDeArmado = numeroDeArmado;
+    }
+
+    public Double getPrecioDolar() {
+        return precioDolar;
+    }
+
+    public void setPrecioDolar(Double precioDolar) {
+        this.precioDolar = precioDolar;
     }
 
     @Override

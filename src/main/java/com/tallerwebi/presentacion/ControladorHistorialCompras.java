@@ -1,6 +1,7 @@
 package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.ServicioCompra;
+import com.tallerwebi.dominio.ServicioPrecios;
 import com.tallerwebi.dominio.entidades.Compra;
 import org.dom4j.rule.Mode;
 import org.springframework.stereotype.Controller;

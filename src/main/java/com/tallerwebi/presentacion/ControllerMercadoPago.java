@@ -157,6 +157,9 @@ public class ControllerMercadoPago {
             compraDto.setProductosComprados(convertirACompraComponenteDto(carritoSesion));
             compraDto.setFormaEntrega((String) session.getAttribute("formaEntrega"));
             compraDto.setCostoDeEnvio((Double) session.getAttribute("costo"));
+            compraDto.setMoneda("pesos");
+            compraDto.setTotalDolar(totalCompraEnDolares);
+
 
             servicioCompra.guardarCompraConUsuarioLogueado(compraDto, usuarioLogueado, session);
             response.sendRedirect(preference.getSandboxInitPoint());
@@ -229,6 +232,7 @@ public class ControllerMercadoPago {
             CompraComponenteDto compraComponenteDto = new CompraComponenteDto();
             compraComponenteDto.setCantidad(productosCarrito.getCantidad());
             Double precioEnPesos = this.servicioPrecios.conversionDolarAPesoDouble(productosCarrito.getPrecio() * productosCarrito.getCantidad());
+            compraComponenteDto.setPrecioDolar(productosCarrito.getPrecio() * productosCarrito.getCantidad());
             compraComponenteDto.setPrecioUnitario(precioEnPesos);
             compraComponenteDto.setId(productosCarrito.getId());
             if (productosCarrito instanceof ProductoCarritoArmadoDto){

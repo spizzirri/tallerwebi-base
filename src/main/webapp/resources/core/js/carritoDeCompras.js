@@ -138,12 +138,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     if (data.success && metodoSeleccionado.value === "mercadoPago") {
                         crearFormularioMercadoPago(data);
-                        btnComprar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Redirigiendo a MercadoPago...';
+                        btnComprar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Redirigiendo a mercado pago...';
                         btnComprar.disabled = true;
                     }
                     if ( data.success && metodoSeleccionado.value === "tarjetaCredito" && data.redirect ) {
                         window.location.href = data.redirect;
                         btnComprar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Redirigiendo a Tarjeta de credito...';
+                        btnComprar.disabled = true;
+                    }
+
+                    if ( data.success && metodoSeleccionado.value === "efectivo" && data.redirect ) {
+                        window.location.href = data.redirect;
+                        btnComprar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Redirigiendo';
                         btnComprar.disabled = true;
                     }
 

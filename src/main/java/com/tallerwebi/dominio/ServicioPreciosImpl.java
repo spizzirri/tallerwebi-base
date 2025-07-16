@@ -1,6 +1,5 @@
 package com.tallerwebi.dominio;
 
-import com.tallerwebi.presentacion.ComponenteEspecificoDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +27,8 @@ public class ServicioPreciosImpl implements ServicioPrecios {
         symbols.setGroupingSeparator('.');
         symbols.setDecimalSeparator(',');
         DecimalFormat formatter = new DecimalFormat("#,##0.00", symbols);
+        precio = Math.round(precio * 100.0) / 100.0;
+
         return formatter.format(precio);
     }
 
