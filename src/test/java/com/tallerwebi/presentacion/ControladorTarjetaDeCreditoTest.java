@@ -109,7 +109,7 @@ public class ControladorTarjetaDeCreditoTest {
 
     @Test
     public void FormularioTarjetaDevuelveVistaCorrecta() {
-        ModelAndView vista = controladorTarjetaDeCredito.mostrarFormularioTarjeta();
+        ModelAndView vista = controladorTarjetaDeCredito.mostrarFormularioTarjeta(sessionMock);
 
         assertThat(vista.getViewName(), equalTo("tarjetaDeCredito"));
     }

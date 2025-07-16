@@ -28,6 +28,7 @@ public class ControladorPagoExitoso {
         if (usuarioLogueado == null) {
             return new ModelAndView("redirect:/login");
         }
+
         List<Compra> comprasUsuarioObtenidas = this.servicioCompra.obtenerCompraComponenteDeUnUsuarioLogueado(usuarioLogueado);
 
         List<Compra> comprasUsuario = comprasUsuarioObtenidas.stream().limit(1).collect(Collectors.toList());
@@ -35,7 +36,8 @@ public class ControladorPagoExitoso {
         model.put("tarjeta", session.getAttribute("tarjeta"));
         model.put("tiempo", session.getAttribute("tiempo"));
         model.put("destino", session.getAttribute("destino"));
-        model.put("formaEntrega", session.getAttribute("formaEntrega"));
+        model.put("totalCompraEnPesos", session.getAttribute("totalCompraEnPesos"));
+        model.put("totalCompraEnDolares", session.getAttribute("totalCompraEnDolares"));
 
         model.put("comprasUsuario", comprasUsuario);
 

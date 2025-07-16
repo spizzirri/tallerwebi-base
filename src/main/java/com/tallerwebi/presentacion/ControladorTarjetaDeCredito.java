@@ -129,15 +129,15 @@ public class ControladorTarjetaDeCredito {
     }
 
     @GetMapping("/tarjetaDeCredito")
-    public ModelAndView mostrarFormularioTarjeta() {
+    public ModelAndView mostrarFormularioTarjeta(HttpSession session) {
         ModelMap modelo = new ModelMap();
+        Double totalCompraEnDolares = this.servicioProductoCarrito.calcularValorTotalDeLosProductos();
+        Double totalCompraEnPesos = this.servicioPrecios.conversionDolarAPesoDouble(totalCompraEnDolares);
+        session.setAttribute("totalCompraEnPesos", totalCompraEnPesos);
+        session.setAttribute("totalCompraEnDolares", totalCompraEnDolares);
+
+        modelo.put("precioDolar", this.servicioPrecios.obtenerPrecioFormateado(totalCompraEnDolares));
+        modelo.put("precioPesos", totalCompraEnPesos);
         return new ModelAndView("tarjetaDeCredito", modelo);
-    }
-
-    @GetMapping("/efectivo")
-    public ModelAndView mostrarPagoExitosoEfectivo() {
-        ModelMap modelo = new ModelMap();
-
-        return new ModelAndView("pagoExitoso", modelo);
     }
 }

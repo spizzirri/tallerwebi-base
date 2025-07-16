@@ -57,10 +57,12 @@
                                             <div class="flex-grow-1" style="min-width: 0;">
                                                 <small class="fw-bold d-block nombre-producto"
                                                        style="max-width: 100%;"
-                                                       th:text="${producto.componente.nombre}"></small>
+                                                       th:text="${producto.componente.nombre}">
+                                                </small>
                                                 <small th:if="${producto.esArmado == true}"
                                                        th:text="|Armado ${producto.numeroDeArmado}|"
-                                                       style="color: #1976d2;"></small>
+                                                       style="color: #1976d2;">
+                                                </small>
                                             </div>
 
                                             <div class="text-end" style="white-space: nowrap;">
@@ -69,6 +71,9 @@
                                                 <small class="text-success">
                                                     <span th:text="'$' + ${#numbers.formatDecimal(producto.precioUnitario, 1, 'POINT', 2, 'COMMA')}"></span>
                                                 </small>
+<!--                                                <small class="text-success" th:if="">-->
+<!--                                                    <span th:text="'$' + ${#numbers.formatDecimal(producto.precioUnitario, 1, 'POINT', 2, 'COMMA')}"></span>-->
+<!--                                                </small>-->
                                             </div>
                                         </div>
                                     </div>
@@ -91,6 +96,6 @@
         </div>
     </div>
 </div>
-</div>
+
 
 <div th:replace="fragments/fragments :: footer"></div>

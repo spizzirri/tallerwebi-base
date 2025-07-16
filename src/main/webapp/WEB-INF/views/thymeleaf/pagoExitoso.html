@@ -203,8 +203,9 @@
                                             <br>
                                             <br>
                                             <span th:if="${tarjeta != null}"
-                                                  th:text="' **** ' + ${#strings.substring(tarjeta.numeroDeTarjeta, tarjeta.numeroDeTarjeta.length() - 4)}"></span>
-                                            <span th:if="${tarjeta == null}"> </span>
+                                                  th:text="' **** ' + ${#strings.substring(tarjeta.numeroDeTarjeta, tarjeta.numeroDeTarjeta.length() - 4)}">
+                                            </span>
+                                            <span th:if="${tarjeta == null}"></span>
                                         </span>
                                     </div>
                                     <div class="exito-resumen-col">
@@ -215,9 +216,15 @@
                                                 style="float:right"></span><br>
                                         </div>
                                         <hr style="margin: 8px 0;">
-                                        <b>Total</b>: <span
+                                        <b>Total</b>:
+                                        <span th:if="${moneda == 'pesos'}"
                                             th:text="'$' + ${#numbers.formatDecimal(compra.total, 1, 'POINT', 2, 'COMMA')}"
-                                            style="float:right; color:#1976d2; font-size:1.1em;"></span>
+                                            style="float:right; color:#1976d2; font-size:1.1em;">
+                                        </span>
+                                        <span th:if="${moneda == 'dolares'}"
+                                              th:text="'$' + ${#numbers.formatDecimal(compra.total, 1, 'POINT', 2, 'COMMA')}"
+                                              style="float:right; color:#1976d2; font-size:1.1em;">
+                                        </span>
                                     </div>
                                 </div>
                             </div>
