@@ -484,27 +484,23 @@
             </table>
 
             <div class="footer" style="margin-top: 100px;">
-                <div class="flex wrapper space-between">
-                    <div style="width:55%">
-
+                <div class="flex wrapper space-between align-items-center" style="width: 100%; margin-top: 40px;">
+                    <div style="flex: 1; max-width: 70%;" class="d-flex align-items-center ms-3">
+                        <img th:if="${compra.metodoDePago == 'efectivo'}"
+                             th:src="@{/uploads/codigoDeBarras.png}"
+                             style="max-height: 120px; width: 85%; object-fit: contain;">
                     </div>
-                    <div style="width:40%;margin-top: 40px;" class="flex wrapper">
 
-                        <!--                    <span class="text-right" style="width:60%"><b>IVA 21%: $</b></span><span class="text-right" style="width:40%"><b>0,00</b></span>-->
-                        <!--                  -->
-                        <span class="text-right" style="width:60%"><b>Importe Total: $</b></span>
-                        <span
-                            class="text-right" style="width:40%"><b> <span
-                            th:if="${compra.moneda == null || compra.moneda == 'pesos'}"
-                            th:text="'$' + ${#numbers.formatDecimal(compra.total, 1, 'POINT', 2, 'COMMA')}">
-
-                        </span>
-                        <span class="text-right" style="width:40%" th:if="${compra.moneda == 'dolares'}"
-                              th:text="'USD $' + ${#numbers.formatDecimal(compra.totalDolar, 1, 'COMMA', 2, 'POINT')}">
-                        </span>
+                    <div style="flex: 1; max-width: 30%;" class="d-flex flex-column align-items-center">
+                        <span class="fw-bold" style="font-size: 1.2rem;">Importe total:</span>
+                        <span class="fw-bold" style="font-size: 1.4rem;"
+                              th:if="${compra.moneda == null || compra.moneda == 'pesos'}"
+                              th:text="'$' + ${#numbers.formatDecimal(compra.total, 1, 'POINT', 2, 'COMMA')}"></span>
+                        <span class="fw-bold" style="font-size: 1.4rem;"
+                              th:if="${compra.moneda == 'dolares'}"
+                              th:text="'USD $' + ${#numbers.formatDecimal(compra.totalDolar, 1, 'COMMA', 2, 'POINT')}"></span>
                     </div>
                 </div>
-
                 <div class="flex relative" style="margin-top: 20px;">
                     <div class="qr-container" style="padding: 0 20px 20px 20px;width: 20%;">
                         <img th:src="@{/uploads/qrArca.png}" style="max-width: 100%;"></div>
