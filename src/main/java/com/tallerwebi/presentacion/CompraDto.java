@@ -19,6 +19,10 @@ public class CompraDto {
     private String cp;
     private String formaEntrega;
     private Double costoDeEnvio;
+    private String moneda;
+    private Double totalDolar;
+    private String documento;
+    private String nombreTitular;
 
     public CompraDto(Compra compra) {
         this.id = compra.getIdCompra();
@@ -32,6 +36,10 @@ public class CompraDto {
                 .collect(Collectors.toList());
         this.formaEntrega = compra.getFormaEntrega();
         this.costoDeEnvio = compra.getCostoDeEnvio();
+        this.moneda = compra.getMoneda();
+        this.totalDolar = compra.getTotalDolar();
+        this.documento = compra.getDocumento();
+        this.nombreTitular = compra.getNombreTitular();
     }
 
     public CompraDto() {
@@ -39,6 +47,22 @@ public class CompraDto {
 
     public List<CompraComponenteDto> getProductosComprados() {
         return productosComprados;
+    }
+
+    public String getDocumento() {
+        return documento;
+    }
+
+    public void setDocumento(String documento) {
+        this.documento = documento;
+    }
+
+    public String getNombreTitular() {
+        return nombreTitular;
+    }
+
+    public void setNombreTitular(String nombreTitular) {
+        this.nombreTitular = nombreTitular;
     }
 
     public Long getIdUsuario() {
@@ -107,5 +131,21 @@ public class CompraDto {
 
     public void setCostoDeEnvio(Double costoDeEnvio) {
         this.costoDeEnvio = costoDeEnvio;
+    }
+
+    public String getMoneda() {
+        return moneda;
+    }
+
+    public void setMoneda(String moneda) {
+        this.moneda = moneda;
+    }
+
+    public void setTotalDolar(Double totalCompraEnDolares) {
+        this.totalDolar = totalCompraEnDolares;
+    }
+
+    public Double getTotalDolar() {
+        return totalDolar;
     }
 }

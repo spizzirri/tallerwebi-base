@@ -1,43 +1,34 @@
-
-    document.addEventListener('DOMContentLoaded', () => {
-    const { jsPDF } = window.jspdf;
-
-    document.getElementById('btn-imprimir').addEventListener('click', async function (e) {
+document.getElementById('btn-imprimir').addEventListener('click', async function (e) {
     e.preventDefault();
 
-    const contenido = document.getElementById('contenido-imprimible');
+    const contenido = document.getElementById('factura-imprimible');
     if (!contenido) {
-    console.error('No se encontró el contenido a imprimir');
-    return;
-}
+        console.error('No se encontró el contenido a imprimir');
+        return;
+    }
 
-    this.style.display = 'none';
-    await new Promise(resolve => setTimeout(resolve, 50));
+    // Mostramos temporalmente
+    contenido.style.display = 'block';
+    await new Promise(resolve => setTimeout(resolve, 100)); // darle tiempo al DOM
 
     const canvas = await html2canvas(contenido, {
-    scale: 1,
-    useCORS: true,
-    width: contenido.scrollWidth,
-    height: contenido.scrollHeight
+        useCORS: true,
+        scale: 3
+    });
+
+    // Lo volvemos a ocultar
+    contenido.style.display = 'none';
+
+    const imgData = canvas.toDataURL('image/jpeg', 1.0);
+
+    // Calculá el tamaño en mm del canvas para escalarlo al tamaño A4
+    const imgWidth = 210; // A4 horizontal en mm
+    const imgHeight = canvas.height * imgWidth / canvas.width;
+
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
+
+    const pdfBlob = pdf.output('blob');
+    const pdfUrl = URL.createObjectURL(pdfBlob);
+    window.open(pdfUrl, '_blank');
 });
-
-    this.style.display = 'inline-block';
-
-    const imgData = canvas.toDataURL('image/jpeg', 0.7);
-    const pdf = new jsPDF('p', 'px', [contenido.scrollWidth, contenido.scrollHeight]);
-
-    const imgProps = pdf.getImageProperties(imgData);
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-    pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
-
-        const pdfBlob = pdf.output('blob');
-        const pdfUrl = URL.createObjectURL(pdfBlob);
-
-        window.open(pdfUrl, '_blank');
-    // Guardar el PDF directamente
-    // pdf.save('comprobante.pdf');
-});
-});
-

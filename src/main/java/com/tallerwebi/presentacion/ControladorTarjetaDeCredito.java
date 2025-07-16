@@ -31,18 +31,15 @@ public class ControladorTarjetaDeCredito {
     @Autowired
     ServicioTarjetaDeCredito servicioTarjeta;
     @Autowired
-    ServicioProductoCarritoImpl servicioProductoCarritoImpl;
     private ServicioProductoCarritoImpl servicioProductoCarrito;
     private ServicioCompra servicioCompra;
     private ServicioPrecios servicioPrecios;
 
     public ControladorTarjetaDeCredito(ServicioTarjetaDeCredito servicioTarjeta,
-                                       ServicioProductoCarritoImpl  servicioProductoCarritoImpl,
                                        ServicioCompra servicioCompra,
                                        ServicioProductoCarritoImpl servicioProductoCarrito,
                                        ServicioPrecios servicioPrecios) {
         this.servicioTarjeta = servicioTarjeta;
-        this.servicioProductoCarritoImpl = servicioProductoCarritoImpl;
         this.servicioCompra = servicioCompra;
         this.servicioProductoCarrito = servicioProductoCarrito;
         this.servicioPrecios = servicioPrecios;
@@ -53,6 +50,10 @@ public class ControladorTarjetaDeCredito {
                                 @RequestParam String vencimiento,
                                 @RequestParam String codigoSeguridad,
                                 @RequestParam String metodoDePago,
+                                @RequestParam String moneda,
+                                @RequestParam String nombreCliente,
+                                @RequestParam String ivaCliente,
+                                @RequestParam String documento,
                                 HttpSession session) {
 
         ModelMap modelo = new ModelMap();
@@ -63,7 +64,7 @@ public class ControladorTarjetaDeCredito {
         Boolean codigoDeSeguridad = servicioTarjeta.codigoDeSeguridad(tarjeta);
 
         boolean hayError = false;
-
+        session.setAttribute("iva", ivaCliente);
         if (!tarjetaValida) {
             modelo.addAttribute("mensajeTarjeta", "Número de tarjeta inválido");
             hayError = true;
@@ -81,26 +82,28 @@ public class ControladorTarjetaDeCredito {
         if (hayError) {
             return new ModelAndView("tarjetaDeCredito", modelo);
         } else {
-            String fechaCompra = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
-            modelo.addAttribute("fechaCompra", fechaCompra);
-
             UsuarioDto usuarioLogueado = (UsuarioDto) session.getAttribute("usuario");
 
             List<ProductoCarritoDto> carritoSesion = obtenerCarritoDeSesion(session);
+            session.setAttribute("moneda", moneda);
 
             Double totalCompraEnDolares = this.servicioProductoCarrito.calcularValorTotalDeLosProductos();
             Double totalCompraEnPesos = this.servicioPrecios.conversionDolarAPesoDouble(totalCompraEnDolares);
 
             CompraDto compraDto = new CompraDto();
+            compraDto.setDocumento(documento);
+            compraDto.setNombreTitular(nombreCliente);
             compraDto.setFecha(LocalDateTime.now());
             compraDto.setMetodoDePago(metodoDePago);
             compraDto.setTotal(totalCompraEnPesos);
             compraDto.setProductosComprados(convertirACompraComponenteDto(carritoSesion));
             compraDto.setFormaEntrega((String) session.getAttribute("formaEntrega"));
             compraDto.setCostoDeEnvio((Double) session.getAttribute("costo"));
+            compraDto.setMoneda(moneda);
+            compraDto.setTotalDolar(totalCompraEnDolares);
 
             servicioCompra.guardarCompraConUsuarioLogueado(compraDto, usuarioLogueado, session );
-            servicioProductoCarritoImpl.limpiarCarrito();
+            servicioProductoCarrito.limpiarCarrito();
             return new ModelAndView("redirect:/pagoExitoso");
         }
     }
@@ -120,6 +123,7 @@ public class ControladorTarjetaDeCredito {
             compraComponenteDto.setCantidad(productosCarrito.getCantidad());
             Double precioEnPesos = this.servicioPrecios.conversionDolarAPesoDouble(productosCarrito.getPrecio() * productosCarrito.getCantidad());
             compraComponenteDto.setPrecioUnitario(precioEnPesos);
+            compraComponenteDto.setPrecioDolar(productosCarrito.getPrecio() * productosCarrito.getCantidad());
             compraComponenteDto.setId(productosCarrito.getId());
 
             if (productosCarrito instanceof ProductoCarritoArmadoDto){
@@ -135,8 +139,12 @@ public class ControladorTarjetaDeCredito {
     }
 
     @GetMapping("/tarjetaDeCredito")
-    public ModelAndView mostrarFormularioTarjeta() {
+    public ModelAndView mostrarFormularioTarjeta(HttpSession session) {
         ModelMap modelo = new ModelMap();
+        Double totalCompraEnDolares = this.servicioProductoCarrito.calcularValorTotalDeLosProductos();
+        Double totalCompraEnPesos = this.servicioPrecios.conversionDolarAPesoDouble(totalCompraEnDolares);
+        modelo.put("precioDolar", this.servicioPrecios.obtenerPrecioFormateado(totalCompraEnDolares));
+        modelo.put("precioPesos", totalCompraEnPesos);
         return new ModelAndView("tarjetaDeCredito", modelo);
     }
 }

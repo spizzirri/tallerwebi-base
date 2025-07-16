@@ -39,13 +39,22 @@ public class ServicioCompraImpl implements ServicioCompra {
         } else {
             compraEntidad.setCp("1440");
         }
-
+        if (compradto.getDocumento()==null || compradto.getDocumento().trim().equals("")) {
+            compraEntidad.setDocumento(usuario.getDni());
+        } else { compraEntidad.setDocumento(compradto.getDocumento()); }
+        if (compradto.getNombreTitular()==null || compradto.getNombreTitular().trim().equals("")) {
+            String nombreYApellido = usuario.getNombre() + " " + usuario.getApellido();
+            compraEntidad.setNombreTitular(nombreYApellido);
+        } else { compraEntidad.setNombreTitular(compradto.getNombreTitular()); }
         compraEntidad.setFecha(compradto.getFecha());
         compraEntidad.setTotal(compradto.getTotal());
         compraEntidad.setMetodoDePago(compradto.getMetodoDePago());
         compraEntidad.setCp(compradto.getCp());
         compraEntidad.setFormaEntrega(compradto.getFormaEntrega());
         compraEntidad.setCostoDeEnvio(compradto.getCostoDeEnvio());
+        compraEntidad.setMoneda(compradto.getMoneda());
+        compraEntidad.setTotalDolar(compradto.getTotalDolar());
+
 
         this.repositorioCompra.guardarCompraDeUsuario(compraEntidad);
 
@@ -82,6 +91,7 @@ public class ServicioCompraImpl implements ServicioCompra {
 
         compraComponenteEntidad.setCantidad(dtoComponente.getCantidad());
         compraComponenteEntidad.setPrecioUnitario(dtoComponente.getPrecioUnitario());
+        compraComponenteEntidad.setPrecioDolar(dtoComponente.getPrecioDolar());
         compraComponenteEntidad.setEsArmado(dtoComponente.getEsArmado());
         compraComponenteEntidad.setNumeroDeArmado(dtoComponente.getNumeroDeArmado());
 

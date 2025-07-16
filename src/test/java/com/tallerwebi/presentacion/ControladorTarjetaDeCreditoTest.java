@@ -22,8 +22,6 @@ public class ControladorTarjetaDeCreditoTest {
     @Mock
     private ServicioTarjetaDeCredito servicioTarjetaMock;
     @Mock
-    private ServicioProductoCarritoImpl productoServiceMock;
-    @Mock
     private ServicioCompra servicioCompraMock;
     @Mock
     private ServicioProductoCarritoImpl servicioProductoCarritoMock;
@@ -38,7 +36,7 @@ public class ControladorTarjetaDeCreditoTest {
     @BeforeEach
     public void init() {
         MockitoAnnotations.openMocks(this);
-        controladorTarjetaDeCredito = new ControladorTarjetaDeCredito(servicioTarjetaMock, productoServiceMock, servicioCompraMock, servicioProductoCarritoMock, servicioPreciosMock);
+        controladorTarjetaDeCredito = new ControladorTarjetaDeCredito(servicioTarjetaMock, servicioCompraMock, servicioProductoCarritoMock, servicioPreciosMock);
 
     }
 
@@ -50,7 +48,7 @@ public class ControladorTarjetaDeCreditoTest {
 
         String metodoDePago = "tarjetaCredito";
 
-        ModelAndView vista = controladorTarjetaDeCredito.validar("1234567890123456", "12/30", "123", metodoDePago, sessionMock);
+        ModelAndView vista = controladorTarjetaDeCredito.validar("1234567890123456", "12/30", "123", metodoDePago, null,null,null,null, sessionMock);
 
         assertThat(vista.getViewName(), equalTo("redirect:/pagoExitoso"));
     }
@@ -62,7 +60,7 @@ public class ControladorTarjetaDeCreditoTest {
         Mockito.when(servicioTarjetaMock.codigoDeSeguridad(Mockito.any())).thenReturn(true);
         String metodoDePago = "tarjetaCredito";
 
-        ModelAndView vista = controladorTarjetaDeCredito.validar("111", "12/30", "123", metodoDePago, sessionMock);
+        ModelAndView vista = controladorTarjetaDeCredito.validar("111", "12/30", "123", metodoDePago, null,null,null,null, sessionMock);
 
         assertThat(vista.getViewName(), equalTo("tarjetaDeCredito"));
         assertThat(vista.getModelMap().get("mensajeTarjeta"), equalTo("Número de tarjeta inválido"));
@@ -75,7 +73,7 @@ public class ControladorTarjetaDeCreditoTest {
         Mockito.when(servicioTarjetaMock.codigoDeSeguridad(Mockito.any())).thenReturn(true);
         String metodoDePago = "tarjetaCredito";
 
-        ModelAndView vista = controladorTarjetaDeCredito.validar("1234567890123456", "00/00", "123", metodoDePago, sessionMock);
+        ModelAndView vista = controladorTarjetaDeCredito.validar("1234567890123456", "00/00", "123", metodoDePago,null,null,null, null, sessionMock);
 
         assertThat(vista.getViewName(), equalTo("tarjetaDeCredito"));
         assertThat(vista.getModelMap().get("mensajeVencimiento"), equalTo("Fecha de vencimiento inválida"));
@@ -88,7 +86,7 @@ public class ControladorTarjetaDeCreditoTest {
         Mockito.when(servicioTarjetaMock.codigoDeSeguridad(Mockito.any())).thenReturn(false);
         String metodoDePago = "tarjetaCredito";
 
-        ModelAndView vista = controladorTarjetaDeCredito.validar("1234567890123456", "12/30", "12", metodoDePago, sessionMock);
+        ModelAndView vista = controladorTarjetaDeCredito.validar("1234567890123456", "12/30", "12", metodoDePago ,null,null,null,null, sessionMock);
 
         assertThat(vista.getViewName(), equalTo("tarjetaDeCredito"));
         assertThat(vista.getModelMap().get("mensajeCodigo"), equalTo("Código de seguridad inválido"));
@@ -101,7 +99,7 @@ public class ControladorTarjetaDeCreditoTest {
         Mockito.when(servicioTarjetaMock.codigoDeSeguridad(Mockito.any())).thenReturn(true);
         String metodoDePago = "tarjetaCredito";
 
-        ModelAndView vista = controladorTarjetaDeCredito.validar("111", "01/20", "123", metodoDePago, sessionMock);
+        ModelAndView vista = controladorTarjetaDeCredito.validar("111", "01/20", "123", metodoDePago, null,null,null,null, sessionMock);
 
         assertThat(vista.getViewName(), equalTo("tarjetaDeCredito"));
         assertThat(vista.getModelMap().get("mensajeTarjeta"), equalTo("Número de tarjeta inválido"));
@@ -111,7 +109,7 @@ public class ControladorTarjetaDeCreditoTest {
 
     @Test
     public void FormularioTarjetaDevuelveVistaCorrecta() {
-        ModelAndView vista = controladorTarjetaDeCredito.mostrarFormularioTarjeta();
+        ModelAndView vista = controladorTarjetaDeCredito.mostrarFormularioTarjeta(sessionMock);
 
         assertThat(vista.getViewName(), equalTo("tarjetaDeCredito"));
     }

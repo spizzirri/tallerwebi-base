@@ -1,6 +1,5 @@
 package com.tallerwebi.presentacion;
 
-import com.tallerwebi.dominio.ServicioCompra;
 import com.tallerwebi.dominio.ServicioDeEnviosImpl;
 import com.tallerwebi.dominio.ServicioPrecios;
 import com.tallerwebi.dominio.ServicioProductoCarritoImpl;
@@ -22,7 +21,10 @@ public class CarritoController {
     public String codigoPostalActual;
     public EnvioDto envioActual;
 
-    public CarritoController(ServicioProductoCarritoImpl servicioProductoCarritoImpl, ServicioDeEnviosImpl servicioDeEnvios, ServicioPrecios servicioPrecios, ServicioCompra servicioCompra) {
+    public CarritoController(ServicioProductoCarritoImpl servicioProductoCarritoImpl,
+                             ServicioDeEnviosImpl servicioDeEnvios,
+                             ServicioPrecios servicioPrecios
+                             ) {
         this.servicioProductoCarrito = servicioProductoCarritoImpl;
         this.servicioDeEnvios = servicioDeEnvios;
         this.servicioPrecios = servicioPrecios;
@@ -196,7 +198,7 @@ public class CarritoController {
 
     @RequestMapping(
             value = {
-                    "/carritoDeCompras/agr=egarMasCantidadDeUnProducto/{id}",
+                    "/carritoDeCompras/agregarMasCantidadDeUnProducto/{id}",
                     "/carritoDeCompras/agregarMasCantidadDeUnProducto/{id}/{numeroDeArmado}"
             },
             method = RequestMethod.POST
@@ -335,6 +337,7 @@ public class CarritoController {
         UsuarioDto usuarioLogueado = (UsuarioDto) session.getAttribute("usuario");
         List<ProductoCarritoDto> carritoSesion = obtenerCarritoDeSesion(session);
         session.setAttribute("formaEntrega", formaEntrega);
+        session.setAttribute("metodoPago", metodoDePago);
 
 
         if (carritoSesion == null || carritoSesion.isEmpty()) {
@@ -352,8 +355,6 @@ public class CarritoController {
         if (usuarioLogueado == null) {
             response.put("success", false);
             response.put("error", "Debes iniciar sesion");
-//            response.put("redirect", "/login");
-//            response.put("redirect", "/login?redirectUrl=/carritoDeCompras/formularioPago");
             return response;
         }
 
@@ -370,6 +371,13 @@ public class CarritoController {
             response.put("redirect", "/tarjetaDeCredito");
             return response;
         }
+
+        if (metodoDePago.equalsIgnoreCase("efectivo")) {
+            response.put("success", true);
+            response.put("redirect", "/finalizarPagoEfectivo");
+            return response;
+        }
+
         if ("mercadoPago".equalsIgnoreCase(metodoDePago)) {
             response.put("success", true);
             response.put("metodoPago", "mercadoPago");
