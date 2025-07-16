@@ -7,6 +7,16 @@
         <p th:if="${param.accionInvalida!=null}" th:text="${param.accionInvalida}" class="alert alert-danger banners-info"></p>
         <p th:if="${param.agregado!=null}" th:text="${param.agregado}" class="alert alert-success banners-info"></p>
         <p th:if="${param.quitado!=null}" th:text="${param.quitado}" class="alert alert-warning banners-info"></p>
+
+        <div>
+            <p>En base a la eleccion de rendimiento y de Programas/Juegos que hiciste, aca te dejamos nuestra recomendacion de componentes</p>
+            <button th:text="'Procesador AMD ' + ${mapaRequisitos['ProcesadorAMD'].intValue()}"></button>
+            <button th:text="'Procesador Intel ' + ${mapaRequisitos['ProcesadorINTEL'].intValue()}"></button>
+            <button th:text="'Memoria RAM ' + ${mapaRequisitos['RAM'].intValue()} + ' GB'"></button>
+            <button th:text="'Memoria VRAM ' + ${mapaRequisitos['GPU'].intValue()} + ' GB'"></button>
+            <button th:text="'Espacio en Disco ' + ${mapaRequisitos['EspacioDisco'].intValue()} + ' GB'"></button>
+        </div>
+
         <div class="row">
             <!-- Sidebar -->
             <div class="col-lg-4 mb-3">
@@ -131,12 +141,12 @@
                     <p class="d-inline fw-bold ms-3" th:text="${'Total: $ ' + armadoPcDto.precioFormateado}"></p> <!-- aca deberia entrar la sumatoria del armadoPcDto-->
                     <div class="d-flex justify-content-between mt-3">
                         <a th:if="${pasoActual != 'procesador'}" th:href="${pasoAnterior}" class="btn btn-outline-primary btn-sm"><i class="bi bi-arrow-left"></i> Anterior paso</a>
-                        <form th:action="@{/arma-tu-pc/tradicional/reiniciar-armado}" method="POST">
+                        <form th:action="@{/arma-tu-pc/custom/reiniciar-armado}" method="POST">
                             <input id="reiniciarArmado" type="submit" class="d-none" value="Reiniciar Armado">
                             <label for="reiniciarArmado" class="btn btn-outline-danger btn-sm"><i class="bi bi-arrow-repeat"></i> Reiniciar Armado</label>
                         </form>
                         <a th:if="${pasoActual != 'periferico'}" th:href="${pasoSiguiente}" class="btn btn-outline-primary btn-sm">Siguiente paso <i class="bi bi-arrow-right"></i></a>
-                        <a th:if="${pasoActual == 'periferico'}" th:href="@{/arma-tu-pc/tradicional/resumen}" class="btn btn-outline-success btn-sm"><i class="bi bi-check2-all"></i> Fin del Armado</a>
+                        <a th:if="${pasoActual == 'periferico'}" th:href="@{/arma-tu-pc/custom/resumen}" class="btn btn-outline-success btn-sm"><i class="bi bi-check2-all"></i> Fin del Armado</a>
                     </div>
                 </div>
             </div>
@@ -150,26 +160,26 @@
                 <div th:if="${errorLista == null}">
                     <!-- Filtros -->
                     <div th:if="${pasoActual == 'procesador'}" class="mb-4"> <!--Si no es un procesador no mostramos AMD y INTEL-->
-                        <a th:href="@{'/arma-tu-pc/tradicional/procesador?q=AMD'}" class="btn btn-outline-dark me-2">AMD</a>
-                        <a th:href="@{'/arma-tu-pc/tradicional/procesador?q=INTEL'}" class="btn btn-outline-primary me-2">Intel</a>
-                        <a th:href="@{'/arma-tu-pc/tradicional/procesador'}" class="btn btn-outline-success">Todos</a>
+                        <a th:href="@{'/arma-tu-pc/custom/procesador?q=AMD'}" class="btn btn-outline-dark me-2">AMD</a>
+                        <a th:href="@{'/arma-tu-pc/custom/procesador?q=INTEL'}" class="btn btn-outline-primary me-2">Intel</a>
+                        <a th:href="@{'/arma-tu-pc/custom/procesador'}" class="btn btn-outline-success">Todos</a>
                     </div>
                     <div th:if="${pasoActual == 'almacenamiento'}" class="mb-4"> <!--Si no es un procesador no mostramos AMD y INTEL-->
-                        <a th:href="@{'/arma-tu-pc/tradicional/almacenamiento?q=SOLIDO'}" class="btn btn-outline-dark me-2">Solido</a>
-                        <a th:href="@{'/arma-tu-pc/tradicional/almacenamiento?q=RIGIDO'}" class="btn btn-outline-primary me-2">Rigido</a>
-                        <a th:href="@{'/arma-tu-pc/tradicional/almacenamiento'}" class="btn btn-outline-success">Todos</a>
+                        <a th:href="@{'/arma-tu-pc/custom/almacenamiento?q=SOLIDO'}" class="btn btn-outline-dark me-2">Solido</a>
+                        <a th:href="@{'/arma-tu-pc/custom/almacenamiento?q=RIGIDO'}" class="btn btn-outline-primary me-2">Rigido</a>
+                        <a th:href="@{'/arma-tu-pc/custom/almacenamiento'}" class="btn btn-outline-success">Todos</a>
                     </div>
                     <div th:if="${pasoActual == 'periferico'}" class="mb-4"> <!--Si no es un procesador no mostramos AMD y INTEL-->
-                        <a th:href="@{'/arma-tu-pc/tradicional/periferico?q=TECLADO'}" class="btn btn-outline-dark me-2">Teclado</a>
-                        <a th:href="@{'/arma-tu-pc/tradicional/periferico?q=MOUSE'}" class="btn btn-outline-dark me-2">Mouse</a>
-                        <a th:href="@{'/arma-tu-pc/tradicional/periferico?q=AURICULARES'}" class="btn btn-outline-dark me-2">Auriculares</a>
-                        <a th:href="@{'/arma-tu-pc/tradicional/periferico'}" class="btn btn-outline-success">Todos</a>
+                        <a th:href="@{'/arma-tu-pc/custom/periferico?q=TECLADO'}" class="btn btn-outline-dark me-2">Teclado</a>
+                        <a th:href="@{'/arma-tu-pc/custom/periferico?q=MOUSE'}" class="btn btn-outline-dark me-2">Mouse</a>
+                        <a th:href="@{'/arma-tu-pc/custom/periferico?q=AURICULARES'}" class="btn btn-outline-dark me-2">Auriculares</a>
+                        <a th:href="@{'/arma-tu-pc/custom/periferico'}" class="btn btn-outline-success">Todos</a>
                     </div>
 
                     <div class="row g-3">
                         <!-- Card ejemplo -->
                         <div class="col-md-6 col-lg-4 mt-2 h-100" th:classappend="${idsDeComponentesSeleccionados.contains(componente.id)} ? ' order-first' : ''" th:each ="componente : ${componentesLista}">
-                            <form method="POST" th:action="@{'/arma-tu-pc/tradicional/' + ${pasoActual} + '/accion'}" class="h-100">
+                            <form method="POST" th:action="@{'/arma-tu-pc/custom/' + ${pasoActual} + '/accionCustom'}" class="h-100">
                                 <div class="card card-armado h-75 position-relative">
                                     <div class="position-absolute top-0 end-0 p-2">
                                         <a th:if="${componente.precio > 0.0}" th:href="@{/productoEspecifico/{id}(id=${componente.id})}" target="_blank" class="fs-3 text-primary"><i class="bi bi-info-circle"></i></a>
@@ -185,9 +195,9 @@
                                         </div>
                                         <input type="hidden" name="id" th:value="${componente.id}">
                                         <input th:if="${pasoActual != 'memoria' && pasoActual != 'almacenamiento'}" type="hidden" name="cantidad" value="1">
-                                        
+
                                         <div class="botones-card mt-auto">
-                                            <button th:if="${componente.stock > 0}" type="submit" name="accion" class="btn btn-primary" value="agregar">Agregar</button>
+                                            <button th:if="${componente.stock > 0}" type="submit" name="accionCustom" class="btn btn-primary" value="agregar">Agregar</button>
                                             <select class="form-select w-auto" th:if="${pasoActual == 'memoria' && slotsRamMotherboardElegida != null}" name="cantidad">
                                                 <option th:each="i : ${#numbers.sequence(1, slotsRamMotherboardElegida)}"
                                                         th:value="${i}"
@@ -206,7 +216,7 @@
                                                         th:text="${i}">
                                                 </option>
                                             </select>
-                                            <button th:if="${idsDeComponentesSeleccionados.contains(componente.id)}" type="submit" name="accion" class="btn btn-danger" value="quitar">Quitar</button>
+                                            <button th:if="${idsDeComponentesSeleccionados.contains(componente.id)}" type="submit" name="accionCustom" class="btn btn-danger" value="quitar">Quitar</button>
                                         </div>
                                     </div>
                                 </div>
