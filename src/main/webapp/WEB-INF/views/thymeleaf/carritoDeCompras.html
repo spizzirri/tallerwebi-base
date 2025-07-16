@@ -58,7 +58,7 @@
                         <td th:utext="${productoArmado.nombre} + '<br><b> Armado ' + ${productoArmado.numeroDeArmadoAlQuePertenece} + '</b>'"></td>
                         <td class="precioTotalDelProducto" th:text="'$' + ${productoArmado.precioFormateado}"></td>
 
-                        <td class="text-center" th:data-id="${productoArmado.id}" th:data-numeroDeArmado="${productoArmado.numeroDeArmadoAlQuePertenece}">
+                        <td class="text-center" th:data-id="${productoArmado.id}" th:data-numeroDeArmado="${productoArmado.numeroDeArmadoAlQuePertenece}" th:data-esEscencial="${productoArmado.esEscencialParaElArmado}">
                             <div class="d-flex justify-content-center align-items-center gap-2">
                                 <button type="button" class="btn btn-outline-secondary btn-sm btnRestarCantidad"
                                         th:if="${productoArmado.precio > 0.0}">-
