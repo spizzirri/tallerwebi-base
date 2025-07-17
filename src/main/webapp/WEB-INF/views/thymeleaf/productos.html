@@ -1,24 +1,38 @@
 <head><link rel="icon" type="image/png" href="uploads/jineteSVG.svg"><title>Jinete Gamer</title></head>
 <div th:replace="fragments/fragments :: header"></div>
 
-
-<div class="container py-3" th:if="${productosBuscados}">
+<!-- SECCIÓN CUANDO HAY PRODUCTOS BUSCADOS -->
+<div class="container-fluid py-3" th:if="${productosBuscados}" style="max-width: 1400px;">
     <div class="row">
         <!-- Menú lateral de categorías -->
-        <div class="col-md-2 mb-4">
-            <div class="list-group">
-                <a href="#" class="list-group-item list-group-item-action active">Categorias</a>
-                <a  th:each="cat : ${categorias}" th:id="'btn-link-' + ${cat.descripcion}"
-                   th:href="@{/productos/search(cat=${cat.nombre})}"
-                   th:text="${cat.descripcion}"
-                   class="list-group-item list-group-item-action">
-                </a>
+        <div class="col-md-3 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="mb-0 d-flex align-items-center">
+                        <i class="bi bi-list-ul me-2"></i>
+                        Categorías
+                    </h6>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        <a href="/productos" class="list-group-item list-group-item-action d-flex align-items-center py-3 border-0">
+                            <i class="bi bi-grid-3x3-gap me-2 text-secondary"></i>
+                            <span class="fw-semibold">Todas las categorías</span>
+                        </a>
+                        <a th:each="cat : ${categorias}"
+                           th:id="'btn-link-' + ${cat.descripcion}"
+                           th:href="@{/productos/search(cat=${cat.nombre})}"
+                           th:text="${cat.descripcion}"
+                           class="list-group-item list-group-item-action d-flex align-items-center py-3 border-0 categoria-item">
+                            <i class="bi bi-chevron-right me-2 text-muted categoria-icon"></i>
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- Productos -->
         <div class="col-md-9">
-
             <div class="d-flex align-items-center justify-content-between mb-3">
                 <h2 class="mb-0">Resultados de busqueda</h2>
                 <form class="d-flex" role="search" th:action="@{/productos/search}" method="get">
@@ -31,11 +45,9 @@
                 </form>
             </div>
 
-
             <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center">
                 <div class="col" th:each="producto : ${productosBuscados}">
                     <div class="card h-100 shadow border-0 position-relative">
-
                         <div class="p-3">
                             <a th:href="@{/productoEspecifico/{id}(id=${producto.id})}">
                                 <img th:src="'http://www.imagenestaller.free.nf/' + ${producto.imagen}"
@@ -44,10 +56,8 @@
                                      style="height: 200px; object-fit: contain;">
                             </a>
                         </div>
-
                         <div class="card-body text-center d-flex flex-column justify-content-between p-3">
                             <p class="card-title fw-bold mb-2 small" th:text="${producto.nombre}"></p>
-
                             <div class="d-flex justify-content-between align-items-center mt-auto">
                                 <span class="fw-bold text-success" th:text="'$ ' + ${producto.precioFormateado}"></span>
                                 <button data-testid="agregar-carrito-btn" th:onclick="|agregarAlCarrito(${producto.id}, 1)|"
@@ -56,7 +66,6 @@
                                 </button>
                             </div>
                         </div>
-
                         <div th:id="'mensajeNotificacion-' + ${producto.id}"
                              class="mensaje-notificacion">
                         </div>
@@ -66,30 +75,46 @@
         </div>
     </div>
 </div>
-<div class="container py-3" th:unless="${productosBuscados}">
+
+<!-- SECCIÓN CUANDO NO HAY PRODUCTOS BUSCADOS -->
+<div class="container-fluid py-3" th:unless="${productosBuscados}" style="max-width: 1400px;">
     <div th:if="${mensaje}" class="alert alert-info text-center">
         <p th:text="${mensaje}"></p>
     </div>
 
     <div class="row">
         <!-- Menú lateral de categorías -->
-        <div class="col-md-2 mb-4">
-            <div class="list-group">
-                <a href="#" class="list-group-item list-group-item-action active">Categorias</a>
-                <a th:each="cat : ${categorias}"
-                   th:href="@{/productos/search(cat=${cat.nombre})}"
-                   th:text="${cat.descripcion}"
-                   class="list-group-item list-group-item-action">
-                </a>
+        <div class="col-md-3 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="mb-0 d-flex align-items-center">
+                        <i class="bi bi-list-ul me-2"></i>
+                        Categorías
+                    </h6>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        <a href="/productos" class="list-group-item list-group-item-action d-flex align-items-center py-3 border-0">
+                            <i class="bi bi-grid-3x3-gap me-2 text-secondary"></i>
+                            <span class="fw-semibold">Todas las categorías</span>
+                        </a>
+                        <a th:each="cat : ${categorias}"
+                           th:id="'btn-link-' + ${cat.descripcion}"
+                           th:href="@{/productos/search(cat=${cat.nombre})}"
+                           th:text="${cat.descripcion}"
+                           class="list-group-item list-group-item-action d-flex align-items-center py-3 border-0 categoria-item">
+                            <i class="bi bi-chevron-right me-2 text-muted categoria-icon"></i>
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- Productos -->
-        <div class="col-md-10">
+        <div class="col-md-9">
             <div class="row row-cols-1 row-cols-md-4 g-4 justify-content-center">
                 <div class="col" th:each="producto : ${productos}">
                     <div class="card h-100 shadow border-0 position-relative">
-
                         <div class="p-3">
                             <a th:href="@{/productoEspecifico/{id}(id=${producto.id})}">
                                 <img th:src="'http://www.imagenestaller.free.nf/' + ${producto.imagen}"
@@ -98,10 +123,8 @@
                                      style="height: 200px; object-fit: contain;">
                             </a>
                         </div>
-
                         <div class="card-body text-center d-flex flex-column justify-content-between p-3">
                             <p class="card-title fw-bold mb-2 small" th:text="${producto.nombre}"></p>
-
                             <div class="d-flex justify-content-between align-items-center mt-auto">
                                 <span class="fw-bold text-success" th:text="'$ ' + ${producto.precioFormateado}"></span>
                                 <button th:onclick="|agregarAlCarrito(${producto.id}, 1)|"
@@ -110,7 +133,6 @@
                                 </button>
                             </div>
                         </div>
-
                         <div th:id="'mensajeNotificacion-' + ${producto.id}"
                              class="mensaje-notificacion">
                         </div>
@@ -120,14 +142,58 @@
         </div>
     </div>
 </div>
-<div th:replace="fragments/fragments :: footer"></div>
+<!--<div class="container py-3" th:unless="${productosBuscados}">-->
+<!--    <div th:if="${mensaje}" class="alert alert-info text-center">-->
+<!--        <p th:text="${mensaje}"></p>-->
+<!--    </div>-->
 
-<!--<script type="text/javascript" th:src="@{webjars/bootstrap/5.2.0/js/bootstrap.min.js}"></script>-->
-<!--<script type="text/javascript" th:src="@{/js/main.js}"></script>-->
-<!--<script type="text/javascript" th:src="@{/js/agregarAlCarrito.js}"></script>-->
-<!--<script th:src="@{/webjars/bootstrap/5.2.0/js/bootstrap.bundle.min.js}"></script>-->
-<!--<script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>-->
-<!--<script type="text/javascript"-->
-<!--        src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>-->
-<!--</body>-->
-<!--</html>-->
+<!--    <div class="row">-->
+<!--        &lt;!&ndash; Menú lateral de categorías &ndash;&gt;-->
+<!--        <div class="col-md-2 mb-4">-->
+<!--            <div class="list-group">-->
+<!--                <a href="#" class="list-group-item list-group-item-action active">Categorias</a>-->
+<!--                <a th:each="cat : ${categorias}"-->
+<!--                   th:href="@{/productos/search(cat=${cat.nombre})}"-->
+<!--                   th:text="${cat.descripcion}"-->
+<!--                   class="list-group-item list-group-item-action">-->
+<!--                </a>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--        &lt;!&ndash; Productos &ndash;&gt;-->
+<!--        <div class="col-md-10">-->
+<!--            <div class="row row-cols-1 row-cols-md-4 g-4 justify-content-center">-->
+<!--                <div class="col" th:each="producto : ${productos}">-->
+<!--                    <div class="card h-100 shadow border-0 position-relative">-->
+
+<!--                        <div class="p-3">-->
+<!--                            <a th:href="@{/productoEspecifico/{id}(id=${producto.id})}">-->
+<!--                                <img th:src="'http://www.imagenestaller.free.nf/' + ${producto.imagen}"-->
+<!--                                     class="card-img-top rounded w-100"-->
+<!--                                     th:alt="${producto.nombre}"-->
+<!--                                     style="height: 200px; object-fit: contain;">-->
+<!--                            </a>-->
+<!--                        </div>-->
+
+<!--                        <div class="card-body text-center d-flex flex-column justify-content-between p-3">-->
+<!--                            <p class="card-title fw-bold mb-2 small" th:text="${producto.nombre}"></p>-->
+
+<!--                            <div class="d-flex justify-content-between align-items-center mt-auto">-->
+<!--                                <span class="fw-bold text-success" th:text="'$ ' + ${producto.precioFormateado}"></span>-->
+<!--                                <button th:onclick="|agregarAlCarrito(${producto.id}, 1)|"-->
+<!--                                        class="btn btn-warning btn-sm">-->
+<!--                                    <i class="bi bi-cart3 fs-4"></i>-->
+<!--                                </button>-->
+<!--                            </div>-->
+<!--                        </div>-->
+
+<!--                        <div th:id="'mensajeNotificacion-' + ${producto.id}"-->
+<!--                             class="mensaje-notificacion">-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+<div th:replace="fragments/fragments :: footer"></div>
