@@ -61,12 +61,10 @@ public class ControladorIndex {
     @Transactional
     public ModelAndView cargarProductosPorCategoria(@PathVariable Integer id) {
         ModelMap model = new ModelMap();
-
         String tipoComponente = convertirIdATipoComponente(id);
         List<ProductoDto> productosDestacados = productoService.getProductosPorTipo(tipoComponente);
         Collections.shuffle(productosDestacados);
         List<ProductoDto> productosLimitados = productosDestacados.stream().limit(8).collect(Collectors.toList());
-
         for (ProductoDto producto : productosDestacados) {
             String totalFormateado = this.servicioPrecios.conversionDolarAPeso(producto.getPrecio());
             producto.setPrecioFormateado(totalFormateado);
@@ -75,6 +73,15 @@ public class ControladorIndex {
         model.addAttribute("productosDestacados", productosLimitados);
 
         return new ModelAndView("cargarProductosDinamicos", model);
+    }
+
+
+
+    @GetMapping("/ayuda")
+    public ModelAndView ayuda() {
+        ModelMap model = new ModelMap();
+        return new ModelAndView("ayuda", model);
+
     }
 
     private String convertirIdATipoComponente(Integer id) {

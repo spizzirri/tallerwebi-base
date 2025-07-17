@@ -47,10 +47,12 @@
 <!--        </div>-->
 <!--    </div>-->
 <!--</header>-->
+<head>
+    <link rel="icon" type="image/png" href="uploads/jineteSVG.svg">
+    <title>Jinete Gamer</title>
+</head>
 
-<div th:replace="fragments/fragments :: header">
-
-</div>
+<div th:replace="fragments/fragments :: header"></div>
 <!--<nav class="bg-secondary-subtle text-dark py-3 ">-->
 <!--    <div class="container d-flex justify-content-center gap-4">-->
 <!--        <a class="text-dark text-decoration-none px-3 fs-5" th:href="@{/productos}">Productos</a>-->
@@ -72,25 +74,28 @@
                     aria-label="Slide 3"></button>
             <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="3"
                     aria-label="Slide 4"></button>
-            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="4"
-                    aria-label="Slide 5"></button>
         </div>
 
         <div class="carousel-inner">
             <div class="carousel-item active">
-                <img th:src="@{/uploads/carrousel4.jpg}" class="d-block w-100" alt="...">
+                <a class="btn p-0" href="./productos/search?cat=PlacaDeVideo">
+                    <img th:src="@{/uploads/carrousel1.jpg}" class="d-block w-100" alt="..." style="min-height: 544px">
+                </a>
             </div>
             <div class="carousel-item">
-                <img th:src="@{/uploads/carrousel5.jpg}" class="d-block w-100" alt="...">
+                <a class="btn p-0" href="./productos">
+                    <img th:src="@{/uploads/carrousel2.jpg}" class="d-block w-100" alt="..." style="min-height: 544px">
+                </a>
             </div>
             <div class="carousel-item">
-                <img th:src="@{/uploads/carrousel3.jpg}" class="d-block w-100" alt="...">
+                <a class="btn p-0" href="./arma-tu-pc/armaTuPc">
+                    <img th:src="@{/uploads/carrousel3.jpg}" class="d-block w-100" alt="..." style="min-height: 544px">
+                </a>
             </div>
             <div class="carousel-item">
-                <img th:src="@{/uploads/carrousel1.jpg}" class="d-block w-100" alt="...">
-            </div>
-            <div class="carousel-item">
-                <img th:src="@{/uploads/carrousel2.jpg}" class="d-block w-100" alt="...">
+                <a class="btn p-0" href="./productos/search?cat=MemoriaRAM">
+                    <img th:src="@{/uploads/carrousel4.jpg}" class="d-block w-100" alt="..." style="min-height: 544px">
+                </a>
             </div>
         </div>
         <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators"
@@ -168,14 +173,14 @@
 
 <div class="container-fluid p-0">
     <div class="position-relative mb-4">
-        <img th:src="@{/uploads/arma-tu-pc2.jpg}" class="img-fluid d-block w-100 "
-             style="height: 500px; object-fit: cover;">
+        <img th:src="@{/uploads/armaTuPc.png}" class="img-fluid d-block w-100 "
+             style="height: 500px; object-fit: cover; border-radius: 10px">
         <div class="position-absolute top-50 end-0 translate-middle-y me-5 p-4 text-white"
-             style="background-color: rgba(0, 0, 0, 0.6); max-width: 30%; border-radius: 10px">
+             style="background-color: rgba(0, 0, 0, 0.9); max-width: 30%; border-radius: 10px">
             <h3 class="mb-3">Arma tu PC</h3>
             <p class="mb-4">Configura tu nueva PC sin errores de compatibilidad,
                 seleccionando todos los componentes que deseas.</p>
-            <a th:href="@{/arma-tu-pc/tradicional/procesador}" class="btn btn-warning">Ver mas</a>
+            <a th:href="@{/arma-tu-pc/armaTuPc}" class="btn btn-warning">Ver mas</a>
         </div>
     </div>
 </div>
@@ -198,11 +203,11 @@
 
             <!-- Resto de categorías -->
             <div class="col-6 col-md-3" th:each="categoria : ${otrasCategorias}">
-                <a  th:href="@{/productos/search(cat=${categoria.nombre})}" class="text-decoration-none">
+                <a  th:href="@{/productos/search(cat=${categoria.nombre})}" class="text-decoration-none text-center">
                     <div class="category-card">
                         <img th:src="@{'/uploads/categoria/' + ${categoria.imagen}}" th:alt="${categoria.nombre}"
                              class="category-img">
-                        <div class="category-title" th:text="${categoria.descripcion}"></div>
+                        <div class="category-title" th:text="${categoria.descripcion.toUpperCase()}"></div>
                     </div>
                 </a>
             </div>

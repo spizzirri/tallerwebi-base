@@ -54,7 +54,8 @@ public class ServicioCompraImpl implements ServicioCompra {
         compraEntidad.setCostoDeEnvio(compradto.getCostoDeEnvio());
         compraEntidad.setMoneda(compradto.getMoneda());
         compraEntidad.setTotalDolar(compradto.getTotalDolar());
-
+        compraEntidad.setValorConDescuento(compradto.getValorConDescuento());
+        compraEntidad.setTotalConDescuentoDolar(compradto.getTotalConDescuentoDolar());
 
         this.repositorioCompra.guardarCompraDeUsuario(compraEntidad);
 
