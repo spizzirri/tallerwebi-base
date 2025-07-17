@@ -15,7 +15,9 @@ body {
 /*    padding: 0 15px;*/
 /*}*/
 
-
+#search-bar{
+    color:gray;
+}
 h1{
 	color:#0000FF;
 }

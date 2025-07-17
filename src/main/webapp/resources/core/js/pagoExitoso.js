@@ -6,7 +6,8 @@ document.getElementById('btn-imprimir').addEventListener('click', async function
         console.error('No se encontró el contenido a imprimir');
         return;
     }
-
+    contenido.style.display = 'flex';
+    contenido.classList.add('d-flex');
     // Mostramos temporalmente
     contenido.style.display = 'block';
     await new Promise(resolve => setTimeout(resolve, 100)); // darle tiempo al DOM
@@ -18,7 +19,7 @@ document.getElementById('btn-imprimir').addEventListener('click', async function
 
     // Lo volvemos a ocultar
     contenido.style.display = 'none';
-
+    contenido.classList.remove('d-flex');
     const imgData = canvas.toDataURL('image/jpeg', 1.0);
 
     // Calculá el tamaño en mm del canvas para escalarlo al tamaño A4

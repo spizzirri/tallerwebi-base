@@ -100,18 +100,18 @@
             color: #fff;
         }
 
-        /*#factura-imprimible {*/
-        /*    width: 794px; !* Ancho de A4 en px a 96dpi *!*/
-        /*    margin: auto;*/
-        /*    background: white;*/
-        /*    padding: 32px;*/
-        /*}*/
+        #factura-imprimible {
+            width: 794px; /* Ancho de A4 en px a 96dpi */
+            margin: auto;
+            background: white;
+            padding: 32px;
+        }
 
         .factura-body {
-            width: 21cm;
-            min-height: 27cm;
-            max-height: 29.7cm;
-            font-size: 13px;
+            width: 1300px;
+            min-height: 2000px;
+            max-height: 2400px;
+            font-size: 14px;
             background-color: white;
             color: black;
             padding: 10px;
@@ -407,7 +407,7 @@
 <!--    </div>-->
 
 
-<div id="factura-imprimible" style="display: none;">
+<div id="factura-imprimible" class="justify-content-center" style="display: none; ">
     <div class="factura-body" th:if="${comprasUsuario != null && !comprasUsuario.isEmpty()}">
         <div th:each="compra : ${comprasUsuario}">
             <div class="wrapper text-center bold text-20" style="width:100%;border-bottom: 0;">
@@ -416,16 +416,16 @@
 
             <div class="flex relative">
                 <div class="wrapper inline-block w50 flex" style="border-right: 0">
-                    <h3 class="text-center" style="font-size:24px;margin-bottom: 3px;width: 100%;">COMPRA GAMER 2</h3>
+                    <h3 class="text-center" style="font-size:24px;margin-bottom: 3px;width: 100%;">JINETE GAMER</h3>
                     <p style="font-size: 13px;line-height: 1.5;margin-bottom: 0;align-self: flex-end;">
-                        <b>Razón Social:</b> Compra Gamer 2
+                        <b>Razón Social:</b> Jinete Gamer
                         <br><b>Domicilio Comercial:</b> Av. Gamer 123 - CABA
                         <br><b>Condición frente al IVA: Responsable Monotributo</b>
                     </p>
                 </div>
                 <div class="wrapper inline-block w50">
                     <h3 class="text-center" style="font-size:24px;margin-bottom: 3px;">FACTURA</h3>
-                    <p style="font-size: 13px;line-height: 1.5;margin-bottom: 0;">
+                    <p style="padding-left: 40px; font-size: 13px;line-height: 1.5;margin-bottom: 0;">
                         <b>Punto de Venta: 00001 Comp. Nro: <span th:text="'FC-000' + ${compra.idCompra}"></span></b>
                         <br><b>Fecha de Emisión: <span th:text="${compra.fecha.toLocalDate()}"></span></b>
                         <br><b>CUIT:</b> 20-38052312-0

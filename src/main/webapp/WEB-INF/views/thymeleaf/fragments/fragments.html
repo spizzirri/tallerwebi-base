@@ -17,7 +17,6 @@
               integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
               crossorigin="anonymous">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css"/>
-        <link rel="icon" type="image/png" th:href="@{../../../../resources/core/uploads/dragon-logo.png}">
         <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.2.0/css/bootstrap.min.css}"/>
         <link rel="stylesheet" th:href="@{/css/fragments.css}">
         <link rel="stylesheet" th:href="@{/css/main.css}"/>
@@ -41,7 +40,7 @@
 
             <form class="d-flex align-items-center m-0" role="search" th:action="@{/productos/search}" method="get">
                 <input class="bg-dark text-white border border-light-subtle form-control me-2 align-content-center "
-                       name="q" type="search" placeholder="Buscar productos" aria-label="Search" style="width:400px;">
+                       name="q" type="search" placeholder="Buscar productos" id="search-bar" aria-label="Search" style="width:400px;">
                 <button class="btn btn-warning align-content-center me-1" type="submit"><i class="bi bi-search"></i></button>
             </form>
             <div class="d-flex align-items-center">
