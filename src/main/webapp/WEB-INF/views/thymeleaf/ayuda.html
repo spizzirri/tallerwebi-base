@@ -1,59 +1,55 @@
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        background: #f7f7f7;
-        margin: 0;
-        padding: 0;
-    }
 
-    .ayuda-container {
-        display: flex;
-        max-width: 1100px;
-        margin: 40px auto;
-        background: none;
-    }
 
-    .ayuda-menu {
-        width: 270px;
-        background: #fafafa;
-        border-right: 1px solid #e0e0e0;
-        padding: 0;
-    }
 
-    .ayuda-menu ul {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-    }
-
-    .ayuda-menu li {
-        padding: 18px 24px;
-        cursor: pointer;
-        color: #666;
-        border-left: 4px solid transparent;
-        transition: background 0.2s, border-color 0.2s;
-    }
-
-    .ayuda-menu li.selected {
-        background: #fff;
-        color: #222;
-        border-left: 4px solid #ff6600;
-        font-weight: bold;
-    }
-
-    .ayuda-content {
-        flex: 1;
-        background: #fff;
-        padding: 32px 40px;
-        min-height: 400px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-    }
-
-    .ayuda-content h2 {
-        margin-top: 0;
-        color: #222;
-    }
-</style>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f7f7f7;
+            margin: 0;
+            padding: 0;
+        }
+        .ayuda-container {
+            display: flex;
+            max-width: 1100px;
+            margin: 40px auto;
+            background: none;
+        }
+        .ayuda-menu {
+            width: 270px;
+            background: #fafafa;
+            border-right: 1px solid #e0e0e0;
+            padding: 0;
+        }
+        .ayuda-menu ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        .ayuda-menu li {
+            padding: 18px 24px;
+            cursor: pointer;
+            color: #666;
+            border-left: 4px solid transparent;
+            transition: background 0.2s, border-color 0.2s;
+        }
+        .ayuda-menu li.selected {
+            background: #fff;
+            color: #222;
+            border-left: 4px solid #fdbf07;
+            font-weight: bold;
+        }
+        .ayuda-content {
+            flex: 1;
+            background: #fff;
+            padding: 32px 40px;
+            min-height: 400px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .ayuda-content h2 {
+            margin-top: 0;
+            color: #222;
+        }
+    </style>
 
 <header th:replace="fragments/fragments :: header"></header>
 <div class="ayuda-container">
