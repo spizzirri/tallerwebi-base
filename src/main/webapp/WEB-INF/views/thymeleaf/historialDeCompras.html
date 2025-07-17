@@ -22,7 +22,7 @@
                                           th:text="'$' + ${#numbers.formatDecimal(compra.total, 1, 'POINT', 2, 'COMMA')}">
                                     </span>
                                     <span th:if="${compra.moneda == 'dolares'}"
-                                          th:text="'USD $' + ${compra.totalDolar}">
+                                          th:text="'USD $' + ${#numbers.formatDecimal(compra.totalDolar, 1, 'COMMA', 2, 'POINT')}">
                                     </span>
                                     <div th:if="${compra.formaEntrega == 'envio'}">
                                         <small class="text-success">
@@ -79,7 +79,8 @@
                                                     <span th:text="'$' + ${#numbers.formatDecimal(producto.precioUnitario, 1, 'POINT', 2, 'COMMA')}"></span>
                                                 </small>
                                                 <small class="text-success" th:if="${compra.moneda == 'dolares'}">
-                                                    <span th:text="'USD $' + ${producto.precioDolar}"></span>
+                                                    <span th:text="'USD $' + ${#numbers.formatDecimal(producto.precioDolar, 1, 'COMMA', 2, 'POINT')}"></span>
+
                                                 </small>
                                             </div>
                                         </div>

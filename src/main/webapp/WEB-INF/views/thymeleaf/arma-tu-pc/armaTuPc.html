@@ -1,0 +1,36 @@
+<div th:replace="fragments/fragments :: header"></div>
+
+<div class="container">
+    <h4>Elegi el tipo de armado</h4>
+    <p class="text-muted">
+        Vas a poder elegir entre los tipos de armados disponibles el que mas se amolde a tus necesidades
+    </p>
+    <div class="row justify-content-evenly">
+        <div class="col-6 col-md-3">
+            <a th:href="@{/arma-tu-pc/tradicional/procesador}" class="text-decoration-none d-block">
+                <div class="bg-dark text-white p-3 d-flex flex-column">
+                    <div class="w-100 mb-2 fw-bold fs-5 border-bottom pb-2 text-center">
+                        ARMADO TRADICIONAL
+                    </div>
+                    <div>
+                        <p class="mb-0">Acá va el contenido que quieras mostrar debajo.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-3">
+            <a th:href="@{/arma-tu-pc/armadoCustom}" class="text-decoration-none d-block">
+                <div class="bg-dark text-white p-3 d-flex flex-column">
+                    <div class="w-100 mb-2 fw-bold fs-5 border-bottom pb-2 text-center">
+                        ARMADO CUSTOMIZADO
+                    </div>
+                    <div>
+                        <p class="mb-0">Acá va el contenido que quieras mostrar debajo.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+
+<div th:replace="fragments/fragments :: footer"></div>
