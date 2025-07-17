@@ -39,6 +39,63 @@ async function obtenerDatos() {
     }
 }
 
+// function mostrarOpciones(filtro) {
+//     const contenedor = document.getElementById('contenedorOpciones');
+//     contenedor.innerHTML = '';
+//
+//     const datosAMostrar = filtro === 'programas' ? programas
+//         : filtro === 'juegos' ? juegos
+//             : [...programas, ...juegos];
+//
+//
+//     datosAMostrar.forEach(item => {
+//         const col = document.createElement('div');
+//         col.className = 'col-md-4 mb-3';
+//         const urlRuta = `/uploads/${item.nombre}.png`;
+//         col.innerHTML = `
+// <!--            <div class="card h-100"  >-->
+// <!--                <div class="card-body d-flex align-items-center">-->
+//         <div class="program-card" style="background-image:  url('${urlRuta}');">
+//                     <div class="overlay">
+//                     <div class="form-check">
+//                         <input class="form-check-input" type="checkbox" id="check-${item.id}" value="${item.id}" name="appSeleccionada[]" data-tipo="${programas.includes(item) ? 'programa' : 'juego'}">
+//                         <label class="form-check-label ms-2" for="check-${item.id}">
+//                             ${item.nombre}
+//                         </label>
+//                     </div>
+//                 </div>
+//             </div>
+//         `;
+//         contenedor.appendChild(col);
+//     });
+// }
+// function mostrarOpciones(filtro) {
+//     const contenedor = document.getElementById('contenedorOpciones');
+//     contenedor.innerHTML = '';
+//
+//     const datosAMostrar = filtro === 'programas' ? programas
+//         : filtro === 'juegos' ? juegos
+//             : [...programas, ...juegos];
+//
+//     datosAMostrar.forEach(item => {
+//         const col = document.createElement('div');
+//         col.className = 'col-md-4 mb-3';
+//         const urlRuta = `/uploads/${item.nombre}.png`;
+//         const tipo = programas.includes(item) ? 'programa' : 'juego';
+//
+//         col.innerHTML = `
+//             <label for="check-${item.id}" class="program-card d-block" style="background-image: url('${urlRuta}'); position: relative;">
+//                 <input type="checkbox" class="form-check-input d-none" id="check-${item.id}" value="${item.id}" name="appSeleccionada[]" data-tipo="${tipo}">
+//
+//                 <div class="overlay d-flex align-items-end" style="position: absolute; bottom: 0; left: 0; right: 0; background-color: rgba(0,0,0,0.6); padding: 10px;">
+//                     <span class="text-white">${item.nombre}</span>
+//                 </div>
+//             </label>
+//         `;
+//
+//         contenedor.appendChild(col);
+//     });
+// }
 function mostrarOpciones(filtro) {
     const contenedor = document.getElementById('contenedorOpciones');
     contenedor.innerHTML = '';
@@ -47,28 +104,26 @@ function mostrarOpciones(filtro) {
         : filtro === 'juegos' ? juegos
             : [...programas, ...juegos];
 
-
     datosAMostrar.forEach(item => {
         const col = document.createElement('div');
-        col.className = 'col-md-4 mb-3';
+        col.className = 'col-md-4 mb-3 d-flex justify-content-center';
         const urlRuta = `/uploads/${item.nombre}.png`;
+        const tipo = programas.includes(item) ? 'programa' : 'juego';
+
         col.innerHTML = `
-<!--            <div class="card h-100"  >-->
-<!--                <div class="card-body d-flex align-items-center">-->
-        <div class="program-card" style="background-image:  url('${urlRuta}');">
-                    <div class="overlay">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="check-${item.id}" value="${item.id}" name="appSeleccionada[]" data-tipo="${programas.includes(item) ? 'programa' : 'juego'}">
-                        <label class="form-check-label ms-2" for="check-${item.id}">
-                            ${item.nombre}
-                        </label>
-                    </div>
+            <label class="program-card" style="background-image: url('${urlRuta}');">
+                <input type="checkbox" id="check-${item.id}" value="${item.id}" name="appSeleccionada[]" data-tipo="${tipo}">
+                
+                <div class="overlay d-flex align-items-end" style="position: absolute; bottom: 0; left: 0; right: 0; background-color: rgba(0,0,0,0.6); padding: 10px;">
+                    <span class="text-white">${item.nombre}</span>
                 </div>
-            </div>
+            </label>
         `;
+
         contenedor.appendChild(col);
     });
 }
+
 
 selectorCategoria.addEventListener('change', () => {
     mostrarOpciones(selectorCategoria.value);
