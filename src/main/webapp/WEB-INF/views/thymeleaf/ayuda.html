@@ -51,82 +51,405 @@
         }
     </style>
 
-    <header th:replace="fragments/fragments :: header"></header>
+<header th:replace="fragments/fragments :: header"></header>
 <div class="ayuda-container">
     <nav class="ayuda-menu">
         <ul>
             <li class="selected" onclick="mostrarCategoria(0)">Realizar un pedido</li>
             <li onclick="mostrarCategoria(1)">Precio</li>
             <li onclick="mostrarCategoria(2)">Formas de pago</li>
-            <li onclick="mostrarCategoria(3)">Depósito - Transferencia bancaria</li>
-            <li onclick="mostrarCategoria(4)">Tarjetas de crédito</li>
-            <li onclick="mostrarCategoria(5)">Envíos</li>
-            <li onclick="mostrarCategoria(6)">Facturación</li>
-            <li onclick="mostrarCategoria(7)">Garantías</li>
+            <li onclick="mostrarCategoria(3)">Tarjetas de crédito</li>
+            <li onclick="mostrarCategoria(4)">Envíos</li>
+            <li onclick="mostrarCategoria(5)">Facturación</li>
+            <li onclick="mostrarCategoria(6)">Garantías</li>
+            <li onclick="mostrarCategoria(7)">Preguntas frecuentes</li>
+
         </ul>
     </nav>
     <section class="ayuda-content">
         <div class="ayuda-section" id="cat-0">
-            <h2>Realizar un pedido</h2>
-            <p>¿Cómo realizo un pedido? </br>
-                ¡Comprar en nuestra web es muy fácil! Primero, sumá al carrito todos los productos que querés. Luego, elegí si preferís envío a domicilio o retirarlo en un punto de entrega. Indicá si necesitás factura A o factura B. Después, seleccioná el medio de pago que más te convenga. Revisá todos los detalles y confirmá tu compra. ¡Listo, ya tenés tu pedido realizado! Te enviamos toda la info y número de pedido al mail que tengas registrado en tu cuenta.</p>
+            <h2 class="d-flex align-items-center mb-3">
+                <i class="bi bi-bag-check me-2"></i>
+                Realizar un pedido
+            </h2>
+            <div class="bg-light rounded p-3">
+                <h5 class="text-primary mb-2">¿Cómo realizo un pedido?</h5>
+                <p class="mb-0">
+                    Realizar tu compra es muy sencillo. Seguí estos pasos:
+                </p>
+                <ol class="mt-2 mb-0">
+                    <li>Agregá todos los productos que desés a tu carrito</li>
+                    <li>Elegí si preferís <strong>envío a domicilio</strong> o <strong>retiro en nuestro
+                        depósito</strong></li>
+                    <li>Seleccioná el medio de pago que más te convenga</li>
+                    <li>Revisá todos los detalles y confirmá tu compra</li>
+                </ol>
+                <p class="mt-2 mb-0">
+                    <i class="bi bi-check-circle text-success me-1"></i>
+                    ¡Listo! Tu pedido está realizado y podés consultar el historial de tus compras en cualquier momento.
+                </p>
+            </div>
         </div>
+
         <div class="ayuda-section" id="cat-1" style="display:none">
-            <h2>Precio</h2>
-            <p>¿El precio que figura en la web es el precio final? </br>
-                Todos los precios en la web incluyen el IVA, y se encuentran expresados en pesos argentinos.</p>
+            <h2 class="d-flex align-items-center mb-3">
+                <i class="bi bi-currency-dollar me-2"></i>
+                Precio
+            </h2>
+            <div class="bg-light rounded p-3">
+                <h5 class="text-primary mb-2">¿El precio que figura en la web es el precio final?</h5>
+                <p class="mb-0">
+                    <i class="bi bi-info-circle text-info me-1"></i>
+                    Todos los precios publicados en nuestra web <strong>incluyen el IVA</strong> y se encuentran
+                    expresados en <strong>pesos argentinos</strong>.
+                    No hay costos adicionales ocultos, lo que ves es lo que pagás.
+                </p>
+            </div>
         </div>
+
         <div class="ayuda-section" id="cat-2" style="display:none">
-            <h2>Formas de pago</h2>
-            <p>¿Cuáles son las formas de pago? </br>
-                Contás con varias opciones para abonar tu pedido: Podés elegir entre depósito o transferencia bancaria (abonando el precio especial) o tarjetas de crédito (en hasta 18 cuotas fijas)</p>
+            <h2 class="d-flex align-items-center mb-3">
+                <i class="bi bi-credit-card me-2"></i>
+                Formas de pago
+            </h2>
+            <div class="bg-light rounded p-3">
+                <h5 class="text-primary mb-2">¿Cuáles son las formas de pago disponibles?</h5>
+                <p class="mb-2">Ofrecemos múltiples opciones para que puedas pagar de la manera que te resulte más
+                    cómoda:</p>
+                <ul class="mb-0">
+                    <li><i class="bi bi-wallet2 me-1"></i> <strong>Mercado Pago:</strong> Ingresá con tu cuenta
+                        existente
+                    </li>
+                    <li><i class="bi bi-credit-card-2-front me-1"></i> <strong>Tarjeta de crédito:</strong> Pago directo
+                        con tu tarjeta
+                    </li>
+                    <li><i class="bi bi-cash me-1"></i> <strong>Efectivo:</strong> A través de Pago Fácil</li>
+                </ul>
+            </div>
         </div>
+
         <div class="ayuda-section" id="cat-3" style="display:none">
-            <h2>Depósito - Transferencia bancaria</h2>
-            <p>Aquí irá el texto explicativo sobre depósito y transferencia bancaria.</p>
+            <h2 class="d-flex align-items-center mb-3">
+                <i class="bi bi-credit-card-2-back me-2"></i>
+                Tarjetas
+            </h2>
+            <div class="bg-light rounded p-3">
+                <h5 class="text-primary mb-2">¿Cómo abono con tarjeta de crédito?</h5>
+                <p class="mb-0">
+                    <i class="bi bi-shield-check text-success me-1"></i>
+                    Una vez que realizás tu pedido y seleccionás <strong>"Pagar con tarjeta"</strong>, deberás completar
+                    de forma segura:
+                </p>
+                <ul class="mt-2 mb-0">
+                    <li>Los datos de tu tarjeta de crédito</li>
+                    <li>La información necesaria para la facturación</li>
+                </ul>
+                <p class="mt-2 mb-0 text-muted">
+                    <small>Todos los datos se procesan de manera segura y encriptada.</small>
+                </p>
+            </div>
         </div>
+
         <div class="ayuda-section" id="cat-4" style="display:none">
-            <h2>Tarjetas de crédito</h2>
-            <p>¿Cómo abono a través de depósito/transferencia? </br>
-
-                Una vez que realizás tu pedido, te enviamos los datos bancarios para hacer el depósito o la transferencia. Para informar el pago, ingresá a tu perfil, buscá el pedido y hacé clic en “Cargar comprobante”. Subí el comprobante (el archivo debe ser en formato JPG, PDF o BMP). Seleccioná el tipo de comprobante (si es depósito, transferencia o retención) e indicá el monto, el DNI o CUIT del titular del pago y el número de comprobante. Si tenés más de un comprobante, cargá cada archivo por separado. ¡Importante! El pago debe completarse antes de la fecha de vencimiento de la reserva.</p>
+            <h2 class="d-flex align-items-center mb-3">
+                <i class="bi bi-truck me-2"></i>
+                Envíos
+            </h2>
+            <div class="bg-light rounded p-3">
+                <h5 class="text-primary mb-2">¿Cómo gestiono mi envío?</h5>
+                <p class="mb-2">
+                    <i class="bi bi-geo-alt text-warning me-1"></i>
+                    Realizamos envíos a todo el país a través de <strong>Andreani</strong>, quien se encarga de que tu
+                    pedido llegue puntualmente al punto de correo más cercano.
+                </p>
+                <p class="mb-2">
+                    <strong>¿Cómo funciona?</strong>
+                </p>
+                <ul class="mb-0">
+                    <li>Ingresá tu código postal durante la compra</li>
+                    <li>El sistema calculará automáticamente el costo y tiempo de entrega</li>
+                    <li>Verás la zona de entrega y todas las opciones disponibles</li>
+                </ul>
+                <p class="mt-2 mb-0 text-muted">
+                    <small><i class="bi bi-clock me-1"></i> Los tiempos de entrega son estimados y pueden variar según
+                        la zona.</small>
+                </p>
+            </div>
         </div>
+
         <div class="ayuda-section" id="cat-5" style="display:none">
-            <h2>Envíos</h2>
-            <p>¿Cómo gestiono mi envío? </br>
-
-                ¡Realizamos envíos a todo el país! Al avanzar con tu compra e ingresar tu dirección, vas a ver los métodos de envío disponibles y el costo según tu zona. También podés elegir retirarlo en un punto de entrega, ingresando tu código postal. Trabajamos con: OCA (envíos a todo el país), Entregar (CABA, AMBA, Rosario y Córdoba) y Pickit (CABA, AMBA y puntos seleccionados en todo el país). El costo se calcula automáticamente según el peso, tamaño del paquete y distancia a tu localidad.</p>
+            <h2 class="d-flex align-items-center mb-3">
+                <i class="bi bi-receipt me-2"></i>
+                Facturación
+            </h2>
+            <div class="bg-light rounded p-3">
+                <h5 class="text-primary mb-2">¿Cómo obtengo la factura de mi compra?</h5>
+                <p class="mb-2">
+                    <i class="bi bi-file-earmark-text text-primary me-1"></i>
+                    <strong>Todas las compras</strong> realizadas en nuestra web incluyen automáticamente la factura
+                    correspondiente.
+                </p>
+                <p class="mb-2">
+                    <strong>¿Cómo la recibo?</strong>
+                </p>
+                <ul class="mb-0">
+                    <li>Una vez completado y abonado tu pedido</li>
+                    <li>Podés descargar la factura directamente desde tu cuenta</li>
+                    <li>También la enviamos a tu dirección de correo electrónico</li>
+                </ul>
+                <p class="mt-2 mb-0 text-success">
+                    <i class="bi bi-check-circle me-1"></i>
+                    <strong>Sin excepciones:</strong> Toda compra tiene su factura garantizada.
+                </p>
+            </div>
         </div>
+
         <div class="ayuda-section" id="cat-6" style="display:none">
-            <h2>Facturación</h2>
-            <p>¿Cómo tramito la factura de mi compra? </br>
-
-                En todas las compras efectuadas en la web, brindamos sin excepción alguna, la factura de compra. Una vez que realiza y abona el pedido, enviamos a tu dirección de correo electrónico la factura correspondiente. Por supuesto, también podés descargarla desde la sección Mi cuenta < Mis facturas. En caso de que precises factura A, solo debes ingresar tu CUIT al cargar el pedido por la web. Tené en cuenta que la factura A puede tener percepciones.</p>
+            <h2 class="d-flex align-items-center mb-3">
+                <i class="bi bi-shield-check me-2"></i>
+                Garantías
+            </h2>
+            <div class="bg-light rounded p-3">
+                <h5 class="text-primary mb-2">¿Cómo utilizo el servicio de PostVenta y garantías?</h5>
+                <p class="mb-2">
+                    <i class="bi bi-tools text-warning me-1"></i>
+                    Todos nuestros productos cuentan con <strong>garantía oficial</strong> según las especificaciones
+                    del fabricante.
+                </p>
+                <p class="mb-2">
+                    <strong>Para hacer uso de la garantía:</strong>
+                </p>
+                <ul class="mb-0">
+                    <li>Conservá tu factura de compra</li>
+                    <li>Contactános a través de nuestros canales de atención</li>
+                    <li>Proporcioná los detalles del producto y el inconveniente</li>
+                </ul>
+                <p class="mt-2 mb-0 text-muted">
+                    <small><i class="bi bi-headset me-1"></i> Nuestro equipo de PostVenta te guiará en todo el proceso.</small>
+                </p>
+            </div>
         </div>
+
         <div class="ayuda-section" id="cat-7" style="display:none">
-            <h2>Garantías</h2>
-            <p>¿Cómo utilizo el servicio de PosVenta y garantías? </br>
-                Para realizar consultas/reclamos relacionadas con la garantía o devolución de alguna de tus compras, al final de esta sección contamos con el apartado “Compra Gamer te ayuda. ¿Cuál es tu consulta?” donde debes exponer tu caso, seleccionando el motivo de “Posventa” que se adapte a tu requerimiento y uno de nuestros representantes te ofrecerá la información correspondiente sobre cómo proceder. En caso de preferir venir a la empresa a gestionar un tema de PosVenta o garantía, podés hacerlo sacando un turno haciendo clic ACÁ</p>
+            <h2 class="d-flex align-items-center mb-3">
+                <i class="bi bi-question-circle me-2"></i>
+                Preguntas Frecuentes
+            </h2>
+            <div class="accordion" id="faqAccordion">
+                <!-- FAQ 1 -->
+                <div class="accordion-item mb-2">
+                    <h6 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#faq1">
+                            <i class="bi bi-lightbulb me-2"></i>
+                            ¿Me ayudan a elegir los componentes para mi PC?
+                        </button>
+                    </h6>
+                    <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            <p class="mb-0">
+                                <i class="bi bi-check-circle text-success me-1"></i>
+                                Te brindamos <strong>asesoramiento guiado</strong> para elegir los mejores componentes
+                                según tus necesidades o los programas-juegos que quieras utilizar. Te guiamos en la
+                                selección de cada parte para que armes tu PC customizada a tu manera.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 2 -->
+                <div class="accordion-item mb-2">
+                    <h6 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#faq2">
+                            <i class="bi bi-gear me-2"></i>
+                            ¿Cómo sé si los componentes son compatibles entre sí?
+                        </button>
+                    </h6>
+                    <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            <p class="mb-0">
+                                <i class="bi bi-shield-check text-success me-1"></i>
+                                Nuestro sistema verifica automáticamente la <strong>compatibilidad</strong> entre
+                                componentes. Además, nuestro equipo técnico te asesora para garantizar que todos los
+                                componentes funcionen perfectamente juntos.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 3 -->
+                <div class="accordion-item mb-2">
+                    <h6 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#faq3">
+                            <i class="bi bi-cpu me-2"></i>
+                            ¿Qué componentes necesito para armar una PC completa?
+                        </button>
+                    </h6>
+                    <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            <p class="mb-2">
+                                <i class="bi bi-list-check text-info me-1"></i>
+                                Para una PC completa necesitás estos componentes esenciales:
+                            </p>
+                            <ul class="mb-0">
+                                <li>Procesador (CPU)</li>
+                                <li>Motherboard</li>
+                                <li>Memoria RAM</li>
+                                <li>Almacenamiento (SSD/HDD)</li>
+                                <li>Placa de video (GPU)</li>
+                                <li>Fuente de alimentacion (PSU)</li>
+                                <li>Gabinete</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 4 -->
+                <div class="accordion-item mb-2">
+                    <h6 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#faq4">
+                            <i class="bi bi-box-seam me-2"></i>
+                            ¿Los productos vienen en sus cajas originales?
+                        </button>
+                    </h6>
+                    <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            <p class="mb-0">
+                                <i class="bi bi-patch-check text-success me-1"></i>
+                                Todos los productos son <strong>nuevos y sellados</strong>, vienen en sus cajas
+                                originales con todos los accesorios incluidos. Conservamos las cajas para garantías y
+                                RMA.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 6 -->
+                <div class="accordion-item mb-2">
+                    <h6 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#faq6">
+                            <i class="bi bi-arrow-clockwise me-2"></i>
+                            ¿Puedo cambiar un componente después de comprar?
+                        </button>
+                    </h6>
+                    <div id="faq6" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            <p class="mb-0">
+                                <i class="bi bi-exclamation-triangle text-warning me-1"></i>
+                                Los cambios son posibles <strong>durante el proceso de compra</strong>. Una vez
+                                confirmada la compra, los cambios generan costo adicional. Te recomendamos revisar bien
+                                la configuración antes de confirmar.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 7 -->
+                <div class="accordion-item mb-2">
+                    <h6 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#faq7">
+                            <i class="bi bi-tools me-2"></i>
+                            ¿Proporcionan manuales o guías de armado?
+                        </button>
+                    </h6>
+                    <div id="faq7" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            <p class="mb-0">
+                                <i class="bi bi-book text-primary me-1"></i>
+                                Incluimos <strong>guías detalladas de armado</strong> con cada compra de componentes.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 8 -->
+                <div class="accordion-item mb-2">
+                    <h6 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#faq8">
+                            <i class="bi bi-power me-2"></i>
+                            ¿Cómo calculo qué fuente necesito para mi PC?
+                        </button>
+                    </h6>
+                    <div id="faq8" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            <p class="mb-0">
+                                <i class="bi bi-calculator text-success me-1"></i>
+                                Te ayudamos a calcular el <strong>consumo exacto</strong> de tu configuración.
+                                Consideramos todos los componentes y recomendamos una fuente con la suficiente cantidad de watts
+                                para garantizar estabilidad y eficiencia.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 9 -->
+                <div class="accordion-item mb-2">
+                    <h6 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#faq9">
+                            <i class="bi bi-truck me-2"></i>
+                            ¿Cómo se embala una PC armada para envío?
+                        </button>
+                    </h6>
+                    <div id="faq9" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            <p class="mb-0">
+                                <i class="bi bi-shield-fill-check text-success me-1"></i>
+                                Utilizamos <strong>embalaje especializado</strong> con espuma antiestática, separamos
+                                componentes pesados como la GPU, y protegemos especialmente el cooler. Todo va en caja
+                                reforzada con seguro de transporte.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 10 -->
+                <div class="accordion-item">
+                    <h6 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#faq10">
+                            <i class="bi bi-headset me-2"></i>
+                            ¿Ofrecen soporte técnico post-venta?
+                        </button>
+                    </h6>
+                    <div id="faq10" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            <p class="mb-0">
+                                <i class="bi bi-chat-dots text-info me-1"></i>
+                                Sí, brindamos <strong>soporte técnico gratuito</strong> durante los primeros 30 días
+                                post-compra. Incluye ayuda con configuración, instalación de programas y resolución de
+                                problemas básicos.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 </div>
+<footer th:replace="fragments/fragments :: footer"></footer>
 
 <script>
     function mostrarCategoria(idx) {
         // Cambia la selección en el menú
         var items = document.querySelectorAll('.ayuda-menu li');
-        items.forEach(function(item, i) {
-            if(i === idx) {
+        items.forEach(function (item, i) {
+            if (i === idx) {
                 item.classList.add('selected');
             } else {
                 item.classList.remove('selected');
             }
         });
         // Muestra la sección correspondiente
-        for(let i=0; i<8; i++) {
-            document.getElementById('cat-'+i).style.display = (i === idx) ? 'block' : 'none';
+        for (let i = 0; i < 8; i++) {
+            document.getElementById('cat-' + i).style.display = (i === idx) ? 'block' : 'none';
         }
     }
 </script>
-    <footer th:replace="fragments/fragments :: footer"></footer>
 

@@ -233,6 +233,10 @@ function calcularConAjax(codigoPostal) {
                 if (!parrafoTotal) {
                     parrafoTotal = document.createElement('p');
                     parrafoTotal.className = 'total-con-envio';
+                    parrafoTotal.style.fontSize = "25px";
+                    parrafoTotal.style.fontWeight = "bold";
+
+
                     document.getElementById('btnComprar').parentElement.insertBefore(parrafoTotal, document.getElementById('btnComprar').parentElement.firstChild);
                 }
 
