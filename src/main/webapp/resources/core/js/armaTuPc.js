@@ -55,16 +55,16 @@ function mostrarOpciones(filtro) {
         col.innerHTML = `
 <!--            <div class="card h-100"  >-->
 <!--                <div class="card-body d-flex align-items-center">-->
-      
+        <div class="program-card" style="background-image:  url('${urlRuta}');">
                     <div class="overlay">
                     <div class="form-check">
-                        <input class="program-card" style="background-image:  url('${urlRuta}');" type="checkbox" id="check-${item.id}" value="${item.id}" name="appSeleccionada[]" data-tipo="${programas.includes(item) ? 'programa' : 'juego'}">
+                        <input class="form-check-input" type="checkbox" id="check-${item.id}" value="${item.id}" name="appSeleccionada[]" data-tipo="${programas.includes(item) ? 'programa' : 'juego'}">
                         <label class="form-check-label ms-2" for="check-${item.id}">
                             ${item.nombre}
                         </label>
                     </div>
                 </div>
-            
+            </div>
         `;
         contenedor.appendChild(col);
     });
