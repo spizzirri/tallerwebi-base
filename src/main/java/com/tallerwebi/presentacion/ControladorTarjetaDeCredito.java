@@ -101,9 +101,14 @@ public class ControladorTarjetaDeCredito {
             compraDto.setCostoDeEnvio((Double) session.getAttribute("costo"));
             compraDto.setMoneda(moneda);
             compraDto.setTotalDolar(totalCompraEnDolares);
+            compraDto.setValorConDescuento((String) session.getAttribute("totalConDescuento"));
+            compraDto.setTotalConDescuentoDolar((Double) session.getAttribute("totalConDescuentoNoFormateado"));
 
             servicioCompra.guardarCompraConUsuarioLogueado(compraDto, usuarioLogueado, session );
             servicioProductoCarrito.limpiarCarrito();
+
+            session.removeAttribute("totalConDescuento");
+            session.removeAttribute("totalConDescuentoNoFormateado");
             return new ModelAndView("redirect:/pagoExitoso");
         }
     }
@@ -146,9 +151,6 @@ public class ControladorTarjetaDeCredito {
         modelo.put("precioDolar", this.servicioPrecios.obtenerPrecioFormateado(totalCompraEnDolares));
         modelo.put("precioPesos", totalCompraEnPesos);
         modelo.put("moneda", session.getAttribute("moneda"));
-
-        modelo.put("valorConDescuento", session.getAttribute("totalConDescuento"));
-        modelo.put("totalConDescuentoNoFormateado", session.getAttribute("totalConDescuentoNoFormateado"));
 
         return new ModelAndView("tarjetaDeCredito", modelo);
     }

@@ -34,18 +34,12 @@ public class ControladorPagoExitoso {
 
         List<Compra> comprasUsuario = comprasUsuarioObtenidas.stream().limit(1).collect(Collectors.toList());
 
-
         model.put("tarjeta", session.getAttribute("tarjeta"));
         model.put("tiempo", session.getAttribute("tiempo"));
         model.put("destino", session.getAttribute("destino"));
         model.put("moneda", session.getAttribute("moneda"));
-        model.put("valorConDescuento", session.getAttribute("totalConDescuento"));
-        model.put("totalConDescuentoNoFormateado", session.getAttribute("totalConDescuentoNoFormateado"));
-        model.put("totalCompraEnDolares", session.getAttribute("totalCompraEnDolares"));
         model.put("iva", session.getAttribute("iva"));
         model.put("comprasUsuario", comprasUsuario);
-
-
 
         return new ModelAndView("pagoExitoso", model);
     }

@@ -52,6 +52,14 @@ public class Compra {
     @Column(length = 100)
     private Double totalDolar;
 
+    @Column(length = 100)
+    private String valorConDescuento;
+
+    @Column(length = 100)
+    private Double totalConDescuentoDolar;
+
+    public Compra() {}
+
     public void setIdCompra(Long idCompra) {
         this.idCompra = idCompra;
     }
@@ -154,5 +162,21 @@ public class Compra {
 
     public Double getTotalDolar() {
         return totalDolar;
+    }
+
+    public void setValorConDescuento(String valorConDescuento) {
+        this.valorConDescuento = valorConDescuento;
+    }
+
+    public String getValorConDescuento() {
+        return valorConDescuento;
+    }
+
+    public void setTotalConDescuentoDolar(Double totalConDescuentoDolar) {
+        this.totalConDescuentoDolar = totalConDescuentoDolar;
+    }
+
+    public Double getTotalConDescuentoDolar() {
+        return totalConDescuentoDolar;
     }
 }
