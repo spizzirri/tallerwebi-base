@@ -23,6 +23,8 @@ public class CompraDto {
     private Double totalDolar;
     private String documento;
     private String nombreTitular;
+    private String valorConDescuento;
+    private Double totalConDescuentoDolar;
 
     public CompraDto(Compra compra) {
         this.id = compra.getIdCompra();
@@ -40,6 +42,8 @@ public class CompraDto {
         this.totalDolar = compra.getTotalDolar();
         this.documento = compra.getDocumento();
         this.nombreTitular = compra.getNombreTitular();
+        this.valorConDescuento = compra.getValorConDescuento();
+        this.totalConDescuentoDolar = compra.getTotalConDescuentoDolar();
     }
 
     public CompraDto() {
@@ -147,5 +151,21 @@ public class CompraDto {
 
     public Double getTotalDolar() {
         return totalDolar;
+    }
+
+    public void setValorConDescuento(String valorConDescuento) {
+        this.valorConDescuento = valorConDescuento;
+    }
+
+    public String getValorConDescuento() {
+        return valorConDescuento;
+    }
+
+    public void setTotalConDescuentoDolar(Double totalConDescuentoDolar) {
+        this.totalConDescuentoDolar = totalConDescuentoDolar;
+    }
+
+    public Double getTotalConDescuentoDolar() {
+        return totalConDescuentoDolar;
     }
 }

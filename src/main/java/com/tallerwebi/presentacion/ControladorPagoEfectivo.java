@@ -51,9 +51,14 @@ public class ControladorPagoEfectivo {
         compraDto.setCostoDeEnvio((Double) session.getAttribute("costo"));
         compraDto.setMoneda("pesos");
         compraDto.setTotalDolar(totalCompraEnDolares);
+        compraDto.setValorConDescuento((String) session.getAttribute("totalConDescuento"));
+        compraDto.setTotalConDescuentoDolar((Double) session.getAttribute("totalConDescuentoNoFormateado"));
 
         servicioCompra.guardarCompraConUsuarioLogueado(compraDto, usuarioLogueado, session);
         servicioProductoCarrito.limpiarCarrito();
+
+        session.removeAttribute("totalConDescuento");
+        session.removeAttribute("totalConDescuentoNoFormateado");
 
         return new ModelAndView("redirect:/pagoExitoso");
     }
