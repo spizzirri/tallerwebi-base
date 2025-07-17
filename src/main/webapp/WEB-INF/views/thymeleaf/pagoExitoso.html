@@ -290,7 +290,7 @@
 
     <div class="d-flex justify-content-center gap-3">
         <a th:href="@{/index.html}" class="btn btn-primary mt-3 col-md-4">Volver al inicio</a>
-        <button class="btn btn-primary mt-3 col-md-4" id="btn-imprimir">Exportar PDF</button>
+        <button class="btn btn-primary mt-3 col-md-4" th:id=" 'btn-imprimir' + ${redirect}">Exportar PDF</button>
     </div>
 </div>
 
