@@ -1,0 +1,132 @@
+
+
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f7f7f7;
+            margin: 0;
+            padding: 0;
+        }
+        .ayuda-container {
+            display: flex;
+            max-width: 1100px;
+            margin: 40px auto;
+            background: none;
+        }
+        .ayuda-menu {
+            width: 270px;
+            background: #fafafa;
+            border-right: 1px solid #e0e0e0;
+            padding: 0;
+        }
+        .ayuda-menu ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        .ayuda-menu li {
+            padding: 18px 24px;
+            cursor: pointer;
+            color: #666;
+            border-left: 4px solid transparent;
+            transition: background 0.2s, border-color 0.2s;
+        }
+        .ayuda-menu li.selected {
+            background: #fff;
+            color: #222;
+            border-left: 4px solid #ff6600;
+            font-weight: bold;
+        }
+        .ayuda-content {
+            flex: 1;
+            background: #fff;
+            padding: 32px 40px;
+            min-height: 400px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .ayuda-content h2 {
+            margin-top: 0;
+            color: #222;
+        }
+    </style>
+
+    <header th:replace="fragments/fragments :: header"></header>
+<div class="ayuda-container">
+    <nav class="ayuda-menu">
+        <ul>
+            <li class="selected" onclick="mostrarCategoria(0)">Realizar un pedido</li>
+            <li onclick="mostrarCategoria(1)">Precio</li>
+            <li onclick="mostrarCategoria(2)">Formas de pago</li>
+            <li onclick="mostrarCategoria(3)">Depósito - Transferencia bancaria</li>
+            <li onclick="mostrarCategoria(4)">Tarjetas de crédito</li>
+            <li onclick="mostrarCategoria(5)">Envíos</li>
+            <li onclick="mostrarCategoria(6)">Facturación</li>
+            <li onclick="mostrarCategoria(7)">Garantías</li>
+        </ul>
+    </nav>
+    <section class="ayuda-content">
+        <div class="ayuda-section" id="cat-0">
+            <h2>Realizar un pedido</h2>
+            <p>¿Cómo realizo un pedido? </br>
+                ¡Comprar en nuestra web es muy fácil! Primero, sumá al carrito todos los productos que querés. Luego, elegí si preferís envío a domicilio o retirarlo en un punto de entrega. Indicá si necesitás factura A o factura B. Después, seleccioná el medio de pago que más te convenga. Revisá todos los detalles y confirmá tu compra. ¡Listo, ya tenés tu pedido realizado! Te enviamos toda la info y número de pedido al mail que tengas registrado en tu cuenta.</p>
+        </div>
+        <div class="ayuda-section" id="cat-1" style="display:none">
+            <h2>Precio</h2>
+            <p>¿El precio que figura en la web es el precio final? </br>
+                Todos los precios en la web incluyen el IVA, y se encuentran expresados en pesos argentinos.</p>
+        </div>
+        <div class="ayuda-section" id="cat-2" style="display:none">
+            <h2>Formas de pago</h2>
+            <p>¿Cuáles son las formas de pago? </br>
+                Contás con varias opciones para abonar tu pedido: Podés elegir entre depósito o transferencia bancaria (abonando el precio especial) o tarjetas de crédito (en hasta 18 cuotas fijas)</p>
+        </div>
+        <div class="ayuda-section" id="cat-3" style="display:none">
+            <h2>Depósito - Transferencia bancaria</h2>
+            <p>Aquí irá el texto explicativo sobre depósito y transferencia bancaria.</p>
+        </div>
+        <div class="ayuda-section" id="cat-4" style="display:none">
+            <h2>Tarjetas de crédito</h2>
+            <p>¿Cómo abono a través de depósito/transferencia? </br>
+
+                Una vez que realizás tu pedido, te enviamos los datos bancarios para hacer el depósito o la transferencia. Para informar el pago, ingresá a tu perfil, buscá el pedido y hacé clic en “Cargar comprobante”. Subí el comprobante (el archivo debe ser en formato JPG, PDF o BMP). Seleccioná el tipo de comprobante (si es depósito, transferencia o retención) e indicá el monto, el DNI o CUIT del titular del pago y el número de comprobante. Si tenés más de un comprobante, cargá cada archivo por separado. ¡Importante! El pago debe completarse antes de la fecha de vencimiento de la reserva.</p>
+        </div>
+        <div class="ayuda-section" id="cat-5" style="display:none">
+            <h2>Envíos</h2>
+            <p>¿Cómo gestiono mi envío? </br>
+
+                ¡Realizamos envíos a todo el país! Al avanzar con tu compra e ingresar tu dirección, vas a ver los métodos de envío disponibles y el costo según tu zona. También podés elegir retirarlo en un punto de entrega, ingresando tu código postal. Trabajamos con: OCA (envíos a todo el país), Entregar (CABA, AMBA, Rosario y Córdoba) y Pickit (CABA, AMBA y puntos seleccionados en todo el país). El costo se calcula automáticamente según el peso, tamaño del paquete y distancia a tu localidad.</p>
+        </div>
+        <div class="ayuda-section" id="cat-6" style="display:none">
+            <h2>Facturación</h2>
+            <p>¿Cómo tramito la factura de mi compra? </br>
+
+                En todas las compras efectuadas en la web, brindamos sin excepción alguna, la factura de compra. Una vez que realiza y abona el pedido, enviamos a tu dirección de correo electrónico la factura correspondiente. Por supuesto, también podés descargarla desde la sección Mi cuenta < Mis facturas. En caso de que precises factura A, solo debes ingresar tu CUIT al cargar el pedido por la web. Tené en cuenta que la factura A puede tener percepciones.</p>
+        </div>
+        <div class="ayuda-section" id="cat-7" style="display:none">
+            <h2>Garantías</h2>
+            <p>¿Cómo utilizo el servicio de PosVenta y garantías? </br>
+                Para realizar consultas/reclamos relacionadas con la garantía o devolución de alguna de tus compras, al final de esta sección contamos con el apartado “Compra Gamer te ayuda. ¿Cuál es tu consulta?” donde debes exponer tu caso, seleccionando el motivo de “Posventa” que se adapte a tu requerimiento y uno de nuestros representantes te ofrecerá la información correspondiente sobre cómo proceder. En caso de preferir venir a la empresa a gestionar un tema de PosVenta o garantía, podés hacerlo sacando un turno haciendo clic ACÁ</p>
+        </div>
+    </section>
+</div>
+
+<script>
+    function mostrarCategoria(idx) {
+        // Cambia la selección en el menú
+        var items = document.querySelectorAll('.ayuda-menu li');
+        items.forEach(function(item, i) {
+            if(i === idx) {
+                item.classList.add('selected');
+            } else {
+                item.classList.remove('selected');
+            }
+        });
+        // Muestra la sección correspondiente
+        for(let i=0; i<8; i++) {
+            document.getElementById('cat-'+i).style.display = (i === idx) ? 'block' : 'none';
+        }
+    }
+</script>
+    <footer th:replace="fragments/fragments :: footer"></footer>
+

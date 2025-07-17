@@ -248,7 +248,7 @@ public class ControladorArmaTuPcTest {
 
         // Verificación (Assert)
         assertThat(mav.getViewName(), equalTo("redirect:/arma-tu-pc/tradicional/memoria"));
-        assertThat(mav.getModelMap().get("errorLimite"), equalTo("Supero el limite de memoria de su armado"));
+        assertThat(mav.getModelMap().get("errorLimite"), equalTo("Supero el limite de memoria de este tipo en su armado"));
         verify(sessionMock, never()).setAttribute(eq("armadoPcDto"), any());
     }
 

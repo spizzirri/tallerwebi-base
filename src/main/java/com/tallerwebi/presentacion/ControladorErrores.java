@@ -10,17 +10,17 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 @Controller
 public class ControladorErrores {
 
-//    @ExceptionHandler(NullPointerException.class)
-//    public ModelAndView manejarNullPointerException(NullPointerException ex) {
-//
-//        return new ModelAndView("error/500");
-//    }
-//    @RequestMapping("/error500")
-//    public ModelAndView manejarError500(Exception ex) {
-//        ModelAndView mav = new ModelAndView("error/500");
-//        mav.addObject("mensaje", ex.getMessage());
-//        return mav;
-//    }
+    @ExceptionHandler(NullPointerException.class)
+    public ModelAndView manejarNullPointerException(NullPointerException ex) {
+
+        return new ModelAndView("error/500");
+    }
+    @RequestMapping("/error500")
+    public ModelAndView manejarError500(Exception ex) {
+        ModelAndView mav = new ModelAndView("error/500");
+        mav.addObject("mensaje", ex.getMessage());
+        return mav;
+    }
 
     @ExceptionHandler(NoHandlerFoundException.class)
     @RequestMapping("/error404")

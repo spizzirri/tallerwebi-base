@@ -22,6 +22,7 @@ public class SesionDestruidaListener implements HttpSessionListener {
         HttpSession session = se.getSession();
         List<ProductoCarritoDto> carrito = (List<ProductoCarritoDto>) session.getAttribute("carritoSesion");
         List<ProductoCarritoArmadoDto> reservaArmado = (List<ProductoCarritoArmadoDto>) session.getAttribute("reservaArmado");
+        List<ProductoCarritoArmadoDto> reservaArmadoCustom = (List<ProductoCarritoArmadoDto>) session.getAttribute("reservaArmadoCustom");
 
         if (carrito != null) {
             ApplicationContext ctx = ApplicationContextProvider.getApplicationContext();
@@ -37,6 +38,15 @@ public class SesionDestruidaListener implements HttpSessionListener {
             RepositorioComponente repo = ctx.getBean(RepositorioComponente.class);
 
             for (ProductoCarritoArmadoDto producto : reservaArmado) {
+                repo.devolverStockDeUnComponente(producto.getId(), producto.getCantidad());
+            }
+        }
+
+        if (reservaArmadoCustom != null) {
+            ApplicationContext ctx = ApplicationContextProvider.getApplicationContext();
+            RepositorioComponente repo = ctx.getBean(RepositorioComponente.class);
+
+            for (ProductoCarritoArmadoDto producto : reservaArmadoCustom) {
                 repo.devolverStockDeUnComponente(producto.getId(), producto.getCantidad());
             }
         }

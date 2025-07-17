@@ -8,6 +8,7 @@ import com.tallerwebi.presentacion.dto.ProductoCarritoArmadoDto;
 
 import java.util.List;
 import java.util.Set;
+import java.util.Map;
 
 public interface ServicioArmaTuPc {
     Set<ComponenteDto> obtenerListaDeComponentesCompatiblesDto(String tipoComponente, ArmadoPcDto armadoPcDto) throws ComponenteDeterminateDelArmadoEnNullException;
@@ -31,6 +32,13 @@ public interface ServicioArmaTuPc {
     Integer obtenerWattsTotalesDeArmado(ArmadoPcDto armadoPcDto);
 
     void devolverStockDeArmado(ArmadoPcDto armadoPcDto);
+    Map<String, Double> obtenerMapaDeRequisitosMinimosSeleccionados(List<String> seleccionados);
+
+    Map<String, Double> obtenerMapaDeRequisitosRecomendadosSeleccionados(List<String> seleccionados);
+
+    List<ComponenteDto> obtenerListaDeComponentesCompatiblesDtoCustomRequisitosMinimos(String tipoComponente, ArmadoPcDto armadoPcDto, Map<String, Double> seleccionados) throws ComponenteDeterminateDelArmadoEnNullException;
+
+    List<ComponenteDto> obtenerListaDeComponentesCompatiblesFiltradosDtoCustomRequisitosMinimos(String tipoComponente, String nombreFiltro, ArmadoPcDto armadoPcDto, Map<String, Double> seleccionados) throws ComponenteDeterminateDelArmadoEnNullException;
 
     Integer obtenerSlotsRamDeMotherboard(ComponenteDto motherboard);
 
@@ -39,4 +47,7 @@ public interface ServicioArmaTuPc {
     Integer obtenerSlotsM2DeMotherboard(ComponenteDto motherboard);
 
     List<ProductoCarritoArmadoDto> configurarNumeroDeArmadoYEscencialidadAProductosCarritoArmadoDto(Integer numeroDeUltimoArmadoEnElCarrito, List<ProductoCarritoArmadoDto> productoCarritoArmadoDtos);
+    List<ComponenteDto> obtenerListaDeComponentesCompatiblesDtoCustomRequisitosRecomendados(String tipoComponente, ArmadoPcDto armadoPcDto, Map<String, Double> seleccionados) throws ComponenteDeterminateDelArmadoEnNullException;
+
+    List<ComponenteDto> obtenerListaDeComponentesCompatiblesFiltradosDtoCustomRequisitosRecomendados(String tipoComponente, String nombreFiltro, ArmadoPcDto armadoPcDto, Map<String, Double> seleccionados) throws ComponenteDeterminateDelArmadoEnNullException;
 }

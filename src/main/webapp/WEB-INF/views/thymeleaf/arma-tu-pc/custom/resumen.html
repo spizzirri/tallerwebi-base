@@ -1,0 +1,78 @@
+<head><link rel="icon" type="image/png" href="uploads/jineteSVG.svg"></head>
+
+<div th:replace="fragments/fragments :: header"></div>
+
+<div class="container py-4">
+    <h3 class="mb-4">Resumen Armado</h3>
+    <div th:if="${errorResumen == null}">
+        <!--FALTA PODER MOSTRAR LOS COMPONENTES QUE SON LISTAS-->
+        <a href="procesador" class="text-decoration-none text-black">
+            <div th:replace="fragments/tarjetaResumen :: cargarTarjetaDeResumen (${armadoPcDto.procesador}, 'Procesador', '1', 'procesadorVacio.png')"></div>
+        </a>
+        <a href="motherboard" class="text-decoration-none text-black">
+            <div th:replace="fragments/tarjetaResumen :: cargarTarjetaDeResumen (${armadoPcDto.motherboard}, 'Motherboard', '1', 'motherboardVacia.png')"></div>
+        </a>
+        <a href="cooler" class="text-decoration-none text-black">
+            <div th:replace="fragments/tarjetaResumen :: cargarTarjetaDeResumen (${armadoPcDto.cooler}, 'Cooler', '1', 'coolerVacio.png')"></div>
+        </a>
+        <a href="memoria" class="text-decoration-none text-black">
+            <div th:each="entry: ${armadoPcDto.ramsDetalladas}">
+                <div th:replace="fragments/tarjetaResumen :: cargarTarjetaDeResumen (${entry.key}, 'Memoria', ${entry.value}, 'memoriaVacia.png')"></div>
+            </div>
+        </a>
+        <a href="gpu" class="text-decoration-none text-black">
+            <div th:replace="fragments/tarjetaResumen :: cargarTarjetaDeResumen (${armadoPcDto.gpu}, 'Placa de Video', '1', 'gpuVacia.png')"></div>
+        </a>
+        <a href="almacenamiento" class="text-decoration-none text-black">
+            <div th:each="entry: ${armadoPcDto.almacenamientoDetallado}">
+                <div th:replace="fragments/tarjetaResumen :: cargarTarjetaDeResumen (${entry.key}, 'Almacenamiento', ${entry.value}, 'almacenamientoVacio.png')"></div>
+            </div>
+        </a>
+        <a href="fuente" class="text-decoration-none text-black">
+            <div th:replace="fragments/tarjetaResumen :: cargarTarjetaDeResumen (${armadoPcDto.fuente}, 'Fuente', '1', 'fuenteVacia.png')"></div>
+        </a>
+        <a href="gabinete" class="text-decoration-none text-black">
+            <div th:replace="fragments/tarjetaResumen :: cargarTarjetaDeResumen (${armadoPcDto.gabinete}, 'Gabinete', '1', 'gabineteVacio.png')"></div>
+        </a>
+        <a href="monitor" class="text-decoration-none text-black">
+            <div th:replace="fragments/tarjetaResumen :: cargarTarjetaDeResumen (${armadoPcDto.monitor}, 'Monitor', '1', 'monitorVacio.png')"></div>
+        </a>
+        <a href="periferico" class="text-decoration-none text-black">
+            <div th:each="entry: ${armadoPcDto.perifericosDetallados}">
+                <div th:replace="fragments/tarjetaResumen :: cargarTarjetaDeResumen (${entry.key}, 'Periferico', ${entry.value}, 'perifericoVacio.png')"></div>
+            </div>
+        </a>
+
+        <div class="m-auto col-3 border rounded bg-white p-1 pt-2 mb-3 d-flex justify-content-center">
+            <h3 class="d-inline">Total:  <span th:text="${'$'+armadoPcDto.precioFormateado}" class="text-success"></span></h3>
+        </div>
+
+        <div class="m-auto d-flex justify-content-center gap-2">
+            <a th:href="@{/arma-tu-pc/custom/procesador}" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Volver al armado</a>
+            <form class="m-0" method="POST" th:action="@{/arma-tu-pc/custom/carrito}">
+                <input id="sumar-al-carrito-armado" type="submit" class="d-none" value="Sumar al carrito">
+                <label for="sumar-al-carrito-armado" class="btn btn-primary"><i class="bi bi-cart3 fs-4"></i> Sumar al carrito</label>
+            </form>
+        </div>
+    </div>
+
+
+    <div th:if="${errorResumen != null}">
+        <h2 class="alert alert-danger" th:text="${errorResumen}"></h2>
+        <div class="m-auto d-flex justify-content-center">
+            <a th:href="@{/arma-tu-pc/custom/procesador}" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Volver al armado</a>
+        </div>
+    </div>
+
+
+</div>
+<div th:replace="fragments/fragments :: footer"></div>
+<!-- Boostrap core js -->
+<script type="text/javascript" th:src="@{webjars/bootstrap/5.2.0/js/bootstrap.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/main.js}"></script>
+<script type="text/javascript" th:src="@{/js/resumenCalculoDeListas.js}"></script>
+<script th:src="@{/webjars/bootstrap/5.2.0/js/bootstrap.bundle.min.js}"></script>
+<script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
