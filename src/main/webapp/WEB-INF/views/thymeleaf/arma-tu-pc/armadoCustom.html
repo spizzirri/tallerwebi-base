@@ -1,6 +1,62 @@
 <head>
     <link rel="icon" type="image/png" href="uploads/jineteSVG.svg">
     <title>Jinete Gamer</title>
+    <style>
+        /*.program-card {*/
+        /*    height: 200px;*/
+        /*    background-size: cover;*/
+        /*    background-position: center;*/
+        /*    !*border-radius: 10px;*!*/
+        /*    cursor: pointer;*/
+        /*    position: relative;*/
+        /*    display: block;*/
+        /*    overflow: hidden;*/
+        /*    transition: transform 0.2s ease, box-shadow 0.2s ease;*/
+        /*    border: 3px solid transparent;*/
+        /*}*/
+
+        /*.program-card:hover {*/
+        /*    transform: scale(1.02);*/
+        /*    box-shadow: 0 0 10px rgba(0,0,0,0.3);*/
+        /*}*/
+
+        .program-card input[type="checkbox"] {
+            display: none;
+        }
+
+        .program-card input[type="checkbox"]:checked + .overlay::after {
+            /*content: '✔';*/
+            color: white;
+            font-size: 1.5rem;
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(0, 128, 0, 0.7);
+            padding: 5px 10px;
+            border-radius: 50%;
+        }
+
+        .program-card input[type="checkbox"]:checked ~ .overlay {
+            border: 5px solid #00cc99;
+        }
+
+        .overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 10px;
+            background-color: rgba(0,0,0,0.6);
+            color: white;
+            font-weight: bold;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+        }
+    </style>
+
 </head>
 <div th:replace="fragments/fragments :: header"></div>
 
@@ -18,7 +74,7 @@
         </select>
         <div class="row justify-content-evenly">
             <div class="container my-4">
-                <div class="row" id="contenedorOpciones"></div>
+                <div class="row justify-content-center" id="contenedorOpciones"></div>
                 <div class="d-flex justify-content-end">
                     <button type="submit" id="filtrarBtn" class="btn btn-primary mt-3">Filtrar</button>
                 </div>
