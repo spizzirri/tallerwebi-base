@@ -20,6 +20,29 @@
 
 <div th:replace="fragments/fragments :: header"></div>
 <div class="container">
+
+  <h4>Armado Customizado</h4>
+  <p>En base a la eleccion de rendimiento y de Programas/Juegos que hiciste, te mostraremos componentes que parten desde las siguientes recomendaciones:</p>
+  <div class="row m-auto mb-2 d-flex justify-content-evenly w-50">
+    <div class="col-5 d-flex gap-2 p-1 bg-dark text-light rounded-4 align-items-center justify-content-center">
+      <i class="bi bi-cpu-fill ms-2 fs-4"></i><h6 class="m-0 fs-6" th:text="'Procesador AMD Ryzen ' + ${mapaRequisitos['ProcesadorAMD'].intValue()}"></h6>
+    </div>
+    <div class="col-5 d-flex gap-2 p-1 bg-dark text-light rounded-4 align-items-center justify-content-center">
+      <i class="bi bi-cpu ms-2 fs-4"></i><h6 class="m-0 fs-6" th:text="'Procesador Intel Core i' + ${mapaRequisitos['ProcesadorINTEL'].intValue()}"></h6>
+    </div>
+  </div>
+  <div class="row m-auto mb-2 d-flex justify-content-evenly w-75">
+    <div class="col-3 d-flex gap-2 p-1 bg-dark text-light rounded-4 align-items-center justify-content-center">
+      <i class="bi bi-memory ms-2 fs-4"></i><h6 class="m-0 fs-6" th:text="'Memoria RAM ' + ${mapaRequisitos['RAM'].intValue()} + ' GB'"></h6>
+    </div>
+    <div class="col-3 d-flex gap-2 p-1 bg-dark text-light rounded-4 align-items-center justify-content-center">
+      <i class="bi bi-gpu-card ms-2 fs-4"></i><h6 class="m-0 fs-6" th:text="'Memoria VRAM ' + ${mapaRequisitos['GPU'].intValue()} + ' GB'"></h6>
+    </div>
+    <div class="col-3 d-flex gap-2 p-1 bg-dark text-light rounded-4 align-items-center justify-content-center">
+      <i class="bi bi-hdd ms-2 fs-4"></i><h6 class="m-0 fs-6" th:text="'Espacio en Disco ' + ${mapaRequisitos['EspacioDisco'].intValue()} + ' GB'"></h6>
+    </div>
+  </div>
+
   <h4>Elegi tus Perifericos</h4>
   <p class="text-muted">
     Mouses, Teclados, MousePad, Auriculares, y mas!
