@@ -17,17 +17,18 @@
               integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
               crossorigin="anonymous">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css"/>
-
+        <link rel="icon" type="image/png" th:href="@{../../../../resources/core/uploads/dragon-logo.png}">
         <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.2.0/css/bootstrap.min.css}"/>
         <link rel="stylesheet" th:href="@{/css/fragments.css}">
         <link rel="stylesheet" th:href="@{/css/main.css}"/>
         <link rel="stylesheet" th:href="@{/css/historialDeCompras.css}"/>
         <link rel="stylesheet" th:href="@{/css/arma-tu-pc.css}"/>
+        <link rel="stylesheet" th:href="@{/css/armaTuPcCustom.css}"/>
     </head>
 
     <body style="margin: 0px;padding: 0px;  min-height: 100vh">
 
-    <header class="sticky-top bg-dark " style="height: 80px; z-index: 1030;">
+    <header class="position-sticky-top bg-dark " style="height: 80px; z-index: 1030;">
         <div class="container-fluid d-flex align-items-center justify-content-between h-100 px-4"
              style="max-width: 1300px;">
             <!-- Logo -->
@@ -227,7 +228,7 @@
             <a class="text-dark text-decoration-none px-3 fs-5" id="nav-productos" th:href="@{/productos}">Productos</a>
             <a class="text-dark text-decoration-none px-3 fs-5" th:href="@{/arma-tu-pc/armaTuPc}">Arma tu
                 PC</a>
-            <a class="text-dark text-decoration-none px-3 fs-5" href="#">Ayuda</a>
+            <a class="text-dark text-decoration-none px-3 fs-5" th:href="@{/ayuda}">Ayuda</a>
         </div>
     </nav>
 

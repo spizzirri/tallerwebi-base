@@ -13,7 +13,7 @@ document.getElementById('btn-imprimir').addEventListener('click', async function
 
     const canvas = await html2canvas(contenido, {
         useCORS: true,
-        scale: 3
+        scale: 2
     });
 
     // Lo volvemos a ocultar
