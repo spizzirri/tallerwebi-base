@@ -493,12 +493,12 @@
                         <!--                    <span class="text-right" style="width:60%"><b>IVA 21%: $</b></span><span class="text-right" style="width:40%"><b>0,00</b></span>-->
                         <!--                  -->
                         <span class="text-right" style="width:60%"><b>Importe Total: $</b></span>
-                        <span
-                            class="text-right" style="width:40%"><b> <span
+
+                        <b>  <span class="text-right" style="width:40%">
                             th:if="${compra.moneda == null || compra.moneda == 'pesos'}"
                             th:text="'$' + ${#numbers.formatDecimal(compra.total, 1, 'POINT', 2, 'COMMA')}">
 
-                        </span>
+                        </span> </b>
                         <span class="text-right" style="width:40%" th:if="${compra.moneda == 'dolares'}"
                               th:text="'USD $' + ${#numbers.formatDecimal(compra.totalDolar, 1, 'COMMA', 2, 'POINT')}">
                         </span>
