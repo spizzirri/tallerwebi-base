@@ -175,7 +175,7 @@ public class CarritoController {
     @ResponseBody
     //este metodo solo se usa para enviar un mensaje de respuesta al cliente cuando se aplica un descuento
     public Map<String, Object> calcularValorTotalDeLosProductosConDescuento
-            (@RequestBody Map<String, String> codigoDescuentoMap) {
+            (@RequestBody Map<String, String> codigoDescuentoMap, HttpSession session) {
         String codigoDescuento = codigoDescuentoMap.get("codigoInput");
 
         Integer codigoDescuentoExtraido = extraerPorcentajeDesdeCodigoDeDescuento(codigoDescuento);
@@ -190,8 +190,11 @@ public class CarritoController {
 
         String valorTotalFormateado = this.servicioPrecios.conversionDolarAPeso(valorTotalConDescuento);
 
+        session.setAttribute("totalConDescuento", valorTotalFormateado);
+        session.setAttribute("totalConDescuentoNoFormateado", valorTotalConDescuento);
+
         response.put("mensaje", "Descuento aplicado! Nuevo total: $" + valorTotalFormateado);
-        response.put("valorTotal", valorTotalFormateado);
+        response.put("valorTotal", valorTotalConDescuento);
 
         return response;
     }
@@ -330,6 +333,7 @@ public class CarritoController {
             @RequestParam(value = "metodoPago") String metodoDePago,
             @RequestParam(value = "formaEntrega") String formaEntrega,
             @RequestParam(value = "codigoPostal", required = false) String codigoPostal,
+            @RequestParam(value = "totalConDescuento", required = false) Double totalConDescuento,
             HttpSession session
     ) {
         Map<String, Object> response = new HashMap<>();
@@ -338,7 +342,6 @@ public class CarritoController {
         List<ProductoCarritoDto> carritoSesion = obtenerCarritoDeSesion(session);
         session.setAttribute("formaEntrega", formaEntrega);
         session.setAttribute("metodoPago", metodoDePago);
-
 
         if (carritoSesion == null || carritoSesion.isEmpty()) {
             response.put("success", false);

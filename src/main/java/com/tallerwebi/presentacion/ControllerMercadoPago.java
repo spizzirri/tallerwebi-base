@@ -159,11 +159,16 @@ public class ControllerMercadoPago {
             compraDto.setCostoDeEnvio((Double) session.getAttribute("costo"));
             compraDto.setMoneda("pesos");
             compraDto.setTotalDolar(totalCompraEnDolares);
-
+            compraDto.setValorConDescuento((String) session.getAttribute("totalConDescuento"));
+            compraDto.setTotalConDescuentoDolar((Double) session.getAttribute("totalConDescuentoNoFormateado"));
 
             servicioCompra.guardarCompraConUsuarioLogueado(compraDto, usuarioLogueado, session);
             response.sendRedirect(preference.getSandboxInitPoint());
             servicioProductoCarritoImpl.limpiarCarrito();
+
+            session.removeAttribute("totalConDescuento");
+            session.removeAttribute("totalConDescuentoNoFormateado");
+
 
             return null;
         } catch (MPApiException e) {
