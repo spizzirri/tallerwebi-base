@@ -160,7 +160,6 @@ public class ControllerMercadoPago {
             compraDto.setMoneda("pesos");
             compraDto.setTotalDolar(totalCompraEnDolares);
 
-
             servicioCompra.guardarCompraConUsuarioLogueado(compraDto, usuarioLogueado, session);
             response.sendRedirect(preference.getSandboxInitPoint());
             servicioProductoCarritoImpl.limpiarCarrito();

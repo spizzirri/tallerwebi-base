@@ -18,21 +18,21 @@
                         <div class="card-body">
                             <div class="text-center mb-3">
                                 <h3 class="text-success fw-bold">
-                                    <!-- Si hay valorConDescuento -->
-                                    <span th:if="${valorConDescuento != null and compra.moneda == 'pesos'}"
-                                          th:text="'$' + ${valorConDescuento}"
-                                    ></span>
+<!--                                    &lt;!&ndash; Si hay valorConDescuento &ndash;&gt;-->
+<!--                                    <span th:if="${valorConDescuento != null and compra.moneda == 'pesos'}"-->
+<!--                                          th:text="'$' + ${valorConDescuento}"-->
+<!--                                    ></span>-->
 
-                                    <span th:if="${totalConDescuentoNoFormateado != null and compra.moneda == 'dolares'}"
-                                          th:text="'USD $' + ${#numbers.formatDecimal(totalConDescuentoNoFormateado, 1, 'COMMA', 2, 'POINT')}">
-                                    </span>
+<!--                                    <span th:if="${totalConDescuentoNoFormateado != null and compra.moneda == 'dolares'}"-->
+<!--                                          th:text="'USD $' + ${#numbers.formatDecimal(totalConDescuentoNoFormateado, 1, 'COMMA', 2, 'POINT')}">-->
+<!--                                    </span>-->
 
                                     <!-- Si NO hay valorConDescuento -->
-                                    <span th:if="${valorConDescuento == null and compra.moneda == 'pesos'}"
+                                    <span th:if="${compra.moneda == 'pesos'}"
                                           th:text="'$' + ${#numbers.formatDecimal(compra.total, 1, 'POINT', 2, 'COMMA')}">
                                     </span>
 
-                                    <span th:if="${valorConDescuento == null and compra.moneda == 'dolares'}"
+                                    <span th:if="${compra.moneda == 'dolares'}"
                                           th:text="'USD $' + ${#numbers.formatDecimal(compra.totalDolar, 1, 'COMMA', 2, 'POINT')}">
                                     </span>
                                     <div th:if="${compra.formaEntrega == 'envio'}">

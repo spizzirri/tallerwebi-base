@@ -45,8 +45,7 @@ public class ControladorPagoExitoso {
         model.put("iva", session.getAttribute("iva"));
         model.put("comprasUsuario", comprasUsuario);
 
-        session.removeAttribute("valorConDescuento");
-        session.removeAttribute("totalConDescuentoNoFormateado");
+
 
         return new ModelAndView("pagoExitoso", model);
     }

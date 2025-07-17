@@ -90,10 +90,10 @@
                 <label class="form-check-label" for="pesos"
                        style="display: flex; flex-direction: column; line-height: 1.2;">
                     <span>Pesos:</span>
-                    <span th:if="${valorConDescuento != null}"
-                          th:text="'$' + ${valorConDescuento}">
-                    </span>
-                    <span th:if="${valorConDescuento == null}"
+<!--                    <span th:if="${valorConDescuento != null}"-->
+<!--                          th:text="'$' + ${valorConDescuento}">-->
+<!--                    </span>-->
+                    <span
                           th:text="'$' + ${#numbers.formatDecimal(precioPesos, 1, 'POINT', 2, 'COMMA')}">
                     </span>
                 </label>
@@ -104,11 +104,11 @@
                 <label class="form-check-label" for="dolares"
                        style="display: flex; flex-direction: column; line-height: 1.2;">
                     <span>Dólares:</span>
-                    <span th:if="${totalConDescuentoNoFormateado != null}"
-                          th:text="'USD $' + ${#numbers.formatDecimal(totalConDescuentoNoFormateado, 1, 'COMMA', 2, 'POINT')}">
-                    </span>
-                    <span th:if="${totalConDescuentoNoFormateado == null}"
-                          th:text="'USD $' + ${#numbers.formatDecimal(precioDolar, 1, 'COMMA', 2, 'POINT')}">
+<!--                    <span th:if="${totalConDescuentoNoFormateado != null}"-->
+<!--                          th:text="'USD $' + ${#numbers.formatDecimal(totalConDescuentoNoFormateado, 1, 'COMMA', 2, 'POINT')}">-->
+<!--                    </span>-->
+                    <span
+                          th:text="'USD $' + ${precioDolar}">
                     </span>
                 </label>
             </div>
