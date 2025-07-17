@@ -3,12 +3,12 @@
     <title>Jinete Gamer</title>
 </head>
 <div th:replace="fragments/fragments :: header"></div>
-
-<div class="container" style="min-height: 70vh;">
-    <h4>Elegi el tipo de armado</h4>
+<div class="d-flex flex-column align-items-center mt-4"><h4>Elegi el tipo de armado</h4>
     <p class="text-muted">
         Vas a poder elegir entre los tipos de armados disponibles el que mas se amolde a tus necesidades
-    </p>
+    </p></div>
+<div class="container d-flex align-items-center" style="min-height: 70vh;">
+
     <div class="row justify-content-evenly">
         <div class="col-6 col-md-4">
             <a th:href="@{/arma-tu-pc/tradicional/procesador}" class="text-decoration-none d-block">

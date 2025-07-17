@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Jinete Gamer</title>
+    <link rel="stylesheet" th:href="@{/core/css/main.css}"/>
+    <link rel="icon" type="image/png" href="uploads/jineteSVG.svg">
+    <style>
+        body {
+            background: #f5f6fa;
+        }
+
+        .exito-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+            padding: 40px 32px 32px 32px;
+        }
+
+        .exito-check {
+            color: #43b324;
+            font-size: 4rem;
+            margin-bottom: 18px;
+        }
+
+        .exito-titulo {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .exito-sub {
+            font-size: 1.1rem;
+            color: #444;
+            margin-bottom: 18px;
+        }
+
+        .exito-pedido {
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .nombre-producto {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.2;
+            max-height: 2.4em; /* 2 líneas * 1.2 line-height */
+            word-wrap: break-word;
+        }
+
+        .exito-fecha {
+            font-size: 0.98rem;
+            color: #666;
+            margin-bottom: 24px;
+        }
+
+        .exito-resumen {
+            background: #f7f9fa;
+            border-radius: 10px;
+            padding: 18px 20px;
+            margin-bottom: 28px;
+        }
+
+        .exito-resumen-row {
+            display: flex;
+            justify-content: space-between;
+            /*gap: 24px;*/
+            /*margin-bottom: 10px;*/
+        }
+
+        .exito-resumen-col {
+            flex: 1;
+        }
+
+        .entrega-item {
+            margin-bottom: 10px;
+        }
+
+        .exito-volver {
+            display: block;
+            margin: 0 auto;
+            background: #1976d2;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 14px 38px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            text-align: center;
+            transition: background 0.2s;
+        }
+
+        .exito-volver:hover {
+            background: #1256a3;
+            color: #fff;
+        }
+
+        #factura-imprimible {
+            width: 794px; /* Ancho de A4 en px a 96dpi */
+            margin: auto;
+            background: white;
+            padding: 32px;
+        }
+
+        .factura-body {
+            width: 1300px;
+            min-height: 2000px;
+            max-height: 2400px;
+            font-size: 14px;
+            background-color: white;
+            color: black;
+            padding: 10px;
+            margin: auto;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        .wrapper {
+            border: 1.5px solid #333;
+            padding: 5px;
+        }
+
+        .text-left {
+            text-align: left;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .bold {
+            font-weight: bold;
+        }
+
+        .italic {
+            font-style: italic;
+        }
+
+        .inline-block {
+            display: inline-block;
+        }
+
+        .flex {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .no-margin {
+            margin: 0;
+        }
+
+        .relative {
+            position: relative;
+        }
+
+        .floating-mid {
+            left: 0;
+            right: 0;
+            margin-left: auto;
+            margin-right: auto;
+            width: 75px;
+            position: absolute;
+            top: 1px;
+            background: #fff;
+        }
+
+        .space-around {
+            justify-content: space-around;
+        }
+
+        .space-between {
+            justify-content: space-between;
+        }
+
+        .w50 {
+            width: 50%;
+        }
+
+        th {
+            border: 1px solid #000;
+            background: #ccc;
+            padding: 5px;
+        }
+
+        td {
+            padding: 5px;
+            font-size: 11px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        .text-20 {
+            font-size: 20px;
+        }
+
+
+        @media (max-width: 900px) {
+            .exito-container {
+                padding: 18px 4px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .exito-resumen-row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+<div th:replace="fragments/fragments :: header"></div>
+<div class="exito-container">
+    <div id="contenido-imprimible">
+        <div class="text-center">
+            <div class="exito-check">
+                <i class="fa fa-check-circle"></i>
+            </div>
+            <div class="exito-titulo">¡Gracias por tu compra!</div>
+
+            <div class="exito-sub">Tu solicitud de compra fue recibida</div>
+            <div th:if="${comprasUsuario != null && !comprasUsuario.isEmpty()}">
+                <div class="row g-4">
+                    <div class="col-12 col-lg-10 mx-auto" th:each="compra : ${comprasUsuario}">
+                        <div class="card h-100 shadow border-0">
+                            <div class="card-header bg-warning text-dark">
+                                <h5 class="mb-0">
+                                    <i class="bi bi-calendar3"></i>
+                                    <span th:text="${compra.fecha.toLocalDate()}"></span>
+                                </h5>
+
+                                <div th:if="${compra.metodoDePago == 'efectivo'}" class="text-nowrap small">
+                                    El pago debe recibirse en los proximos diez días habiles o la compra sera cancelada
+                                </div>
+
+                            </div>
+                            <div class="card-body">
+                                <div th:if="${compra.productosComprados != null && !compra.productosComprados.isEmpty()}">
+                                    <h6 class="fw-bold mb-2">Productos comprados:</h6>
+                                    <div class="productos-lista" style="word-wrap: break-word;">
+                                        <div class="border-bottom pb-2 mb-2"
+                                             th:each="producto : ${compra.productosComprados}">
+                                            <div class="d-flex align-items-center gap-3">
+                                                <div>
+                                                    <img th:src="'http://www.imagenestaller.free.nf/' + ${producto.urlImagen}"
+                                                         style="width: 50px; height: 50px; object-fit: contain;">
+                                                </div>
+
+                                                <div class="flex-grow-1" style="min-width: 0;">
+                                                    <small class="fw-bold d-block nombre-producto"
+                                                           style="max-width: 100%;"
+                                                           th:text="${producto.componente.nombre}"></small>
+                                                    <small th:if="${producto.esArmado == true}"
+                                                           th:text="|Armado ${producto.numeroDeArmado}|"
+                                                           style="color: #1976d2;"></small>
+                                                </div>
+
+                                                <div class="text-end" style="white-space: nowrap;">
+                                                    <small class="text-muted">x<span
+                                                            th:text="${producto.cantidad}"></span></small>
+                                                    <br>
+                                                    <small class="text-success"
+                                                           th:if="${compra.moneda == null || compra.moneda == 'pesos'}">
+                                                        <span th:text="'$' + ${#numbers.formatDecimal(producto.precioUnitario, 1, 'POINT', 2, 'COMMA')}"></span>
+                                                    </small>
+                                                    <small class="text-success" th:if="${compra.moneda == 'dolares'}">
+                                                        <span th:text="'USD $' + ${producto.precioDolar}"></span>
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="exito-pedido">Pedido: <span style="color:#1976d2;"
+                                                                        th:text="'OV01-1240' + ${compra.idCompra}"></span>
+                                </div>
+                                <div class="exito-fecha">
+                                    Fecha de solicitud de compra: <span th:text="${compra.fecha.toLocalDate()}"></span>
+                                </div>
+                            </div>
+
+                            <div class="exito-resumen container">
+                                <div class="row">
+
+                                    <div class="col-md-4 mb-3" th:if="${compra.formaEntrega == 'envio'}">
+                                        <div class="entrega-item"><b>Entrega</b></div>
+                                        <div class="entrega-item">Entrega estimada: <span th:text="${tiempo}"></span>
+                                        </div>
+                                        <div th:text="${destino}" style="white-space: nowrap;"></div>
+                                    </div>
+
+                                    <div class="col-md-4 mb-3" th:if="${compra.formaEntrega == 'retiro'}">
+                                        <b>Entrega</b><br>
+                                        <div>Retiro en depósito</div>
+                                        <div>Av. Gamer 123, CABA</div>
+                                    </div>
+
+                                    <div class="col-md-4 mb-3">
+                                        Metodo de pago:
+                                        <span class="badge bg-secondary mb-2 w-100 d-block text-center">
+                                            <i class="bi bi-credit-card me-1"></i>
+                                            <span th:if="${compra.metodoDePago == 'tarjetaCredito'}">Tarjeta de crédito</span>
+                                            <span th:if="${compra.metodoDePago == 'mercadoPago'}">Mercado Pago</span>
+                                            <span th:if="${compra.metodoDePago == 'efectivo'}">Efectivo</span>
+                                            <span th:if="${tarjeta != null || compra.metodoDePago == 'tarjetaCredito'}"
+                                                  th:text="' **** ' + ${#strings.substring(tarjeta.numeroDeTarjeta, tarjeta.numeroDeTarjeta.length() - 4)}"></span>
+                                        </span>
+                                    </div>
+
+                                    <div class="col-md-4 mb-3">
+                                        <b>Resumen</b><br>
+                                        <div th:if="${compra.formaEntrega == 'envio'}">
+                                            Valor envío:
+                                            <span th:text="'$' + ${#numbers.formatDecimal(compra.costoDeEnvio, 1, 'POINT', 2, 'COMMA')}"
+                                                  style="float:right"></span>
+                                            <br>
+                                            <p>Precio de envío sujeto a Andreani</p>
+                                        </div>
+                                        <hr style="margin: 8px 0;">
+                                        <b>Total</b>:
+
+                                        <!-- Si hay valorConDescuento -->
+                                        <span th:if="${compra.valorConDescuento != null and compra.moneda == 'pesos'}"
+                                              th:text="'$' + ${compra.valorConDescuento}"
+                                              style="float:right; color:#1976d2; font-size:1.1em;"></span>
+
+                                        <span th:if="${compra.totalConDescuentoDolar != null and compra.moneda == 'dolares'}"
+                                              th:text="'USD $' + ${#numbers.formatDecimal(compra.totalConDescuentoDolar, 1, 'COMMA', 2, 'POINT')}"
+                                              style="float:right; color:#1976d2; font-size:1.1em;"></span>
+
+                                        <!-- Si NO hay valorConDescuento -->
+                                        <span th:if="${compra.moneda == 'pesos' && compra.valorConDescuento == null}"
+                                              th:text="'$' + ${#numbers.formatDecimal(compra.total, 1, 'POINT', 2, 'COMMA')}"
+                                              style="float:right; color:#1976d2; font-size:1.1em;"></span>
+
+                                        <span th:if="${ compra.moneda == 'dolares' && compra.totalConDescuentoDolar == null}"
+                                              th:text="'USD $' + ${#numbers.formatDecimal(compra.totalDolar, 1, 'COMMA', 2, 'POINT')}"
+                                              style="float:right; color:#1976d2; font-size:1.1em;"></span>
+
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-center gap-3">
+        <a th:href="@{/index.html}" class="btn btn-primary mt-3 col-md-4">Volver al inicio</a>
+        <button class="btn btn-primary mt-3 col-md-4" id="btn-imprimir">Exportar PDF</button>
+    </div>
+</div>
+
+
+<!-- FACTURA C PARA IMPRIMIR (invisible) -->
+<!--    <div id="factura-imprimible" style="display: none;">-->
+
+<!--            <div style="padding: 40px; font-family: sans-serif; max-width: 800px; margin: auto;"-->
+<!--                 th:each="compra : ${comprasUsuario}">-->
+<!--                <h1 style="text-align: center;">Factura C</h1>-->
+<!--                <hr>-->
+<!--                <p><strong>Fecha:</strong> <span th:text="${compra.fecha.toLocalDate()}"></span></p>-->
+<!--                <p><strong>Número de factura:</strong> <span th:text="'FC-000' + ${compra.idCompra}"></span></p>-->
+<!--                <p><strong>Cliente:</strong> <span th:text="${compra.nombreTitular}"></span></p>-->
+<!--                <p><strong>CUIT/DNI:</strong> <span th:text="${compra.documento}"></span></p>-->
+<!--                <hr>-->
+<!--                <h3>Detalle de productos</h3>-->
+<!--                <table style="width: 100%; border-collapse: collapse;" border="1">-->
+<!--                    <thead>-->
+<!--                    <tr>-->
+<!--                        <th>Producto</th>-->
+<!--                        <th>Cantidad</th>-->
+<!--                        <th>Precio Unitario</th>-->
+<!--                        <th>Total</th>-->
+<!--                    </tr>-->
+<!--                    </thead>-->
+<!--                    <tbody>-->
+<!--                    <tr th:each="producto : ${compra.productosComprados}">-->
+<!--                        <td th:text="${producto.componente.nombre}"></td>-->
+<!--                        <td th:text="${producto.cantidad}"></td>-->
+<!--                        <td th:text="'$' + ${#numbers.formatDecimal(producto.precioUnitario, 1, 'POINT', 2, 'COMMA')}"></td>-->
+<!--                        <td th:text="'$' + ${#numbers.formatDecimal(producto.precioUnitario * producto.cantidad, 1, 'POINT', 2, 'COMMA')}"></td>-->
+<!--                    </tr>-->
+<!--                    </tbody>-->
+<!--                </table>-->
+<!--                <hr>-->
+<!--                <p style="text-align: right;"><strong>Total:</strong> -->
+<!--                      <span  th:text="'$' + ${#numbers.formatDecimal(compra.total, 1, 'POINT', 2, 'COMMA')}"></span></p>-->
+<!--                <p style="text-align: right;"><strong>Condición frente al IVA:</strong> Monotributista</p>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+
+
+<div id="factura-imprimible" class="justify-content-center" style="display: none; ">
+    <div class="factura-body" th:if="${comprasUsuario != null && !comprasUsuario.isEmpty()}">
+        <div th:each="compra : ${comprasUsuario}">
+            <div class="wrapper text-center bold text-20" style="width:100%;border-bottom: 0; background:yellow; color:white; font-weight: 1000; font-size: 20px;">
+                PAGO FACIL
+            </div>
+
+            <div class="flex relative">
+                <div class="wrapper inline-block w-100 flex" style="">
+                    <img src="/uploads/pago-facil-2019-logo.png" style="width: 100px; height: 100px;"><h3 class="text-center" style="font-size:24px;margin-bottom: 3px;width: 100%;">JINETE GAMER</h3>
+                    <p style="font-size: 13px;line-height: 1.5;margin-bottom: 0;align-self: flex-end;">
+                        <b>RazÃ³n Social:</b> Jinete Gamer
+                        <br><b>Domicilio Comercial:</b> Av. Gamer 123 - CABA
+                        <br><b>CondiciÃ³n frente al IVA: Responsable Monotributo</b>
+                    </p>
+                </div>
+
+
+            </div>
+
+            <div class="wrapper flex space-around" style="margin-top: 1px;">
+
+                <span><b>Compobante de pago emitido:</b> <span th:text="${compra.fecha.toLocalDate()}"></span></span>
+
+            </div>
+
+            <div class="wrapper" style="margin-top: 2px;font-size: 12px;">
+                <div class="flex" style="margin-bottom: 15px;">
+
+                    <span><b>Apellido y Nombre: </b><span
+                            th:text="${compra.nombreTitular}"></span></span>
+                </div>
+                <div class="flex" style="flex-wrap: nowrap;margin-bottom: 5px;">
+                    <span><b>Domicilio:</b> Av.Rivadavia 9851 - Capital Federal, Ciudad de Buenos Aires</span>
+                </div>
+            </div>
+
+            <table style="margin-top: 5px;">
+                <thead>
+
+                <th class="text-left">Producto</th>
+                <th class="text-center">Cantidad</th>
+                <th class="text-center">Precio Unit.</th>
+                <!--            <th>% Bonif</th>-->
+                <!--            <th>Subtotal</th>-->
+                <!--            <th>Alicuota IVA</th>-->
+                <th class="text-center">Total</th>
+                </thead>
+                <tbody>
+                <tr th:each="producto : ${compra.productosComprados}">
+
+                    <td th:text="${producto.componente.nombre}" class="text-left"></td>
+                    <td th:text="${producto.cantidad}" class="text-center"></td>
+                    <td th:if="${compra.moneda == null || compra.moneda == 'pesos'}"
+                        th:text="'$' + ${#numbers.formatDecimal(producto.precioUnitario / producto.getCantidad(), 1, 'POINT', 2, 'COMMA')}"
+                        class="text-center">
+                    </td>
+                    <td class="text-center" th:if="${compra.moneda == 'dolares'}"
+                        th:text="'USD $' + ${#numbers.formatDecimal(producto.precioDolar / producto.getCantidad(), 1, 'COMMA', 2, 'POINT')}">
+                    </td>
+                    <!--                <td class="text-center">0,00</td>-->
+                    <!--                <td class="text-center">100,00</td>-->
+                    <!--                <td class="text-right">1,21</td>-->
+                    <td th:if="${compra.moneda == null || compra.moneda == 'pesos'}"
+                        th:text="'$' + ${#numbers.formatDecimal(producto.precioUnitario, 1, 'POINT', 2, 'COMMA')}"
+                        class="text-center">
+
+                    </td>
+                    <td class="text-center" th:if="${compra.moneda == 'dolares'}"
+                        th:text="'USD $' + ${producto.precioDolar}"></td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div class="footer" style="margin-top: 100px;">
+                <div class="flex wrapper space-between align-items-center" style="width: 100%; margin-top: 40px;">
+                    <div style="flex: 1; max-width: 70%;" class="d-flex align-items-center ms-3">
+                        <p>Acercate a una  sucursal de pago facil y escanea el codigo de barras para realizar tu compra</p>
+                        <img th:if="${compra.metodoDePago == 'efectivo'}"
+                             th:src="@{/uploads/codigoDeBarras.png}"
+                             style="max-height: 120px; width: 85%; object-fit: contain;">
+                    </div>
+
+                    <div style="flex: 1; max-width: 30%;" class="d-flex flex-column align-items-center">
+                        <span class="fw-bold" style="font-size: 1.2rem;">Importe total:</span>
+                        <span th:if="${compra.valorConDescuento != null && compra.moneda == 'pesos'}"
+                              th:text="'$' + ${compra.valorConDescuento}"
+                              class="fw-bold" style="font-size: 1.4rem;">
+                        </span>
+
+                        <span th:if="${compra.totalConDescuentoDolar != null && compra.moneda == 'dolares'}"
+                              th:text="'USD $' + ${#numbers.formatDecimal(compra.totalConDescuentoDolar, 1, 'COMMA', 2, 'POINT')}"
+                              class="fw-bold" style="font-size: 1.4rem;">
+                        </span>
+
+                        <!-- Si NO hay valorConDescuento -->
+                        <span th:if="${ compra.moneda == 'pesos' && compra.valorConDescuento == null}"
+                              th:text="'$' + ${#numbers.formatDecimal(compra.total, 1, 'POINT', 2, 'COMMA')}"
+                              class="fw-bold" style="font-size: 1.4rem;">
+                        </span>
+
+                        <span th:if="${compra.moneda == 'dolares' && compra.totalConDescuentoDolar == null}"
+                              th:text="'USD $' + ${#numbers.formatDecimal(compra.totalDolar, 1, 'COMMA', 2, 'POINT')}"
+                              class="fw-bold" style="font-size: 1.4rem;">
+                        </span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<div th:replace="fragments/fragments :: footer"></div>
+
+<!-- FontAwesome para el icono de check -->
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+</body>
+</html>

@@ -43,4 +43,26 @@ public class ControladorPagoExitoso {
 
         return new ModelAndView("pagoExitoso", model);
     }
+    @GetMapping("/pagoEfectivo")
+    public ModelAndView mostrarPagoEfectivo(HttpSession session) {
+        ModelMap model = new ModelMap();
+        UsuarioDto usuarioLogueado = (UsuarioDto) session.getAttribute("usuario");
+        if (usuarioLogueado == null) {
+            return new ModelAndView("redirect:/login");
+        }
+
+        List<Compra> comprasUsuarioObtenidas = this.servicioCompra.obtenerCompraComponenteDeUnUsuarioLogueado(usuarioLogueado);
+
+        List<Compra> comprasUsuario = comprasUsuarioObtenidas.stream().limit(1).collect(Collectors.toList());
+
+        model.put("tarjeta", session.getAttribute("tarjeta"));
+        model.put("tiempo", session.getAttribute("tiempo"));
+        model.put("destino", session.getAttribute("destino"));
+        model.put("moneda", session.getAttribute("moneda"));
+        model.put("iva", session.getAttribute("iva"));
+        model.put("comprasUsuario", comprasUsuario);
+
+        return new ModelAndView("pagoEfectivo", model);
+    }
+
 }

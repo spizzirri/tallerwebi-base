@@ -60,7 +60,7 @@ public class ControladorPagoEfectivo {
         session.removeAttribute("totalConDescuento");
         session.removeAttribute("totalConDescuentoNoFormateado");
 
-        return new ModelAndView("redirect:/pagoExitoso");
+        return new ModelAndView("redirect:/pagoEfectivo");
     }
 
     private List<ProductoCarritoDto> obtenerCarritoDeSesion(HttpSession session) {
