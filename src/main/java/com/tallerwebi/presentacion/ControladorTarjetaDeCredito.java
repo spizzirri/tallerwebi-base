@@ -145,6 +145,11 @@ public class ControladorTarjetaDeCredito {
         Double totalCompraEnPesos = this.servicioPrecios.conversionDolarAPesoDouble(totalCompraEnDolares);
         modelo.put("precioDolar", this.servicioPrecios.obtenerPrecioFormateado(totalCompraEnDolares));
         modelo.put("precioPesos", totalCompraEnPesos);
+        modelo.put("moneda", session.getAttribute("moneda"));
+
+        modelo.put("valorConDescuento", session.getAttribute("totalConDescuento"));
+        modelo.put("totalConDescuentoNoFormateado", session.getAttribute("totalConDescuentoNoFormateado"));
+
         return new ModelAndView("tarjetaDeCredito", modelo);
     }
 }

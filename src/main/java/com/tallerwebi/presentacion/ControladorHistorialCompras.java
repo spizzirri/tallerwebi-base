@@ -31,6 +31,11 @@ public class ControladorHistorialCompras {
     public ModelAndView mostrarHistorialDeCompras(HttpSession session) {
         ModelMap model = new ModelMap();
         agregarComprasAlModelo(model, session);
+        model.put("valorConDescuento", session.getAttribute("totalConDescuento"));
+        model.put("totalConDescuentoNoFormateado", session.getAttribute("totalConDescuentoNoFormateado"));
+
+        session.removeAttribute("valorConDescuento");
+        session.removeAttribute("totalConDescuentoNoFormateado");
         return new ModelAndView("historialDeCompras", model);
     }
 

@@ -78,7 +78,7 @@
 
 <div class="tarjeta-container">
     <div class="tarjeta-header">Agrega una nueva tarjeta</div>
-    <form  method="post" th:action="@{/tarjetaDeCredito/validar}">
+    <form method="post" th:action="@{/tarjetaDeCredito/validar}">
         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 18px; flex-wrap: nowrap;">
             <button type="button"
                     style="background: #f3f4f6; border: none; border-radius: 20px; padding: 8px 18px; font-weight: 500; display: flex; align-items: center; gap: 8px; white-space: nowrap;">
@@ -86,19 +86,30 @@
             </button>
 
             <div class="form-check" style="display: flex; align-items: center; gap: 3px; margin: 0;">
-                <input class="form-check-input" type="radio" id="pesos" name="moneda"
-                       value="pesos" checked>
-                <label class="form-check-label" for="dolares" style="display: flex; flex-direction: column; line-height: 1.2;">
-                    <span>Pesos: </span>
-                    <span th:text="${#numbers.formatDecimal(precioPesos, 1, 'POINT', 2, 'COMMA')}"></span>
+                <input class="form-check-input" type="radio" id="pesos" name="moneda" value="pesos" checked>
+                <label class="form-check-label" for="pesos"
+                       style="display: flex; flex-direction: column; line-height: 1.2;">
+                    <span>Pesos:</span>
+                    <span th:if="${valorConDescuento != null}"
+                          th:text="'$' + ${valorConDescuento}">
+                    </span>
+                    <span th:if="${valorConDescuento == null}"
+                          th:text="'$' + ${#numbers.formatDecimal(precioPesos, 1, 'POINT', 2, 'COMMA')}">
+                    </span>
                 </label>
             </div>
 
             <div class="form-check" style="display: flex; align-items: center; gap: 3px; margin: 0;">
                 <input class="form-check-input" type="radio" id="dolares" name="moneda" value="dolares">
-                <label class="form-check-label" for="dolares" style="display: flex; flex-direction: column; line-height: 1.2;">
+                <label class="form-check-label" for="dolares"
+                       style="display: flex; flex-direction: column; line-height: 1.2;">
                     <span>Dólares:</span>
-                    <span th:text="'USD $' + ${precioDolar}"></span>
+                    <span th:if="${totalConDescuentoNoFormateado != null}"
+                          th:text="'USD $' + ${#numbers.formatDecimal(totalConDescuentoNoFormateado, 1, 'COMMA', 2, 'POINT')}">
+                    </span>
+                    <span th:if="${totalConDescuentoNoFormateado == null}"
+                          th:text="'USD $' + ${#numbers.formatDecimal(precioDolar, 1, 'COMMA', 2, 'POINT')}">
+                    </span>
                 </label>
             </div>
         </div>

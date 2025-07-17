@@ -47,7 +47,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const mensajeParaAlert = document.getElementById("mensajeDescuento");
     const contenidoMensaje = document.getElementById("contenidoMensaje");
 
-
     if (boton) {
         boton.addEventListener("click", function () {
             const codigo = input.value.trim();
@@ -55,8 +54,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
             fetch('/carritoDeCompras/aplicarDescuento', {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({codigoInput: codigo})
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ codigoInput: codigo })
             })
                 .then(response => response.json())
                 .then(data => {
@@ -67,21 +66,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     if (data.valorTotal) {
                         const valorTotalElement = document.querySelector('.valorTotalDelCarrito');
-                        if (valorTotalElement) {
-                            if (!valorTotalElement.dataset.valorOriginal) {
-                                const valorActualTexto = valorTotalElement.textContent || valorTotalElement.innerHTML;
-                                const valorLimpio = parseFloat(valorActualTexto.replace(/[^\d.-]/g, ''));
-                                valorTotalElement.dataset.valorOriginal = valorLimpio;
-                            }
-
-                            valorTotalElement.dataset.valorConDescuento = data.valorTotal;
-                            valorTotalElement.innerHTML = `$${data.valorTotal}`;
-                        }
+                        valorTotalElement.dataset.valorConDescuento = data.valorTotal;
+                        valorTotalElement.innerHTML = `$${data.valorTotal}`;
                     }
-                })
-                .catch(error => {
-                    contenidoMensaje.textContent = 'Hubo un error al aplicar el descuento.';
-                    mensajeParaAlert.classList.remove("d-none");
                 });
         });
     }
@@ -95,29 +82,28 @@ document.addEventListener("DOMContentLoaded", function () {
             e.preventDefault();
 
             const formaDeEntrega = document.querySelector('input[name="tipoEntrega"]:checked')?.value;
-            const codigoPostal = document.getElementById("codigoPostal");
+            const codigoPostal = document.getElementById("codigoPostal").value;
+            const metodoSeleccionado = document.querySelector('input[name="metodoPago"]:checked');
+            const errorDiv = document.getElementById("errorMetodoPago");
+            const btnComprar = document.getElementById("btnComprar");
 
-            let metodoSeleccionado = document.querySelector('input[name="metodoPago"]:checked');
-            if (metodoSeleccionado === null) {
-                const errorDiv = document.getElementById("errorMetodoPago");
+            if (!metodoSeleccionado) {
                 errorDiv.innerText = "Debes seleccionar un metodo de pago";
                 errorDiv.classList.remove("d-none");
                 return false;
             }
 
-            const errorDiv = document.getElementById("errorMetodoPago");
             errorDiv.classList.add("d-none");
 
-            const btnComprar = document.getElementById("btnComprar");
-
+            const valorTotalElement = document.querySelector('.valorTotalDelCarrito');
+            const valorConDescuento = valorTotalElement?.dataset?.valorConDescuento || "";
 
             const params = new URLSearchParams();
             params.append('metodoPago', metodoSeleccionado.value);
             params.append('formaEntrega', formaDeEntrega);
-            params.append('codigoPostal', codigoPostal.value);
+            params.append('codigoPostal', codigoPostal);
+            params.append('totalConDescuento', valorConDescuento);
 
-            const valorTotalElement = document.querySelector('.valorTotalDelCarrito');
-            params.append('totalConDescuento',valorTotalElement.dataset.valorConDescuento);
 
             fetch('/carritoDeCompras/formularioPago', {
                 method: 'POST',
