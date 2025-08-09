@@ -1,0 +1,8 @@
+{
+  "titulo": "Login (desde JSON)",
+  "error": "Credenciales inválidas.",
+  "datosLogin": {
+    "email": "test@tallerwebi.com",
+    "password": ""
+  }
+}

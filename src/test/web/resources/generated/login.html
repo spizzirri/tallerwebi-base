@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="es">
+ <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Taller Web I</title><!-- Boostrap core css -->
+  <link rel="stylesheet" href="/webjars/bootstrap/5.2.0/css/bootstrap.min.css"><!-- custom style -->
+  <link rel="stylesheet" href="file:///home/damian/Documentos/UNLaM/TallerWebI/tallerwebi-base/src/main/webapp/resources/core/css/main.css">
+ </head>
+ <body>
+  <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+   <a class="navbar-brand" href="#">UNLAM</a>
+  </nav>
+  <main role="main" class="container">
+   <div class="container">
+    <div id="loginbox" style="margin-top:50px;" class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
+     <form action="/validar-login" method="POST">
+      <h3 class="form-signin-heading">Taller Web I</h3>
+      <hr class="colorgraph">
+      <br><input field="test@tallerwebi.com" id="email" type="email" class="form-control" required> <input type="password" id="password" class="form-control" required> <button id="btn-login" class="btn btn-lg btn-primary btn-block" type="Submit" disabled>Login</button>
+      <p class="alert alert-danger">Error Credenciales inválidas.</p>
+     </form><a id="btn-register" href="nuevo-usuario">Registrarme</a>
+    </div>
+   </div>
+  </main><!-- /.container --> <!-- Boostrap core js -->
+  <script type="text/javascript" src="webjars/bootstrap/5.2.0/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="file:///home/damian/Documentos/UNLaM/TallerWebI/tallerwebi-base/src/main/webapp/resources/core/js/login.js"></script>
+ </body>
+</html>

@@ -38,6 +38,8 @@ $ mvn test -Dtest="VistaLoginE2E#deberiaNavegarAlHomeSiElUsuarioExiste"
 ```
 
 ## 8. Como correr las pruebas unitarias de javascript
+mvn test-compile
+mvn exec:java -Dexec.mainClass="com.tallerwebi.preparacion.ThymeleafPreProcessor" -Dexec.classpathScope="test" 
 ```shell
 $ cd src/main/webapp/resources/core/js
 # Si es la primera vez debo descargar las dependencias
