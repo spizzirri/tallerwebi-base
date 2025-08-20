@@ -1,5 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.tallerwebi</groupId>
     <artifactId>tallerwebi-base</artifactId>
@@ -20,6 +21,7 @@
         <hibernate.version>5.4.24.Final</hibernate.version>
         <playwright.version>1.36.0</playwright.version>
         <hsqldb.version>2.3.2</hsqldb.version>
+        <postgresql.version>42.7.3</postgresql.version>
     </properties>
 
     <dependencies>
@@ -48,11 +50,19 @@
             <version>${hsqldb.version}</version>
         </dependency>
 
-        <dependency>
+        <!-- <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>8.0.33</version>
+        </dependency> -->
+
+        <!-- Dependencia de PostgreSql para Render-->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${postgresql.version}</version>
         </dependency>
+        <!-- Fin Dependencia de PostgreSql para Render-->
 
         <dependency>
             <groupId>org.thymeleaf</groupId>
@@ -122,6 +132,7 @@
             <scope>provided</scope>
         </dependency>
         -->
+
     </dependencies>
 
     <build>
@@ -165,7 +176,8 @@
                 <artifactId>jetty-maven-plugin</artifactId>
                 <version>9.4.45.v20220203</version>
                 <configuration>
-                    <scanIntervalSeconds>2</scanIntervalSeconds>
+                    <!-- Para render hay que aumentarlo, estaba en 2 -->
+                    <scanIntervalSeconds>20</scanIntervalSeconds>
                     <httpConnector>
                         <port>8080</port>
                     </httpConnector>

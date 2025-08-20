@@ -2,7 +2,7 @@
 FROM openjdk:11
 
 # Define variables de entorno para Tomcat
-ENV TOMCAT_VERSION=9.0.97
+ENV TOMCAT_VERSION=9.0.108
 ENV TOMCAT_HOME=/opt/tomcat
 
 # Descarga y extrae Tomcat

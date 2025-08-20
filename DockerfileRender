@@ -1,0 +1,37 @@
+# 1. Etapa de Construcción (Build Stage) 🛠️
+FROM maven:3-openjdk-11 AS build
+COPY . /usr/src/app
+WORKDIR /usr/src/app
+RUN mvn clean package -DskipTests
+
+# 2. Etapa de Ejecución (Runtime Stage) 🚀
+FROM openjdk:11
+
+ENV JETTY_VERSION=9.4.56.v20240826
+ENV JETTY_HOME=/opt/jetty
+
+RUN apt-get update && apt-get install -y wget && \
+    mkdir -p $JETTY_HOME && \
+    wget https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/${JETTY_VERSION}/jetty-distribution-${JETTY_VERSION}.tar.gz && \
+    tar -xzvf jetty-distribution-${JETTY_VERSION}.tar.gz -C $JETTY_HOME --strip-components=1 && \
+    rm jetty-distribution-${JETTY_VERSION}.tar.gz
+
+COPY --from=build /usr/src/app/target/tallerwebi-base-1.0-SNAPSHOT.war $JETTY_HOME/webapps/spring.war
+
+# Expone el puerto 80 en el que Jetty correrá.
+EXPOSE 80
+
+# Me paro en el directorio de Jetty.
+WORKDIR $JETTY_HOME
+
+# Comando para iniciar Jetty en el puerto 80.
+CMD ["java", "-jar", "start.jar", "jetty.http.port=80"]
+
+# El comando CMD para iniciar Tomcat ya está preconfigurado en la imagen oficial, por lo que no es necesario añadirlo aquí.
+
+# En Windows
+# Instalar Docker Desktop
+# Desde PowerShell o el terminal de IntelliJ ejecutar: docker images -> nos muestra los cotenedores. Copiar el primer IMAGE ID
+# (opcional) Desde Docker Desktop: Ir a containers -> seleccionar el dato "image" del contenedor -> copiar el IMAGE ID (es el mismo que el paso anterior pero desde la app)
+# Ejecutar e PowerShell o el terminarl de IntelliJ: docker run -d -p 8080:8080 -it <IMAGE ID> -> vincula el puerto 8080 del contenedor con el puerto 8080 de nuestra maquina.
+# En el navegador: http://localhost:8080/tallerwebi-base-1.0-SNAPSHOT/login
