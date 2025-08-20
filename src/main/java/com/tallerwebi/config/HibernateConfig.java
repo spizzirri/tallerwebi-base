@@ -25,7 +25,7 @@ public class HibernateConfig {
         String dbPassword = System.getenv("DB_PASSWORD");
 
         if (dbHost == null)
-            dbHost = "dpg-d2iehvhr0fns73e8es40-a.oregon-postgres.render.com";
+            dbHost = "dpg-d2iehvhr0fns73e8es40-a";
         if (dbPort == null)
             dbPort = "5432";
         if (dbName == null)
