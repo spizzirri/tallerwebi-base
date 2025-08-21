@@ -68,7 +68,7 @@ Una vez que tenemos la imagen generada, podemos instanciar un contenedor y ejecu
 docker run -p 8080:8080 tallerwebi
 ```
 
-### 9. Comandos básicod:
+### 9. Comandos básicos:
 ```shell
 # Crear una imagen con el nombre "tallerwebi".
 docker build -f DockerfileJetty -t tallerwebi .
@@ -115,6 +115,18 @@ docker-compose up --build
 # Invoco a docker para que elimine los contenedores creados 
 docker-compose down
 ```
+## 11. Publicación en Render.com
+Render es una plataforma (alterrativa y mas simple que Heroku o AWS) que simplifica el despliegue y alojamiento de aplicaciones web, bases de datos y servicios. Permite conectar un repositorio de Git (Ejemplos: GitHub GitLab) para luego construir (en caso de aplicar) y desplegar una aplicación en cada push. Provee de opciones gratuitas (pero limitadas) para distintos servicios.
+
+Entre los servicios que ofrece podemos encontrar:
+* Alojamiento de servicios web, páginas web estáticas, workers y trabajos programados (cron jobs).
+* Alojamiento de bases de datos PostgreSql y Redis.
+* Escalabilidad: soporta auto escalado horizontal de servicios, ajustando el número de instancias según la carga de CPU y memoria.
+* Red privada: Los servicios desplegados pueden comunicarse entrese sí de forma segura a través de una red privada.
+
+### ¿Cómo desplegar en Render?
+* Se deberá configurar una instancia de base de datos PostgreSql.
+* Se deberá configurar un servicio web utilizando un repositorio Git público (como ejemplo), eligiendo Docker como lenguage (language) y ajustando la ruta (Dockerfile path) para que pueda tomar la configuración desde el archivo DockerfileRender. Es importante configurar la conexión a la base de datos previamente levantada en Render, desde donde se podrán tomar los datos necesarios para la conexión.
 
 ## Tecnologías:
 * Java 11

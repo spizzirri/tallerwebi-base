@@ -24,16 +24,11 @@ public class HibernateConfig {
         String dbUser = System.getenv("DB_USER");
         String dbPassword = System.getenv("DB_PASSWORD");
 
-        if (dbHost == null)
-            dbHost = "dpg-d2iehvhr0fns73e8es40-a";
-        if (dbPort == null)
-            dbPort = "5432";
-        if (dbName == null)
-            dbName = "twi";
-        if (dbUser == null)
-            dbUser = "user";
-        if (dbPassword == null)
-            dbPassword = "HbOg1MpOWEJXi1Q8yTqgsTYEZeFjgrpu";
+        if (dbHost == null) dbHost = "localhost";
+        if (dbPort == null) dbPort = "5432";
+        if (dbName == null) dbName = "tallerwebi";
+        if (dbUser == null) dbUser = "user";
+        if (dbPassword == null) dbPassword = "user";
 
         String url = String.format("jdbc:postgresql://%s:%s/%s?sslmode=require", dbHost, dbPort, dbName);
         dataSource.setUrl(url);

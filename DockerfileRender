@@ -1,4 +1,9 @@
+# Este dockerfile realiza 2 tareas:
+# Empaqueta el proyecto. Es importante que el proyecto tenga la configuracion de la base de datos Postgres correcta.
+# Levanta el servidor web del proyecto Spring con Jetty. 
+
 # 1. Etapa de Construcción (Build Stage) 🛠️
+# Genera el war para publicar
 FROM maven:3-openjdk-11 AS build
 COPY . /usr/src/app
 WORKDIR /usr/src/app
@@ -26,12 +31,3 @@ WORKDIR $JETTY_HOME
 
 # Comando para iniciar Jetty en el puerto 80.
 CMD ["java", "-jar", "start.jar", "jetty.http.port=80"]
-
-# El comando CMD para iniciar Tomcat ya está preconfigurado en la imagen oficial, por lo que no es necesario añadirlo aquí.
-
-# En Windows
-# Instalar Docker Desktop
-# Desde PowerShell o el terminal de IntelliJ ejecutar: docker images -> nos muestra los cotenedores. Copiar el primer IMAGE ID
-# (opcional) Desde Docker Desktop: Ir a containers -> seleccionar el dato "image" del contenedor -> copiar el IMAGE ID (es el mismo que el paso anterior pero desde la app)
-# Ejecutar e PowerShell o el terminarl de IntelliJ: docker run -d -p 8080:8080 -it <IMAGE ID> -> vincula el puerto 8080 del contenedor con el puerto 8080 de nuestra maquina.
-# En el navegador: http://localhost:8080/tallerwebi-base-1.0-SNAPSHOT/login
