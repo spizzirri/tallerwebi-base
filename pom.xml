@@ -50,12 +50,6 @@
             <version>${hsqldb.version}</version>
         </dependency>
 
-        <!-- <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.33</version>
-        </dependency> -->
-
         <!-- Dependencia de PostgreSql para Render-->
         <dependency>
             <groupId>org.postgresql</groupId>
@@ -176,8 +170,7 @@
                 <artifactId>jetty-maven-plugin</artifactId>
                 <version>9.4.45.v20220203</version>
                 <configuration>
-                    <!-- Para render hay que aumentarlo, estaba en 2 -->
-                    <scanIntervalSeconds>20</scanIntervalSeconds>
+                    <scanIntervalSeconds>2</scanIntervalSeconds>
                     <httpConnector>
                         <port>8080</port>
                     </httpConnector>
