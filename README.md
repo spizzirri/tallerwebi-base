@@ -2,7 +2,13 @@ Proyecto base Taller Web I (Maven and Thymeleaf)
 ===============================
 
 ## 1. Como iniciar el proyecto
+> Necesitamos previamente una base de datos mysql en el puerto 3306 
 ```shell
+# Levantamos un BBDD con docker
+docker build -f DockerfileSQL -t mysql .
+docker run --env-file .env --name mysql-container -d -p 3306:3306 mysql
+
+# Iniciamos el proyecto
 $ mvn clean jetty:run
 # http://localhost:8080/spring
 ```
@@ -117,6 +123,7 @@ docker-compose down
 ```
 
 ## Tecnologías:
+* Docker
 * Java 11
 * Spring 5.2.22.RELEASE
 * Thymeleaf 3.0.15.RELEASE
