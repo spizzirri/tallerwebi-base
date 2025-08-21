@@ -101,7 +101,7 @@ docker rmi <imageId>
 docker build -f DockerfileSQL -t mysql .
 
 # Instancia un contendor en base a la imagen mysql.
-docker run --name mysql-container -d -p 3306:3306 mysql # sudo apt install mysql-client
+docker run --env-file .env --name mysql-container -d -p 3306:3306 mysql # sudo apt install mysql-client
 ```
 
 ## 10. docker-compose
