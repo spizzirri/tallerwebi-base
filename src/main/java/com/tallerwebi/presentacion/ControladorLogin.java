@@ -76,5 +76,11 @@ public class ControladorLogin {
     public ModelAndView inicio() {
         return new ModelAndView("redirect:/login");
     }
+
+    @RequestMapping(path = "/nuevaSubasta", method = RequestMethod.GET)
+    public ModelAndView irANuevaSubasta() {
+        return new ModelAndView("nuevaSubasta");
+    }
+
 }
 
