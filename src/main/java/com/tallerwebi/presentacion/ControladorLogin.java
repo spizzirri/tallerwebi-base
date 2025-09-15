@@ -76,5 +76,10 @@ public class ControladorLogin {
     public ModelAndView inicio() {
         return new ModelAndView("redirect:/login");
     }
+
+    @RequestMapping(path = "/categoria-productos", method = RequestMethod.GET)
+    public ModelAndView irACategories() {
+        return new ModelAndView("categoria-productos");
+    }
 }
 
