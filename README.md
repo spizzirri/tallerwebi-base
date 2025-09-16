@@ -13,28 +13,28 @@ $ mvn clean jetty:run
 # http://localhost:8080/spring
 ```
 ## 2. Thymeleaf
-* [Documentacion](https://www.thymeleaf.org/doc/tutorials/3.0/usingthymeleaf.html)
+* [Documentación](https://www.thymeleaf.org/doc/tutorials/3.0/usingthymeleaf.html)
 
 ## 3. Hamcrest
-* [Documentacion](https://hamcrest.org/JavaHamcrest/javadoc/2.2/)
+* [Documentación](https://hamcrest.org/JavaHamcrest/javadoc/2.2/)
 
 ## 4. GitHub Actions
-* [Documentacion](https://docs.github.com/es/actions/quickstart)
+* [Documentación](https://docs.github.com/es/actions/quickstart)
 
 ## 5. Playwright
-* [Documentacion](https://playwright.dev/java/docs/intro)
+* [Documentación](https://playwright.dev/java/docs/intro)
 
 ## 6. Jetty
-* [Documentacion](https://eclipse.dev/jetty/documentation/jetty-9/index.html#maven-and-jetty)
+* [Documentación](https://eclipse.dev/jetty/documentation/jetty-9/index.html#maven-and-jetty)
 
 ## 7. ¿Cómo correr las pruebas de punta a punta?
 
 ### Iniciar el servidor
 ```shell
-# Opcion 1
+# Opción 1
 $ mvn clean jetty:run
 
-# Opcion 2 -- ver seccion 10 docker-compose
+# Opción 2 -- ver seccion 10 docker-compose
 $ docker-compose up --build
 ```
 ### Correr las pruebas en otra terminal
@@ -97,7 +97,7 @@ docker ps
 # Muestra todos los contenedores creados (o existentes).
 docker ps -a 
 
-# Muestra todas las imagenes creadas.
+# Muestra todas las imágenes creadas.
 docker images
 
 # Elimina un contenedor.
@@ -124,6 +124,29 @@ docker-compose up --build
 # Invoco a docker para que elimine los contenedores creados 
 docker-compose down
 ```
+
+## 11. Maven (mvn) - Instalación y configuración en el sistema operativo
+Maven es una herramienta que permite la gestión de proyectos (principalmente proyectos Java). Simplifica y estandariza el proceso de construcción del producto software. 
+
+Entre sus tareas podemos encontrar: 
+* Limpiar dependencias o artefactos existentes.
+* Validar la estructura del proyecto.
+* Compilar el código fuente.
+* Ejecutar pruebas unitarias.
+* Empaquetar el código compilado.
+* Verificar el resultado de la integración (pruebas de integración, validación mediante plugins, etc). 
+* Instalar dependencias o componentes necesarios (descargando automáticamente las librerías y/o componentes que el proyecto necesita para funcionar correctamente).
+* Publicar el empaquetado.
+* Ejecutar plugins previamente configurados. 
+
+Gran parte de la configuración la encontraremos en el archivo `pom.xml`.
+
+Algunos IDEs como IntelliJ permiten ejecutar comandos de Maven (Ejemplo: `mvn clean install`) desde el IDE. También podemos (de manera alternativa), ejecutar los comandos desde un CMD (en Windows) o Terminal (en Linux). Para esto debemos instalar y configurar Maven en el sistema operativo:
+* Es requisito tener instalado Java (mínimo Java 8) y configuradas las variables de entorno (`JAVA_HOME` y `PATH`).
+* Descargar Maven desde el [sitio oficial](https://dlcdn.apache.org/maven/maven-3/3.8.9/binaries/apache-maven-3.8.9-bin.zip) y luego descomprimirlo en una carpeta (Puede estar junto a la instalación de Java o en otra carpeta).
+* Configurar una variable de entorno con la clave `MAVEN_HOME` indicando en el valor, la ruta donde se descomprimió el archivo descargado. Ejemplo: `C:\maven\apache-maven-3.9.11` (en Windows) o `/home/maven/apache-maven-3.9.11` (en Linux).
+* Configurar la variable de entorno `PATH` incluyendo la variable `MAVEN_HOME`: Agregamos -> `%MAVEN_HOME%\bin` al listado de las variable PATH.
+* Luego de guardar la configuración de las variables de entorno, ejecutamos en el CMD o Terminal `mvn -version`, debiendo visualizar como salida la versión de Maven descargada.
 
 ## Tecnologías:
 * Docker
