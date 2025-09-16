@@ -21,7 +21,20 @@
 </nav>
 
 <main role="main" class="container">
+    <div id="newSubastabox" style="margin-top:50px;" class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
+        <form action="#" th:action="@{/crearSubasta}" method="POST" th:object="${subasta}">
+            <h3 class="form-signin-heading">Crear subasta</h3>
+            <hr class="colorgraph"><br>
 
+            <button id="btn-crearSubasta" class="btn btn-lg btn-primary btn-block" Type="Submit">Crear</button>
+            <p th:if="${error != null}" class="alert alert-danger" th:text="'Error ' + ${error}">
+            </p>
+            <!--
+            <input th:field="*{email}" id="email" class="form-control" required/>
+            <input th:field="*{password}" type="password" id="password" class="form-control" required/>
+            -->
+        </form>
+    </div>
 </main>
 <!-- /.container -->
 

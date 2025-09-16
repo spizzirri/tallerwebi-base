@@ -1,6 +1,8 @@
 package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.ServicioLogin;
+import com.tallerwebi.dominio.ServicioSubasta;
+import com.tallerwebi.dominio.Subasta;
 import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.excepcion.UsuarioExistente;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +19,17 @@ import javax.servlet.http.HttpServletRequest;
 public class ControladorLogin {
 
     private ServicioLogin servicioLogin;
+    private ServicioSubasta servicioSubasta;
 
     @Autowired
-    public ControladorLogin(ServicioLogin servicioLogin){
+    public ControladorLogin(ServicioLogin servicioLogin, ServicioSubasta servicioSubasta) {
         this.servicioLogin = servicioLogin;
+        this.servicioSubasta = servicioSubasta;
     }
+
+    //NOTA: Creo que el profe se enojara si pongo 2 servicios en 1 controlador. Despues arreglare eso.
+
+
 
     @RequestMapping("/login")
     public ModelAndView irALogin() {
@@ -34,9 +42,10 @@ public class ControladorLogin {
     @RequestMapping(path = "/validar-login", method = RequestMethod.POST)
     public ModelAndView validarLogin(@ModelAttribute("datosLogin") DatosLogin datosLogin, HttpServletRequest request) {
         ModelMap model = new ModelMap();
-
         Usuario usuarioBuscado = servicioLogin.consultarUsuario(datosLogin.getEmail(), datosLogin.getPassword());
         if (usuarioBuscado != null) {
+            request.getSession().setAttribute("USUARIO", usuarioBuscado.getEmail());
+            request.getSession().setAttribute("PASS", usuarioBuscado.getPassword());
             request.getSession().setAttribute("ROL", usuarioBuscado.getRol());
             return new ModelAndView("redirect:/home");
         } else {
@@ -77,10 +86,30 @@ public class ControladorLogin {
         return new ModelAndView("redirect:/login");
     }
 
+    //TO-DO: Mover estas clases de subastas a un controlador exclusivo, en vez de usar el de Login.
     @RequestMapping(path = "/nuevaSubasta", method = RequestMethod.GET)
     public ModelAndView irANuevaSubasta() {
-        return new ModelAndView("nuevaSubasta");
+        ModelMap model = new ModelMap();
+        model.put("subasta", new Subasta());
+        return new ModelAndView("nuevaSubasta", model);
     }
 
+    @RequestMapping(path = "/crearSubasta", method = RequestMethod.POST)
+    public ModelAndView crearSubasta(@ModelAttribute("subasta") Subasta subasta, HttpServletRequest request) {
+
+        ModelMap model = new ModelMap();
+        Usuario creador;
+        String creadorEmail = (String) request.getSession().getAttribute("USUARIO");
+        String creadorPass = (String) request.getSession().getAttribute("PASS");
+        creador = servicioLogin.consultarUsuario(creadorEmail, creadorPass);
+        subasta.setCreador(creador);
+        try{
+            servicioSubasta.crearSubasta(subasta);
+        }catch (Exception e){
+            model.put("error", "Hubo un error al crear la subasta. Intentelo nuevamente.");
+            return new ModelAndView("nuevaSubasta", model);
+        }
+        return new ModelAndView("redirect:/home");
+    }
 }
 
