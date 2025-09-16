@@ -1,0 +1,68 @@
+/* Utilidades personalizadas */
+.lista-categorias-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+    gap: .5rem;
+}
+
+.lista-categorias-scroll .badge {
+    font-size: .95rem;
+    padding: .6rem .9rem;
+}
+
+.tarjeta-categoria img {
+    height: 140px;
+    object-fit: cover;
+}
+
+.sombra-suave {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, .07);
+}
+
+.seccion-titulo span {
+    font-weight: 600;
+    letter-spacing: .2px;
+    color: #0d6efd;
+}
+
+.logo-img {
+    height: 36px;
+    object-fit: contain;
+}
+
+.mercado-logo {
+    height: 48px;
+    object-fit: contain;
+    filter: grayscale(30%);
+}
+
+.precio {
+    font-weight: 700;
+    font-size: 1.25rem;
+}
+
+.bg-onda {
+    background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%);
+}
+
+.reseña-avatar {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.noticia-img {
+    height: 160px;
+    object-fit: cover;
+}
+
+.footer-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.footer-link:hover {
+    text-decoration: underline;
+}
