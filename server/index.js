@@ -70,6 +70,15 @@ app.delete('/objetos/:id', (req, res) => {
 	res.json(eliminado[0]);
 });
 
+app.head('/objetos', (req, res) => {
+	res.status(200).end();
+});
+
+app.options('/objetos', (req, res) => {
+	res.set('Allow', 'GET,POST,PUT,PATCH,DELETE,HEAD,OPTIONS');
+	res.status(200).end();
+});
+
 app.listen(PORT, () => {
 	console.log(`Servidor Express escuchando en puerto ${PORT}`);
 });
