@@ -5,8 +5,8 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 
 let objetos = [
-	{ id: 1, nombre: 'Objeto 1' },
-	{ id: 2, nombre: 'Objeto 2' }
+	{ id: 1, nombre: 'Fabio', dni: '12345678' },
+	{ id: 2, nombre: 'Roberto' , dni: '87654321' },
 ];
 
 const APIKEY = 'tallerwebi';
@@ -21,11 +21,20 @@ function validarApiKey(req, res, next) {
 
 app.use(validarApiKey);
 
-app.get('/objetos', (req, res) => {
+app.get('/deudores', (req, res) => {
 	res.json(objetos);
 });
 
-app.post('/objetos', (req, res) => {
+app.get('/deudores/:dni', (req, res) => {
+	const dni = req.params.dni;
+	const objeto = objetos.find(obj => obj.dni === dni);
+	if (!objeto) {
+		return res.status(404).json({ error: 'No encontrado' });
+	}
+	res.json(objeto);
+});
+
+app.post('/deudores', (req, res) => {
 	const nuevo = req.body;
 	if (!nuevo || !nuevo.nombre) {
 		return res.status(400).json({ error: 'Falta nombre' });
@@ -35,7 +44,7 @@ app.post('/objetos', (req, res) => {
 	res.status(201).json(nuevo);
 });
 
-app.put('/objetos/:id', (req, res) => {
+app.put('/deudores/:id', (req, res) => {
 	const id = parseInt(req.params.id);
 	const index = objetos.findIndex(obj => obj.id === id);
 	if (index === -1) {
@@ -50,7 +59,7 @@ app.put('/objetos/:id', (req, res) => {
 	res.json(nuevo);
 });
 
-app.patch('/objetos/:id', (req, res) => {
+app.patch('/deudores/:id', (req, res) => {
 	const id = parseInt(req.params.id);
 	const index = objetos.findIndex(obj => obj.id === id);
 	if (index === -1) {
@@ -60,7 +69,7 @@ app.patch('/objetos/:id', (req, res) => {
 	res.json(objetos[index]);
 });
 
-app.delete('/objetos/:id', (req, res) => {
+app.delete('/deudores/:id', (req, res) => {
 	const id = parseInt(req.params.id);
 	const index = objetos.findIndex(obj => obj.id === id);
 	if (index === -1) {
@@ -70,11 +79,11 @@ app.delete('/objetos/:id', (req, res) => {
 	res.json(eliminado[0]);
 });
 
-app.head('/objetos', (req, res) => {
+app.head('/deudores', (req, res) => {
 	res.status(200).end();
 });
 
-app.options('/objetos', (req, res) => {
+app.options('/deudores', (req, res) => {
 	res.set('Allow', 'GET,POST,PUT,PATCH,DELETE,HEAD,OPTIONS');
 	res.status(200).end();
 });

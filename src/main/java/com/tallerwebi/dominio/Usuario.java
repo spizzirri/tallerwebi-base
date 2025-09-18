@@ -13,6 +13,8 @@ public class Usuario {
     private Long id;
     private String email;
     private String password;
+    private String edad;
+    private String dni;
     private String rol;
     private Boolean activo = false;
 
@@ -34,6 +36,22 @@ public class Usuario {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    public String getEdad() {
+        return edad;
+    }
+    public void setEdad(String edad) {
+        this.edad = edad;
+    }
+
+    public String getDni() {
+        return dni;
+    }
+
+    public void setDni(String dni) {
+        this.dni = dni;
+    }
+
     public String getRol() {
         return rol;
     }

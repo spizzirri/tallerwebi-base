@@ -28,9 +28,10 @@
         <h3 class="form-signin-heading">Nuevo Usuario</h3>
         <hr class="colorgraph"><br>
 
-        <input th:field="*{email}" id="email" class="form-control" required/>
-        <input th:field="*{password}" type="password" id="password" class="form-control" required/>
-
+        <input th:field="*{email}" id="email" placeholder="Email" type="email" class="form-control" required/>
+        <input th:field="*{password}" id="password" placeholder="Contraseña" type="password" class="form-control" required/>
+        <input th:field="*{dni}" id="dni" placeholder="DNI" type="number" min="0" max="99999999" pattern="\d+" class="form-control" required/>
+        <input th:field="*{edad}" id="edad" placeholder="Edad" type="number" min="0" max="100" pattern="\d+" class="form-control" required/>
         <button id="btn-registrarme" class="btn btn-lg btn-primary btn-block" Type="Submit">Registrarme</button>
         <p th:if="${error != null}" class="alert alert-danger" th:text="'Error ' + ${error}">
         </p>
