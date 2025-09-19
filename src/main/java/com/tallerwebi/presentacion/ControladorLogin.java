@@ -1,6 +1,7 @@
 package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.ServicioLogin;
+import com.tallerwebi.dominio.ServicioAutenticacion;
 import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.excepcion.NoCumpleRequisitos;
 import com.tallerwebi.dominio.excepcion.UsuarioExistente;
@@ -19,9 +20,12 @@ public class ControladorLogin {
 
     private ServicioLogin servicioLogin;
 
+    private ServicioAutenticacion servicioAutenticacion;
+
     @Autowired
-    public ControladorLogin(ServicioLogin servicioLogin){
+    public ControladorLogin(ServicioLogin servicioLogin, ServicioAutenticacion servicioAutenticacion){
         this.servicioLogin = servicioLogin;
+        this.servicioAutenticacion = servicioAutenticacion;
     }
 
     @RequestMapping("/login")
@@ -50,7 +54,7 @@ public class ControladorLogin {
     public ModelAndView registrarme(@ModelAttribute("usuario") Usuario usuario) {
         ModelMap model = new ModelMap();
         try{
-            servicioLogin.validarUsuario(usuario);
+            servicioAutenticacion.esUsuarioValido(usuario);
             servicioLogin.registrar(usuario);
         } catch (UsuarioExistente e){
             model.put("error", "El usuario ya existe");

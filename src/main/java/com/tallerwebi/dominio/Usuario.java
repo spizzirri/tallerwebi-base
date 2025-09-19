@@ -13,10 +13,21 @@ public class Usuario {
     private Long id;
     private String email;
     private String password;
-    private String edad;
+    private Integer edad;
     private String dni;
     private String rol;
     private Boolean activo = false;
+
+    public Usuario() {
+    
+    }
+
+    public Usuario(String nombre, String email, String password, Integer edad, String rol) {
+        this.email = email;
+        this.password = password;
+        this.edad = edad;
+        this.rol = rol;
+    }
 
     public Long getId() {
         return id;
@@ -37,10 +48,10 @@ public class Usuario {
         this.password = password;
     }
 
-    public String getEdad() {
+    public Integer getEdad() {
         return edad;
     }
-    public void setEdad(String edad) {
+    public void setEdad(Integer edad) {
         this.edad = edad;
     }
 
