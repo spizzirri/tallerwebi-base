@@ -10,7 +10,6 @@
     <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.2.0/css/bootstrap.min.css}"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
 
-
     <!-- custom style -->
     <link rel="stylesheet" th:href="@{/css/main.css}"/>
     <link rel="stylesheet" th:href="@{/css/categorias.css}"/>
@@ -47,30 +46,45 @@
 
     </header>
 
-
-
     <!-- categorías desde SQL-->
-    <section class="container py-3 mb-5 container-categorias">
-        <ul class="nav justify-content-between flex-wrap">
-            <li class="nav-item flex-fill text-center" th:each="categoria : ${categorias}">
-                <div class="badge-wrapper">
-                    <a th:href="@{'/categorias/' + ${categoria.nombreEnUrl}}" class="nav-link px-2 py-1 text-body small " th:text="${categoria.nombre}">
-                        Nombre categoría
-                    </a>
-                    <div class="badge-info">
-                        <img src="https://picsum.photos/100/60" alt="Imagen categoría">
-                        <h4 th:text="${categoria.nombre}" >Nombre categoria</h4>
-                        <ul>
-                            <li>Celulares</li>
-                            <li>TV & Audio</li>
-                            <li>Computadoras</li>
-                        </ul>
-                    </div>
-                </div>
-            </li>
-        </ul>
-    </section>
+    <nav class="navbar navbar-expand-lg container">
+    <a class="navbar-brand titulo-categoria" href="#">Categorías</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+                aria-controls="mainNav" aria-expanded="false" aria-label="Abrir menú">
+            <i class="bi bi-journal-text toggler-icon" aria-hidden="true"></i>
+            <span class="visually-hidden">Abrir menú</span>
+        </button>
+    </nav>
+    <section class="container py-3 mb-3 container-categorias navbar navbar-expand-lg">
+        <div class="collapse navbar-collapse" id="mainNav">
 
+            <ul class="navbar-nav mx-auto">
+                <li class="nav-item flex-fill " th:each="categoria : ${categorias}">
+                    <div class="badge-wrapper">
+                        <a th:href="@{'/categorias/' + ${categoria.nombreEnUrl}}"
+                           class="nav-link px-2 py-1 text-body small "
+                           th:text="${categoria.nombre}">
+                            Nombre categoría
+                        </a>
+                        <div class="badge-info">
+                            <ul>
+                                <li th:text="${categoria.nombre}">categoria</li>
+                                <li>Subcategoría 1</li>
+                                <li>Subcategoría 2</li>
+                                <li>Subcategoría 3</li>
+                                <li>Subcategoría 4</li>
+                                <li>Subcategoría 5</li>
+                                <li>Subcategoría 6</li>
+                                <li>Subcategoría 7</li>
+                                <li>Subcategoría 8</li>
+                            </ul>
+                            <img th:src="@{|https://picsum.photos/seed/${categoria.nombreEnUrl}/100/60|}" alt="Imagen categoría">
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+</section>
 
 
 
