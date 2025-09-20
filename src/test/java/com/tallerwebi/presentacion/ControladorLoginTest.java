@@ -35,8 +35,7 @@ public class ControladorLoginTest {
 		requestMock = mock(HttpServletRequest.class);
 		sessionMock = mock(HttpSession.class);
 		servicioLoginMock = mock(ServicioLogin.class);
-        ServicioSubasta servicioSubastaMock = mock(ServicioSubasta.class);
-		controladorLogin = new ControladorLogin(servicioLoginMock, servicioSubastaMock);
+		controladorLogin = new ControladorLogin(servicioLoginMock);
 	}
 
 	@Test
