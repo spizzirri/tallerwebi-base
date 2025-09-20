@@ -20,7 +20,8 @@ public class ServicioSubastaImpl implements ServicioSubasta {
     @Autowired
     public ServicioSubastaImpl(RepositorioSubasta repositorioSubasta,  RepositorioUsuario repositorioUsuario) {
         this.repositorioSubasta = repositorioSubasta;
-        this.repositorioUsuario = repositorioUsuario;}
+        this.repositorioUsuario = repositorioUsuario;
+    }
 
 
     @Override
