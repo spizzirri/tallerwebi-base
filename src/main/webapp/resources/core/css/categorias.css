@@ -1,15 +1,3 @@
-.lista-categorias-scroll {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    white-space: nowrap;
-    gap: .5rem;
-}
-
-.lista-categorias-scroll .badge {
-    font-size: .95rem;
-    padding: .6rem .9rem;
-}
-
 .seccion-titulo span {
     font-weight: 600;
     letter-spacing: 0.2px;
@@ -97,6 +85,11 @@
     height: 3rem;
     object-fit: contain;
 }
+
+.titulo-de-pagina{
+    color:#86B8E5;
+}
+
 
 @media (max-width: 992px){
     .badge-wrapper:hover .badge-info {
