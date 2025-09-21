@@ -34,12 +34,12 @@
 
             <label for="estadoProducto">Estado Producto</label>
             <input th:field="*{estadoProducto}" id="estadoProducto" class="form-control" required/>
-            <!--    TO-DO: Cambiarlo a una lista de posibles valores    -->
+            <!--    TODO: Cambiarlo a una lista de posibles valores    -->
 
             <label for="precioInicial">Monto inicial de Subasta</label>
             <input type="number" th:field="*{precioInicial}" id="precioInicial" class="form-control" required/>
 
-            <!--TODO: Encontrar manera de no usar el estadoSubasta y usar una variable que llegue al controlador -->
+            <!--    TODO: Encontrar manera de no usar el estadoSubasta y usar una variable que llegue al controlador    -->
             <label for="select_fechaFin">Duracion Subasta</label>
             <select th:field="*{estadoSubasta}" id="select_fechaFin" class="form-control" required>
                 <option value="" selected disabled>Seleccionar duracion</option>
@@ -59,43 +59,5 @@
 
 <!-- Boostrap core js -->
 <script type="text/javascript" th:src="@{webjars/bootstrap/5.2.0/js/bootstrap.min.js}"></script>
-<!-- TODO: Crear .js propio para esto -->
-<!--
-<script>
-    const input_selectfechaFin = document.getElementById("select_fechaFin");
-    const input_fechaFin = document.getElementById("fechaFin");
-
-
-    input_selectfechaFin.addEventListener("change", (event) => {
-        let value_selectorFechaFin = input_selectfechaFin.value;
-        let ahora = Date.now();
-        let hora = (60 * 60 * 100);
-        let dia = 24 * hora;
-        let fechaFin;
-        switch (value_selectorFechaFin) {
-            case "0":
-                fechaFin = ahora + ( 12 * hora );
-                input_fechaFin.value = fechaFin;
-                break;
-            case "1":
-                fechaFin = ahora + dia;
-                input_fechaFin.value = fechaFin;
-                break;
-            case "2":
-                fechaFin = ahora + ( 3 * dia);
-                input_fechaFin.value = fechaFin;
-                break;
-            case "3":
-                fechaFin = ahora + ( 7 * dia);
-                input_fechaFin.value = fechaFin;
-                break;
-            default:
-                fechaFin = ahora;
-                input_fechaFin.value = fechaFin;
-                break;
-        }
-    });
-</script>
--->
 </body>
 </html>
