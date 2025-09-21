@@ -1,0 +1,63 @@
+<!DOCTYPE HTML>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>Taller Web I - Nueva Subasta</title>
+
+    <!-- Boostrap core css -->
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.2.0/css/bootstrap.min.css}"/>
+
+    <!-- custom style -->
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+    <a class="navbar-brand" href="#">UNLAM</a>
+</nav>
+
+<main role="main" class="container">
+    <div id="newSubastabox" style="margin-top:50px;" class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
+        <form action="#" th:action="@{/crearSubasta}" method="POST" th:object="${subasta}">
+            <h3 class="form-signin-heading">Crear subasta</h3>
+            <hr class="colorgraph"><br>
+
+            <label for="titulo">Producto</label>
+            <input th:field="*{titulo}" id="titulo" class="form-control" required/>
+
+            <label for="descripcion">Descripcion</label>
+            <textarea  th:field="*{descripcion}" id="descripcion" class="form-control" required></textarea>
+
+            <label for="estadoProducto">Estado Producto</label>
+            <input th:field="*{estadoProducto}" id="estadoProducto" class="form-control" required/>
+            <!--    TODO: Cambiarlo a una lista de posibles valores    -->
+
+            <label for="precioInicial">Monto inicial de Subasta</label>
+            <input type="number" th:field="*{precioInicial}" id="precioInicial" class="form-control" required/>
+
+            <!--    TODO: Encontrar manera de no usar el estadoSubasta y usar una variable que llegue al controlador    -->
+            <label for="select_fechaFin">Duracion Subasta</label>
+            <select th:field="*{estadoSubasta}" id="select_fechaFin" class="form-control" required>
+                <option value="" selected disabled>Seleccionar duracion</option>
+                <option value="0">Express (12 horas)</option>
+                <option value="1">Rapido (1 dia)</option>
+                <option value="2">Normal (3 dia)</option>
+                <option value="3">Prolongado (7 dia)</option>
+            </select>
+
+            <button id="btn-crearSubasta" class="btn btn-lg btn-primary btn-block" Type="Submit">Crear</button>
+            <p th:if="${error != null}" class="alert alert-danger" th:text="'Error ' + ${error}">
+            </p>
+        </form>
+    </div>
+</main>
+<!-- /.container -->
+
+<!-- Boostrap core js -->
+<script type="text/javascript" th:src="@{webjars/bootstrap/5.2.0/js/bootstrap.min.js}"></script>
+</body>
+</html>
