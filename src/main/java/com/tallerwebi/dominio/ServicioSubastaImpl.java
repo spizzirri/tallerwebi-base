@@ -23,10 +23,13 @@ public class ServicioSubastaImpl implements ServicioSubasta {
         this.repositorioUsuario = repositorioUsuario;
     }
 
-
     @Override
     public void crearSubasta(Subasta subasta, String creador) {
         subasta.setCreador(repositorioUsuario.buscar(creador));
+        subasta.setFechaInicio();
+        subasta.setFechaFin(repositorioSubasta.obtenerTiempoFin(subasta.getEstadoSubasta()));   //Subasta en curso
+        subasta.setEstadoSubasta(10);
         repositorioSubasta.guardar(subasta);
     }
+
 }

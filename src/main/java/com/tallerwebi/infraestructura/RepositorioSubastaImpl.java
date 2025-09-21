@@ -7,6 +7,8 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+
 @Repository("repositorioSubasta")
 public class RepositorioSubastaImpl implements RepositorioSubasta {
     private SessionFactory sessionFactory;
@@ -17,4 +19,28 @@ public class RepositorioSubastaImpl implements RepositorioSubasta {
     public void guardar(Subasta subasta) {
         sessionFactory.getCurrentSession().save(subasta);
     }
+
+    public LocalDateTime obtenerTiempoFin(Integer indicador){
+        LocalDateTime temp = LocalDateTime.now();
+        LocalDateTime result;
+        switch(indicador){
+            case 0:
+                result = temp.plusHours(12);
+                break;
+            case 1:
+                result = temp.plusDays(1);
+                break;
+            case 2:
+                result = temp.plusDays(3);
+                break;
+            case 3:
+                result = temp.plusDays(7);
+                break;
+            default:
+                result = temp;
+        }
+        return result;
+    }
+
+
 }
