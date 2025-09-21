@@ -1,0 +1,56 @@
+# Etapa 1: Build - Compilar el proyecto Maven
+FROM maven:3.8.6-openjdk-11 AS build
+
+# Establecer directorio de trabajo
+WORKDIR /app
+
+# Copiar archivos de configuración de Maven primero (para cache)
+COPY pom.xml .
+
+# Descargar dependencias (se cachea si pom.xml no cambia)
+RUN mvn dependency:go-offline -B
+
+# Copiar el código fuente
+COPY src ./src
+
+# Compilar y generar el WAR
+RUN mvn clean package -DskipTests
+
+# Etapa 2: Runtime - Configurar Tomcat con el WAR generado
+FROM tomcat:9.0-jdk11-openjdk
+
+# Eliminar aplicaciones por defecto de Tomcat
+RUN rm -rf /usr/local/tomcat/webapps/*
+
+# Copiar el WAR desde la etapa de build (inicial)
+COPY --from=build /app/target/tallerwebi-base-1.0-SNAPSHOT.war /usr/local/tomcat/webapps/
+
+# Crear script para copiar WAR actualizado desde volumen
+RUN echo '#!/bin/bash\n\
+if [ -f /app/target/tallerwebi-base-1.0-SNAPSHOT.war ]; then\n\
+  echo "Copying updated WAR from volume..."\n\
+  cp /app/target/tallerwebi-base-1.0-SNAPSHOT.war /usr/local/tomcat/webapps/\n\
+fi\n\
+exec "$@"' > /usr/local/bin/entrypoint.sh && \
+chmod +x /usr/local/bin/entrypoint.sh
+
+# Exponer puerto 8080
+EXPOSE 8080
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["catalina.sh", "run"]
+
+# Instrucciones de uso en Windows:
+# 1. Construir la imagen:
+#    docker build -t tallerwebi-app -f DockerfileTomcat .
+#
+# 2. Ejecutar el contenedor:
+#    docker run -d -p 8080:8080 --name tallerwebi-container tallerwebi-app
+#
+# 3. Acceder a la aplicación:
+#    http://localhost:8080/tallerwebi-base-1.0-SNAPSHOT/login
+#
+# Comandos útiles:
+# - Ver contenedores: docker ps
+# - Detener contenedor: docker stop tallerwebi-container
+# - Ver logs: docker logs tallerwebi-container
