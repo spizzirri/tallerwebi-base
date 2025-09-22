@@ -1,5 +1,7 @@
 {
   "devDependencies": {
-    "jasmine-spec-reporter": "^7.0.0"
+    "jasmine": "^5.10.0",
+    "jasmine-spec-reporter": "^7.0.0",
+    "jsdom": "^27.0.0"
   }
 }

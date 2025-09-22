@@ -6,19 +6,15 @@
       name="viewport"
       content="width=device-width, initial-scale=1, shrink-to-fit=no"
     />
+    <title>Hamburgueserías Cercanas</title>
 
-    <title>Taller Web I</title>
-
-    <!-- Boostrap core css -->
+    <!-- Bootstrap CSS -->
     <link
       rel="stylesheet"
       th:href="@{/webjars/bootstrap/5.2.0/css/bootstrap.min.css}"
     />
-
-    <!-- custom style -->
     <link rel="stylesheet" th:href="@{/css/main.css}" />
   </head>
-
   <body>
     <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
       <a class="navbar-brand" href="#">UNLAM</a>
@@ -26,21 +22,15 @@
 
     <main role="main" class="container">
       <div class="container">
-        <h1>Bienvenidos a Taller Web 1</h1>
-        <a
-          th:href="@{/hamburguecerias-cercanas}"
-          class="btn btn-lg btn-primary btn-block"
-          >Hamburgueser&iacuteas Cercanas</a
-        >
-        <a href="login.html" class="btn btn-lg btn-primary btn-block">Volver</a>
+        <h1>Hamburgueser&iacuteas Cercanas</h1>
+        <!-- Tu contenido aquí -->
       </div>
     </main>
-    <!-- /.container -->
 
-    <!-- Boostrap core js -->
+    <!-- Bootstrap JS -->
     <script
       type="text/javascript"
-      th:src="@{webjars/bootstrap/5.2.0/js/bootstrap.min.js}"
+      th:src="@{/webjars/bootstrap/5.2.0/js/bootstrap.min.js}"
     ></script>
   </body>
 </html>
