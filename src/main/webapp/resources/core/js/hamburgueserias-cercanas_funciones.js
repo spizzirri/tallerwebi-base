@@ -20,3 +20,17 @@ export function obtenerUbicacion() {
     }
   });
 }
+
+export async function obtenerHamburgueseriasCercanas(latitud, longitud) {
+  const url = `/hamburgueserias-cercanas/${latitud}/${longitud}/lista`;
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error("Error al obtener hamburgueserías");
+    }
+    return await response.json();
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+}

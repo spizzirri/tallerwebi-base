@@ -22,15 +22,29 @@
 
     <main role="main" class="container">
       <div class="container">
-        <h1>Hamburgueser&iacuteas Cercanas</h1>
-        <!-- Tu contenido aquí -->
+        <h1>Hamburgueserías Cercanas</h1>
+        <div th:if="${hamburgueserias != null}">
+          <ul class="list-group">
+            <li class="list-group-item active">Listado de Hamburgueserías</li>
+            <li class="list-group-item" th:each="h : ${hamburgueserias}">
+              <strong th:text="${h.nombre}"></strong><br />
+              Puntuación: <span th:text="${h.puntuacion}"></span><br />
+              Latitud: <span th:text="${h.latitud}"></span> | Longitud:
+              <span th:text="${h.longitud}"></span>
+            </li>
+          </ul>
+        </div>
+        <div th:if="${hamburgueserias == null}">
+          <p>No se encontraron hamburgueserías cercanas.</p>
+        </div>
       </div>
     </main>
 
     <!-- Bootstrap JS -->
     <script
       type="text/javascript"
-      th:src="@{/webjars/bootstrap/5.2.0/js/bootstrap.min.js}"
+      th:src="@{webjars/bootstrap/5.2.0/js/bootstrap.min.js}"
     ></script>
+    <script type="module" th:src="@{js/hamburgueserias-cercanas.js}"></script>
   </body>
 </html>
