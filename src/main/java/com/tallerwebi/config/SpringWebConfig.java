@@ -12,6 +12,7 @@ import org.thymeleaf.spring5.SpringTemplateEngine;
 import org.thymeleaf.spring5.templateresolver.SpringResourceTemplateResolver;
 import org.thymeleaf.spring5.view.ThymeleafViewResolver;
 import org.thymeleaf.templatemode.TemplateMode;
+import java.nio.charset.StandardCharsets;
 
 @EnableWebMvc
 @Configuration
@@ -26,6 +27,7 @@ public class SpringWebConfig implements WebMvcConfigurer {
     public void addResourceHandlers(final ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/css/**").addResourceLocations("/resources/core/css/");
         registry.addResourceHandler("/js/**").addResourceLocations("/resources/core/js/");
+        registry.addResourceHandler("/img/**").addResourceLocations("/resources/core/img/");
         registry.addResourceHandler("/webjars/**").addResourceLocations("/webjars/");
     }
 
@@ -43,6 +45,7 @@ public class SpringWebConfig implements WebMvcConfigurer {
         templateResolver.setTemplateMode(TemplateMode.HTML);
         // Template cache is true by default. Set to false if you want
         // templates to be automatically updated when modified.
+        templateResolver.setCharacterEncoding(StandardCharsets.UTF_8.name());
         templateResolver.setCacheable(true);
         return templateResolver;
     }
@@ -68,6 +71,8 @@ public class SpringWebConfig implements WebMvcConfigurer {
     public ThymeleafViewResolver viewResolver() {
         ThymeleafViewResolver viewResolver = new ThymeleafViewResolver();
         viewResolver.setTemplateEngine(templateEngine());
+        viewResolver.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        viewResolver.setContentType("text/html; charset=UTF-8");
         return viewResolver;
     }
 

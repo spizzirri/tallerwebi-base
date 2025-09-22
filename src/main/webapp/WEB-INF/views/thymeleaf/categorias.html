@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>Categorías</title>
+
+    <!-- Boostrap core css -->
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.2.0/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+
+    <!-- custom style -->
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+    <link rel="stylesheet" th:href="@{/css/categorias.css}"/>
+</head>
+
+
+<body class="bg-white">
+    <!-- Header -->
+    <header class="border-bottom border-info mb-1">
+        <nav class="navbar navbar-expand-lg container py-2">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="#">
+                <img class="logo-img" th:src="@{/img/logo.png}" alt="Logo" />
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navContenido"
+                    aria-controls="navContenido" aria-expanded="false" aria-label="Alternar navegación">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navContenido">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <form class="d-flex" role="search">
+                            <div class="input-group">
+                                <input class="form-control" type="search" placeholder="Buscar..." aria-label="Buscar">
+                                <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i></button>
+                            </div>
+                        </form>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="#">Mi perfil</a></li>
+                </ul>
+            </div>
+
+        </nav>
+
+
+    </header>
+
+    <!-- categorías desde SQL-->
+    <nav class="navbar navbar-expand-lg container">
+        <a class="navbar-brand titulo-categoria text-decoration-none ps-1" href="#">
+            <h2 class="titulo-de-pagina h4 fw-bold text-center m-0 ps-3">Categorías</h2>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+                aria-controls="mainNav" aria-expanded="false" aria-label="Abrir menú">
+            <i class="bi bi-journal-text toggler-icon" aria-hidden="true"></i>
+            <span class="visually-hidden">Abrir menú</span>
+        </button>
+    </nav>
+    <section class="container py-1 mb-1 container-categorias navbar navbar-expand-lg">
+        <div class="collapse navbar-collapse" id="mainNav">
+
+            <ul class="navbar-nav mx-auto">
+                <li class="nav-item flex-fill " th:each="categoria : ${categorias}">
+                    <div class="badge-wrapper">
+                        <a th:href="@{'/categorias/' + ${categoria.nombreEnUrl}}"
+                           class="nav-link px-2 py-1 text-body small "
+                           th:text="${categoria.nombre}">
+                            Nombre categoría
+                        </a>
+                        <div class="badge-info">
+                            <ul>
+                                <li th:text="${categoria.nombre}">categoria</li>
+                                <li>Subcategoría 1</li>
+                                <li>Subcategoría 2</li>
+                                <li>Subcategoría 3</li>
+                                <li>Subcategoría 4</li>
+                                <li>Subcategoría 5</li>
+                                <li>Subcategoría 6</li>
+                                <li>Subcategoría 7</li>
+                                <li>Subcategoría 8</li>
+                            </ul>
+                            <img th:src="@{|https://picsum.photos/seed/${categoria.nombreEnUrl}/100/60|}" alt="Imagen categoría">
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+</section>
+
+    <!-- Carrusel de imágenes -->
+    <section class="container my-4">
+        <div id="galeria" class="carousel slide w-70" data-bs-ride="false">
+
+            <div class="carousel-indicators">
+                <button type="button" data-bs-target="#galeria" data-bs-slide-to="0" class="active" aria-current="true"
+                        aria-label="1"></button>
+                <button type="button" data-bs-target="#galeria" data-bs-slide-to="1" aria-label="2"></button>
+                <button type="button" data-bs-target="#galeria" data-bs-slide-to="2" aria-label="3"></button>
+                <button type="button" data-bs-target="#galeria" data-bs-slide-to="3" aria-label="4"></button>
+                <button type="button" data-bs-target="#galeria" data-bs-slide-to="4" aria-label="5"></button>
+            </div>
+
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <img src="https://picsum.photos/seed/1/1200/300" class="d-block w-100" alt="Foto 1">
+                </div>
+                <div class="carousel-item">
+                    <img src="https://picsum.photos/seed/2/1200/300" class="d-block w-100" alt="Foto 2">
+                </div>
+                <div class="carousel-item">
+                    <img src="https://picsum.photos/seed/3/1200/300" class="d-block w-100" alt="Foto 3">
+                </div>
+                <div class="carousel-item">
+                    <img src="https://picsum.photos/seed/4/1200/300" class="d-block w-100" alt="Foto 4">
+                </div>
+                <div class="carousel-item">
+                    <img src="https://picsum.photos/seed/5/1200/300" class="d-block w-100" alt="Foto 5">
+                </div>
+            </div>
+
+            <button class="carousel-control-prev" type="button" data-bs-target="#galeria" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span><span class="visually-hidden">Anterior</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#galeria" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span><span class="visually-hidden">Siguiente</span>
+            </button>
+        </div>
+    </section>
+
+    <!-- Categorias populares -->
+    <section id="categorias-populares" class="container my-4">
+        <div class="container d-flex justify-content-between mb-5">
+            <a href="#" class="text-decoration-none">
+                <h2 class="titulo-de-pagina h4 fw-bold text-center m-0">Categorías populares</h2>
+            </a>
+        </div>
+
+        <ul class="row row-cols-3 row-cols-md-5 g-2 g-md-4 list-unstyled mb-0">
+            <li class="col">
+                <a href="#"
+                   class="d-block text-center text-decoration-none text-body">
+                    <div class="cat-thumb mx-auto mb-2 rounded-circle overflow-hidden bg-red-gradient">
+                        <img src="https://picsum.photos/seed/1/100/100"
+                             alt="Relojes de Pulsera" loading="lazy" class="w-100 h-100 object-fit-cover">
+                    </div>
+                    <div class="fw-bold">Relojes de Pulsera</div>
+                </a>
+            </li>
+            <li class="col">
+                <a href="#"
+                   class="d-block text-center text-decoration-none text-body">
+                    <div class="cat-thumb mx-auto mb-2 rounded-circle overflow-hidden bg-red-gradient">
+                        <img src="https://picsum.photos/seed/2/100/100"
+                             alt="Zapatillas para hombre" loading="lazy" class="w-100 h-100 object-fit-cover">
+                    </div>
+                    <div class="fw-bold">Zapatillas para hombre</div>
+                </a>
+            </li>
+            <li class="col">
+                <a href="#"
+                   class="d-block text-center text-decoration-none text-body">
+                    <div class="cat-thumb mx-auto mb-2 rounded-circle overflow-hidden bg-red-gradient">
+                        <img src="https://picsum.photos/seed/2/100/100"
+                             alt="Peluches" loading="lazy" class="w-100 h-100 object-fit-cover">
+                    </div>
+                    <div class="fw-bold">Peluches</div>
+                </a>
+            </li>
+            <li class="col">
+                <a href="#"
+                   class="d-block text-center text-decoration-none text-body">
+                    <div class="cat-thumb mx-auto mb-2 rounded-circle overflow-hidden bg-red-gradient">
+                        <img src="https://picsum.photos/seed/4/100/100"
+                             alt="Categoria popular" loading="lazy" class="w-100 h-100 object-fit-cover">
+                    </div>
+                    <div class="fw-bold">Categoria popular</div>
+                </a>
+            </li>
+            <li class="col">
+                <a href="#"
+                   class="d-block text-center text-decoration-none text-body">
+                    <div class="cat-thumb mx-auto mb-2 rounded-circle overflow-hidden bg-red-gradient">
+                        <img src="https://picsum.photos/seed/5/100/100"
+                             alt="Manga/Anime" loading="lazy" class="w-100 h-100 object-fit-cover">
+                    </div>
+                    <div class="fw-bold">Manga/Anime</div>
+                </a>
+            </li>
+            <li class="col">
+                <a href="#"
+                   class="d-block text-center text-decoration-none text-body">
+                    <div class="cat-thumb mx-auto mb-2 rounded-circle overflow-hidden bg-red-gradient">
+                        <img src="https://picsum.photos/seed/6/100/100"
+                             alt="Tarjeta Coleccionables" loading="lazy" class="w-100 h-100 object-fit-cover">
+                    </div>
+                    <div class="fw-bold">Tarjeta Coleccionables</div>
+                </a>
+            </li>
+            <li class="col">
+                <a href="#"
+                   class="d-block text-center text-decoration-none text-body">
+                    <div class="cat-thumb mx-auto mb-2 rounded-circle overflow-hidden bg-red-gradient">
+                        <img src="https://picsum.photos/seed/7/100/100"
+                             alt="Videojuegos y Consolas" loading="lazy" class="w-100 h-100 object-fit-cover">
+                    </div>
+                    <div class="fw-bold">Videojuegos y Consolas</div>
+                </a>
+            </li>
+            <li class="col">
+                <a href="#"
+                   class="d-block text-center text-decoration-none text-body">
+                    <div class="cat-thumb mx-auto mb-2 rounded-circle overflow-hidden bg-red-gradient">
+                        <img src="https://picsum.photos/seed/8/100/100"
+                             alt="Gameboy" loading="lazy" class="w-100 h-100 object-fit-cover">
+                    </div>
+                    <div class="fw-bold">Gameboy</div>
+                </a>
+            </li>
+            <li class="col">
+                <a href="#"
+                   class="d-block text-center text-decoration-none text-body">
+                    <div class="cat-thumb mx-auto mb-2 rounded-circle overflow-hidden bg-red-gradient">
+                        <img src="https://picsum.photos/seed/9/100/100"
+                             alt="Switch 2" loading="lazy" class="w-100 h-100 object-fit-cover">
+                    </div>
+                    <div class="fw-bold">Switch 2</div>
+                </a>
+            </li>
+            <li class="col">
+                <a href="#"
+                   class="d-block text-center text-decoration-none text-body">
+                    <div class="cat-thumb mx-auto mb-2 rounded-circle overflow-hidden bg-red-gradient">
+                        <img src="https://picsum.photos/seed/10/100/100"
+                             alt="Pantalones para hombre" loading="lazy" class="w-100 h-100 object-fit-cover">
+                    </div>
+                    <div class="fw-bold">Pantalones para hombre</div>
+                </a>
+            </li>
+
+
+        </ul>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-light text-center text-lg-start border-top mt-5">
+        <div class="text-center p-3">
+            © 2025 SubastARG
+        </div>
+    </footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+
+
+</html>

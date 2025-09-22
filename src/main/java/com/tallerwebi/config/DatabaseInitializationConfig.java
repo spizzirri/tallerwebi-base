@@ -18,6 +18,7 @@ public class DatabaseInitializationConfig {
     @Bean
     public DataSourceInitializer dataSourceInitializer() {
         ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
+        populator.setSqlScriptEncoding("UTF-8");
         populator.addScript(new ClassPathResource("data.sql"));
 
         DataSourceInitializer initializer = new DataSourceInitializer();
