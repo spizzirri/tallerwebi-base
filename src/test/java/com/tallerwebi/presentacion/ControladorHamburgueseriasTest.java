@@ -3,7 +3,7 @@ package com.tallerwebi.presentacion;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -14,15 +14,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.tallerwebi.dominio.Hamburgueseria;
-import com.tallerwebi.dominio.ServicioCoordenadas;
-import com.tallerwebi.dominio.ServicioHamburgueserias;
+import com.tallerwebi.dominio.ServicioCoordenadasImpl;
+import com.tallerwebi.dominio.ServicioHamburgueseriasImpl;
 
 public class ControladorHamburgueseriasTest {
 	private Double latitudMock = 45.0;
 	private Double longitudMock = -75.0;
     private ControladorHamburgueserias controladorHamburgueserias;
-    private ServicioCoordenadas servicioCoordenadas = mock(ServicioCoordenadas.class);
-    private ServicioHamburgueserias servicioHamburgueserias = mock(ServicioHamburgueserias.class);
+    private ServicioCoordenadasImpl servicioCoordenadas = mock(ServicioCoordenadasImpl.class);
+    private ServicioHamburgueseriasImpl servicioHamburgueserias = mock(ServicioHamburgueseriasImpl.class);
     
 	@BeforeEach
 	public void init(){
@@ -53,8 +53,8 @@ public class ControladorHamburgueseriasTest {
     public void listarhamburgueseriasDeberiaRetornarUnaListaDeHamburgueseriasSiLatitudYLongitudSonValidas() {
         when(this.servicioCoordenadas.validarLatitud(latitudMock)).thenReturn(true);
         when(this.servicioCoordenadas.validarLongitud(longitudMock)).thenReturn(true);
-        when(this.servicioHamburgueserias.obtenerHamburgueseriasCercanas(latitudMock, longitudMock)).thenReturn(new ArrayList<Hamburgueseria>());
-        ResponseEntity<ArrayList<Hamburgueseria>> resultado = controladorHamburgueserias.listarhamburgueserias(latitudMock, longitudMock);
+        when(this.servicioHamburgueserias.obtenerHamburgueseriasCercanas(latitudMock, longitudMock)).thenReturn(List.of(new Hamburgueseria()));
+        ResponseEntity<List<HamburgueseriaCercana>> resultado = controladorHamburgueserias.listarhamburgueserias(latitudMock, longitudMock);
         org.junit.jupiter.api.Assertions.assertNotNull(resultado);
     }
 }

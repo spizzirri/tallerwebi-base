@@ -1,6 +1,6 @@
 package com.tallerwebi.integracion;
 
-import com.tallerwebi.dominio.ServicioCoordenadas;
+import com.tallerwebi.dominio.ServicioCoordenadasImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -9,11 +9,11 @@ import static org.hamcrest.Matchers.is;
 
 public class ServicioCoordenadasTest {
     
-    private ServicioCoordenadas servicioHamburgueserias;
+    private ServicioCoordenadasImpl servicioHamburgueserias;
     
     @BeforeEach
     public void init() {
-        servicioHamburgueserias = new ServicioCoordenadas();
+        servicioHamburgueserias = new ServicioCoordenadasImpl();
     }
     
     @Test

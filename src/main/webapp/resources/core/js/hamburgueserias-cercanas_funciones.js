@@ -22,7 +22,7 @@ export function obtenerUbicacion() {
 }
 
 export async function obtenerHamburgueseriasCercanas(latitud, longitud) {
-  const url = `/hamburgueserias-cercanas/${latitud}/${longitud}/lista`;
+  const url = `/spring//hamburgueserias-cercanas/${latitud}/${longitud}/lista`;
   try {
     const response = await fetch(url);
     if (!response.ok) {
