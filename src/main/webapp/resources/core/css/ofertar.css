@@ -1,0 +1,48 @@
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+}
+
+.content-container {
+    max-width: 1200px;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.card {
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 0.5rem;
+    background-color: #f8f9fa;
+}
+
+.product-image img {
+    width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+}
+
+.quantity-control {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.quantity-control input {
+    width: 50px;
+    text-align: center;
+}
+
+.quantity-control button {
+    width: 2rem;
+    height: 2rem;
+}
+
+.ranking li.text-primary {
+    font-weight: bold;
+}
