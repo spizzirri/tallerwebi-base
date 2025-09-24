@@ -10,13 +10,12 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.equalToIgnoringCase;
 import static org.mockito.Mockito.mock;
 
-public class ControladorVerHAmburguesaTest {
+public class ControladorVerHamburguesaTest {
     @Test
-    public void dadoQuePidoVerDatosDeLaHamburguesaConID1MostrarEsaHamburguesa(){
+    public void dadoQuePidoVerHamburguesaQueMeLleveASuVistaCorrectamente(){
         ServicioVerHamburguesa sevicioVerHamburguesa =mock(ServicioVerHamburguesa.class);
         ControladorVerHamburguesa controladorVerHamburguesa =new ControladorVerHamburguesa(sevicioVerHamburguesa);
-        ModelAndView modelAndView= new ModelAndView();
-        modelAndView=controladorVerHamburguesa.irAMostrarHamburguesa();
+        ModelAndView modelAndView = controladorVerHamburguesa.irAMostrarHamburguesa();
         assertThat(modelAndView.getViewName(),equalToIgnoringCase("hamburguesa"));
         
        
