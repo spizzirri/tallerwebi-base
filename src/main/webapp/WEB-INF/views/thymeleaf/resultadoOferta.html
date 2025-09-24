@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Subasta confirmada</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="confirmacion.css" rel="stylesheet">
+</head>
+<body>
+<div class="confirm-card">
+
+
+
+    <h1 class="fw-semibold">Subasta confirmada</h1>
+    <p class="lead">Tu oferta se registró correctamente y la subasta fue confirmada con éxito.</p>
+
+
+    <div class="mb-3 text-muted small">ID de la subasta: <strong>#A-20250923-001</strong></div>
+
+
+    <div class="d-flex justify-content-center gap-3">
+        <button type="button" class="btn btn-outline-secondary btn-volver" onclick="history.back()">Volver</button>
+        <a th:href="@{/home}" class="btn btn-success btn-volver">Ver mis subastas</a>
+    </div>
+
+
+    <small class="d-block mt-3 text-muted">Si necesitas ayuda, contactá al soporte.</small>
+</div>
+
+
+<!-- Bootstrap JS (opcional) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

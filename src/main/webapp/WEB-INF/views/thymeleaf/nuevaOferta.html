@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Ofertar - Producto 1</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.2.0/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">DC Subastas</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+                aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" th:href="@{/home}">Inicio</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/nuevaSubasta}">Subastas</a></li>
+                <li class="nav-item"><a class="nav-link active" th:href="@{/ofertas/nueva}">Ofertar</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Contacto</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<main class="container my-5">
+    <div class="row g-4">
+
+        <!-- Imagen del producto -->
+        <div class="col-md-6">
+            <div class="card">
+                <img src="https://via.placeholder.com/500x300" class="card-img-top" alt="Producto">
+            </div>
+        </div>
+
+        <!-- Información y formulario -->
+        <div class="col-md-6">
+            <div class="card p-3">
+                <h3 >Gran producto 1</h3>
+                <p>Precio inicial $0</span></p>
+
+                <!-- Formulario de oferta -->
+                <form th:action="@{/ofertar/guardar}" th:object="${oferta}" method="post">
+                    <div class="mb-3">
+                        <label for="montoOfertado" class="form-label">Monto a ofertar:</label>
+                        <input type="number" th:field="*{montoOfertado}" id="montoOfertado"
+                               class="form-control" required/>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="emailDelOfertador" class="form-label">Email del ofertador:</label>
+                        <input type="email" name="emailDelOfertador" id="emailDelOfertador"
+                               class="form-control" required/>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Ofertar</button>
+                </form>
+
+                <!-- Mensaje de confirmación -->
+                <div th:if="${mensaje != null}" class="alert alert-success mt-3" th:text="${mensaje}"></div>
+            </div>
+        </div>
+
+        <!-- Lista de últimas ofertas -->
+        <div class="col-12">
+            <div class="card p-3">
+                <h4>Últimas ofertas</h4>
+                <ol>
+                    <li th:each="ofertaItem : ${ultimasOfertas}"
+                        th:text="${ofertaItem.ofertadorID.nombre + ' $' + ofertaItem.montoOfertado}"></li>
+                </ol>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<footer class="bg-dark text-white p-3 text-center">
+    &copy; 2025 DC Subastas. Todos los derechos reservados.
+</footer>
+
+<script th:src="@{/webjars/bootstrap/5.2.0/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

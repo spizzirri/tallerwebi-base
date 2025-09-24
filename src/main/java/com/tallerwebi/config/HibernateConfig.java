@@ -1,5 +1,6 @@
 package com.tallerwebi.config;
 
+import org.hibernate.SessionFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -57,9 +58,11 @@ public class HibernateConfig {
     }
 
     @Bean
-    public HibernateTransactionManager transactionManager() {
-        return new HibernateTransactionManager(sessionFactory(dataSource()).getObject());
+   public HibernateTransactionManager transactionManager() {
+    return new HibernateTransactionManager(sessionFactory(dataSource()).getObject());
     }
+
+
 
     private Properties hibernateProperties() {
         Properties properties = new Properties();
