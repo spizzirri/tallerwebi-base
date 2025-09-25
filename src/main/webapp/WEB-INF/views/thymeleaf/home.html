@@ -1,32 +1,129 @@
 <!DOCTYPE HTML>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-  <title>Taller Web I</title>
+    <title>Taller Web I</title>
 
-  <!-- Boostrap core css -->
-  <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.2.0/css/bootstrap.min.css}"/>
+    <!-- font -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Audiowide&family=Epunda+Sans:ital,wght@0,300..900;1,300..900&family=Exo+2:ital,wght@0,100..900;1,100..900&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap');
+    </style>
 
-  <!-- custom style -->
-  <link rel="stylesheet" th:href="@{/css/main.css}"/>
+    <!-- Boostrap core css -->
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.2.0/css/bootstrap.min.css}"/>
+
+    <!-- custom style -->
+
+    <link rel="stylesheet" th:href="@{/css/home.css}"/>
+    <link rel="stylesheet" href="../../../resources/core/css/home.css"/>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 
 </head>
 
 <body>
+<header class="header">
 
-<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-  <a class="navbar-brand" href="#">UNLAM</a>
-</nav>
+    <nav class="navbar ">
+        <a class="navbar-brand" href="#"  >UniNet</a>
+    </nav>
+</header>
+<aside class="aside">
 
-<main role="main" class="container">
-  <div class = "container">
-    <h1>Bienvenidos a Taller Web 1</h1>
+    <div class="container_profile">
+        <i class="material-icons">account_circle</i>
 
-    <a href="login.html" class="btn btn-lg btn-primary btn-block">Volver</a>
-  </div>
+        <h2 th:text= "${usuario.email}">Nombre y Apellido</h2>
+
+    </div>
+
+    <div class="user_info" >
+        <p>blablaba</p>
+        <p>blablaba</p>
+        <p>blablaba</p>
+
+        <a href="#" class="ver_mas">Conocer más...</a>
+
+    </div>
+
+    <div class="user_info_items" >
+        <ul>
+
+            <li> <i class="material-icons">archive</i>Archivos</li>
+            <li> <i class="material-icons">group</i>Grupos</li>
+
+        </ul>
+
+
+    </div>
+
+</aside>
+
+<!-- main que contiene div para publicar y div de publicaciones de otros usuarios -->
+
+<main class="content">
+    <div class = "container_publicar">
+        <form method="POST" action="/spring/publicaciones">
+            <input name="descripcion" id="publicacion" placeholder="Escribe algo"/>
+
+        <div class="contenedor_publi-botones">
+
+            <button><i class="material-icons">attach_file</i></button>
+            <button><i class="material-icons">visibility</i></button>
+
+               <button name="nueva-publicacion">Publicar</button>
+
+        </div>
+        </form>
+    </div>
+    <div class="botones-quePublisVer">
+        <div class="botones-ver">
+            <button>Toda La Universidad</button>
+            <button>Para Ti</button>
+        </div>
+        <div class="container_puicacionesUsuarios" th:each="publi : ${publicaciones}">
+            <h2 th:text="${publi.descripcion} + '' + ${publi.usuario.email}"> </h2>
+            <p class="texto" th:text="${publi.descripcion}">
+
+            </p>
+            <a href="#" class="ver-mas">Ver más</a>
+            <div>
+                <i class="material-icons">recommend</i>
+                <i class="material-icons">comment</i>
+            </div>
+        </div>
+    </div>
+
+
 </main>
+
+<!-- aside recomendaciones de alumnos a seguir -->
+
+<aside class="recomendaciones">
+
+    <div class="container_profile">
+
+
+        <h2>Aumnos cursando...</h2>
+        <p>Ingeniería en Sistemas</p>
+    </div>
+
+    <div class="recomendaciones_users" >
+        <i class="material-icons">account_circle</i>
+        <i class="material-icons">account_circle</i>
+        <i class="material-icons">account_circle</i>
+        <i class="material-icons">account_circle</i>
+        <i class="material-icons">account_circle</i>
+
+
+    </div>
+
+
+
+</aside>
+
+
 <!-- /.container -->
 
 <!-- Boostrap core js -->

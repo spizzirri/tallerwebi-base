@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
+
 @Controller
 public class ControladorPublicacion {
 
@@ -18,10 +20,18 @@ public class ControladorPublicacion {
     public ControladorPublicacion(ServicioPublicado servicioPublicado){
         this.servicioPublicado = servicioPublicado;
     }
-    @RequestMapping(path = "/publicaciones/demo", method = RequestMethod.POST)
-    public ModelAndView agregarPublicacion(@ModelAttribute("publicacion") Publicacion publicacion) {
+
+
+
+    @RequestMapping(path = "/publicaciones", method = RequestMethod.POST)
+    public ModelAndView agregarPublicacion(@ModelAttribute("publicacion") Publicacion publicacion,
+                                           HttpServletRequest request) {
         ModelMap model = new ModelMap();
         try {
+            Usuario usuario = (Usuario) request.getSession().getAttribute("usuarioLogueado");
+            if (usuario != null) {
+                publicacion.setUsuario(usuario); // <--- clave
+            }
             servicioPublicado.realizar(publicacion);
             Publicacion publicada = servicioPublicado.publicacionEntera(publicacion.getDescripcion(), publicacion.getUsuario());
             model.put("publicacion", publicada);
@@ -29,13 +39,14 @@ public class ControladorPublicacion {
         } catch (Exception e) {
             model.put("error", "Error al publicar");
         }
-        return new ModelAndView("nuevo-publicacion", model);
+        return new ModelAndView("redirect:/home");
+
     }
 
     @RequestMapping(path = "/nuevo-publicacion", method = RequestMethod.GET)
     public ModelAndView mostrarPublicacion() {
         ModelMap model = new ModelMap();
         model.put("publicacion", new Publicacion());
-        return new ModelAndView("nuevo-publicacion", model);
+        return new ModelAndView("nueva-publicacion", model);
     }
 }

@@ -1,6 +1,8 @@
 package com.tallerwebi.presentacion;
 
+import com.tallerwebi.dominio.Publicacion;
 import com.tallerwebi.dominio.ServicioLogin;
+import com.tallerwebi.dominio.ServicioPublicado;
 import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.excepcion.UsuarioExistente;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +20,13 @@ public class ControladorLogin {
 
     private ServicioLogin servicioLogin;
 
+    /* hacer un controlador Home y ordenar Luego ***/
     @Autowired
-    public ControladorLogin(ServicioLogin servicioLogin){
+    private ServicioPublicado servicioPublicado;
+          /******     ***/
+
+    @Autowired
+    public ControladorLogin(ServicioLogin servicioLogin) {
         this.servicioLogin = servicioLogin;
     }
 
@@ -37,7 +44,12 @@ public class ControladorLogin {
 
         Usuario usuarioBuscado = servicioLogin.consultarUsuario(datosLogin.getEmail(), datosLogin.getPassword());
         if (usuarioBuscado != null) {
+            // guardás el rol por separado
             request.getSession().setAttribute("ROL", usuarioBuscado.getRol());
+
+            // y también guardás el objeto usuario entero //*agregado*//
+            request.getSession().setAttribute("usuarioLogueado", usuarioBuscado);
+
             return new ModelAndView("redirect:/home");
         } else {
             model.put("error", "Usuario o clave incorrecta");
@@ -48,12 +60,12 @@ public class ControladorLogin {
     @RequestMapping(path = "/registrarme", method = RequestMethod.POST)
     public ModelAndView registrarme(@ModelAttribute("usuario") Usuario usuario) {
         ModelMap model = new ModelMap();
-        try{
+        try {
             servicioLogin.registrar(usuario);
-        } catch (UsuarioExistente e){
+        } catch (UsuarioExistente e) {
             model.put("error", "El usuario ya existe");
             return new ModelAndView("nuevo-usuario", model);
-        } catch (Exception e){
+        } catch (Exception e) {
             model.put("error", "Error al registrar el nuevo usuario");
             return new ModelAndView("nuevo-usuario", model);
         }
@@ -67,14 +79,48 @@ public class ControladorLogin {
         return new ModelAndView("nuevo-usuario", model);
     }
 
-    @RequestMapping(path = "/home", method = RequestMethod.GET)
+  /*  @RequestMapping(path = "/home", method = RequestMethod.GET)
     public ModelAndView irAHome() {
         return new ModelAndView("home");
-    }
+    }*/   /*COMENTADO PORQUE NO ANDA EL DE IR A HOME DESPUES DE OBTENER USUARIO LOGUEADO */
 
     @RequestMapping(path = "/", method = RequestMethod.GET)
     public ModelAndView inicio() {
         return new ModelAndView("redirect:/login");
     }
+
+
+
+
+
+
+
+    /*agregado para que mande a home con datos usuario */
+    @RequestMapping(path = "/home", method = RequestMethod.GET)
+    public ModelAndView irAHome(HttpServletRequest request) {
+        ModelMap model = new ModelMap();
+
+        Usuario usuario = (Usuario) request.getSession().getAttribute("usuarioLogueado");
+
+        if (usuario != null) {
+
+            DatosLogin datosLogin = new DatosLogin();   /*(dto)  no usar Usuario directamente , no exponer password*/
+            datosLogin.setEmail(usuario.getEmail());
+            // No seteamos password
+            model.put("usuario", datosLogin);
+            // formulario vacío para publicar
+            model.put("publicacion", new Publicacion());
+            // lista de publicaciones
+            model.put("publicaciones", servicioPublicado.findAll());
+
+
+            return new ModelAndView("home", model);
+        } else {
+            return new ModelAndView("redirect:/login");
+        }
+    }
+
+
+
 }
 

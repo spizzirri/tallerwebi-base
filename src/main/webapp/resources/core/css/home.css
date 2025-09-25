@@ -1,0 +1,166 @@
+*{
+    margin:0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Source Sans 3", sans-serif;
+}
+
+
+
+body{
+
+    display: grid;
+    grid-template-columns: [col-first] 1fr [col-content] 3fr [col-last]1fr;
+ grid-template-rows:
+  [row-first] 70px   /* header con tamaño fijo */
+  [row-content] auto /* se ajusta a las publicaciones */
+  [row-last] auto;   /* footer si lo usás */gap: 20px; /* separación entre columnas */
+    padding: 20px; /* margen lateral general */
+    background-color:#0E0E10;
+    min-height: 100vh;
+
+    }
+
+
+
+/****MENU ASIDE -- INFO PERFIL***/
+.header{
+    margin: -20px;
+
+    padding: 20px;
+    background: #18181B;
+    grid-row: row-first;
+    grid-column: 1 / -1;
+
+        height: 70px; /* o lo que quieras */
+        display: flex;
+        align-items: center; /* centra el contenido vertical */
+        justify-content: space-between; /* distribuye horizontal */
+
+
+}
+
+.navbar{
+    height: 100%;
+}
+
+.navbar-brand{
+    color: #019873;
+}
+
+.aside
+{
+    margin-top: 50px;
+    background-color: #26262C;
+    grid-row: row-content;
+    grid-column: col-first;
+    height: 500px;
+    color: #DADADC;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    border-radius: 5px;
+
+
+}
+
+.aside .container_profile{
+
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+.aside .container_profile i{
+ font-size: 80px;
+}
+
+.aside .container_profile i{
+    font-size: 80px;
+}
+.aside .user_info {
+    border:1px solid black;
+}
+.recomendaciones{
+    margin-top: 50px;
+    background-color: #26262C;
+    color: #DADADC;
+    grid-row: row-content;
+    grid-column: col-last;
+    height: 200px;
+    border-radius: 5px;
+
+}
+
+/**** CONTENIDO PUBLICACION DE USURARIO + VER CPUBLICACION DE OTROS USUARIOS*****/
+
+.content {
+    margin-top: 50px;
+    border:1px solid yellow;
+    border-radius: 5px;
+    background-color: transparent;
+    grid-row: row-content;
+    grid-column: col-content;
+    display: flex;
+    flex-direction: column;
+}
+
+.container_publicar{
+    display: flex;
+    flex-direction: column;
+    align-self: center;
+    width: 80%;
+    height: 100px;
+    background-color: #26262C;
+    border-radius: 5px;
+    margin-bottom: 25px;
+
+}
+
+.container_publicar input {
+    margin-top: 15px;
+    align-self: center;
+    width: 80%;
+    height: 50px;
+    border-radius: 5px;
+}
+
+.container_publicar .contenedor_publi-botones {
+    display: flex;
+    flex: 1;
+
+    width: 80%;
+    align-self: center;
+    justify-content: end;
+    gap: 8px;
+
+
+
+}
+
+.container_publicar .contenedor_publi-botones button {
+    padding:5px;
+    width: 40px;
+    height: 25px;
+    align-self: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    background: #019873;
+    border: none;
+
+}
+.container_publicar .contenedor_publi-botones button i {
+    font-size: 20px;
+    color:white;
+}
+
+.container_puicacionesUsuarios {
+   /* border:1px solid green;*/
+    min-height: 250px;
+    color: #DADADC;
+    background-color: #26262C;
+}

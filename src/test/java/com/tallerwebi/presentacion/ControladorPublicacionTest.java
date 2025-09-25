@@ -29,7 +29,7 @@ public class ControladorPublicacionTest {
     private ServicioPublicado servicioPublicadoMock;
 
     @BeforeEach
-    public void init(){
+    public void init() {
         datosLoginMock = new DatosLogin("dami@unlam.com", "123");
         usuarioMock = mock(Usuario.class);
         when(usuarioMock.getEmail()).thenReturn("dami@unlam.com");
@@ -49,25 +49,26 @@ public class ControladorPublicacionTest {
     }
 
     @Test
-    public void queSePuedaCrearUnaPublicacionConDescripcionYUsuarioYQueVayaAPublicaciones(){
+    public void queSePuedaCrearUnaPublicacionConDescripcionYUsuarioYQueVayaAPublicaciones() { /*cambio a Home porque es donde se va a ver*/
         // preparacion
         Publicacion publicacionMock = mock(Publicacion.class);
 
+
+        // Mockear sesión para que el controlador obtenga el usuario
+        when(requestMock.getSession()).thenReturn(sessionMock);
+        when(sessionMock.getAttribute("usuarioLogueado")).thenReturn(usuarioMock);
+
         // ejecucion
-        ModelAndView modelAndView = controladorPublicacion.agregarPublicacion(publicacionMock);
+        ModelAndView modelAndView = controladorPublicacion.agregarPublicacion(publicacionMock,  requestMock);
 
         // validacion
-        assertThat(modelAndView.getViewName(), equalToIgnoringCase("nuevo-publicacion"));
+        assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/home"));
     }
 
 
-
-
-
     /*que se muestre en nuevo-publicacion */
-
     @Test
-    public void queSeMuestrePublicacionEnNuevoPublicacion() throws Exception {
+    public void queSeRedirijaAlHomeDespuesDePublicar() throws Exception {
         // Preparación
         Publicacion publiMock = mock(Publicacion.class);
         Usuario userMock = mock(Usuario.class);
@@ -76,10 +77,12 @@ public class ControladorPublicacionTest {
         when(servicioPublicadoMock.publicacionEntera(anyString(), any())).thenReturn(publiMock);
 
         // Ejecución
-        ModelAndView modelAndView = controladorPublicacion.agregarPublicacion(publiMock);
+        ModelAndView modelAndView = controladorPublicacion.agregarPublicacion(publiMock, requestMock);
 
         // Validación
-        assertThat(modelAndView.getViewName(), equalToIgnoringCase("nuevo-publicacion"));
-        assertThat(((Publicacion) modelAndView.getModel().get("publicacion")).getDescripcion(), equalToIgnoringCase("Hola mundo"));
+        assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/home"));
+
+
     }
+
 }
