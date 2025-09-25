@@ -1,4 +1,4 @@
-package com.tallerwebi.dominio.excepcion;
+package com.tallerwebi.dominio;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

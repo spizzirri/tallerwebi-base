@@ -1,7 +1,7 @@
 package com.tallerwebi.presentacion;
 
-import com.tallerwebi.dominio.excepcion.Producto;
-import com.tallerwebi.dominio.excepcion.ServicioProducto;
+import com.tallerwebi.dominio.Producto;
+import com.tallerwebi.dominio.ServicioProducto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
