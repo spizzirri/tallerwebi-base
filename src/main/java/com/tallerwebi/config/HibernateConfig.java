@@ -31,7 +31,7 @@ public class HibernateConfig {
         if (dbUser == null) dbUser = "user";
         if (dbPassword == null) dbPassword = "user";
         
-<<<<<<< HEAD
+
         String url = String.format(
                 "jdbc:mysql://%s:%s/%s" +
                         "?useUnicode=true" +
@@ -41,9 +41,7 @@ public class HibernateConfig {
                         "&allowPublicKeyRetrieval=true" +
                         "&serverTimezone=America/Argentina/Buenos_Aires",
                 dbHost, dbPort, dbName);
-=======
-        String url = String.format("jdbc:mysql://%s:%s/%s?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true", dbHost, dbPort, dbName);
->>>>>>> 1d3ff (Funcion-buscar-producto)
+
         
         dataSource.setUrl(url);
         dataSource.setUsername(dbUser);
