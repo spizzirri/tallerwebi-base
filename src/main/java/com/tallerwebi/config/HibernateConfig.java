@@ -31,6 +31,7 @@ public class HibernateConfig {
         if (dbUser == null) dbUser = "user";
         if (dbPassword == null) dbPassword = "user";
         
+
         String url = String.format(
                 "jdbc:mysql://%s:%s/%s" +
                         "?useUnicode=true" +
@@ -40,6 +41,7 @@ public class HibernateConfig {
                         "&allowPublicKeyRetrieval=true" +
                         "&serverTimezone=America/Argentina/Buenos_Aires",
                 dbHost, dbPort, dbName);
+
         
         dataSource.setUrl(url);
         dataSource.setUsername(dbUser);

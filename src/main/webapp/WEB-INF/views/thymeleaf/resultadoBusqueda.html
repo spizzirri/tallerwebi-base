@@ -1,0 +1,37 @@
+<!DOCTYPE HTML>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <title>Buscar Producto</title>
+
+  <!-- Boostrap core css -->
+  <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.2.0/css/bootstrap.min.css}"/>
+
+  <!-- custom style -->
+  <link rel="stylesheet" th:href="@{/css/main.css}"/>
+
+</head>
+
+<body>
+
+<h2>Resultados para: "<span th:text="${productoBuscado}"></span>"</h2>
+<div th:if="${resultados.isEmpty()}">
+    <p>No se encontraron productos.</p>
+</div>
+<div th:each="producto : ${resultados}">
+    <div class="card mb-2">
+        <div class="card-body">
+            <h5 th:text="${producto.nombre}"></h5>
+            <p th:text="${producto.descripcion}"></p>
+            <p th:text="${producto.precio}"></p>
+        </div>
+    </div>
+</div>
+<!-- /.container -->
+
+<!-- Boostrap core js -->
+<script type="text/javascript" th:src="@{webjars/bootstrap/5.2.0/js/bootstrap.min.js}"></script>
+</body>
+</html>
