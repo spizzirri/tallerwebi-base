@@ -17,10 +17,6 @@ public class Usuario {
     private String password;
     private String rol;
     private Boolean activo = false;
-    private List<Publicacion> publicaciones = new ArrayList<>();
-
-
-
 
 
     public Long getId() {
@@ -65,13 +61,4 @@ public class Usuario {
 
 
 
-    /***publicaciones***/
-
-    public void agregarPublicacion(Publicacion p) {
-        publicaciones.add(p);
-    }
-
-    public List<Publicacion> obtenerPublicaciones() {
-        return publicaciones;
-    }
 }

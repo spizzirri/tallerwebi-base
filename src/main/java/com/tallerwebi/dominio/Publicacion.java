@@ -16,11 +16,6 @@ public class Publicacion {
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
 
-    public Publicacion() {}
-
-    public Publicacion(String descripcion) {
-        this.descripcion = descripcion;
-    }
 
     // getters y setters
 
@@ -31,5 +26,13 @@ public class Publicacion {
 
     public String getDescripcion() {
         return descripcion;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }
