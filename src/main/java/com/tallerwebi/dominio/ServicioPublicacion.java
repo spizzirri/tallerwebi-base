@@ -1,6 +1,8 @@
 package com.tallerwebi.dominio;
 
 import com.tallerwebi.dominio.excepcion.UsuarioExistente;
+import org.springframework.stereotype.Service;
+
 
 public interface ServicioPublicacion {
 

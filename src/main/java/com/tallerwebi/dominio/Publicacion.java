@@ -24,6 +24,15 @@ public class Publicacion {
         return usuario;
     }
 
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+
     public String getDescripcion() {
         return descripcion;
     }

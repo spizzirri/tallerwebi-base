@@ -1,5 +1,9 @@
 package com.tallerwebi.dominio;
 
+
+import org.springframework.stereotype.Repository;
+
+@Repository
 public interface RepositorioUsuario {
 
     Usuario buscarUsuario(String email, String password);
