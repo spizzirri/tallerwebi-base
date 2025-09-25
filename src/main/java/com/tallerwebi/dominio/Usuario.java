@@ -4,6 +4,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Usuario {
@@ -15,6 +17,11 @@ public class Usuario {
     private String password;
     private String rol;
     private Boolean activo = false;
+    private List<Publicacion> publicaciones = new ArrayList<>();
+
+
+
+
 
     public Long getId() {
         return id;
@@ -53,5 +60,18 @@ public class Usuario {
 
     public void activar() {
         activo = true;
+    }
+
+
+
+
+    /***publicaciones***/
+
+    public void agregarPublicacion(Publicacion p) {
+        publicaciones.add(p);
+    }
+
+    public List<Publicacion> obtenerPublicaciones() {
+        return publicaciones;
     }
 }
