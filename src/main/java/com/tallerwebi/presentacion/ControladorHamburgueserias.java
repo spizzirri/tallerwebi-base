@@ -12,49 +12,43 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.tallerwebi.dominio.Hamburgueseria;
-import com.tallerwebi.dominio.ServicioCoordenadasImpl;
-import com.tallerwebi.dominio.ServicioHamburgueseriasImpl;
+import com.tallerwebi.dominio.ServicioCoordenadas;
+import com.tallerwebi.dominio.ServicioHamburgueserias;
 
 @RestController
 public class ControladorHamburgueserias {
 
-    private ServicioCoordenadasImpl servicioCoordenadas;
-    private ServicioHamburgueseriasImpl servicioHamburgueserias;
+    private ServicioCoordenadas servicioCoordenadas;
+    private ServicioHamburgueserias servicioHamburgueserias;
 
     @Autowired
-    public ControladorHamburgueserias(ServicioCoordenadasImpl servicioCoordenadas, ServicioHamburgueseriasImpl servicioHamburgueserias){
+    public ControladorHamburgueserias(ServicioCoordenadas servicioCoordenadas,
+            ServicioHamburgueserias servicioHamburgueserias) {
         this.servicioCoordenadas = servicioCoordenadas;
         this.servicioHamburgueserias = servicioHamburgueserias;
     }
 
-    @RequestMapping(path = "/hamburgueserias-cercanas", method = RequestMethod.GET)
+    @RequestMapping("/hamburgueserias-cercanas")
     public ModelAndView irAHamburgueseriasCercanas() {
         ModelMap modelo = new ModelMap();
         return new ModelAndView("hamburgueserias-cercanas", modelo);
     }
 
     @RequestMapping(path = "/hamburgueserias-cercanas/{latitud}/{longitud}/lista", method = RequestMethod.GET)
-        public ResponseEntity<List<HamburgueseriaCercana>> listarhamburgueserias(
+    public ResponseEntity<List<HamburgueseriaCercana>> listarhamburgueserias(
             @org.springframework.web.bind.annotation.PathVariable("latitud") Double latitud,
             @org.springframework.web.bind.annotation.PathVariable("longitud") Double longitud) {
-            if (!servicioCoordenadas.validarLatitud(latitud) || !servicioCoordenadas.validarLongitud(longitud)) {
-                System.out.println("Error: coordenadas inválidas. Latitud: " + latitud + ", Longitud: " + longitud);
-                throw new org.springframework.web.server.ResponseStatusException(
+        if (!servicioCoordenadas.validarLatitud(latitud) || !servicioCoordenadas.validarLongitud(longitud)) {
+            System.out.println("Error: coordenadas inválidas. Latitud: " + latitud + ", Longitud: " + longitud);
+            throw new org.springframework.web.server.ResponseStatusException(
                     org.springframework.http.HttpStatus.BAD_REQUEST,
-                    "Coordenadas inválidas"
-                );
-            }
-            
-            List<Hamburgueseria> hamburgueserias = servicioHamburgueserias.obtenerHamburgueseriasCercanas(latitud, longitud);
-            List<HamburgueseriaCercana> dtos = hamburgueserias.stream()
-                .map(h -> new HamburgueseriaCercana(
-                    h.getId(),
-                    h.getNombre(),
-                    h.getLatitud(),
-                    h.getLongitud(),
-                    h.getPuntuacion()
-                ))
-                .collect(Collectors.toList());
-            return ResponseEntity.ok(dtos);
+                    "Coordenadas inválidas");
         }
-} 
+
+        List<HamburgueseriaCercana> hamburgueseriaCercanas = HamburgueseriasCercanasMapper
+                .mapList(servicioHamburgueserias.obtenerHamburgueseriasCercanas(latitud,
+                        longitud));
+
+        return ResponseEntity.ok(hamburgueseriaCercanas);
+    }
+}

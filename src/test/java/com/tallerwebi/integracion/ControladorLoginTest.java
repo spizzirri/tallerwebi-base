@@ -28,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(SpringExtension.class)
 @WebAppConfiguration
-@ContextConfiguration(classes = {SpringWebTestConfig.class, HibernateTestConfig.class})
+@ContextConfiguration(classes = { SpringWebTestConfig.class, HibernateTestConfig.class })
 public class ControladorLoginTest {
 
 	private Usuario usuarioMock;
@@ -37,9 +37,8 @@ public class ControladorLoginTest {
 	private WebApplicationContext wac;
 	private MockMvc mockMvc;
 
-
 	@BeforeEach
-	public void init(){
+	public void init() {
 		usuarioMock = mock(Usuario.class);
 		when(usuarioMock.getEmail()).thenReturn("dami@unlam.com");
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
@@ -49,12 +48,11 @@ public class ControladorLoginTest {
 	public void debeRetornarLaPaginaLoginCuandoSeNavegaALaRaiz() throws Exception {
 
 		MvcResult result = this.mockMvc.perform(get("/"))
-				/*.andDo(print())*/
 				.andExpect(status().is3xxRedirection())
 				.andReturn();
 
 		ModelAndView modelAndView = result.getModelAndView();
-        assert modelAndView != null;
+		assert modelAndView != null;
 		assertThat("redirect:/login", equalToIgnoringCase(Objects.requireNonNull(modelAndView.getViewName())));
 		assertThat(true, is(modelAndView.getModel().isEmpty()));
 	}
@@ -67,8 +65,9 @@ public class ControladorLoginTest {
 				.andReturn();
 
 		ModelAndView modelAndView = result.getModelAndView();
-        assert modelAndView != null;
-        assertThat(modelAndView.getViewName(), equalToIgnoringCase("login"));
-		assertThat(modelAndView.getModel().get("datosLogin").toString(), containsString("com.tallerwebi.presentacion.DatosLogin"));
+		assert modelAndView != null;
+		assertThat(modelAndView.getViewName(), equalToIgnoringCase("login"));
+		assertThat(modelAndView.getModel().get("datosLogin").toString(),
+				containsString("com.tallerwebi.presentacion.DatosLogin"));
 	}
 }

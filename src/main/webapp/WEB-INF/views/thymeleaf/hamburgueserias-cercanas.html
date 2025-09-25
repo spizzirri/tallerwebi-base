@@ -14,6 +14,35 @@
       th:href="@{/webjars/bootstrap/5.2.0/css/bootstrap.min.css}"
     />
     <link rel="stylesheet" th:href="@{/css/main.css}" />
+    <style>
+      .loader {
+        border: 8px solid #f3f3f3;
+        border-radius: 50%;
+        border-top: 8px solid #3498db;
+        width: 32px;
+        height: 32px;
+        -webkit-animation: spin 2s linear infinite; /* Safari */
+        animation: spin 2s linear infinite;
+      }
+      /* Safari */
+      @-webkit-keyframes spin {
+        0% {
+          -webkit-transform: rotate(0deg);
+        }
+        100% {
+          -webkit-transform: rotate(360deg);
+        }
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
   </head>
   <body>
     <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
@@ -22,9 +51,15 @@
 
     <main role="main" class="container">
       <div class="container">
-        <h1>Hamburgueserías Cercanas</h1>
-        <ul class="list-group">
-          <li class="list-group-item active">Listado de Hamburgueserías</li>
+        <h1>Hamburgueser&iacute;as Cercanas</h1>
+        <ul id="hamburgueserias-list" class="list-group">
+          <li class="list-group-item active">
+            Listado de Hamburgueser&iacute;as Cercanas
+          </li>
+          <li class="list-group-item d-flex flex-column align-items-center">
+            <div class="loader"></div>
+            <div>Buscando hamburgueser&iacute;as cercanas...</div>
+          </li>
           <!-- JavaScript will populate the list here -->
         </ul>
       </div>

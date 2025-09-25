@@ -17,19 +17,19 @@ public class VistaWeb {
         return url;
     }
 
-    protected String obtenerTextoDelElemento(String selectorCSS){
+    protected String obtenerTextoDelElemento(String selectorCSS) {
         return this.obtenerElemento(selectorCSS).textContent();
     }
 
-    protected void darClickEnElElemento(String selectorCSS){
+    protected void darClickEnElElemento(String selectorCSS) {
         this.obtenerElemento(selectorCSS).click();
     }
 
-    protected void escribirEnElElemento(String selectorCSS, String texto){
+    protected void escribirEnElElemento(String selectorCSS, String texto) {
         this.obtenerElemento(selectorCSS).type(texto);
     }
 
-    private Locator obtenerElemento(String selectorCSS){
+    public Locator obtenerElemento(String selectorCSS) {
         return page.locator(selectorCSS);
     }
 }

@@ -1,20 +1,22 @@
 package com.tallerwebi.dominio;
 
 public class Hamburgueseria {
-    private Long id;
+	private Long id;
 	private double puntuacion;
 	private double latitud;
 	private double longitud;
 	private String nombre;
+	private String direccion;
+	private boolean esComercioAdherido;
 
-    public Long getId() {
-        return id;
-    }
+	public Long getId() {
+		return id;
+	}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-    
+	public void setId(Long id) {
+		this.id = id;
+	}
+
 	public double getPuntuacion() {
 		return puntuacion;
 	}
@@ -45,5 +47,21 @@ public class Hamburgueseria {
 
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
+	}
+
+	public String getDireccion() {
+		return direccion;
+	}
+
+	public void setDireccion(String direccion) {
+		this.direccion = direccion;
+	}
+
+	public boolean getEsComercioAdherido() {
+		return esComercioAdherido;
+	}
+
+	public void setEsComercioAdherido(boolean EsComercioAdherido) {
+		this.esComercioAdherido = EsComercioAdherido;
 	}
 }
