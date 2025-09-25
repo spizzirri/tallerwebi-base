@@ -69,7 +69,7 @@ export async function renderizarHamburgueserias() {
         h.esComercioAdherido ? "Si" : "No"
       }<br>Latitud: ${h.latitud} | Longitud: ${
         h.longitud
-      }<br><a href="hamburguesa.html" target="_blank">Ver Hamburguesa</a>`;
+      }<br><a href="" target="_blank">Ver Mas</a>`;
       container.appendChild(li);
     });
   } catch (error) {
