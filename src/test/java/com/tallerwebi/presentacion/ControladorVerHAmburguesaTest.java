@@ -12,12 +12,10 @@ import static org.mockito.Mockito.mock;
 
 public class ControladorVerHamburguesaTest {
     @Test
-    public void dadoQuePidoVerHamburguesaQueMeLleveASuVistaCorrectamente(){
-        ServicioVerHamburguesa sevicioVerHamburguesa =mock(ServicioVerHamburguesa.class);
-        ControladorVerHamburguesa controladorVerHamburguesa =new ControladorVerHamburguesa(sevicioVerHamburguesa);
+    public void dadoQuePidoVerHamburguesaQueMeLleveASuVistaCorrectamente() {
+        ServicioVerHamburguesa sevicioVerHamburguesa = mock(ServicioVerHamburguesa.class);
+        ControladorVerHamburguesa controladorVerHamburguesa = new ControladorVerHamburguesa(sevicioVerHamburguesa);
         ModelAndView modelAndView = controladorVerHamburguesa.irAMostrarHamburguesa();
-        assertThat(modelAndView.getViewName(),equalToIgnoringCase("hamburguesa"));
-        
-       
+        assertThat(modelAndView.getViewName(), equalToIgnoringCase("hamburguesa"));
     }
 }
