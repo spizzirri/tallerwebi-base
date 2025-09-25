@@ -1,0 +1,46 @@
+<!DOCTYPE HTML>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>Reseñar hamburguesa</title>
+
+    <!-- Boostrap core css -->
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.2.0/css/bootstrap.min.css}"/>
+
+    <!-- custom style -->
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+    <a class="navbar-brand" href="#">UNLAM</a>
+</nav>
+
+<main role="main" class="container">
+
+    <div class = "container">
+        <div id="loginbox" style="margin-top:50px;" class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
+            <form action="#" th:action="@{/resenia/crear}" method="POST" th:object="${datosResenia}">
+                <h3 class="form-signin-heading">Reseña de hamburguesa</h3>
+                <hr class="colorgraph"><br>
+                <label>Id de la hamburguesa</label>
+                <input th:field="*{hamburguesaId}" id="hamburguesaId" type="number" class="form-control" required/>
+                <label for="calificacion">Calificación</label>
+                <input th:field="*{calificacion}" id="calificacion" type="number" class="form-control" required/>
+                <label for="comentario">Comentario</label>
+                <input th:field="*{comentario}" type="text" id="comentario" class="form-control" />
+                <button id="btn-login" class="btn btn-lg btn-primary btn-block" Type="Submit">Enviar</button>
+            </form>
+        </div>
+    </div>
+</main>
+<!-- /.container -->
+
+<!-- Boostrap core js -->
+<script type="text/javascript" th:src="@{webjars/bootstrap/5.2.0/js/bootstrap.min.js}"></script>
+</body>
+</html>
