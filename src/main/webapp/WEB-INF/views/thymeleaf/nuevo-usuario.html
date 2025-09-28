@@ -24,12 +24,34 @@
 
   <div class = "container">
     <div id="loginbox" style="margin-top:50px;" class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
-      <form action="#" th:action="@{/registrarme}" method="POST" th:object="${usuario}">
+        <form action="#" th:action="@{/registrarme}" method="POST" th:object="${usuario}" accept-charset="UTF-8">
         <h3 class="form-signin-heading">Nuevo Usuario</h3>
         <hr class="colorgraph"><br>
-
+          <div>
+              <label for="nombre" >Nombre</label>
+              <input th:field="*{nombre}" id="nombre" class="form-control" required/>
+          </div>
+          <div>
+              <label for="apellido" >Apellido</label>
+              <input th:field="*{apellido}" id="apellido" class="form-control" required/>
+          </div>
+            <div>
+                <label>Carreras (máx. 2)</label>
+                <div th:each="carrera : ${todasLasCarreras}">
+                    <input type="checkbox"
+                           th:value="${carrera.nombre}"
+                           th:field="*{carrerasNombres}" />
+                    <span th:text="${carrera.nombre}"></span>
+                </div>
+            </div>
+          <div>
+        <label for="email" >Email</label>
         <input th:field="*{email}" id="email" class="form-control" required/>
+          </div>
+          <div>
+              <label for="password">Contraseña</label>
         <input th:field="*{password}" type="password" id="password" class="form-control" required/>
+          </div>
 
         <button id="btn-registrarme" class="btn btn-lg btn-primary btn-block" Type="Submit">Registrarme</button>
         <p th:if="${error != null}" class="alert alert-danger" th:text="'Error ' + ${error}">

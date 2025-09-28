@@ -1,10 +1,12 @@
 package com.tallerwebi.presentacion;
 
-import com.tallerwebi.dominio.ServicioLogin;
-import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.*;
 import com.tallerwebi.dominio.excepcion.UsuarioExistente;
+import com.tallerwebi.infraestructura.RepositorioUsuarioImpl;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,6 +16,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
 import static org.mockito.Mockito.*;
 
+
+
+@Transactional
 public class ControladorLoginTest {
 
 	private ControladorLogin controladorLogin;
@@ -24,16 +29,35 @@ public class ControladorLoginTest {
 	private ServicioLogin servicioLoginMock;
 
 
+
+    private ServicioLoginImpl servicioLoginImplMock;
+    private RepositorioUsuarioImpl servicioUsuarioMock;
+    private ServicioLoginMemoria  servicioLoginMemoria;
+
+
 	@BeforeEach
-	public void init(){
-		datosLoginMock = new DatosLogin("dami@unlam.com", "123");
-		usuarioMock = mock(Usuario.class);
-		when(usuarioMock.getEmail()).thenReturn("dami@unlam.com");
-		requestMock = mock(HttpServletRequest.class);
-		sessionMock = mock(HttpSession.class);
-		servicioLoginMock = mock(ServicioLogin.class);
-		controladorLogin = new ControladorLogin(servicioLoginMock);
-	}
+
+    public void init(){
+        servicioLoginMemoria = new ServicioLoginMemoria();
+        datosLoginMock = new DatosLogin("dami@unlam.com", "123");
+        usuarioMock = mock(Usuario.class);
+        when(usuarioMock.getEmail()).thenReturn("dami@unlam.com");
+        requestMock = mock(HttpServletRequest.class);
+        sessionMock = mock(HttpSession.class);
+        servicioLoginMock = mock(ServicioLogin.class);
+
+
+        // Mocks para ControladorRegistro
+        servicioUsuarioMock = mock(RepositorioUsuarioImpl.class);
+        servicioLoginImplMock = mock(ServicioLoginImpl.class);
+
+
+        // También inicializá el controladorLogin si no lo hiciste
+        controladorLogin = new ControladorLogin(servicioLoginMock);
+
+
+    }
+
 
 	@Test
 	public void loginConUsuarioYPasswordInorrectosDeberiaLlevarALoginNuevamente(){
@@ -47,6 +71,7 @@ public class ControladorLoginTest {
 		assertThat(modelAndView.getViewName(), equalToIgnoringCase("login"));
 		assertThat(modelAndView.getModel().get("error").toString(), equalToIgnoringCase("Usuario o clave incorrecta"));
 		verify(sessionMock, times(0)).setAttribute("ROL", "ADMIN");
+        verify(sessionMock, never()).setAttribute(eq("usuarioLogueado"), any());
 	}
 	
 	@Test
@@ -64,6 +89,8 @@ public class ControladorLoginTest {
 		// validacion
 		assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/home"));
 		verify(sessionMock, times(1)).setAttribute("ROL", usuarioEncontradoMock.getRol());
+        // <-- Verificar que el usuario completo se guardó en sesión
+        verify(sessionMock, times(1)).setAttribute("usuarioLogueado", usuarioEncontradoMock);
 	}
 
 	@Test
@@ -102,4 +129,20 @@ public class ControladorLoginTest {
 		assertThat(modelAndView.getViewName(), equalToIgnoringCase("nuevo-usuario"));
 		assertThat(modelAndView.getModel().get("error").toString(), equalToIgnoringCase("Error al registrar el nuevo usuario"));
 	}
+
+
+    @Test
+    public void loginConUsuarioRolUserDeberiaLLevarAHome(){
+        Usuario usuarioEncontradoMock = mock(Usuario.class);
+        when(usuarioEncontradoMock.getRol()).thenReturn("USER"); // ahora USER
+
+        when(requestMock.getSession()).thenReturn(sessionMock);
+        when(servicioLoginMock.consultarUsuario(anyString(), anyString())).thenReturn(usuarioEncontradoMock);
+
+        ModelAndView modelAndView = controladorLogin.validarLogin(datosLoginMock, requestMock);
+
+        assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/home"));
+        verify(sessionMock, times(1)).setAttribute("ROL", "USER");
+        verify(sessionMock, times(1)).setAttribute("usuarioLogueado", usuarioEncontradoMock);
+    }
 }

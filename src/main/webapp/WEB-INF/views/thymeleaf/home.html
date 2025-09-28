@@ -34,7 +34,10 @@
     <div class="container_profile">
         <i class="material-icons">account_circle</i>
 
-        <h2 th:text= "${usuario.email}">Nombre y Apellido</h2>
+        <h2 th:text= "${usuario.nombre}"></h2>
+        <ul>
+            <li th:each="carrera : ${usuario.carreras}" th:text="${carrera.nombre}">Carrera</li>
+        </ul>
 
     </div>
 

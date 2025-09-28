@@ -8,6 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service("servicioLogin")
 @Transactional
@@ -34,5 +38,13 @@ public class ServicioLoginImpl implements ServicioLogin {
         repositorioUsuario.guardar(usuario);
     }
 
-}
+    @Override
+    public void asignarCarrerasPorNombre(Usuario usuario, List<String> nombresCarreras) {
+        List<Carrera> carrerasAsignadas = nombresCarreras.stream()
+                .map(nombre -> repositorioUsuario.buscarCarreraPorNombre(nombre))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        usuario.setCarreras(carrerasAsignadas);
+    }
 
+}
