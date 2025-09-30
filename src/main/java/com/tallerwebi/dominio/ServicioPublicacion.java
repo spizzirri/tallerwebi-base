@@ -8,5 +8,6 @@ public interface ServicioPublicacion {
 
     Publicacion consultarPublicacion(String publicacion);
     void registrarpublicacion(String publicacion);
-
+    long obtenerCantidadDeLikes(long id);
+    int obtenerCantidadDeLikes(String publicacion);
 }

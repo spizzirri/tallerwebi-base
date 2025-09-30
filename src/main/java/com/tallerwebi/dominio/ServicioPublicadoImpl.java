@@ -14,7 +14,7 @@ import java.util.List;
 public class ServicioPublicadoImpl implements ServicioPublicado {
 
     private RepositorioPublicacion repositorioPublicacion;
-
+    private long nextId = 1;
 
 
 
@@ -38,6 +38,8 @@ public class ServicioPublicadoImpl implements ServicioPublicado {
         if(publicacionNueva != null){
             throw new PublicacionFallida();
         }
+        publicacion.setId(nextId++);
+
         repositorioPublicacion.realizada(publicacion);
         publicaciones.add(publicacion);
     }
@@ -46,6 +48,18 @@ public class ServicioPublicadoImpl implements ServicioPublicado {
     public List<Publicacion> findAll() {
         return publicaciones;
     }
+    @Override
+    public Publicacion obtenerPublicacionPorId(long id) {
+        return publicaciones.stream()
+                .filter(p -> p.getId() == id)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Publicación no encontrada"));
+    }
 
+    @Override
+    public int obtenerCantidadDeLikes(long id) {
+        Publicacion publiEncontrada = obtenerPublicacionPorId(id);
+        return publiEncontrada.getLikes();
+    }
 
 }

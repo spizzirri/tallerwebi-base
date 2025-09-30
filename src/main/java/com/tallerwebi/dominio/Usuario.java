@@ -42,10 +42,13 @@ public class Usuario {
     )
     private List<Publicacion> publicacionesGuardadas= new ArrayList<>();
 
+    /*relacion con likes*/
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Like> likesDados = new ArrayList<>();
+
+
+
     /*relacion con carrera*/
-
-
-
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "usuario_carrera",
@@ -125,6 +128,11 @@ public class Usuario {
         return carreras;
   }
 
+    public void darLike(Like like) {
+        if (!likesDados.contains(like)) {
+            likesDados.add(like);
+        }
+    }
 
 
   /*auxiliares*/

@@ -26,7 +26,8 @@ public class ControladorHomeTest {
     private HttpServletRequest requestMock;
     private HttpSession sessionMock;
     private Usuario usuarioLogueado;
-private RepositorioUsuario repositorioUsuarioMock;
+    private ServicioLike servicioLikeMock;
+    private RepositorioUsuario repositorioUsuarioMock;
 
     @BeforeEach
     public void init() {
@@ -52,7 +53,8 @@ private RepositorioUsuario repositorioUsuarioMock;
 
         // Controlador
         repositorioUsuarioMock = mock(RepositorioUsuario.class);
-        controlador = new ControladorHome(servicioPublicadoMock);
+        servicioLikeMock = mock(ServicioLike.class);
+        controlador = new ControladorHome(servicioPublicadoMock, servicioLikeMock);
     }
 
 

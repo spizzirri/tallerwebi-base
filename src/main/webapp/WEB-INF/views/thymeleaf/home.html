@@ -87,18 +87,19 @@
             <button>Para Ti</button>
         </div>
         <div class="container_puicacionesUsuarios" th:each="publi : ${publicaciones}">
-            <h2 th:text="${publi.descripcion} + '' + ${publi.usuario.email}"> </h2>
+            <h2 th:text="${publi.descripcion} + '' + ${publi.usuario?.nombre}"> </h2>
             <p class="texto" th:text="${publi.descripcion}">
+
 
             </p>
             <a href="#" class="ver-mas">Ver más</a>
-            <div>
-                <i class="material-icons">recommend</i>
-                <i class="material-icons">comment</i>
-            </div>
-        </div>
+            <form th:action="@{/publicacion/darLike}" method="post">
+                <input type="hidden" name="id" th:value="${publi.id}" />
+                <button type="submit"><i class="material-icons">recommend</i></button>
+                <span th:text="${likesPorPublicacion[publi.id]}"></span>
+            </form>
     </div>
-
+    </div>
 
 </main>
 
