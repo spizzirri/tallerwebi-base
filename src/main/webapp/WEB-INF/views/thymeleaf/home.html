@@ -87,7 +87,7 @@
             <button>Para Ti</button>
         </div>
         <div class="container_puicacionesUsuarios" th:each="publi : ${publicaciones}">
-            <h2 th:text="${publi.descripcion} + '' + ${publi.usuario?.nombre}"> </h2>
+            <h2 th:text="${publi.usuario?.nombre}"> </h2>
             <p class="texto" th:text="${publi.descripcion}">
 
 
