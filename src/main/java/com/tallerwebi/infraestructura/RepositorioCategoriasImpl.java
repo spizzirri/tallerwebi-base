@@ -24,4 +24,13 @@ public class RepositorioCategoriasImpl implements RepositorioCategorias {
         final Session session = sessionFactory.getCurrentSession();
         return session.createQuery("from Categorias", Categorias.class).list();
     }
+
+    @Override
+    public Categorias buscarCategoriaPorNombre (String nombreDeCategoriaEnUrl) {
+        final Session session = sessionFactory.getCurrentSession();
+        return session.createQuery("from Categorias where nombreEnUrl = :nombre",Categorias.class)
+                .setParameter("nombre", nombreDeCategoriaEnUrl)
+                .uniqueResult();
+
+    }
 }

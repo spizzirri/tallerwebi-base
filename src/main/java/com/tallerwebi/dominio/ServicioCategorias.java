@@ -18,4 +18,10 @@ public class ServicioCategorias {
     public List<Categorias> listarCategorias() {
         return repositorioCategorias.listarCategorias();
     }
+
+    @Transactional(readOnly = true)
+    public Categorias buscarCategoriaPorNombre(String nombreDeCategoriaEnUrl) {
+        return repositorioCategorias.buscarCategoriaPorNombre(nombreDeCategoriaEnUrl);
+    }
+
 }
