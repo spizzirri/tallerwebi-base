@@ -13,6 +13,9 @@ public class Subasta {
     private Usuario creador;
     private String titulo;
     private String descripcion;
+    @OneToOne
+    @JoinColumn(name = "categoria_id")
+    private Categorias categoria;
     private String estadoProducto;
     private Float precioInicial;
     private Float precioActual; //Dependiendo de como aplicaramos el de subastar, esto se puede eliminar por un SELECT
@@ -20,12 +23,8 @@ public class Subasta {
     private LocalDateTime fechaFin; //  Express -> Inicio + 12hr | Rapido -> Inicio + 24 hrs || Normal -> Inicio + 72 hrs || Prolongado -> Inicio + 168 hrs
     private Integer estadoSubasta;  //  10 = En curso | -1 = Cerrada
 
-    public Long getId() {
-        return id;
-    }
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
     public Usuario getCreador() { return creador; }
     public void setCreador(Usuario creador) { this.creador = creador; }
@@ -35,6 +34,9 @@ public class Subasta {
 
     public String getDescripcion() { return descripcion; }
     public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+
+    public Categorias getCategoria() {  return categoria; }
+    public void setCategoria(Categorias categoria) { this.categoria = categoria; }
 
     public String getEstadoProducto() { return estadoProducto; }
     public void setEstadoProducto(String estadoProducto) { this.estadoProducto = estadoProducto; }
@@ -53,4 +55,5 @@ public class Subasta {
 
     public Integer getEstadoSubasta() { return estadoSubasta; }
     public void setEstadoSubasta(Integer estadoSubasta) { this.estadoSubasta = estadoSubasta; }
+
 }

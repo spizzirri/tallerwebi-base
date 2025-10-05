@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @Controller
 public class ControladorSubasta {
@@ -20,11 +21,12 @@ public class ControladorSubasta {
         this.servicioSubasta = servicioSubasta;
     }
 
-    //TO-DO: Mover estas clases de subastas a un controlador exclusivo, en vez de usar el de Login.
     @RequestMapping(path = "/nuevaSubasta", method = RequestMethod.GET)
     public ModelAndView irANuevaSubasta() {
         ModelMap model = new ModelMap();
         model.put("subasta", new Subasta());
+        List<Categorias> cat = servicioSubasta.listarCategoriasDisponibles();
+        model.put("listaCategorias", cat);
         return new ModelAndView("nuevaSubasta", model);
     }
 

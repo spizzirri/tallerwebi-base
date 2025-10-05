@@ -36,6 +36,11 @@
             <input th:field="*{estadoProducto}" id="estadoProducto" class="form-control" required/>
             <!--    TODO: Cambiarlo a una lista de posibles valores    -->
 
+            <label for="categoria">Categoria</label>
+            <select th:field="*{categoria.id}" id="categoria" class="form-control" required>
+                <option th:each="cat : ${listaCategorias}" th:value="${cat.getId()}" th:text="${cat.getNombre()}"></option>
+            </select>
+
             <label for="precioInicial">Monto inicial de Subasta</label>
             <input type="number" th:field="*{precioInicial}" id="precioInicial" class="form-control" required/>
 
@@ -48,6 +53,9 @@
                 <option value="2">Normal (3 dia)</option>
                 <option value="3">Prolongado (7 dia)</option>
             </select>
+
+
+
 
             <button id="btn-crearSubasta" class="btn btn-lg btn-primary btn-block" Type="Submit">Crear</button>
             <p th:if="${error != null}" class="alert alert-danger" th:text="'Error ' + ${error}">
