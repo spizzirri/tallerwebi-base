@@ -1,6 +1,6 @@
 package com.tallerwebi.infraestructura;
 
-import com.tallerwebi.dominio.Categorias;
+import com.tallerwebi.dominio.Categoria;
 import com.tallerwebi.dominio.RepositorioCategorias;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -20,15 +20,15 @@ public class RepositorioCategoriasImpl implements RepositorioCategorias {
     }
 
     @Override
-    public List<Categorias> listarCategorias(){
+    public List<Categoria> listarCategorias(){
         final Session session = sessionFactory.getCurrentSession();
-        return session.createQuery("from Categorias", Categorias.class).list();
+        return session.createQuery("from Categoria", Categoria.class).list();
     }
 
     @Override
-    public Categorias buscarCategoriaPorNombreDeRuta(String nombreDeCategoriaEnUrl) {
+    public Categoria buscarCategoriaPorNombreDeRuta(String nombreDeCategoriaEnUrl) {
         final Session session = sessionFactory.getCurrentSession();
-        return session.createQuery("from Categorias where nombreEnUrl = :nombre",Categorias.class)
+        return session.createQuery("from Categoria where nombreEnUrl = :nombre", Categoria.class)
                 .setParameter("nombre", nombreDeCategoriaEnUrl)
                 .uniqueResult();
 

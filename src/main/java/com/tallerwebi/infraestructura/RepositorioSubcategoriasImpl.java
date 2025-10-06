@@ -1,7 +1,7 @@
 package com.tallerwebi.infraestructura;
 
 import com.tallerwebi.dominio.RepositorioSubcategorias;
-import com.tallerwebi.dominio.Subcategorias;
+import com.tallerwebi.dominio.Subcategoria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,15 +20,15 @@ public class RepositorioSubcategoriasImpl implements RepositorioSubcategorias {
     }
 
     @Override
-    public List<Subcategorias> listarSubcategorias(){
+    public List<Subcategoria> listarSubcategorias(){
         final var session = sessionFactory.getCurrentSession();
-        return session.createQuery("from Subcategorias", Subcategorias.class).list();
+        return session.createQuery("from Subcategoria", Subcategoria.class).list();
     }
 
     @Override
-    public Subcategorias buscarSubcategoriaPorNombreDeRuta(String nombreDeSubcategoriaEnUrl) {
+    public Subcategoria buscarSubcategoriaPorNombreDeRuta(String nombreDeSubcategoriaEnUrl) {
         final Session session = sessionFactory.getCurrentSession();
-        return session.createQuery("from Subcategorias where nombreEnUrl = :nombre",Subcategorias.class)
+        return session.createQuery("from Subcategoria where nombreEnUrl = :nombre", Subcategoria.class)
                 .setParameter("nombre", nombreDeSubcategoriaEnUrl)
                 .uniqueResult();
         }

@@ -1,7 +1,8 @@
 package com.tallerwebi.presentacion;
 
-import com.tallerwebi.dominio.Categorias;
+import com.tallerwebi.dominio.Categoria;
 import com.tallerwebi.dominio.ServicioCategorias;
+import com.tallerwebi.dominio.ServicioSubcategorias;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.ui.Model;
@@ -12,23 +13,24 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
 import static org.mockito.Mockito.*;
 
-public class ControladorCategoriasTest {
+public class ControladorCategoriaTest {
 
     private ControladorCategorias controladorCategorias;
     private ServicioCategorias servicioCategoriasMock;
+    private ServicioSubcategorias servicioSubcategoriasMock;
     private Model modelMock;
 
     @BeforeEach
     public void init() {
         servicioCategoriasMock = mock(ServicioCategorias.class);
         modelMock = mock(Model.class);
-        controladorCategorias = new ControladorCategorias(servicioCategoriasMock);
+        controladorCategorias = new ControladorCategorias(servicioCategoriasMock, servicioSubcategoriasMock);
     }
 
     @Test
     public void deberiaMostrarCategoriasEnLaVista() {
         // preparación
-        List<Categorias> lista = List.of(
+        List<Categoria> lista = List.of(
                 crearCategoria(1L, "Electrónica", "electronica"),
                 crearCategoria(2L, "Hogar", "hogar")
         );
@@ -59,8 +61,8 @@ public class ControladorCategoriasTest {
         verifyNoMoreInteractions(servicioCategoriasMock, modelMock);
     }
 
-    private Categorias crearCategoria(Long id, String nombre, String nombreEnUrl) {
-        Categorias c = new Categorias();
+    private Categoria crearCategoria(Long id, String nombre, String nombreEnUrl) {
+        Categoria c = new Categoria();
         c.setId(id);
         c.setNombre(nombre);
         c.setNombreEnUrl(nombreEnUrl);

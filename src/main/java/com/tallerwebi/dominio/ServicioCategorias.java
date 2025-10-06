@@ -15,12 +15,12 @@ public class ServicioCategorias {
     }
 
     @Transactional(readOnly = true)
-    public List<Categorias> listarCategorias() {
+    public List<Categoria> listarCategorias() {
         return repositorioCategorias.listarCategorias();
     }
 
     @Transactional(readOnly = true)
-    public Categorias buscarCategoriaPorNombreDeRuta(String nombreDeCategoriaEnUrl) {
+    public Categoria buscarCategoriaPorNombreDeRuta(String nombreDeCategoriaEnUrl) {
         return repositorioCategorias.buscarCategoriaPorNombreDeRuta(nombreDeCategoriaEnUrl);
     }
 

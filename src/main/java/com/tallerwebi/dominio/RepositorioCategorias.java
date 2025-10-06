@@ -3,6 +3,6 @@ package com.tallerwebi.dominio;
 import java.util.List;
 
 public interface RepositorioCategorias {
-    List<Categorias> listarCategorias();
-    Categorias buscarCategoriaPorNombreDeRuta(String nombreDeCategoriaEnUrl);
+    List<Categoria> listarCategorias();
+    Categoria buscarCategoriaPorNombreDeRuta(String nombreDeCategoriaEnUrl);
 }

@@ -17,12 +17,12 @@ public class ServicioSubcategorias {
     }
 
     @Transactional(readOnly = true)
-    public List<Subcategorias> listarSubcategorias() {
+    public List<Subcategoria> listarSubcategorias() {
         return repositorioSubcategorias.listarSubcategorias();
     }
 
     @Transactional(readOnly = true)
-    public Subcategorias buscarSubcategoriaPorNombreDeRuta(String nombreDeSubcategoriaEnUrl) {
+    public Subcategoria buscarSubcategoriaPorNombreDeRuta(String nombreDeSubcategoriaEnUrl) {
         return repositorioSubcategorias.buscarSubcategoriaPorNombreDeRuta(nombreDeSubcategoriaEnUrl);
     }
 

@@ -1,12 +1,12 @@
 package com.tallerwebi.dominio;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-public class Categorias {
+@Table(name = "categorias")
+public class Categoria {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -14,6 +14,8 @@ public class Categorias {
 
     private String nombre;
     private String nombreEnUrl;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy="categoria", fetch = FetchType.LAZY)
+    private List<Subcategoria> subcategorias = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -34,5 +36,12 @@ public class Categorias {
     }
     public void setNombreEnUrl(String nombreEnUrl) {
         this.nombreEnUrl = nombreEnUrl;
+    }
+
+    public List<Subcategoria> getSubcategorias() {
+        return subcategorias;
+    }
+    public void setSubcategorias(List<Subcategoria> subcategorias) {
+        this.subcategorias = subcategorias;
     }
 }

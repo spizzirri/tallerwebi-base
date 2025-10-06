@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @WebAppConfiguration
 @ContextConfiguration(classes = {SpringWebTestConfig.class, HibernateTestConfig.class})
-public class ControladorCategoriasTest {
+public class ControladorCategoriaTest {
 
     @Autowired
     private WebApplicationContext wac;

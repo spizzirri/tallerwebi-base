@@ -3,6 +3,6 @@ package com.tallerwebi.dominio;
 import java.util.List;
 
 public interface RepositorioSubcategorias {
-    List<Subcategorias> listarSubcategorias();
-    Subcategorias buscarSubcategoriaPorNombreDeRuta(String nombreDeSubcategoriaEnUrl);
+    List<Subcategoria> listarSubcategorias();
+    Subcategoria buscarSubcategoriaPorNombreDeRuta(String nombreDeSubcategoriaEnUrl);
 }

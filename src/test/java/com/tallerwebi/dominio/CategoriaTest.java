@@ -4,12 +4,12 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class CategoriasTest {
+public class CategoriaTest {
 
 
     @Test
     void funcionanLosGetterYSettersDeCategorias() {
-        Categorias categoria = new Categorias();
+        Categoria categoria = new Categoria();
 
         categoria.setId(1L);
         categoria.setNombre("Electrónica");

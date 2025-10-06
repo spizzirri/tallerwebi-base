@@ -71,14 +71,11 @@
                         <div class="badge-info">
                             <ul>
                                 <li th:text="${categoria.nombre}">categoria</li>
-                                <li>Subcategoría 1</li>
-                                <li>Subcategoría 2</li>
-                                <li>Subcategoría 3</li>
-                                <li>Subcategoría 4</li>
-                                <li>Subcategoría 5</li>
-                                <li>Subcategoría 6</li>
-                                <li>Subcategoría 7</li>
-                                <li>Subcategoría 8</li>
+                                <li th:each="subcat : ${subcategorias}">
+                                    <a th:text="${subcat.nombre}"
+                                       th:href="@{/subcategoria/{id}(id=${subcat.id})}">
+                                    </a>
+                                </li>
                             </ul>
                             <img th:src="@{|https://picsum.photos/seed/${categoria.nombreEnUrl}/100/60|}" alt="Imagen categoría">
                         </div>
