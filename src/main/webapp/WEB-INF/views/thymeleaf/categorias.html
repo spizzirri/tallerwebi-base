@@ -69,16 +69,36 @@
                             Nombre categoría
                         </a>
                         <div class="badge-info">
-                            <ul>
+                             <ul>
                                 <li th:text="${categoria.nombre}">categoria</li>
-                                <li th:each="subcat : ${subcategorias}">
+                                <li th:each="subcat : ${categoria.subcategorias}">
                                     <a th:text="${subcat.nombre}"
                                        th:href="@{/subcategoria/{id}(id=${subcat.id})}">
                                     </a>
                                 </li>
-                            </ul>
+                            </ul> 
+                            <div th:each="categoria : ${categorias}" class="badge-info">
+  <ul>
+    <li th:text="${categoria.nombre}">categoria</li>
+
+    <li th:each="subcat : ${categoria.subcategorias}">
+      <a th:text="${subcat.nombre}"
+         th:href="@{/subcategoria/{id}(id=${subcat.id})}">
+      </a>
+    </li>
+  </ul>
                             <img th:src="@{|https://picsum.photos/seed/${categoria.nombreEnUrl}/100/60|}" alt="Imagen categoría">
-                        </div>
+                        </div> 
+                        <div th:each="categoria : ${categorias}" class="badge-info">
+  <ul>
+    <li th:text="${categoria.nombre}">categoria</li>
+    <li th:each="subcat : ${categoria.subcategorias}">
+      <a th:text="${subcat.nombre}"
+         th:href="@{/subcategoria/{id}(id=${subcat.id})}">
+      </a>
+    </li>
+  </ul>
+</div>
                     </div>
                 </li>
             </ul>

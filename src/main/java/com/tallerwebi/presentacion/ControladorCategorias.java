@@ -24,8 +24,7 @@ public class ControladorCategorias {
 
     @RequestMapping(path = "/categorias", method = RequestMethod.GET)
     public String mostrarCategoriasExistentes(Model model) {
-        model.addAttribute("categorias", servicioCategorias.listarCategorias());
-        model.addAttribute("subcategorias", servicioSubcategorias.listarSubcategorias());
+        model.addAttribute("categorias", servicioCategorias.listarCategoriaConSubCategorias());
         return "categorias";
     }
 

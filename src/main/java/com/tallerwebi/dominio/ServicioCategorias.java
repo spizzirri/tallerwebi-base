@@ -24,4 +24,8 @@ public class ServicioCategorias {
         return repositorioCategorias.buscarCategoriaPorNombreDeRuta(nombreDeCategoriaEnUrl);
     }
 
+    @Transactional(readOnly = true)
+    public List<Categoria> listarCategoriaConSubCategorias() {
+        return repositorioCategorias.listarCategoriaConSubCategorias();
+    }
 }

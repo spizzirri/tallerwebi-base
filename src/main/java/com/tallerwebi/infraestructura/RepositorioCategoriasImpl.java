@@ -1,6 +1,7 @@
 package com.tallerwebi.infraestructura;
 
 import com.tallerwebi.dominio.Categoria;
+import com.tallerwebi.dominio.Subcategoria;
 import com.tallerwebi.dominio.RepositorioCategorias;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -32,5 +33,18 @@ public class RepositorioCategoriasImpl implements RepositorioCategorias {
                 .setParameter("nombre", nombreDeCategoriaEnUrl)
                 .uniqueResult();
 
+            }
+
+    @Override
+    public List<Categoria> listarCategoriaConSubCategorias() {
+        final Session session = sessionFactory.getCurrentSession();
+
+        // Usamos fetch junto con join para indicar que se debe traer una relación asociada en la misma consulta,
+        // en lugar de cargarla después (carga lazy), evitando el envio repetido de varias consultas.
+
+        return session.createQuery("select distinct c from Categoria c " +
+                "left join fetch c.subcategorias s" +
+                " order by c.nombre asc, s.nombre asc ", Categoria.class)
+                .list();
     }
 }
