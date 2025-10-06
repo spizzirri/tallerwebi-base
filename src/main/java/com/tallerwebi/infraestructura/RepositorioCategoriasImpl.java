@@ -26,7 +26,7 @@ public class RepositorioCategoriasImpl implements RepositorioCategorias {
     }
 
     @Override
-    public Categorias buscarCategoriaPorNombre (String nombreDeCategoriaEnUrl) {
+    public Categorias buscarCategoriaPorNombreDeRuta(String nombreDeCategoriaEnUrl) {
         final Session session = sessionFactory.getCurrentSession();
         return session.createQuery("from Categorias where nombreEnUrl = :nombre",Categorias.class)
                 .setParameter("nombre", nombreDeCategoriaEnUrl)

@@ -20,8 +20,8 @@ public class ServicioCategorias {
     }
 
     @Transactional(readOnly = true)
-    public Categorias buscarCategoriaPorNombre(String nombreDeCategoriaEnUrl) {
-        return repositorioCategorias.buscarCategoriaPorNombre(nombreDeCategoriaEnUrl);
+    public Categorias buscarCategoriaPorNombreDeRuta(String nombreDeCategoriaEnUrl) {
+        return repositorioCategorias.buscarCategoriaPorNombreDeRuta(nombreDeCategoriaEnUrl);
     }
 
 }

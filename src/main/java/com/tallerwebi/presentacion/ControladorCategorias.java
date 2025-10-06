@@ -29,7 +29,7 @@ public class ControladorCategorias {
     //Usamos PathVariable para capturar el valor que viene en la URL
     public String verCategoria(@PathVariable("nombreDeCategoriaEnUrl") String nombreDeCategoriaEnUrl, Model model) {
 
-        Categorias categoria = servicioCategorias.buscarCategoriaPorNombre(nombreDeCategoriaEnUrl);
+        Categorias categoria = servicioCategorias.buscarCategoriaPorNombreDeRuta(nombreDeCategoriaEnUrl);
 
         model.addAttribute("categoria", categoria);
         return "pagina-categoria-seleccionada";

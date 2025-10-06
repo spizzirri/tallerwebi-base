@@ -9,7 +9,7 @@ TRUNCATE TABLE Categorias;
 SET FOREIGN_KEY_CHECKS = 1;
 INSERT INTO Categorias(id, nombre, nombreEnUrl) VALUES (null, 'Electrónica', 'electronica');
 INSERT INTO Categorias(id, nombre, nombreEnUrl) VALUES (null, 'Moda', 'moda');
-INSERT INTO Categorias(id, nombre, nombreEnUrl) VALUES (null, 'Juegos y pasatiempos', 'juguetes-y-pasatiempos');
+INSERT INTO Categorias(id, nombre, nombreEnUrl) VALUES (null, 'Juegos y pasatiempos', 'juegos-y-pasatiempos');
 INSERT INTO Categorias(id, nombre, nombreEnUrl) VALUES (null, 'Hogar', 'hogar');
 INSERT INTO Categorias(id, nombre, nombreEnUrl) VALUES (null, 'Oficina', 'oficina');
 INSERT INTO Categorias(id, nombre, nombreEnUrl) VALUES (null, 'Deportes', 'deportes');
