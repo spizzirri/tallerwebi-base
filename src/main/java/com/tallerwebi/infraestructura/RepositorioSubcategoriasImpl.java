@@ -26,10 +26,15 @@ public class RepositorioSubcategoriasImpl implements RepositorioSubcategorias {
     }
 
     @Override
-    public Subcategoria buscarSubcategoriaPorNombreDeRuta(String nombreDeSubcategoriaEnUrl) {
+    public Subcategoria buscarSubcategoriaPorNombreDeRuta(String nombreDeCategoriaEnUrl, String nombreDeSubcategoriaEnUrl) {
         final Session session = sessionFactory.getCurrentSession();
-        return session.createQuery("from Subcategoria where nombreEnUrl = :nombre", Subcategoria.class)
-                .setParameter("nombre", nombreDeSubcategoriaEnUrl)
+        return session.createQuery(
+                "select s from Subcategoria s " +
+                        "join fetch s.categoria c " +
+                        " where c.nombreEnUrl = :nombreCategoria and s.nombreEnUrl = :nombreSubcategoria",
+                        Subcategoria.class)
+                .setParameter("nombreSubcategoria", nombreDeSubcategoriaEnUrl)
+                .setParameter("nombreCategoria", nombreDeCategoriaEnUrl)
                 .uniqueResult();
         }
 }

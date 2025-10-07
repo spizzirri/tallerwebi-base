@@ -1,7 +1,5 @@
 package com.tallerwebi.dominio;
 
-
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,8 +20,8 @@ public class ServicioSubcategorias {
     }
 
     @Transactional(readOnly = true)
-    public Subcategoria buscarSubcategoriaPorNombreDeRuta(String nombreDeSubcategoriaEnUrl) {
-        return repositorioSubcategorias.buscarSubcategoriaPorNombreDeRuta(nombreDeSubcategoriaEnUrl);
+    public Subcategoria buscarSubcategoriaPorNombreDeRuta(String nombreDeCategoriaEnUrl, String nombreDeSubcategoriaEnUrl) {
+        return repositorioSubcategorias.buscarSubcategoriaPorNombreDeRuta(nombreDeCategoriaEnUrl, nombreDeSubcategoriaEnUrl);
     }
 
 }
