@@ -64,46 +64,27 @@
                 <li class="nav-item flex-fill " th:each="categoria : ${categorias}">
                     <div class="badge-wrapper">
                         <a th:href="@{'/categorias/' + ${categoria.nombreEnUrl}}"
-                           class="nav-link px-2 py-1 text-body small "
+                           class="nav-link px-2 py-1 text-body small"
                            th:text="${categoria.nombre}">
                             Nombre categoría
                         </a>
                         <div class="badge-info">
                              <ul>
-                                <li th:text="${categoria.nombre}">categoria</li>
-                                <li th:each="subcat : ${categoria.subcategorias}">
+                                <li th:each="subcat : ${categoria.subcategorias}"
+                                class="list-unstyled">
                                     <a th:text="${subcat.nombre}"
-                                       th:href="@{/subcategoria/{id}(id=${subcat.id})}">
+                                       th:href="@{'/categorias/' + ${categoria.nombreEnUrl} + '/'+ ${subcat.nombreEnUrl}}"
+                                       class="text-body small fs-6 fw-semibold text-decoration-none ">
                                     </a>
                                 </li>
-                            </ul> 
-                            <div th:each="categoria : ${categorias}" class="badge-info">
-  <ul>
-    <li th:text="${categoria.nombre}">categoria</li>
-
-    <li th:each="subcat : ${categoria.subcategorias}">
-      <a th:text="${subcat.nombre}"
-         th:href="@{/subcategoria/{id}(id=${subcat.id})}">
-      </a>
-    </li>
-  </ul>
+                            </ul>
                             <img th:src="@{|https://picsum.photos/seed/${categoria.nombreEnUrl}/100/60|}" alt="Imagen categoría">
-                        </div> 
-                        <div th:each="categoria : ${categorias}" class="badge-info">
-  <ul>
-    <li th:text="${categoria.nombre}">categoria</li>
-    <li th:each="subcat : ${categoria.subcategorias}">
-      <a th:text="${subcat.nombre}"
-         th:href="@{/subcategoria/{id}(id=${subcat.id})}">
-      </a>
-    </li>
-  </ul>
-</div>
+                        </div>
                     </div>
                 </li>
             </ul>
         </div>
-</section>
+    </section>
 
     <!-- Carrusel de imágenes -->
     <section class="container my-4">

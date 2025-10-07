@@ -44,5 +44,48 @@ VALUES
     (NULL, 'Bolsos', 'bolsos', 2),
     (NULL, 'Joyería', 'joyeria', 2),
     (NULL, 'Accesorios', 'accesorios', 2),
-    (NULL, 'Relojes de pulsera', 'relojes-de-pulsera', 2);
-    ;
+    (NULL, 'Relojes de pulsera', 'relojes-de-pulsera', 2),
+
+    (NULL, 'Cómics / Anime', 'comics-anime', 3),
+    (NULL, 'Tarjetas coleccionables', 'tarjetas-coleccionables', 3),
+    (NULL, 'Figuras', 'figuras', 3),
+    (NULL, 'Instrumentos musicales', 'instrumentos-musicales', 3),
+    (NULL, 'Coleccionables', 'coleccionables', 3),
+    (NULL, 'Arte', 'arte', 3),
+
+    (NULL, 'Muebles', 'muebles', 4),
+    (NULL, 'Decoración', 'decoracion', 4),
+    (NULL, 'Electrodomésticos', 'electrodomesticos', 4),
+    (NULL, 'Cocina y comedor', 'cocina-y-comedor', 4),
+    (NULL, 'Ropa de cama y baño', 'ropa-de-cama-y-bano', 4),
+
+    (NULL, 'Bolígrafos', 'boligrafos', 5),
+    (NULL, 'Lápices', 'lapices', 5),
+    (NULL, 'Cuadernos y diarios', 'cuadernos-y-diarios', 5),
+    (NULL, 'Artículos de oficina', 'articulos-de-oficina', 5),
+
+    (NULL, 'Ciclismo', 'ciclismo', 6),
+    (NULL, 'Monopatín', 'monopatin', 6),
+    (NULL, 'Snowboard', 'snowboard', 6),
+    (NULL, 'Esquí', 'esqui', 6),
+    (NULL, 'Entrenamiento de fuerza', 'entrenamiento-de-fuerza', 6),
+    (NULL, 'Fútbol', 'futbol', 6),
+    (NULL, 'Artes marciales y lucha', 'artes-marciales-y-lucha', 6),
+    (NULL, 'Tenis', 'tenis', 6),
+    (NULL, 'Otros', 'otros', 6),
+
+    (NULL, 'Piezas de coche', 'piezas-de-coche', 7),
+    (NULL, 'Accesorios', 'accesorios', 7),
+    (NULL, 'Piezas de moto', 'piezas-de-moto', 7),
+    (NULL, 'Accesorios de moto', 'accesorios-de-moto', 7),
+
+    (NULL, 'Cochecitos y sillas de paseo', 'cochecitos-y-sillas-de-paseo', 8),
+    (NULL, 'Pañales y accesorios para el cambio', 'panales-y-accesorios-para-el-cambio', 8),
+    (NULL, 'Alimentación y lactancia', 'alimentacion-y-lactancia', 8),
+    (NULL, 'Juguetes para bebés', 'juguetes-para-bebes', 8),
+    (NULL, 'Muebles para bebés', 'muebles-para-bebes', 8),
+
+    (NULL, 'Cuidado de la piel', 'cuidado-de-la-piel', 9),
+    (NULL, 'Cuidado del cabello', 'cuidado-del-cabello', 9),
+    (NULL, 'Maquillaje', 'maquillaje', 9),
+    (NULL, 'Cuidado personal', 'cuidado-personal', 9);
