@@ -27,20 +27,22 @@ public class RepositorioCategoriasImpl implements RepositorioCategorias {
     }
 
     @Override
-    public Categoria buscarCategoriaPorNombreDeRuta(String nombreDeCategoriaEnUrl) {
+    public Categoria buscarCategoriaConSusSubcategoriasPorNombreDeRuta(String nombreDeCategoriaEnUrl) {
         final Session session = sessionFactory.getCurrentSession();
-        return session.createQuery("from Categoria where nombreEnUrl = :nombre", Categoria.class)
+        return session.createQuery("select distinct c from Categoria c " +
+                        "left join fetch c.subcategorias s " +
+                        "where c.nombreEnUrl = :nombre " +
+                        "order by s.nombre asc", Categoria.class)
                 .setParameter("nombre", nombreDeCategoriaEnUrl)
                 .uniqueResult();
-
-            }
+    }
 
     @Override
     public List<Categoria> listarCategoriaConSubCategorias() {
         final Session session = sessionFactory.getCurrentSession();
 
         // Usamos fetch junto con join para indicar que se debe traer una relación asociada en la misma consulta,
-        // en lugar de cargarla después (carga lazy), evitando el envio repetido de varias consultas.
+        // en lugar de cargarla después (carga lazy), evitando el envío repetido de varias consultas.
 
         return session.createQuery("select distinct c from Categoria c " +
                 "left join fetch c.subcategorias s" +

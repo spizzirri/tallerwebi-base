@@ -20,12 +20,13 @@ public class ServicioCategorias {
     }
 
     @Transactional(readOnly = true)
-    public Categoria buscarCategoriaPorNombreDeRuta(String nombreDeCategoriaEnUrl) {
-        return repositorioCategorias.buscarCategoriaPorNombreDeRuta(nombreDeCategoriaEnUrl);
+    public Categoria buscarCategoriaConSusSubcategoriasPorNombreDeRuta(String nombreDeCategoriaEnUrl) {
+        return repositorioCategorias.buscarCategoriaConSusSubcategoriasPorNombreDeRuta(nombreDeCategoriaEnUrl);
     }
 
     @Transactional(readOnly = true)
     public List<Categoria> listarCategoriaConSubCategorias() {
         return repositorioCategorias.listarCategoriaConSubCategorias();
     }
+
 }

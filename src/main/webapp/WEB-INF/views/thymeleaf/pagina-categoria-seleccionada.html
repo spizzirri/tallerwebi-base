@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <title th:text="${categoria.nombre}">Categorías</title>
+
     <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}" />
 
     <!-- Boostrap core css -->
@@ -55,7 +56,9 @@
         </div>
         <ul class="list-group list-group-horizontal">
             <li class="list-group-item" th:each="subcat : ${categoria.subcategorias}">
-                <a th:text="${subcat.nombre}">Subcategoria</a>
+                <a th:text="${subcat.nombre}"
+                   th:href="@{'/categorias/' + ${categoria.nombreEnUrl} + '/'+ ${subcat.nombreEnUrl}}"
+                   class="text-body small fs-6 fw-semibold text-decoration-none ">>Subcategoria</a>
             </li>
         </ul>
     </nav>

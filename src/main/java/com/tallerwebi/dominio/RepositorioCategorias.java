@@ -4,6 +4,6 @@ import java.util.List;
 
 public interface RepositorioCategorias {
     List<Categoria> listarCategorias();
-    Categoria buscarCategoriaPorNombreDeRuta(String nombreDeCategoriaEnUrl);
+    Categoria buscarCategoriaConSusSubcategoriasPorNombreDeRuta(String nombreDeCategoriaEnUrl);
     List<Categoria> listarCategoriaConSubCategorias();
 }
