@@ -55,8 +55,14 @@
             </select>
 
             <!--    TODO: Posibilidad de que pueda agregar mas fotos    -->
-            <label for="imagenSubasta">Foto del Producto (Max. 1)</label>
-            <input type="file" class="form-control-file" id="imagenSubasta" name="imagenSubasta" accept="image/*" required>
+            <div class="form-group">
+                <label for="imagenSubasta">Foto del Producto (Max. 1)</label>
+                <input type="file" class="form-control-file" id="imagenSubasta" name="imagenSubasta" accept="image/*" required>
+            </div>
+
+            <!-- Para la gente confundida, asi se llama la foto subida:
+            <img th:if="${subasta.imagen != null}" th:src="@{/{subastaID}/image(subastaID=${subasta.id})}" class="img-thumbnail" alt="">
+            -->
 
             <button id="btn-crearSubasta" class="btn btn-lg btn-primary btn-block" Type="Submit">Crear</button>
             <p th:if="${error != null}" class="alert alert-danger" th:text="'Error ' + ${error}">
