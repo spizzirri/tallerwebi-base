@@ -8,27 +8,57 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.2.0/css/bootstrap.min.css}"/>
     <link rel="stylesheet" th:href="@{/css/main.css}"/>
+
+    <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}" />
+
+    <!-- Boostrap core css -->
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.2.0/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+
+    <!-- custom style -->
+    <link rel="stylesheet" th:href="@{/css/categorias.css}"/>
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="#">DC Subastas</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
-                aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+<header class="border-bottom border-info mb-1">
+    <nav class="navbar navbar-expand-lg container py-2">
+        <a class="navbar-brand d-flex align-items-center gap-2" href="#">
+            <img class="logo-img" th:src="@{/img/logo.png}" alt="Logo" />
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navContenido"
+                aria-controls="navContenido" aria-expanded="false" aria-label="Alternar navegación">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown">
-            <ul class="navbar-nav">
-                <li class="nav-item"><a class="nav-link" th:href="@{/home}">Inicio</a></li>
-                <li class="nav-item"><a class="nav-link" th:href="@{/nuevaSubasta}">Subastas</a></li>
-                <li class="nav-item"><a class="nav-link active" th:href="@{/ofertas/nueva}">Ofertar</a></li>
-                <li class="nav-item"><a class="nav-link" th:href="@{/categorias}">Ver categorias</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Mi Perfil</a></li>
+        <div class="collapse navbar-collapse " id="navContenido">
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link" th:href="@{/categorias.html}">Inicio</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/nuevaSubasta}">Subastas</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/ofertar/nuevaOferta}">Ofertar</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/categorias}">Ver categorias</a></li>
+
+                </ul>
+            </div>
+
+
+
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <form class="d-flex" role="search">
+                        <div class="input-group">
+                            <input class="form-control" type="search" placeholder="Buscar..." aria-label="Buscar">
+                            <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i></button>
+                        </div>
+                    </form>
+                </li>
+                <li class="nav-item"><a class="nav-link" href="#">Mi perfil</a></li>
             </ul>
         </div>
-    </div>
-</nav>
+
+    </nav>
+
+
+</header>
 
 <main class="container my-5">
     <div class="row g-4">
