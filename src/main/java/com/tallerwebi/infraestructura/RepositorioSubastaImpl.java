@@ -3,7 +3,9 @@ package com.tallerwebi.infraestructura;
 
 import com.tallerwebi.dominio.Subasta;
 import com.tallerwebi.dominio.RepositorioSubasta;
+import com.tallerwebi.dominio.Usuario;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -42,5 +44,10 @@ public class RepositorioSubastaImpl implements RepositorioSubasta {
         return result;
     }
 
+    public Subasta obtenerSubasta(Long id){
+        return (Subasta) sessionFactory.getCurrentSession().createCriteria(Subasta.class)
+                .add(Restrictions.eq("id", id))
+                .uniqueResult();
+    }
 
 }

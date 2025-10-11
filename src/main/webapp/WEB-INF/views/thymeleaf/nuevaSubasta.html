@@ -22,7 +22,7 @@
 
 <main role="main" class="container">
     <div id="newSubastabox" style="margin-top:50px;" class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
-        <form action="#" th:action="@{/crearSubasta}" method="POST" th:object="${subasta}">
+        <form action="#" th:action="@{/crearSubasta}" method="POST" th:object="${subasta}" enctype="multipart/form-data">
             <h3 class="form-signin-heading">Crear subasta</h3>
             <hr class="colorgraph"><br>
 
@@ -36,6 +36,11 @@
             <input th:field="*{estadoProducto}" id="estadoProducto" class="form-control" required/>
             <!--    TODO: Cambiarlo a una lista de posibles valores    -->
 
+            <label for="categoria">Categoria</label>
+            <select th:field="*{categoria.id}" id="categoria" class="form-control" required>
+                <option th:each="cat : ${listaCategorias}" th:value="${cat.getId()}" th:text="${cat.getNombre()}"></option>
+            </select>
+
             <label for="precioInicial">Monto inicial de Subasta</label>
             <input type="number" th:field="*{precioInicial}" id="precioInicial" class="form-control" required/>
 
@@ -48,6 +53,16 @@
                 <option value="2">Normal (3 dia)</option>
                 <option value="3">Prolongado (7 dia)</option>
             </select>
+
+            <!--    TODO: Posibilidad de que pueda agregar mas fotos    -->
+            <div class="form-group">
+                <label for="imagenSubasta">Foto del Producto (Max. 1)</label>
+                <input type="file" class="form-control-file" id="imagenSubasta" name="imagenSubasta" accept="image/*" required>
+            </div>
+
+            <!-- Para la gente confundida, asi se llama la foto subida:
+            <img th:if="${subasta.imagen != null}" th:src="@{/{subastaID}/image(subastaID=${subasta.id})}" class="img-thumbnail" alt="">
+            -->
 
             <button id="btn-crearSubasta" class="btn btn-lg btn-primary btn-block" Type="Submit">Crear</button>
             <p th:if="${error != null}" class="alert alert-danger" th:text="'Error ' + ${error}">
