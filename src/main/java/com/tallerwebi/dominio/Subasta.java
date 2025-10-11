@@ -25,7 +25,7 @@ public class Subasta {
     private Integer estadoSubasta;  //  10 = En curso | -1 = Cerrada
     @Lob
     @Column(columnDefinition = "MEDIUMBLOB")
-    private List<String> imagenes;
+    private String imagen;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -60,8 +60,7 @@ public class Subasta {
     public Integer getEstadoSubasta() { return estadoSubasta; }
     public void setEstadoSubasta(Integer estadoSubasta) { this.estadoSubasta = estadoSubasta; }
 
-    public List<String> getImagenes() { return imagenes; }
-    public void setImagenes(List<String> imagenes) { this.imagenes = imagenes; }
-
+    public String getImagen() { return imagen; }
+    public void setImagen(String imagen) { this.imagen = imagen; }
 
 }

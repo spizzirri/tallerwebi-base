@@ -22,7 +22,7 @@
 
 <main role="main" class="container">
     <div id="newSubastabox" style="margin-top:50px;" class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
-        <form action="#" th:action="@{/crearSubasta}" method="POST" th:object="${subasta}">
+        <form action="#" th:action="@{/crearSubasta}" method="POST" th:object="${subasta}" enctype="multipart/form-data">
             <h3 class="form-signin-heading">Crear subasta</h3>
             <hr class="colorgraph"><br>
 
@@ -54,6 +54,9 @@
                 <option value="3">Prolongado (7 dia)</option>
             </select>
 
+            <!--    TODO: Posibilidad de que pueda agregar mas fotos    -->
+            <label for="imagenSubasta">Foto del Producto (Max. 1)</label>
+            <input type="file" class="form-control-file" id="imagenSubasta" name="imagenSubasta" accept="image/*" required>
 
             <button id="btn-crearSubasta" class="btn btn-lg btn-primary btn-block" Type="Submit">Crear</button>
             <p th:if="${error != null}" class="alert alert-danger" th:text="'Error ' + ${error}">
