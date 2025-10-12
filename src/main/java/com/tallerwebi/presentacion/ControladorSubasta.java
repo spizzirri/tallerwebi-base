@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -43,7 +44,7 @@ public class ControladorSubasta {
             model.put("error", "Hubo un error al crear la subasta. Intentelo nuevamente.");
             return new ModelAndView("nuevaSubasta", model);
         }
-        return new ModelAndView("redirect:/home");
+        return new ModelAndView("redirect:/confirmacion-subasta");
     }
 
     @RequestMapping(value = "/{subastaID}/imagen")
@@ -56,5 +57,10 @@ public class ControladorSubasta {
             return new ResponseEntity<>(imagenBytes, headers, HttpStatus.OK);
         }
         return new ResponseEntity<>(new byte[0], HttpStatus.NOT_FOUND );
+    }
+
+    @RequestMapping(path = "/confirmacion-subasta", method = RequestMethod.GET)
+    public String confirmacionDeSubastaRealizada(Model model) {
+        return "confirmacion-subasta";
     }
 }

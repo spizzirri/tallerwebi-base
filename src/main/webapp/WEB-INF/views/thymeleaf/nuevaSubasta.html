@@ -48,6 +48,7 @@
             <select th:field="*{categoria.id}" id="categoria" class="form-control" required>
                 <option th:each="cat : ${listaCategorias}" th:value="${cat.getId()}" th:text="${cat.getNombre()}"></option>
             </select>
+            <!--    TODO: Luego de seleccionar categoría seleccionar correspondiente subcategoría   -->
 
             <label for="precioInicial">Monto inicial de Subasta</label>
             <input type="number" th:field="*{precioInicial}" id="precioInicial" class="form-control" required/>
@@ -79,6 +80,9 @@
     </div>
 </main>
 <!-- /.container -->
+
+<!-- Footer -->
+<div th:replace="~{fragments/footer :: footer}"></div>
 
 <!-- Boostrap core js -->
 <script type="text/javascript" th:src="@{webjars/bootstrap/5.2.0/js/bootstrap.min.js}"></script>
