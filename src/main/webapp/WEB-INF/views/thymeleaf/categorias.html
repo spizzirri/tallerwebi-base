@@ -28,7 +28,19 @@
                     aria-controls="navContenido" aria-expanded="false" aria-label="Alternar navegación">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navContenido">
+            <div class="collapse navbar-collapse " id="navContenido">
+                <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown">
+                    <ul class="navbar-nav">
+                        <li class="nav-item"><a class="nav-link" th:href="@{/categorias.html}">Inicio</a></li>
+                        <li class="nav-item"><a class="nav-link" th:href="@{/nuevaSubasta}">Subastas</a></li>
+                        <li class="nav-item"><a class="nav-link" th:href="@{/ofertar/nuevaOferta}">Ofertar</a></li>
+                        <li class="nav-item"><a class="nav-link" th:href="@{/categorias}">Ver categorias</a></li>
+
+                    </ul>
+                </div>
+
+
+
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
                         <form class="d-flex" role="search">
