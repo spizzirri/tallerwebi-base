@@ -40,7 +40,7 @@ public class ServicioSubastaImpl implements ServicioSubasta {
     }
 
     @Override
-    public List<Categorias> listarCategoriasDisponibles() {
+    public List<Categoria> listarCategoriasDisponibles() {
         return repositorioCategorias.listarCategorias();
     }
 

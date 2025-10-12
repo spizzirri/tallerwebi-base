@@ -16,7 +16,7 @@ public class Subasta {
     private String descripcion;
     @OneToOne
     @JoinColumn(name = "categoria_id")
-    private Categorias categoria;
+    private Categoria categoria;
     private String estadoProducto;
     private Float precioInicial;
     private Float precioActual; //Dependiendo de como aplicaramos el de subastar, esto se puede eliminar por un SELECT
@@ -39,8 +39,8 @@ public class Subasta {
     public String getDescripcion() { return descripcion; }
     public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
 
-    public Categorias getCategoria() {  return categoria; }
-    public void setCategoria(Categorias categoria) { this.categoria = categoria; }
+    public Categoria getCategoria() {  return categoria; }
+    public void setCategoria(Categoria categoria) { this.categoria = categoria; }
 
     public String getEstadoProducto() { return estadoProducto; }
     public void setEstadoProducto(String estadoProducto) { this.estadoProducto = estadoProducto; }

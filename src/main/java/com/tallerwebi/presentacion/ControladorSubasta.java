@@ -28,7 +28,7 @@ public class ControladorSubasta {
     public ModelAndView irANuevaSubasta() {
         ModelMap model = new ModelMap();
         model.put("subasta", new Subasta());
-        List<Categorias> cat = servicioSubasta.listarCategoriasDisponibles();
+        List<Categoria> cat = servicioSubasta.listarCategoriasDisponibles();
         model.put("listaCategorias", cat);
         return new ModelAndView("nuevaSubasta", model);
     }
