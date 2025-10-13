@@ -23,7 +23,6 @@ public class ControladorLoginTest {
 	private HttpServletRequest requestMock;
 	private HttpSession sessionMock;
 	private ServicioLogin servicioLoginMock;
-    private ServicioSubasta servicioSubastaMock;
 
 
 	@BeforeEach
@@ -34,7 +33,6 @@ public class ControladorLoginTest {
 		requestMock = mock(HttpServletRequest.class);
 		sessionMock = mock(HttpSession.class);
 		servicioLoginMock = mock(ServicioLogin.class);
-		controladorLogin = new ControladorLogin(servicioLoginMock);
 	}
 
 	@Test
