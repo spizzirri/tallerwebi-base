@@ -42,7 +42,7 @@ public class ControladorSubasta {
             servicioSubasta.crearSubasta(subasta, creadorEmail, imagenSubasta);
         }catch (Exception e){
             model.put("error", e.getMessage());
-            List<Categorias> cat = servicioSubasta.listarCategoriasDisponibles();
+            List<Categoria> cat = servicioSubasta.listarCategoriasDisponibles();
             model.put("listaCategorias", cat);
             return new ModelAndView("nuevaSubasta", model);
         }
