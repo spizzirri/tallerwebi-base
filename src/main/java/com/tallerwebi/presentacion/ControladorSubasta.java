@@ -40,7 +40,9 @@ public class ControladorSubasta {
         try{
             servicioSubasta.crearSubasta(subasta, creadorEmail, imagenSubasta);
         }catch (Exception e){
-            model.put("error", "Hubo un error al crear la subasta. Intentelo nuevamente.");
+            model.put("error", e.getMessage());
+            List<Categorias> cat = servicioSubasta.listarCategoriasDisponibles();
+            model.put("listaCategorias", cat);
             return new ModelAndView("nuevaSubasta", model);
         }
         return new ModelAndView("redirect:/home");

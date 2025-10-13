@@ -31,6 +31,21 @@ public class ServicioSubastaImpl implements ServicioSubasta {
 
     @Override
     public void crearSubasta(Subasta subasta, String creador, MultipartFile imagen) throws IOException {
+        if(creador == null || creador.isEmpty()){
+            throw new RuntimeException("Usuario no definido.");
+        }
+
+        if(imagen == null || imagen.isEmpty()){
+            throw new RuntimeException("Imagen no definida.");
+        }
+
+        if(     subasta.getEstadoSubasta() != 0 &&
+                subasta.getEstadoSubasta() != 1 &&
+                subasta.getEstadoSubasta() != 2 &&
+                subasta.getEstadoSubasta() != 3){
+            throw new RuntimeException("Categoria no definida.");
+        }
+
         subasta.setCreador(repositorioUsuario.buscar(creador));
         subasta.setImagen(Base64.getEncoder().encodeToString(imagen.getBytes()));
         subasta.setFechaInicio();
