@@ -41,8 +41,16 @@
             <textarea  th:field="*{descripcion}" id="descripcion" class="form-control" required></textarea>
 
             <label for="estadoProducto">Estado Producto</label>
-            <input th:field="*{estadoProducto}" id="estadoProducto" class="form-control" required/>
-            <!--    TODO: Cambiarlo a una lista de posibles valores    -->
+            <select th:field="*{estadoProducto}" id="estadoProducto" class="form-control" required >
+                <option value="Nuevo; En caja" selected>Nuevo; En caja</option>
+                <option value="Nuevo; Sin caja">Nuevo; Sin caja</option>
+                <option value="Usado; Como nuevo">Usado; Como nuevo</option>
+                <option value="Usado; Buen estado">Usado; Buen estado</option>
+                <option value="Usado">Usado</option>
+                <option value="Para repuestos">Para repuestos</option>
+            </select>
+            <!--    <input th:field="*{estadoProducto}" id="estadoProducto" class="form-control" required/> -->
+
 
             <label for="categoria">Categoria</label>
             <select th:field="*{categoria.id}" id="categoria" class="form-control" required>
