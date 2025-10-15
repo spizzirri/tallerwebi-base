@@ -1,0 +1,54 @@
+<!DOCTYPE HTML>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <title>Taller Web I - Mi perfil</title>
+
+  <!-- Boostrap core css -->
+  <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.2.0/css/bootstrap.min.css}"/>
+
+  <!-- custom style -->
+  <link rel="stylesheet" th:href="@{/css/main.css}"/>
+  <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}" />
+
+  <!-- Boostrap core css -->
+  <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.2.0/css/bootstrap.min.css}"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+
+  <!-- custom style -->
+
+  <link rel="stylesheet" th:href="@{/css/categorias.css}"/>
+
+</head>
+
+<body>
+
+<!-- Header -->
+<div th:replace="~{fragments/header :: userHeader}"></div>
+
+<main role="main" class="container">
+
+  <p>¡Bienvenido <span th:text="${usuario.nombre}"></span>!</p>
+
+  <form th:action="@{/perfil}" th:object="${usuario}" method="post">
+
+    <h3>Modifica tus datos</h3>
+    <p>Tu email es: <span th:text="*{email}"></span></p>
+    <label>Nombre:</label>
+    <input type="text" th:field="*{nombre}" placeholder="Ingrese su nombre"/>
+
+    <button type="submit">Guardar cambios</button>
+  </form>
+
+</main>
+<!-- /.container -->
+
+<!-- Footer -->
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<!-- Boostrap core js -->
+<script type="text/javascript" th:src="@{webjars/bootstrap/5.2.0/js/bootstrap.min.js}"></script>
+</body>
+</html>

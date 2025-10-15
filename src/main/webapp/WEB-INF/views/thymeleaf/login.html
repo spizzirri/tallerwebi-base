@@ -16,29 +16,48 @@
 
 <body>
 
-<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-    <a class="navbar-brand" href="#">UNLAM</a>
-</nav>
+<main role="main" class="">
 
-<main role="main" class="container">
+    <div class="container my-auto">
 
-    <div class = "container">
-        <div id="loginbox" style="margin-top:50px;" class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
-            <form action="#" th:action="@{/validar-login}" method="POST" th:object="${datosLogin}">
-                <h3 class="form-signin-heading">Taller Web I</h3>
-                <hr class="colorgraph"><br>
+            <div class="row align-items-center">
 
-                <input th:field="*{email}" id="email" type="email" class="form-control" required/>
-                <input th:field="*{password}" type="password" id="password" class="form-control" required/>
+                <div class="col-1"></div>
 
-                <button id="btn-login" class="btn btn-lg btn-primary btn-block" Type="Submit" disabled>Login</button>
+                <div class="col-6">
+                    <div id="loginbox" style="margin-top:50px;" class="mainbox col-9">
 
-                <p th:if="${error != null}" class="alert alert-danger" th:text="'Error ' + ${error}">
-                </p>
-            </form>
-            <a id="btn-register" href="nuevo-usuario">Registrarme</a>
-        </div>
+                        <h3 class="form-signin-heading mb-3">Iniciar Sesión</h3>
+
+                        <form action="#" th:action="@{/validar-login}" method="POST" th:object="${datosLogin}">
+
+                            <div class="form-floating mb-3">
+                                <input th:field="*{email}" type="email" class="form-control" id="email" placeholder="email@ejemplo.com" required>
+                                <label for="email">Email</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input th:field="*{password}" type="password" class="form-control" id="password" placeholder="Password" required>
+                                <label for="password">Password</label>
+                            </div>
+
+                            <button id="btn-login" class="btn btn-primary btn-lg mb-3" Type="Submit" disabled>Login</button>
+
+                            <p th:if="${error != null}" class="alert alert-danger" th:text="'Error ' + ${error}"></p>
+
+                        </form>
+                        <a id="btn-register" class="btn btn-secondary btn-sm mb-3" href="nuevo-usuario">Registrarme</a>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <img class="img-fluid" th:src="@{/img/logo.png}" alt="Logo" />
+                </div>
+
+                <div class="col-1"></div>
+
+            </div>
+
     </div>
+
 </main>
 <!-- /.container -->
 

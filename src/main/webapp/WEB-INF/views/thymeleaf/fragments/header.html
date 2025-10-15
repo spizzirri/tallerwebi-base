@@ -33,7 +33,12 @@
                         </div>
                     </form>
                 </li>
-                <li class="nav-item"><a class="nav-link" href="#">Mi perfil</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/perfil}">Mi perfil</a></li>
+                <li class="nav-item" th:if="${session.email}">
+                    <a class="nav-link" th:href="@{/logout}">
+                        <button class="btn btn-outline-danger btn-sm" type="button">Cerrar sesión</button>
+                    </a>
+                </li>
             </ul>
         </div>
 
