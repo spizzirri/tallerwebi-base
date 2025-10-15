@@ -16,45 +16,34 @@
 
 <body>
 
-<main role="main" class="">
+<main role="main" class="container my-5">
 
-    <div class="container my-auto">
+    <div class="row g-4">
 
-            <div class="row align-items-center">
+        <div class="col-md-6 p-3 text-center align-self-center">
+            <img class="img-fluid" th:src="@{/img/logo.png}" alt="Logo" style="max-width: 80%"/>
+        </div>
 
-                <div class="col-1"></div>
+        <div id="loginbox" style="margin-top:50px;" class="mainbox col-md-6">
 
-                <div class="col-6">
-                    <div id="loginbox" style="margin-top:50px;" class="mainbox col-9">
+            <h3 class="form-signin-heading mb-3">Iniciar Sesión</h3>
 
-                        <h3 class="form-signin-heading mb-3">Iniciar Sesión</h3>
-
-                        <form action="#" th:action="@{/validar-login}" method="POST" th:object="${datosLogin}">
-
-                            <div class="form-floating mb-3">
-                                <input th:field="*{email}" type="email" class="form-control" id="email" placeholder="email@ejemplo.com" required>
-                                <label for="email">Email</label>
-                            </div>
-                            <div class="form-floating mb-3">
-                                <input th:field="*{password}" type="password" class="form-control" id="password" placeholder="Password" required>
-                                <label for="password">Password</label>
-                            </div>
-
-                            <button id="btn-login" class="btn btn-primary btn-lg mb-3" Type="Submit" disabled>Login</button>
-
-                            <p th:if="${error != null}" class="alert alert-danger" th:text="'Error ' + ${error}"></p>
-
-                        </form>
-                        <a id="btn-register" class="btn btn-secondary btn-sm mb-3" href="nuevo-usuario">Registrarme</a>
-                    </div>
+            <form action="#" th:action="@{/validar-login}" method="POST" th:object="${datosLogin}">
+                <div class="form-floating mb-3">
+                    <input th:field="*{email}" type="email" class="form-control" id="email" placeholder="email@ejemplo.com" required>
+                    <label for="email">Email</label>
                 </div>
-                <div class="col-4">
-                    <img class="img-fluid" th:src="@{/img/logo.png}" alt="Logo" />
+                <div class="form-floating mb-3">
+                    <input th:field="*{password}" type="password" class="form-control" id="password" placeholder="Password" required>
+                    <label for="password">Password</label>
                 </div>
+                <button id="btn-login" class="btn btn-primary btn-lg mb-3" Type="Submit" disabled>Login</button>
+                <p th:if="${error != null}" class="alert alert-danger" th:text="'Error ' + ${error}"></p>
+            </form>
 
-                <div class="col-1"></div>
+            <a id="btn-register" class="btn btn-secondary btn-sm mb-3" href="nuevo-usuario">Registrarme</a>
 
-            </div>
+        </div>
 
     </div>
 

@@ -16,16 +16,15 @@
 
 <body>
 
-<main role="main">
+<main role="main" class="container my-5">
 
-  <div class="container my-auto">
+    <div class="row g-4">
 
-    <div class="row align-items-center">
+        <div class="col-md-6 p-3 text-center align-self-center">
+          <img class="img-fluid" th:src="@{/img/logo.png}" alt="Logo" style="max-width: 80%"/>
+        </div>
 
-      <div class="col-1"></div>
-
-      <div class="col-6">
-        <div id="loginbox" style="margin-top:50px;" class="mainbox col-9">
+        <div id="loginbox" style="margin-top:50px;" class="mainbox col-md-6">
 
           <h3 class="form-signin-heading mb-3">Registrarme</h3>
 
@@ -46,45 +45,8 @@
 
           </form>
         </div>
-      </div>
-      <div class="col-4">
-        <img class="img-fluid" th:src="@{/img/logo.png}" alt="Logo" />
-      </div>
-
-      <div class="col-1"></div>
 
     </div>
-
-  </div>
-
-  <!--
-  <div class="container">
-    <div id="loginbox" style="margin-top:50px;" class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
-      <form action="#" th:action="@{/registrarme}" method="POST" th:object="${usuario}">
-        <h3 class="form-signin-heading">Nuevo Usuario</h3>
-        <hr class="colorgraph"><br>
-
-        <div class="form-floating mb-3">
-          <input th:field="*{email}" type="email" class="form-control" id="email" placeholder="email@ejemplo.com" required>
-          <label for="email">Email</label>
-        </div>
-        <div class="form-floating">
-          <input th:field="*{password}" type="password" class="form-control" id="password" placeholder="Password" required>
-          <label for="password">Password</label>
-        </div>
-
-        <input th:field="*{email}" id="email" class="form-control" required/>
-        <input th:field="*{password}" type="password" id="password" class="form-control" required/>
-
-
-        <button id="btn-registrarme" class="btn btn-lg btn-primary btn-block" Type="Submit">Registrarme</button>
-        <p th:if="${error != null}" class="alert alert-danger" th:text="'Error ' + ${error}">
-        </p>
-      </form>
-
-    </div>
-  </div>
-  -->
 
 </main>
 <!-- /.container -->
