@@ -62,4 +62,12 @@ public class ServicioSubastaImpl implements ServicioSubasta {
     @Override
     public Subasta buscarSubasta(Long idSubasta) {return repositorioSubasta.obtenerSubasta(idSubasta);}
 
+    @Override
+    public List<Subasta> listarSubastasDelUsuario(String emailCreador) {
+        if (emailCreador == null || emailCreador.isEmpty()) {
+            throw new RuntimeException("El email del usuario no puede ser nulo o vacío.");
+        }
+        return repositorioSubasta.buscarSubastasPorCreador(emailCreador);
+    }
+
 }

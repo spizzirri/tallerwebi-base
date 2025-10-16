@@ -4,12 +4,14 @@ package com.tallerwebi.infraestructura;
 import com.tallerwebi.dominio.Subasta;
 import com.tallerwebi.dominio.RepositorioSubasta;
 import com.tallerwebi.dominio.Usuario;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Repository("repositorioSubasta")
 public class RepositorioSubastaImpl implements RepositorioSubasta {
@@ -48,6 +50,15 @@ public class RepositorioSubastaImpl implements RepositorioSubasta {
         return (Subasta) sessionFactory.getCurrentSession().createCriteria(Subasta.class)
                 .add(Restrictions.eq("id", id))
                 .uniqueResult();
+    }
+
+    @Override
+    public List<Subasta> buscarSubastasPorCreador(String emailCreador) {
+        final Session session = sessionFactory.getCurrentSession();
+        return session.createCriteria(Subasta.class)
+                .createAlias("creador", "u")
+                .add(Restrictions.eq("u.email", emailCreador))
+                .list();
     }
 
 }

@@ -30,17 +30,49 @@
 
 <main role="main" class="container">
 
-  <p>¡Bienvenido <span th:text="${usuario.nombre}"></span>!</p>
+  <h2>¡Bienvenido <span th:text="${usuario.nombre}"></span>!</h2>
+  <p>Este es un resumen de tu perfil donde podrás ver tus datos e historial de subastas creadas.</p>
 
-  <form th:action="@{/perfil}" th:object="${usuario}" method="post">
+  <h4>Modifica tus datos</h4>
 
-    <h3>Modifica tus datos</h3>
-    <p>Tu email es: <span th:text="*{email}"></span></p>
-    <label>Nombre:</label>
-    <input type="text" th:field="*{nombre}" placeholder="Ingrese su nombre"/>
+  <form th:action="@{/perfil}" th:object="${usuario}" method="post" class="p-3">
 
-    <button type="submit">Guardar cambios</button>
+    <div class="input-group flex-nowrap mb-3">
+      <span class="input-group-text" id="addon-wrapping-email">Email</span>
+      <input class="form-control" type="text" th:value="*{email}" aria-label="readonly input example" readonly>
+    </div>
+
+    <div class="input-group flex-nowrap mb-3">
+      <span class="input-group-text" id="addon-wrapping">Nombre</span>
+      <input th:field="*{nombre}" type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="addon-wrapping">
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar cambios</button>
   </form>
+
+  <h2>Historial de subastas</h2>
+
+  <div th:if="${#lists.isEmpty(subastas)}">
+    <p>No tenés subastas creadas todavía.</p>
+  </div>
+
+    <div th:each="subasta : ${subastas}">
+      <div class="card m-3" style="width: 18rem;">
+        <img th:src="@{'/' + ${subasta.id} + '/imagen'}" class="card-img-top" alt="Imagen de subasta">
+        <div class="card-body border-top">
+          <h5 th:text="${subasta.titulo}" class="card-title text-uppercase">Título de la subasta</h5>
+          <p th:text="${subasta.descripcion}" class="card-text">Descripción</p>
+        </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item">
+            <p>Precio inicial: <span th:text="${subasta.precioInicial}"></span></p>
+          </li>
+          <li class="list-group-item">
+            <p class="fw-bold"><span th:text="${subasta.estadoSubasta == 10 ? 'En curso' : 'Cerrada'}"></span></p>
+          </li>
+        </ul>
+      </div>
+    </div>
 
 </main>
 <!-- /.container -->
