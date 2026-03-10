@@ -190,8 +190,8 @@
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <version>${checkstyle.version}</version>
                 <configuration>
-                    <!-- Ubicación del archivo de configuración de reglas (estándar de Google) -->
-                    <configLocation>google_checks.xml</configLocation>
+                    <!-- Ubicación del archivo de configuración personalizado (basado en Google Style pero compatible con Prettier) -->
+                    <configLocation>${project.basedir}/checkstyle-base.xml</configLocation>
                     <!-- Mostrar los errores de reglas directamente en la consola -->
                     <consoleOutput>true</consoleOutput>
                     <!-- Detener el build si se encuentra algun error de las reglas de estilo -->
@@ -199,7 +199,7 @@
                     <!-- No generar enlaces a reportes XRef (útil para reportes HTML detallados) -->
                     <linkXRef>false</linkXRef>
                     <!-- Directorio donde se generan los reportes visuales (HTML) -->
-                    <outputDirectory>${project.basedir}/.salud/checkstyle</outputDirectory>
+                    <outputDirectory>${project.basedir}/.calidad-de-codigo/checkstyle</outputDirectory>
                 </configuration>
                 <executions>
                     <execution>
@@ -257,9 +257,9 @@
                         </goals>
                         <configuration>
                             <!-- Directorio donde se guarda el archivo XML de resultados para la validación -->
-                            <targetDirectory>${project.basedir}/.salud/pmd</targetDirectory>
+                            <targetDirectory>${project.basedir}/.calidad-de-codigo/pmd</targetDirectory>
                             <!-- Directorio donde se generan los reportes visuales (HTML) y sus recursos (CSS/imágenes) -->
-                            <outputDirectory>${project.basedir}/.salud/pmd</outputDirectory>
+                            <outputDirectory>${project.basedir}/.calidad-de-codigo/pmd</outputDirectory>
                         </configuration>
                     </execution>
 
@@ -277,9 +277,9 @@
                         </goals>
                         <configuration>
                             <!-- Directorio donde se guarda el archivo XML de duplicados para la validación -->
-                            <targetDirectory>${project.basedir}/.salud/cpd</targetDirectory>
+                            <targetDirectory>${project.basedir}/.calidad-de-codigo/cpd</targetDirectory>
                             <!-- Directorio donde se generan los reportes visuales de duplicados (HTML) -->
-                            <outputDirectory>${project.basedir}/.salud/cpd</outputDirectory>
+                            <outputDirectory>${project.basedir}/.calidad-de-codigo/cpd</outputDirectory>
                         </configuration>
                     </execution>
                     <execution>
@@ -290,9 +290,9 @@
                         </goals>
                         <configuration>
                             <!-- Directorio de resultados XML para la fase de pruebas -->
-                            <targetDirectory>${project.basedir}/.salud/pmd</targetDirectory>
+                            <targetDirectory>${project.basedir}/.calidad-de-codigo/pmd</targetDirectory>
                             <!-- Directorio de reportes HTML para la fase de pruebas -->
-                            <outputDirectory>${project.basedir}/.salud/pmd</outputDirectory>
+                            <outputDirectory>${project.basedir}/.calidad-de-codigo/pmd</outputDirectory>
                         </configuration>
                     </execution>
                     <execution>
@@ -303,9 +303,95 @@
                         </goals>
                         <configuration>
                             <!-- Directorio de resultados XML de duplicados para la fase de pruebas -->
-                            <targetDirectory>${project.basedir}/.salud/cpd</targetDirectory>
+                            <targetDirectory>${project.basedir}/.calidad-de-codigo/cpd</targetDirectory>
                             <!-- Directorio de reportes HTML de duplicados para la fase de pruebas -->
-                            <outputDirectory>${project.basedir}/.salud/cpd</outputDirectory>
+                            <outputDirectory>${project.basedir}/.calidad-de-codigo/cpd</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.12</version>
+                <executions>
+                    <execution>
+                        <!-- Fase de preparación: Configura el agente de JaCoCo para integrarse con el proceso de tests de la JVM -->
+                        <goals>
+                            <!-- Prepara al agente para recolectar datos de cobertura durante la ejecución de los tests -->
+                            <goal>prepare-agent</goal>
+                        </goals>
+                        <configuration>
+                            <!-- Archivo binario donde se guardarán los datos de ejecución recolectados -->
+                            <destFile>${project.basedir}/.calidad-de-codigo/jacoco/jacoco.exec</destFile>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <!-- Fase donde se procesan los datos binarios para generar reportes legibles -->
+                        <phase>test</phase>
+                        <goals>
+                            <!-- Genera el reporte visual (HTML, XML, CSV) de cobertura -->
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <!-- Directorio de salida para el reporte HTML -->
+                            <outputDirectory>${project.basedir}/.calidad-de-codigo/jacoco</outputDirectory>
+                            <!-- Archivo de datos de entrada generado por prepare-agent -->
+                            <dataFile>${project.basedir}/.calidad-de-codigo/jacoco/jacoco.exec</dataFile>
+                            <!-- Exclusiones para el reporte visual: Se omiten clases de configuración 
+                                 que no contienen lógica de negocio para no distorsionar la métrica global -->
+                            <excludes>
+                                <exclude>com/tallerwebi/config/*</exclude>
+                                <exclude>com/tallerwebi/MyServletInitializer.class</exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>check-coverage</id>
+                        <!-- Validación de umbrales: Se ejecuta en la fase 'test' para fallar el build si no se cumplen las reglas -->
+                        <phase>test</phase>
+                        <goals>
+                            <!-- Verifica que la cobertura cumpla con los límites mínimos definidos -->
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <!-- Archivo de datos a validar -->
+                            <dataFile>${project.basedir}/.calidad-de-codigo/jacoco/jacoco.exec</dataFile>
+                            <rules>
+                                <rule>
+                                    <!-- Nivel de granularidad del chequeo (BUNDLE abarca todo el proyecto) -->
+                                    <element>BUNDLE</element>
+                                    <limits>
+                                        <limit>
+                                            <!-- Métrica a evaluar. 
+                                                 Opciones: 
+                                                 - LINE (Líneas de código)
+                                                 - BRANCH (Ramas de decisión: if/switch)
+                                                 - INSTRUCTION (Instrucciones bytecode)
+                                                 - COMPLEXITY (Complejidad ciclomática)
+                                                 - METHOD (Métodos cubiertos)
+                                                 - CLASS (Clases cubiertas) -->
+                                            <counter>LINE</counter>
+                                            <!-- Tipo de valor a controlar.
+                                                 Opciones:
+                                                 - COVEREDRATIO (Porcentaje de cobertura: 0.0 a 1.0)
+                                                 - MISSEDCOUNT (Número máximo de elementos no cubiertos permitidos)
+                                                 - COVEREDCOUNT (Número mínimo de elementos cubiertos)
+                                                 - TOTALCOUNT (Número total de elementos) -->
+                                            <value>COVEREDRATIO</value>
+                                            <!-- Porcentaje mínimo requerido (0.80 = 80%) -->
+                                            <minimum>0.80</minimum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                            </rules>
+                            <!-- Exclusiones para la validación: Estas clases no se tienen en cuenta para el cálculo del 80% -->
+                            <excludes>
+                                <exclude>com/tallerwebi/config/*</exclude>
+                                <exclude>com/tallerwebi/MyServletInitializer.class</exclude>
+                            </excludes>
                         </configuration>
                     </execution>
                 </executions>
@@ -363,6 +449,34 @@
                                         <goals>
                                             <goal>check</goal>
                                             <goal>checkstyle</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore></ignore>
+                                    </action>
+                                </pluginExecution>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.jacoco</groupId>
+                                        <artifactId>jacoco-maven-plugin</artifactId>
+                                        <versionRange>[0.8.0,)</versionRange>
+                                        <goals>
+                                            <goal>prepare-agent</goal>
+                                            <goal>report</goal>
+                                            <goal>check</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore></ignore>
+                                    </action>
+                                </pluginExecution>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>com.hubspot.maven.plugins</groupId>
+                                        <artifactId>prettier-maven-plugin</artifactId>
+                                        <versionRange>[0.0.1,)</versionRange>
+                                        <goals>
+                                            <goal>write</goal>
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>

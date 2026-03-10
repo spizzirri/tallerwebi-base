@@ -1,6 +1,7 @@
 package com.tallerwebi.presentacion;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
 import static org.mockito.Mockito.*;
 
@@ -110,5 +111,43 @@ public class ControladorLoginTest {
       modelAndView.getModel().get("error").toString(),
       equalToIgnoringCase("Error al registrar el nuevo usuario")
     );
+  }
+
+  @Test
+  public void irALoginDeberiaRetornarVistaLoginConDatosLogin() {
+    // ejecucion
+    ModelAndView modelAndView = controladorLogin.irALogin();
+
+    // validacion
+    assertThat(modelAndView.getViewName(), equalToIgnoringCase("login"));
+    assertThat(modelAndView.getModel().get("datosLogin"), instanceOf(DatosLogin.class));
+  }
+
+  @Test
+  public void nuevoUsuarioDeberiaRetornarVistaNuevoUsuarioConUsuarioVacio() {
+    // ejecucion
+    ModelAndView modelAndView = controladorLogin.nuevoUsuario();
+
+    // validacion
+    assertThat(modelAndView.getViewName(), equalToIgnoringCase("nuevo-usuario"));
+    assertThat(modelAndView.getModel().get("usuario"), instanceOf(Usuario.class));
+  }
+
+  @Test
+  public void irAHomeDeberiaRetornarVistaHome() {
+    // ejecucion
+    ModelAndView modelAndView = controladorLogin.irAHome();
+
+    // validacion
+    assertThat(modelAndView.getViewName(), equalToIgnoringCase("home"));
+  }
+
+  @Test
+  public void inicioDeberiaRedirigirALogin() {
+    // ejecucion
+    ModelAndView modelAndView = controladorLogin.inicio();
+
+    // validacion
+    assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/login"));
   }
 }
