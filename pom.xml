@@ -20,6 +20,7 @@
         <hibernate.version>5.4.24.Final</hibernate.version>
         <playwright.version>1.36.0</playwright.version>
         <hsqldb.version>2.3.2</hsqldb.version>
+        <checkstyle.version>3.2.1</checkstyle.version>
     </properties>
 
     <dependencies>
@@ -161,6 +162,156 @@
             </plugin>
 
             <plugin>
+                <groupId>com.hubspot.maven.plugins</groupId>
+                <artifactId>prettier-maven-plugin</artifactId>
+                <version>0.22</version>
+                <configuration>
+                    <!-- Prettier-Java documentation: https://github.com/jhipster/prettier-java -->
+                    <prettierJavaVersion>2.5.0</prettierJavaVersion>
+                    <!-- Longitud máxima de línea (100) alineada con el estándar de Google Checkstyle -->
+                    <printWidth>100</printWidth>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>format-code</id>
+                        <!-- Se ejecuta en la fase 'process-sources' para formatear automáticamente 
+                             el código antes de la compilación y los tests -->
+                        <phase>process-sources</phase>
+                        <goals>
+                            <!-- El objetivo 'write' sobreescribe los archivos con el formato correcto -->
+                            <goal>write</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>${checkstyle.version}</version>
+                <configuration>
+                    <!-- Ubicación del archivo de configuración de reglas (estándar de Google) -->
+                    <configLocation>google_checks.xml</configLocation>
+                    <!-- Mostrar los errores de reglas directamente en la consola -->
+                    <consoleOutput>true</consoleOutput>
+                    <!-- Detener el build si se encuentra algun error de las reglas de estilo -->
+                    <failsOnError>true</failsOnError>
+                    <!-- No generar enlaces a reportes XRef (útil para reportes HTML detallados) -->
+                    <linkXRef>false</linkXRef>
+                    <!-- Directorio donde se generan los reportes visuales (HTML) -->
+                    <outputDirectory>${project.basedir}/.salud/checkstyle</outputDirectory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <!-- Identificador único para esta ejecución del plugin -->
+                        <id>validate</id>
+                        <!-- Fase del ciclo de vida de Maven en la que se ejecutará (validación inicial) -->
+                        <phase>validate</phase>
+                        <goals>
+                            <!-- Ejecuta la verificación (check) de las reglas de estilo. 
+                                 Si falla, el build se detendrá según la configuración anterior -->
+                            <goal>check</goal>
+                            <!-- Genera el reporte visual (HTML) durante la validación -->
+                            <goal>checkstyle</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>checkstyle-report</id>
+                        <!-- Fase del ciclo de vida para generar reportes durante las pruebas -->
+                        <phase>test</phase>
+                        <goals>
+                            <goal>checkstyle</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <version>3.21.0</version>
+                <configuration>
+                    <!-- Mostrar los errores de reglas directamente en la consola de Maven -->
+                    <printFailingErrors>true</printFailingErrors>
+                    <!-- No generar enlaces a reportes XRef (referencias cruzadas del código) -->
+                    <linkXRef>false</linkXRef>
+                    <rulesets>
+                        <!-- Conjuntos de reglas a aplicar (estándar y personalizados) -->
+                        <ruleset>/category/java/bestpractices.xml</ruleset>
+                        <ruleset>/category/java/errorprone.xml</ruleset>
+                        <ruleset>${project.basedir}/pmd-reglas-de-codigo.xml</ruleset>
+                    </rulesets>
+                </configuration>
+                <executions>
+                    <!-- Ejecución unificada de PMD (Análisis de reglas) -->
+                    <execution>
+                        <!-- Identificador único de la ejecución -->
+                        <id>pmd-all</id>
+                        <!-- Fase del ciclo de vida de Maven en la que se ejecuta (validación inicial) -->
+                        <phase>validate</phase>
+                        <goals>
+                            <!-- Genera el reporte PMD (necesario para el check) -->
+                            <goal>pmd</goal>
+                            <!-- Valida los resultados contra las reglas definidas y falla si hay errores -->
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <!-- Directorio donde se guarda el archivo XML de resultados para la validación -->
+                            <targetDirectory>${project.basedir}/.salud/pmd</targetDirectory>
+                            <!-- Directorio donde se generan los reportes visuales (HTML) y sus recursos (CSS/imágenes) -->
+                            <outputDirectory>${project.basedir}/.salud/pmd</outputDirectory>
+                        </configuration>
+                    </execution>
+
+                    <!-- Ejecución unificada de CPD (Detección de duplicados) -->
+                    <execution>
+                        <!-- Identificador único de la ejecución -->
+                        <id>cpd-all</id>
+                        <!-- Fase del ciclo de vida de Maven en la que se ejecuta (validación inicial) -->
+                        <phase>validate</phase>
+                        <goals>
+                            <!-- Genera el reporte CPD de duplicados -->
+                            <goal>cpd</goal>
+                            <!-- Valida los duplicados encontrados y falla si superan el umbral -->
+                            <goal>cpd-check</goal>
+                        </goals>
+                        <configuration>
+                            <!-- Directorio donde se guarda el archivo XML de duplicados para la validación -->
+                            <targetDirectory>${project.basedir}/.salud/cpd</targetDirectory>
+                            <!-- Directorio donde se generan los reportes visuales de duplicados (HTML) -->
+                            <outputDirectory>${project.basedir}/.salud/cpd</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>pmd-report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>pmd</goal>
+                        </goals>
+                        <configuration>
+                            <!-- Directorio de resultados XML para la fase de pruebas -->
+                            <targetDirectory>${project.basedir}/.salud/pmd</targetDirectory>
+                            <!-- Directorio de reportes HTML para la fase de pruebas -->
+                            <outputDirectory>${project.basedir}/.salud/pmd</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>cpd-report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>cpd</goal>
+                        </goals>
+                        <configuration>
+                            <!-- Directorio de resultados XML de duplicados para la fase de pruebas -->
+                            <targetDirectory>${project.basedir}/.salud/cpd</targetDirectory>
+                            <!-- Directorio de reportes HTML de duplicados para la fase de pruebas -->
+                            <outputDirectory>${project.basedir}/.salud/cpd</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
                 <version>9.4.45.v20220203</version>
@@ -176,6 +327,54 @@
             </plugin>
 
         </plugins>
+
+        <pluginManagement>
+            <plugins>
+                <!-- Esta configuración es para calmar las advertencias del IDE (m2e) 
+                     sobre ejecuciones de plugins que no reconoce en su ciclo de vida interno -->
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.apache.maven.plugins</groupId>
+                                        <artifactId>maven-pmd-plugin</artifactId>
+                                        <versionRange>[3.0.0,)</versionRange>
+                                        <goals>
+                                            <goal>pmd</goal>
+                                            <goal>check</goal>
+                                            <goal>cpd</goal>
+                                            <goal>cpd-check</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore></ignore>
+                                    </action>
+                                </pluginExecution>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.apache.maven.plugins</groupId>
+                                        <artifactId>maven-checkstyle-plugin</artifactId>
+                                        <versionRange>[3.0.0,)</versionRange>
+                                        <goals>
+                                            <goal>check</goal>
+                                            <goal>checkstyle</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore></ignore>
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
 
 </project>
