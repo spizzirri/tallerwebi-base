@@ -4,11 +4,16 @@
   "description": "pruebas unitarias",
   "type": "module",
   "scripts": {
-    "test": "jasmine"
+    "test": "jasmine",
+    "lint": "eslint ."
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@eslint/js": "^9.39.4",
+    "eslint": "^9.39.4",
+    "eslint-plugin-jasmine": "^4.2.2",
+    "globals": "^17.4.0",
     "jasmine": "^5.8.0",
     "jasmine-spec-reporter": "^7.0.0",
     "jsdom": "^26.1.0"

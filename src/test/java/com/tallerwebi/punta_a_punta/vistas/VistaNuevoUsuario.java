@@ -4,24 +4,23 @@ import com.microsoft.playwright.Page;
 
 public class VistaNuevoUsuario extends VistaWeb {
 
-    public VistaNuevoUsuario(Page page) {
-        super(page);
-    }
+  public VistaNuevoUsuario(Page page) {
+    super(page);
+  }
 
-    public void escribirEMAIL(String email){
-        this.escribirEnElElemento("#email", email);
-    }
+  public void escribirEMAIL(String email) {
+    this.escribirEnElElemento("#email", email);
+  }
 
-    public void escribirClave(String clave){
-        this.escribirEnElElemento("#password", clave);
-    }
+  public void escribirClave(String clave) {
+    this.escribirEnElElemento("#password", clave);
+  }
 
-    public void darClickEnRegistrarme(){
-        this.darClickEnElElemento("#btn-registrarme");
-    }
+  public void darClickEnRegistrarme() {
+    this.darClickEnElElemento("#btn-registrarme");
+  }
 
-    public String obtenerMensajeDeError(){
-        return this.obtenerTextoDelElemento("p.alert.alert-danger");
-    }
-    
+  public String obtenerMensajeDeError() {
+    return this.obtenerTextoDelElemento("p.alert.alert-danger");
+  }
 }

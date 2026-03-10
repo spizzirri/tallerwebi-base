@@ -204,6 +204,55 @@ mvn clean install
 
 ```
 
+## 12. Herramientas de Calidad de Código
+El proyecto integra varias herramientas para asegurar que el código sea limpio, mantenible y libre de errores comunes. Estas herramientas se ejecutan automáticamente durante el ciclo de vida de Maven.
+
+### PMD (Static Code Analyzer)
+Analiza el código Java en busca de problemas de diseño, variables no utilizadas, optimizaciones faltantes y malas prácticas.
+* **Se ejecuta en:** Fase `validate`.
+* **Configuración:** Utiliza `pmd-reglas-de-codigo.xml`.
+* **Comandos:**
+  * `mvn pmd:check`: Valida las reglas y falla si hay errores.
+  * `mvn pmd:pmd`: Genera el reporte visual en `.salud/pmd/pmd.html`.
+* **Reportes:** Todos los resultados (XML e HTML) se guardan en la carpeta `.salud/pmd/` en la raíz del proyecto.
+* **Ejemplo de fallo:** Crear una variable con un nombre muy corto (ej: `int x = 0;`) o tener un método con una complejidad ciclomática superior a 10.
+* **Documentación:** [PMD Official Site](https://pmd.github.io/)
+
+### CPD (Copy-Paste Detector)
+Es una extensión de PMD que detecta bloques de código duplicados (copy-paste) en el proyecto.
+* **Se ejecuta en:** Fase `validate` (chequeo) y fase `test` (generación de reporte).
+* **Comandos:**
+  * `mvn pmd:cpd-check`: Valida duplicados y falla si los encuentra.
+  * `mvn pmd:cpd`: Genera el reporte de duplicados en `.salud/cpd/cpd.html`.
+* **Reportes:** Todos los resultados (XML e HTML) se guardan en la carpeta `.salud/cpd/` en la raíz del proyecto.
+* **Ejemplo de fallo:** Copiar y pegar un bloque de lógica idéntico en dos controladores diferentes en lugar de abstraerlo en un servicio.
+* **Documentación:** [CPD Documentation](https://pmd.github.io/latest/pmd_userdocs_cpd.html)
+
+### Checkstyle
+Verifica que el código siga estándares de formato y estilo (basado en la guía de Google). Se enfoca en la estética y estructura del código.
+* **Se ejecuta en:** Fase `validate`.
+* **Comandos:**
+  * `mvn checkstyle:check`: Valida el estilo y falla si hay errores.
+  * `mvn checkstyle:checkstyle`: Genera el reporte visual en `.salud/checkstyle/checkstyle.html`.
+* **Reportes:** Todos los resultados (XML e HTML) se guardan en la carpeta `.salud/checkstyle/` en la raíz del proyecto.
+* **Ejemplo de fallo:** Indentación incorrecta (usa 2 espacios), falta de Javadoc en clases públicas o llaves en lugares incorrectos.
+* **Documentación:** [Checkstyle Google Style](https://checkstyle.sourceforge.io/google_style.html)
+
+### Prettier (Maven Plugin)
+Formatea automáticamente el código Java para que cumpla con las reglas de estilo.
+* **Se ejecuta en:** Fase `process-sources` (antes de compilar).
+* **Comandos:**
+  * `mvn prettier:write`: Formatea y sobreescribe los archivos con el estilo correcto.
+  * `mvn prettier:check`: Solo verifica si el código cumple el formato sin modificar archivos.
+* **Función:** Reescribe tus archivos `.java` para corregir la indentación y el formato automáticamente al ejecutar `mvn test` o `mvn compile`.
+* **Documentación:** [Prettier Java](https://github.com/jhipster/prettier-java)
+
+### ESLint (JavaScript Linter)
+Analiza el código JavaScript para detectar errores y asegurar un estilo consistente.
+* **Se ejecuta en:** GitHub Actions (CI) antes de correr los tests de JS.
+* **Ejemplo de fallo:** Uso de variables no definidas o falta de punto y coma si la regla lo exige.
+* **Documentación:** [ESLint Official Site](https://eslint.org/)
+
 ## Tecnologías:
 * Docker
 * Java 11
@@ -220,6 +269,10 @@ mvn clean install
 * Hibernate 5.4.24.Final
 * Mockito 5.3.1
 * Playwright 1.36.0
+* PMD 3.21.0 & CPD
+* Checkstyle 10.9.1 (Google Style)
+* Prettier Maven Plugin 0.22 (Prettier-Java 2.5.0)
+* ESLint 9.x
 * Node 18.16.1 o superior <- Instalación manual desde la [página de node](https://nodejs.org/en) 
 * npm --> npm install -g npm
 
