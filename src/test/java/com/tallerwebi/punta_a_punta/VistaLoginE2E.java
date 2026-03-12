@@ -48,27 +48,27 @@ public class VistaLoginE2E {
     context.close();
   }
 
-  // @Test
+  @Test
   void deberiaDecirUNLAMEnElNavbar() throws MalformedURLException {
     dadoQueElUsuarioEstaEnLaVistaDeLogin();
     entoncesDeberiaVerUNLAMEnElNavbar();
   }
 
-  // @Test
+  @Test
   void deberiaDarUnErrorAlIntentarIniciarSesionConUnUsuarioQueNoExiste() {
     dadoQueElUsuarioCargaSusDatosDeLoginCon("damian@unlam.edu.ar", "unlam");
     cuandoElUsuarioTocaElBotonDeLogin();
     entoncesDeberiaVerUnMensajeDeError();
   }
 
-  // @Test
+  @Test
   void deberiaNavegarAlHomeSiElUsuarioExiste() throws MalformedURLException {
     dadoQueElUsuarioCargaSusDatosDeLoginCon("test@unlam.edu.ar", "test");
     cuandoElUsuarioTocaElBotonDeLogin();
     entoncesDeberiaSerRedirigidoALaVistaDeHome();
   }
 
-  // @Test
+  @Test
   void deberiaRegistrarUnUsuarioEIniciarSesionExistosamente() throws MalformedURLException {
     dadoQueElUsuarioNavegaALaVistaDeRegistro();
     dadoQueElUsuarioSeRegistraCon("juan@unlam.edu.ar", "123456");
