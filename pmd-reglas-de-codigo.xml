@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<ruleset name="Reglas de Calidad Taller Web I"
+    xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
+
+    <description>Estándares de calidad de código para Taller Web I - UNLaM</description>
+
+    <!-- Documentación de reglas Codestyle: https://pmd.github.io/latest/pmd_rules_java_codestyle.html -->
+    <!-- 1. Evitar nombres de variables demasiado cortos (mínimo 2 letras para permitir 'id' y 'ok') -->
+    <rule ref="category/java/codestyle.xml/ShortVariable">
+        <properties>
+            <property name="minimum" value="2"/>
+        </properties>
+    </rule>
+
+    <!-- Documentación de reglas Design: https://pmd.github.io/latest/pmd_rules_java_design.html -->
+    <!-- 2. Complejidad Ciclomática (Métrica de salud del código)
+         Mide cuántos caminos lógicos diferentes puede tomar un método.
+         Aumenta por cada: if, for, while, switch, case, catch, &&, ||.
+         Estándar: 10 (Si un método supera este valor, es demasiado difícil de testear y mantener).
+         Ejemplo: Un método con 5 if anidados y 2 bucles for tiene una complejidad de 8. -->
+    <rule ref="category/java/design.xml/CyclomaticComplexity">
+        <properties>
+            <property name="methodReportLevel" value="10"/>
+        </properties>
+    </rule>
+
+    <!-- Documentación de reglas Design: https://pmd.github.io/latest/pmd_rules_java_design.html -->
+    <!-- 3. Evitar clases con demasiados campos (máximo 10 campos) -->
+    <rule ref="category/java/design.xml/TooManyFields">
+        <properties>
+            <property name="maxfields" value="10"/>
+        </properties>
+    </rule>
+
+</ruleset>

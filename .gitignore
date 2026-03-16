@@ -21,3 +21,6 @@ hs_err_pid*
 
 **/node_modules/
 .vscode/
+
+# Reportes de codigo limpio y cobertura de pruebas
+.calidad-de-codigo/
