@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+          "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+          "https://checkstyle.org/dtds/configuration_1_3.dtd">
+
+<!--
+    Configuración personalizada de Checkstyle optimizada para trabajar con Prettier.
+    Basada en Google Java Style, pero desactivando reglas de formateo que Prettier ya maneja.
+-->
+
+<module name="Checker">
+    <property name="charset" value="UTF-8"/>
+    <property name="severity" value="warning"/>
+    <property name="fileExtensions" value="java, properties, xml"/>
+
+    <!-- Excluir archivos de configuración generados o de terceros si es necesario -->
+    <module name="BeforeExecutionExclusionFileFilter">
+        <property name="fileNamePattern" value="module\-info\.java$"/>
+    </module>
+
+    <!-- Reglas de archivos (File set checks) -->
+    <module name="NewlineAtEndOfFile"/>
+    <module name="Translation"/>
+    <module name="FileLength"/>
+    <module name="FileTabCharacter">
+        <property name="eachLine" value="true"/>
+    </module>
+
+    <module name="TreeWalker">
+        <!-- 1. DOCUMENTACIÓN (Javadocs) - Checkstyle sigue siendo la autoridad aquí -->
+        <module name="JavadocType">
+            <property name="scope" value="public"/>
+        </module>
+        <module name="JavadocMethod">
+            <property name="accessModifiers" value="public"/>
+            <property name="allowMissingParamTags" value="true"/>
+            <property name="allowMissingReturnTag" value="true"/>
+        </module>
+        <module name="MissingJavadocType">
+             <property name="scope" value="public"/>
+        </module>
+
+        <!-- 2. NOMENCLATURA (Naming conventions) - Prettier no revisa esto -->
+        <module name="ConstantName"/>
+        <module name="LocalFinalVariableName"/>
+        <module name="LocalVariableName"/>
+        <module name="MemberName"/>
+        <module name="MethodName"/>
+        <module name="PackageName"/>
+        <module name="ParameterName"/>
+        <module name="StaticVariableName"/>
+        <module name="TypeName"/>
+        <module name="AbbreviationAsWordInName">
+            <property name="ignoreFinal" value="false"/>
+            <property name="allowedAbbreviationLength" value="1"/>
+        </module>
+
+        <!-- 3. IMPORTACIONES (Imports) -->
+        <module name="AvoidStarImport"/>
+        <module name="IllegalImport"/>
+        <module name="RedundantImport"/>
+        <module name="UnusedImports"/>
+
+        <!-- 4. LÍMITES DE ESTRUCTURA (Size Violations) -->
+        <module name="MethodLength">
+            <property name="max" value="50"/>
+        </module>
+        <module name="ParameterNumber">
+            <property name="max" value="7"/>
+        </module>
+
+        <!-- 5. CODIFICACIÓN (Coding) -->
+        <module name="EmptyStatement"/>
+        <module name="EqualsHashCode"/>
+        <module name="HiddenField">
+            <property name="ignoreConstructorParameter" value="true"/>
+            <property name="ignoreSetter" value="true"/>
+        </module>
+        <module name="InnerAssignment"/>
+        <module name="MissingSwitchDefault"/>
+        <module name="SimplifyBooleanExpression"/>
+        <module name="SimplifyBooleanReturn"/>
+
+        <!-- 6. DISEÑO (Design) -->
+        <module name="FinalClass"/>
+        <module name="HideUtilityClassConstructor"/>
+        <module name="InterfaceIsType"/>
+        <module name="VisibilityModifier">
+            <property name="protectedAllowed" value="true"/>
+        </module>
+
+        <!-- 
+           NOTA: Se omiten intencionalmente las reglas de Indentation, LineLength, 
+           WhitespaceAround, LeftCurly, RightCurly, etc. 
+           Prettier es el encargado exclusivo de esas tareas.
+        -->
+
+    </module>
+</module>

@@ -24,6 +24,10 @@ jobs:
         run: |
           cd src/main/webapp/resources/core/js
           npm install
+      - name: Ejecutar linter de javascript (ESLint)
+        run: |
+          cd src/main/webapp/resources/core/js
+          npm run lint
       - name: Ejecutar pruebas de javascript
         run: |
           cd src/main/webapp/resources/core/js

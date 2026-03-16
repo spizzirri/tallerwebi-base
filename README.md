@@ -204,6 +204,96 @@ mvn clean install
 
 ```
 
+## 12. Herramientas de Calidad de Código
+El proyecto integra varias herramientas para asegurar que el código sea limpio, mantenible y libre de errores comunes. Estas herramientas se ejecutan automáticamente durante el ciclo de vida de Maven.
+
+### Resumen de Herramientas
+
+| Herramienta | Función Principal | Rol en el Proyecto | Ubicación Reporte |
+| :--- | :--- | :--- | :--- |
+| **Prettier** | **Formateo Automático** | Define la estética (espacios, llaves, indentación). Se encarga del "look". | N/A (Aplica cambios) |
+| **Checkstyle** | **Convenciones y Estructura** | Valida nombres de variables, presencia de Javadocs e importaciones. | `.calidad-de-codigo/checkstyle/` |
+| **PMD** | **Lógica y Buenas Prácticas** | Detecta errores potenciales, variables no usadas y optimizaciones. | `.calidad-de-codigo/pmd/` |
+| **CPD** | **Detección de Duplicados** | Encuentra bloques de código copiados y pegados (Copy-Paste). | `.calidad-de-codigo/cpd/` |
+| **JaCoCo** | **Cobertura de Tests** | Mide qué porcentaje del código está cubierto por pruebas (>80%). | `.calidad-de-codigo/jacoco/` |
+
+---
+
+### PMD (Static Code Analyzer)
+Analiza el código Java en busca de problemas de diseño, variables no utilizadas, optimizaciones faltantes y malas prácticas.
+* **Se ejecuta en:** Fase `validate`.
+* **Configuración:** Utiliza `pmd-reglas-de-codigo.xml`.
+* **Comandos:**
+  * `mvn pmd:check`: Valida las reglas y falla si hay errores.
+  * `mvn pmd:pmd`: Genera el reporte visual en `.calidad-de-codigo/pmd/pmd.html`.
+* **Reportes:** Todos los resultados (XML e HTML) se guardan en la carpeta `.calidad-de-codigo/pmd/` en la raíz del proyecto.
+* **Ejemplo de fallo:** Crear una variable con un nombre muy corto (ej: `int x = 0;`) o tener un método con una complejidad ciclomática superior a 10.
+* **Documentación:** [PMD Official Site](https://pmd.github.io/)
+
+### CPD (Copy-Paste Detector)
+Es una extensión de PMD que detecta bloques de código duplicados (copy-paste) en el proyecto.
+* **Se ejecuta en:** Fase `validate` (chequeo) y fase `test` (generación de reporte).
+* **Comandos:**
+  * `mvn pmd:cpd-check`: Valida duplicados y falla si los encuentra.
+  * `mvn pmd:cpd`: Genera el reporte de duplicados en `.calidad-de-codigo/cpd/cpd.html`.
+* **Reportes:** Todos los resultados (XML e HTML) se guardan en la carpeta `.calidad-de-codigo/cpd/` en la raíz del proyecto.
+* **Ejemplo de fallo:** Copiar y pegar un bloque de lógica idéntico en dos controladores diferentes en lugar de abstraerlo en un servicio.
+* **Documentación:** [CPD Documentation](https://pmd.github.io/latest/pmd_userdocs_cpd.html)
+
+### Checkstyle
+Verifica que el código siga estándares de formato y estilo (basado en la guía de Google). Se enfoca en la estética y estructura del código.
+* **Se ejecuta en:** Fase `validate`.
+* **Configuración:** Utiliza `checkstyle-base.xml`. Este archivo es una configuración personalizada que hereda de Google Style pero **desactiva las reglas de formateo** (indentación, espacios, llaves) para evitar conflictos con Prettier, enfocándose únicamente en convenciones de nombres, Javadocs e importaciones.
+* **Comandos:**
+  * `mvn checkstyle:check`: Valida el estilo y falla si hay errores.
+  * `mvn checkstyle:checkstyle`: Genera el reporte visual en `.calidad-de-codigo/checkstyle/checkstyle.html`.
+* **Reportes:** Todos los resultados (XML e HTML) se guardan en la carpeta `.calidad-de-codigo/checkstyle/` en la raíz del proyecto.
+* **Ejemplo de fallo:** Uso de nombres de variables incorrectos (ej: `int MiVariable`), falta de Javadoc en clases públicas o importaciones con asterisco (`import java.util.*`).
+* **Documentación:** [Checkstyle Google Style](https://checkstyle.sourceforge.io/google_style.html)
+
+### Prettier (Maven Plugin)
+Formatea automáticamente el código Java para que cumpla con las reglas de estilo.
+* **Se ejecuta en:** Fase `process-sources` (antes de compilar).
+* **Comandos:**
+  * `mvn prettier:write`: Formatea y sobreescribe los archivos con el estilo correcto.
+  * `mvn prettier:check`: Solo verifica si el código cumple el formato sin modificar archivos.
+* **Función:** Reescribe tus archivos `.java` para corregir la indentación y el formato automáticamente al ejecutar `mvn test` o `mvn compile`.
+* **Documentación:** [Prettier Java](https://github.com/jhipster/prettier-java)
+
+### ESLint (JavaScript Linter)
+Analiza el código JavaScript para detectar errores y asegurar un estilo consistente.
+* **Se ejecuta en:** GitHub Actions (CI) antes de correr los tests de JS.
+* **Ejemplo de fallo:** Uso de variables no definidas o falta de punto y coma si la regla lo exige.
+* **Documentación:** [ESLint Official Site](https://eslint.org/)
+
+### JaCoCo (Code Coverage)
+Mide qué porcentaje del código fuente está cubierto por las pruebas unitarias.
+* **Se ejecuta en:** Fase `test`.
+* **Configuración:** Requiere un mínimo de 80% de cobertura en líneas (excluyendo configuraciones).
+* **Comandos:**
+  * `mvn jacoco:report`: Genera el reporte visual en `.calidad-de-codigo/jacoco/index.html`.
+* **Reportes:** Todos los resultados (binarios e HTML) se guardan en la carpeta `.calidad-de-codigo/jacoco/` en la raíz del proyecto.
+* **Ejemplo de fallo:** Si los tests cubren menos del 80% de las líneas de lógica de negocio, el build fallará durante la verificación.
+* **Documentación:** [JaCoCo Official Site](https://www.jacoco.org/jacoco/)
+
+#### Comando para generar reporte fresco:
+Como los resultados se guardan en una carpeta personalizada fuera de `target`, se recomienda borrar los resultados anteriores para asegurar que la métrica sea actual:
+
+**En Linux / macOS / Git Bash:**
+```shell
+rm -rf .calidad-de-codigo/jacoco && mvn clean test
+```
+
+**En Windows (PowerShell):**
+```powershell
+Remove-Item -Recurse -Force .calidad-de-codigo/jacoco; mvn clean test
+```
+
+**En Windows (CMD):**
+```cmd
+rd /s /q .calidad-de-codigo\jacoco & mvn clean test
+```
+
 ## Tecnologías:
 * Docker
 * Java 11
@@ -220,6 +310,11 @@ mvn clean install
 * Hibernate 5.4.24.Final
 * Mockito 5.3.1
 * Playwright 1.36.0
+* PMD 3.21.0 & CPD
+* Checkstyle 10.9.1 (Google Style)
+* Prettier Maven Plugin 0.22 (Prettier-Java 2.5.0)
+* ESLint 9.x
+* JaCoCo 0.8.12
 * Node 18.16.1 o superior <- Instalación manual desde la [página de node](https://nodejs.org/en) 
 * npm --> npm install -g npm
 
