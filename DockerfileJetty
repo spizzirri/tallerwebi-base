@@ -1,5 +1,5 @@
 # Usa la imagen base de OpenJDK 11
-FROM openjdk:11
+FROM eclipse-temurin:11-jdk
 
 # Define una variable para la versión de Jetty
 ENV JETTY_VERSION=9.4.56.v20240826
