@@ -2,6 +2,7 @@ package com.tallerwebi;
 
 import com.tallerwebi.config.DatabaseInitializationConfig;
 import com.tallerwebi.config.HibernateConfig;
+import com.tallerwebi.config.R2Config;
 import com.tallerwebi.config.SpringWebConfig;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
@@ -20,6 +21,7 @@ public class MyServletInitializer extends AbstractAnnotationConfigDispatcherServ
       SpringWebConfig.class,
       HibernateConfig.class,
       DatabaseInitializationConfig.class,
+      R2Config.class,
     };
   }
 
