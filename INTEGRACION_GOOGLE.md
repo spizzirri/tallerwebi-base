@@ -57,5 +57,3 @@ mvn clean jetty:run -Djetty.systemPropertiesFile=/ruta/a/application.properties
     *   Revisar que las credenciales (`GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`) sean correctas y no tengan espacios en blanco.
 *   **Error de `503 Service Unavailable` al iniciar**:
     *   Generalmente significa que hay otra instancia de Jetty corriendo. Detener cualquier proceso anterior (`fuser -k 8080/tcp`).
-
-¡Lista la integración!. La aplicación utilizará estas credenciales para autenticar a los usuarios a través de Google.
