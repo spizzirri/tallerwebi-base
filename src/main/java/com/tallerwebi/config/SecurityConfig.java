@@ -27,6 +27,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
   @Autowired
   private ServicioGoogleOAuth2 servicioGoogleOAuth2;
 
+  /**
+   * Configura las reglas de seguridad HTTP, incluyendo la protección CSRF,
+   * las rutas públicas/privadas y la integración del flujo de inicio de sesión con OAuth2.
+   *
+   * @param http el objeto HttpSecurity utilizado para configurar la seguridad web
+   * @throws Exception si ocurre un error en la configuración
+   */
   @Override
   protected void configure(HttpSecurity http) throws Exception {
     http
@@ -50,6 +57,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
       .oidcUserService(servicioGoogleOAuth2);
   }
 
+  /**
+   * Crea y registra el repositorio de clientes OAuth2 en memoria, cargando las
+   * credenciales de Google desde las propiedades del sistema.
+   *
+   * @param googleClientId     ID del cliente de Google obtenido desde las variables de entorno
+   * @param googleClientSecret Secreto del cliente de Google obtenido desde las variables de entorno
+   * @return una instancia de ClientRegistrationRepository configurada
+   */
   @Bean
   public static ClientRegistrationRepository clientRegistrationRepository(
     @Value("${GOOGLE_CLIENT_ID:}") String googleClientId,
@@ -60,6 +75,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     );
   }
 
+  /**
+   * Construye la configuración necesaria para interactuar con la API de autenticación de Google,
+   * incluyendo URLs de autorización, intercambio de tokens y obtención de perfil de usuario.
+   *
+   * @param clientId     el ID del cliente de Google
+   * @param clientSecret el secreto del cliente de Google
+   * @return la configuración completa del cliente OAuth2 para Google
+   * @throws IllegalArgumentException si el clientId está vacío o nulo
+   */
   private static ClientRegistration googleClientRegistration(String clientId, String clientSecret) {
     LOGGER.debug("Google Client ID recibido: '{}'", clientId);
     if (clientId == null || clientId.isEmpty()) {

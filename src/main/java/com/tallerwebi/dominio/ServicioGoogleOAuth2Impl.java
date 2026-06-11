@@ -8,6 +8,10 @@ import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 
+/**
+ * Implementación de {@link ServicioGoogleOAuth2} que gestiona la carga y registro
+ * automático de usuarios obtenidos a través de Google OAuth2.
+ */
 @Service
 public class ServicioGoogleOAuth2Impl implements ServicioGoogleOAuth2 {
 
@@ -17,8 +21,12 @@ public class ServicioGoogleOAuth2Impl implements ServicioGoogleOAuth2 {
   private OidcUserService delegate = new OidcUserService();
 
   /**
-   * Método obligatorio definido en la interfaz OAuth2UserService/OidcUserService.
-   * Spring Security lo invoca automáticamente tras obtener el token de usuario del proveedor (Google).
+   * Carga la información del usuario desde Google, verifica si existe en la base de datos
+   * y, en caso contrario, realiza el registro automático del nuevo usuario.
+   *
+   * @param userRequest el objeto que contiene la solicitud de información del usuario OAuth2
+   * @return el objeto {@link OidcUser} con la información autenticada
+   * @throws LoginGoogleException si ocurre un error durante el proceso de registro o si el usuario ya existe
    */
   @Override
   public OidcUser loadUser(OidcUserRequest userRequest) {
