@@ -98,8 +98,8 @@ td.producto-cell {
 }
 
 .producto-img {
-    width: 40px;
-    height: 40px;
+    width: 65px;
+    height: 65px;
     object-fit: contain;
     border-radius: 8px;
     background: #F8F9FD;
@@ -109,12 +109,12 @@ td.producto-cell {
 
 .producto-nombre {
     font-weight: 600;
-    font-size: .875rem;
+    font-size: 1rem;
     color: var(--text);
 }
 
 .producto-precio {
-    font-size: .75rem;
+    font-size: .95rem;
     color: var(--muted);
     margin-top: 2px;
 }
@@ -127,8 +127,8 @@ td.producto-cell {
 }
 
 .hijo-avatar {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     background: var(--purple-lt);
     display: flex;
@@ -192,6 +192,12 @@ td.producto-cell {
 .btn-trash:hover {
     color: #E24B4A;
     background: #FCEBEB;
+}
+
+.accordion-collapse {
+
+background: #F8F9FD;
+
 }
 
 .tabla-footer {
