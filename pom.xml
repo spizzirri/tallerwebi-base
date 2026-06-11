@@ -74,6 +74,31 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Spring Security: Infraestructura base para proteger la aplicación (filtros, seguridad HTTP). -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-web</artifactId>
+            <version>5.2.15.RELEASE</version>
+        </dependency>
+        <!-- Spring Security Config: Permite configurar la seguridad mediante clases Java (@EnableWebSecurity). -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-config</artifactId>
+            <version>5.2.15.RELEASE</version>
+        </dependency>
+        <!-- OAuth2 Client: Proporciona soporte para actuar como cliente OAuth2 (login con proveedores como Google). -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-oauth2-client</artifactId>
+            <version>5.2.15.RELEASE</version>
+        </dependency>
+        <!-- OAuth2 JOSE: Necesario para procesar y validar tokens JWT (JSON Web Tokens) usados en OpenID Connect. -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-oauth2-jose</artifactId>
+            <version>5.2.15.RELEASE</version>
+        </dependency>
+
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
@@ -99,6 +124,12 @@
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
             <version>${hibernate.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.15.2</version>
         </dependency>
 
         <dependency>
@@ -358,21 +389,7 @@
                                     <element>BUNDLE</element>
                                     <limits>
                                         <limit>
-                                            <!-- Métrica a evaluar. 
-                                                 Opciones: 
-                                                 - LINE (Líneas de código)
-                                                 - BRANCH (Ramas de decisión: if/switch)
-                                                 - INSTRUCTION (Instrucciones bytecode)
-                                                 - COMPLEXITY (Complejidad ciclomática)
-                                                 - METHOD (Métodos cubiertos)
-                                                 - CLASS (Clases cubiertas) -->
                                             <counter>LINE</counter>
-                                            <!-- Tipo de valor a controlar.
-                                                 Opciones:
-                                                 - COVEREDRATIO (Porcentaje de cobertura: 0.0 a 1.0)
-                                                 - MISSEDCOUNT (Número máximo de elementos no cubiertos permitidos)
-                                                 - COVEREDCOUNT (Número mínimo de elementos cubiertos)
-                                                 - TOTALCOUNT (Número total de elementos) -->
                                             <value>COVEREDRATIO</value>
                                             <!-- Porcentaje mínimo requerido (0.80 = 80%) -->
                                             <minimum>0.80</minimum>
