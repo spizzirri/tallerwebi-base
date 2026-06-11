@@ -24,6 +24,22 @@ public class ServicioGeminiImpl implements ServicioGemini {
 
   private String systemInstructions = "";
 
+  // Modelos disponibles:
+  //
+  // Nivel Gratuito (Limitado por cuotas, mejora la IA con tus datos):
+  // - gemini-3-flash: Recomendado, mejor equilibrio actual.
+  // - gemini-2.5-flash: Estable y rápido.
+  // - gemini-2.5-flash-lite: Máxima velocidad, mayores límites de peticiones.
+  //
+  // Nivel De Pago (Pay-as-you-go, datos privados):
+  // - gemini-3.1-pro: Razonamiento complejo y tareas avanzadas.
+  // - gemini-2.5-pro: Tareas de análisis y razonamiento avanzado.
+  //
+  // Métodos disponibles (usar después de los dos puntos en la URL):
+  // - generateContent: Generación síncrona (espera la respuesta completa)
+  // - streamGenerateContent: Generación en tiempo real (streaming, ideal para UI)
+  // - countTokens: Verifica el costo/uso de tokens antes de procesar
+  // - embedContent: Convierte texto en vectores (para búsqueda semántica)
   private static final String URL =
     "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent";
 
