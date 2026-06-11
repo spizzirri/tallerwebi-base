@@ -73,4 +73,9 @@ public class SpringWebTestConfig implements WebMvcConfigurer {
     viewResolver.setTemplateEngine(templateEngine());
     return viewResolver;
   }
+
+  @Bean
+  public org.springframework.web.client.RestTemplate restTemplate() {
+    return new org.springframework.web.client.RestTemplate();
+  }
 }

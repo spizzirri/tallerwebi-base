@@ -21,6 +21,7 @@
         <hsqldb.version>2.7.4</hsqldb.version>
         <checkstyle.version>3.6.0</checkstyle.version>
         <checkstyle.runtime.version>13.8.0</checkstyle.runtime.version>
+        <jackson.version>2.15.2</jackson.version>
     </properties>
 
     <dependencies>
@@ -107,6 +108,19 @@
             <artifactId>playwright</artifactId>
             <version>${playwright.version}</version>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+            <!-- 
+              Jackson Databind es la librería estándar utilizada para el procesamiento de JSON en Java.
+              En este proyecto, se utiliza para:
+              1. Serializar objetos Java (como DeudorDto) a formato JSON para las respuestas de la API.
+              2. Deserializar el JSON recibido en las peticiones entrantes a objetos Java.
+              Es esencial para el funcionamiento de los controladores @RestController.
+            -->
         </dependency>
     </dependencies>
 
