@@ -1,6 +1,7 @@
 package com.tallerwebi.presentacion.Pagos;
 
 import com.tallerwebi.dominio.Carrito.ServicioCarrito;
+import com.tallerwebi.dominio.Mail.ServicioEmail;
 import com.tallerwebi.dominio.Pagos.ServicioMercadoPago;
 import com.tallerwebi.dominio.Pedidos.Pedido;
 import com.tallerwebi.dominio.Pedidos.ServicioPedido;
@@ -20,6 +21,9 @@ public class ControladorMercadoPago {
   private final ServicioMercadoPago servicioMercadoPago;
   private final ServicioCarrito servicioCarrito;
   private final ServicioPedido servicioPedido;
+
+  @Autowired
+  private ServicioEmail servicioEmail;
 
   @Autowired
   public ControladorMercadoPago(
@@ -74,6 +78,26 @@ public class ControladorMercadoPago {
     }
     // Marcás los pedidos como pagados
     servicioPedido.marcarComoPagados(usuario.getId());
+
+    // Mandar un mail de confirmacion de pago
+
+    Double total = pedidos
+      .stream()
+      .flatMap(p -> p.getItems().stream())
+      .mapToDouble(i -> i.getCantidad() * i.getPrecioUnitario())
+      .sum();
+
+    String mensaje =
+      "Hola " +
+      usuario.getNombre() +
+      "\n\n" +
+      "Recibimos correctamente tu pago.\n\n" +
+      "Total abonado: $" +
+      total +
+      "\n\n" +
+      "Gracias por utilizar Kionet.";
+
+    servicioEmail.enviarEmail(usuario.getEmail(), "Pago recibido - Kionet", mensaje);
 
     // Recién acá vaciás el carrito
     servicioCarrito.vaciarCarrito(usuario.getId());
