@@ -64,7 +64,13 @@
                         </div>
                         <form action="carrito/agregar" method="post" class="add-to-cart-form">
                             <input type="hidden" name="productoId" th:value="${producto.id}">
-                            <button type="submit" class="btn-add-product">+ Agregar al carrito</button>
+
+                            <button
+                                    type="submit"
+                                    class="btn-add-product"
+                                    th:disabled="${producto.cantidad <= 0}"
+                                    th:text="${producto.cantidad <= 0 ? '¡No hay stock!' : '+ Agregar al carrito'}">
+                            </button>
                         </form>
                     </div>
                 </div>
@@ -96,9 +102,15 @@
 <!--                        </form>-->
                         <button type="button"
                                 th:data-producto-id="${producto.id}"
-                                th:classappend="${#lists.contains(idsEnCarrito, producto.id)} ? 'btn-add-product agregado' : 'btn-add-product'"
-                                th:text="${#lists.contains(idsEnCarrito, producto.id)} ? '✓ Agregado' : '+ Agregar al carrito'"
-                                th:disabled="${#lists.contains(idsEnCarrito, producto.id)}"
+                                th:classappend="${
+                                    producto.cantidad <= 0 ? 'btn-add-product sin-stock' :
+                                    (#lists.contains(idsEnCarrito, producto.id) ? 'btn-add-product agregado' : 'btn-add-product')
+                                }"
+                                th:text="${
+                                    producto.cantidad <= 0 ? '¡No hay stock!' :
+                                    (#lists.contains(idsEnCarrito, producto.id) ? '✓ Agregado' : '+ Agregar al carrito')
+                                }"
+                                th:disabled="${producto.cantidad <= 0 || #lists.contains(idsEnCarrito, producto.id)}"
                                 onclick="agregarAlCarrito(this)">
                         </button>
                     </div>

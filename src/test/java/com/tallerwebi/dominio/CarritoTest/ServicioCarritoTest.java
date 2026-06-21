@@ -14,6 +14,8 @@ import com.tallerwebi.dominio.Usuario.Usuario;
 import com.tallerwebi.dominio.excepcion.ProductoNoEncontradoException;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.tallerwebi.dominio.excepcion.ProductoSinStockException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -284,5 +286,37 @@ public class ServicioCarritoTest {
 
     //validacion
     assertEquals(1, resultado);
+  }
+
+  @Test
+  void noDeberiaAgregarProductoSinStock() {
+
+    // given
+    Producto producto = new Producto();
+    producto.setCantidad(0);
+
+    when(repositorioProductoMock.buscarProductoPorId(1L))
+            .thenReturn(producto);
+
+    // then
+    assertThrows(
+            ProductoSinStockException.class,
+            () -> servicioCarrito.agregarProducto(1L, 1L)
+    );
+  }
+
+  @Test
+  void noDeberiaAgregarProductoCuandoElStockEsNegativo() {
+
+    Producto producto = new Producto();
+    producto.setCantidad(-5);
+
+    when(repositorioProductoMock.buscarProductoPorId(1L))
+            .thenReturn(producto);
+
+    assertThrows(
+            ProductoSinStockException.class,
+            () -> servicioCarrito.agregarProducto(1L, 1L)
+    );
   }
 }
