@@ -12,10 +12,9 @@ import com.tallerwebi.dominio.Productos.Producto;
 import com.tallerwebi.dominio.Productos.RepositorioProducto;
 import com.tallerwebi.dominio.Usuario.Usuario;
 import com.tallerwebi.dominio.excepcion.ProductoNoEncontradoException;
+import com.tallerwebi.dominio.excepcion.ProductoSinStockException;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.tallerwebi.dominio.excepcion.ProductoSinStockException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -290,33 +289,23 @@ public class ServicioCarritoTest {
 
   @Test
   void noDeberiaAgregarProductoSinStock() {
-
     // given
     Producto producto = new Producto();
     producto.setCantidad(0);
 
-    when(repositorioProductoMock.buscarProductoPorId(1L))
-            .thenReturn(producto);
+    when(repositorioProductoMock.buscarProductoPorId(1L)).thenReturn(producto);
 
     // then
-    assertThrows(
-            ProductoSinStockException.class,
-            () -> servicioCarrito.agregarProducto(1L, 1L)
-    );
+    assertThrows(ProductoSinStockException.class, () -> servicioCarrito.agregarProducto(1L, 1L));
   }
 
   @Test
   void noDeberiaAgregarProductoCuandoElStockEsNegativo() {
-
     Producto producto = new Producto();
     producto.setCantidad(-5);
 
-    when(repositorioProductoMock.buscarProductoPorId(1L))
-            .thenReturn(producto);
+    when(repositorioProductoMock.buscarProductoPorId(1L)).thenReturn(producto);
 
-    assertThrows(
-            ProductoSinStockException.class,
-            () -> servicioCarrito.agregarProducto(1L, 1L)
-    );
+    assertThrows(ProductoSinStockException.class, () -> servicioCarrito.agregarProducto(1L, 1L));
   }
 }

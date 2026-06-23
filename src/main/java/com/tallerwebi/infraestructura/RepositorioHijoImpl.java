@@ -52,4 +52,15 @@ public class RepositorioHijoImpl implements RepositorioHijo {
     //        }
     return !query.getResultList().isEmpty();
   }
+
+  @Override
+  public boolean existeAlias(String alias) {
+    return (
+      this.sessionFactory.getCurrentSession()
+        .createQuery("SELECT COUNT(h) FROM Hijo h WHERE h.aliasRetiro = :alias", Long.class)
+        .setParameter("alias", alias)
+        .getSingleResult() >
+      0
+    );
+  }
 }

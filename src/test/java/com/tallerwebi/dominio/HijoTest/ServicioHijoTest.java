@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
+import com.tallerwebi.dominio.AliasDeRetiro.ServicioGeneradorAlias;
 import com.tallerwebi.dominio.Hijos.Hijo;
 import com.tallerwebi.dominio.Hijos.RepositorioHijo;
 import com.tallerwebi.dominio.Hijos.ServicioHijo;
@@ -21,14 +22,16 @@ public class ServicioHijoTest {
   private Usuario usuarioMock;
   private ServicioHijo servicioHijo;
   private RepositorioHijo repositorioHijoMock;
+  private ServicioGeneradorAlias servicioGeneradorAliasMock;
   private Hijo hijoMock;
 
   @BeforeEach
   public void init() {
     repositorioHijoMock = Mockito.mock(RepositorioHijo.class);
+    servicioGeneradorAliasMock = Mockito.mock(ServicioGeneradorAlias.class);
 
     usuarioMock = Mockito.mock(Usuario.class);
-    servicioHijo = new ServicioHijoImpl(repositorioHijoMock);
+    servicioHijo = new ServicioHijoImpl(repositorioHijoMock, servicioGeneradorAliasMock);
     hijoMock = Mockito.mock(Hijo.class);
   }
 
