@@ -14,7 +14,7 @@ public class Usuario {
   @Column(nullable = false, unique = true)
   private String email;
 
-  @Column(nullable = false)
+  @Column(nullable = true)
   private String password;
 
   @Embedded
