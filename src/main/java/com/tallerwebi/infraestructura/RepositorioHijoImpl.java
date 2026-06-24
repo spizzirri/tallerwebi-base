@@ -54,6 +54,17 @@ public class RepositorioHijoImpl implements RepositorioHijo {
   }
 
   @Override
+  public boolean existeAlias(String alias) {
+    return (
+      this.sessionFactory.getCurrentSession()
+        .createQuery("SELECT COUNT(h) FROM Hijo h WHERE h.aliasRetiro = :alias", Long.class)
+        .setParameter("alias", alias)
+        .getSingleResult() >
+      0
+    );
+  }
+
+  @Override
   public void modificar(Hijo hijo) {
     sessionFactory.getCurrentSession().update(hijo);
   }

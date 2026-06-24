@@ -1,5 +1,6 @@
 package com.tallerwebi.dominio.Hijos;
 
+import com.tallerwebi.dominio.AliasDeRetiro.ServicioGeneradorAlias;
 import com.tallerwebi.dominio.SubidaDeImgs.ServicioImagenes;
 import com.tallerwebi.dominio.Usuario.Usuario;
 import com.tallerwebi.dominio.excepcion.HijoExistenteException;
@@ -15,11 +16,17 @@ import org.springframework.web.multipart.MultipartFile;
 public class ServicioHijoImpl implements ServicioHijo {
 
   private final RepositorioHijo repoHijo;
+  private final ServicioGeneradorAlias servicioGeneradorAlias;
   private final ServicioImagenes servicioImagenes;
 
   @Autowired
-  public ServicioHijoImpl(RepositorioHijo repositorioHijo, ServicioImagenes servicioImagenes) {
+  public ServicioHijoImpl(
+    RepositorioHijo repositorioHijo,
+    ServicioGeneradorAlias servicioGeneradorAlias,
+    ServicioImagenes servicioImagenes
+  ) {
     this.repoHijo = repositorioHijo;
+    this.servicioGeneradorAlias = servicioGeneradorAlias;
     this.servicioImagenes = servicioImagenes;
   }
 
@@ -33,6 +40,7 @@ public class ServicioHijoImpl implements ServicioHijo {
     if (repoHijo.existeHijoPorDni(hijo.getDni())) {
       throw new HijoExistenteException();
     }
+
     hijo.setPadre(usuario);
     // Si subieron una foto, la procesamos y guardamos la URL
     if (fotoPerfil != null && !fotoPerfil.isEmpty()) {
@@ -42,6 +50,19 @@ public class ServicioHijoImpl implements ServicioHijo {
       );
       hijo.setFotoPerfil(rutaGuardarEnHosting);
     }
+
+    String alias = servicioGeneradorAlias.generarAliasDisponible();
+
+    hijo.setAliasRetiro(alias);
+
+    //    String alias;
+    //
+    //    do {
+    //      alias = servicioGeneradorAlias.generarAlias();
+    //    } while (repoHijo.existeAlias(alias));
+
+    //    hijo.setAliasRetiro(alias);
+
     repoHijo.guardar(hijo);
   }
 

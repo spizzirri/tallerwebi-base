@@ -12,6 +12,7 @@ import com.tallerwebi.dominio.Productos.Producto;
 import com.tallerwebi.dominio.Productos.RepositorioProducto;
 import com.tallerwebi.dominio.Usuario.Usuario;
 import com.tallerwebi.dominio.excepcion.ProductoNoEncontradoException;
+import com.tallerwebi.dominio.excepcion.ProductoSinStockException;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,6 +42,7 @@ public class ServicioCarritoTest {
     //preparacion
     Producto producto = new Producto();
     producto.setId(1L);
+    producto.setCantidad(10);
     producto.setNombre("Galletitas");
 
     Usuario usuario = new Usuario();
@@ -67,11 +69,13 @@ public class ServicioCarritoTest {
     //preparacion
     Producto producto1 = new Producto();
     producto1.setId(1L);
+    producto1.setCantidad(10);
     producto1.setNombre("Galletitas");
     producto1.setPrecio(100.0);
 
     Producto producto2 = new Producto();
     producto2.setId(2L);
+    producto2.setCantidad(10);
     producto2.setNombre("Gaseosa");
     producto2.setPrecio(200.0);
 
@@ -102,6 +106,7 @@ public class ServicioCarritoTest {
     //preparacion
     Producto producto = new Producto();
     producto.setId(1L);
+    producto.setCantidad(10);
     producto.setNombre("Alfajor");
 
     Usuario usuario = new Usuario();
@@ -131,6 +136,7 @@ public class ServicioCarritoTest {
     //preparacion
     Producto producto = new Producto();
     producto.setId(1L);
+    producto.setCantidad(10);
     producto.setNombre("Alfajor");
 
     Usuario usuario = new Usuario();
@@ -159,6 +165,7 @@ public class ServicioCarritoTest {
     //preparacion
     Producto producto = new Producto();
     producto.setId(1L);
+    producto.setCantidad(10);
     producto.setNombre("Alfajor");
 
     Usuario usuario = new Usuario();
@@ -187,6 +194,7 @@ public class ServicioCarritoTest {
     //preparacion
     Producto producto = new Producto();
     producto.setId(1L);
+    producto.setCantidad(10);
     producto.setNombre("Alfajor");
 
     Usuario usuario = new Usuario();
@@ -233,6 +241,7 @@ public class ServicioCarritoTest {
     //preparacion
     Producto producto = new Producto();
     producto.setId(1L);
+    producto.setCantidad(10);
     producto.setNombre("Alfajor");
 
     Usuario usuario = new Usuario();
@@ -261,6 +270,7 @@ public class ServicioCarritoTest {
     //preparacion
     Producto producto = new Producto();
     producto.setId(1L);
+    producto.setCantidad(10);
     producto.setNombre("Alfajor");
 
     Usuario usuario = new Usuario();
@@ -284,5 +294,27 @@ public class ServicioCarritoTest {
 
     //validacion
     assertEquals(1, resultado);
+  }
+
+  @Test
+  void noDeberiaAgregarProductoSinStock() {
+    // given
+    Producto producto = new Producto();
+    producto.setCantidad(0);
+
+    when(repositorioProductoMock.buscarProductoPorId(1L)).thenReturn(producto);
+
+    // then
+    assertThrows(ProductoSinStockException.class, () -> servicioCarrito.agregarProducto(1L, 1L));
+  }
+
+  @Test
+  void noDeberiaAgregarProductoCuandoElStockEsNegativo() {
+    Producto producto = new Producto();
+    producto.setCantidad(-5);
+
+    when(repositorioProductoMock.buscarProductoPorId(1L)).thenReturn(producto);
+
+    assertThrows(ProductoSinStockException.class, () -> servicioCarrito.agregarProducto(1L, 1L));
   }
 }

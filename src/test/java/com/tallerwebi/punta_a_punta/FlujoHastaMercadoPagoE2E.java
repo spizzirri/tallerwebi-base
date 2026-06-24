@@ -12,6 +12,10 @@ import com.tallerwebi.punta_a_punta.vistas.VistaCarrito;
 import com.tallerwebi.punta_a_punta.vistas.VistaHijos;
 import com.tallerwebi.punta_a_punta.vistas.VistaHome;
 import com.tallerwebi.punta_a_punta.vistas.VistaLogin;
+import com.tallerwebi.punta_a_punta.vistas.VistaNuevoUsuario;
+import java.net.MalformedURLException;
+import java.net.URL;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.*;
 
 public class FlujoHastaMercadoPagoE2E {
