@@ -29,11 +29,13 @@ public class ControladorMercadoPago {
   public ControladorMercadoPago(
     ServicioMercadoPago servicioMercadoPago,
     ServicioCarrito servicioCarrito,
-    ServicioPedido servicioPedido
+    ServicioPedido servicioPedido,
+    ServicioEmail servicioEmail
   ) {
     this.servicioMercadoPago = servicioMercadoPago;
     this.servicioCarrito = servicioCarrito;
     this.servicioPedido = servicioPedido;
+    this.servicioEmail = servicioEmail;
   }
 
   @RequestMapping(path = "/pagar", method = RequestMethod.GET)

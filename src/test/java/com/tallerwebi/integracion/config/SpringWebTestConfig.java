@@ -1,5 +1,7 @@
 package com.tallerwebi.integracion.config;
 
+import static org.mockito.Mockito.mock;
+
 import com.cloudinary.Cloudinary;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,6 +10,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -91,5 +94,10 @@ public class SpringWebTestConfig implements WebMvcConfigurer {
     config.put("api_key", "test");
     config.put("api_secret", "test");
     return new Cloudinary(config);
+  }
+
+  @Bean
+  public JavaMailSender javaMailSender() {
+    return mock(JavaMailSender.class);
   }
 }

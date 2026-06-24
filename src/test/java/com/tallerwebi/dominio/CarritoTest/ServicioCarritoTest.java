@@ -42,6 +42,7 @@ public class ServicioCarritoTest {
     //preparacion
     Producto producto = new Producto();
     producto.setId(1L);
+    producto.setCantidad(10);
     producto.setNombre("Galletitas");
 
     Usuario usuario = new Usuario();
@@ -68,11 +69,13 @@ public class ServicioCarritoTest {
     //preparacion
     Producto producto1 = new Producto();
     producto1.setId(1L);
+    producto1.setCantidad(10);
     producto1.setNombre("Galletitas");
     producto1.setPrecio(100.0);
 
     Producto producto2 = new Producto();
     producto2.setId(2L);
+    producto2.setCantidad(10);
     producto2.setNombre("Gaseosa");
     producto2.setPrecio(200.0);
 
@@ -103,6 +106,7 @@ public class ServicioCarritoTest {
     //preparacion
     Producto producto = new Producto();
     producto.setId(1L);
+    producto.setCantidad(10);
     producto.setNombre("Alfajor");
 
     Usuario usuario = new Usuario();
@@ -132,6 +136,7 @@ public class ServicioCarritoTest {
     //preparacion
     Producto producto = new Producto();
     producto.setId(1L);
+    producto.setCantidad(10);
     producto.setNombre("Alfajor");
 
     Usuario usuario = new Usuario();
@@ -160,6 +165,7 @@ public class ServicioCarritoTest {
     //preparacion
     Producto producto = new Producto();
     producto.setId(1L);
+    producto.setCantidad(10);
     producto.setNombre("Alfajor");
 
     Usuario usuario = new Usuario();
@@ -188,6 +194,7 @@ public class ServicioCarritoTest {
     //preparacion
     Producto producto = new Producto();
     producto.setId(1L);
+    producto.setCantidad(10);
     producto.setNombre("Alfajor");
 
     Usuario usuario = new Usuario();
@@ -234,6 +241,7 @@ public class ServicioCarritoTest {
     //preparacion
     Producto producto = new Producto();
     producto.setId(1L);
+    producto.setCantidad(10);
     producto.setNombre("Alfajor");
 
     Usuario usuario = new Usuario();
@@ -262,6 +270,7 @@ public class ServicioCarritoTest {
     //preparacion
     Producto producto = new Producto();
     producto.setId(1L);
+    producto.setCantidad(10);
     producto.setNombre("Alfajor");
 
     Usuario usuario = new Usuario();
