@@ -6,6 +6,7 @@ import com.tallerwebi.dominio.Pedidos.Pedido;
 import com.tallerwebi.dominio.Pedidos.ServicioPedido;
 import com.tallerwebi.dominio.Usuario.Usuario;
 import com.tallerwebi.dominio.excepcion.ProductoNoEncontradoException;
+import com.tallerwebi.dominio.excepcion.ProductoSinStockException;
 import java.util.List;
 import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,8 @@ public class CarritoControlador {
       servicioCarrito.agregarProducto(productoId, usuario.getId());
       return ResponseEntity.ok("ok");
     } catch (ProductoNoEncontradoException e) {
+      return ResponseEntity.status(400).body(e.getMessage());
+    } catch (ProductoSinStockException e) {
       return ResponseEntity.status(400).body(e.getMessage());
     }
   }

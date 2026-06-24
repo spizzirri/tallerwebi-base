@@ -78,6 +78,16 @@
                     </div>
                     <p class="hijo-nombre" th:text="${hijo.nombre}"></p>
                     <span class="hijo-badge" th:text="${hijo.curso.descripcion}"></span>
+                    <!-- ALIAS DE RETIRO-->
+                    <p>
+                        Alias: <strong th:text="${hijo.aliasRetiro}"></strong>
+                    </p>
+
+                    <div th:if="${hijo.aliasRetiro == null}"
+                         class="alert alert-warning">
+                        ⚠ Este hijo aún no tiene alias de retiro configurado.
+                    </div>
+                    <!-- ACA IRIA UN BOTON DE IMPRIMIR CREDENCIAL QUE ARME UNA VISTA  PARA GENERAR EL PDF CON LOS DATOS Y EL ALIAS DEL HIJO -->
                 </div>
             </div>
 

@@ -1,5 +1,9 @@
 package com.tallerwebi.punta_a_punta;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.matchesPattern;
+import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
+
 import com.microsoft.playwright.Browser;
 import com.microsoft.playwright.BrowserContext;
 import com.microsoft.playwright.Page;
@@ -8,6 +12,10 @@ import com.tallerwebi.punta_a_punta.vistas.VistaCarrito;
 import com.tallerwebi.punta_a_punta.vistas.VistaHijos;
 import com.tallerwebi.punta_a_punta.vistas.VistaHome;
 import com.tallerwebi.punta_a_punta.vistas.VistaLogin;
+import com.tallerwebi.punta_a_punta.vistas.VistaNuevoUsuario;
+import java.net.MalformedURLException;
+import java.net.URL;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.*;
 
 public class FlujoHastaMercadoPagoE2E {
