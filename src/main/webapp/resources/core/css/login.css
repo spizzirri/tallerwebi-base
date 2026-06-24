@@ -179,3 +179,52 @@ body {
     .extras { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
     .security-badge { margin-top: 3rem; }
 }
+
+/* ── DIVIDER ── */
+.divider {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    margin: 1.3rem 0;
+    color: var(--muted);
+    font-size: .82rem;
+}
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+}
+
+/* ── BOTÓN SOCIAL ── */
+.btn-social {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .75rem;
+    padding: .8rem;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    background: var(--white);
+    color: var(--text);
+    font-size: .95rem;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    text-decoration: none;
+    transition: border-color .2s, box-shadow .2s, background .2s;
+    margin-bottom: .75rem;
+}
+.btn-social:hover {
+    border-color: var(--purple);
+    box-shadow: 0 4px 14px rgba(91,63,228,.12);
+    background: var(--purple-lt);
+}
+
+@media (max-width: 768px) {
+    .btn-social {
+        font-size: .88rem;
+        padding: .75rem;
+    }
+}

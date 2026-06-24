@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -28,15 +29,14 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Bean
-  public ClientRegistrationRepository clientRegistrationRepository() {
-    return new InMemoryClientRegistrationRepository(googleClientRegistration());
-  }
-
-  private ClientRegistration googleClientRegistration() {
-    return ClientRegistration
+  public static ClientRegistrationRepository clientRegistrationRepository(
+    @Value("${google.client.id}") String clientId,
+    @Value("${google.client.secret}") String clientSecret
+  ) {
+    ClientRegistration registration = ClientRegistration
       .withRegistrationId("google")
-      .clientId("aca")
-      .clientSecret("aca")
+      .clientId(clientId)
+      .clientSecret(clientSecret)
       .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
       .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
       .redirectUri("{baseUrl}/login/oauth2/code/{registrationId}")
@@ -48,6 +48,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
       .jwkSetUri("https://www.googleapis.com/oauth2/v3/certs")
       .clientName("Google")
       .build();
+    return new InMemoryClientRegistrationRepository(registration);
   }
 
   @Qualifier("googleOAuth2UserService")
