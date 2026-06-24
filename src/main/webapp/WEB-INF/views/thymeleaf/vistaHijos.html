@@ -78,16 +78,23 @@
                     </div>
                     <p class="hijo-nombre" th:text="${hijo.nombre}"></p>
                     <span class="hijo-badge" th:text="${hijo.curso.descripcion}"></span>
-                    <!-- ALIAS DE RETIRO-->
-                    <p>
-                        Alias: <strong th:text="${hijo.aliasRetiro}"></strong>
-                    </p>
+
+                    <p>Alias de retiro:</p>
+
+                    <div th:if="${hijo.aliasRetiro != null}"
+                         class="pill-mensaje-alias pill-informacion-alias">
+                        <span><strong th:text="${hijo.aliasRetiro}"></strong></span>
+                    </div>
 
                     <div th:if="${hijo.aliasRetiro == null}"
-                         class="alert alert-warning">
-                        ⚠ Este hijo aún no tiene alias de retiro configurado.
+                         class="alerta-mensaje alerta-informacion alerta-alias">
+
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                        </svg>
+
+                        <span>Sin alias de retiro.</span>
                     </div>
-                    <!-- ACA IRIA UN BOTON DE IMPRIMIR CREDENCIAL QUE ARME UNA VISTA  PARA GENERAR EL PDF CON LOS DATOS Y EL ALIAS DEL HIJO -->
                 </div>
             </div>
 

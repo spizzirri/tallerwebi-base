@@ -217,6 +217,45 @@
     filter: brightness(1.1);
 }
 
+.pill-mensaje-alias {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border-radius: var(--radius-sm);
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    box-shadow: var(--shadow-sm);
+}
+
+.pill-informacion-alias {
+    background-color: var(--primary-light);
+    color: var(--primary);
+    border: 1px solid var(--purple-dark);
+}
+
+.alerta-alias {
+    padding: 6px 10px;
+    margin-bottom: 8px;
+    font-size: 0.8rem;
+    display: inline-flex;
+}
+
+.alerta-alias svg {
+    width: 30px;
+    height: 30px;
+}
+
+.btn-crear-alias {
+    margin-left: auto;
+    padding: 4px 8px;
+    font-size: 0.8rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
 .btn-editar-hijo svg,
 .banner-edicion svg {
     width: 18px;
