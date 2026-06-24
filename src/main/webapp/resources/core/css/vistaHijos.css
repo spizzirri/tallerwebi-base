@@ -155,6 +155,7 @@
     margin-top: .5rem;
 }
 
+.btn-cancelar-alias,
 .btn-cancelar {
     background: transparent;
     border: 1.5px solid var(--border);
@@ -173,6 +174,8 @@
     color: var(--text);
 }
 
+.btn-crear-alias,
+.btn-guardar-alias,
 .btn-guardar {
     background: var(--primary);
     color: var(--white);
@@ -240,20 +243,30 @@
     margin-bottom: 8px;
     font-size: 0.8rem;
     display: inline-flex;
+    flex-direction: column;
 }
 
-.alerta-alias svg {
+.alerta-alias-contenido {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.alerta-alias-contenido svg {
     width: 30px;
     height: 30px;
 }
 
-.btn-crear-alias {
-    margin-left: auto;
-    padding: 4px 8px;
-    font-size: 0.8rem;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
+.modal-alias-btn-container {
+    margin-top: 15px;
+}
+
+.modal-overlay .modal-card input {
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    width: 80%;
+    height: 30px;
+    box-sizing: border-box; /* Evita que el padding sume tamaño y desborde */
 }
 
 .btn-editar-hijo svg,
