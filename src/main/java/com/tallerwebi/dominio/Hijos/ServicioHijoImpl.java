@@ -4,6 +4,7 @@ import com.tallerwebi.dominio.AliasDeRetiro.ServicioGeneradorAlias;
 import com.tallerwebi.dominio.SubidaDeImgs.ServicioImagenes;
 import com.tallerwebi.dominio.Usuario.Usuario;
 import com.tallerwebi.dominio.excepcion.AliasExistenteException;
+import com.tallerwebi.dominio.excepcion.AliasVacioException;
 import com.tallerwebi.dominio.excepcion.HijoExistenteException;
 import com.tallerwebi.dominio.excepcion.HijoNoEncontradoException;
 import java.util.List;
@@ -81,11 +82,17 @@ public class ServicioHijoImpl implements ServicioHijo {
       hijoExistente.setFotoPerfil(rutaGuardarEnHosting);
     }
 
+    if (datosNuevos.getAliasRetiro() != null) {
+      actualizarAlias(hijoExistente.getId(), datosNuevos.getAliasRetiro(), usuario);
+    }
+
     repoHijo.modificar(hijoExistente);
   }
 
   @Override
   public void actualizarAlias(Long hijoId, String aliasRetiro, Usuario usuario) {
+    validarAliasVacio(aliasRetiro);
+
     Hijo hijo = repoHijo.buscarPorId(hijoId);
 
     if (hijo == null) {
@@ -96,7 +103,7 @@ public class ServicioHijoImpl implements ServicioHijo {
       throw new RuntimeException("No puede modificar este hijo");
     }
 
-    if (repoHijo.existeAlias(aliasRetiro)) {
+    if (repoHijo.existeAlias(aliasRetiro) && !aliasRetiro.equals(hijo.getAliasRetiro())) {
       throw new AliasExistenteException("El alias ya está en uso");
     }
 
@@ -113,5 +120,11 @@ public class ServicioHijoImpl implements ServicioHijo {
       throw new HijoNoEncontradoException();
     }
     repoHijo.eliminar(hijoExistente);
+  }
+
+  private void validarAliasVacio(String aliasRetiro) {
+    if (aliasRetiro == null || aliasRetiro.trim().isEmpty()) {
+      throw new AliasVacioException("El alias no puede estar vacío");
+    }
   }
 }
