@@ -224,7 +224,6 @@ public class HijosControladorTest {
   }
 
 
-
   @Test
   public void editarHijoDeberiaLlamarAlServicioYRecargarLaVistaHijos() {
     when(sessionMock.getAttribute("USUARIO")).thenReturn(usuarioMock);
@@ -358,5 +357,30 @@ public class HijosControladorTest {
       verify(redirectAttributesMock, times(1))
               .addFlashAttribute("error", "No se pudo eliminar: el hijo no existe o no te pertenece.");
       assertThat(mv.getViewName(), equalToIgnoringCase("redirect:/vistaHijos"));
+    }
+
+    @Test
+    public void irACredencialesDebeMostrarVistaCredencialesConInfoDeLosHijosDelUsuario(){
+        when(sessionMock.getAttribute("USUARIO")).thenReturn(usuarioMock);
+        when(usuarioMock.getId()).thenReturn(1L); // ← FIJAMOS el ID del usuario primero
+        Hijo hijoMock1 = Mockito.mock(Hijo.class);
+        when(hijoMock1.getNombre()).thenReturn("Santiago");
+
+        Hijo hijoMock2 = Mockito.mock(Hijo.class);
+        when(hijoMock2.getNombre()).thenReturn("Romina");
+
+        List<Hijo> hijosSimulados = List.of(hijoMock1, hijoMock2);
+
+        when(servicioHijoMock.obtenerHijosPorUsuario(1L)).thenReturn(hijosSimulados);
+
+        ModelAndView mav = hijosControlador.irACredenciales(sessionMock);
+        assertThat(mav.getViewName(), equalToIgnoringCase("credenciales"));
+
+        List<Hijo> hijosObtenidos = (List<Hijo>) mav.getModel().get("hijos");
+
+        assertThat(hijosObtenidos.get(0).getNombre(), equalToIgnoringCase("Santiago"));
+        assertThat(hijosObtenidos.get(1).getNombre(), equalToIgnoringCase("Romina"));
+        assertThat(mav.getModel().get("usuario"), equalTo(usuarioMock));
+
     }
 }
