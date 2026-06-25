@@ -19,3 +19,16 @@ function abrirSeccionEdicion(boton) {
 function cerrarSeccionEdicion() {
   document.getElementById("seccionEdicionHijo").style.display = "none";
 }
+
+function abrirModalAlias(button) {
+
+    const hijoId = button.dataset.id;
+
+    document.getElementById("hijoIdAlias").value = hijoId;
+
+    document.getElementById("modalAlias").style.display = "flex";
+}
+
+function cerrarModalAlias() {
+    document.getElementById("modalAlias").style.display = "none";
+}

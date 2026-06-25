@@ -4,6 +4,7 @@ import com.tallerwebi.dominio.Hijos.Curso;
 import com.tallerwebi.dominio.Hijos.Hijo;
 import com.tallerwebi.dominio.Hijos.ServicioHijo;
 import com.tallerwebi.dominio.Usuario.Usuario;
+import com.tallerwebi.dominio.excepcion.AliasExistenteException;
 import com.tallerwebi.dominio.excepcion.HijoExistenteException;
 import com.tallerwebi.dominio.excepcion.HijoNoEncontradoException;
 import java.util.List;
@@ -140,6 +141,23 @@ public class HijosControlador {
     model.put("hijos", hijos);
 
     return new ModelAndView("credenciales", model);
+  }
+
+  @RequestMapping(path = "/guardar-alias", method = RequestMethod.POST)
+  public ModelAndView guardarAlias(
+    @RequestParam Long hijoId,
+    @RequestParam String aliasRetiro,
+    HttpSession session
+  ) {
+    Usuario usuario = (Usuario) session.getAttribute(USUARIO_SESSION);
+
+    try {
+      servicioHijo.actualizarAlias(hijoId, aliasRetiro, usuario);
+
+      return new ModelAndView("redirect:/vistaHijos");
+    } catch (AliasExistenteException e) {
+      return devolverVistaConError(usuario, "Ese alias ya está en uso.");
+    }
   }
 
   @RequestMapping(path = "/eliminarHijo", method = RequestMethod.POST)

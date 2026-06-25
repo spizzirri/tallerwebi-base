@@ -95,15 +95,72 @@
                     </div>
                     <p class="hijo-nombre" th:text="${hijo.nombre}"></p>
                     <span class="hijo-badge" th:text="${hijo.curso.descripcion}"></span>
-                    <!-- ALIAS DE RETIRO-->
-                    <p>
-                        Alias: <strong th:text="${hijo.aliasRetiro}"></strong>
-                    </p>
+
+                    <p>Alias de retiro:</p>
+
+                    <div th:if="${hijo.aliasRetiro != null}"
+                         class="pill-mensaje-alias pill-informacion-alias">
+                        <span><strong th:text="${hijo.aliasRetiro}"></strong></span>
+                    </div>
 
                     <div th:if="${hijo.aliasRetiro == null}"
-                         class="alerta-mensaje alerta-informacion">
-                        ⚠ Este hijo aún no tiene alias de retiro configurado.
+                         class="alerta-mensaje alerta-informacion alerta-alias">
+
+                        <div class="alerta-alias-contenido">
+
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                            </svg>
+
+                            <span>Sin alias de retiro.</span>
+
+                        </div>
+
+                        <button type="button"
+                                class="btn-crear-alias"
+                                th:data-id="${hijo.id}"
+                                onclick="abrirModalAlias(this)">
+                            Crear alias
+                        </button>
+
                     </div>
+                </div>
+            </div>
+
+            <div id="modalAlias" class="modal-overlay" style="display:none;">
+                <div class="modal-card">
+
+                    <h3>Crear alias de retiro</h3>
+
+                    <form th:action="@{/guardar-alias}" method="post">
+
+                        <input type="hidden"
+                               id="hijoIdAlias"
+                               name="hijoId">
+
+                        <label for="aliasRetiro">
+                            Alias
+                        </label>
+
+                        <input type="text"
+                               id="aliasRetiro"
+                               name="aliasRetiro"
+                               placeholder="Ej: ROJO.GATO.TREN"
+                               required>
+
+                        <div class="modal-alias-btn-container">
+                            <button class="btn-guardar-alias" type="submit">
+                                Guardar
+                            </button>
+
+                            <button class="btn-cancelar-alias" type="button"
+                                    onclick="cerrarModalAlias()">
+                                Cancelar
+                            </button>
+                        </div>
+
+                    </form>
+
                 </div>
             </div>
 
