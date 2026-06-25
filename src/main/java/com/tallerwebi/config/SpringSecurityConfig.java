@@ -5,19 +5,19 @@ import com.tallerwebi.dominio.Usuario.Usuario;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.oidc.IdTokenClaimNames;
@@ -27,6 +27,12 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 @Configuration
 @EnableWebSecurity
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
+
+  @Bean
+  @Primary
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
 
   @Bean
   public static ClientRegistrationRepository clientRegistrationRepository(
@@ -51,24 +57,32 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     return new InMemoryClientRegistrationRepository(registration);
   }
 
-  @Qualifier("googleOAuth2UserService")
-  private OAuth2UserService<OAuth2UserRequest, OAuth2User> googleOAuth2UserService;
+  @Override
+  public void configure(
+    org.springframework.security.config.annotation.web.builders.WebSecurity web
+  ) {
+    web.ignoring().antMatchers("/validar-login", "/registrarme");
+  }
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
     http
+      .csrf()
+      .disable()
       .authorizeRequests()
-      .antMatchers("/", "/login", "/css/**", "/js/**", "/img/**", "/imagenes/**")
+      .antMatchers("/**")
       .permitAll()
       .anyRequest()
       .authenticated()
       .and()
+      .formLogin()
+      .disable()
       .oauth2Login()
       .loginPage("/login")
       .successHandler(oauth2SuccessHandler())
       .and()
       .logout()
-      .logoutSuccessUrl("/login");
+      .disable();
   }
 
   @Autowired
