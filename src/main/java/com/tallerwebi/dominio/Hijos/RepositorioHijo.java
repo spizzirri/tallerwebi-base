@@ -14,4 +14,6 @@ public interface RepositorioHijo {
   boolean existeAlias(String alias);
 
   void modificar(Hijo hijo);
+
+    void eliminar(Hijo hijoExistente);
 }

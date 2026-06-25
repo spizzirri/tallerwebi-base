@@ -68,4 +68,9 @@ public class RepositorioHijoImpl implements RepositorioHijo {
   public void modificar(Hijo hijo) {
     sessionFactory.getCurrentSession().update(hijo);
   }
+
+    @Override
+    public void eliminar(Hijo hijo) {
+        sessionFactory.getCurrentSession().delete(hijo);
+    }
 }
