@@ -92,12 +92,9 @@ public class ServicioHijoImpl implements ServicioHijo {
       throw new HijoNoEncontradoException();
     }
 
-    //    if (!hijo.getUsuario().getId()
-    //            .equals(usuario.getId())) {
-    //
-    //      throw new RuntimeException(
-    //              "No puede modificar este hijo");
-    //    }
+    if (!hijo.getPadre().getId().equals(usuario.getId())) {
+      throw new RuntimeException("No puede modificar este hijo");
+    }
 
     if (repoHijo.existeAlias(aliasRetiro)) {
       throw new AliasExistenteException("El alias ya está en uso");

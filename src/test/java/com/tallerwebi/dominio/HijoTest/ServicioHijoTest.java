@@ -3,6 +3,7 @@ package com.tallerwebi.dominio.HijoTest;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
@@ -13,6 +14,7 @@ import com.tallerwebi.dominio.Hijos.ServicioHijo;
 import com.tallerwebi.dominio.Hijos.ServicioHijoImpl;
 import com.tallerwebi.dominio.SubidaDeImgs.ServicioImagenes;
 import com.tallerwebi.dominio.Usuario.Usuario;
+import com.tallerwebi.dominio.excepcion.AliasExistenteException;
 import com.tallerwebi.dominio.excepcion.HijoExistenteException;
 import com.tallerwebi.dominio.excepcion.HijoNoEncontradoException;
 import java.util.List;
@@ -175,5 +177,76 @@ public class ServicioHijoTest {
       hijoExistente.getFotoPerfil(),
       equalTo("https://res.cloudinary.com/test/img_hijos/foto_santi.jpg")
     );
+  }
+
+  @Test
+  void cuandoElAliasNoExisteEntoncesSeActualizaCorrectamente() {
+    Long hijoId = 1L;
+
+    Hijo hijo = new Hijo();
+
+    Usuario usuario = new Usuario();
+    usuario.setId(10L);
+
+    hijo.setId(hijoId);
+    hijo.setPadre(usuario);
+
+    when(repositorioHijoMock.buscarPorId(hijoId)).thenReturn(hijo);
+
+    when(repositorioHijoMock.existeAlias("alias")).thenReturn(false);
+
+    servicioHijo.actualizarAlias(hijoId, "alias", usuario);
+
+    assertEquals("alias", hijo.getAliasRetiro());
+
+    verify(repositorioHijoMock).guardar(hijo);
+  }
+
+  @Test
+  void cuandoElAliasYaExisteEntoncesLanzaExcepcion() {
+    Long hijoId = 1L;
+
+    Usuario usuario = new Usuario();
+    usuario.setId(10L);
+
+    Hijo hijo = new Hijo();
+    hijo.setPadre(usuario);
+
+    when(repositorioHijoMock.buscarPorId(hijoId)).thenReturn(hijo);
+
+    when(repositorioHijoMock.existeAlias("alias")).thenReturn(true);
+
+    assertThrows(
+      AliasExistenteException.class,
+      () -> servicioHijo.actualizarAlias(hijoId, "alias", usuario)
+    );
+  }
+
+  @Test
+  void cuandoSeIntentaActualizarUnAliasYElHijoNoExisteEntoncesLanzaExcepcion() {
+    when(repositorioHijoMock.buscarPorId(1L)).thenReturn(null);
+
+    Usuario usuario = new Usuario();
+
+    assertThrows(
+      HijoNoEncontradoException.class,
+      () -> servicioHijo.actualizarAlias(1L, "alias", usuario)
+    );
+  }
+
+  @Test
+  void cuandoElUsuarioNoEsElTutorDelHijoEntoncesLanzaExcepcion() {
+    Usuario tutor = new Usuario();
+    tutor.setId(1L);
+
+    Usuario intruso = new Usuario();
+    intruso.setId(2L);
+
+    Hijo hijo = new Hijo();
+    hijo.setPadre(tutor);
+
+    when(repositorioHijoMock.buscarPorId(1L)).thenReturn(hijo);
+
+    assertThrows(RuntimeException.class, () -> servicioHijo.actualizarAlias(1L, "alias", intruso));
   }
 }
