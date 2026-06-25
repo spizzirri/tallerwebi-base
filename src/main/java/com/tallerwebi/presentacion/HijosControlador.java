@@ -4,6 +4,7 @@ import com.tallerwebi.dominio.Hijos.Curso;
 import com.tallerwebi.dominio.Hijos.Hijo;
 import com.tallerwebi.dominio.Hijos.ServicioHijo;
 import com.tallerwebi.dominio.Usuario.Usuario;
+import com.tallerwebi.dominio.excepcion.AliasExistenteException;
 import com.tallerwebi.dominio.excepcion.HijoExistenteException;
 import com.tallerwebi.dominio.excepcion.HijoNoEncontradoException;
 import java.util.List;
@@ -28,6 +29,7 @@ public class HijosControlador {
   private static final String USUARIO_SESSION = "USUARIO";
   private static final String USUARIO_MODEL = "usuario";
   private static final String REDIRECT_LOGIN = "redirect:/login";
+  private static final String REDIRECT_VISTA_HIJOS = "redirect:/vistaHijos";
 
   public HijosControlador(ServicioHijo servicioHijo) {
     this.servicioHijo = servicioHijo;
@@ -84,7 +86,7 @@ public class HijosControlador {
       return devolverVistaConError(usuario, "El año o división seleccionados no son válidos");
     }
 
-    return new ModelAndView("redirect:/vistaHijos");
+    return new ModelAndView(REDIRECT_VISTA_HIJOS);
   }
 
   @RequestMapping(path = "/editarHijo", method = RequestMethod.POST)
@@ -123,7 +125,7 @@ public class HijosControlador {
       return devolverVistaConError(usuario, "El año o división seleccionados no son válidos");
     }
 
-    return new ModelAndView("redirect:/vistaHijos");
+    return new ModelAndView(REDIRECT_VISTA_HIJOS);
   }
 
   @RequestMapping(path = "/credenciales", method = RequestMethod.GET)
@@ -140,6 +142,23 @@ public class HijosControlador {
     model.put("hijos", hijos);
 
     return new ModelAndView("credenciales", model);
+  }
+
+  @RequestMapping(path = "/guardar-alias", method = RequestMethod.POST)
+  public ModelAndView guardarAlias(
+    @RequestParam Long hijoId,
+    @RequestParam String aliasRetiro,
+    HttpSession session
+  ) {
+    Usuario usuario = (Usuario) session.getAttribute(USUARIO_SESSION);
+
+    try {
+      servicioHijo.actualizarAlias(hijoId, aliasRetiro, usuario);
+
+      return new ModelAndView(REDIRECT_VISTA_HIJOS);
+    } catch (AliasExistenteException e) {
+      return devolverVistaConError(usuario, "Ese alias ya está en uso.");
+    }
   }
 
   @RequestMapping(path = "/eliminarHijo", method = RequestMethod.POST)
@@ -159,7 +178,7 @@ public class HijosControlador {
       flash.addFlashAttribute("error", "No se pudo eliminar: el hijo no existe o no te pertenece.");
     }
 
-    return new ModelAndView("redirect:/vistaHijos");
+    return new ModelAndView(REDIRECT_VISTA_HIJOS);
   }
 
   // Métodos auxiliares

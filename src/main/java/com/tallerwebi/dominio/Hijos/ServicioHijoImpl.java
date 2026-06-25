@@ -3,6 +3,7 @@ package com.tallerwebi.dominio.Hijos;
 import com.tallerwebi.dominio.AliasDeRetiro.ServicioGeneradorAlias;
 import com.tallerwebi.dominio.SubidaDeImgs.ServicioImagenes;
 import com.tallerwebi.dominio.Usuario.Usuario;
+import com.tallerwebi.dominio.excepcion.AliasExistenteException;
 import com.tallerwebi.dominio.excepcion.HijoExistenteException;
 import com.tallerwebi.dominio.excepcion.HijoNoEncontradoException;
 import java.util.List;
@@ -55,14 +56,6 @@ public class ServicioHijoImpl implements ServicioHijo {
 
     hijo.setAliasRetiro(alias);
 
-    //    String alias;
-    //
-    //    do {
-    //      alias = servicioGeneradorAlias.generarAlias();
-    //    } while (repoHijo.existeAlias(alias));
-
-    //    hijo.setAliasRetiro(alias);
-
     repoHijo.guardar(hijo);
   }
 
@@ -89,6 +82,27 @@ public class ServicioHijoImpl implements ServicioHijo {
     }
 
     repoHijo.modificar(hijoExistente);
+  }
+
+  @Override
+  public void actualizarAlias(Long hijoId, String aliasRetiro, Usuario usuario) {
+    Hijo hijo = repoHijo.buscarPorId(hijoId);
+
+    if (hijo == null) {
+      throw new HijoNoEncontradoException();
+    }
+
+    if (!hijo.getPadre().getId().equals(usuario.getId())) {
+      throw new RuntimeException("No puede modificar este hijo");
+    }
+
+    if (repoHijo.existeAlias(aliasRetiro)) {
+      throw new AliasExistenteException("El alias ya está en uso");
+    }
+
+    hijo.setAliasRetiro(aliasRetiro);
+
+    repoHijo.guardar(hijo);
   }
 
   @Override
