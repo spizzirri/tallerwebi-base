@@ -22,7 +22,7 @@ public class ServicioImagenesImpl implements ServicioImagenes {
   @Override
   public String subirImagen(MultipartFile archivo, String carpeta) {
     try {
-      Map resultado = cloudinary
+      Map <String, Object> resultado = (Map<String, Object>)cloudinary
         .uploader()
         .upload(archivo.getBytes(), ObjectUtils.asMap("folder", carpeta));
 
@@ -35,7 +35,7 @@ public class ServicioImagenesImpl implements ServicioImagenes {
   @Override
   public String subirImagenHijo(MultipartFile archivo, String carpeta) {
     try {
-      Map resultado = cloudinary
+        Map<String, Object> resultado = (Map<String, Object>) cloudinary
         .uploader()
         .upload(
           archivo.getBytes(),
@@ -43,7 +43,7 @@ public class ServicioImagenesImpl implements ServicioImagenes {
             "folder",
             carpeta,
             "transformation",
-            new Transformation()
+            new Transformation<>()
               .width(400) // Tamaño carnet
               .height(400)
               .crop("thumb") // Recorte inteligente
