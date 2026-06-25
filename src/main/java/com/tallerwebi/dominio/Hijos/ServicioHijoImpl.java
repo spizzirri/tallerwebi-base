@@ -7,6 +7,7 @@ import com.tallerwebi.dominio.excepcion.AliasExistenteException;
 import com.tallerwebi.dominio.excepcion.HijoExistenteException;
 import com.tallerwebi.dominio.excepcion.HijoNoEncontradoException;
 import java.util.List;
+import java.util.Locale;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,8 +53,7 @@ public class ServicioHijoImpl implements ServicioHijo {
       hijo.setFotoPerfil(rutaGuardarEnHosting);
     }
 
-    String alias = servicioGeneradorAlias.generarAliasDisponible();
-
+    String alias = servicioGeneradorAlias.generarAliasDisponible().toUpperCase(Locale.ROOT);
     hijo.setAliasRetiro(alias);
 
     repoHijo.guardar(hijo);
@@ -73,13 +73,9 @@ public class ServicioHijoImpl implements ServicioHijo {
     hijoExistente.setCurso(datosNuevos.getCurso());
     hijoExistente.setDni(datosNuevos.getDni());
 
-    if (fotoPerfil != null && !fotoPerfil.isEmpty()) {
-      String rutaGuardarEnHosting = servicioImagenes.subirImagenHijo(
-        fotoPerfil,
-        "KionetTWI/img_hijos"
-      );
-      hijoExistente.setFotoPerfil(rutaGuardarEnHosting);
-    }
+    // Delegamos el procesamiento en métodos privados para bajar la complejidad
+    this.procesarAliasEnEdicion(hijoExistente, datosNuevos.getAliasRetiro());
+    this.procesarFotoEnEdicion(hijoExistente, fotoPerfil);
 
     repoHijo.modificar(hijoExistente);
   }
@@ -95,8 +91,9 @@ public class ServicioHijoImpl implements ServicioHijo {
     if (!hijo.getPadre().getId().equals(usuario.getId())) {
       throw new RuntimeException("No puede modificar este hijo");
     }
+    String aliasEnMayuscula = (aliasRetiro != null) ? aliasRetiro.toUpperCase(Locale.ROOT) : null;
 
-    if (repoHijo.existeAlias(aliasRetiro)) {
+    if (repoHijo.existeAlias(aliasEnMayuscula)) {
       throw new AliasExistenteException("El alias ya está en uso");
     }
 
@@ -113,5 +110,35 @@ public class ServicioHijoImpl implements ServicioHijo {
       throw new HijoNoEncontradoException();
     }
     repoHijo.eliminar(hijoExistente);
+  }
+
+  //----METODOS AUXILIARES---
+
+  private void procesarAliasEnEdicion(Hijo hijoExistente, String aliasNuevo) {
+    if (aliasNuevo == null) {
+      return;
+    }
+
+    String aliasEditadoMayuscula = aliasNuevo.toUpperCase(Locale.ROOT);
+
+    if (aliasEditadoMayuscula.equals(hijoExistente.getAliasRetiro())) {
+      return;
+    }
+
+    if (repoHijo.existeAlias(aliasEditadoMayuscula)) {
+      throw new AliasExistenteException("El alias ya está en uso");
+    }
+
+    hijoExistente.setAliasRetiro(aliasEditadoMayuscula);
+  }
+
+  private void procesarFotoEnEdicion(Hijo hijoExistente, MultipartFile fotoPerfil) {
+    if (fotoPerfil != null && !fotoPerfil.isEmpty()) {
+      String rutaGuardarEnHosting = servicioImagenes.subirImagenHijo(
+        fotoPerfil,
+        "KionetTWI/img_hijos"
+      );
+      hijoExistente.setFotoPerfil(rutaGuardarEnHosting);
+    }
   }
 }

@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.Authentication;
@@ -28,13 +29,16 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 @EnableWebSecurity
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
+  @Autowired
+  private ServicioUsuarioOAuth servicioUsuarioOAuth;
+
   @Bean
-  @Primary
+  @Primary //si hay mas de un codificador , debe usar este por defecto
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
   }
 
-  @Bean
+  @Bean //este configura el puente entre nuestra app y el servicio de google
   public static ClientRegistrationRepository clientRegistrationRepository(
     @Value("${google.client.id}") String clientId,
     @Value("${google.client.secret}") String clientSecret
@@ -46,10 +50,10 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
       .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
       .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
       .redirectUri("{baseUrl}/login/oauth2/code/{registrationId}")
-      .scope("openid", "profile", "email")
-      .authorizationUri("https://accounts.google.com/o/oauth2/v2/auth")
-      .tokenUri("https://www.googleapis.com/oauth2/v4/token")
-      .userInfoUri("https://www.googleapis.com/oauth2/v3/userinfo")
+      .scope("openid", "profile", "email") //permisos que le pide al usuario para loguearse
+      .authorizationUri("https://accounts.google.com/o/oauth2/v2/auth") // a donde redirije al usuario para que ponga su mail
+      .tokenUri("https://www.googleapis.com/oauth2/v4/token") //canje de token seguro
+      .userInfoUri("https://www.googleapis.com/oauth2/v3/userinfo") //donde se extrae mail, nombre y foto del usuario
       .userNameAttributeName(IdTokenClaimNames.SUB)
       .jwkSetUri("https://www.googleapis.com/oauth2/v3/certs")
       .clientName("Google")
@@ -58,17 +62,16 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
   }
 
   @Override
-  public void configure(
-    org.springframework.security.config.annotation.web.builders.WebSecurity web
-  ) {
+  public void configure(WebSecurity web) { //excepciones de seguridad
     web.ignoring().antMatchers("/validar-login", "/registrarme");
+    //al usar el web ignoring, estas url quedan fuera de las capas de filtro de seguridad, agiliza el login clasico
   }
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
     http
       .csrf()
-      .disable()
+      .disable() /// Desactiva la protección CSRF (común en APIs o desarrollo)
       .authorizeRequests()
       .antMatchers("/**")
       .permitAll()
@@ -76,30 +79,36 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
       .authenticated()
       .and()
       .formLogin()
-      .disable()
+      .disable() // Desactiva el formulario de login feo que trae Spring por defecto
       .oauth2Login()
-      .loginPage("/login")
-      .successHandler(oauth2SuccessHandler())
+      .loginPage("/login") // Si alguien quiere loguearse, esta es la vista
+      .successHandler(oauth2SuccessHandler()) // <-- Qué pasa cuando se loguea bien con Google
       .and()
       .logout()
       .disable();
   }
 
-  @Autowired
-  private ServicioUsuarioOAuth servicioUsuarioOAuth;
-
   @Bean
-  public AuthenticationSuccessHandler oauth2SuccessHandler() {
+  public AuthenticationSuccessHandler oauth2SuccessHandler() { //Qué pasa tras loguearse con Google
     return (
       HttpServletRequest request,
       HttpServletResponse response,
       Authentication authentication
     ) -> {
       OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+      //Cuando el usuario pone su patrón/contraseña en la ventana flotante de Google y acepta, Google te devuelve un objeto (OAuth2User).
       String email = oAuth2User.getAttribute("email");
       String nombre = oAuth2User.getAttribute("given_name");
       String apellido = oAuth2User.getAttribute("family_name");
-      Usuario usuario = servicioUsuarioOAuth.buscarOCrearUsuario(email, nombre, apellido);
+      String fotoPerfil = oAuth2User.getAttribute("picture"); // <-- EXTRAEMOS LA FOTO DE GOOGLE
+      //Llama a tu servicio personalizado (servicioUsuarioOAuth).
+      Usuario usuario = servicioUsuarioOAuth.buscarOCrearUsuario(
+        email,
+        nombre,
+        apellido,
+        fotoPerfil
+      );
+      //Guarda ese objeto Usuario obtenido de la BD en la Sesión de HTTP bajo la clave "USUARIO"
       request.getSession().setAttribute("USUARIO", usuario);
       response.sendRedirect("/spring/home");
     };
