@@ -29,6 +29,7 @@ public class HijosControlador {
   private static final String USUARIO_SESSION = "USUARIO";
   private static final String USUARIO_MODEL = "usuario";
   private static final String REDIRECT_LOGIN = "redirect:/login";
+  private static final String REDIRECT_VISTA_HIJOS = "redirect:/vistaHijos";
 
   public HijosControlador(ServicioHijo servicioHijo) {
     this.servicioHijo = servicioHijo;
@@ -85,7 +86,7 @@ public class HijosControlador {
       return devolverVistaConError(usuario, "El año o división seleccionados no son válidos");
     }
 
-    return new ModelAndView("redirect:/vistaHijos");
+    return new ModelAndView(REDIRECT_VISTA_HIJOS);
   }
 
   @RequestMapping(path = "/editarHijo", method = RequestMethod.POST)
@@ -124,7 +125,7 @@ public class HijosControlador {
       return devolverVistaConError(usuario, "El año o división seleccionados no son válidos");
     }
 
-    return new ModelAndView("redirect:/vistaHijos");
+    return new ModelAndView(REDIRECT_VISTA_HIJOS);
   }
 
   @RequestMapping(path = "/credenciales", method = RequestMethod.GET)
@@ -154,7 +155,7 @@ public class HijosControlador {
     try {
       servicioHijo.actualizarAlias(hijoId, aliasRetiro, usuario);
 
-      return new ModelAndView("redirect:/vistaHijos");
+      return new ModelAndView(REDIRECT_VISTA_HIJOS);
     } catch (AliasExistenteException e) {
       return devolverVistaConError(usuario, "Ese alias ya está en uso.");
     }
@@ -177,7 +178,7 @@ public class HijosControlador {
       flash.addFlashAttribute("error", "No se pudo eliminar: el hijo no existe o no te pertenece.");
     }
 
-    return new ModelAndView("redirect:/vistaHijos");
+    return new ModelAndView(REDIRECT_VISTA_HIJOS);
   }
 
   // Métodos auxiliares
