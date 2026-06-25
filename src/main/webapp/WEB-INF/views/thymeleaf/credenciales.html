@@ -2,49 +2,96 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Imprimir Credenciales - KioNet</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/variablesColor.css}" />
-    <link rel="stylesheet" th:href="@{/css/credenciales.css}" />
-    <link rel="stylesheet" th:href="@{/css/vistaHijos.css}" />
+    <link rel="stylesheet" th:href="@{/css/variablesColor.css}"/>
+    <link rel="stylesheet" th:href="@{/css/componentesYAlertas.css}"/>
+    <link rel="stylesheet" th:href="@{/css/home.css}"/>
+    <link rel="stylesheet" th:href="@{/css/login.css}"/>
+
+    <link rel="stylesheet" th:href="@{/css/credenciales.css}"/>
+    <link rel="stylesheet" th:href="@{/css/vistaHijos.css}"/>
 
 </head>
 
 <body>
-<div class="barra-herramientas">
-    <div class="filtros">
-        <a th:href="@{/vistaHijos}" class="btn-volver">← Volver</a>
-        <label class="checkbox-label">
-            <input type="checkbox" id="checkTodos" checked> <strong>Todos</strong>
-        </label>
-        <hr style="height: 20px; border: 0; border-left: 1px solid #ccc; margin: 0 5px;">
+<div class="container-fluid">
+    <div th:replace="fragmentos/header :: header"></div>
+    <main class="main">
 
-        <th:block th:each="hijo : ${hijos}">
-            <label class="checkbox-label">
-                <input type="checkbox" class="check-hijo" th:data-id="${hijo.id}" checked>
-                <span th:text="${hijo.nombre}"></span>
-            </label>
-        </th:block>
-    </div>
-    <button class="btn-imprimir" onclick="window.print()">Imprimir / Guardar PDF</button>
-</div>
+        <section class="panel-cliente">
+            <div th:replace="fragmentos/panelIzqCliente :: panelCliente"></div>
+            <a href="/spring/home" class="btn-volver"> Ir a tienda</a>
+        </section>
+        <section class="panel-tienda">
+            <div class="banner-titulos">
+                <div class="banner-titulos-texto">
+                    <h1>Mis credenciales</h1>
+                </div>
+            </div>
 
-<div class="hoja-a4" id="contenedorHojas">
-    <div class="credencial-card" th:each="hijo : ${hijos}" th:id="'credencial-' + ${hijo.id}">
-        <img th:if="${hijo.fotoPerfil != null}" th:src="${hijo.fotoPerfil}" class="foto-lado" alt="Rostro Alumno">
-        <div th:unless="${hijo.fotoPerfil != null}" class="foto-placeholder">
-            <span th:text="${#strings.substring(hijo.nombre,0,1)}"></span>
-        </div>
+            <div class="barra-herramientas">
+                <p class="barra-herramientas-titulo">Seleccione las credenciales que desea imprimir</p>
 
-        <div class="datos-lado">
-            <span class="colegio-header">KioNet Credencial Escolar</span>
-            <h2 class="alumno-nombre" th:text="${hijo.nombre + ' ' + hijo.apellido}"></h2>
-            <span class="alumno-curso" th:text="${hijo.curso.descripcion}"></span>
-            <span class="uso-credencial">Retiro de Golosinas Autorizado</span>
-        </div>
-    </div>
+                <div class="barra-herramientas-fila">
+                    <div class="filtros">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="checkTodos" checked> <strong>Todos</strong>
+                        </label>
+                        <hr style="height: 20px; border: 0; border-left: 1px solid #ccc; margin: 0 5px;">
+
+                        <th:block th:each="hijo : ${hijos}">
+                            <label class="checkbox-label">
+                                <input type="checkbox" class="check-hijo" th:data-id="${hijo.id}" checked>
+                                <span th:text="${hijo.nombre}"></span>
+                            </label>
+                        </th:block>
+                    </div>
+                    <button class="btn-imprimir" onclick="window.print()">Imprimir / Guardar PDF</button>
+                </div>
+            </div>
+
+            <div class="hoja-a4" id="contenedorHojas">
+                <div class="credencial-card" th:each="hijo : ${hijos}" th:id="'credencial-' + ${hijo.id}">
+                    <div class="credencial-header">
+                        <span class="colegio-header">KioNet Credencial Escolar</span>
+                    </div>
+                    <div class="credencial-cuerpo">
+
+                        <img th:if="${hijo.fotoPerfil != null}" th:src="${hijo.fotoPerfil}" class="foto-lado" alt="Rostro Alumno">
+                        <div th:unless="${hijo.fotoPerfil != null}" class="foto-placeholder">
+                            <span th:text="${#strings.substring(hijo.nombre,0,1)}"></span>
+                        </div>
+
+                        <div class="datos-lado">
+                            <!-- Nuevo grupo para compactar el contenido principal -->
+                            <div class="datos-grupo">
+                                <h2 class="alumno-nombre" th:text="${hijo.nombre + ' ' + hijo.apellido}"></h2>
+                                <div class="alumno-curso-contenedor">
+                                    <span class="alumno-curso" th:text="${hijo.curso.descripcion}"></span>
+                                </div>
+                                <hr class="divisor-credencial">
+                                <div class="alias-contenedor">
+                                    <p class="alias-etiqueta">Alias de retiro:</p>
+                                    <span class="alumno-alias" th:text="${hijo.aliasRetiro}"></span>
+                                </div>
+                            </div>
+
+                            <!-- El logo ahora forma parte del flujo de datos, abajo a la derecha -->
+                            <img th:src="'https://res.cloudinary.com/dqrka5zry/image/upload/v1780531490/KioNet_imp3c0.png'"
+                                 class="logo-credencial" alt="KioNet">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
 </div>
 <script th:src="@{/js/credenciales.js}"></script>
+<script th:src="@{/js/drawer.js}"></script>
+
 
 </body>
 </html>
