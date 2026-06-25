@@ -143,20 +143,25 @@ public class HijosControlador {
   }
 
   @RequestMapping(path = "/eliminarHijo", method = RequestMethod.POST)
-  public ModelAndView darDeBajaUnHijo(@RequestParam Long hijoId,HttpSession session, RedirectAttributes flash){
-      Usuario usuario = (Usuario) session.getAttribute(USUARIO_SESSION);
-      if (usuario == null) {
-          return new ModelAndView(REDIRECT_LOGIN);
-      }
-      try {
-          servicioHijo.eliminarHijo(hijoId, usuario);
-          flash.addFlashAttribute("exito", "El hijo fue dado de baja correctamente.");
-      } catch (HijoNoEncontradoException e) {
-          flash.addFlashAttribute("error", "No se pudo eliminar: el hijo no existe o no te pertenece.");
-      }
+  public ModelAndView darDeBajaUnHijo(
+    @RequestParam Long hijoId,
+    HttpSession session,
+    RedirectAttributes flash
+  ) {
+    Usuario usuario = (Usuario) session.getAttribute(USUARIO_SESSION);
+    if (usuario == null) {
+      return new ModelAndView(REDIRECT_LOGIN);
+    }
+    try {
+      servicioHijo.eliminarHijo(hijoId, usuario);
+      flash.addFlashAttribute("exito", "El hijo fue dado de baja correctamente.");
+    } catch (HijoNoEncontradoException e) {
+      flash.addFlashAttribute("error", "No se pudo eliminar: el hijo no existe o no te pertenece.");
+    }
 
-      return new ModelAndView("redirect:/vistaHijos");
+    return new ModelAndView("redirect:/vistaHijos");
   }
+
   // Métodos auxiliares
   private ModelAndView devolverVistaConError(Usuario usuario, String mensajeError) {
     ModelMap model = new ModelMap();

@@ -11,5 +11,5 @@ public interface ServicioHijo {
 
   void editarHijo(Long idHijo, Hijo datosNuevos, MultipartFile fotoPerfil, Usuario usuario);
 
-    void eliminarHijo(Long hijoId, Usuario usuario);
+  void eliminarHijo(Long hijoId, Usuario usuario);
 }
