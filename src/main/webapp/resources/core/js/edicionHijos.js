@@ -1,11 +1,9 @@
-﻿/* eslint-disable no-unused-vars */
+/* eslint-disable no-unused-vars */
 const overlay = document.getElementById("modalOverlay");
 document.getElementById("btnAbrirForm").addEventListener("click", () => overlay.classList.add("visible"));
 document.getElementById("btnCerrar").addEventListener("click", () => overlay.classList.remove("visible"));
 document.getElementById("btnCancelar").addEventListener("click", () => overlay.classList.remove("visible"));
 overlay.addEventListener("click", (e) => { if (e.target === overlay) overlay.classList.remove("visible"); });
-
-
 function abrirSeccionEdicion(boton) {
   const seccion = document.getElementById("seccionEdicionHijo");
   seccion.style.display = "block";
@@ -16,27 +14,20 @@ function abrirSeccionEdicion(boton) {
   document.getElementById("editDni").value = boton.getAttribute("data-dni");
   document.getElementById("editAnio").value = boton.getAttribute("data-anio");
   document.getElementById("editDivision").value = boton.getAttribute("data-division");
-// CORRECCIÓN ID: Verificamos con el ID correcto del HTML ('editAlias')
-    const inputAlias = document.getElementById('editAlias');
-    if (inputAlias) {
-        inputAlias.value = boton.getAttribute('data-alias') || '';
-    }
-    seccion.scrollIntoView({ behavior: "smooth" });
+  const inputAlias = document.getElementById("editAlias");
+  if (inputAlias) {
+    inputAlias.value = boton.getAttribute("data-alias") || "";
+  }
+  seccion.scrollIntoView({ behavior: "smooth" });
 }
-
 function cerrarSeccionEdicion() {
   document.getElementById("seccionEdicionHijo").style.display = "none";
 }
-
 function abrirModalAlias(button) {
-
-    const hijoId = button.dataset.id;
-
-    document.getElementById("hijoIdAlias").value = hijoId;
-
-    document.getElementById("modalAlias").style.display = "flex";
+  const hijoId = button.dataset.id;
+  document.getElementById("hijoIdAlias").value = hijoId;
+  document.getElementById("modalAlias").style.display = "flex";
 }
-
 function cerrarModalAlias() {
-    document.getElementById("modalAlias").style.display = "none";
+  document.getElementById("modalAlias").style.display = "none";
 }
