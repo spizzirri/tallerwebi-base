@@ -154,3 +154,20 @@
     text-decoration: none;
     display: inline-block;
 }
+
+@media (max-width: 480px) {
+    .pedido-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    .pedido-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    .pedido-footer {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+}
