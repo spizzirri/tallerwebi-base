@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class CarritoControlador {
@@ -53,7 +54,7 @@ public class CarritoControlador {
   }
 
   @RequestMapping(path = "/carrito", method = RequestMethod.GET)
-  public ModelAndView verCarrito(HttpSession session) {
+  public ModelAndView verCarrito(HttpSession session, RedirectAttributes flash) {
     Usuario usuario = (Usuario) session.getAttribute(USUARIO);
     if (usuario == null) {
       return new ModelAndView("redirect:/login");
@@ -62,6 +63,10 @@ public class CarritoControlador {
 
     // Si no hay pedidos, no dejamos entrar al carrito
     if (pedidos == null || pedidos.isEmpty()) {
+      flash.addFlashAttribute(
+        "errorDistribucion",
+        "Hay productos sin cantidades asignadas, debes asignarlos o eliminarlos"
+      );
       return new ModelAndView("redirect:/distribucion");
     }
     Double total = pedidos

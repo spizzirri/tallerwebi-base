@@ -23,6 +23,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 public class CarritoControladorTest {
 
@@ -32,6 +33,8 @@ public class CarritoControladorTest {
   private ServicioHijo serviHijoMock;
   private Usuario usuarioMock;
   private Carrito carritoMock;
+  private RedirectAttributes redirectAttributesMock;
+
   private Producto productoMock;
   private ItemCarrito itemMock;
   private Hijo hijoMock;
@@ -48,13 +51,14 @@ public class CarritoControladorTest {
     itemMock = mock(ItemCarrito.class);
     hijoMock = mock(Hijo.class);
     carritoControlador = new CarritoControlador(serviCarritomock, serviPedidoMock);
+    redirectAttributesMock = mock(RedirectAttributes.class);
   }
 
   @Test
   public void siNoHayUsuarioLogueadoDebeRedirigirALogin() {
     when(sessionMock.getAttribute("USUARIO")).thenReturn(null);
 
-    ModelAndView mv = carritoControlador.verCarrito(sessionMock);
+    ModelAndView mv = carritoControlador.verCarrito(sessionMock, redirectAttributesMock);
 
     assertThat(mv.getViewName(), equalToIgnoringCase("redirect:/login"));
   }
@@ -65,7 +69,7 @@ public class CarritoControladorTest {
     when(serviPedidoMock.obtenerPedidosPendientesDePago(any()))
       .thenReturn(List.of(mock(Pedido.class)));
 
-    ModelAndView mv = carritoControlador.verCarrito(sessionMock);
+    ModelAndView mv = carritoControlador.verCarrito(sessionMock, redirectAttributesMock);
 
     assertThat(mv.getViewName(), equalToIgnoringCase("carrito"));
   }
@@ -78,7 +82,7 @@ public class CarritoControladorTest {
     when(serviPedidoMock.obtenerPedidosPendientesDePago(any()))
       .thenReturn(List.of(mock(Pedido.class)));
 
-    ModelAndView mv = carritoControlador.verCarrito(sessionMock);
+    ModelAndView mv = carritoControlador.verCarrito(sessionMock, redirectAttributesMock);
 
     List<Pedido> pedidos = (List<Pedido>) mv.getModel().get("pedidos");
     assertThat(pedidos.size(), equalTo(1));
