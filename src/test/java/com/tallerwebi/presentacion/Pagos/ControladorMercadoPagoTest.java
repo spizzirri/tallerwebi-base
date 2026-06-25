@@ -2,12 +2,12 @@ package com.tallerwebi.presentacion.Pagos;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.Carrito.Carrito;
 import com.tallerwebi.dominio.Carrito.ItemCarrito;
 import com.tallerwebi.dominio.Carrito.ServicioCarrito;
+import com.tallerwebi.dominio.Mail.ServicioEmail;
 import com.tallerwebi.dominio.Pagos.ServicioMercadoPago;
 import com.tallerwebi.dominio.Pedidos.Pedido;
 import com.tallerwebi.dominio.Pedidos.ServicioPedido;
@@ -28,18 +28,21 @@ public class ControladorMercadoPagoTest {
   private HttpSession sessionMock;
   private Usuario usuarioMock;
   private ServicioPedido servicioPedidoMock;
+  private ServicioEmail servicioEmailMock;
 
   @BeforeEach
   public void init() {
     this.servicioMercadoPago = mock(ServicioMercadoPago.class);
     this.servicioCarrito = mock(ServicioCarrito.class); // <-- Inicializamos el mock del carrito
     this.servicioPedidoMock = mock(ServicioPedido.class);
+    this.servicioEmailMock = mock(ServicioEmail.class);
     // Le pasamos ambos servicios al controlador unificado
     this.controladorMercadoPago =
       new ControladorMercadoPago(
         this.servicioMercadoPago,
         this.servicioCarrito,
-        servicioPedidoMock
+        servicioPedidoMock,
+        servicioEmailMock
       );
     this.sessionMock = mock(HttpSession.class);
 
@@ -48,6 +51,8 @@ public class ControladorMercadoPagoTest {
     when(this.usuarioMock.getId()).thenReturn(1L);
     // Hacemos que la sesión siempre devuelva este usuario para simular que está logueado
     when(this.sessionMock.getAttribute("USUARIO")).thenReturn(this.usuarioMock);
+    when(usuarioMock.getNombre()).thenReturn("Test");
+    when(usuarioMock.getEmail()).thenReturn("test@mail.com");
   }
 
   @Test
@@ -161,6 +166,7 @@ public class ControladorMercadoPagoTest {
     //    // 3. Then
     //    assertThat(modelAndView.getViewName(), equalTo("pago-exitoso"));
     //    assertThat(modelAndView.getModel().get("itemsComprados"), equalTo(items));
+
     Pedido pedido = mock(Pedido.class);
     List<Pedido> pedidos = List.of(pedido);
     when(servicioPedidoMock.obtenerPedidosPendientesDePago(1L)).thenReturn(pedidos);

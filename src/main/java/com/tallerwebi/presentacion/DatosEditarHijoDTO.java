@@ -23,6 +23,8 @@ public class DatosEditarHijoDTO {
 
   private MultipartFile fotoPerfilH;
 
+  private String aliasRetiro;
+
   public String getAnio() {
     return anio;
   }
@@ -85,5 +87,13 @@ public class DatosEditarHijoDTO {
 
   public void setDniH(Long dniH) {
     this.dniH = dniH;
+  }
+
+  public String getAliasRetiro() {
+    return aliasRetiro;
+  }
+
+  public void setAliasRetiro(String aliasRetiro) {
+    this.aliasRetiro = aliasRetiro;
   }
 }

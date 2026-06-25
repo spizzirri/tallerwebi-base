@@ -9,9 +9,7 @@ ALTER TABLE Hijo CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 INSERT INTO Usuario
 (id,dni,nombre,apellido,celular, email, password, rol, activo,fotoPerfil)
-VALUES(null,1234567890, 'Pepe','Sujeto',1112341234,'test@unlam.edu.ar', '$2b$10$rJB22an3TIUZ34l7doj44.FIAeTPMUcqZofxul6GLaQvHn8F0gxi6', 'ADMIN', true,'https://res.cloudinary.com/dqrka5zry/image/upload/v1780520000/istockphoto-1447126543-612x612_ek0kjw.jpg');
-
-
+VALUES(null,1234567890, 'Pepe','Sujeto',1112341234,'test@unlam.edu.ar', '$2a$10$2ll9SsWXF8a0HWPdz3iKKuBQ9S37sQxnfCFlghyUp7jKJFzlKhazy', 'ADMIN', true,'https://res.cloudinary.com/dqrka5zry/image/upload/v1780520000/istockphoto-1447126543-612x612_ek0kjw.jpg');
 INSERT INTO Hijo (id,curso, fechaNac, fotoPerfil, nombre, idPadre,dni,apellido)
 VALUES (null,'TERCERO_C','2020-06-18',null,'Santiago',1,12345,'Sujeto');
 

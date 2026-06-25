@@ -2,6 +2,7 @@ package com.tallerwebi;
 
 import com.tallerwebi.config.DatabaseInitializationConfig;
 import com.tallerwebi.config.HibernateConfig;
+import com.tallerwebi.config.SpringSecurityConfig;
 import com.tallerwebi.config.SpringWebConfig;
 import javax.servlet.Filter;
 import org.springframework.web.filter.CharacterEncodingFilter;
@@ -22,6 +23,7 @@ public class MyServletInitializer extends AbstractAnnotationConfigDispatcherServ
       SpringWebConfig.class,
       HibernateConfig.class,
       DatabaseInitializationConfig.class,
+      SpringSecurityConfig.class,
     };
   }
 

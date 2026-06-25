@@ -33,8 +33,8 @@ public class Hijo {
   @Column(nullable = false)
   private String apellido;
 
-  @Column
-  private String codigoRetiro;
+  @Column(unique = true)
+  private String aliasRetiro;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
@@ -96,12 +96,12 @@ public class Hijo {
     this.apellido = apellido;
   }
 
-  public String getCodigoRetiro() {
-    return codigoRetiro;
+  public String getAliasRetiro() {
+    return aliasRetiro;
   }
 
-  public void setCodigoRetiro(String codigoRetiro) {
-    this.codigoRetiro = codigoRetiro;
+  public void setAliasRetiro(String aliasRetiro) {
+    this.aliasRetiro = aliasRetiro;
   }
 
   public Long getDni() {

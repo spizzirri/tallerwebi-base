@@ -67,17 +67,104 @@
                             th:data-fecha="${#dates.format(hijo.fechaNac, 'yyyy-MM-dd')}"
                             th:data-anio="${hijo.curso.name().substring(0, hijo.curso.name().indexOf('_'))}"
                             th:data-division="${hijo.curso.name().substring(hijo.curso.name().indexOf('_') + 1)}"
+                            th:data-alias="${hijo.aliasRetiro}"
                             onclick="abrirSeccionEdicion(this)">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
                         </svg>
                     </button>
+                    <!--ELIMINAR HIJO-->
+                    <form th:action="@{/eliminarHijo}" method="post" style="display: inline;"
+                        onsubmit="return confirm('¿Estás seguro de que deseas dar de baja a este hijo?')">
+                        <input type="hidden" name="hijoId" th:value="${hijo.id}" />
+                        <button type="submit" class="btn-trash btn btn-danger d-flex align-items-center mt-4 mb-3"
+                                aria-label="Eliminar HIJO">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                 fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                            </svg>
+                        </button>
+
+                    </form>
+
+
                     <img th:if="${hijo.fotoPerfil != null}" th:src="${hijo.fotoPerfil}" class="hijo-avatar" alt="foto hijo">
                     <div th:unless="${hijo.fotoPerfil != null}" class="hijo-avatar-iniciales">
                         <span th:text="${#strings.substring(hijo.nombre,0,1)}"></span>
                     </div>
                     <p class="hijo-nombre" th:text="${hijo.nombre}"></p>
                     <span class="hijo-badge" th:text="${hijo.curso.descripcion}"></span>
+
+                    <p>Alias de retiro:</p>
+
+                    <div th:if="${hijo.aliasRetiro != null}"
+                         class="pill-mensaje-alias pill-informacion-alias">
+                        <span><strong th:text="${hijo.aliasRetiro}"></strong></span>
+                    </div>
+
+                    <div th:if="${hijo.aliasRetiro == null}"
+                         class="alerta-mensaje alerta-informacion alerta-alias">
+
+                        <div class="alerta-alias-contenido">
+
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                            </svg>
+
+                            <span>Sin alias de retiro.</span>
+
+                        </div>
+
+                        <button type="button"
+                                class="btn-crear-alias"
+                                th:data-id="${hijo.id}"
+                                onclick="abrirModalAlias(this)">
+                            Crear alias
+                        </button>
+
+                    </div>
+                </div>
+            </div>
+
+            <div id="modalAlias" class="modal-overlay" style="display:none;">
+                <div class="modal-card">
+
+                    <h3>Crear alias de retiro</h3>
+
+                    <form th:action="@{/guardar-alias}" method="post">
+
+                        <input type="hidden"
+                               id="hijoIdAlias"
+                               name="hijoId">
+
+                        <label for="aliasRetiro">
+                            Alias
+                        </label>
+
+                        <input type="text"
+                               id="aliasRetiro"
+                               name="aliasRetiro"
+                               placeholder="Ej: ROJO.GATO.TREN"
+                               oninput="this.value = this.value.toUpperCase()"
+                               style="text-transform: uppercase;"
+                               pattern="[A-Z0-9\.]+"
+                               title="El alias debe contener solo letras mayúsculas, números y puntos."
+                               required>
+
+                        <div class="modal-alias-btn-container">
+                            <button class="btn-guardar-alias" type="submit">
+                                Guardar
+                            </button>
+
+                            <button class="btn-cancelar-alias" type="button"
+                                    onclick="cerrarModalAlias()">
+                                Cancelar
+                            </button>
+                        </div>
+
+                    </form>
+
                 </div>
             </div>
 
@@ -87,7 +174,7 @@
                 </div>
                 <button class="btn-agregar" id="btnAbrirForm">+ Agregar hijo</button>
             </div>
-
+<!--AGREGAR HIJO NUEVO!!!-->
             <div class="modal-overlay" id="modalOverlay">
                 <div class="modal-card">
                     <div class="modal-header">
@@ -126,7 +213,7 @@
                             </div>
                         </div>
 
-                        <div class="campo-edicion" style="margin-top: 15px;">
+                        <div class="campo-edicion">
                             <span class="dato-label">Foto de perfil (Rostro visible)</span>
                             <input type="file" name="fotoPerfilHijo" class="input-foto-hijo" accept="image/*">
                             <div class="contenedor-error-foto alerta-mensaje alerta-error" style="display: none; margin-top: 10px;">
@@ -164,7 +251,7 @@
                     </form>
                 </div>
             </div>
-
+<!--EDITAR HIJO EXISTENTEEE!!-->
             <div id="seccionEdicionHijo" style="display: none; margin-top: 20px;" class="agregar-hijo-banner-edicion">
                 <div class="banner-edicion">
                     <h2> Editar Información del Hijo
@@ -213,6 +300,20 @@
                             </svg>
                             <span class="texto-error-foto"></span>
                         </div>
+                    </div>
+                    <div class="campo-edicion" style="margin-top: 15px;">
+                        <span class="dato-label">Alias de Retiro</span>
+                        <input type="text"
+                               name="aliasRetiro"
+                               id="editAlias"
+                               placeholder="Ej: ROJO.GATO.TREN"
+                               oninput="this.value = this.value.toUpperCase()"
+                               style="text-transform: uppercase;"
+                               pattern="[A-Z0-9\.]+"
+                               title="El alias debe contener solo letras mayúsculas, números y puntos.">
+                        <small class="texto-ayuda">
+                            Debe ser único para cada alumno.
+                        </small>
                     </div>
 
                     <div class="campo-edicion" style="margin-top: 15px;">

@@ -10,4 +10,8 @@ public interface ServicioHijo {
   void guardarHijo(Hijo hijo, MultipartFile fotoPerfil, Usuario usuario);
 
   void editarHijo(Long idHijo, Hijo datosNuevos, MultipartFile fotoPerfil, Usuario usuario);
+
+  void actualizarAlias(Long hijoId, String aliasRetiro, Usuario usuario);
+
+  void eliminarHijo(Long hijoId, Usuario usuario);
 }

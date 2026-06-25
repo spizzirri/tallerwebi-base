@@ -1,4 +1,4 @@
-﻿/* eslint-disable no-unused-vars */
+/* eslint-disable no-unused-vars */
 const overlay = document.getElementById("modalOverlay");
 document.getElementById("btnAbrirForm").addEventListener("click", () => overlay.classList.add("visible"));
 document.getElementById("btnCerrar").addEventListener("click", () => overlay.classList.remove("visible"));
@@ -14,8 +14,20 @@ function abrirSeccionEdicion(boton) {
   document.getElementById("editDni").value = boton.getAttribute("data-dni");
   document.getElementById("editAnio").value = boton.getAttribute("data-anio");
   document.getElementById("editDivision").value = boton.getAttribute("data-division");
+  const inputAlias = document.getElementById("editAlias");
+  if (inputAlias) {
+    inputAlias.value = boton.getAttribute("data-alias") || "";
+  }
   seccion.scrollIntoView({ behavior: "smooth" });
 }
 function cerrarSeccionEdicion() {
   document.getElementById("seccionEdicionHijo").style.display = "none";
+}
+function abrirModalAlias(button) {
+  const hijoId = button.dataset.id;
+  document.getElementById("hijoIdAlias").value = hijoId;
+  document.getElementById("modalAlias").style.display = "flex";
+}
+function cerrarModalAlias() {
+  document.getElementById("modalAlias").style.display = "none";
 }

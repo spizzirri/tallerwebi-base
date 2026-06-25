@@ -5,6 +5,7 @@ import com.tallerwebi.dominio.Productos.RepositorioProducto;
 import com.tallerwebi.dominio.Usuario.RepositorioUsuario;
 import com.tallerwebi.dominio.Usuario.Usuario;
 import com.tallerwebi.dominio.excepcion.ProductoNoEncontradoException;
+import com.tallerwebi.dominio.excepcion.ProductoSinStockException;
 import javax.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -49,6 +50,10 @@ public class ServicioCarritoImpl implements ServicioCarrito {
 
     if (producto == null) {
       throw new ProductoNoEncontradoException("El producto no fue encontrado");
+    }
+
+    if (producto.getCantidad() <= 0) {
+      throw new ProductoSinStockException("No hay stock disponible");
     }
 
     Carrito carrito = obtenerOCrearCarrito(usuarioId);

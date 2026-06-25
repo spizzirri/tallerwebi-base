@@ -3,15 +3,18 @@ package com.tallerwebi.dominio.HijoTest;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
+import com.tallerwebi.dominio.AliasDeRetiro.ServicioGeneradorAlias;
 import com.tallerwebi.dominio.Hijos.Hijo;
 import com.tallerwebi.dominio.Hijos.RepositorioHijo;
 import com.tallerwebi.dominio.Hijos.ServicioHijo;
 import com.tallerwebi.dominio.Hijos.ServicioHijoImpl;
 import com.tallerwebi.dominio.SubidaDeImgs.ServicioImagenes;
 import com.tallerwebi.dominio.Usuario.Usuario;
+import com.tallerwebi.dominio.excepcion.AliasExistenteException;
 import com.tallerwebi.dominio.excepcion.HijoExistenteException;
 import com.tallerwebi.dominio.excepcion.HijoNoEncontradoException;
 import java.util.List;
@@ -25,15 +28,19 @@ public class ServicioHijoTest {
   private Usuario usuarioMock;
   private ServicioHijo servicioHijo;
   private RepositorioHijo repositorioHijoMock;
+  private ServicioGeneradorAlias servicioGeneradorAliasMock;
   private ServicioImagenes servicioImagenesMock;
   private Hijo hijoMock;
 
   @BeforeEach
   public void init() {
     repositorioHijoMock = Mockito.mock(RepositorioHijo.class);
+    servicioGeneradorAliasMock = Mockito.mock(ServicioGeneradorAlias.class);
+
     servicioImagenesMock = Mockito.mock(ServicioImagenes.class);
     usuarioMock = Mockito.mock(Usuario.class);
-    servicioHijo = new ServicioHijoImpl(repositorioHijoMock, servicioImagenesMock);
+    servicioHijo =
+      new ServicioHijoImpl(repositorioHijoMock, servicioGeneradorAliasMock, servicioImagenesMock);
     hijoMock = Mockito.mock(Hijo.class);
   }
 
@@ -50,7 +57,7 @@ public class ServicioHijoTest {
   public void guardarHijoSiNoExisteDeberiaGuardarlo() {
     when(hijoMock.getDni()).thenReturn(12345678L);
     when(repositorioHijoMock.existeHijoPorDni(12345678L)).thenReturn(false);
-
+    when(servicioGeneradorAliasMock.generarAliasDisponible()).thenReturn("rojo.gato.tren");
     servicioHijo.guardarHijo(hijoMock, null, usuarioMock);
 
     verify(repositorioHijoMock, times(1)).guardar(hijoMock);
@@ -76,6 +83,7 @@ public class ServicioHijoTest {
 
     when(hijoMock.getDni()).thenReturn(12345678L);
     when(repositorioHijoMock.existeHijoPorDni(12345678L)).thenReturn(false);
+    when(servicioGeneradorAliasMock.generarAliasDisponible()).thenReturn("rojo.gato.tren");
     when(servicioImagenesMock.subirImagenHijo(any(), any())).thenReturn("url_de_la_foto");
 
     // Pasamos el fotoMock
@@ -98,7 +106,7 @@ public class ServicioHijoTest {
     Hijo datosNuevosMock = Mockito.mock(Hijo.class);
     when(datosNuevosMock.getNombre()).thenReturn("Santiago");
     when(datosNuevosMock.getApellido()).thenReturn("Perez");
-
+    when(datosNuevosMock.getAliasRetiro()).thenReturn(null); // FIX: Evitamos NPE en la refactorización
     servicioHijo.editarHijo(idHijo, datosNuevosMock, null, usuarioMock);
 
     verify(hijoExistenteMock, times(1)).setNombre("Santiago");
@@ -148,14 +156,19 @@ public class ServicioHijoTest {
     Long idHijo = 1L;
     Hijo hijoExistente = new Hijo(); // Objeto real para comprobar el cambio de estado
     hijoExistente.setPadre(usuarioMock);
+    hijoExistente.setAliasRetiro("VIEJO.ALIAS");
+
     when(usuarioMock.getId()).thenReturn(10L);
     when(repositorioHijoMock.buscarPorId(idHijo)).thenReturn(hijoExistente);
 
     Hijo datosNuevosMock = Mockito.mock(Hijo.class);
+    when(datosNuevosMock.getAliasRetiro()).thenReturn("nuevo.alias"); // Cambia de alias
 
     // Simulamos el archivo que viene del frontend
     MultipartFile fotoMock = Mockito.mock(MultipartFile.class);
     when(fotoMock.isEmpty()).thenReturn(false); // SÍ viene una foto válida
+
+    when(repositorioHijoMock.existeAlias("NUEVO.ALIAS")).thenReturn(false);
 
     // Imitamos la subida apuntando a la carpeta de hijos y el método exclusivo con IA
     when(servicioImagenesMock.subirImagenHijo(fotoMock, "KionetTWI/img_hijos"))
@@ -170,5 +183,76 @@ public class ServicioHijoTest {
       hijoExistente.getFotoPerfil(),
       equalTo("https://res.cloudinary.com/test/img_hijos/foto_santi.jpg")
     );
+    assertThat(hijoExistente.getAliasRetiro(), equalTo("NUEVO.ALIAS")); // Verifica que se editó en MAYÚSCULAS
+  }
+
+  @Test
+  void cuandoElAliasNoExisteEntoncesSeActualizaCorrectamente() {
+    Long hijoId = 1L;
+
+    Hijo hijo = new Hijo();
+
+    Usuario usuario = new Usuario();
+    usuario.setId(10L);
+
+    hijo.setId(hijoId);
+    hijo.setPadre(usuario);
+
+    when(repositorioHijoMock.buscarPorId(hijoId)).thenReturn(hijo);
+
+    when(repositorioHijoMock.existeAlias("ALIAS")).thenReturn(false); // FIX: Espera la búsqueda en mayúsculas
+    servicioHijo.actualizarAlias(hijoId, "ALIAS", usuario);
+
+    assertEquals("ALIAS", hijo.getAliasRetiro());
+
+    verify(repositorioHijoMock).guardar(hijo);
+  }
+
+  @Test
+  void cuandoElAliasYaExisteEntoncesLanzaExcepcion() {
+    Long hijoId = 1L;
+
+    Usuario usuario = new Usuario();
+    usuario.setId(10L);
+
+    Hijo hijo = new Hijo();
+    hijo.setPadre(usuario);
+
+    when(repositorioHijoMock.buscarPorId(hijoId)).thenReturn(hijo);
+
+    when(repositorioHijoMock.existeAlias("ALIAS")).thenReturn(true);
+
+    assertThrows(
+      AliasExistenteException.class,
+      () -> servicioHijo.actualizarAlias(hijoId, "alias", usuario)
+    );
+  }
+
+  @Test
+  void cuandoSeIntentaActualizarUnAliasYElHijoNoExisteEntoncesLanzaExcepcion() {
+    when(repositorioHijoMock.buscarPorId(1L)).thenReturn(null);
+
+    Usuario usuario = new Usuario();
+
+    assertThrows(
+      HijoNoEncontradoException.class,
+      () -> servicioHijo.actualizarAlias(1L, "alias", usuario)
+    );
+  }
+
+  @Test
+  void cuandoElUsuarioNoEsElTutorDelHijoEntoncesLanzaExcepcion() {
+    Usuario tutor = new Usuario();
+    tutor.setId(1L);
+
+    Usuario intruso = new Usuario();
+    intruso.setId(2L);
+
+    Hijo hijo = new Hijo();
+    hijo.setPadre(tutor);
+
+    when(repositorioHijoMock.buscarPorId(1L)).thenReturn(hijo);
+
+    assertThrows(RuntimeException.class, () -> servicioHijo.actualizarAlias(1L, "alias", intruso));
   }
 }

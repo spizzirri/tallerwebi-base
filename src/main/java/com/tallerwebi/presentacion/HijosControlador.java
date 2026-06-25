@@ -4,6 +4,8 @@ import com.tallerwebi.dominio.Hijos.Curso;
 import com.tallerwebi.dominio.Hijos.Hijo;
 import com.tallerwebi.dominio.Hijos.ServicioHijo;
 import com.tallerwebi.dominio.Usuario.Usuario;
+import com.tallerwebi.dominio.excepcion.AliasExistenteException;
+import com.tallerwebi.dominio.excepcion.AliasVacioException;
 import com.tallerwebi.dominio.excepcion.HijoExistenteException;
 import com.tallerwebi.dominio.excepcion.HijoNoEncontradoException;
 import java.util.List;
@@ -28,6 +30,7 @@ public class HijosControlador {
   private static final String USUARIO_SESSION = "USUARIO";
   private static final String USUARIO_MODEL = "usuario";
   private static final String REDIRECT_LOGIN = "redirect:/login";
+  private static final String REDIRECT_VISTA_HIJOS = "redirect:/vistaHijos";
 
   public HijosControlador(ServicioHijo servicioHijo) {
     this.servicioHijo = servicioHijo;
@@ -84,7 +87,7 @@ public class HijosControlador {
       return devolverVistaConError(usuario, "El año o división seleccionados no son válidos");
     }
 
-    return new ModelAndView("redirect:/vistaHijos");
+    return new ModelAndView(REDIRECT_VISTA_HIJOS);
   }
 
   @RequestMapping(path = "/editarHijo", method = RequestMethod.POST)
@@ -113,6 +116,7 @@ public class HijosControlador {
       datosNuevos.setFechaNac(datosEditarHijo.getFechaH());
       datosNuevos.setCurso(curso);
       datosNuevos.setDni(datosEditarHijo.getDniH());
+      datosNuevos.setAliasRetiro(datosEditarHijo.getAliasRetiro());
       MultipartFile foto = datosEditarHijo.getFotoPerfilH();
 
       servicioHijo.editarHijo(datosEditarHijo.getIdHijo(), datosNuevos, foto, usuario);
@@ -121,9 +125,13 @@ public class HijosControlador {
       return devolverVistaConError(usuario, "El hijo no existe o no pertenece al usuario");
     } catch (IllegalArgumentException e) {
       return devolverVistaConError(usuario, "El año o división seleccionados no son válidos");
+    } catch (AliasExistenteException e) {
+      return devolverVistaConError(usuario, "El alias ya está en uso.");
+    } catch (AliasVacioException e) {
+      return devolverVistaConError(usuario, e.getMessage());
     }
 
-    return new ModelAndView("redirect:/vistaHijos");
+    return new ModelAndView(REDIRECT_VISTA_HIJOS);
   }
 
   @RequestMapping(path = "/credenciales", method = RequestMethod.GET)
@@ -140,6 +148,43 @@ public class HijosControlador {
     model.put("hijos", hijos);
 
     return new ModelAndView("credenciales", model);
+  }
+
+  @RequestMapping(path = "/guardar-alias", method = RequestMethod.POST)
+  public ModelAndView guardarAlias(
+    @RequestParam Long hijoId,
+    @RequestParam String aliasRetiro,
+    HttpSession session
+  ) {
+    Usuario usuario = (Usuario) session.getAttribute(USUARIO_SESSION);
+
+    try {
+      servicioHijo.actualizarAlias(hijoId, aliasRetiro, usuario);
+
+      return new ModelAndView(REDIRECT_VISTA_HIJOS);
+    } catch (AliasExistenteException e) {
+      return devolverVistaConError(usuario, "Ese alias ya está en uso.");
+    }
+  }
+
+  @RequestMapping(path = "/eliminarHijo", method = RequestMethod.POST)
+  public ModelAndView darDeBajaUnHijo(
+    @RequestParam Long hijoId,
+    HttpSession session,
+    RedirectAttributes flash
+  ) {
+    Usuario usuario = (Usuario) session.getAttribute(USUARIO_SESSION);
+    if (usuario == null) {
+      return new ModelAndView(REDIRECT_LOGIN);
+    }
+    try {
+      servicioHijo.eliminarHijo(hijoId, usuario);
+      flash.addFlashAttribute("exito", "El hijo fue dado de baja correctamente.");
+    } catch (HijoNoEncontradoException e) {
+      flash.addFlashAttribute("error", "No se pudo eliminar: el hijo no existe o no te pertenece.");
+    }
+
+    return new ModelAndView(REDIRECT_VISTA_HIJOS);
   }
 
   // Métodos auxiliares
