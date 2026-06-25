@@ -196,33 +196,32 @@ public class HijosControladorTest {
 
   @Test
   public void guardarHijoConCursoInvalidoDeberiaRetornarVistaConError() {
-      when(sessionMock.getAttribute("USUARIO")).thenReturn(usuarioMock);
-      when(usuarioMock.getId()).thenReturn(1L);
+    when(sessionMock.getAttribute("USUARIO")).thenReturn(usuarioMock);
+    when(usuarioMock.getId()).thenReturn(1L);
 
-      // Simulamos que al pedir los hijos para reconstruir la vista, retorne una lista vacía o con datos
-      when(servicioHijoMock.obtenerHijosPorUsuario(1L)).thenReturn(List.of());
+    // Simulamos que al pedir los hijos para reconstruir la vista, retorne una lista vacía o con datos
+    when(servicioHijoMock.obtenerHijosPorUsuario(1L)).thenReturn(List.of());
 
-      // Ejecutamos pasando "ANIO_TRUCHO" para forzar el IllegalArgumentException en Curso.valueOf()
-      ModelAndView modelAndView = hijosControlador.guardarHijos(
-              mock(Hijo.class),
-              "ANIO_TRUCHO",
-              "X",
-              fotoMock,
-              sessionMock,
-              redirectAttributesMock
-      );
-      // Verificaciones de lo que hace 'devolverVistaConError'
-      assertThat(modelAndView.getViewName(), equalToIgnoringCase("vistaHijos"));
-      assertThat(
-              modelAndView.getModel().get("error").toString(),
-              equalToIgnoringCase("El año o división seleccionados no son válidos")
-      );
-      // Verificamos que se volvió a cargar el comando "hijo" vacío para el modal
-      //devolverVistaConError esté cumpliendo con su trabajo de
-      // dejar un objeto de tipo Hijo guardado bajo la clave "hijo"
-      assertThat(modelAndView.getModel().get("hijo"), instanceOf(Hijo.class));
+    // Ejecutamos pasando "ANIO_TRUCHO" para forzar el IllegalArgumentException en Curso.valueOf()
+    ModelAndView modelAndView = hijosControlador.guardarHijos(
+      mock(Hijo.class),
+      "ANIO_TRUCHO",
+      "X",
+      fotoMock,
+      sessionMock,
+      redirectAttributesMock
+    );
+    // Verificaciones de lo que hace 'devolverVistaConError'
+    assertThat(modelAndView.getViewName(), equalToIgnoringCase("vistaHijos"));
+    assertThat(
+      modelAndView.getModel().get("error").toString(),
+      equalToIgnoringCase("El año o división seleccionados no son válidos")
+    );
+    // Verificamos que se volvió a cargar el comando "hijo" vacío para el modal
+    //devolverVistaConError esté cumpliendo con su trabajo de
+    // dejar un objeto de tipo Hijo guardado bajo la clave "hijo"
+    assertThat(modelAndView.getModel().get("hijo"), instanceOf(Hijo.class));
   }
-
 
   @Test
   public void editarHijoDeberiaLlamarAlServicioYRecargarLaVistaHijos() {
@@ -275,33 +274,33 @@ public class HijosControladorTest {
     );
   }
 
-    @Test
-    public void editarHijoConCamposInvalidosDeberiaRetornarVistaConError() {
-        when(sessionMock.getAttribute("USUARIO")).thenReturn(usuarioMock);
-        when(usuarioMock.getId()).thenReturn(1L);
+  @Test
+  public void editarHijoConCamposInvalidosDeberiaRetornarVistaConError() {
+    when(sessionMock.getAttribute("USUARIO")).thenReturn(usuarioMock);
+    when(usuarioMock.getId()).thenReturn(1L);
 
-        // 1. FORZAMOS el error de validación del DTO
-        when(bindingResultMock.hasErrors()).thenReturn(true);
+    // 1. FORZAMOS el error de validación del DTO
+    when(bindingResultMock.hasErrors()).thenReturn(true);
 
-        // Simulamos la recarga de la lista de hijos del método auxiliar
-        when(servicioHijoMock.obtenerHijosPorUsuario(1L)).thenReturn(List.of());
+    // Simulamos la recarga de la lista de hijos del método auxiliar
+    when(servicioHijoMock.obtenerHijosPorUsuario(1L)).thenReturn(List.of());
 
-        ModelAndView modelAndView = hijosControlador.editarHijo(
-                datosHijoMock,
-                bindingResultMock,
-                sessionMock,
-                redirectAttributesMock
-        );
+    ModelAndView modelAndView = hijosControlador.editarHijo(
+      datosHijoMock,
+      bindingResultMock,
+      sessionMock,
+      redirectAttributesMock
+    );
 
-        // Verificaciones del retorno de 'devolverVistaConError'
-        assertThat(modelAndView.getViewName(), equalToIgnoringCase("vistaHijos"));
-        assertThat(
-                modelAndView.getModel().get("error").toString(),
-                equalToIgnoringCase("Hay campos inválidos en el formulario de edición.")
-        );
-        // Verificamos que no intentó llamar al servicio de edición porque frenó antes
-        verify(servicioHijoMock, never()).editarHijo(anyLong(), any(Hijo.class), any(), any());
-    }
+    // Verificaciones del retorno de 'devolverVistaConError'
+    assertThat(modelAndView.getViewName(), equalToIgnoringCase("vistaHijos"));
+    assertThat(
+      modelAndView.getModel().get("error").toString(),
+      equalToIgnoringCase("Hay campos inválidos en el formulario de edición.")
+    );
+    // Verificamos que no intentó llamar al servicio de edición porque frenó antes
+    verify(servicioHijoMock, never()).editarHijo(anyLong(), any(Hijo.class), any(), any());
+  }
 
   @Test
   public void seDebePoderCambiarLaFotoDelHijo() {
@@ -335,52 +334,56 @@ public class HijosControladorTest {
   }
 
   @Test
-    public void seDebePoderEliminarHijo(){
-      when(sessionMock.getAttribute("USUARIO")).thenReturn(usuarioMock);
-      when(datosHijoMock.getIdHijo()).thenReturn(1L);
+  public void seDebePoderEliminarHijo() {
+    when(sessionMock.getAttribute("USUARIO")).thenReturn(usuarioMock);
+    when(datosHijoMock.getIdHijo()).thenReturn(1L);
 
-      ModelAndView mav = hijosControlador.darDeBajaUnHijo(datosHijoMock.getIdHijo(),sessionMock,redirectAttributesMock);
+    ModelAndView mav = hijosControlador.darDeBajaUnHijo(
+      datosHijoMock.getIdHijo(),
+      sessionMock,
+      redirectAttributesMock
+    );
 
-      verify(servicioHijoMock,times(1)).eliminarHijo(datosHijoMock.getIdHijo(), usuarioMock);
-      verify(redirectAttributesMock, times(1)).addFlashAttribute("exito", "El hijo fue dado de baja correctamente.");
-      assertThat(mav.getViewName(), equalToIgnoringCase("redirect:/vistaHijos"));
+    verify(servicioHijoMock, times(1)).eliminarHijo(datosHijoMock.getIdHijo(), usuarioMock);
+    verify(redirectAttributesMock, times(1))
+      .addFlashAttribute("exito", "El hijo fue dado de baja correctamente.");
+    assertThat(mav.getViewName(), equalToIgnoringCase("redirect:/vistaHijos"));
   }
 
   @Test
-    public void eliminarHijoInexistenteDebeLanzarExcepcion() {
+  public void eliminarHijoInexistenteDebeLanzarExcepcion() {
     when(sessionMock.getAttribute("USUARIO")).thenReturn(usuarioMock);
 
     doThrow(HijoNoEncontradoException.class).when(servicioHijoMock).eliminarHijo(1L, usuarioMock);
 
     ModelAndView mv = hijosControlador.darDeBajaUnHijo(1L, sessionMock, redirectAttributesMock);
-      // Verificamos que se capturó la excepción y se asignó el mensaje flash de error
-      verify(redirectAttributesMock, times(1))
-              .addFlashAttribute("error", "No se pudo eliminar: el hijo no existe o no te pertenece.");
-      assertThat(mv.getViewName(), equalToIgnoringCase("redirect:/vistaHijos"));
-    }
+    // Verificamos que se capturó la excepción y se asignó el mensaje flash de error
+    verify(redirectAttributesMock, times(1))
+      .addFlashAttribute("error", "No se pudo eliminar: el hijo no existe o no te pertenece.");
+    assertThat(mv.getViewName(), equalToIgnoringCase("redirect:/vistaHijos"));
+  }
 
-    @Test
-    public void irACredencialesDebeMostrarVistaCredencialesConInfoDeLosHijosDelUsuario(){
-        when(sessionMock.getAttribute("USUARIO")).thenReturn(usuarioMock);
-        when(usuarioMock.getId()).thenReturn(1L); // ← FIJAMOS el ID del usuario primero
-        Hijo hijoMock1 = Mockito.mock(Hijo.class);
-        when(hijoMock1.getNombre()).thenReturn("Santiago");
+  @Test
+  public void irACredencialesDebeMostrarVistaCredencialesConInfoDeLosHijosDelUsuario() {
+    when(sessionMock.getAttribute("USUARIO")).thenReturn(usuarioMock);
+    when(usuarioMock.getId()).thenReturn(1L); // ← FIJAMOS el ID del usuario primero
+    Hijo hijoMock1 = Mockito.mock(Hijo.class);
+    when(hijoMock1.getNombre()).thenReturn("Santiago");
 
-        Hijo hijoMock2 = Mockito.mock(Hijo.class);
-        when(hijoMock2.getNombre()).thenReturn("Romina");
+    Hijo hijoMock2 = Mockito.mock(Hijo.class);
+    when(hijoMock2.getNombre()).thenReturn("Romina");
 
-        List<Hijo> hijosSimulados = List.of(hijoMock1, hijoMock2);
+    List<Hijo> hijosSimulados = List.of(hijoMock1, hijoMock2);
 
-        when(servicioHijoMock.obtenerHijosPorUsuario(1L)).thenReturn(hijosSimulados);
+    when(servicioHijoMock.obtenerHijosPorUsuario(1L)).thenReturn(hijosSimulados);
 
-        ModelAndView mav = hijosControlador.irACredenciales(sessionMock);
-        assertThat(mav.getViewName(), equalToIgnoringCase("credenciales"));
+    ModelAndView mav = hijosControlador.irACredenciales(sessionMock);
+    assertThat(mav.getViewName(), equalToIgnoringCase("credenciales"));
 
-        List<Hijo> hijosObtenidos = (List<Hijo>) mav.getModel().get("hijos");
+    List<Hijo> hijosObtenidos = (List<Hijo>) mav.getModel().get("hijos");
 
-        assertThat(hijosObtenidos.get(0).getNombre(), equalToIgnoringCase("Santiago"));
-        assertThat(hijosObtenidos.get(1).getNombre(), equalToIgnoringCase("Romina"));
-        assertThat(mav.getModel().get("usuario"), equalTo(usuarioMock));
-
-    }
+    assertThat(hijosObtenidos.get(0).getNombre(), equalToIgnoringCase("Santiago"));
+    assertThat(hijosObtenidos.get(1).getNombre(), equalToIgnoringCase("Romina"));
+    assertThat(mav.getModel().get("usuario"), equalTo(usuarioMock));
+  }
 }

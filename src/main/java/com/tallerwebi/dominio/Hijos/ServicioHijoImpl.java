@@ -91,13 +91,13 @@ public class ServicioHijoImpl implements ServicioHijo {
     repoHijo.modificar(hijoExistente);
   }
 
-    @Override
-    public void eliminarHijo(Long hijoId, Usuario usuario) {
-        Hijo hijoExistente = repoHijo.buscarPorId(hijoId);
+  @Override
+  public void eliminarHijo(Long hijoId, Usuario usuario) {
+    Hijo hijoExistente = repoHijo.buscarPorId(hijoId);
 
-        if (hijoExistente == null || !hijoExistente.getPadre().getId().equals(usuario.getId())) {
-            throw new HijoNoEncontradoException();
-        }
-        repoHijo.eliminar(hijoExistente);
+    if (hijoExistente == null || !hijoExistente.getPadre().getId().equals(usuario.getId())) {
+      throw new HijoNoEncontradoException();
     }
+    repoHijo.eliminar(hijoExistente);
+  }
 }
