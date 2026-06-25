@@ -7,24 +7,19 @@ overlay.addEventListener("click", (e) => { if (e.target === overlay) overlay.cla
 
 
 function abrirSeccionEdicion(boton) {
-    const seccion = document.getElementById("seccionEdicionHijo");
-    seccion.style.display = "block";
-
-    document.getElementById("editIdHijo").value = boton.getAttribute("data-id");
-    document.getElementById("editNombre").value = boton.getAttribute("data-nombre");
-    document.getElementById("editApellido").value = boton.getAttribute("data-apellido");
-    document.getElementById("editFecha").value = boton.getAttribute("data-fecha");
-    document.getElementById("editDni").value = boton.getAttribute("data-dni");
-    document.getElementById("editAnio").value = boton.getAttribute("data-anio");
-    document.getElementById("editDivision").value = boton.getAttribute("data-division");
-
-    // CORRECCIÓN SEGURA: Verificamos primero si existe el input en el HTML antes de asignarle el valor
-    const inputAlias = document.getElementById('editAlias');
-    if (inputAlias) {
-        inputAlias.value = boton.getAttribute('data-alias') || '';
-    }
 
     seccion.scrollIntoView({ behavior: "smooth" });
+  const seccion = document.getElementById("seccionEdicionHijo");
+  seccion.style.display = "block";
+  document.getElementById("editIdHijo").value = boton.getAttribute("data-id");
+  document.getElementById("editNombre").value = boton.getAttribute("data-nombre");
+  document.getElementById("editApellido").value = boton.getAttribute("data-apellido");
+  document.getElementById("editFecha").value = boton.getAttribute("data-fecha");
+  document.getElementById("editDni").value = boton.getAttribute("data-dni");
+  document.getElementById("editAnio").value = boton.getAttribute("data-anio");
+  document.getElementById("editDivision").value = boton.getAttribute("data-division");
+  document.getElementById("editAliasRetiro").value = boton.getAttribute("data-alias") || "";
+  seccion.scrollIntoView({ behavior: "smooth" });
 }
 
 function cerrarSeccionEdicion() {

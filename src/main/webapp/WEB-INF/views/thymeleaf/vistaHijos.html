@@ -213,7 +213,7 @@
                             </div>
                         </div>
 
-                        <div class="campo-edicion" style="margin-top: 15px;">
+                        <div class="campo-edicion">
                             <span class="dato-label">Foto de perfil (Rostro visible)</span>
                             <input type="file" name="fotoPerfilHijo" class="input-foto-hijo" accept="image/*">
                             <div class="contenedor-error-foto alerta-mensaje alerta-error" style="display: none; margin-top: 10px;">
@@ -331,6 +331,21 @@
                                 <option value="D">D</option>
                             </select>
                         </div>
+                    </div>
+
+                    <div class="campo-edicion" style="margin-top: 15px;">
+                        <span class="dato-label">Alias de retiro</span>
+
+                        <input type="text"
+                               name="aliasRetiro"
+                               id="editAliasRetiro"
+                               placeholder="Ej: ROJO.GATO.TREN"
+                               >
+
+
+                        <small class="texto-ayuda">
+                            Debe ser único para cada alumno.
+                        </small>
                     </div>
 
                     <div class="acciones-edicion" style="margin-top: 20px;">

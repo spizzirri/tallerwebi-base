@@ -3,13 +3,17 @@ package com.tallerwebi.presentacion;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.Hijos.Curso;
 import com.tallerwebi.dominio.Hijos.Hijo;
 import com.tallerwebi.dominio.Hijos.ServicioHijo;
 import com.tallerwebi.dominio.Usuario.Usuario;
+import com.tallerwebi.dominio.excepcion.AliasExistenteException;
+import com.tallerwebi.dominio.excepcion.AliasVacioException;
 import com.tallerwebi.dominio.excepcion.HijoExistenteException;
 import com.tallerwebi.dominio.excepcion.HijoNoEncontradoException;
 import com.tallerwebi.presentacion.HijosControlador;
@@ -385,5 +389,63 @@ public class HijosControladorTest {
     assertThat(hijosObtenidos.get(0).getNombre(), equalToIgnoringCase("Santiago"));
     assertThat(hijosObtenidos.get(1).getNombre(), equalToIgnoringCase("Romina"));
     assertThat(mav.getModel().get("usuario"), equalTo(usuarioMock));
+  }
+
+  @Test
+  public void cuandoSeEditaUnHijoConAliasVacioDebeDevolverVistaConError() {
+    when(sessionMock.getAttribute("USUARIO")).thenReturn(usuarioMock);
+    when(bindingResultMock.hasErrors()).thenReturn(false);
+
+    // IMPORTANTE: usar valores válidos para que no falle antes en Curso.valueOf(...)
+    when(datosHijoMock.getAnio()).thenReturn("PRIMERO");
+    when(datosHijoMock.getDivision()).thenReturn("A");
+    when(datosHijoMock.getFotoPerfilH()).thenReturn(fotoMock);
+
+    doThrow(new AliasVacioException("El alias no puede estar vacío"))
+      .when(servicioHijoMock)
+      .editarHijo(anyLong(), any(Hijo.class), any(MultipartFile.class), eq(usuarioMock));
+
+    ModelAndView mav = hijosControlador.editarHijo(
+      datosHijoMock,
+      bindingResultMock,
+      sessionMock,
+      redirectAttributesMock
+    );
+
+    verify(servicioHijoMock)
+      .editarHijo(anyLong(), any(Hijo.class), any(MultipartFile.class), eq(usuarioMock));
+
+    assertThat(mav.getViewName(), not(equalToIgnoringCase("redirect:/vistaHijos")));
+  }
+
+  @Test
+  public void cuandoGuardoUnAliasValidoEntoncesRedirigeAVistaHijos() {
+    Usuario usuario = new Usuario();
+
+    when(sessionMock.getAttribute("USUARIO")).thenReturn(usuario);
+
+    ModelAndView mv = hijosControlador.guardarAlias(1L, "ROJO.GATO.TREN", sessionMock);
+
+    verify(servicioHijoMock).actualizarAlias(1L, "ROJO.GATO.TREN", usuario);
+
+    assertEquals("redirect:/vistaHijos", mv.getViewName());
+  }
+
+  @Test
+  public void cuandoElAliasYaExisteEntoncesDevuelveVistaConError() {
+    Usuario usuario = new Usuario();
+    usuario.setId(1L);
+
+    when(sessionMock.getAttribute("USUARIO")).thenReturn(usuario);
+
+    doThrow(new AliasExistenteException("Alias existente"))
+      .when(servicioHijoMock)
+      .actualizarAlias(1L, "ROJO.GATO.TREN", usuario);
+
+    ModelAndView mv = hijosControlador.guardarAlias(1L, "ROJO.GATO.TREN", sessionMock);
+
+    assertEquals("vistaHijos", mv.getViewName());
+
+    assertEquals("Ese alias ya está en uso.", mv.getModel().get("error"));
   }
 }

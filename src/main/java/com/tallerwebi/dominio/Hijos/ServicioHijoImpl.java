@@ -4,6 +4,7 @@ import com.tallerwebi.dominio.AliasDeRetiro.ServicioGeneradorAlias;
 import com.tallerwebi.dominio.SubidaDeImgs.ServicioImagenes;
 import com.tallerwebi.dominio.Usuario.Usuario;
 import com.tallerwebi.dominio.excepcion.AliasExistenteException;
+import com.tallerwebi.dominio.excepcion.AliasVacioException;
 import com.tallerwebi.dominio.excepcion.HijoExistenteException;
 import com.tallerwebi.dominio.excepcion.HijoNoEncontradoException;
 import java.util.List;
@@ -17,128 +18,137 @@ import org.springframework.web.multipart.MultipartFile;
 @Transactional
 public class ServicioHijoImpl implements ServicioHijo {
 
-  private final RepositorioHijo repoHijo;
-  private final ServicioGeneradorAlias servicioGeneradorAlias;
-  private final ServicioImagenes servicioImagenes;
+    private final RepositorioHijo repoHijo;
+    private final ServicioGeneradorAlias servicioGeneradorAlias;
+    private final ServicioImagenes servicioImagenes;
 
-  @Autowired
-  public ServicioHijoImpl(
-    RepositorioHijo repositorioHijo,
-    ServicioGeneradorAlias servicioGeneradorAlias,
-    ServicioImagenes servicioImagenes
-  ) {
-    this.repoHijo = repositorioHijo;
-    this.servicioGeneradorAlias = servicioGeneradorAlias;
-    this.servicioImagenes = servicioImagenes;
-  }
-
-  @Override
-  public List<Hijo> obtenerHijosPorUsuario(Long idUsuario) {
-    return this.repoHijo.listarHijos(idUsuario);
-  }
-
-  @Override
-  public void guardarHijo(Hijo hijo, MultipartFile fotoPerfil, Usuario usuario) {
-    if (repoHijo.existeHijoPorDni(hijo.getDni())) {
-      throw new HijoExistenteException();
+    @Autowired
+    public ServicioHijoImpl(
+            RepositorioHijo repositorioHijo,
+            ServicioGeneradorAlias servicioGeneradorAlias,
+            ServicioImagenes servicioImagenes
+    ) {
+        this.repoHijo = repositorioHijo;
+        this.servicioGeneradorAlias = servicioGeneradorAlias;
+        this.servicioImagenes = servicioImagenes;
     }
 
-    hijo.setPadre(usuario);
-    // Si subieron una foto, la procesamos y guardamos la URL
-    if (fotoPerfil != null && !fotoPerfil.isEmpty()) {
-      String rutaGuardarEnHosting = servicioImagenes.subirImagenHijo(
-        fotoPerfil,
-        "KionetTWI/img_hijos"
-      );
-      hijo.setFotoPerfil(rutaGuardarEnHosting);
+    @Override
+    public List<Hijo> obtenerHijosPorUsuario(Long idUsuario) {
+        return this.repoHijo.listarHijos(idUsuario);
     }
 
-    String alias = servicioGeneradorAlias.generarAliasDisponible().toUpperCase(Locale.ROOT);
-    hijo.setAliasRetiro(alias);
+    @Override
+    public void guardarHijo(Hijo hijo, MultipartFile fotoPerfil, Usuario usuario) {
+        if (repoHijo.existeHijoPorDni(hijo.getDni())) {
+            throw new HijoExistenteException();
+        }
 
-    repoHijo.guardar(hijo);
-  }
+        hijo.setPadre(usuario);
 
-  @Override
-  public void editarHijo(Long idHijo, Hijo datosNuevos, MultipartFile fotoPerfil, Usuario usuario) {
-    Hijo hijoExistente = repoHijo.buscarPorId(idHijo);
+        if (fotoPerfil != null && !fotoPerfil.isEmpty()) {
+            String rutaGuardarEnHosting = servicioImagenes.subirImagenHijo(
+                    fotoPerfil,
+                    "KionetTWI/img_hijos"
+            );
+            hijo.setFotoPerfil(rutaGuardarEnHosting);
+        }
 
-    if (hijoExistente == null || !hijoExistente.getPadre().getId().equals(usuario.getId())) {
-      throw new HijoNoEncontradoException();
+        String alias = servicioGeneradorAlias.generarAliasDisponible().toUpperCase(Locale.ROOT);
+        hijo.setAliasRetiro(alias);
+
+        repoHijo.guardar(hijo);
     }
 
-    hijoExistente.setNombre(datosNuevos.getNombre());
-    hijoExistente.setApellido(datosNuevos.getApellido());
-    hijoExistente.setFechaNac(datosNuevos.getFechaNac());
-    hijoExistente.setCurso(datosNuevos.getCurso());
-    hijoExistente.setDni(datosNuevos.getDni());
+    @Override
+    public void editarHijo(Long idHijo, Hijo datosNuevos, MultipartFile fotoPerfil, Usuario usuario) {
+        Hijo hijoExistente = repoHijo.buscarPorId(idHijo);
 
-    // Delegamos el procesamiento en métodos privados para bajar la complejidad
-    this.procesarAliasEnEdicion(hijoExistente, datosNuevos.getAliasRetiro());
-    this.procesarFotoEnEdicion(hijoExistente, fotoPerfil);
+        if (hijoExistente == null || !hijoExistente.getPadre().getId().equals(usuario.getId())) {
+            throw new HijoNoEncontradoException();
+        }
 
-    repoHijo.modificar(hijoExistente);
-  }
+        hijoExistente.setNombre(datosNuevos.getNombre());
+        hijoExistente.setApellido(datosNuevos.getApellido());
+        hijoExistente.setFechaNac(datosNuevos.getFechaNac());
+        hijoExistente.setCurso(datosNuevos.getCurso());
+        hijoExistente.setDni(datosNuevos.getDni());
 
-  @Override
-  public void actualizarAlias(Long hijoId, String aliasRetiro, Usuario usuario) {
-    Hijo hijo = repoHijo.buscarPorId(hijoId);
+        // Encapsulado limpio para PMD
+        this.procesarAliasEnEdicion(hijoExistente, datosNuevos.getAliasRetiro());
+        this.procesarFotoEnEdicion(hijoExistente, fotoPerfil);
 
-    if (hijo == null) {
-      throw new HijoNoEncontradoException();
+        repoHijo.modificar(hijoExistente);
     }
 
-    if (!hijo.getPadre().getId().equals(usuario.getId())) {
-      throw new RuntimeException("No puede modificar este hijo");
-    }
-    String aliasEnMayuscula = (aliasRetiro != null) ? aliasRetiro.toUpperCase(Locale.ROOT) : null;
+    @Override
+    public void actualizarAlias(Long hijoId, String aliasRetiro, Usuario usuario) {
+        validarAliasVacio(aliasRetiro);
 
-    if (repoHijo.existeAlias(aliasEnMayuscula)) {
-      throw new AliasExistenteException("El alias ya está en uso");
-    }
+        Hijo hijo = repoHijo.buscarPorId(hijoId);
 
-    hijo.setAliasRetiro(aliasRetiro);
+        if (hijo == null) {
+            throw new HijoNoEncontradoException();
+        }
 
-    repoHijo.guardar(hijo);
-  }
+        if (!hijo.getPadre().getId().equals(usuario.getId())) {
+            throw new RuntimeException("No puede modificar este hijo");
+        }
 
-  @Override
-  public void eliminarHijo(Long hijoId, Usuario usuario) {
-    Hijo hijoExistente = repoHijo.buscarPorId(hijoId);
+        String aliasEnMayuscula = aliasRetiro.toUpperCase(Locale.ROOT);
 
-    if (hijoExistente == null || !hijoExistente.getPadre().getId().equals(usuario.getId())) {
-      throw new HijoNoEncontradoException();
-    }
-    repoHijo.eliminar(hijoExistente);
-  }
+        // Evita lanzar excepción si el alias ya lo tenía este mismo hijo
+        if (repoHijo.existeAlias(aliasEnMayuscula) && !aliasEnMayuscula.equals(hijo.getAliasRetiro())) {
+            throw new AliasExistenteException("El alias ya está en uso");
+        }
 
-  //----METODOS AUXILIARES---
-
-  private void procesarAliasEnEdicion(Hijo hijoExistente, String aliasNuevo) {
-    if (aliasNuevo == null) {
-      return;
+        hijo.setAliasRetiro(aliasEnMayuscula);
+        repoHijo.guardar(hijo);
     }
 
-    String aliasEditadoMayuscula = aliasNuevo.toUpperCase(Locale.ROOT);
+    @Override
+    public void eliminarHijo(Long hijoId, Usuario usuario) {
+        Hijo hijoExistente = repoHijo.buscarPorId(hijoId);
 
-    if (aliasEditadoMayuscula.equals(hijoExistente.getAliasRetiro())) {
-      return;
+        if (hijoExistente == null || !hijoExistente.getPadre().getId().equals(usuario.getId())) {
+            throw new HijoNoEncontradoException();
+        }
+        repoHijo.eliminar(hijoExistente);
     }
 
-    if (repoHijo.existeAlias(aliasEditadoMayuscula)) {
-      throw new AliasExistenteException("El alias ya está en uso");
+    //---- MÉTODOS AUXILIARES PRIVADOS ----
+
+    private void validarAliasVacio(String aliasRetiro) {
+        if (aliasRetiro == null || aliasRetiro.trim().isEmpty()) {
+            throw new AliasVacioException("El alias no puede estar vacío");
+        }
     }
 
-    hijoExistente.setAliasRetiro(aliasEditadoMayuscula);
-  }
+    private void procesarAliasEnEdicion(Hijo hijoExistente, String aliasNuevo) {
+        if (aliasNuevo == null || aliasNuevo.trim().isEmpty()) {
+            return;
+        }
 
-  private void procesarFotoEnEdicion(Hijo hijoExistente, MultipartFile fotoPerfil) {
-    if (fotoPerfil != null && !fotoPerfil.isEmpty()) {
-      String rutaGuardarEnHosting = servicioImagenes.subirImagenHijo(
-        fotoPerfil,
-        "KionetTWI/img_hijos"
-      );
-      hijoExistente.setFotoPerfil(rutaGuardarEnHosting);
+        String aliasEditadoMayuscula = aliasNuevo.toUpperCase(Locale.ROOT);
+
+        if (aliasEditadoMayuscula.equals(hijoExistente.getAliasRetiro())) {
+            return;
+        }
+
+        if (repoHijo.existeAlias(aliasEditadoMayuscula)) {
+            throw new AliasExistenteException("El alias ya está en uso");
+        }
+
+        hijoExistente.setAliasRetiro(aliasEditadoMayuscula);
     }
-  }
+
+    private void procesarFotoEnEdicion(Hijo hijoExistente, MultipartFile fotoPerfil) {
+        if (fotoPerfil != null && !fotoPerfil.isEmpty()) {
+            String rutaGuardarEnHosting = servicioImagenes.subirImagenHijo(
+                    fotoPerfil,
+                    "KionetTWI/img_hijos"
+            );
+            hijoExistente.setFotoPerfil(rutaGuardarEnHosting);
+        }
+    }
 }

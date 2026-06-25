@@ -5,6 +5,7 @@ import com.tallerwebi.dominio.Hijos.Hijo;
 import com.tallerwebi.dominio.Hijos.ServicioHijo;
 import com.tallerwebi.dominio.Usuario.Usuario;
 import com.tallerwebi.dominio.excepcion.AliasExistenteException;
+import com.tallerwebi.dominio.excepcion.AliasVacioException;
 import com.tallerwebi.dominio.excepcion.HijoExistenteException;
 import com.tallerwebi.dominio.excepcion.HijoNoEncontradoException;
 import java.util.List;
@@ -115,6 +116,7 @@ public class HijosControlador {
       datosNuevos.setFechaNac(datosEditarHijo.getFechaH());
       datosNuevos.setCurso(curso);
       datosNuevos.setDni(datosEditarHijo.getDniH());
+      datosNuevos.setAliasRetiro(datosEditarHijo.getAliasRetiro());
       MultipartFile foto = datosEditarHijo.getFotoPerfilH();
 
       servicioHijo.editarHijo(datosEditarHijo.getIdHijo(), datosNuevos, foto, usuario);
@@ -123,6 +125,10 @@ public class HijosControlador {
       return devolverVistaConError(usuario, "El hijo no existe o no pertenece al usuario");
     } catch (IllegalArgumentException e) {
       return devolverVistaConError(usuario, "El año o división seleccionados no son válidos");
+    } catch (AliasExistenteException e) {
+      return devolverVistaConError(usuario, "El alias ya está en uso.");
+    } catch (AliasVacioException e) {
+      return devolverVistaConError(usuario, e.getMessage());
     }
 
     return new ModelAndView(REDIRECT_VISTA_HIJOS);
