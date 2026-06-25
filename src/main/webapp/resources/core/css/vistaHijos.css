@@ -295,3 +295,21 @@
     height: 18px;
     color: var(--white);
 }
+
+@media (max-width: 520px) {
+    .modal-card {
+        padding: 1.25rem;
+        border-radius: 16px 16px 0 0;
+        position: fixed;
+        bottom: 0; left: 0; right: 0;
+        max-height: 90vh;
+        max-width: 100%;
+    }
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+    .agregar-hijo-banner {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
