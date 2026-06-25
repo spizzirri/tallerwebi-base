@@ -7,8 +7,6 @@ overlay.addEventListener("click", (e) => { if (e.target === overlay) overlay.cla
 
 
 function abrirSeccionEdicion(boton) {
-
-    seccion.scrollIntoView({ behavior: "smooth" });
   const seccion = document.getElementById("seccionEdicionHijo");
   seccion.style.display = "block";
   document.getElementById("editIdHijo").value = boton.getAttribute("data-id");
@@ -18,8 +16,12 @@ function abrirSeccionEdicion(boton) {
   document.getElementById("editDni").value = boton.getAttribute("data-dni");
   document.getElementById("editAnio").value = boton.getAttribute("data-anio");
   document.getElementById("editDivision").value = boton.getAttribute("data-division");
-  document.getElementById("editAliasRetiro").value = boton.getAttribute("data-alias") || "";
-  seccion.scrollIntoView({ behavior: "smooth" });
+// CORRECCIÓN ID: Verificamos con el ID correcto del HTML ('editAlias')
+    const inputAlias = document.getElementById('editAlias');
+    if (inputAlias) {
+        inputAlias.value = boton.getAttribute('data-alias') || '';
+    }
+    seccion.scrollIntoView({ behavior: "smooth" });
 }
 
 function cerrarSeccionEdicion() {
