@@ -229,3 +229,25 @@
         gap: 0.25rem;
     }
 }
+
+.cambiar-contrasenia-zona {
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.cambiar-contrasenia-link {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.cambiar-contrasenia-link:hover {
+    color: var(--purple);
+}
+
+.modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}

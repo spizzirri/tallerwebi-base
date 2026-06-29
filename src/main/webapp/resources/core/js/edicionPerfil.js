@@ -55,3 +55,11 @@ function verificarFrase(valor) {
     btn.disabled = true;
   }
 }
+
+function abrirModalContrasenia() {
+  document.getElementById("modalCambiarContrasenia").classList.add("visible");
+}
+
+function cerrarModalContrasenia() {
+  document.getElementById("modalCambiarContrasenia").classList.remove("visible");
+}

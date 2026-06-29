@@ -7,6 +7,7 @@ import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.Hijos.Hijo;
 import com.tallerwebi.dominio.Hijos.ServicioHijo;
+import com.tallerwebi.dominio.Usuario.ServicioLogin;
 import com.tallerwebi.dominio.Usuario.ServicioUsuario;
 import com.tallerwebi.dominio.Usuario.Usuario;
 import com.tallerwebi.dominio.excepcion.NoSePudoGuardarInformacionException;
@@ -29,11 +30,12 @@ public class PerfilControladorTest {
   private BindingResult bindingResultMock;
   private DatosEditarPerfilDTO dto;
   private RedirectAttributes redirectAttributesMock;
+  private ServicioLogin servicioLoginMock;
 
   @BeforeEach
   public void init() {
     servicioUsuarioMock = Mockito.mock(ServicioUsuario.class);
-    perfilControlador = new PerfilControlador(servicioUsuarioMock);
+    perfilControlador = new PerfilControlador(servicioUsuarioMock, servicioLoginMock);
     usuarioMock = Mockito.mock(Usuario.class);
     sessionMock = Mockito.mock(HttpSession.class);
     bindingResultMock = Mockito.mock(BindingResult.class);

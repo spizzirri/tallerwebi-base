@@ -1,16 +1,20 @@
 package com.tallerwebi.presentacion;
 
+import com.tallerwebi.dominio.Usuario.ServicioLogin;
 import com.tallerwebi.dominio.Usuario.ServicioUsuario;
 import com.tallerwebi.dominio.Usuario.Usuario;
 import com.tallerwebi.dominio.excepcion.NoSePudoGuardarInformacionException;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -24,10 +28,13 @@ public class PerfilControlador {
   private static final String USUARIO_SESSION = "USUARIO";
   private static final String USUARIO_MODEL = "usuario";
   private static final String REDIRECT_LOGIN = "redirect:/login";
+  private final ServicioLogin servicioLogin;
+  private static final Logger logger = LoggerFactory.getLogger(PerfilControlador.class);
 
   @Autowired
-  public PerfilControlador(ServicioUsuario servicioUsuario) {
+  public PerfilControlador(ServicioUsuario servicioUsuario, ServicioLogin servicioLogin) {
     this.servicioUsuario = servicioUsuario;
+    this.servicioLogin = servicioLogin;
   }
 
   @RequestMapping(path = "/perfil", method = RequestMethod.GET)
@@ -160,5 +167,40 @@ public class PerfilControlador {
     servicioUsuario.eliminarCuenta(usuario.getId());
     session.invalidate();
     return new ModelAndView(REDIRECT_LOGIN);
+  }
+
+  @RequestMapping(path = "/perfil/cambiar-contrasenia", method = RequestMethod.POST)
+  public ModelAndView cambiarContrasenia(
+    @RequestParam("contraseniaActual") String contraseniaActual,
+    @RequestParam("contraseniaNueva") String contraseniaNueva,
+    @RequestParam("confirmarContrasenia") String confirmarContrasenia,
+    HttpSession session,
+    RedirectAttributes flash
+  ) {
+    logger.info(
+      "=== CAMBIAR PASS === actual: {} nueva: {} confirmar: {}",
+      contraseniaActual,
+      contraseniaNueva,
+      confirmarContrasenia
+    );
+    Usuario usuario = (Usuario) session.getAttribute(USUARIO_SESSION);
+    if (usuario == null) {
+      return new ModelAndView(REDIRECT_LOGIN);
+    }
+    if (!contraseniaNueva.equals(confirmarContrasenia)) {
+      return devolverVistaError(usuario, "Las contraseñas no coinciden");
+    }
+    Usuario usuarioLogin = servicioLogin.consultarUsuarioLogin(
+      usuario.getEmail(),
+      contraseniaActual
+    );
+    if (usuarioLogin == null) {
+      return devolverVistaError(usuario, "La contraseña actual es incorrecta");
+    }
+    servicioLogin.cambiarContrasenia(usuario.getEmail(), contraseniaNueva);
+    Usuario usuarioActualizado = servicioUsuario.buscarPorId(usuario.getId());
+    session.setAttribute(USUARIO_SESSION, usuarioActualizado);
+    flash.addFlashAttribute("exito", "¡Contraseña actualizada con éxito!");
+    return new ModelAndView("redirect:/perfil");
   }
 }

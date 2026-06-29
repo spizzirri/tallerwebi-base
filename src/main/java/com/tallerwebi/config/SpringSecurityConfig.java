@@ -110,6 +110,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
       );
       //Guarda ese objeto Usuario obtenido de la BD en la Sesión de HTTP bajo la clave "USUARIO"
       request.getSession().setAttribute("USUARIO", usuario);
+      request.getSession().setAttribute("ROL", "CLIENTE");
       response.sendRedirect("/spring/home");
     };
   }
