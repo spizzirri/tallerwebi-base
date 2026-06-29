@@ -365,3 +365,15 @@
         align-items: flex-start;
     }
 }
+
+@media (max-width: 520px) {
+    .modal-card {
+        position: fixed;
+        bottom: 0;
+        left: 8px;
+        right: 8px;
+        width: auto;
+        max-width: none;
+        box-sizing: border-box;
+    }
+}
