@@ -61,6 +61,10 @@ public class ControladorLogin {
         cookie.setPath("/");
         response.addCookie(cookie);
       }
+      // VALIDACIÓN DE ROL PARA REDIRECCIÓN INICIAL
+      if ("KIOSQUERO".equals(usuarioBuscado.getRol())) {
+        return new ModelAndView("redirect:/homeKiosquero");
+      }
 
       return new ModelAndView("redirect:/home");
     } else {
@@ -75,7 +79,7 @@ public class ControladorLogin {
   public ModelAndView registrarme(@ModelAttribute("usuario") Usuario usuario) {
     ModelMap model = new ModelMap();
     try {
-      usuario.setRol("USER");
+      usuario.setRol("CLIENTE");
       servicioLogin.registrar(usuario);
     } catch (UsuarioExistente e) {
       model.put("error", "El usuario ya existe");

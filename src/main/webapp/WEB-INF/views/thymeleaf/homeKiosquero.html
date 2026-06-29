@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>KioNet - Tu Kiosco Virtual</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" th:href="@{/css/login.css}" />
+    <link rel="stylesheet" th:href="@{/css/componentesYAlertas.css}" />
+    <link rel="stylesheet" th:href="@{/css/home.css}" />
+
+</head>
+<body>
+<header class="main-header">
+    <a class="navbar-brand" th:href="@{/homeKiosquero}">
+        <img th:src="'https://res.cloudinary.com/dqrka5zry/image/upload/v1780531490/KioNet_imp3c0.png'" alt="logo">
+    </a>
+
+    <!--BUSQUEDA POR NRO DE PEDIDO!-->
+    <div class="header-center">
+        <form th:action="@{/homeKiosquero}" method="GET" class="search-form">
+            <div class="search-wrapper">
+                <input type="search" name="busqueda" class="form-control-search" placeholder="Buscar pedido..." th:value="${param.busquedaPedido}">
+                <button type="submit" class="btn-search">Buscar</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="header-right">
+        <form th:action="@{/logout}" method="post" class="logout-form-header">
+            <button type="submit" class="btn-logout">Cerrar sesión</button>
+        </form>
+    </div>
+
+</header>
+
+<main class="main">
+    <section class="panel-tienda">
+        <div class="banner-titulos">
+            <div class="banner-titulos-texto">
+                <h1>Bienvenidos a KioNet UNLAM</h1>
+                <h2>Control de pedidos</h2>
+            </div>
+        </div>
+    </section><!--FIN PANEL TIENDA-->
+</main>
+
+</body>
+</html>
