@@ -124,7 +124,34 @@
                 <form id="formDistribucion" th:action="@{/distribucion/confirmar}"
                       method="post">
 
-                    <div class="accordion" id="accordionPanelsStayOpenExample">
+                    <div class="campo-fecha-retiro card mb-4">
+                        <div class="card-body p-4">
+                            <div class="row align-items-center g-3">
+
+                                <div class="col-lg-7">
+                                    <h5 class="mb-1 text-purple fw-bold">
+                                        📅 Fecha de retiro
+                                    </h5>
+
+                                    <p class="text-muted mb-0">
+                                        Seleccioná el día en que vas a retirar el pedido del kiosco.
+                                    </p>
+                                </div>
+
+                                <div class="col-lg-5">
+                                    <input
+                                            type="date"
+                                            id="fechaRetiro"
+                                            name="fechaRetiro"
+                                            class="form-control fecha-input"
+                                            required>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion mb-4 mt-4" id="accordionPanelsStayOpenExample">
 
                         <div class="accordion-item" th:each="producto : ${productos}" th:data-producto-id="${producto.id}">
 
@@ -201,9 +228,9 @@
                         </div>
                     </div>
 
-                    <div class="tabla-footer mt-3">
+                    <div class="tabla-footer mt-3 mb-3">
                         <a th:href="@{/home}" class="btn-agregar-productos">+ Agregar más productos</a>
-                        <button type="submit" class="btn-confirmar">
+                        <button type="submit" id="btnConfirmarPedido" class="btn-confirmar">
                             Confirmar pedido
                         </button>
                     </div>

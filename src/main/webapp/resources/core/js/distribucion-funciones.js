@@ -35,4 +35,24 @@ function actualizarEstadoBotonConfirmar() {
     .some((input) => parseInt(input.value) > 0);
   btnConfirmar.disabled = !hayAlgunaCantidad;
 }
-document.addEventListener("DOMContentLoaded", actualizarEstadoBotonConfirmar);
+
+function configurarFechaRetiro() {
+  const fecha = document.getElementById("fechaRetiro");
+
+  if (!fecha) {
+    return;
+  }
+
+  const manana = new Date();
+  manana.setDate(manana.getDate() + 1);
+
+  fecha.min = manana.toISOString().split("T")[0];
+}
+
+function inicializarPagina() {
+  actualizarEstadoBotonConfirmar();
+  configurarFechaRetiro();
+}
+
+
+document.addEventListener("DOMContentLoaded", inicializarPagina);

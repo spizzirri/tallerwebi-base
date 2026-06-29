@@ -17,6 +17,7 @@ import com.tallerwebi.dominio.Productos.Producto;
 import com.tallerwebi.dominio.Productos.RepositorioProducto;
 import com.tallerwebi.dominio.Usuario.Usuario;
 import com.tallerwebi.presentacion.DistribucionCarrito.ItemDistribucionDTO;
+import java.time.LocalDate;
 import java.util.List;
 import javax.servlet.http.HttpSession;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,6 +34,7 @@ public class ServicioPedidoTest {
   private RepositorioHijo repositorioHijoMock;
   private RepositorioProducto repositorioProductoMock;
   private Producto productoMock;
+  private LocalDate fechaRetiro;
 
   @BeforeEach
   public void init() {
@@ -45,6 +47,7 @@ public class ServicioPedidoTest {
       new ServicioPedidoImpl(repositorioPedidoMock, repositorioHijoMock, repositorioProductoMock);
     hijoMock = mock(Hijo.class);
     productoMock = mock(Producto.class);
+    fechaRetiro = LocalDate.of(2026, 7, 15);
   }
 
   @Test
@@ -55,7 +58,7 @@ public class ServicioPedidoTest {
     when(repositorioProductoMock.buscarProductoPorId(1L)).thenReturn(productoMock);
 
     List<ItemDistribucionDTO> items = List.of(new ItemDistribucionDTO(1L, 1L, 2));
-    servicioPedido.crearPedido(1L, items, usuarioMock);
+    servicioPedido.crearPedido(1L, items, fechaRetiro, usuarioMock);
     Mockito.verify(repositorioPedidoMock).guardar(any(Pedido.class));
   }
 
@@ -69,7 +72,7 @@ public class ServicioPedidoTest {
 
     List<ItemDistribucionDTO> items = List.of(new ItemDistribucionDTO(1L, 1L, 2));
 
-    servicioPedido.crearPedido(1L, items, usuarioMock);
+    servicioPedido.crearPedido(1L, items, fechaRetiro, usuarioMock);
 
     Mockito.verify(repositorioPedidoMock).guardar(argThat(pedido -> pedido.getHijo() != null));
   }
@@ -82,7 +85,7 @@ public class ServicioPedidoTest {
 
     List<ItemDistribucionDTO> items = List.of(new ItemDistribucionDTO(1L, 1L, 2));
 
-    servicioPedido.crearPedido(1L, items, usuarioMock);
+    servicioPedido.crearPedido(1L, items, fechaRetiro, usuarioMock);
 
     Mockito
       .verify(repositorioPedidoMock)

@@ -10,6 +10,7 @@ import com.tallerwebi.dominio.Pedidos.Pedido;
 import com.tallerwebi.dominio.Pedidos.ServicioPedido;
 import com.tallerwebi.dominio.Productos.Producto;
 import com.tallerwebi.dominio.Usuario.Usuario;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +18,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
@@ -81,6 +83,9 @@ public class DistribucionControlador {
   @PostMapping("/distribucion/confirmar")
   public ModelAndView confirmarPedido(
     @RequestParam Map<String, String> params,
+    @RequestParam("fechaRetiro") @DateTimeFormat(
+      iso = DateTimeFormat.ISO.DATE
+    ) LocalDate fechaRetiro,
     HttpSession session
   ) {
     Usuario usuario = (Usuario) session.getAttribute(USUARIO_SESSION);
@@ -121,7 +126,7 @@ public class DistribucionControlador {
 
     for (Map.Entry<Long, List<ItemDistribucionDTO>> entry : listaPorHijo.entrySet()) {
       if (!entry.getValue().isEmpty()) {
-        servicioPedido.crearPedido(entry.getKey(), entry.getValue(), usuario);
+        servicioPedido.crearPedido(entry.getKey(), entry.getValue(), fechaRetiro, usuario);
       }
     }
 

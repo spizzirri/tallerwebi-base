@@ -17,6 +17,7 @@ import com.tallerwebi.dominio.Productos.Producto;
 import com.tallerwebi.dominio.Usuario.Usuario;
 import com.tallerwebi.presentacion.DistribucionCarrito.DistribucionControlador;
 import com.tallerwebi.presentacion.DistribucionCarrito.ItemDistribucionDTO;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,6 +41,7 @@ public class DistribucionControladorTest {
   private ItemCarrito itemMock;
   private Hijo hijoMock;
   private ServicioPedido serviPedidoMock;
+  private LocalDate fechaRetiro;
 
   @BeforeEach
   public void init() {
@@ -54,6 +56,7 @@ public class DistribucionControladorTest {
     productoMock = Mockito.mock(Producto.class);
     itemMock = Mockito.mock(ItemCarrito.class);
     hijoMock = Mockito.mock(Hijo.class);
+    fechaRetiro = LocalDate.of(2026, 7, 15);
   }
 
   @Test
@@ -125,7 +128,7 @@ public class DistribucionControladorTest {
     params.put("hijoId1_prodId1", "2"); //lo de detras de la coma es la cantidad
     params.put("hijoId2_prodId1", "3");
 
-    ModelAndView mv = distriControlador.confirmarPedido(params, sessionMock);
+    ModelAndView mv = distriControlador.confirmarPedido(params, fechaRetiro, sessionMock);
 
     assertThat(mv.getViewName(), equalToIgnoringCase("redirect:/carrito"));
   }
@@ -136,7 +139,7 @@ public class DistribucionControladorTest {
 
     Map<String, String> params = new HashMap<>();
 
-    ModelAndView mv = distriControlador.confirmarPedido(params, sessionMock);
+    ModelAndView mv = distriControlador.confirmarPedido(params, fechaRetiro, sessionMock);
 
     assertThat(mv.getViewName(), equalToIgnoringCase("redirect:/login"));
   }
@@ -148,8 +151,8 @@ public class DistribucionControladorTest {
     params.put("hijoId1_prodId1", "2");
     params.put("hijoId1_prodId2", "3");
 
-    distriControlador.confirmarPedido(params, sessionMock);
+    distriControlador.confirmarPedido(params, fechaRetiro, sessionMock);
 
-    Mockito.verify(serviPedidoMock).crearPedido(any(), any(), any());
+    Mockito.verify(serviPedidoMock).crearPedido(any(), any(), any(), any());
   }
 }
