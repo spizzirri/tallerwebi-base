@@ -73,4 +73,13 @@ public class RepositorioHijoImpl implements RepositorioHijo {
   public void eliminar(Hijo hijo) {
     sessionFactory.getCurrentSession().delete(hijo);
   }
+
+  @Override
+  public void eliminarPorUsuario(Long idPadre) {
+    sessionFactory
+      .getCurrentSession()
+      .createQuery("DELETE FROM Hijo h WHERE h.padre.id = :idPadre")
+      .setParameter("idPadre", idPadre)
+      .executeUpdate();
+  }
 }

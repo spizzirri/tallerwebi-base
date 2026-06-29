@@ -36,3 +36,22 @@ document.getElementById("inputFoto")
       lector.readAsDataURL(archivo);
     }
   });
+
+function abrirModalEliminar() {
+  document.getElementById("modalEliminarCuenta").classList.add("visible");
+}
+
+function cerrarModalEliminar() {
+  document.getElementById("modalEliminarCuenta").classList.remove("visible");
+  document.getElementById("inputConfirmacionEliminar").value = "";
+  document.getElementById("btnEliminarCuenta").disabled = true;
+}
+
+function verificarFrase(valor) {
+  const btn = document.getElementById("btnEliminarCuenta");
+  if (valor === "quiero eliminar mi cuenta") {
+    btn.disabled = false;
+  } else {
+    btn.disabled = true;
+  }
+}

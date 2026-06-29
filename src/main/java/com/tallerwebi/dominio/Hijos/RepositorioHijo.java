@@ -16,4 +16,6 @@ public interface RepositorioHijo {
   void modificar(Hijo hijo);
 
   void eliminar(Hijo hijoExistente);
+
+  void eliminarPorUsuario(Long idPadre);
 }

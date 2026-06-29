@@ -62,4 +62,9 @@ public class RepositorioUsuarioImpl implements RepositorioUsuario {
     List<Usuario> resultado = query.getResultList();
     return resultado.isEmpty() ? null : resultado.get(0);
   }
+
+  @Override
+  public void eliminar(Usuario usuario) {
+    sessionFactory.getCurrentSession().delete(usuario);
+  }
 }

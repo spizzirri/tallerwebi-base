@@ -1,5 +1,8 @@
 package com.tallerwebi.dominio.Usuario;
 
+import com.tallerwebi.dominio.Carrito.RepositorioCarrito;
+import com.tallerwebi.dominio.Hijos.RepositorioHijo;
+import com.tallerwebi.dominio.Pedidos.RepositorioPedido;
 import com.tallerwebi.dominio.SubidaDeImgs.ServicioImagenes;
 import com.tallerwebi.dominio.excepcion.NoSePudoGuardarInformacionException;
 import javax.transaction.Transactional;
@@ -13,14 +16,23 @@ public class ServicioUsuarioImpl implements ServicioUsuario {
 
   RepositorioUsuario repositorioUsuario;
   ServicioImagenes servicioImagenes;
+  RepositorioHijo repositorioHijo;
+  RepositorioCarrito repositorioCarrito;
+  RepositorioPedido repositorioPedido;
 
   @Autowired
   public ServicioUsuarioImpl(
     RepositorioUsuario repositorioUsuario,
-    ServicioImagenes servicioImagenes
+    ServicioImagenes servicioImagenes,
+    RepositorioHijo repositorioHijo,
+    RepositorioCarrito repositorioCarrito,
+    RepositorioPedido repositorioPedido
   ) {
     this.repositorioUsuario = repositorioUsuario;
     this.servicioImagenes = servicioImagenes;
+    this.repositorioHijo = repositorioHijo;
+    this.repositorioCarrito = repositorioCarrito;
+    this.repositorioPedido = repositorioPedido;
   }
 
   @Override
@@ -69,5 +81,16 @@ public class ServicioUsuarioImpl implements ServicioUsuario {
   @Override
   public Usuario buscarPorId(Long id) {
     return repositorioUsuario.buscarUsuarioPorId(id);
+  }
+
+  @Override
+  public void eliminarCuenta(Long id) {
+    repositorioHijo.eliminarPorUsuario(id);
+    repositorioCarrito.eliminarPorUsuario(id);
+    repositorioPedido.eliminarPorUsuario(id);
+    Usuario usuario = repositorioUsuario.buscarUsuarioPorId(id);
+    if (usuario != null) {
+      repositorioUsuario.eliminar(usuario);
+    }
   }
 }

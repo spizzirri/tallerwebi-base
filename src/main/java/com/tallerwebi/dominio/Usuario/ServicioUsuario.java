@@ -10,4 +10,6 @@ public interface ServicioUsuario {
   void actualizarFoto(Long id, MultipartFile fotoPerfil);
 
   Usuario buscarPorId(Long id);
+
+  void eliminarCuenta(Long id);
 }

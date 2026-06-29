@@ -34,4 +34,12 @@ public class RepositorioCarritoImpl implements RepositorioCarrito {
       .setParameter("usuarioId", usuarioId)
       .uniqueResult();
   }
+
+  @Override
+  public void eliminarPorUsuario(Long usuarioId) {
+    Carrito carrito = buscarPorUsuario(usuarioId);
+    if (carrito != null) {
+      sessionFactory.getCurrentSession().delete(carrito);
+    }
+  }
 }

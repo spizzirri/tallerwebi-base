@@ -6,4 +6,6 @@ public interface RepositorioCarrito {
   void guardar(Carrito carrito);
 
   Carrito buscarPorUsuario(Long usuarioId);
+
+  void eliminarPorUsuario(Long id);
 }

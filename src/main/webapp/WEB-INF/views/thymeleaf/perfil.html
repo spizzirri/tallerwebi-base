@@ -145,6 +145,37 @@
                             </div>
 
                         </form>
+                        <!-- ZONA ELIMINAR CUENTA -->
+                        <div class="eliminar-cuenta-zona">
+                            <p class="eliminar-cuenta-link" onclick="abrirModalEliminar()">
+                                ¿Querés eliminar tu cuenta?
+                            </p>
+                        </div>
+
+                        <!-- MODAL ELIMINAR CUENTA -->
+                        <div id="modalEliminarCuenta" class="modal-overlay">
+                            <div class="modal-cuerpo">
+                                <h3 class="modal-titulo">Eliminar cuenta</h3>
+                                <p class="modal-descripcion">
+                                    Esta acción es permanente. Para confirmar, escribí exactamente:<br>
+                                    <strong>quiero eliminar mi cuenta</strong>
+                                </p>
+                                <input id="inputConfirmacionEliminar" type="text"
+                                       placeholder="Escribí la frase aquí"
+                                       class="modal-input"
+                                       oninput="verificarFrase(this.value)" />
+                                <div class="modal-acciones">
+                                    <button class="btn-cancelar-modal" onclick="cerrarModalEliminar()">
+                                        Cancelar
+                                    </button>
+                                    <form th:action="@{/perfil/eliminar-cuenta}" method="post">
+                                        <button id="btnEliminarCuenta" type="submit" disabled class="btn-eliminar">
+                                            Eliminar cuenta
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

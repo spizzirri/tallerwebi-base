@@ -23,6 +23,7 @@ public class PerfilControlador {
   private static final String VISTA_HIJOS = "vistaHijos";
   private static final String USUARIO_SESSION = "USUARIO";
   private static final String USUARIO_MODEL = "usuario";
+  private static final String REDIRECT_LOGIN = "redirect:/login";
 
   @Autowired
   public PerfilControlador(ServicioUsuario servicioUsuario) {
@@ -33,7 +34,7 @@ public class PerfilControlador {
   public ModelAndView irAlPerfil(HttpSession session) {
     Usuario usuario = (Usuario) session.getAttribute(USUARIO_SESSION);
     if (usuario == null) {
-      return new ModelAndView("redirect:/login");
+      return new ModelAndView(REDIRECT_LOGIN);
     }
     ModelMap model = new ModelMap();
     ModelAndView mv = new ModelAndView();
@@ -61,7 +62,7 @@ public class PerfilControlador {
   ) {
     Usuario usuario = (Usuario) session.getAttribute(USUARIO_SESSION);
     if (usuario == null) {
-      return new ModelAndView("redirect:/login");
+      return new ModelAndView(REDIRECT_LOGIN);
     }
     if (bindingResult.hasErrors()) {
       return devolverVistaError(usuario, "Hay campos inválidos");
@@ -148,5 +149,16 @@ public class PerfilControlador {
     Usuario usuario = (Usuario) session.getAttribute(USUARIO_SESSION);
 
     return devolverVistaError(usuario, "La imagen supera el tamaño máximo permitido de 5MB");
+  }
+
+  @RequestMapping(path = "/perfil/eliminar-cuenta", method = RequestMethod.POST)
+  public ModelAndView eliminarCuenta(HttpSession session) {
+    Usuario usuario = (Usuario) session.getAttribute(USUARIO_SESSION);
+    if (usuario == null) {
+      return new ModelAndView(REDIRECT_LOGIN);
+    }
+    servicioUsuario.eliminarCuenta(usuario.getId());
+    session.invalidate();
+    return new ModelAndView(REDIRECT_LOGIN);
   }
 }

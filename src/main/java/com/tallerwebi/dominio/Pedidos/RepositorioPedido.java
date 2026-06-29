@@ -8,4 +8,6 @@ public interface RepositorioPedido {
   void eliminarPedidosPendientes(Long usuarioId);
   List<Pedido> obtenerTodosLosPedidosPorUsuario(Long usuarioId);
   void marcarPedidoPagado(Long usuarioId);
+
+  void eliminarPorUsuario(Long id);
 }

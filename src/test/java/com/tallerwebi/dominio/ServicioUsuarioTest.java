@@ -7,6 +7,9 @@ import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.tallerwebi.dominio.Carrito.RepositorioCarrito;
+import com.tallerwebi.dominio.Hijos.RepositorioHijo;
+import com.tallerwebi.dominio.Pedidos.RepositorioPedido;
 import com.tallerwebi.dominio.SubidaDeImgs.ServicioImagenes;
 import com.tallerwebi.dominio.Usuario.*;
 import com.tallerwebi.dominio.excepcion.NoSePudoGuardarInformacionException;
@@ -25,8 +28,17 @@ public class ServicioUsuarioTest {
   public void init() {
     this.repositorioUsuarioMock = mock(RepositorioUsuario.class);
     this.servicioImagenesMock = mock(ServicioImagenes.class);
+    RepositorioHijo repositorioHijoMock = mock(RepositorioHijo.class);
+    RepositorioCarrito repositorioCarritoMock = mock(RepositorioCarrito.class);
+    RepositorioPedido repositorioPedidoMock = mock(RepositorioPedido.class);
     this.servicioUsuario =
-      new ServicioUsuarioImpl(this.repositorioUsuarioMock, servicioImagenesMock);
+      new ServicioUsuarioImpl(
+        this.repositorioUsuarioMock,
+        this.servicioImagenesMock,
+        repositorioHijoMock,
+        repositorioCarritoMock,
+        repositorioPedidoMock
+      );
   }
 
   @Test

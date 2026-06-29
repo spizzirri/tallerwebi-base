@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class RepositorioPedidoImpl implements RepositorioPedido {
 
+  private static final String USUARIO_ID = "usuarioId";
   private final SessionFactory sessionFactory;
 
   public RepositorioPedidoImpl(SessionFactory sessionFactory) {
@@ -33,7 +34,7 @@ public class RepositorioPedidoImpl implements RepositorioPedido {
         "and p.estado = :estado",
         Pedido.class
       )
-      .setParameter("usuarioId", usuarioId)
+      .setParameter(USUARIO_ID, usuarioId)
       .setParameter("estado", EstadoPedido.PAGO_PENDIENTE)
       .getResultList();
   }
@@ -48,7 +49,7 @@ public class RepositorioPedidoImpl implements RepositorioPedido {
         "where p.usuario.id = :usuarioId " +
         "and p.estado = :pendiente"
       )
-      .setParameter("usuarioId", usuarioId)
+      .setParameter(USUARIO_ID, usuarioId)
       .setParameter("cancelado", EstadoPedido.CANCELADO)
       .setParameter("pendiente", EstadoPedido.PAGO_PENDIENTE)
       .executeUpdate();
@@ -73,8 +74,17 @@ public class RepositorioPedidoImpl implements RepositorioPedido {
         "and p.estado = :pendiente"
       )
       .setParameter("pagado", EstadoPedido.PAGADO)
-      .setParameter("usuarioId", usuarioId)
+      .setParameter(USUARIO_ID, usuarioId)
       .setParameter("pendiente", EstadoPedido.PAGO_PENDIENTE)
+      .executeUpdate();
+  }
+
+  @Override
+  public void eliminarPorUsuario(Long usuarioId) {
+    sessionFactory
+      .getCurrentSession()
+      .createQuery("DELETE FROM Pedido p WHERE p.usuario.id = :usuarioId")
+      .setParameter(USUARIO_ID, usuarioId)
       .executeUpdate();
   }
 }
