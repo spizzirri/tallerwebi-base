@@ -4,6 +4,7 @@ import com.tallerwebi.dominio.AliasDeRetiro.ServicioGeneradorAlias;
 import com.tallerwebi.dominio.SubidaDeImgs.ServicioImagenes;
 import com.tallerwebi.dominio.Usuario.Usuario;
 import com.tallerwebi.dominio.excepcion.AliasExistenteException;
+import com.tallerwebi.dominio.excepcion.AliasInvalidoException;
 import com.tallerwebi.dominio.excepcion.AliasVacioException;
 import com.tallerwebi.dominio.excepcion.HijoExistenteException;
 import com.tallerwebi.dominio.excepcion.HijoNoEncontradoException;
@@ -21,6 +22,7 @@ public class ServicioHijoImpl implements ServicioHijo {
   private final RepositorioHijo repoHijo;
   private final ServicioGeneradorAlias servicioGeneradorAlias;
   private final ServicioImagenes servicioImagenes;
+  private static final int LONGITUD_MAXIMA_ALIAS = 30;
 
   @Autowired
   public ServicioHijoImpl(
@@ -95,12 +97,11 @@ public class ServicioHijoImpl implements ServicioHijo {
       throw new RuntimeException("No puede modificar este hijo");
     }
 
-    String aliasEnMayuscula = aliasRetiro.toUpperCase(Locale.ROOT);
+    String aliasEnMayuscula = aliasRetiro.trim().toUpperCase(Locale.ROOT);
 
-    // Evita lanzar excepción si el alias ya lo tenía este mismo hijo
-    if (repoHijo.existeAlias(aliasEnMayuscula) && !aliasEnMayuscula.equals(hijo.getAliasRetiro())) {
-      throw new AliasExistenteException("El alias ya está en uso");
-    }
+    validarFormatoAlias(aliasEnMayuscula);
+
+    validarAliasDisponible(aliasEnMayuscula, hijo.getAliasRetiro());
 
     hijo.setAliasRetiro(aliasEnMayuscula);
     repoHijo.guardar(hijo);
@@ -129,15 +130,15 @@ public class ServicioHijoImpl implements ServicioHijo {
       return;
     }
 
-    String aliasEditadoMayuscula = aliasNuevo.toUpperCase(Locale.ROOT);
+    String aliasEditadoMayuscula = aliasNuevo.trim().toUpperCase(Locale.ROOT);
+
+    validarFormatoAlias(aliasEditadoMayuscula);
 
     if (aliasEditadoMayuscula.equals(hijoExistente.getAliasRetiro())) {
       return;
     }
 
-    if (repoHijo.existeAlias(aliasEditadoMayuscula)) {
-      throw new AliasExistenteException("El alias ya está en uso");
-    }
+    validarAliasDisponible(aliasEditadoMayuscula, hijoExistente.getAliasRetiro());
 
     hijoExistente.setAliasRetiro(aliasEditadoMayuscula);
   }
@@ -149,6 +150,23 @@ public class ServicioHijoImpl implements ServicioHijo {
         "KionetTWI/img_hijos"
       );
       hijoExistente.setFotoPerfil(rutaGuardarEnHosting);
+    }
+  }
+
+  private void validarFormatoAlias(String aliasRetiro) {
+    if (aliasRetiro.length() > LONGITUD_MAXIMA_ALIAS) {
+      throw new AliasInvalidoException("El alias no puede superar los 30 caracteres");
+    }
+
+    if (!aliasRetiro.matches("^[A-Z0-9]+(\\.[A-Z0-9]+)*$")) {
+      throw new AliasInvalidoException("El alias solo puede contener letras, números y puntos");
+    }
+  }
+
+  private void validarAliasDisponible(String alias, String aliasActual) {
+    // Evita lanzar excepción si el alias ya lo tenía este mismo hijo
+    if (repoHijo.existeAlias(alias) && !alias.equals(aliasActual)) {
+      throw new AliasExistenteException("El alias ya está en uso");
     }
   }
 }

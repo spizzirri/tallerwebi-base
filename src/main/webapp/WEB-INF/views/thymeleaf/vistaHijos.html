@@ -147,9 +147,11 @@
                                name="aliasRetiro"
                                placeholder="Ej: ROJO.GATO.TREN"
                                oninput="this.value = this.value.toUpperCase()"
+                               maxlength="30"
                                style="text-transform: uppercase;"
-                               pattern="[A-Z0-9\.]+"
-                               title="El alias debe contener solo letras mayúsculas, números y puntos."
+                               pattern="^[A-Za-z0-9]+(\.[A-Za-z0-9]+)*$"
+                               autocomplete="off"
+                               title="El alias solo puede contener letras, números y puntos. No puede comenzar ni terminar con punto ni contener espacios."
                                required>
 
                         <div class="modal-alias-btn-container">
@@ -306,11 +308,13 @@
                         <input type="text"
                                name="aliasRetiro"
                                id="editAlias"
+                               maxlength="30"
                                placeholder="Ej: ROJO.GATO.TREN"
+                               autocomplete="off"
                                oninput="this.value = this.value.toUpperCase()"
                                style="text-transform: uppercase;"
-                               pattern="[A-Z0-9\.]+"
-                               title="El alias debe contener solo letras mayúsculas, números y puntos.">
+                               pattern="^[A-Za-z0-9]+(\.[A-Za-z0-9]+)*$"
+                               title="El alias solo puede contener letras, números y puntos. No puede comenzar ni terminar con punto ni contener espacios.">
                         <small class="texto-ayuda">
                             Debe ser único para cada alumno.
                         </small>

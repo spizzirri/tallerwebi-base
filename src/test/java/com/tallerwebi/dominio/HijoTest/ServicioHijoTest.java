@@ -15,6 +15,7 @@ import com.tallerwebi.dominio.Hijos.ServicioHijoImpl;
 import com.tallerwebi.dominio.SubidaDeImgs.ServicioImagenes;
 import com.tallerwebi.dominio.Usuario.Usuario;
 import com.tallerwebi.dominio.excepcion.AliasExistenteException;
+import com.tallerwebi.dominio.excepcion.AliasInvalidoException;
 import com.tallerwebi.dominio.excepcion.HijoExistenteException;
 import com.tallerwebi.dominio.excepcion.HijoNoEncontradoException;
 import java.util.List;
@@ -254,5 +255,113 @@ public class ServicioHijoTest {
     when(repositorioHijoMock.buscarPorId(1L)).thenReturn(hijo);
 
     assertThrows(RuntimeException.class, () -> servicioHijo.actualizarAlias(1L, "alias", intruso));
+  }
+
+  @Test
+  void cuandoElAliasTieneEspaciosDebeLanzarAliasInvalidoException() {
+    Long hijoId = 1L;
+
+    Hijo hijo = new Hijo();
+    Usuario usuario = new Usuario();
+    usuario.setId(10L);
+
+    hijo.setPadre(usuario);
+
+    when(repositorioHijoMock.buscarPorId(hijoId)).thenReturn(hijo);
+
+    assertThrows(
+      AliasInvalidoException.class,
+      () -> servicioHijo.actualizarAlias(hijoId, "PEPE GATO", usuario)
+    );
+  }
+
+  @Test
+  void cuandoElAliasTieneUnCaracterInvalidoDebeLanzarAliasInvalidoException() {
+    Long hijoId = 1L;
+
+    Hijo hijo = new Hijo();
+    Usuario usuario = new Usuario();
+    usuario.setId(10L);
+
+    hijo.setPadre(usuario);
+
+    when(repositorioHijoMock.buscarPorId(hijoId)).thenReturn(hijo);
+
+    assertThrows(
+      AliasInvalidoException.class,
+      () -> servicioHijo.actualizarAlias(hijoId, "PEPE@", usuario)
+    );
+  }
+
+  @Test
+  void cuandoElAliasEmpiezaConUnPuntoDebeLanzarAliasInvalidoException() {
+    Long hijoId = 1L;
+
+    Hijo hijo = new Hijo();
+    Usuario usuario = new Usuario();
+    usuario.setId(10L);
+
+    hijo.setPadre(usuario);
+
+    when(repositorioHijoMock.buscarPorId(hijoId)).thenReturn(hijo);
+
+    assertThrows(
+      AliasInvalidoException.class,
+      () -> servicioHijo.actualizarAlias(hijoId, ".PEPE", usuario)
+    );
+  }
+
+  @Test
+  void cuandoElAliasTerminaConUnPuntoDebeLanzarAliasInvalidoException() {
+    Long hijoId = 1L;
+
+    Hijo hijo = new Hijo();
+    Usuario usuario = new Usuario();
+    usuario.setId(10L);
+
+    hijo.setPadre(usuario);
+
+    when(repositorioHijoMock.buscarPorId(hijoId)).thenReturn(hijo);
+
+    assertThrows(
+      AliasInvalidoException.class,
+      () -> servicioHijo.actualizarAlias(hijoId, "PEPE.", usuario)
+    );
+  }
+
+  @Test
+  void cuandoElAliasTieneDosPuntosSeguidosDebeLanzarAliasInvalidoException() {
+    Long hijoId = 1L;
+
+    Hijo hijo = new Hijo();
+    Usuario usuario = new Usuario();
+    usuario.setId(10L);
+
+    hijo.setPadre(usuario);
+
+    when(repositorioHijoMock.buscarPorId(hijoId)).thenReturn(hijo);
+
+    assertThrows(
+      AliasInvalidoException.class,
+      () -> servicioHijo.actualizarAlias(hijoId, "PEPE..GATO", usuario)
+    );
+  }
+
+  @Test
+  void cuandoElAliasEsDemasiadoLargoDebeLanzarAliasInvalidoException() {
+    Long hijoId = 1L;
+
+    Hijo hijo = new Hijo();
+    Usuario usuario = new Usuario();
+    usuario.setId(10L);
+
+    hijo.setPadre(usuario);
+
+    when(repositorioHijoMock.buscarPorId(hijoId)).thenReturn(hijo);
+
+    assertThrows(
+      AliasInvalidoException.class,
+      () -> servicioHijo.actualizarAlias(hijoId, "ABCDEFGHIJKLMNOPQRSTUVWXYZ12345", usuario)
+    );
   }
 }

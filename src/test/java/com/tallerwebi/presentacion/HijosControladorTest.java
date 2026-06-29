@@ -12,10 +12,7 @@ import com.tallerwebi.dominio.Hijos.Curso;
 import com.tallerwebi.dominio.Hijos.Hijo;
 import com.tallerwebi.dominio.Hijos.ServicioHijo;
 import com.tallerwebi.dominio.Usuario.Usuario;
-import com.tallerwebi.dominio.excepcion.AliasExistenteException;
-import com.tallerwebi.dominio.excepcion.AliasVacioException;
-import com.tallerwebi.dominio.excepcion.HijoExistenteException;
-import com.tallerwebi.dominio.excepcion.HijoNoEncontradoException;
+import com.tallerwebi.dominio.excepcion.*;
 import com.tallerwebi.presentacion.HijosControlador;
 import java.util.List;
 import javax.servlet.http.HttpSession;
@@ -447,5 +444,127 @@ public class HijosControladorTest {
     assertEquals("vistaHijos", mv.getViewName());
 
     assertEquals("Ese alias ya está en uso.", mv.getModel().get("error"));
+  }
+
+  @Test
+  public void cuandoSeEditaUnHijoConCursoInvalidoDebeVolverALaVistaConError() {
+    Usuario usuario = new Usuario();
+    usuario.setId(1L);
+
+    when(sessionMock.getAttribute("USUARIO")).thenReturn(usuario);
+
+    when(bindingResultMock.hasErrors()).thenReturn(false);
+
+    when(datosHijoMock.getAnio()).thenReturn("NOVENO"); // no existe
+
+    when(datosHijoMock.getDivision()).thenReturn("Z");
+
+    ModelAndView mv = hijosControlador.editarHijo(
+      datosHijoMock,
+      bindingResultMock,
+      sessionMock,
+      redirectAttributesMock
+    );
+
+    assertEquals("vistaHijos", mv.getViewName());
+
+    assertEquals("El año o división seleccionados no son válidos", mv.getModel().get("error"));
+
+    verify(servicioHijoMock, never()).editarHijo(anyLong(), any(), any(), any());
+  }
+
+  @Test
+  public void cuandoSeEditaUnHijoConAliasExistenteDebeVolverALaVistaConError() {
+    Usuario usuario = new Usuario();
+    usuario.setId(1L);
+
+    when(sessionMock.getAttribute("USUARIO")).thenReturn(usuario);
+
+    when(bindingResultMock.hasErrors()).thenReturn(false);
+
+    when(datosHijoMock.getAnio()).thenReturn("PRIMERO");
+    when(datosHijoMock.getDivision()).thenReturn("A");
+
+    doThrow(new AliasExistenteException("El alias ya está en uso"))
+      .when(servicioHijoMock)
+      .editarHijo(anyLong(), any(Hijo.class), any(), eq(usuario));
+
+    ModelAndView mv = hijosControlador.editarHijo(
+      datosHijoMock,
+      bindingResultMock,
+      sessionMock,
+      redirectAttributesMock
+    );
+
+    assertEquals("vistaHijos", mv.getViewName());
+    assertEquals("El alias ya está en uso.", mv.getModel().get("error"));
+  }
+
+  @Test
+  public void cuandoSeEditaUnHijoConAliasInvalidoDebeVolverALaVistaConError() {
+    Usuario usuario = new Usuario();
+    usuario.setId(1L);
+
+    when(sessionMock.getAttribute("USUARIO")).thenReturn(usuario);
+
+    when(bindingResultMock.hasErrors()).thenReturn(false);
+
+    when(datosHijoMock.getAnio()).thenReturn("PRIMERO");
+    when(datosHijoMock.getDivision()).thenReturn("A");
+
+    doThrow(new AliasInvalidoException("El alias solo puede contener letras, números y puntos"))
+      .when(servicioHijoMock)
+      .editarHijo(anyLong(), any(Hijo.class), any(), eq(usuario));
+
+    ModelAndView mv = hijosControlador.editarHijo(
+      datosHijoMock,
+      bindingResultMock,
+      sessionMock,
+      redirectAttributesMock
+    );
+
+    assertEquals("vistaHijos", mv.getViewName());
+
+    assertEquals(
+      "El alias solo puede contener letras, números y puntos",
+      mv.getModel().get("error")
+    );
+  }
+
+  @Test
+  public void cuandoSeGuardaUnAliasVacioDebeVolverALaVistaConError() {
+    Usuario usuario = new Usuario();
+    usuario.setId(1L);
+
+    when(sessionMock.getAttribute("USUARIO")).thenReturn(usuario);
+
+    doThrow(new AliasVacioException("El alias no puede estar vacío"))
+      .when(servicioHijoMock)
+      .actualizarAlias(1L, "", usuario);
+
+    ModelAndView mv = hijosControlador.guardarAlias(1L, "", sessionMock);
+
+    assertEquals("vistaHijos", mv.getViewName());
+    assertEquals("El alias no puede estar vacío", mv.getModel().get("error"));
+  }
+
+  @Test
+  public void cuandoSeGuardaUnAliasInvalidoDebeVolverALaVistaConError() {
+    Usuario usuario = new Usuario();
+    usuario.setId(1L);
+
+    when(sessionMock.getAttribute("USUARIO")).thenReturn(usuario);
+
+    doThrow(new AliasInvalidoException("El alias solo puede contener letras, números y puntos"))
+      .when(servicioHijoMock)
+      .actualizarAlias(1L, "PEPE GOMEZ", usuario);
+
+    ModelAndView mv = hijosControlador.guardarAlias(1L, "PEPE GOMEZ", sessionMock);
+
+    assertEquals("vistaHijos", mv.getViewName());
+    assertEquals(
+      "El alias solo puede contener letras, números y puntos",
+      mv.getModel().get("error")
+    );
   }
 }

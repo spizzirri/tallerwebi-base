@@ -5,6 +5,7 @@ import com.tallerwebi.dominio.Hijos.Hijo;
 import com.tallerwebi.dominio.Hijos.ServicioHijo;
 import com.tallerwebi.dominio.Usuario.Usuario;
 import com.tallerwebi.dominio.excepcion.AliasExistenteException;
+import com.tallerwebi.dominio.excepcion.AliasInvalidoException;
 import com.tallerwebi.dominio.excepcion.AliasVacioException;
 import com.tallerwebi.dominio.excepcion.HijoExistenteException;
 import com.tallerwebi.dominio.excepcion.HijoNoEncontradoException;
@@ -129,6 +130,8 @@ public class HijosControlador {
       return devolverVistaConError(usuario, "El alias ya está en uso.");
     } catch (AliasVacioException e) {
       return devolverVistaConError(usuario, e.getMessage());
+    } catch (AliasInvalidoException e) {
+      return devolverVistaConError(usuario, e.getMessage());
     }
 
     return new ModelAndView(REDIRECT_VISTA_HIJOS);
@@ -164,6 +167,10 @@ public class HijosControlador {
       return new ModelAndView(REDIRECT_VISTA_HIJOS);
     } catch (AliasExistenteException e) {
       return devolverVistaConError(usuario, "Ese alias ya está en uso.");
+    } catch (AliasVacioException e) {
+      return devolverVistaConError(usuario, e.getMessage());
+    } catch (AliasInvalidoException e) {
+      return devolverVistaConError(usuario, e.getMessage());
     }
   }
 
