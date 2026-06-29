@@ -1,6 +1,7 @@
 package com.tallerwebi.dominio.Pagos;
 
 import com.mercadopago.MercadoPagoConfig;
+import com.mercadopago.client.preference.PreferenceBackUrlsRequest;
 import com.mercadopago.client.preference.PreferenceClient;
 import com.mercadopago.client.preference.PreferenceItemRequest;
 import com.mercadopago.client.preference.PreferenceRequest;
@@ -21,22 +22,21 @@ public class ServicioMercadoPagoImpl implements ServicioMercadoPago {
   @Value("${mp.access.token}")
   private String accessToken;
 
+  @Value("${app.base.url}")
+  private String appBaseUrl;
+
   @Override
   public String crearPreferenciaDePago(List<Pedido> pedidos) {
     if (pedidos == null || pedidos.isEmpty()) {
       return null;
     }
-
     try {
       MercadoPagoConfig.setAccessToken(accessToken);
-
       List<PreferenceItemRequest> itemsMercadoPago = new ArrayList<>();
-
       for (Pedido pedido : pedidos) {
         if (pedido.getItems() == null) {
           continue;
         }
-
         pedido
           .getItems()
           .forEach(item ->
@@ -51,13 +51,25 @@ public class ServicioMercadoPagoImpl implements ServicioMercadoPago {
             )
           );
       }
-
       if (itemsMercadoPago.isEmpty()) {
         return null;
       }
+      PreferenceBackUrlsRequest backUrls = PreferenceBackUrlsRequest
+        .builder()
+        .success(appBaseUrl + "/pago-exitoso")
+        .failure(appBaseUrl + "/pago-fallido")
+        .pending(appBaseUrl + "/pago-pendiente")
+        .build();
 
       return new PreferenceClient()
-        .create(PreferenceRequest.builder().items(itemsMercadoPago).build())
+        .create(
+          PreferenceRequest
+            .builder()
+            .items(itemsMercadoPago)
+            .backUrls(backUrls)
+            .autoReturn("approved")
+            .build()
+        )
         .getInitPoint();
     } catch (Exception e) {
       logger.error("Error API Mercado Pago", e);
