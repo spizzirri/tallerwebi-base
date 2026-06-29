@@ -45,6 +45,7 @@ public class HomeControladorTest {
     Carrito carritoMock = Mockito.mock(Carrito.class);
     when(carritoMock.getItems()).thenReturn(new ArrayList<>());
     when(servicioCarritoMock.obtenerOCrearCarrito(any())).thenReturn(carritoMock);
+    when(sessionMock.getAttribute("ROL")).thenReturn("CLIENTE");
   }
 
   @Test

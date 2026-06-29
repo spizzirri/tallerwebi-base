@@ -38,9 +38,13 @@ public class HomeControlador {
     @RequestParam(value = "busqueda", required = false) String busqueda
   ) {
     Usuario usuario = (Usuario) session.getAttribute("USUARIO");
-    if (usuario == null) {
+    String rol = (String) session.getAttribute("ROL");
+
+    // Validación estricta: Si no es CLIENTE, no pasa.
+    if (usuario == null || !"CLIENTE".equals(rol)) {
       return new ModelAndView("redirect:/login");
     }
+
     ModelMap modelo = new ModelMap();
     //LLAMO A LOS METODOS PRIVADOS REFACTORIZADOS
     this.cargarDatosUsuario(modelo, usuario);
