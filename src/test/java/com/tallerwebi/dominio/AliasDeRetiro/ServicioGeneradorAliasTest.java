@@ -16,12 +16,25 @@ import org.mockito.Mockito;
 public class ServicioGeneradorAliasTest {
 
   private ServicioGeneradorAlias servicioGeneradorAlias;
+  private ServicioPalabrasAlias servicioPalabrasAliasMock;
   private RepositorioHijo repositorioHijoMock;
 
   @BeforeEach
   public void init() {
+    servicioPalabrasAliasMock = Mockito.mock(ServicioPalabrasAlias.class);
     repositorioHijoMock = Mockito.mock(RepositorioHijo.class);
-    servicioGeneradorAlias = new ServicioGeneradorAliasImpl(repositorioHijoMock);
+
+    when(servicioPalabrasAliasMock.obtenerColores())
+      .thenReturn(List.of("ROJO", "AZUL", "VERDE", "AMARILLO", "VIOLETA"));
+
+    when(servicioPalabrasAliasMock.obtenerAnimales())
+      .thenReturn(List.of("GATO", "PERRO", "CONEJO", "TIGRE", "PANDA"));
+
+    when(servicioPalabrasAliasMock.obtenerObjetos())
+      .thenReturn(List.of("COMETA", "LAPIZ", "PELOTA", "BICICLETA", "TREN"));
+
+    servicioGeneradorAlias =
+      new ServicioGeneradorAliasImpl(servicioPalabrasAliasMock, repositorioHijoMock);
   }
 
   @Test
