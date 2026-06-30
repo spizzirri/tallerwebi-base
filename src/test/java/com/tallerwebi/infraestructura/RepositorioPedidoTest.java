@@ -13,6 +13,7 @@ import com.tallerwebi.dominio.Productos.Producto;
 import com.tallerwebi.dominio.Usuario.DatosPersonales;
 import com.tallerwebi.dominio.Usuario.Usuario;
 import com.tallerwebi.infraestructura.config.HibernateInfraestructuraTestConfig;
+import java.time.LocalDate;
 import java.util.List;
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,6 +50,7 @@ public class RepositorioPedidoTest {
     Pedido pedido = new Pedido();
     pedido.setUsuario(usuario);
     pedido.setHijo(hijo);
+    pedido.setFechaRetiro(LocalDate.now().plusDays(1));
 
     ItemPedido itemPedido = new ItemPedido(producto, 2);
     itemPedido.setPedido(pedido);
@@ -74,6 +76,7 @@ public class RepositorioPedidoTest {
     Pedido pedido = new Pedido();
     pedido.setUsuario(usuario);
     pedido.setHijo(hijo);
+    pedido.setFechaRetiro(LocalDate.now().plusDays(1));
 
     ItemPedido itemPedido = new ItemPedido(producto, 2);
     itemPedido.setPedido(pedido);
@@ -98,6 +101,7 @@ public class RepositorioPedidoTest {
     Pedido pedido = new Pedido();
     pedido.setUsuario(usuario);
     pedido.setHijo(hijo);
+    pedido.setFechaRetiro(LocalDate.now().plusDays(1));
 
     ItemPedido itemPedido = new ItemPedido(producto, 2);
     itemPedido.setPedido(pedido);
@@ -105,6 +109,7 @@ public class RepositorioPedidoTest {
     pedido.agregarItem(itemPedido);
     pedido.calcularSubtotal();
     pedido.setEstado(EstadoPedido.PAGO_PENDIENTE); // ← esto falta
+    pedido.setFechaRetiro(LocalDate.now().plusDays(1));
 
     sessionFactory.getCurrentSession().save(pedido);
 
@@ -137,6 +142,7 @@ public class RepositorioPedidoTest {
     pedido.agregarItem(itemPedido);
     pedido.calcularSubtotal();
     pedido.setEstado(EstadoPedido.PAGO_PENDIENTE);
+    pedido.setFechaRetiro(LocalDate.now().plusDays(1));
 
     sessionFactory.getCurrentSession().save(pedido);
 
@@ -158,6 +164,7 @@ public class RepositorioPedidoTest {
     Pedido pedido = new Pedido();
     pedido.setUsuario(usuario);
     pedido.setHijo(hijo);
+    pedido.setFechaRetiro(LocalDate.now().plusDays(1));
 
     ItemPedido itemPedido = new ItemPedido(producto, 2);
     itemPedido.setPedido(pedido);

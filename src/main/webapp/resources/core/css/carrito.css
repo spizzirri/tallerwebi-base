@@ -42,6 +42,16 @@ body {
     margin-bottom: 1.5rem;
 }
 
+.fecha-retiro-info{
+    margin-bottom:1.5rem;
+    padding:0.8rem 1rem;
+    background:#f7f4ff;
+    border-left:4px solid var(--purple);
+    border-radius:8px;
+    color:#555;
+    font-size:0.95rem;
+}
+
 /* --- Tarjetas de Productos --- */
 .cart-items-list {
     display: flex;

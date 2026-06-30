@@ -16,9 +16,24 @@
 
 .tabla-wrap {
     background: var(--white);
-    border: 1px solid var(--border);
     border-radius: 16px;
     overflow: hidden;
+}
+
+.card.campo-fecha-retiro {
+    border: 1px solid var(--border);
+    border-radius: 16px;
+}
+
+.fecha-input{
+    border-radius: 12px;
+    border: 2px solid var(--border-color);
+    padding: .75rem 1rem;
+}
+
+.fecha-input:focus{
+    border-color: var(--purple);
+    box-shadow: 0 0 0 .2rem rgba(124, 58, 237, .15);
 }
 
 .tabla-scroll {
@@ -196,8 +211,9 @@ background: #F8F9FD;
     align-items: center;
     justify-content: space-between;
     padding: 1rem 1.25rem;
-    border-top: 1px solid var(--border);
+    border: 1px solid var(--border);
     background: #F8F9FD;
+    border-radius: 16px;
 }
 
 .btn-agregar-productos {

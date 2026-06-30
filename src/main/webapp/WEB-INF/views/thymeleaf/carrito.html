@@ -20,6 +20,11 @@
             <section class="cart-items-section">
                 <h2 class="section-title">Distribución de pedidos confirmada</h2>
 
+                <div th:if="${!#lists.isEmpty(pedidos)}" class="fecha-retiro-info">
+                    <strong>📅 Fecha de retiro:</strong>
+                    <span th:text="${pedidos[0].fechaRetiro}"></span>
+                </div>
+
                 <div th:if="${#lists.isEmpty(pedidos)}" class="cart-items-list">
                     <p>No hay pedidos pendientes.</p>
                     <a th:href="@{/home}" class="btn-primary" style="text-align:center; text-decoration:none; display:block; padding: 1rem;">
