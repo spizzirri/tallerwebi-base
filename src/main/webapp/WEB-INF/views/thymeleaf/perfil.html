@@ -13,18 +13,26 @@
     <link rel="stylesheet" th:href="@{/css/home.css}" />
     <link rel="stylesheet" th:href="@{/css/perfil.css}" />
     <link rel="stylesheet" th:href="@{/css/vistaEdicion.css}" />
+
 </head>
 
 <body>
 <div class="container-fluid">
 
-    <div th:replace="fragmentos/header :: header"></div>
+    <div th:if="${usuario.rol == 'CLIENTE'}" th:replace="fragmentos/header :: header"></div>
 
     <main class="main">
         <section class="panel-cliente">
-            <div th:replace="fragmentos/panelIzqCliente :: panelCliente"></div>
-            <a th:href="@{/home}" class="btn-volver"> Ir a Tienda</a>
+
+            <!-- PANELES IZQUIERDOS CONDICIONALES POR ROL -->
+            <!-- Si es Cliente -->
+            <div th:if="${usuario.rol == 'CLIENTE'}">
+                <div th:replace="fragmentos/panelIzqCliente :: panelCliente"></div>
+                <a th:href="@{/home}" class="btn-volver"> Ir a Tienda</a>
+            </div>
+
         </section>
+
 
         <!-- PANEL PRINCIPAL PERFIL -->
         <section class="panel-tienda">
@@ -33,7 +41,9 @@
                 <div class="banner-titulos-texto">
                     <h1>Mi Perfil</h1>
                     <h2>Administrá tu información personal</h2>
+
                 </div>
+
                 <button class="btn-editar" onclick="activarEdicion()">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
@@ -57,6 +67,8 @@
             </div>
 
             <div class="perfil-card">
+
+
                 <div class="perfil-card-header">
                     <img th:if="${usuario.fotoPerfil != null}" th:src="${usuario.fotoPerfil}" alt="foto de perfil" class="perfil-avatar">
                     <img th:unless="${usuario.fotoPerfil != null}" th:src="'https://res.cloudinary.com/dqrka5zry/image/upload/v1780525781/default-user_lk0vzd.jpg'" alt="foto de perfil" class="perfil-avatar">
@@ -68,11 +80,9 @@
                         <p class="perfil-email-sub" th:text="${usuario.email}"></p>
                     </div>
                 </div>
+                <div id="perfil-datos">  <!-- este es el que recibe en-edicion -->
 
-                <div id="perfil-datos">
-
-                    <!-- VISTA LECTURA -->
-                    <div class="perfil-datos vista-lectura">
+                    <div class="perfil-datos vista-lectura"><!--vista lectura-->
                         <div class="perfil-dato">
                             <span class="dato-label">Nombre</span>
                             <span class="dato-valor" th:text="${usuario.nombre}"></span>
@@ -101,36 +111,43 @@
                     <!-- VISTA EDICIÓN -->
                     <div class="vista-edicion">
                         <form th:action="@{/editarPerfil}" method="post" enctype="multipart/form-data" class="form-edicion">
+
                             <div class="campo-edicion">
                                 <span class="dato-label">Email</span>
                                 <input type="email" name="email"
                                        th:value="${usuario.email}"
                                        placeholder="tu@email.com" />
                             </div>
+
                             <div class="campo-edicion">
                                 <span class="dato-label">Teléfono</span>
                                 <input type="number" name="celular"
                                        th:value="${usuario.celular}"
                                        placeholder="Ej: 1123456789" />
                             </div>
+
                             <div class="campo-edicion">
                                 <span class="dato-label">Foto de perfil</span>
                                 <div class="foto-edicion-wrap">
                                     <img id="fotoPreview"
                                          th:src="${usuario.fotoPerfil != null ? usuario.fotoPerfil : 'https://res.cloudinary.com/dqrka5zry/image/upload/v1780525781/default-user_lk0vzd.jpg'}"
                                          th:data-original="${usuario.fotoPerfil != null ? usuario.fotoPerfil : 'https://res.cloudinary.com/dqrka5zry/image/upload/v1780525781/default-user_lk0vzd.jpg'}"
+
                                          alt="preview"
                                          class="foto-preview" />
+
                                     <input type="file" name="fotoPerfil"
                                            id="inputFoto"
                                            placeholder=""
                                            accept="image/*">
                                 </div>
                             </div>
+
                             <div class="acciones-edicion">
                                 <button type="button" class="btn-cancelar" onclick="cancelarEdicion()">Cancelar</button>
                                 <button type="submit" class="btn-guardar">Guardar</button>
                             </div>
+
                         </form>
 
                         <!-- CAMBIAR CONTRASEÑA (solo usuarios no-Google) -->
@@ -198,7 +215,6 @@
                     </div>
                 </div>
             </div>
-
         </section>
     </main>
 </div>

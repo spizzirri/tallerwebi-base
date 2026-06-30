@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+
+    <!-- Overlay oscuro (solo mobile) -->
+    <div class="drawer-overlay" id="drawerOverlay" onclick="cerrarDrawer()"></div>
+
+    <section class="panel-cliente" th:fragment="panelIzqKiosquero" id="panelKiosquero">
+        <!-- Botón cerrar drawer (solo mobile) -->
+        <button class="btn-cerrar-drawer" id="btnCerrarDrawer" onclick="cerrarDrawer()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+        </button>
+        <div>
+            <img th:if="${usuario.fotoPerfil != null}" th:src="${usuario.fotoPerfil}" alt="perfil" class="avatar">
+            <img th:unless="${usuario.fotoPerfil != null}" th:src="'https://res.cloudinary.com/dqrka5zry/image/upload/v1780525781/default-user_lk0vzd.jpg'" alt="perfil" class="avatar">
+            <p class="welcome-text">Hola, <span th:text="${usuario.nombre} "></span><span th:text= " ${usuario.apellido}"></span></p>
+        </div>
+        <nav class="panel-nav">
+            <a th:href="@{/homeKiosquero}" class="panel-nav-link">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                Panel de Pedidos
+            </a >
+        </nav>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="btn-volver" style="width:100%; color: red; border-color: red;">Cerrar sesión</button>
+        </form>
+
+    </section>
+
+
+</body>
+</html>

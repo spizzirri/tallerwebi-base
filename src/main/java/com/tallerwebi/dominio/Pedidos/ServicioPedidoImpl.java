@@ -91,4 +91,19 @@ public class ServicioPedidoImpl implements ServicioPedido {
       throw new FechaRetiroInvalidaException("La fecha de retiro debe ser a partir de mañana.");
     }
   }
+
+  @Override
+  public List<Pedido> obtenerPedidosDeLosUsuarios() {
+    return repositorioPedido.obtenerTodosLosPedidosDeTodosLosClientes();
+  }
+
+  @Override
+  public List<Pedido> obtenerPedidosDeLosUsuariosFiltrado(String estadoPedido) {
+    return repositorioPedido.obtenerTodosLosPedidosDeTodosLosClientesFiltrado(estadoPedido);
+  }
+
+  @Override
+  public List<Pedido> obtenerResultadosBusquedaPorNombre(String nombreAlumno) {
+    return repositorioPedido.buscarPedidosPorNombreDelAlumno(nombreAlumno);
+  }
 }

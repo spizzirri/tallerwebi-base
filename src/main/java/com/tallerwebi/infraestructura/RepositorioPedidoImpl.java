@@ -87,4 +87,56 @@ public class RepositorioPedidoImpl implements RepositorioPedido {
       .setParameter(USUARIO_ID, usuarioId)
       .executeUpdate();
   }
+
+  @Override
+  public List<Pedido> obtenerTodosLosPedidosDeTodosLosClientes() {
+    return sessionFactory
+      .getCurrentSession()
+      .createQuery(
+        "SELECT DISTINCT p FROM Pedido p " +
+        "LEFT JOIN FETCH p.hijo " + // Trae los datos del alumno de una
+        "LEFT JOIN FETCH p.items i " + // Trae los items del pedido
+        "LEFT JOIN FETCH i.producto " + // Trae los datos de cada producto en el item
+        "ORDER BY p.fecha DESC", // Siempre viene bien ver los más nuevos primero
+        Pedido.class
+      )
+      .getResultList();
+  }
+
+  @Override
+  public List<Pedido> obtenerTodosLosPedidosDeTodosLosClientesFiltrado(String estadoPedido) {
+    // Primero convertimos el String que viene de la URL al Enum correspondiente
+    EstadoPedido estadoEnum = EstadoPedido.valueOf(estadoPedido);
+
+    return sessionFactory
+      .getCurrentSession()
+      .createQuery(
+        "SELECT DISTINCT p FROM Pedido p " +
+        "LEFT JOIN FETCH p.hijo " +
+        "LEFT JOIN FETCH p.items i " +
+        "LEFT JOIN FETCH i.producto " +
+        "WHERE p.estado = :estado " + // Filtramos solo por el estado
+        "ORDER BY p.fecha DESC",
+        Pedido.class
+      )
+      .setParameter("estado", estadoEnum)
+      .getResultList();
+  }
+
+  @Override
+  public List<Pedido> buscarPedidosPorNombreDelAlumno(String nombreAlumno) {
+    return sessionFactory
+      .getCurrentSession()
+      .createQuery(
+        "SELECT DISTINCT p FROM Pedido p " +
+        "LEFT JOIN FETCH p.hijo h " + // Le damos el alias 'h' a la relación hijo (alumno)
+        "LEFT JOIN FETCH p.items i " +
+        "LEFT JOIN FETCH i.producto " +
+        "WHERE LOWER(h.nombre) LIKE LOWER(:nombre) " + // Búsqueda por coincidencia parcial e insensible a mayúsculas
+        "ORDER BY p.fecha DESC",
+        Pedido.class
+      )
+      .setParameter("nombre", "%" + nombreAlumno + "%")
+      .getResultList();
+  }
 }
