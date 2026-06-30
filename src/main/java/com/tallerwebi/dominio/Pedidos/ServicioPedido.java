@@ -10,4 +10,10 @@ public interface ServicioPedido {
   void limpiarPedidosPendientes(Long usuarioId);
   List<Pedido> obtenerTodosLosPedidos(Long usuarioId);
   void marcarComoPagados(Long id);
+
+  List<Pedido> obtenerPedidosDeLosUsuarios();
+
+  List<Pedido> obtenerPedidosDeLosUsuariosFiltrado(String estadoPedido);
+
+  List<Pedido> obtenerResultadosBusquedaPorNombre(String nombreAlumno);
 }

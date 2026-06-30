@@ -9,13 +9,14 @@ ALTER TABLE Hijo CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 INSERT INTO Usuario
 (id,dni,nombre,apellido,celular, email, password, rol, activo,fotoPerfil)
-VALUES(null,1234567890, 'Pepe','Sujeto',1112341234,'test@unlam.edu.ar', '$2a$10$2ll9SsWXF8a0HWPdz3iKKuBQ9S37sQxnfCFlghyUp7jKJFzlKhazy', 'CLIENTE', true,'https://res.cloudinary.com/dqrka5zry/image/upload/v1780520000/istockphoto-1447126543-612x612_ek0kjw.jpg');
+VALUES(null,1234567890, 'Pepe','Sujeto',1112341234,'test@unlam.edu.ar', '$2a$10$2ll9SsWXF8a0HWPdz3iKKuBQ9S37sQxnfCFlghyUp7jKJFzlKhazy', 'CLIENTE', true,'https://res.cloudinary.com/dqrka5zry/image/upload/v1780520000/istockphoto-1447126543-612x612_ek0kjw.jpg'),
+    (null,1122334455,'Rocio','Campa',1122334455,'rociov.campagnoli@gmail.com','$2a$10$VBLw8Bn5sJnHlUMkkiKxiOjMVxxCUlSDy2SPrc0q7z1glRoHfNQYW','CLIENTE',true,null);
 
-INSERT INTO Hijo (id,curso, fechaNac, fotoPerfil, nombre, idPadre,dni,apellido)
-VALUES (null,'TERCERO_C','2020-06-18',null,'Santiago',1,12345,'Sujeto');
+INSERT INTO Hijo (id,curso, fechaNac, fotoPerfil, nombre, idPadre,dni,apellido,aliasRetiro)
+VALUES (null,'TERCERO_C','2020-06-18',null,'Santiago',1,12345,'Sujeto','ROJO.BARCO.PIZZA'),
+         (null,'CUARTO_C','2022-07-28',null,'Ariana',1,223345,'Sujeto','VERDE.MANZANA.PASTO'),
+    (null,'PRIMERO_A','2020-06-18',null,'Martina',2,22334455,'Campagnoli','AZUL.GATO.COMETA');
 
-INSERT INTO Hijo (id,curso, fechaNac, fotoPerfil, nombre, idPadre,dni,apellido)
-VALUES (null,'CUARTO_C','2022-07-28',null,'Ariana',1,223345,'Sujeto');
 
 
 INSERT INTO Usuario
@@ -72,3 +73,14 @@ VALUES (null, 'Jugo Baggio 200ml Multifruta', 'Jugo de fruta listo para tomar de
 INSERT INTO Producto (id, nombre, descripcion, precio, categoria_id,imagen,cantidad)
 VALUES (null, 'Cuaderno Éxito N°1', 'Cuaderno tapa dura de 48 hojas rayadas', 8000.00, 3,
         'https://res.cloudinary.com/dqrka5zry/image/upload/v1780514267/cuad-exito-n1_sra7m3.jpg',5);
+
+
+INSERT INTO Pedido(id,estado,fecha,subtotal,hijo_id,usuario_id)
+VALUES (1,'PAGO_PENDIENTE','2026-06-30 02:05:04.896000',600,1,1),
+    (2,'PAGO_PENDIENTE','2026-06-30 02:05:04.957000',1200,2,1),
+            (3,'PAGO_PENDIENTE','2026-06-30 02:08:47.750000',600,3,2);
+
+INSERT INTO ItemPedido(id,cantidad,precioUnitario,pedido_id,producto_id)
+VALUES (1,1,600,1,1),
+    (2,1,1200,2,2),
+    (3,1,600,3,1);

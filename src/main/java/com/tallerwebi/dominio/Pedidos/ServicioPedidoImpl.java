@@ -69,4 +69,19 @@ public class ServicioPedidoImpl implements ServicioPedido {
   public void marcarComoPagados(Long usuarioId) {
     repositorioPedido.marcarPedidoPagado(usuarioId);
   }
+
+  @Override
+  public List<Pedido> obtenerPedidosDeLosUsuarios() {
+    return repositorioPedido.obtenerTodosLosPedidosDeTodosLosClientes();
+  }
+
+  @Override
+  public List<Pedido> obtenerPedidosDeLosUsuariosFiltrado(String estadoPedido) {
+    return repositorioPedido.obtenerTodosLosPedidosDeTodosLosClientesFiltrado(estadoPedido);
+  }
+
+  @Override
+  public List<Pedido> obtenerResultadosBusquedaPorNombre(String nombreAlumno) {
+    return repositorioPedido.buscarPedidosPorNombreDelAlumno(nombreAlumno);
+  }
 }

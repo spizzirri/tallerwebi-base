@@ -25,8 +25,9 @@
 }
 
 .pedido-card-header {
-    background: linear-gradient(135deg, #5B3FE4 0%, #4A32C8 100%);
-    color: white;
+    /* Invierte el orden del banner o usa variaciones para que no sea idéntico */
+    background: linear-gradient(135deg, var(--purple-dark) 0%, #6C52EE 100%);
+    color: var(--white);
     padding: 1rem 1.5rem;
     display: flex;
     align-items: center;

@@ -98,4 +98,25 @@ public class ServicioPedidoTest {
 
     assertThat(pedidos.size(), equalTo(1));
   }
+
+  @Test
+  public void dadoUnUsuarioKiosqueroDebeRetornarVistaConPedidosDeLosClientes() {
+    Pedido pedidoMock = mock(Pedido.class);
+    when(repositorioPedidoMock.obtenerTodosLosPedidosDeTodosLosClientes())
+      .thenReturn(List.of(pedidoMock));
+
+    List<Pedido> pedidosClientes = servicioPedido.obtenerPedidosDeLosUsuarios();
+    assertThat(pedidosClientes.size(), equalTo(1));
+  }
+
+  @Test
+  public void dadoUnUsuarioKiosqueroDebeRetornarVistaConPedidosFiltradoPorEstado() {
+    Pedido pedidoMock = mock(Pedido.class);
+    when(repositorioPedidoMock.obtenerTodosLosPedidosDeTodosLosClientesFiltrado("PAGADO"))
+      .thenReturn(List.of(pedidoMock));
+
+    List<Pedido> pedidosClientes = servicioPedido.obtenerPedidosDeLosUsuariosFiltrado("PAGADO");
+
+    assertThat(pedidosClientes.size(), equalTo(1));
+  }
 }

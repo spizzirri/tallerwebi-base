@@ -1,5 +1,7 @@
 <!DOCTYPE HTML>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
 
 <head>
     <meta charset="utf-8">
@@ -19,13 +21,17 @@
 <body>
 <div class="container-fluid">
 
-    <div th:replace="fragmentos/header :: header"></div>
+    <div th:if="${usuario.rol == 'CLIENTE'}" th:replace="fragmentos/header :: header"></div>
 
     <main class="main">
         <section class="panel-cliente">
-            <div th:replace="fragmentos/panelIzqCliente :: panelCliente"></div>
 
-            <a th:href="@{/home}" class="btn-volver"> Ir a Tienda</a>
+            <!-- PANELES IZQUIERDOS CONDICIONALES POR ROL -->
+            <!-- Si es Cliente -->
+            <div th:if="${usuario.rol == 'CLIENTE'}">
+                <div th:replace="fragmentos/panelIzqCliente :: panelCliente"></div>
+                <a th:href="@{/home}" class="btn-volver"> Ir a Tienda</a>
+            </div>
 
         </section>
 
