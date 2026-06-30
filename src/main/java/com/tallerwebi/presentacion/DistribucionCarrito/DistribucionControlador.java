@@ -10,6 +10,7 @@ import com.tallerwebi.dominio.Pedidos.Pedido;
 import com.tallerwebi.dominio.Pedidos.ServicioPedido;
 import com.tallerwebi.dominio.Productos.Producto;
 import com.tallerwebi.dominio.Usuario.Usuario;
+import com.tallerwebi.dominio.excepcion.FechaRetiroInvalidaException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -124,12 +125,48 @@ public class DistribucionControlador {
       itemsDelHijo.add(new ItemDistribucionDTO(productoId, hijoId, cantidad));
     }
 
-    for (Map.Entry<Long, List<ItemDistribucionDTO>> entry : listaPorHijo.entrySet()) {
-      if (!entry.getValue().isEmpty()) {
-        servicioPedido.crearPedido(entry.getKey(), entry.getValue(), fechaRetiro, usuario);
+    try {
+      for (Map.Entry<Long, List<ItemDistribucionDTO>> entry : listaPorHijo.entrySet()) {
+        if (!entry.getValue().isEmpty()) {
+          servicioPedido.crearPedido(entry.getKey(), entry.getValue(), fechaRetiro, usuario);
+        }
       }
+    } catch (FechaRetiroInvalidaException e) {
+      return devolverVistaConError(usuario, e.getMessage());
     }
 
     return new ModelAndView("redirect:/carrito");
+  }
+
+  // Métodos auxiliares
+  private ModelAndView devolverVistaConError(Usuario usuario, String mensaje) {
+    Carrito carrito = servicioCarrito.obtenerOCrearCarrito(usuario.getId());
+    List<Hijo> hijos = servicioHijo.obtenerHijosPorUsuario(usuario.getId());
+
+    List<Producto> productos = carrito
+      .getItems()
+      .stream()
+      .map(ItemCarrito::getProducto)
+      .collect(Collectors.toList());
+
+    List<Pedido> pedidosPrevios = servicioPedido.obtenerPedidosPendientesDePago(usuario.getId());
+
+    Map<String, Integer> cantidadesPrevias = new HashMap<>();
+
+    for (Pedido pedido : pedidosPrevios) {
+      for (ItemPedido item : pedido.getItems()) {
+        String key = pedido.getHijo().getId() + "_" + item.getProducto().getId();
+        cantidadesPrevias.put(key, item.getCantidad());
+      }
+    }
+
+    ModelMap model = new ModelMap();
+    model.put("productos", productos);
+    model.put("hijos", hijos);
+    model.put("usuario", usuario);
+    model.put("cantidadesPrevias", cantidadesPrevias);
+    model.put("error", mensaje);
+
+    return new ModelAndView("carritoDistribucion", model);
   }
 }

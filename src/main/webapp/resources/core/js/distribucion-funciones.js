@@ -46,7 +46,27 @@ function configurarFechaRetiro() {
   const manana = new Date();
   manana.setDate(manana.getDate() + 1);
 
-  fecha.min = manana.toISOString().split("T")[0];
+  const anio = manana.getFullYear();
+  const mes = String(manana.getMonth() + 1).padStart(2, "0");
+  const dia = String(manana.getDate()).padStart(2, "0");
+
+
+  fecha.min = `${anio}-${mes}-${dia}`;
+
+  // Evita escribir la fecha con el teclado
+  fecha.addEventListener("keydown", (e) => {
+    e.preventDefault();
+  });
+
+  // Evita pegar texto
+  fecha.addEventListener("paste", (e) => {
+    e.preventDefault();
+  });
+
+  // Evita soltar texto arrastrándolo
+  fecha.addEventListener("drop", (e) => {
+    e.preventDefault();
+  });
 }
 
 function inicializarPagina() {

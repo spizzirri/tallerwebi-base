@@ -5,6 +5,7 @@ import com.tallerwebi.dominio.Hijos.RepositorioHijo;
 import com.tallerwebi.dominio.Productos.Producto;
 import com.tallerwebi.dominio.Productos.RepositorioProducto;
 import com.tallerwebi.dominio.Usuario.Usuario;
+import com.tallerwebi.dominio.excepcion.FechaRetiroInvalidaException;
 import com.tallerwebi.presentacion.DistribucionCarrito.ItemDistribucionDTO;
 import java.time.LocalDate;
 import java.util.List;
@@ -44,6 +45,8 @@ public class ServicioPedidoImpl implements ServicioPedido {
     pedido.setEstado(EstadoPedido.PAGO_PENDIENTE);
     pedido.setFechaRetiro(fechaRetiro);
 
+    validarFechaRetiro(fechaRetiro);
+
     for (ItemDistribucionDTO item : items) {
       Producto producto = repositorioProducto.buscarProductoPorId(item.getProductoId());
 
@@ -75,5 +78,17 @@ public class ServicioPedidoImpl implements ServicioPedido {
   @Override
   public void marcarComoPagados(Long usuarioId) {
     repositorioPedido.marcarPedidoPagado(usuarioId);
+  }
+
+  //---- MÉTODOS AUXILIARES PRIVADOS ----
+
+  private void validarFechaRetiro(LocalDate fechaRetiro) {
+    if (fechaRetiro == null) {
+      throw new FechaRetiroInvalidaException("Debe seleccionar una fecha de retiro.");
+    }
+
+    if (fechaRetiro.isBefore(LocalDate.now().plusDays(1))) {
+      throw new FechaRetiroInvalidaException("La fecha de retiro debe ser a partir de mañana.");
+    }
   }
 }

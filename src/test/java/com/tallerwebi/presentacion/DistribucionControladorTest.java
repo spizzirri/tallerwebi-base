@@ -2,10 +2,10 @@ package com.tallerwebi.presentacion;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.Carrito.Carrito;
 import com.tallerwebi.dominio.Carrito.ItemCarrito;
@@ -15,6 +15,7 @@ import com.tallerwebi.dominio.Hijos.ServicioHijo;
 import com.tallerwebi.dominio.Pedidos.ServicioPedido;
 import com.tallerwebi.dominio.Productos.Producto;
 import com.tallerwebi.dominio.Usuario.Usuario;
+import com.tallerwebi.dominio.excepcion.FechaRetiroInvalidaException;
 import com.tallerwebi.presentacion.DistribucionCarrito.DistribucionControlador;
 import com.tallerwebi.presentacion.DistribucionCarrito.ItemDistribucionDTO;
 import java.time.LocalDate;
@@ -154,5 +155,33 @@ public class DistribucionControladorTest {
     distriControlador.confirmarPedido(params, fechaRetiro, sessionMock);
 
     Mockito.verify(serviPedidoMock).crearPedido(any(), any(), any(), any());
+  }
+
+  @Test
+  public void cuandoLaFechaRetiroEsInvalidaDebeDevolverVistaConError() {
+    // Preparación
+    when(sessionMock.getAttribute("USUARIO")).thenReturn(usuarioMock);
+    when(usuarioMock.getId()).thenReturn(1L);
+
+    when(serviCarritomock.obtenerOCrearCarrito(1L)).thenReturn(carritoMock);
+    when(carritoMock.getItems()).thenReturn(new ArrayList<>());
+
+    when(serviHijoMock.obtenerHijosPorUsuario(1L)).thenReturn(new ArrayList<>());
+
+    when(serviPedidoMock.obtenerPedidosPendientesDePago(1L)).thenReturn(new ArrayList<>());
+
+    doThrow(new FechaRetiroInvalidaException("La fecha de retiro debe ser a partir de mañana."))
+      .when(serviPedidoMock)
+      .crearPedido(anyLong(), anyList(), any(LocalDate.class), eq(usuarioMock));
+
+    Map<String, String> params = new HashMap<>();
+    params.put("hijoId1_prodId1", "2");
+
+    // Ejecución
+    ModelAndView mv = distriControlador.confirmarPedido(params, fechaRetiro, sessionMock);
+
+    // Verificación
+    assertThat(mv.getViewName(), is("carritoDistribucion"));
+    assertThat(mv.getModel().get("error"), is("La fecha de retiro debe ser a partir de mañana."));
   }
 }
