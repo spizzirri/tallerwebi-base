@@ -196,6 +196,7 @@ public class RepositorioPedidoTest {
     pedido.setUsuario(usuario);
     pedido.setHijo(hijo);
     pedido.setEstado(EstadoPedido.PAGADO);
+    pedido.setFechaRetiro(LocalDate.now().plusDays(1));
 
     ItemPedido itemPedido = new ItemPedido(producto, 2);
     itemPedido.setPedido(pedido);
@@ -232,6 +233,7 @@ public class RepositorioPedidoTest {
     pedidoPagado.setUsuario(usuario);
     pedidoPagado.setHijo(hijo);
     pedidoPagado.setEstado(EstadoPedido.PAGADO);
+    pedidoPagado.setFechaRetiro(LocalDate.now().plusDays(1));
     ItemPedido item1 = new ItemPedido(producto, 1);
     item1.setPedido(pedidoPagado);
     pedidoPagado.agregarItem(item1);
@@ -243,6 +245,7 @@ public class RepositorioPedidoTest {
     pedidoCancelado.setUsuario(usuario);
     pedidoCancelado.setHijo(hijo);
     pedidoCancelado.setEstado(EstadoPedido.CANCELADO);
+    pedidoCancelado.setFechaRetiro(LocalDate.now().plusDays(1));
     ItemPedido item2 = new ItemPedido(producto, 1);
     item2.setPedido(pedidoCancelado);
     pedidoCancelado.agregarItem(item2);

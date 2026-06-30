@@ -75,10 +75,10 @@ VALUES (null, 'Cuaderno Éxito N°1', 'Cuaderno tapa dura de 48 hojas rayadas', 
         'https://res.cloudinary.com/dqrka5zry/image/upload/v1780514267/cuad-exito-n1_sra7m3.jpg',5);
 
 
-INSERT INTO Pedido(id,estado,fecha,subtotal,hijo_id,usuario_id)
-VALUES (1,'PAGO_PENDIENTE','2026-06-30 02:05:04.896000',600,1,1),
-    (2,'PAGO_PENDIENTE','2026-06-30 02:05:04.957000',1200,2,1),
-            (3,'PAGO_PENDIENTE','2026-06-30 02:08:47.750000',600,3,2);
+INSERT INTO Pedido(id,estado,fecha,subtotal,hijo_id,usuario_id,fecha_retiro)
+VALUES (1,'PAGO_PENDIENTE','2026-06-30 02:05:04.896000',600,1,1,'2026-06-30'),
+    (2,'PAGADO','2026-06-30 02:05:04.957000',1200,2,1,'2026-06-30'),
+     (3,'PAGO_PENDIENTE','2026-06-30 02:08:47.750000',600,3,2,'2026-06-30');
 
 INSERT INTO ItemPedido(id,cantidad,precioUnitario,pedido_id,producto_id)
 VALUES (1,1,600,1,1),
