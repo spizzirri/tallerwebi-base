@@ -1,42 +1,44 @@
-<!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>¡Pago Exitoso!</title>
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f6; text-align: center; padding: 50px; }
-        .card { background: white; max-width: 500px; margin: 0 auto; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h1 { color: #2ecc71; margin-bottom: 10px; }
-        ul { list-style: none; padding: 0; text-align: left; max-width: 300px; margin: 20px auto; }
-        li { padding: 10px 0; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; }
-        .btn { display: inline-block; background: #3498db; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; margin-top: 20px; }
-    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/variablesColor.css}" />
+    <link rel="stylesheet" th:href="@{/css/pago-exitoso.css}" />
 </head>
 <body>
-
 <div class="card">
-    <h1>¡Tu pago fue exitoso! 🎉</h1>
+
+    <div class="icono-exito">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+    </div>
+
+    <h1>¡Pago exitoso!</h1>
     <p>Gracias por tu compra en el Kiosco. Acá tenés el detalle de tus productos:</p>
 
-    <ul>
+    <ul class="lista-pedidos">
         <th:block th:each="pedido : ${pedidos}">
-            <li style="background:#f0f0f0; font-weight:bold;">
+            <li class="fila-hijo">
                 <span th:text="'Pedido para: ' + ${pedido.hijo.nombre}">Hijo</span>
                 <span th:text="'$' + ${pedido.subtotal}">$0</span>
             </li>
-            <li th:each="item : ${pedido.items}">
-            <span>
-                <strong th:text="${item.producto.nombre}">Nombre</strong>
-                <span th:text="'(x' + ${item.cantidad} + ')'"></span>
-            </span>
-                <span th:text="'$' + ${item.subtotal}">$0</span>
+            <li class="fila-item" th:each="item : ${pedido.items}">
+                <div class="item-nombre">
+                    <strong th:text="${item.producto.nombre}">Nombre</strong>
+                    <span class="item-cantidad" th:text="'x' + ${item.cantidad}"></span>
+                </div>
+                <span class="item-precio" th:text="'$' + ${item.subtotal}">$0</span>
             </li>
         </th:block>
     </ul>
 
-    <a th:href="@{/home}" class="btn">Volver al Inicio</a>
-    <a th:href="@{/mis-pedidos}" class="btn">Ver Pedidos</a>
-</div>
+    <div class="acciones">
+        <a th:href="@{/home}" class="btn btn-primary">Volver al inicio</a>
+        <a th:href="@{/mis-pedidos}" class="btn btn-secondary">Ver mis pedidos</a>
+    </div>
 
+</div>
 </body>
-</html>
