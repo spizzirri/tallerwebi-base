@@ -22,7 +22,12 @@ function eliminarFila(btn) {
     method: "POST",
     headers: {"Content-Type": "application/x-www-form-urlencoded"},
     body: "productoId=" + productoId
-  }).then(() => {
+  }).then((response) => {
+    if (response.ok) {
+      producto.remove();
+      actualizarEstadoBotonConfirmar();
+    }
+  }).catch(() => {
     producto.remove();
     actualizarEstadoBotonConfirmar();
   });
