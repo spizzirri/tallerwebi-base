@@ -11,6 +11,8 @@ import org.springframework.stereotype.Repository;
 public class RepositorioPedidoImpl implements RepositorioPedido {
 
   private static final String USUARIO_ID = "usuarioId";
+  private static final String JOIN_ITEMS = "LEFT JOIN FETCH p.items i ";
+  private static final String JOIN_PRODUCTO = "LEFT JOIN FETCH i.producto ";
   private final SessionFactory sessionFactory;
 
   public RepositorioPedidoImpl(SessionFactory sessionFactory) {
@@ -86,5 +88,78 @@ public class RepositorioPedidoImpl implements RepositorioPedido {
       .createQuery("DELETE FROM Pedido p WHERE p.usuario.id = :usuarioId")
       .setParameter(USUARIO_ID, usuarioId)
       .executeUpdate();
+  }
+
+  @Override
+  public List<Pedido> obtenerTodosLosPedidosDeTodosLosClientes() {
+    return sessionFactory
+      .getCurrentSession()
+      .createQuery(
+        "SELECT DISTINCT p FROM Pedido p " +
+        "LEFT JOIN FETCH p.hijo " + // Trae los datos del alumno de una
+        JOIN_ITEMS + // Trae los items del pedido
+        JOIN_PRODUCTO + // Trae los datos de cada producto en el item
+        "ORDER BY p.fecha DESC", // Siempre viene bien ver los más nuevos primero
+        Pedido.class
+      )
+      .getResultList();
+  }
+
+  @Override
+  public List<Pedido> obtenerTodosLosPedidosDeTodosLosClientesFiltrado(String estadoPedido) {
+    // Primero convertimos el String que viene de la URL al Enum correspondiente
+    EstadoPedido estadoEnum = EstadoPedido.valueOf(estadoPedido);
+
+    return sessionFactory
+      .getCurrentSession()
+      .createQuery(
+        "SELECT DISTINCT p FROM Pedido p " +
+        "LEFT JOIN FETCH p.hijo " +
+        JOIN_ITEMS +
+        JOIN_PRODUCTO +
+        "WHERE p.estado = :estado " + // Filtramos solo por el estado
+        "ORDER BY p.fecha DESC",
+        Pedido.class
+      )
+      .setParameter("estado", estadoEnum)
+      .getResultList();
+  }
+
+  @Override
+  public List<Pedido> buscarPedidosPorNombreDelAlumno(String nombreApellidoAlumno) {
+    return sessionFactory
+      .getCurrentSession()
+      .createQuery(
+        "SELECT DISTINCT p FROM Pedido p " +
+        "LEFT JOIN FETCH p.hijo h " + // Le damos el alias 'h' a la relación hijo (alumno)
+        JOIN_ITEMS +
+        JOIN_PRODUCTO +
+        "WHERE LOWER(CONCAT(h.nombre,'',h.apellido)) LIKE LOWER(:busqueda) " + // Búsqueda por coincidencia parcial e insensible a mayúsculas
+        "ORDER BY p.fecha DESC",
+        Pedido.class
+      )
+      .setParameter("busqueda", "%" + nombreApellidoAlumno.trim() + "%")
+      .getResultList();
+  }
+
+  @Override
+  public void cambiarEstadoPedido(Long idPedido, String estadoNuevo) {
+    Pedido pedido = sessionFactory.getCurrentSession().get(Pedido.class, idPedido);
+    if (pedido != null) {
+      pedido.setEstado(EstadoPedido.valueOf(estadoNuevo)); // Se convierte y se usa directo acá
+      sessionFactory.getCurrentSession().update(pedido);
+    }
+  }
+
+  @Override
+  public Pedido buscarPedidoPorId(Long idPedido) {
+    return sessionFactory
+      .getCurrentSession()
+      .createQuery(
+        "SELECT p FROM Pedido p " + JOIN_ITEMS + JOIN_PRODUCTO + "WHERE p.id= :idPedido",
+        Pedido.class
+      )
+      .setParameter("idPedido", idPedido)
+      .uniqueResult();
   }
 }

@@ -13,6 +13,7 @@ import com.tallerwebi.dominio.Productos.Producto;
 import com.tallerwebi.dominio.Usuario.DatosPersonales;
 import com.tallerwebi.dominio.Usuario.Usuario;
 import com.tallerwebi.infraestructura.config.HibernateInfraestructuraTestConfig;
+import java.time.LocalDate;
 import java.util.List;
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,6 +50,7 @@ public class RepositorioPedidoTest {
     Pedido pedido = new Pedido();
     pedido.setUsuario(usuario);
     pedido.setHijo(hijo);
+    pedido.setFechaRetiro(LocalDate.now().plusDays(1));
 
     ItemPedido itemPedido = new ItemPedido(producto, 2);
     itemPedido.setPedido(pedido);
@@ -74,6 +76,7 @@ public class RepositorioPedidoTest {
     Pedido pedido = new Pedido();
     pedido.setUsuario(usuario);
     pedido.setHijo(hijo);
+    pedido.setFechaRetiro(LocalDate.now().plusDays(1));
 
     ItemPedido itemPedido = new ItemPedido(producto, 2);
     itemPedido.setPedido(pedido);
@@ -98,6 +101,7 @@ public class RepositorioPedidoTest {
     Pedido pedido = new Pedido();
     pedido.setUsuario(usuario);
     pedido.setHijo(hijo);
+    pedido.setFechaRetiro(LocalDate.now().plusDays(1));
 
     ItemPedido itemPedido = new ItemPedido(producto, 2);
     itemPedido.setPedido(pedido);
@@ -105,6 +109,7 @@ public class RepositorioPedidoTest {
     pedido.agregarItem(itemPedido);
     pedido.calcularSubtotal();
     pedido.setEstado(EstadoPedido.PAGO_PENDIENTE); // ← esto falta
+    pedido.setFechaRetiro(LocalDate.now().plusDays(1));
 
     sessionFactory.getCurrentSession().save(pedido);
 
@@ -137,6 +142,7 @@ public class RepositorioPedidoTest {
     pedido.agregarItem(itemPedido);
     pedido.calcularSubtotal();
     pedido.setEstado(EstadoPedido.PAGO_PENDIENTE);
+    pedido.setFechaRetiro(LocalDate.now().plusDays(1));
 
     sessionFactory.getCurrentSession().save(pedido);
 
@@ -158,6 +164,7 @@ public class RepositorioPedidoTest {
     Pedido pedido = new Pedido();
     pedido.setUsuario(usuario);
     pedido.setHijo(hijo);
+    pedido.setFechaRetiro(LocalDate.now().plusDays(1));
 
     ItemPedido itemPedido = new ItemPedido(producto, 2);
     itemPedido.setPedido(pedido);
@@ -175,6 +182,186 @@ public class RepositorioPedidoTest {
     assertThat(pedidos, hasSize(1));
   }
 
+  //METODOS PARA EL USUARIO KIOSQUERO
+  @Test
+  @Transactional
+  @Rollback
+  public void dadoUnKiosqueroDeboPoderVerTodosLosPedidosPorUsuario() {
+    // GIVEN (Dado que existen datos en la BD)
+    Usuario usuario = dadoQueExisteUnUsuario();
+    Hijo hijo = dadoQueExisteUnHijo(usuario);
+    Producto producto = dadoQueExisteUnProducto();
+
+    Pedido pedido = new Pedido();
+    pedido.setUsuario(usuario);
+    pedido.setHijo(hijo);
+    pedido.setEstado(EstadoPedido.PAGADO);
+    pedido.setFechaRetiro(LocalDate.now().plusDays(1));
+
+    ItemPedido itemPedido = new ItemPedido(producto, 2);
+    itemPedido.setPedido(pedido);
+    pedido.agregarItem(itemPedido);
+    pedido.calcularSubtotal();
+
+    // Guardamos en la base de datos directamente usando Hibernate para testear la lectura posterior
+    sessionFactory.getCurrentSession().save(pedido);
+
+    // Forzamos la escritura y limpiamos la caché para asegurar que se pruebe la query HQL real
+    sessionFactory.getCurrentSession().flush();
+    sessionFactory.getCurrentSession().clear();
+
+    // WHEN (Cuando el kiosquero pide todos los pedidos)
+    List<Pedido> pedidosObtenidos = repositorioPedido.obtenerTodosLosPedidosDeTodosLosClientes();
+
+    // THEN (Entonces debe recuperar el pedido)
+    assertThat(pedidosObtenidos, hasSize(1));
+    assertThat(pedidosObtenidos.get(0).getId(), equalTo(pedido.getId()));
+    assertThat(pedidosObtenidos.get(0).getHijo().getNombre(), equalTo("Santi"));
+  }
+
+  @Test
+  @Transactional
+  @Rollback
+  public void dadoUnKiosqueroDeboPoderVerTodosLosPedidosPorUsuarioFiltradoPorEstado() {
+    // GIVEN (Dado que existen múltiples pedidos con distintos estados)
+    Usuario usuario = dadoQueExisteUnUsuario();
+    Hijo hijo = dadoQueExisteUnHijo(usuario);
+    Producto producto = dadoQueExisteUnProducto();
+
+    // Pedido 1: Estado PAGADO
+    Pedido pedidoPagado = new Pedido();
+    pedidoPagado.setUsuario(usuario);
+    pedidoPagado.setHijo(hijo);
+    pedidoPagado.setEstado(EstadoPedido.PAGADO);
+    pedidoPagado.setFechaRetiro(LocalDate.now().plusDays(1));
+    ItemPedido item1 = new ItemPedido(producto, 1);
+    item1.setPedido(pedidoPagado);
+    pedidoPagado.agregarItem(item1);
+    pedidoPagado.calcularSubtotal();
+    sessionFactory.getCurrentSession().save(pedidoPagado);
+
+    // Pedido 2: Estado CANCELADO (No debería venir en el filtro de 'PAGADO')
+    Pedido pedidoCancelado = new Pedido();
+    pedidoCancelado.setUsuario(usuario);
+    pedidoCancelado.setHijo(hijo);
+    pedidoCancelado.setEstado(EstadoPedido.CANCELADO);
+    pedidoCancelado.setFechaRetiro(LocalDate.now().plusDays(1));
+    ItemPedido item2 = new ItemPedido(producto, 1);
+    item2.setPedido(pedidoCancelado);
+    pedidoCancelado.agregarItem(item2);
+    pedidoCancelado.calcularSubtotal();
+    sessionFactory.getCurrentSession().save(pedidoCancelado);
+
+    sessionFactory.getCurrentSession().flush();
+    sessionFactory.getCurrentSession().clear();
+
+    // WHEN (Cuando el kiosquero filtra únicamente por "PAGADO")
+    List<Pedido> pedidosFiltrados =
+      repositorioPedido.obtenerTodosLosPedidosDeTodosLosClientesFiltrado("PAGADO");
+
+    // THEN (Entonces solo debe retornar el pedido que coincida con ese estado)
+    assertThat(pedidosFiltrados, hasSize(1));
+    assertThat(pedidosFiltrados.get(0).getEstado(), equalTo(EstadoPedido.PAGADO));
+    assertThat(pedidosFiltrados.get(0).getId(), equalTo(pedidoPagado.getId()));
+  }
+
+  @Test
+  @Transactional
+  @Rollback
+  public void dadoUnNombreDeAlumnoDeboPoderBuscarLosPedidosQueCoincidan() {
+    // GIVEN
+    Usuario usuario = dadoQueExisteUnUsuario();
+    Hijo hijo = dadoQueExisteUnHijo(usuario); // Se llama "Santi"
+    Producto producto = dadoQueExisteUnProducto();
+
+    Pedido pedido = new Pedido();
+    pedido.setUsuario(usuario);
+    pedido.setHijo(hijo);
+    pedido.setEstado(EstadoPedido.PAGADO);
+    pedido.setFechaRetiro(LocalDate.now().plusDays(1));
+    ItemPedido item = new ItemPedido(producto, 1);
+    item.setPedido(pedido);
+    pedido.agregarItem(item);
+    pedido.calcularSubtotal();
+    sessionFactory.getCurrentSession().save(pedido);
+
+    sessionFactory.getCurrentSession().flush();
+    sessionFactory.getCurrentSession().clear();
+
+    // WHEN (Buscamos de forma parcial o total)
+    List<Pedido> resultados = repositorioPedido.buscarPedidosPorNombreDelAlumno("san");
+
+    // THEN
+    assertThat(resultados, hasSize(1));
+    assertThat(resultados.get(0).getHijo().getNombre(), equalTo("Santi"));
+  }
+
+  @Test
+  @Transactional
+  @Rollback
+  public void dadoUnIdDePedidoDeboPoderBuscarElPedidoYTraerSusItems() {
+    // GIVEN
+    Usuario usuario = dadoQueExisteUnUsuario();
+    Hijo hijo = dadoQueExisteUnHijo(usuario);
+    Producto producto = dadoQueExisteUnProducto();
+
+    Pedido pedido = new Pedido();
+    pedido.setUsuario(usuario);
+    pedido.setHijo(hijo);
+    pedido.setEstado(EstadoPedido.PAGADO);
+    pedido.setFechaRetiro(LocalDate.now().plusDays(1));
+    ItemPedido item = new ItemPedido(producto, 3);
+    item.setPedido(pedido);
+    pedido.agregarItem(item);
+    pedido.calcularSubtotal();
+    sessionFactory.getCurrentSession().save(pedido);
+
+    sessionFactory.getCurrentSession().flush();
+    sessionFactory.getCurrentSession().clear();
+
+    // WHEN
+    Pedido pedidoObtenido = repositorioPedido.buscarPedidoPorId(pedido.getId());
+
+    // THEN
+    assertThat(pedidoObtenido, notNullValue());
+    assertThat(pedidoObtenido.getItems(), hasSize(1));
+    assertThat(pedidoObtenido.getItems().get(0).getCantidad(), equalTo(3));
+  }
+
+  @Test
+  @Transactional
+  @Rollback
+  public void dadoUnIdDePedidoDeboPoderCambiarSuEstadoDirectamente() {
+    // GIVEN
+    Usuario usuario = dadoQueExisteUnUsuario();
+    Hijo hijo = dadoQueExisteUnHijo(usuario);
+    Producto producto = dadoQueExisteUnProducto();
+
+    Pedido pedido = new Pedido();
+    pedido.setUsuario(usuario);
+    pedido.setHijo(hijo);
+    pedido.setEstado(EstadoPedido.PAGO_PENDIENTE);
+    pedido.setFechaRetiro(LocalDate.now().plusDays(1));
+    ItemPedido item = new ItemPedido(producto, 1);
+    item.setPedido(pedido);
+    pedido.agregarItem(item);
+    pedido.calcularSubtotal();
+    sessionFactory.getCurrentSession().save(pedido);
+
+    sessionFactory.getCurrentSession().flush();
+    sessionFactory.getCurrentSession().clear();
+
+    // WHEN
+    repositorioPedido.cambiarEstadoPedido(pedido.getId(), "PEDIDO_ARMADO");
+
+    sessionFactory.getCurrentSession().flush();
+    sessionFactory.getCurrentSession().clear();
+
+    // THEN
+    Pedido pedidoModificado = sessionFactory.getCurrentSession().get(Pedido.class, pedido.getId());
+    assertThat(pedidoModificado.getEstado(), equalTo(EstadoPedido.PEDIDO_ARMADO));
+  }
+
   //METODOS AUXILIARES
   private Usuario dadoQueExisteUnUsuario() {
     DatosPersonales datos = new DatosPersonales();
@@ -187,7 +374,7 @@ public class RepositorioPedidoTest {
     usuario.setDatosPersonales(datos);
     usuario.setEmail("juan@test.com");
     usuario.setPassword("1234");
-    usuario.setRol("USER");
+    usuario.setRol("CLIENTE");
 
     sessionFactory.getCurrentSession().save(usuario);
     return usuario;

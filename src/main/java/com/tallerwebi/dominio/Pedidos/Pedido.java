@@ -2,6 +2,7 @@ package com.tallerwebi.dominio.Pedidos;
 
 import com.tallerwebi.dominio.Hijos.Hijo;
 import com.tallerwebi.dominio.Usuario.Usuario;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -32,6 +33,9 @@ public class Pedido {
   @Column(nullable = false)
   @Temporal(TemporalType.TIMESTAMP)
   private Date fecha;
+
+  @Column(name = "fecha_retiro", nullable = false)
+  private LocalDate fechaRetiro;
 
   @Column(nullable = false)
   private Double subtotal;
@@ -89,6 +93,14 @@ public class Pedido {
 
   public void setFecha(Date fecha) {
     this.fecha = fecha;
+  }
+
+  public LocalDate getFechaRetiro() {
+    return fechaRetiro;
+  }
+
+  public void setFechaRetiro(LocalDate fechaRetiro) {
+    this.fechaRetiro = fechaRetiro;
   }
 
   public Double getSubtotal() {

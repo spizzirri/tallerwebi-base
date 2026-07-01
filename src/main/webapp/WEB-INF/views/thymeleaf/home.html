@@ -50,7 +50,9 @@
             </nav>
             <section class="products-section" th:if="${productosBuscados != null || errorBusquedaProductos != null}">
                 <h2 class="subtitulos">Resultados de la búsqueda:</h2>
-                <p th:if="${errorBusquedaProductos}" th:text="${errorBusquedaProductos}"></p>
+                <p th:if="${errorBusquedaProductos}" th:text="${errorBusquedaProductos}">
+
+                </p>
 
 
                 <div class="products-grid" th:unless="${#lists.isEmpty(productosBuscados)}">

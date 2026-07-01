@@ -10,4 +10,14 @@ public interface RepositorioPedido {
   void marcarPedidoPagado(Long usuarioId);
 
   void eliminarPorUsuario(Long id);
+
+  List<Pedido> obtenerTodosLosPedidosDeTodosLosClientes();
+
+  List<Pedido> obtenerTodosLosPedidosDeTodosLosClientesFiltrado(String estadoPedido);
+
+  List<Pedido> buscarPedidosPorNombreDelAlumno(String nombreAlumno);
+
+  void cambiarEstadoPedido(Long idPedido, String estadoNuevo);
+
+  Pedido buscarPedidoPorId(Long idPedido);
 }

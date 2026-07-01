@@ -19,21 +19,47 @@ public class ServicioUsuarioOAuth {
   ) {
     Usuario usuario = repositorioUsuario.buscarUsuarioPorEmail(email);
     if (usuario == null) {
-      usuario = new Usuario();
-      usuario.setEmail(email);
-      usuario.setNombre(nombre != null ? nombre : "");
-      usuario.setApellido(apellido != null ? apellido : "");
-      usuario.setFotoPerfil(fotoPerfil != null ? fotoPerfil : "");
-      usuario.setDni(0L);
-      usuario.setCelular(0L);
-      usuario.setRol("ROLE_USER");
-      usuario.setActivo(true);
-      repositorioUsuario.guardar(usuario);
-      //    }else if (fotoPerfil != null && !fotoPerfil.equals(usuario.getFotoPerfil())) {
-      //        // OPCIONAL: Si el usuario ya existía pero cambió su foto en Google, se la actualizamos
-      //        usuario.setFotoPerfil(fotoPerfil);
-      //        repositorioUsuario.guardar(usuario);
+      return crearNuevoUsuario(email, nombre, apellido, fotoPerfil);
     }
+
+    actualizarFotoSiEsNecesario(usuario, fotoPerfil);
     return usuario;
+  }
+
+  //METODOS AUXILIARES!!
+  private Usuario crearNuevoUsuario(
+    String email,
+    String nombre,
+    String apellido,
+    String fotoPerfil
+  ) {
+    Usuario nuevoUsuario = new Usuario();
+    nuevoUsuario.setEmail(email);
+    nuevoUsuario.setNombre(nombre != null ? nombre : "");
+    nuevoUsuario.setApellido(apellido != null ? apellido : "");
+    nuevoUsuario.setFotoPerfil(obtenerFotoValida(fotoPerfil));
+
+    Long numeroTemporalUnico = System.currentTimeMillis();
+    nuevoUsuario.setDni(numeroTemporalUnico);
+    nuevoUsuario.setCelular(numeroTemporalUnico);
+    nuevoUsuario.setRol("CLIENTE");
+    nuevoUsuario.setActivo(true);
+
+    repositorioUsuario.guardar(nuevoUsuario);
+    return nuevoUsuario;
+  }
+
+  private void actualizarFotoSiEsNecesario(Usuario usuario, String fotoPerfil) {
+    if (usuario.getFotoPerfil() == null || usuario.getFotoPerfil().trim().isEmpty()) {
+      usuario.setFotoPerfil(obtenerFotoValida(fotoPerfil));
+      repositorioUsuario.guardar(usuario);
+    }
+  }
+
+  private String obtenerFotoValida(String fotoPerfil) {
+    if (fotoPerfil != null && !fotoPerfil.trim().isEmpty()) {
+      return fotoPerfil;
+    }
+    return "https://res.cloudinary.com/dqrka5zry/image/upload/v1780525781/default-user_lk0vzd.jpg";
   }
 }

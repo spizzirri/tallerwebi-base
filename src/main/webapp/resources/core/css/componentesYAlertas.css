@@ -86,7 +86,7 @@
     border: 1px solid #93C5FD;
 }
 
-.estado-badge.RECIBIDO {
+.estado-badge.PEDIDO_VISTO {
     background-color: var(--purple-lt);
     color: var(--purple-dark);
     border: 1px solid #C4B5FD;

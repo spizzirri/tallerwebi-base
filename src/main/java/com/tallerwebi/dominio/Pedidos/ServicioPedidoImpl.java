@@ -5,7 +5,10 @@ import com.tallerwebi.dominio.Hijos.RepositorioHijo;
 import com.tallerwebi.dominio.Productos.Producto;
 import com.tallerwebi.dominio.Productos.RepositorioProducto;
 import com.tallerwebi.dominio.Usuario.Usuario;
+import com.tallerwebi.dominio.excepcion.FechaRetiroInvalidaException;
+import com.tallerwebi.dominio.excepcion.PedidoNoEncontradoException;
 import com.tallerwebi.presentacion.DistribucionCarrito.ItemDistribucionDTO;
+import java.time.LocalDate;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,13 +32,21 @@ public class ServicioPedidoImpl implements ServicioPedido {
   }
 
   @Override
-  public void crearPedido(Long hijoId, List<ItemDistribucionDTO> items, Usuario usuario) {
+  public void crearPedido(
+    Long hijoId,
+    List<ItemDistribucionDTO> items,
+    LocalDate fechaRetiro,
+    Usuario usuario
+  ) {
     Hijo hijo = repositorioHijo.buscarPorId(hijoId);
 
     Pedido pedido = new Pedido();
     pedido.setUsuario(usuario);
     pedido.setHijo(hijo);
     pedido.setEstado(EstadoPedido.PAGO_PENDIENTE);
+    pedido.setFechaRetiro(fechaRetiro);
+
+    validarFechaRetiro(fechaRetiro);
 
     for (ItemDistribucionDTO item : items) {
       Producto producto = repositorioProducto.buscarProductoPorId(item.getProductoId());
@@ -68,5 +79,47 @@ public class ServicioPedidoImpl implements ServicioPedido {
   @Override
   public void marcarComoPagados(Long usuarioId) {
     repositorioPedido.marcarPedidoPagado(usuarioId);
+  }
+
+  @Override
+  public List<Pedido> obtenerPedidosDeLosUsuarios() {
+    return repositorioPedido.obtenerTodosLosPedidosDeTodosLosClientes();
+  }
+
+  @Override
+  public List<Pedido> obtenerPedidosDeLosUsuariosFiltrado(String estadoPedido) {
+    return repositorioPedido.obtenerTodosLosPedidosDeTodosLosClientesFiltrado(estadoPedido);
+  }
+
+  @Override
+  public List<Pedido> obtenerResultadosBusquedaPorNombre(String nombreAlumno) {
+    return repositorioPedido.buscarPedidosPorNombreDelAlumno(nombreAlumno);
+  }
+
+  @Override
+  public void actualizarEstadoPedido(Long idPedido, String estadoNuevo) {
+    // 1. Buscamos el pedido para asegurarnos de que exista
+    Pedido pedido = repositorioPedido.buscarPedidoPorId(idPedido);
+    if (pedido == null) {
+      throw new PedidoNoEncontradoException("El pedido con ID " + idPedido + " no existe.");
+    }
+    repositorioPedido.cambiarEstadoPedido(idPedido, estadoNuevo);
+  }
+
+  @Override
+  public Pedido obtenerResultadosBusquedaPedidoPorId(Long idPedido) {
+    return repositorioPedido.buscarPedidoPorId(idPedido);
+  }
+
+  //---- MÉTODOS AUXILIARES PRIVADOS ----
+
+  private void validarFechaRetiro(LocalDate fechaRetiro) {
+    if (fechaRetiro == null) {
+      throw new FechaRetiroInvalidaException("Debe seleccionar una fecha de retiro.");
+    }
+
+    if (fechaRetiro.isBefore(LocalDate.now().plusDays(1))) {
+      throw new FechaRetiroInvalidaException("La fecha de retiro debe ser a partir de mañana.");
+    }
   }
 }

@@ -38,7 +38,7 @@ public class GoogleOAuth2UserService extends DefaultOAuth2UserService {
       usuario.setEmail(email);
       usuario.setNombre(nombre);
       usuario.setApellido(apellido);
-      usuario.setRol("ROLE_USER");
+      usuario.setRol("CLIENTE");
       usuario.setActivo(true);
       repositorioUsuario.guardar(usuario);
       LOGGER.info("=== OAUTH2 === usuario guardado");

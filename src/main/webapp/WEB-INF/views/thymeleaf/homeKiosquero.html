@@ -8,47 +8,308 @@
     <title>KioNet - Tu Kiosco Virtual</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+          rel="stylesheet">
 
-    <link rel="stylesheet" th:href="@{/css/login.css}" />
-    <link rel="stylesheet" th:href="@{/css/componentesYAlertas.css}" />
-    <link rel="stylesheet" th:href="@{/css/home.css}" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+
+    <link rel="stylesheet" th:href="@{/css/login.css}"/>
+    <link rel="stylesheet" th:href="@{/css/componentesYAlertas.css}"/>
+    <link rel="stylesheet" th:href="@{/css/home.css}"/>
+    <link rel="stylesheet" th:href="@{/css/mis-pedidos.css}"/>
 
 </head>
 <body>
-<header class="main-header">
-    <a class="navbar-brand" th:href="@{/homeKiosquero}">
-        <img th:src="'https://res.cloudinary.com/dqrka5zry/image/upload/v1780531490/KioNet_imp3c0.png'" alt="logo">
-    </a>
+<div class="container-fluid">
+    <div th:replace="fragmentos/headerKiosquero :: headerKiosquero"></div>
 
-    <!--BUSQUEDA POR NRO DE PEDIDO!-->
-    <div class="header-center">
-        <form th:action="@{/homeKiosquero}" method="GET" class="search-form">
-            <div class="search-wrapper">
-                <input type="search" name="busqueda" class="form-control-search" placeholder="Buscar pedido..." th:value="${param.busquedaPedido}">
-                <button type="submit" class="btn-search">Buscar</button>
+
+    <main class="main">
+        <section class="panel-cliente">
+            <div th:replace="fragmentos/panelIzqKiosquero :: panelIzqKiosquero"></div>
+        </section>
+
+        <section class="panel-tienda">
+            <div class="banner-titulos">
+                <div class="banner-titulos-texto">
+                    <h1>Bienvenidos a KioNet UNLAM - Panel de pedidos</h1>
+                    <h2>Control de pedidos</h2>
+                </div>
             </div>
-        </form>
-    </div>
+            <!-- ================================================================= -->
+            <!-- MENSAJE DE ÉXITO (Aparece cuando el controlador redirige con éxito) -->
+            <!-- ================================================================= -->
+            <div th:if="${mensajeExito}" class="alerta-mensaje alerta-exito" style="margin: 20px 0; display: flex; align-items: center; gap: 10px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+                <span th:text="${mensajeExito}">¡El pedido cambió de estado con éxito!</span>
+            </div>
+            <!-- ================================================================= -->
+            <!-- NUEVO: MENSAJE DE ERROR (Aparece si falla la actualización)       -->
+            <!-- ================================================================= -->
+            <div th:if="${mensajeError}" class="alerta-mensaje alerta-error" style="margin: 20px 0; display: flex; align-items: center; gap: 10px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <span th:text="${mensajeError}">Hubo un error al procesar el pedido.</span>
+            </div>
 
-    <div class="header-right">
-        <form th:action="@{/logout}" method="post" class="logout-form-header">
-            <button type="submit" class="btn-logout">Cerrar sesión</button>
-        </form>
-    </div>
+            <!-- SECCIÓN DE RESULTADOS / LISTADO -->
+            <!-- SECCIÓN DE RESULTADOS / LISTADO -->
+            <section class="products-section">
 
-</header>
+                <!-- ================================================================= -->
+                <!-- BLOQUE A: SECCIÓN DE BÚSQUEDA (Solo aparece si el parámetro busqueda existe) -->
+                <!-- ================================================================= -->
+                <th:block th:if="${param.busqueda != null and !#strings.isEmpty(param.busqueda)}">
 
-<main class="main">
-    <section class="panel-tienda">
-        <div class="banner-titulos">
-            <div class="banner-titulos-texto">
-                <h1>Bienvenidos a KioNet UNLAM</h1>
-                <h2>Control de pedidos</h2>
+                    <h2 class="subtitulos">
+                        Resultados de la búsqueda: <span th:text="'&quot;' + ${param.busqueda} + '&quot;'" style="color: var(--purple); font-style: italic;">"Martina"</span>
+                    </h2>
+                    <hr class="section-divider">
+
+                    <!-- Caso 1: Excepción/Error controlado desde el Backend -->
+                    <div th:if="${errorBusquedaPedido}" class="alerta-mensaje alerta-error" style="margin-bottom: 30px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                        <span th:text="${errorBusquedaPedido}">Mensaje de error</span>
+                    </div>
+
+                    <!-- Caso 2: No hubo excepción pero la lista volvió vacía -->
+                    <div th:if="${errorBusquedaPedido == null and (pedidosBuscados == null or pedidosBuscados.isEmpty())}"
+                         class="alerta-mensaje alerta-informacion" style="margin-bottom: 30px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                        <span>No se encontraron pedidos de alumnos con ese nombre.</span>
+                    </div>
+
+                    <!-- Tarjetas de resultados encontrados -->
+                    <div th:if="${pedidosBuscados != null and !pedidosBuscados.isEmpty()}" style="margin-bottom: 50px;">
+                        <div class="pedido-card" th:each="pedido : ${pedidosBuscados}" style="border: 2px solid var(--purple);">
+
+                            <div class="pedido-card-header">
+                                <div>
+                                    <h3 th:text="'Pedido #' + ${pedido.id}">Pedido #000</h3>
+                                    <div class="alumno-info" style="display: flex; flex-direction: column; gap: 2px; margin-top: 5px;">
+                                        <span style="font-weight: 600;" th:text="'Alumno: ' + ${pedido.hijo.nombre} + ' ' + ${pedido.hijo.apellido}">Nombre Apellido</span>
+                                        <div style="background: white; padding:1px;">
+                                            <span style="font-size: 15px; color: var(--purple);" th:text="'Curso: ' + ${pedido.hijo.curso}">Curso</span>
+                                            <br>
+                                            <span style="font-size: 15px; color:var(--purple); font-weight: 600;" th:text="'Alias de Retiro: ' + ${pedido.hijo.aliasRetiro}">Alias</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <span class="estado-badge" th:classappend="${pedido.estado.name()}" th:text="${pedido.estado}"></span>
+                                    <span class="pedido-fecha-label" style="display: block; font-size: 12px; color: #888; text-transform: uppercase; font-weight: bold;">Pedido realizado:</span>
+                                    <span class="pedido-fecha" th:text="${#dates.format(pedido.fecha, 'dd/MM/yyyy HH:mm')}" style="font-weight: 500;">00/00/0000 00:00</span>
+                                </div>
+                            </div>
+
+                            <div class="pedido-items">
+                                <div class="pedido-item" th:each="item : ${pedido.items}">
+                                    <div class="item-info">
+                                        <span class="item-cantidad" th:text="'x' + ${item.cantidad}">x1</span>
+                                        <span class="item-nombre" th:text="${item.producto.nombre}">Producto</span>
+                                    </div>
+                                    <span class="item-precio" th:text="'$' + ${item.subtotal}">$0</span>
+                                </div>
+                            </div>
+
+                            <div class="pedido-footer" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                                <div>
+                                    <span class="pedido-total-label" style="display: block;">Total del pedido</span>
+                                    <span class="pedido-total-valor" th:text="'$' + ${pedido.subtotal}">$0</span>
+                                </div>
+                                <div class="kiosquero-actions" style="display: flex; align-items: center; gap: 10px;">
+                                    <form th:action="@{/homeKiosquero/cambiar-estado}" method="POST" style="display: flex; align-items: center; gap: 10px; margin: 0;">
+                                        <input type="hidden" name="pedidoId" th:value="${pedido.id}"/>
+                                        <label th:for="'nuevoEstado-' + ${pedido.id}" style="font-size: 14px; font-weight: 500;">Cambiar estado:</label>
+                                        <select name="nuevoEstado"
+                                                th:id="'nuevoEstado-' + ${pedido.id}"
+                                                th:data-pedido-id="${pedido.id}"
+                                                th:data-estado-actual="${pedido.estado}"
+                                                class="form-control-search cambio-estado-select"
+                                                style="padding: 5px 10px; height: auto; width: auto;">
+                                            <option th:each="est : ${T(com.tallerwebi.dominio.Pedidos.EstadoPedido).values()}" th:value="${est}" th:text="${est}" th:selected="${est == pedido.estado}"></option>
+                                        </select>
+                                    </form>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </th:block>
+
+
+                <!-- ================================================================= -->
+                <!-- BLOQUE B: LISTADO FIJO GENERAL (Siempre visible abajo) -->
+                <!-- ================================================================= -->
+
+                <!-- Chips de navegación -->
+                <nav class="categories-nav">
+                    <a class="category-chip"
+                       th:href="@{/homeKiosquero}"
+                       th:classappend="${estadoActual == null || estadoActual == '' || estadoActual == 'TODOS'} ? 'active' : ''">Todos
+                    </a>
+                    <th:block th:each="estadoPedido : ${estados}">
+                        <a class="category-chip"
+                           th:href="@{/homeKiosquero(estado=${estadoPedido.name()})}"
+                           th:text="${estadoPedido.name()}"
+                           th:classappend="${estadoActual == estadoPedido.name()} ? 'active' : ''">
+                        </a>
+                    </th:block>
+                </nav>
+
+                <h2 class="subtitulos" th:text="${estadoActual != null and estadoActual != 'TODOS'} ? 'Pedidos en estado: ' + ${estadoActual} : 'Todos los pedidos'">Todos los pedidos</h2>
+                <hr class="section-divider">
+
+                <!-- Estado vacío de la lista general -->
+                <div th:if="${pedidosClientes == null or pedidosClientes.isEmpty()}" class="perfil-card">
+                    <div class="empty-state">
+                        <h3>No se encontraron pedidos en esta sección</h3>
+                        <p>Cuando los clientes realicen compras o cambien de estado, aparecerán aquí.</p>
+                    </div>
+                </div>
+
+                <!-- Muestra el feed completo/filtrado de pedidos -->
+                <div th:if="${pedidosClientes != null and !pedidosClientes.isEmpty()}">
+                    <div class="pedido-card" th:each="pedido : ${pedidosClientes}">
+
+                        <div class="pedido-card-header">
+                            <div>
+                                <h3 th:text="'Pedido #' + ${pedido.id}">Pedido #000</h3>
+                                <div class="alumno-info" style="display: flex; flex-direction: column; gap: 2px; margin-top: 5px;">
+                                    <span style="font-weight: 600;" th:text="'Alumno: ' + ${pedido.hijo.nombre} + ' ' + ${pedido.hijo.apellido}">Nombre Apellido</span>
+                                    <div style="background: white; padding:1px;">
+                                        <span style="font-size: 15px; color: var(--purple);" th:text="'Curso: ' + ${pedido.hijo.curso}">Curso</span>
+                                        <br>
+                                        <span style="font-size: 15px; color:var(--purple); font-weight: 600;" th:text="'Alias de Retiro: ' + ${pedido.hijo.aliasRetiro}">Alias</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="text-align: right;">
+                                <span class="estado-badge" th:classappend="${pedido.estado.name()}" th:text="${pedido.estado}"></span>
+                                <span class="pedido-fecha-label" style="display: block; font-size: 12px; color: #888; text-transform: uppercase; font-weight: bold;">Pedido realizado:</span>
+                                <span class="pedido-fecha" th:text="${#dates.format(pedido.fecha, 'dd/MM/yyyy HH:mm')}" style="font-weight: 500;">00/00/0000 00:00</span>
+                            </div>
+                        </div>
+
+                        <div class="pedido-items">
+                            <div class="pedido-item" th:each="item : ${pedido.items}">
+                                <div class="item-info">
+                                    <span class="item-cantidad" th:text="'x' + ${item.cantidad}">x1</span>
+                                    <span class="item-nombre" th:text="${item.producto.nombre}">Producto</span>
+                                </div>
+                                <span class="item-precio" th:text="'$' + ${item.subtotal}">$0</span>
+                            </div>
+                        </div>
+
+                        <div class="pedido-footer" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                            <div>
+                                <span class="pedido-total-label" style="display: block;">Total del pedido</span>
+                                <span class="pedido-total-valor" th:text="'$' + ${pedido.subtotal}">$0</span>
+                            </div>
+
+                            <div class="kiosquero-actions" style="display: flex; align-items: center; gap: 10px;">
+                                <form th:action="@{/homeKiosquero/cambiar-estado}" method="POST" style="display: flex; align-items: center; gap: 10px; margin: 0;">
+                                    <input type="hidden" name="pedidoId" th:value="${pedido.id}"/>
+                                    <label th:for="'nuevoEstado-' + ${pedido.id}" style="font-size: 14px; font-weight: 500;">Cambiar estado:</label>
+                                    <select name="nuevoEstado"
+                                            th:id="'nuevoEstado-' + ${pedido.id}"
+                                            th:data-pedido-id="${pedido.id}"
+                                            th:data-estado-actual="${pedido.estado}"
+                                            class="form-control-search cambio-estado-select"
+                                            style="padding: 5px 10px; height: auto; width: auto;">
+                                        <option th:each="est : ${T(com.tallerwebi.dominio.Pedidos.EstadoPedido).values()}" th:value="${est}" th:text="${est}" th:selected="${est == pedido.estado}"></option>
+                                    </select>
+                                </form>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </section> <!-- FIN PRODUCTS SECTION -->
+        </section><!--FIN PANEL TIENDA-->
+    </main>
+</div>
+
+<!-- Modal de Confirmación Estilizado -->
+<div class="modal fade" id="confirmarEstadoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 12px; border: 2px solid var(--purple); padding: 10px;">
+            <div class="modal-header" style="border-bottom: none;">
+                <h5 class="modal-title" style="font-weight: 700; color: var(--purple);">Confirmar cambio de estado</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="modalTextoConfirmacion" style="font-size: 16px; color: #333; margin: 0;">
+                    ¿Estás seguro de cambiar el estado del pedido?
+                </p>
+            </div>
+            <div class="modal-footer" style="border-top: none; gap: 10px;">
+                <button type="button" class="category-chip" data-bs-dismiss="modal" style="background: #e0e0e0; color: #333; border: none; cursor: pointer; padding: 8px 16px;">
+                    Cancelar
+                </button>
+                <button type="button" id="btnConfirmarCambio" class="category-chip active" style="border: none; cursor: pointer; padding: 8px 16px;">
+                    Aceptar
+                </button>
             </div>
         </div>
-    </section><!--FIN PANEL TIENDA-->
-</main>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
+        crossorigin="anonymous"></script>
+<script th:src="@{/js/drawer.js}"></script>
 
+
+<script>
+    let selectActual = null;
+    let estadoOriginal = '';
+    let procesandoEnvio = false;
+
+    // Escuchamos de forma segura el cambio en todos los select con la clase
+    document.querySelectorAll('.cambio-estado-select').forEach(select => {
+        select.addEventListener('change', function() {
+            selectActual = this;
+            estadoOriginal = this.getAttribute('data-estado-actual');
+            procesandoEnvio = false;
+
+            const pedidoId = this.getAttribute('data-pedido-id');
+            const nuevoEstado = this.value;
+
+            // Si eligió el mismo estado, no hace nada
+            if (nuevoEstado === estadoOriginal) return;
+
+            // Armamos el texto del modal central
+            document.getElementById('modalTextoConfirmacion').innerHTML =
+                `¿Estás seguro de cambiar el estado del <strong>pedido #${pedidoId}</strong> a <span style="color: var(--purple); font-weight: 600;">${nuevoEstado}</span>?`;
+
+            // Levantamos el modal
+            const miModal = new bootstrap.Modal(document.getElementById('confirmarEstadoModal'));
+            miModal.show();
+        });
+    });
+
+    // Al confirmar, disparamos el envío del formulario
+    document.getElementById('btnConfirmarCambio').addEventListener('click', function() {
+        if (selectActual) {
+            procesandoEnvio = true;
+            selectActual.form.submit();
+        }
+    });
+
+    // Al cancelar, reseteamos el select a su valor inicial
+    document.getElementById('confirmarEstadoModal').addEventListener('hidden.bs.modal', function () {
+        if (!procesandoEnvio && selectActual && selectActual.value !== estadoOriginal) {
+            selectActual.value = estadoOriginal;
+        }
+    });
+</script>
 </body>
 </html>

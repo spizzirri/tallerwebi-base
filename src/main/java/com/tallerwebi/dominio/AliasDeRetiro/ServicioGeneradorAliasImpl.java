@@ -11,15 +11,15 @@ import org.springframework.stereotype.Service;
 @Transactional
 public class ServicioGeneradorAliasImpl implements ServicioGeneradorAlias {
 
-  private static final String[] COLORES = { "ROJO", "AZUL", "VERDE", "AMARILLO", "VIOLETA" };
-
-  private static final String[] ANIMALES = { "GATO", "PERRO", "CONEJO", "TIGRE", "PANDA" };
-
-  private static final String[] OBJETOS = { "COMETA", "LAPIZ", "PELOTA", "BICICLETA", "TREN" };
+  private final ServicioPalabrasAlias servicioPalabrasAlias;
 
   private RepositorioHijo repositorioHijo;
 
-  public ServicioGeneradorAliasImpl(RepositorioHijo repositorioHijo) {
+  public ServicioGeneradorAliasImpl(
+    ServicioPalabrasAlias servicioPalabrasAlias,
+    RepositorioHijo repositorioHijo
+  ) {
+    this.servicioPalabrasAlias = servicioPalabrasAlias;
     this.repositorioHijo = repositorioHijo;
   }
 
@@ -27,9 +27,9 @@ public class ServicioGeneradorAliasImpl implements ServicioGeneradorAlias {
   public List<String> obtenerTodasLasCombinaciones() {
     List<String> aliases = new ArrayList<>();
 
-    for (String color : COLORES) {
-      for (String animal : ANIMALES) {
-        for (String objeto : OBJETOS) {
+    for (String color : servicioPalabrasAlias.obtenerColores()) {
+      for (String animal : servicioPalabrasAlias.obtenerAnimales()) {
+        for (String objeto : servicioPalabrasAlias.obtenerObjetos()) {
           aliases.add(color + "." + animal + "." + objeto);
         }
       }
