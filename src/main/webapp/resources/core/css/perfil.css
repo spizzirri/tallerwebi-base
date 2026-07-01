@@ -249,3 +249,12 @@
     flex-direction: column;
     gap: 0.75rem;
 }
+
+.badge-google {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
