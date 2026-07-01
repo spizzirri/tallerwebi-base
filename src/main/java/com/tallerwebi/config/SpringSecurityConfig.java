@@ -38,10 +38,11 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     return new BCryptPasswordEncoder();
   }
 
-  @Bean //este configura el puente entre nuestra app y el servicio de google
+  @Bean
   public static ClientRegistrationRepository clientRegistrationRepository(
     @Value("${google.client.id}") String clientId,
-    @Value("${google.client.secret}") String clientSecret
+    @Value("${google.client.secret}") String clientSecret,
+    @Value("${app.base.url:http://localhost:8080/spring}") String appBaseUrl
   ) {
     ClientRegistration registration = ClientRegistration
       .withRegistrationId("google")
@@ -49,11 +50,11 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
       .clientSecret(clientSecret)
       .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
       .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-      .redirectUri("{baseUrl}/login/oauth2/code/{registrationId}")
-      .scope("openid", "profile", "email") //permisos que le pide al usuario para loguearse
-      .authorizationUri("https://accounts.google.com/o/oauth2/v2/auth") // a donde redirije al usuario para que ponga su mail
-      .tokenUri("https://www.googleapis.com/oauth2/v4/token") //canje de token seguro
-      .userInfoUri("https://www.googleapis.com/oauth2/v3/userinfo") //donde se extrae mail, nombre y foto del usuario
+      .redirectUri(appBaseUrl + "/login/oauth2/code/{registrationId}")
+      .scope("openid", "profile", "email")
+      .authorizationUri("https://accounts.google.com/o/oauth2/v2/auth")
+      .tokenUri("https://www.googleapis.com/oauth2/v4/token")
+      .userInfoUri("https://www.googleapis.com/oauth2/v3/userinfo")
       .userNameAttributeName(IdTokenClaimNames.SUB)
       .jwkSetUri("https://www.googleapis.com/oauth2/v3/certs")
       .clientName("Google")
