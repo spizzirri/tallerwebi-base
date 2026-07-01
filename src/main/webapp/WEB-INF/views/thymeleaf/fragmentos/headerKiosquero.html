@@ -18,7 +18,7 @@
     <div class="header-center">
         <form th:action="@{/homeKiosquero}" method="GET" class="search-form">
             <div class="search-wrapper">
-                <input type="search" name="busqueda" class="form-control-search" placeholder="Buscar pedido..." th:value="${param.busquedaPedido}">
+                <input type="search" name="busqueda" class="form-control-search" placeholder="Buscar por nombre del alumno o ID del pedido..." th:value="${param.busquedaPedido}">
                 <button type="submit" class="btn-search">Buscar</button>
             </div>
         </form>

@@ -16,4 +16,8 @@ public interface RepositorioPedido {
   List<Pedido> obtenerTodosLosPedidosDeTodosLosClientesFiltrado(String estadoPedido);
 
   List<Pedido> buscarPedidosPorNombreDelAlumno(String nombreAlumno);
+
+  void cambiarEstadoPedido(Long idPedido, String estadoNuevo);
+
+  Pedido buscarPedidoPorId(Long idPedido);
 }

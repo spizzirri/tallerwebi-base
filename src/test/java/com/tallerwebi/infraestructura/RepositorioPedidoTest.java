@@ -265,6 +265,103 @@ public class RepositorioPedidoTest {
     assertThat(pedidosFiltrados.get(0).getId(), equalTo(pedidoPagado.getId()));
   }
 
+  @Test
+  @Transactional
+  @Rollback
+  public void dadoUnNombreDeAlumnoDeboPoderBuscarLosPedidosQueCoincidan() {
+    // GIVEN
+    Usuario usuario = dadoQueExisteUnUsuario();
+    Hijo hijo = dadoQueExisteUnHijo(usuario); // Se llama "Santi"
+    Producto producto = dadoQueExisteUnProducto();
+
+    Pedido pedido = new Pedido();
+    pedido.setUsuario(usuario);
+    pedido.setHijo(hijo);
+    pedido.setEstado(EstadoPedido.PAGADO);
+    pedido.setFechaRetiro(LocalDate.now().plusDays(1));
+    ItemPedido item = new ItemPedido(producto, 1);
+    item.setPedido(pedido);
+    pedido.agregarItem(item);
+    pedido.calcularSubtotal();
+    sessionFactory.getCurrentSession().save(pedido);
+
+    sessionFactory.getCurrentSession().flush();
+    sessionFactory.getCurrentSession().clear();
+
+    // WHEN (Buscamos de forma parcial o total)
+    List<Pedido> resultados = repositorioPedido.buscarPedidosPorNombreDelAlumno("san");
+
+    // THEN
+    assertThat(resultados, hasSize(1));
+    assertThat(resultados.get(0).getHijo().getNombre(), equalTo("Santi"));
+  }
+
+  @Test
+  @Transactional
+  @Rollback
+  public void dadoUnIdDePedidoDeboPoderBuscarElPedidoYTraerSusItems() {
+    // GIVEN
+    Usuario usuario = dadoQueExisteUnUsuario();
+    Hijo hijo = dadoQueExisteUnHijo(usuario);
+    Producto producto = dadoQueExisteUnProducto();
+
+    Pedido pedido = new Pedido();
+    pedido.setUsuario(usuario);
+    pedido.setHijo(hijo);
+    pedido.setEstado(EstadoPedido.PAGADO);
+    pedido.setFechaRetiro(LocalDate.now().plusDays(1));
+    ItemPedido item = new ItemPedido(producto, 3);
+    item.setPedido(pedido);
+    pedido.agregarItem(item);
+    pedido.calcularSubtotal();
+    sessionFactory.getCurrentSession().save(pedido);
+
+    sessionFactory.getCurrentSession().flush();
+    sessionFactory.getCurrentSession().clear();
+
+    // WHEN
+    Pedido pedidoObtenido = repositorioPedido.buscarPedidoPorId(pedido.getId());
+
+    // THEN
+    assertThat(pedidoObtenido, notNullValue());
+    assertThat(pedidoObtenido.getItems(), hasSize(1));
+    assertThat(pedidoObtenido.getItems().get(0).getCantidad(), equalTo(3));
+  }
+
+  @Test
+  @Transactional
+  @Rollback
+  public void dadoUnIdDePedidoDeboPoderCambiarSuEstadoDirectamente() {
+    // GIVEN
+    Usuario usuario = dadoQueExisteUnUsuario();
+    Hijo hijo = dadoQueExisteUnHijo(usuario);
+    Producto producto = dadoQueExisteUnProducto();
+
+    Pedido pedido = new Pedido();
+    pedido.setUsuario(usuario);
+    pedido.setHijo(hijo);
+    pedido.setEstado(EstadoPedido.PAGO_PENDIENTE);
+    pedido.setFechaRetiro(LocalDate.now().plusDays(1));
+    ItemPedido item = new ItemPedido(producto, 1);
+    item.setPedido(pedido);
+    pedido.agregarItem(item);
+    pedido.calcularSubtotal();
+    sessionFactory.getCurrentSession().save(pedido);
+
+    sessionFactory.getCurrentSession().flush();
+    sessionFactory.getCurrentSession().clear();
+
+    // WHEN
+    repositorioPedido.cambiarEstadoPedido(pedido.getId(), "PEDIDO_ARMADO");
+
+    sessionFactory.getCurrentSession().flush();
+    sessionFactory.getCurrentSession().clear();
+
+    // THEN
+    Pedido pedidoModificado = sessionFactory.getCurrentSession().get(Pedido.class, pedido.getId());
+    assertThat(pedidoModificado.getEstado(), equalTo(EstadoPedido.PEDIDO_ARMADO));
+  }
+
   //METODOS AUXILIARES
   private Usuario dadoQueExisteUnUsuario() {
     DatosPersonales datos = new DatosPersonales();

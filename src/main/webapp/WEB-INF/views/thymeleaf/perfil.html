@@ -23,14 +23,8 @@
 
     <main class="main">
         <section class="panel-cliente">
-
-            <!-- PANELES IZQUIERDOS CONDICIONALES POR ROL -->
-            <!-- Si es Cliente -->
-            <div th:if="${usuario.rol == 'CLIENTE'}">
-                <div th:replace="fragmentos/panelIzqCliente :: panelCliente"></div>
-                <a th:href="@{/home}" class="btn-volver"> Ir a Tienda</a>
-            </div>
-
+            <div th:replace="fragmentos/panelIzqCliente :: panelCliente"></div>
+            <a th:href="@{/home}" class="btn-volver"> Ir a Tienda</a>
         </section>
 
 

@@ -11,6 +11,8 @@ import org.springframework.stereotype.Repository;
 public class RepositorioPedidoImpl implements RepositorioPedido {
 
   private static final String USUARIO_ID = "usuarioId";
+  private static final String JOIN_ITEMS = "LEFT JOIN FETCH p.items i ";
+  private static final String JOIN_PRODUCTO = "LEFT JOIN FETCH i.producto ";
   private final SessionFactory sessionFactory;
 
   public RepositorioPedidoImpl(SessionFactory sessionFactory) {
@@ -95,8 +97,8 @@ public class RepositorioPedidoImpl implements RepositorioPedido {
       .createQuery(
         "SELECT DISTINCT p FROM Pedido p " +
         "LEFT JOIN FETCH p.hijo " + // Trae los datos del alumno de una
-        "LEFT JOIN FETCH p.items i " + // Trae los items del pedido
-        "LEFT JOIN FETCH i.producto " + // Trae los datos de cada producto en el item
+        JOIN_ITEMS + // Trae los items del pedido
+        JOIN_PRODUCTO + // Trae los datos de cada producto en el item
         "ORDER BY p.fecha DESC", // Siempre viene bien ver los más nuevos primero
         Pedido.class
       )
@@ -113,8 +115,8 @@ public class RepositorioPedidoImpl implements RepositorioPedido {
       .createQuery(
         "SELECT DISTINCT p FROM Pedido p " +
         "LEFT JOIN FETCH p.hijo " +
-        "LEFT JOIN FETCH p.items i " +
-        "LEFT JOIN FETCH i.producto " +
+        JOIN_ITEMS +
+        JOIN_PRODUCTO +
         "WHERE p.estado = :estado " + // Filtramos solo por el estado
         "ORDER BY p.fecha DESC",
         Pedido.class
@@ -124,19 +126,40 @@ public class RepositorioPedidoImpl implements RepositorioPedido {
   }
 
   @Override
-  public List<Pedido> buscarPedidosPorNombreDelAlumno(String nombreAlumno) {
+  public List<Pedido> buscarPedidosPorNombreDelAlumno(String nombreApellidoAlumno) {
     return sessionFactory
       .getCurrentSession()
       .createQuery(
         "SELECT DISTINCT p FROM Pedido p " +
         "LEFT JOIN FETCH p.hijo h " + // Le damos el alias 'h' a la relación hijo (alumno)
-        "LEFT JOIN FETCH p.items i " +
-        "LEFT JOIN FETCH i.producto " +
-        "WHERE LOWER(h.nombre) LIKE LOWER(:nombre) " + // Búsqueda por coincidencia parcial e insensible a mayúsculas
+        JOIN_ITEMS +
+        JOIN_PRODUCTO +
+        "WHERE LOWER(CONCAT(h.nombre,'',h.apellido)) LIKE LOWER(:busqueda) " + // Búsqueda por coincidencia parcial e insensible a mayúsculas
         "ORDER BY p.fecha DESC",
         Pedido.class
       )
-      .setParameter("nombre", "%" + nombreAlumno + "%")
+      .setParameter("busqueda", "%" + nombreApellidoAlumno.trim() + "%")
       .getResultList();
+  }
+
+  @Override
+  public void cambiarEstadoPedido(Long idPedido, String estadoNuevo) {
+    Pedido pedido = sessionFactory.getCurrentSession().get(Pedido.class, idPedido);
+    if (pedido != null) {
+      pedido.setEstado(EstadoPedido.valueOf(estadoNuevo)); // Se convierte y se usa directo acá
+      sessionFactory.getCurrentSession().update(pedido);
+    }
+  }
+
+  @Override
+  public Pedido buscarPedidoPorId(Long idPedido) {
+    return sessionFactory
+      .getCurrentSession()
+      .createQuery(
+        "SELECT p FROM Pedido p " + JOIN_ITEMS + JOIN_PRODUCTO + "WHERE p.id= :idPedido",
+        Pedido.class
+      )
+      .setParameter("idPedido", idPedido)
+      .uniqueResult();
   }
 }

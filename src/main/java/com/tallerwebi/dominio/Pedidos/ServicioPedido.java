@@ -22,4 +22,8 @@ public interface ServicioPedido {
   List<Pedido> obtenerPedidosDeLosUsuariosFiltrado(String estadoPedido);
 
   List<Pedido> obtenerResultadosBusquedaPorNombre(String nombreAlumno);
+
+  void actualizarEstadoPedido(Long idPedido, String estadoNuevo);
+
+  Pedido obtenerResultadosBusquedaPedidoPorId(Long idPedido);
 }

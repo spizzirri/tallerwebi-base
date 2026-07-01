@@ -6,6 +6,7 @@ import com.tallerwebi.dominio.Productos.Producto;
 import com.tallerwebi.dominio.Productos.RepositorioProducto;
 import com.tallerwebi.dominio.Usuario.Usuario;
 import com.tallerwebi.dominio.excepcion.FechaRetiroInvalidaException;
+import com.tallerwebi.dominio.excepcion.PedidoNoEncontradoException;
 import com.tallerwebi.presentacion.DistribucionCarrito.ItemDistribucionDTO;
 import java.time.LocalDate;
 import java.util.List;
@@ -80,18 +81,6 @@ public class ServicioPedidoImpl implements ServicioPedido {
     repositorioPedido.marcarPedidoPagado(usuarioId);
   }
 
-  //---- MÉTODOS AUXILIARES PRIVADOS ----
-
-  private void validarFechaRetiro(LocalDate fechaRetiro) {
-    if (fechaRetiro == null) {
-      throw new FechaRetiroInvalidaException("Debe seleccionar una fecha de retiro.");
-    }
-
-    if (fechaRetiro.isBefore(LocalDate.now().plusDays(1))) {
-      throw new FechaRetiroInvalidaException("La fecha de retiro debe ser a partir de mañana.");
-    }
-  }
-
   @Override
   public List<Pedido> obtenerPedidosDeLosUsuarios() {
     return repositorioPedido.obtenerTodosLosPedidosDeTodosLosClientes();
@@ -105,5 +94,32 @@ public class ServicioPedidoImpl implements ServicioPedido {
   @Override
   public List<Pedido> obtenerResultadosBusquedaPorNombre(String nombreAlumno) {
     return repositorioPedido.buscarPedidosPorNombreDelAlumno(nombreAlumno);
+  }
+
+  @Override
+  public void actualizarEstadoPedido(Long idPedido, String estadoNuevo) {
+    // 1. Buscamos el pedido para asegurarnos de que exista
+    Pedido pedido = repositorioPedido.buscarPedidoPorId(idPedido);
+    if (pedido == null) {
+      throw new PedidoNoEncontradoException("El pedido con ID " + idPedido + " no existe.");
+    }
+    repositorioPedido.cambiarEstadoPedido(idPedido, estadoNuevo);
+  }
+
+  @Override
+  public Pedido obtenerResultadosBusquedaPedidoPorId(Long idPedido) {
+    return repositorioPedido.buscarPedidoPorId(idPedido);
+  }
+
+  //---- MÉTODOS AUXILIARES PRIVADOS ----
+
+  private void validarFechaRetiro(LocalDate fechaRetiro) {
+    if (fechaRetiro == null) {
+      throw new FechaRetiroInvalidaException("Debe seleccionar una fecha de retiro.");
+    }
+
+    if (fechaRetiro.isBefore(LocalDate.now().plusDays(1))) {
+      throw new FechaRetiroInvalidaException("La fecha de retiro debe ser a partir de mañana.");
+    }
   }
 }
