@@ -3,6 +3,7 @@ package com.tallerwebi.presentacion;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.Hijos.Hijo;
@@ -35,6 +36,7 @@ public class PerfilControladorTest {
   @BeforeEach
   public void init() {
     servicioUsuarioMock = Mockito.mock(ServicioUsuario.class);
+    servicioLoginMock = Mockito.mock(ServicioLogin.class);
     perfilControlador = new PerfilControlador(servicioUsuarioMock, servicioLoginMock);
     usuarioMock = Mockito.mock(Usuario.class);
     sessionMock = Mockito.mock(HttpSession.class);
@@ -234,5 +236,134 @@ public class PerfilControladorTest {
     );
 
     assertThat((String) mv.getModel().get("mensajeError"), equalToIgnoringCase(msjError));
+  }
+
+  @Test
+  public void dadoQueNoHayUsuarioEnSesionCuandoSeQuiereEliminarLaCuentaEntoncesRedirigeAlLogin() {
+    when(sessionMock.getAttribute("USUARIO")).thenReturn(null);
+
+    ModelAndView mv = perfilControlador.eliminarCuenta(sessionMock);
+
+    assertEquals("redirect:/login", mv.getViewName());
+
+    verify(servicioUsuarioMock, never()).eliminarCuenta(anyLong());
+    verify(sessionMock, never()).invalidate();
+  }
+
+  @Test
+  public void dadoQueHayUsuarioEnSesionCuandoSeEliminaLaCuentaEntoncesSeEliminaLaCuentaYSeInvalidaLaSesion() {
+    Usuario usuario = new Usuario();
+    usuario.setId(1L);
+
+    when(sessionMock.getAttribute("USUARIO")).thenReturn(usuario);
+
+    ModelAndView mv = perfilControlador.eliminarCuenta(sessionMock);
+
+    assertEquals("redirect:/login", mv.getViewName());
+
+    verify(servicioUsuarioMock).eliminarCuenta(1L);
+    verify(sessionMock).invalidate();
+  }
+
+  @Test
+  public void dadoUnUsuarioConContraseniaCorrectaCuandoLaCambiaEntoncesSeActualizaYRedirigeAlPerfil() {
+    RedirectAttributes flashMock = mock(RedirectAttributes.class);
+
+    Usuario usuarioSesion = new Usuario();
+    usuarioSesion.setId(1L);
+    usuarioSesion.setEmail("usuario@test.com");
+
+    Usuario usuarioActualizado = new Usuario();
+    usuarioActualizado.setId(1L);
+    usuarioActualizado.setEmail("usuario@test.com");
+
+    when(sessionMock.getAttribute("USUARIO")).thenReturn(usuarioSesion);
+
+    when(servicioLoginMock.consultarUsuarioLogin("usuario@test.com", "claveActual"))
+      .thenReturn(usuarioSesion);
+
+    when(servicioUsuarioMock.buscarPorId(1L)).thenReturn(usuarioActualizado);
+
+    ModelAndView mv = perfilControlador.cambiarContrasenia(
+      "claveActual",
+      "claveNueva",
+      "claveNueva",
+      sessionMock,
+      flashMock
+    );
+
+    assertEquals("redirect:/perfil", mv.getViewName());
+
+    verify(servicioLoginMock).cambiarContrasenia("usuario@test.com", "claveNueva");
+
+    verify(servicioUsuarioMock).buscarPorId(1L);
+
+    verify(sessionMock).setAttribute("USUARIO", usuarioActualizado);
+
+    verify(flashMock).addFlashAttribute("exito", "¡Contraseña actualizada con éxito!");
+  }
+
+  @Test
+  public void dadoQueNoHayUsuarioEnSesionCuandoIntentaCambiarLaContraseniaEntoncesRedirigeAlLogin() {
+    when(sessionMock.getAttribute("USUARIO")).thenReturn(null);
+
+    ModelAndView mv = perfilControlador.cambiarContrasenia(
+      "actual",
+      "nueva",
+      "nueva",
+      sessionMock,
+      redirectAttributesMock
+    );
+
+    assertEquals("redirect:/login", mv.getViewName());
+
+    verify(servicioLoginMock, never()).consultarUsuarioLogin(anyString(), anyString());
+
+    verify(servicioUsuarioMock, never()).buscarPorId(anyLong());
+  }
+
+  @Test
+  public void dadoQueLasContraseniasNoCoincidenCuandoSeCambiaLaContraseniaEntoncesDebeMostrarError() {
+    Usuario usuario = new Usuario();
+    usuario.setEmail("usuario@test.com");
+
+    when(sessionMock.getAttribute("USUARIO")).thenReturn(usuario);
+
+    ModelAndView mv = perfilControlador.cambiarContrasenia(
+      "actual",
+      "nueva1",
+      "nueva2",
+      sessionMock,
+      redirectAttributesMock
+    );
+
+    assertEquals("perfil", mv.getViewName());
+    assertEquals("Las contraseñas no coinciden", mv.getModel().get("mensajeError"));
+
+    verify(servicioLoginMock, never()).consultarUsuarioLogin(anyString(), anyString());
+  }
+
+  @Test
+  public void dadoQueLaContraseniaActualEsIncorrectaCuandoSeIntentaCambiarEntoncesDebeMostrarError() {
+    Usuario usuario = new Usuario();
+    usuario.setEmail("usuario@test.com");
+
+    when(sessionMock.getAttribute("USUARIO")).thenReturn(usuario);
+
+    when(servicioLoginMock.consultarUsuarioLogin("usuario@test.com", "incorrecta"))
+      .thenReturn(null);
+
+    ModelAndView mv = perfilControlador.cambiarContrasenia(
+      "incorrecta",
+      "nueva",
+      "nueva",
+      sessionMock,
+      redirectAttributesMock
+    );
+
+    assertEquals("perfil", mv.getViewName());
+    assertEquals("La contraseña actual es incorrecta", mv.getModel().get("mensajeError"));
+
+    verify(servicioLoginMock, never()).cambiarContrasenia(anyString(), anyString());
   }
 }
