@@ -22,7 +22,7 @@ public class ServicioHijoImpl implements ServicioHijo {
   private final RepositorioHijo repoHijo;
   private final ServicioGeneradorAlias servicioGeneradorAlias;
   private final ServicioImagenes servicioImagenes;
-  private static final int LONGITUD_MAXIMA_ALIAS = 30;
+  private static final int LONGITUD_MAXIMA_ALIAS = 20;
 
   @Autowired
   public ServicioHijoImpl(
@@ -155,7 +155,7 @@ public class ServicioHijoImpl implements ServicioHijo {
 
   private void validarFormatoAlias(String aliasRetiro) {
     if (aliasRetiro.length() > LONGITUD_MAXIMA_ALIAS) {
-      throw new AliasInvalidoException("El alias no puede superar los 30 caracteres");
+      throw new AliasInvalidoException("El alias no puede superar los 20 caracteres");
     }
 
     if (!aliasRetiro.matches("^[A-Z0-9]+(\\.[A-Z0-9]+)*$")) {

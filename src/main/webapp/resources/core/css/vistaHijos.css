@@ -272,6 +272,7 @@
     box-shadow: var(--shadow-sm);
     box-sizing: border-box; /* Clave: evita que el padding ensanche el contenedor por fuera de la tarjeta */
     width: 100%;            /* Toma el 100% exacto de la tarjeta hijo-card */
+    justify-content: center;
 }
 
 
@@ -284,9 +285,14 @@
 .pill-mensaje-alias strong {
     display: block;
     max-width: 100%;
+    /*
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap; /* Mantiene los 3 puntitos si el alias se pasa del ancho en PC */
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    font-size: clamp(0.60rem, 2.5vw, 0.8rem);
 }
 
 .alerta-alias {
