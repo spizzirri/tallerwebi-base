@@ -217,12 +217,27 @@
 
                         <div class="campo-edicion">
                             <span class="dato-label">Foto de perfil (Rostro visible)</span>
-                            <input type="file" name="fotoPerfilHijo" class="input-foto-hijo" accept="image/*">
+
+                            <div class="foto-input-wrap">
+                                <input type="file" name="fotoPerfilHijo" id="agregarFotoInput" class="input-foto-hijo" accept="image/*">
+                                <button type="button" class="btn-quitar-foto" style="display:none;" aria-label="Quitar foto seleccionada">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="16" height="16">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
                             <div class="contenedor-error-foto alerta-mensaje alerta-error" style="display: none; margin-top: 10px;">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="20" height="20">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
                                 </svg>
                                 <span class="texto-error-foto"></span>
+                            </div>
+                            <div class="contenedor-exito-foto alerta-mensaje alerta-exito" style="display: none; margin-top: 10px;">
+                                <span class="texto-exito-foto"></span>
+                            </div>
+                            <div class="contenedor-validando-foto alerta-mensaje alerta-informacion" style="display: none; margin-top: 10px;">
+                                <span class="spinner-foto"></span>
+                                <span class="texto-validando-foto">Validando foto, por favor esperá...</span>
                             </div>
                         </div>
 
@@ -294,7 +309,14 @@
 
                     <div class="campo-edicion" style="margin-top: 15px;">
                         <span class="dato-label">Foto de Perfil (Rostro visible)</span>
-                        <input type="file" name="fotoPerfilH" id="editFotoInput" class="input-foto-hijo" accept="image/*">
+                        <div class="foto-input-wrap">
+                            <input type="file" name="fotoPerfilH" id="editFotoInput" class="input-foto-hijo" accept="image/*">
+                            <button type="button" class="btn-quitar-foto" style="display:none;" aria-label="Quitar foto seleccionada">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="16" height="16">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
 
                         <div class="contenedor-error-foto alerta-mensaje alerta-error" style="display: none; margin-top: 10px;">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="20" height="20">
@@ -302,6 +324,14 @@
                             </svg>
                             <span class="texto-error-foto"></span>
                         </div>
+                        <div class="contenedor-exito-foto alerta-mensaje alerta-exito" style="display: none; margin-top: 10px;">
+                            <span class="texto-exito-foto"></span>
+                        </div>
+                        <div class="contenedor-validando-foto alerta-mensaje alerta-informacion" style="display: none; margin-top: 10px;">
+                            <span class="spinner-foto"></span>
+                            <span class="texto-validando-foto">Validando foto, por favor esperá...</span>
+                        </div>
+
                     </div>
                     <div class="campo-edicion" style="margin-top: 15px;">
                         <span class="dato-label">Alias de Retiro</span>

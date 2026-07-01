@@ -110,6 +110,28 @@
     border: 1px solid var(--error-border);
 }
 
+.btn-guardar {
+    background: var(--primary);
+    color: var(--white);
+    border: none;
+    border-radius: 10px;
+    padding: .5rem 1.25rem;
+    font-size: .875rem;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: background .2s, opacity .2s;
+}
+
+.btn-guardar:hover {
+    background: var(--primary-hover);
+}
+
+.btn-guardar:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+    filter: grayscale(30%);
+}
 
 /* === RESPONSIVE: BANNER DE TÍTULO === */
 @media (max-width: 768px) {

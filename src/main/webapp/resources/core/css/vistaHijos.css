@@ -175,8 +175,7 @@
 }
 
 .btn-crear-alias,
-.btn-guardar-alias,
-.btn-guardar {
+.btn-guardar-alias {
     background: var(--primary);
     color: var(--white);
     border: none;
@@ -188,11 +187,52 @@
     cursor: pointer;
     transition: background .2s;
 }
-
-.btn-guardar:hover {
-    background: var(--primary-hover);
+.spinner-foto {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(0,0,0,0.2);
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: girar 0.8s linear infinite;
+    margin-right: 8px;
 }
 
+@keyframes girar {
+    to { transform: rotate(360deg); }
+}
+
+
+.foto-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.foto-input-wrap input[type=file] {
+    flex: 1;
+}
+
+.btn-quitar-foto {
+    background: none;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--muted);
+    flex-shrink: 0;
+    transition: background .2s, color .2s;
+}
+
+.btn-quitar-foto:hover {
+    background: var(--error-bg);
+    color: var(--error-text);
+    border-color: var(--error-border);
+}
 /* ── TARJETA HIJO Y BOTÓN LÁPIZ VIOLETA ── */
 .hijo-card {
     position: relative;
@@ -230,12 +270,23 @@
     font-size: 0.95rem;
     font-weight: 500;
     box-shadow: var(--shadow-sm);
+    box-sizing: border-box; /* Clave: evita que el padding ensanche el contenedor por fuera de la tarjeta */
+    width: 100%;            /* Toma el 100% exacto de la tarjeta hijo-card */
 }
+
 
 .pill-informacion-alias {
     background-color: var(--primary-light);
     color: var(--primary);
     border: 1px solid var(--purple-dark);
+}
+.pill-mensaje-alias span,
+.pill-mensaje-alias strong {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap; /* Mantiene los 3 puntitos si el alias se pasa del ancho en PC */
 }
 
 .alerta-alias {
@@ -244,6 +295,8 @@
     font-size: 0.8rem;
     display: inline-flex;
     flex-direction: column;
+    box-sizing: border-box;
+    width: 100%;
 }
 
 .alerta-alias-contenido {
@@ -363,17 +416,5 @@
     .agregar-hijo-banner {
         flex-direction: column;
         align-items: flex-start;
-    }
-}
-
-@media (max-width: 520px) {
-    .modal-card {
-        position: fixed;
-        bottom: 0;
-        left: 8px;
-        right: 8px;
-        width: auto;
-        max-width: none;
-        box-sizing: border-box;
     }
 }
