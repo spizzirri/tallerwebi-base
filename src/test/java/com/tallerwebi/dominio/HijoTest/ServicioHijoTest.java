@@ -361,7 +361,7 @@ public class ServicioHijoTest {
 
     assertThrows(
       AliasInvalidoException.class,
-      () -> servicioHijo.actualizarAlias(hijoId, "ABCDEFGHIJKLMNOPQRSTUVWXYZ12345", usuario)
+      () -> servicioHijo.actualizarAlias(hijoId, "ABCDEFGHIJKLMNOPQRSTJ1232", usuario)
     );
   }
 }
