@@ -2,17 +2,19 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
-    <link rel="icon" type="image/png" href="https://res.cloudinary.com/dqrka5zry/image/upload/v1782952771/WhatsApp_Image_2026-07-01_at_9.28.32_PM_oplcqj.jpg" />
+    <link rel="icon" type="image/png"
+          href="https://res.cloudinary.com/dqrka5zry/image/upload/v1782952771/WhatsApp_Image_2026-07-01_at_9.28.32_PM_oplcqj.jpg"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Mis Pedidos - KioNet</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/variablesColor.css}" />
-    <link rel="stylesheet" th:href="@{/css/componentesYAlertas.css}" />
-    <link rel="stylesheet" th:href="@{/css/home.css}" />
-    <link rel="stylesheet" th:href="@{/css/perfil.css}" />
-    <link rel="stylesheet" th:href="@{/css/mis-pedidos.css}" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+          rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/variablesColor.css}"/>
+    <link rel="stylesheet" th:href="@{/css/componentesYAlertas.css}"/>
+    <link rel="stylesheet" th:href="@{/css/home.css}"/>
+    <link rel="stylesheet" th:href="@{/css/perfil.css}"/>
+    <link rel="stylesheet" th:href="@{/css/mis-pedidos.css}"/>
 </head>
 
 <body>
@@ -38,8 +40,10 @@
             <!-- SIN PEDIDOS -->
             <div th:if="${pedidos == null or pedidos.isEmpty()}" class="perfil-card">
                 <div class="empty-state">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                         stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/>
                     </svg>
                     <h3>Todavía no realizaste ningún pedido</h3>
                     <p>Explorá nuestra tienda y hacé tu primera compra</p>
@@ -101,6 +105,17 @@
                                 </button>
                             </form>
                         </div>
+
+<!--                        <div class="pedido-acciones" th:if="${pedido.estado.name() == 'ENTREGADO'}">-->
+
+<!--                            <form th:action="@{/pedidos/Repetir pedido}" method="post" class="w-50">-->
+<!--                                <input type="hidden" name="pedidoId" th:value="${pedido.id}">-->
+<!--                                <button type="submit" class="btn-accion-repetir w-100" disabled=disabled>-->
+<!--                                    Repetir pedido-->
+<!--                                </button>-->
+<!--                            </form>-->
+
+<!--                        </div>-->
                     </div>
 
                 </div>

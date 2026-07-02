@@ -34,7 +34,7 @@ public interface ServicioPedido {
     LocalDate fechaRetiro,
     Usuario usuario
   );
-
+  void cancelarPedido(Long idPedido, Long usuarioId);
   Pedido buscarPorId(Long id);
 
   List<Pedido> obtenerPedidosEnCarrito(Long usuarioId);

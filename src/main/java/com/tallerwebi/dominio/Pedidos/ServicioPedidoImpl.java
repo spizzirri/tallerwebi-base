@@ -208,6 +208,25 @@ public class ServicioPedidoImpl implements ServicioPedido {
   }
 
   @Override
+  public void cancelarPedido(Long idPedido, Long usuarioId) {
+    Pedido pedido = buscarPorId(idPedido); // ya tira PedidoNoEncontradoException si no existe
+
+    // Seguridad: nos aseguramos de que el pedido sea del usuario logueado
+    if (!pedido.getUsuario().getId().equals(usuarioId)) {
+      throw new PedidoNoEncontradoException("El pedido con ID " + idPedido + " no existe.");
+    }
+
+    // Devolvemos el stock reservado por este pedido
+    for (ItemPedido item : pedido.getItems()) {
+      Producto producto = item.getProducto();
+      producto.setCantidad(producto.getCantidad() + item.getCantidad());
+    }
+
+    pedido.setEstado(EstadoPedido.CANCELADO);
+    repositorioPedido.guardar(pedido);
+  }
+
+  @Override
   public Pedido buscarPorId(Long id) {
     Pedido pedido = repositorioPedido.buscarPedidoPorId(id);
     if (pedido == null) {
