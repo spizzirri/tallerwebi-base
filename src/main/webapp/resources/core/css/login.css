@@ -228,3 +228,7 @@ body {
         padding: .75rem;
     }
 }
+
+.oculto {
+    display: none;
+}
