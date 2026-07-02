@@ -1,0 +1,64 @@
+@import "variablesColor.css";
+.fin-semana {
+    background-color: #a9a7a7 !important;
+}
+
+.fc-event.estado-badge.EN_CARRITO .fc-event-title {
+    color: #1A1A2E !important;
+}
+
+.fc-event.estado-badge.PAGO_PENDIENTE .fc-event-title {
+    color: #dc3545 !important;
+}
+
+.fc-event.estado-badge.PAGADO .fc-event-title {
+    color: #177c3c !important;
+}
+
+.fc-event.estado-badge.PEDIDO_VISTO .fc-event-title {
+    color: #92400E !important;
+}
+
+.fc-event.estado-badge.PEDIDO_ARMADO .fc-event-title {
+    color: #ad0474 !important;
+}
+
+.fc-event.estado-badge.ENTREGADO .fc-event-title {
+    color: #125dab !important;
+
+}
+
+.fc-event.estado-badge.CANCELADO .fc-event-title {
+    color: #2f2f2f !important;
+}
+
+/* === RESPONSIVE PARA MOBILE === */
+@media (max-width: 768px) {
+    /* Achicamos la tipografía general del calendario en mobile */
+    .fc {
+        font-size: 0.65rem !important;
+    }
+
+    /* Modificamos los eventos tipo badge para que se adapten al ancho de la celda */
+    .fc-event.estado-badge {
+        padding: 2px 4px !important; /* Menos padding para ganar espacio */
+        margin: 2px 1px !important;
+        display: block !important;    /* Permite que ocupe el ancho disponible */
+        width: auto !important;
+        white-space: normal !important; /* ¡CLAVE! Permite que el texto salte de línea si es largo */
+        overflow: hidden;
+    }
+
+    .fc-event-title {
+        display: block !important;
+        white-space: nowrap !important;   /* Obliga a quedarse en una sola línea */
+        overflow: hidden !important;       /* Recorta el texto sobrante */
+        text-overflow: ellipsis !important; /* Agrega los tres puntitos (...) */
+    }
+
+    /* Achicamos un poco los números de los días para dar más espacio a los badges */
+    .fc-daygrid-day-top {
+        font-size: 0.7rem;
+        padding: 2px !important;
+    }
+}

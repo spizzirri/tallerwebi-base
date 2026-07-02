@@ -85,7 +85,7 @@
                             <span class="pedido-total-valor" th:text="'$' + ${pedido.subtotal}">$0</span>
                         </div>
 
-                        <div class="pedido-acciones" th:if="${pedido.estado.name() == 'PENDIENTE'}">
+                        <div class="pedido-acciones" th:if="${pedido.estado.name() == 'PAGO_PENDIENTE'}">
 
                             <form th:action="@{/pedidos/cancelar}" method="post" class="w-50">
                                 <input type="hidden" name="pedidoId" th:value="${pedido.id}">

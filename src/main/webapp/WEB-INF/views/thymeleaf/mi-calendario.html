@@ -1,0 +1,87 @@
+<!DOCTYPE HTML>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <link rel="icon" type="image/png"
+          href="https://res.cloudinary.com/dqrka5zry/image/upload/v1782952771/WhatsApp_Image_2026-07-01_at_9.28.32_PM_oplcqj.jpg"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>Calendario de retiros</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+          rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/variablesColor.css}"/>
+    <link rel="stylesheet" th:href="@{/css/componentesYAlertas.css}"/>
+    <link rel="stylesheet" th:href="@{/css/home.css}"/>
+    <link rel="stylesheet" th:href="@{/css/perfil.css}"/>
+    <link rel="stylesheet" th:href="@{/css/mis-pedidos.css}"/>
+    <link rel="stylesheet" th:href="@{/css/calendario.css}"/>
+
+
+</head>
+
+<body>
+<div class="container-fluid">
+
+    <div th:replace="fragmentos/header :: header"></div>
+
+    <main class="main">
+        <section class="panel-cliente">
+            <div th:replace="fragmentos/panelIzqCliente :: panelCliente"></div>
+            <a href="/spring/perfil" class="btn-volver"> Mi perfil</a>
+            <a th:href="@{/home}" class="btn-volver">Ir a Tienda</a>
+
+        </section>
+        <section class="panel-tienda">
+
+            <div class="banner-titulos">
+                <div class="banner-titulos-texto">
+                    <h1>Mi Calendario de pedidos</h1>
+                    <h2>Registro mensual de tus compras en Kionet</h2>
+                </div>
+            </div>
+
+            <div class="calendario">
+                <!--ACA IRIA EL CALENDARIO-->
+                <div id="calendar" th:data-url="@{/api/calendario}"></div>
+            </div>
+        </section>
+    </main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.19/index.global.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const calendarEl = document.getElementById('calendar');
+        const urlApiCalendario = calendarEl.getAttribute('data-url');        const calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth', firstDay: 1, height: 'auto',
+            events: urlApiCalendario,
+            // 2. Transformar tu DTO de Java a lo que FullCalendar entiende
+            eventDataTransform: function(eventData) {
+                return {
+                    id: eventData.pedidoId,
+                    title: eventData.titulo,
+                    start: eventData.fecha, // FullCalendar usa 'start' para la fecha de inicio
+                    className: 'estado-badge ' + eventData.claseCss                };
+            },
+
+            dayCellDidMount: function (info) {
+
+                if (info.date.getDay() === 0 || info.date.getDay() === 6) {
+                    info.el.classList.add("fin-semana");
+                }
+
+            }
+        });
+
+        calendar.render();
+    });
+
+
+</script>
+<script th:src="@{/js/drawer.js}"></script>
+
+</body>
+</html>

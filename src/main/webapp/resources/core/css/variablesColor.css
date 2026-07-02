@@ -5,7 +5,7 @@
     --bg:          #F0EEFE;
     --white:       #FFFFFF;
     --text:        #1A1A2E;
-    --muted: #6b7280;
+    --muted: #000000;
     --border: #ddb4f8;
     --primary-color: #5D38DF; /* Morado del botón */
     --primary-hover: #4A2BBA;
@@ -26,13 +26,10 @@
     --primary: #5D38DF;
     --primary-light: #EEE9FF;
 
-    /* --- 🆕 Nuevas Variables para Estados y Alertas --- */
-    /* Errores / Alertas Negativas */
     --error-bg:      #FEE2E2;
     --error-text: #383737;
     --error-border: #f30a0a;
 
-    /* Éxito / Alertas Positivas */
     --success-bg:    #DCFCE7;
     --success-text:  #166534;
     --success-border:#86EFAC;

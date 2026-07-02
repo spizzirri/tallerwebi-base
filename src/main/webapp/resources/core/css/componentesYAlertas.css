@@ -88,7 +88,7 @@
 
 .estado-badge.PAGADO {
     background-color: #dbfede;
-    color: #1eaf51;
+    color: #177c3c;
     border: 1px solid #02460d;
 }
 
@@ -108,7 +108,7 @@
 
 .estado-badge.ENTREGADO {
     background-color: #7bb1ff;
-    color: #2c6db6;
+    color: #125dab;
     border: 1px solid #6699cc;
 }
 
