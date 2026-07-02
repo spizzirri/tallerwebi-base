@@ -6,6 +6,7 @@ import com.tallerwebi.dominio.Pagos.ServicioMercadoPago;
 import com.tallerwebi.dominio.Pedidos.Pedido;
 import com.tallerwebi.dominio.Pedidos.ServicioPedido;
 import com.tallerwebi.dominio.Usuario.Usuario;
+import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
@@ -93,7 +94,7 @@ public class ControladorMercadoPago {
 
     // Como /pagar ya dejó estos pedidos en PAGO_PENDIENTE antes de mandar a MercadoPago,
     // acá simplemente los tomamos y los pasamos a PAGADO.
-    List<Pedido> pedidosPagados = servicioPedido.obtenerPedidosPendientesDePago(usuario.getId());
+    List<Pedido> pedidosPagados = new ArrayList<>();
 
     if (externalReference != null && !externalReference.isEmpty()) {
       // Camino correcto: sabemos EXACTAMENTE qué pedidos se pagaron en este intento
@@ -114,8 +115,6 @@ public class ControladorMercadoPago {
     if (pedidosPagados.isEmpty()) {
       return new ModelAndView("redirect:/home");
     }
-    servicioPedido.marcarComoPagados(usuario.getId());
-
     Double total = pedidosPagados
       .stream()
       .flatMap(p -> p.getItems().stream())

@@ -77,7 +77,7 @@ public class ControladorMercadoPagoTest {
     Pedido pedido = new Pedido();
     List<Pedido> pedidos = List.of(pedido);
 
-    when(servicioPedidoMock.obtenerPedidosPendientesDePago(1L)).thenReturn(pedidos);
+    when(servicioPedidoMock.obtenerPedidosEnCarrito(1L)).thenReturn(pedidos);
 
     when(servicioMercadoPago.crearPreferenciaDePago(pedidos)).thenReturn("https://mp.com/redirect");
     // 2. When
@@ -106,7 +106,7 @@ public class ControladorMercadoPagoTest {
     Pedido pedido = new Pedido();
     List<Pedido> pedidos = List.of(pedido);
 
-    when(servicioPedidoMock.obtenerPedidosPendientesDePago(1L)).thenReturn(pedidos);
+    when(servicioPedidoMock.obtenerPedidosEnCarrito(1L)).thenReturn(pedidos);
 
     when(servicioMercadoPago.crearPreferenciaDePago(pedidos)).thenReturn(null);
 
