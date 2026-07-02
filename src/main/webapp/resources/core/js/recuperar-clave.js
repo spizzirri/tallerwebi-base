@@ -16,27 +16,32 @@ emailInput.addEventListener("keyup", () => {
 });
 
 btnEnviar.addEventListener("click", async () => {
+
+  btnEnviar.disabled = true;
+
   const params = new URLSearchParams();
   params.append("email", emailInput.value);
+
   const res = await fetch("/spring/verificar-email", {
     method: "POST",
     body: params
   });
 
   if (res.ok) {
-    console.log("Codigo enviado: 1234");
+    /*console.log("Codigo enviado: 1234");*/
     paso1.classList.add("oculto");
     paso2.classList.remove("oculto");
   } else {
     alert("El email no esta registrado");
-    return;
+    btnEnviar.disabled = false;
   }
 });
 
-codigoInput.addEventListener("keyup", () => {
+codigoInput.addEventListener("input", () => {
   btnVerificar.disabled = codigoInput.value.length === 0;
 });
 
+/*
 btnVerificar.addEventListener("click", () => {
   if (codigoInput.value === "1234") {
     paso2.classList.add("oculto");
@@ -44,6 +49,26 @@ btnVerificar.addEventListener("click", () => {
   } else {
     alert("Codigo incorrecto");
   }
+});
+*/
+
+btnVerificar.addEventListener("click", async () => {
+
+  const params = new URLSearchParams();
+  params.append("codigo", codigoInput.value);
+
+  const res = await fetch("/spring/verificar-codigo", {
+    method: "POST",
+    body: params
+  });
+
+  if (res.ok) {
+    paso2.classList.add("oculto");
+    paso3.classList.remove("oculto");
+  } else {
+    alert("Código incorrecto o vencido");
+  }
+
 });
 
 nuevaClaveInput.addEventListener("keyup", () => {
@@ -63,5 +88,7 @@ btnCambiar.addEventListener("click", async () => {
   if (res.ok) {
     paso3.classList.add("oculto");
     paso4.classList.remove("oculto");
+  } else {
+    alert("No fue posible cambiar la contraseña.");
   }
 });

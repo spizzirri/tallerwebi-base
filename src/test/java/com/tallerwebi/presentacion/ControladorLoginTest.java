@@ -7,7 +7,9 @@ import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
 import static org.mockito.Mockito.*;
 
 import com.microsoft.playwright.Response;
+import com.tallerwebi.dominio.Mail.ServicioEmail;
 import com.tallerwebi.dominio.Usuario.ServicioLogin;
+import com.tallerwebi.dominio.Usuario.ServicioRecuperacionContrasenia;
 import com.tallerwebi.dominio.Usuario.Usuario;
 import com.tallerwebi.dominio.excepcion.UsuarioExistente;
 import javax.servlet.http.Cookie;
@@ -29,6 +31,8 @@ public class ControladorLoginTest {
   private HttpSession sessionMock;
   private ServicioLogin servicioLoginMock;
   private HttpServletResponse responseMock;
+  private ServicioRecuperacionContrasenia servicioRecuperacionContraseniaMock;
+  private ServicioEmail servicioEmailMock;
 
   @BeforeEach
   public void init() {
@@ -38,7 +42,14 @@ public class ControladorLoginTest {
     requestMock = mock(HttpServletRequest.class);
     sessionMock = mock(HttpSession.class);
     servicioLoginMock = mock(ServicioLogin.class);
-    controladorLogin = new ControladorLogin(servicioLoginMock);
+    servicioRecuperacionContraseniaMock = mock(ServicioRecuperacionContrasenia.class);
+    servicioEmailMock = mock(ServicioEmail.class);
+    controladorLogin =
+      new ControladorLogin(
+        servicioLoginMock,
+        servicioRecuperacionContraseniaMock,
+        servicioEmailMock
+      );
     responseMock = mock(HttpServletResponse.class);
   }
 
@@ -231,17 +242,25 @@ public class ControladorLoginTest {
   @Test
   public void verificarMailParaCambioDeClaveDeberiaRetornarOkSiElUsuarioExiste() {
     when(servicioLoginMock.usuarioYaExiste(any(Usuario.class))).thenReturn(true);
-    ResponseEntity<String> respuesta = controladorLogin.verificarEmail("ro@unlam.com");
+
+    ResponseEntity<String> respuesta = controladorLogin.verificarEmail("ro@unlam.com", sessionMock);
 
     assertThat(respuesta.getStatusCode(), equalTo(HttpStatus.OK));
+
+    verify(sessionMock, times(1)).setAttribute(eq("codigoRecuperacion"), any());
+
+    verify(sessionMock, times(1)).setAttribute(eq("emailRecuperacion"), eq("ro@unlam.com"));
   }
 
   @Test
-  public void verificarMailParaCambioDeClaveDeberiaRetornarOkSiElUsuarioNoExiste() {
+  public void verificarMailParaCambioDeClaveDeberiaRetornarNotFoundSiElUsuarioNoExiste() {
     when(servicioLoginMock.usuarioYaExiste(any(Usuario.class))).thenReturn(false);
-    ResponseEntity<String> respuesta = controladorLogin.verificarEmail("ro@unlam.com");
+
+    ResponseEntity<String> respuesta = controladorLogin.verificarEmail("ro@unlam.com", sessionMock);
 
     assertThat(respuesta.getStatusCode(), equalTo(HttpStatus.NOT_FOUND));
+
+    verify(sessionMock, never()).setAttribute(anyString(), any());
   }
 
   @Test
@@ -251,14 +270,37 @@ public class ControladorLoginTest {
   }
 
   @Test
-  public void actualizarContraseniaDebeLlamarAlServicioYMostrarMensaje() {
-    ModelAndView mv = controladorLogin.actualizarContrasenia("ro@test.com", "nuevaClave");
+  public void actualizarContraseniaDebeCambiarPasswordSiCodigoVerificado() {
+    when(sessionMock.getAttribute("codigoVerificado")).thenReturn(true);
+    when(sessionMock.getAttribute("emailRecuperacion")).thenReturn("ro@test.com");
+
+    ResponseEntity<Void> response = controladorLogin.actualizarContrasenia(
+      "ro@test.com",
+      "nuevaClave",
+      sessionMock
+    );
+
+    assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));
 
     verify(servicioLoginMock, times(1)).cambiarContrasenia("ro@test.com", "nuevaClave");
-    assertThat(mv.getViewName(), equalToIgnoringCase("cambiarContrasenia"));
-    assertThat(
-      mv.getModel().get("exito").toString(),
-      equalToIgnoringCase("Su contraseña fue cambiada exitosamente")
+
+    verify(sessionMock, times(1)).removeAttribute("codigoRecuperacion");
+
+    verify(sessionMock, times(1)).removeAttribute("emailRecuperacion");
+  }
+
+  @Test
+  public void actualizarContraseniaDebeFallarSiCodigoNoVerificado() {
+    when(sessionMock.getAttribute("codigoVerificado")).thenReturn(false);
+
+    ResponseEntity<Void> response = controladorLogin.actualizarContrasenia(
+      "ro@test.com",
+      "nuevaClave",
+      sessionMock
     );
+
+    assertThat(response.getStatusCode(), equalTo(HttpStatus.FORBIDDEN));
+
+    verify(servicioLoginMock, never()).cambiarContrasenia(anyString(), anyString());
   }
 }
