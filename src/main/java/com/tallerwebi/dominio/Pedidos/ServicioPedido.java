@@ -4,6 +4,7 @@ import com.tallerwebi.dominio.Usuario.Usuario;
 import com.tallerwebi.presentacion.DistribucionCarrito.ItemDistribucionDTO;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 public interface ServicioPedido {
   void crearPedido(
@@ -26,4 +27,17 @@ public interface ServicioPedido {
   void actualizarEstadoPedido(Long idPedido, String estadoNuevo);
 
   Pedido obtenerResultadosBusquedaPedidoPorId(Long idPedido);
+
+  void actualizarPedidoExistente(
+    Long pedidoId,
+    Map<Long, List<ItemDistribucionDTO>> listaPorHijo,
+    LocalDate fechaRetiro,
+    Usuario usuario
+  );
+
+  Pedido buscarPorId(Long id);
+
+  List<Pedido> obtenerPedidosEnCarrito(Long usuarioId);
+
+  void marcarPedidosEnCarritoComoPendientes(Long usuarioId);
 }

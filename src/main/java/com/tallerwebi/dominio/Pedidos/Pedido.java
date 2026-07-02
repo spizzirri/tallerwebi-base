@@ -27,7 +27,12 @@ public class Pedido {
   @JoinColumn(name = "usuario_id")
   private Usuario usuario;
 
-  @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+  @OneToMany(
+    mappedBy = "pedido",
+    cascade = CascadeType.ALL,
+    fetch = FetchType.EAGER,
+    orphanRemoval = true
+  )
   private List<ItemPedido> items;
 
   @Column(nullable = false)
@@ -43,7 +48,7 @@ public class Pedido {
   public Pedido() {
     this.items = new ArrayList<>();
     this.fecha = new Date();
-    this.estado = EstadoPedido.PAGO_PENDIENTE; // ← siempre nace así
+    this.estado = EstadoPedido.EN_CARRITO; // ← siempre nace así
   }
 
   public void agregarItem(ItemPedido item) {

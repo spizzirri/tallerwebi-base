@@ -77,6 +77,7 @@ public class RepositorioPedidoTest {
     pedido.setUsuario(usuario);
     pedido.setHijo(hijo);
     pedido.setFechaRetiro(LocalDate.now().plusDays(1));
+    pedido.setEstado(EstadoPedido.PAGO_PENDIENTE); // 👈 explícito, ya no depende del default del constructor
 
     ItemPedido itemPedido = new ItemPedido(producto, 2);
     itemPedido.setPedido(pedido);

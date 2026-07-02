@@ -54,6 +54,13 @@ public class ServicioMercadoPagoImpl implements ServicioMercadoPago {
       if (itemsMercadoPago.isEmpty()) {
         return null;
       }
+
+      // Armamos la referencia con los IDs de los pedidos que se están pagando en este intento
+      String referenciaExterna = pedidos
+        .stream()
+        .map(p -> String.valueOf(p.getId()))
+        .collect(java.util.stream.Collectors.joining(","));
+
       PreferenceBackUrlsRequest backUrls = PreferenceBackUrlsRequest
         .builder()
         .success(appBaseUrl + "/pago-exitoso")
@@ -68,6 +75,7 @@ public class ServicioMercadoPagoImpl implements ServicioMercadoPago {
             .items(itemsMercadoPago)
             .backUrls(backUrls)
             .autoReturn("approved")
+            .externalReference(referenciaExterna) // 👈 nuevo
             .build()
         )
         .getInitPoint();

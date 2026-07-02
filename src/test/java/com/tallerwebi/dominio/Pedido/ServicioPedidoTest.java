@@ -9,18 +9,18 @@ import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.Hijos.Hijo;
 import com.tallerwebi.dominio.Hijos.RepositorioHijo;
-import com.tallerwebi.dominio.Pedidos.Pedido;
-import com.tallerwebi.dominio.Pedidos.RepositorioPedido;
-import com.tallerwebi.dominio.Pedidos.ServicioPedido;
-import com.tallerwebi.dominio.Pedidos.ServicioPedidoImpl;
+import com.tallerwebi.dominio.Pedidos.*;
 import com.tallerwebi.dominio.Productos.Producto;
 import com.tallerwebi.dominio.Productos.RepositorioProducto;
 import com.tallerwebi.dominio.Usuario.Usuario;
 import com.tallerwebi.dominio.excepcion.FechaRetiroInvalidaException;
 import com.tallerwebi.dominio.excepcion.PedidoNoEncontradoException;
+import com.tallerwebi.dominio.excepcion.ProductoSinStockException;
 import com.tallerwebi.presentacion.DistribucionCarrito.ItemDistribucionDTO;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import javax.servlet.http.HttpSession;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -57,6 +57,7 @@ public class ServicioPedidoTest {
     when(sessionMock.getAttribute("USUARIO")).thenReturn(usuarioMock);
 
     when(productoMock.getPrecio()).thenReturn(100.0);
+    when(productoMock.getCantidad()).thenReturn(10);
     when(repositorioProductoMock.buscarProductoPorId(1L)).thenReturn(productoMock);
 
     List<ItemDistribucionDTO> items = List.of(new ItemDistribucionDTO(1L, 1L, 2));
@@ -68,6 +69,7 @@ public class ServicioPedidoTest {
   public void dadoUnHijoAlCrearPedidoElPedidoDebeTenerEseHijo() {
     when(hijoMock.getId()).thenReturn(1L);
     when(productoMock.getPrecio()).thenReturn(100.0);
+    when(productoMock.getCantidad()).thenReturn(10);
 
     when(repositorioHijoMock.buscarPorId(1L)).thenReturn(hijoMock);
     when(repositorioProductoMock.buscarProductoPorId(1L)).thenReturn(productoMock);
@@ -82,6 +84,7 @@ public class ServicioPedidoTest {
   @Test
   public void dadoUnItemConCantidad2ElPedidoDebeCrearseConEsaCantidad() {
     when(productoMock.getPrecio()).thenReturn(100.0);
+    when(productoMock.getCantidad()).thenReturn(10);
     when(repositorioHijoMock.buscarPorId(1L)).thenReturn(hijoMock);
     when(repositorioProductoMock.buscarProductoPorId(1L)).thenReturn(productoMock);
 
@@ -197,5 +200,145 @@ public class ServicioPedidoTest {
       PedidoNoEncontradoException.class,
       () -> servicioPedido.actualizarEstadoPedido(99L, "ENTREGADO")
     );
+  }
+
+  @Test
+  public void dadoUnIdDePedidoExistenteBuscarPorIdDebeRetornarElPedido() {
+    Pedido pedidoMock = mock(Pedido.class);
+    when(repositorioPedidoMock.buscarPedidoPorId(1L)).thenReturn(pedidoMock);
+
+    Pedido resultado = servicioPedido.buscarPorId(1L);
+
+    assertThat(resultado, notNullValue());
+    assertThat(resultado, equalTo(pedidoMock));
+  }
+
+  @Test
+  public void dadoUnIdDePedidoInexistenteBuscarPorIdDebeLanzarPedidoNoEncontradoException() {
+    when(repositorioPedidoMock.buscarPedidoPorId(99L)).thenReturn(null);
+
+    assertThrows(PedidoNoEncontradoException.class, () -> servicioPedido.buscarPorId(99L));
+  }
+
+  @Test
+  public void dadoUnUsuarioConPedidosPendientesAlLimpiarDebeRestaurarStockYCambiarEstadoACancelado() {
+    Pedido pedidoMock = mock(Pedido.class);
+    ItemPedido itemMock = mock(ItemPedido.class);
+    Producto productoMockReal = new Producto(); // Usamos un objeto real corto para verificar el cambio de stock sin encadenar tantos mocks
+    productoMockReal.setCantidad(10);
+    productoMockReal.setNombre("Alfajor");
+
+    when(repositorioPedidoMock.obtenerPedidosPorUsuario(1L)).thenReturn(List.of(pedidoMock));
+    when(pedidoMock.getItems()).thenReturn(List.of(itemMock));
+    when(itemMock.getProducto()).thenReturn(productoMockReal);
+    when(itemMock.getCantidad()).thenReturn(5);
+
+    servicioPedido.limpiarPedidosPendientes(1L);
+
+    // 10 iniciales + 5 restaurados = 15
+    assertThat(productoMockReal.getCantidad(), equalTo(15));
+    verify(pedidoMock).setEstado(EstadoPedido.CANCELADO);
+  }
+
+  @Test
+  public void alActualizarPedidoExistenteDebeDevolverStockViejoDescontarNuevoYRecalcular()
+    throws ProductoSinStockException {
+    Pedido pedidoOriginal = new Pedido();
+    Hijo hijoReal = new Hijo();
+    hijoReal.setId(10L);
+    pedidoOriginal.setHijo(hijoReal);
+
+    Producto productoViejo = new Producto();
+    productoViejo.setCantidad(5);
+    productoViejo.setPrecio(100.0); // Seteamos precio para evitar NPE en calcularSubtotal
+
+    ItemPedido itemViejo = new ItemPedido(productoViejo, 3);
+    itemViejo.setPedido(pedidoOriginal);
+    pedidoOriginal.agregarItem(itemViejo);
+
+    // Configuración del pedido original a editar
+    when(repositorioPedidoMock.buscarPedidoPorId(1L)).thenReturn(pedidoOriginal);
+    // Producto nuevo al que se le va a re-descontar stock
+    Producto productoNuevo = new Producto();
+    productoNuevo.setCantidad(10);
+    productoNuevo.setNombre("Jugo");
+    productoNuevo.setPrecio(150.0); // Seteamos precio para evitar NPE en calcularSubtotal
+    when(repositorioProductoMock.buscarProductoPorId(2L)).thenReturn(productoNuevo);
+    ItemDistribucionDTO nuevoItemDTO = new ItemDistribucionDTO(2L, 10L, 4); // pide 4
+    Map<Long, List<ItemDistribucionDTO>> listaPorHijo = Map.of(10L, List.of(nuevoItemDTO));
+
+    // Ejecución
+    servicioPedido.actualizarPedidoExistente(
+      1L,
+      listaPorHijo,
+      LocalDate.now().plusDays(2),
+      usuarioMock
+    );
+
+    // VERIFICACIONES:
+    assertThat(productoViejo.getCantidad(), equalTo(8)); // 5 original + 3 devueltos
+    assertThat(productoNuevo.getCantidad(), equalTo(6)); // 10 original - 4 pedidos
+    assertThat(pedidoOriginal.getEstado(), equalTo(EstadoPedido.EN_CARRITO));
+    verify(repositorioPedidoMock).guardar(pedidoOriginal);
+  }
+
+  @Test
+  public void alActualizarPedidoExistenteSiNoHayStockSuficienteDebeLanzarProductoSinStockException() {
+    // 1. Instanciamos objetos REALES
+    Pedido pedidoOriginal = new Pedido();
+    Hijo hijoReal = new Hijo();
+    hijoReal.setId(10L);
+    pedidoOriginal.setHijo(hijoReal);
+
+    // Configuramos el mock para que devuelva nuestro pedido real
+    when(repositorioPedidoMock.buscarPedidoPorId(1L)).thenReturn(pedidoOriginal);
+
+    // Producto nuevo simulado que se queda sin stock (con cantidad, nombre y precio por las dudas)
+    Producto productoNuevo = new Producto();
+    productoNuevo.setCantidad(2);
+    productoNuevo.setNombre("Galletitas");
+    productoNuevo.setPrecio(50.0);
+    when(repositorioProductoMock.buscarProductoPorId(2L)).thenReturn(productoNuevo);
+
+    // Pedimos 5 unidades del producto 2 (supera las 2 disponibles)
+    ItemDistribucionDTO nuevoItemDTO = new ItemDistribucionDTO(2L, 10L, 5);
+    Map<Long, List<ItemDistribucionDTO>> listaPorHijo = Map.of(10L, List.of(nuevoItemDTO));
+
+    // 4. VERIFICACIÓN: Comprobamos que el servicio lance SÍ O SÍ la excepción esperada
+    assertThrows(
+      ProductoSinStockException.class,
+      () ->
+        servicioPedido.actualizarPedidoExistente(
+          1L,
+          listaPorHijo,
+          LocalDate.now().plusDays(2),
+          usuarioMock
+        )
+    );
+  }
+
+  @Test
+  public void alActualizarPedidoExistenteSiLaListaDeItemsVieneVaciaDebeCancelarElPedido()
+    throws ProductoSinStockException {
+    Pedido pedidoOriginal = mock(Pedido.class);
+    Hijo hijoMock = mock(Hijo.class);
+
+    when(repositorioPedidoMock.buscarPedidoPorId(1L)).thenReturn(pedidoOriginal);
+    when(pedidoOriginal.getHijo()).thenReturn(hijoMock);
+    when(hijoMock.getId()).thenReturn(10L);
+    when(pedidoOriginal.getItems()).thenReturn(new ArrayList<>());
+
+    // Pasamos un Map vacío (el usuario desmarcó todos los productos para este hijo)
+    Map<Long, List<ItemDistribucionDTO>> listaPorHijo = Map.of();
+
+    servicioPedido.actualizarPedidoExistente(
+      1L,
+      listaPorHijo,
+      LocalDate.now().plusDays(2),
+      usuarioMock
+    );
+
+    verify(pedidoOriginal).setEstado(EstadoPedido.CANCELADO);
+    verify(pedidoOriginal).setSubtotal(0.0);
   }
 }
