@@ -49,40 +49,60 @@
             <!-- CON PEDIDOS -->
             <div th:if="${pedidos != null and !pedidos.isEmpty()}">
 
-                <div class="pedido-card" th:each="pedido : ${pedidos}">
-                    <div class="pedido-card-header">
-                        <div>
-                            <h3 th:text="'Pedido #' + ${pedido.id}">Pedido</h3>
-                            <span th:text="${pedido.hijo.nombre}">Hijo</span>
-                        </div>
-                        <div>
-                            <!-- Badge de estado con color según valor -->
-                            <span class="estado-badge"
-                                  th:classappend="${pedido.estado.name()}"
-                                  th:text="${pedido.estado}">
-                            </span>
-                            <span class="pedido-fecha"
-                                  th:text="${#dates.format(pedido.fecha, 'dd/MM/yyyy HH:mm')}">
-                            </span>
-                        </div>
-                    </div>
+                <div class="pedidos-grid-container">
 
-                    <div class="pedido-items">
-                        <div class="pedido-item" th:each="item : ${pedido.items}">
-                            <div class="item-info">
-                                <span class="item-cantidad" th:text="'x' + ${item.cantidad}">x1</span>
-                                <span class="item-nombre" th:text="${item.producto.nombre}">Producto</span>
+                    <div class="pedido-card" th:each="pedido : ${pedidos}">
+                        <div class="pedido-card-header">
+                            <div>
+                                <h3 th:text="'Pedido #' + ${pedido.id}">Pedido</h3>
+                                <span class="badge bg-light text-dark" th:text="${pedido.hijo.nombre}">Hijo</span>
                             </div>
-                            <span class="item-precio" th:text="'$' + ${item.subtotal}">$0</span>
+                            <div class="text-end">
+                                <span class="estado-badge"
+                                      th:classappend="${pedido.estado.name()}"
+                                      th:text="${pedido.estado}">
+                                </span>
+                                <br>
+                                <span class="pedido-fecha"
+                                      th:text="${#dates.format(pedido.fecha, 'dd/MM/yyyy HH:mm')}">
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="pedido-items flex-grow-1">
+                            <div class="pedido-item" th:each="item : ${pedido.items}">
+                                <div class="item-info">
+                                    <span class="item-cantidad" th:text="'x' + ${item.cantidad}">x1</span>
+                                    <span class="item-nombre" th:text="${item.producto.nombre}">Producto</span>
+                                </div>
+                                <span class="item-precio" th:text="'$' + ${item.subtotal}">$0</span>
+                            </div>
+                        </div>
+
+                        <div class="pedido-footer">
+                            <span class="pedido-total-label">Total del pedido</span>
+                            <span class="pedido-total-valor" th:text="'$' + ${pedido.subtotal}">$0</span>
+                        </div>
+
+                        <div class="pedido-acciones" th:if="${pedido.estado.name() == 'PENDIENTE'}">
+
+                            <form th:action="@{/pedidos/cancelar}" method="post" class="w-50">
+                                <input type="hidden" name="pedidoId" th:value="${pedido.id}">
+                                <button type="submit" class="btn-accion-cancelar w-100">
+                                    Cancelar
+                                </button>
+                            </form>
+
+                            <form th:action="@{/pedidos/retomar-pago}" method="post" class="w-50">
+                                <input type="hidden" name="pedidoId" th:value="${pedido.id}">
+                                <button type="submit" class="btn-accion-pagar w-100">
+                                    Pagar
+                                </button>
+                            </form>
                         </div>
                     </div>
 
-                    <div class="pedido-footer">
-                        <span class="pedido-total-label">Total del pedido</span>
-                        <span class="pedido-total-valor" th:text="'$' + ${pedido.subtotal}">$0</span>
-                    </div>
                 </div>
-
             </div>
 
         </section>

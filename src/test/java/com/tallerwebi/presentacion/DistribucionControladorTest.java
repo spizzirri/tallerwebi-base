@@ -17,7 +17,6 @@ import com.tallerwebi.dominio.Productos.Producto;
 import com.tallerwebi.dominio.Usuario.Usuario;
 import com.tallerwebi.dominio.excepcion.FechaRetiroInvalidaException;
 import com.tallerwebi.presentacion.DistribucionCarrito.DistribucionControlador;
-import com.tallerwebi.presentacion.DistribucionCarrito.ItemDistribucionDTO;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,7 +26,6 @@ import javax.servlet.http.HttpSession;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.servlet.ModelAndView;
 
 public class DistribucionControladorTest {

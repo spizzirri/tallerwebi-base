@@ -1,6 +1,6 @@
 :root {
     --purple:      #5B3FE4;
-    --purple-dark: #4A32C8;
+    --purple-dark: #3927a1;
     --purple-lt:   #EEE9FF;
     --bg:          #F0EEFE;
     --white:       #FFFFFF;
@@ -29,8 +29,8 @@
     /* --- 🆕 Nuevas Variables para Estados y Alertas --- */
     /* Errores / Alertas Negativas */
     --error-bg:      #FEE2E2;
-    --error-text:    #991B1B;
-    --error-border:  #FCA5A5;
+    --error-text: #383737;
+    --error-border: #f30a0a;
 
     /* Éxito / Alertas Positivas */
     --success-bg:    #DCFCE7;

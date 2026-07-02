@@ -12,8 +12,8 @@
     <link rel="stylesheet" th:href="@{/css/componentesYAlertas.css}" />
     <link rel="stylesheet" th:href="@{/css/home.css}" />
     <link rel="stylesheet" th:href="@{/css/distribucion.css}" />
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
-              integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
 </head>
 
 <body>
@@ -36,100 +36,33 @@
                 </div>
             </div>
 
+            <!-- --- ZONA UNIFICADA DE ALERTAS --- -->
+            <!-- Alertas de Error -->
             <div th:if="${errorDistribucion}" class="alerta-mensaje alerta-error" th:text="${errorDistribucion}"></div>
 
-            <div th:if="${#lists.isEmpty(productos)}" class="carrito-vacio">
-                <p>No tenés productos en el carrito.</p>
-                <a th:href="@{/home}" class="btn-agregar-productos">+ Agregar productos</a>
-            </div>
-
-            <!--
-
-            <div th:unless="${#lists.isEmpty(productos)}" class="tabla-wrap">
-                <form id="formDistribucion" th:action="@{/distribucion/confirmar}"
-                      method="post">
-                    <div class="tabla-scroll">
-                        <table>
-                            <thead>
-                            <tr>
-                                <th class="col-producto">Producto</th>
-                                <th th:each="hijo : ${hijos}" class="col-hijo">
-                                    <div class="hijo-header">
-                                        <div class="hijo-avatar"
-                                             th:text="${#strings.substring(hijo.nombre,0,1)}"></div>
-                                        <span th:text="${hijo.nombre}"></span>
-                                    </div>
-                                </th>
-                                <th class="col-eliminar"></th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr th:each="producto : ${productos}" th:data-producto-id="${producto.id}">
-                                <td class="producto-cell">
-                                    <div class="producto-info">
-                                        <img th:if="${producto.imagen != null}"
-                                             th:src="${producto.imagen}"
-                                             class="producto-img" alt="">
-                                        <img th:unless="${producto.imagen != null}"
-                                             th:src="@{/imagenes/imagenesDefault/caramelo.png}"
-                                             class="producto-img" alt="">
-                                        <div>
-                                            <div class="producto-nombre" th:text="${producto.nombre}"></div>
-                                            <div class="producto-precio">$<span th:text="${producto.precio}"></span></div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td th:each="hijo : ${hijos}" class="col-hijo">
-                                    <div class="qty-control" th:data-stock="${producto.cantidad}">
-                                        <button type="button" class="qty-btn" onclick="cambiar(this, -1)">−</button>
-                                        <input type="hidden"
-                                               th:name="'hijoId'+ ${hijo.id}+'_prodId'+ ${producto.id}"
-                                               th:data-hijo-id="${hijo.id}"
-                                               class="qty-input" th:value="${cantidadesPrevias[hijo.id + '_' + producto.id] ?: 0}">
-                                        <span class="qty-num" th:text="${cantidadesPrevias[hijo.id + '_' + producto.id] ?: 0}" ></span>
-                                        <button type="button" class="qty-btn" onclick="cambiar(this, 1)">+</button>
-                                    </div>
-                                </td>
-                                <td class="col-eliminar">
-                                    <button type="button" class="btn-trash"
-                                            onclick="eliminarFila(this)"
-                                            aria-label="Eliminar producto">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                                             fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                        </svg>
-                                    </button>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="tabla-footer">
-                        <a th:href="@{/home}" class="btn-agregar-productos">+ Agregar más productos</a>
-                        <button type="submit" class="btn-confirmar" id="btnConfirmarPedido" disabled>
-                            Confirmar pedido
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            -->
-
-            <!-- Nueva distribucion -->
-
-            <div th:if="${error}" class="alerta-mensaje alerta-error">
+            <div th:if="${error}" class="alerta-mensaje alerta-error d-flex align-items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="20" height="20">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
                 </svg>
                 <span th:text="${error}">Hubo un error</span>
             </div>
 
+            <!-- Alerta de Éxito (Por si en un futuro redirigís o manejás un mensaje de confirmación acá) -->
+            <div th:if="${exito}" class="alerta-mensaje alerta-exito d-flex align-items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="20" height="20">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span th:text="${exito}">¡Operación realizada con éxito!</span>
+            </div>
+            <!-- --------------------------------- -->
+
+            <div th:if="${#lists.isEmpty(productos)}" class="carrito-vacio">
+                <p>No tenés productos en el carrito.</p>
+                <a th:href="@{/home}" class="btn-agregar-productos">+ Agregar productos</a>
+            </div>
+
             <div th:unless="${#lists.isEmpty(productos)}" class="tabla-wrap">
-                <!-- SIN th:action ni method: el submit lo maneja el JS via fetch -->
-                <form id="formDistribucion" th:action="@{/distribucion/confirmar}"
-                      method="post">
+                <form id="formDistribucion" th:action="@{/distribucion/confirmar}" method="post">
 
                     <div class="campo-fecha-retiro card mb-4">
                         <div class="card-body p-4">
@@ -139,7 +72,6 @@
                                     <h5 class="mb-1 text-purple fw-bold">
                                         📅 Fecha de retiro
                                     </h5>
-
                                     <p class="text-muted mb-0">
                                         Seleccioná el día en que vas a retirar el pedido del kiosco.
                                     </p>
@@ -158,85 +90,89 @@
                         </div>
                     </div>
 
-                    <div class="accordion mb-4 mt-4" id="accordionPanelsStayOpenExample">
+                    <!-- Grilla de acordeones tipo tarjeta -->
+                    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4 mt-2">
 
-                        <div class="accordion-item" th:each="producto : ${productos}" th:data-producto-id="${producto.id}">
+                        <div class="col" th:each="producto : ${productos}" th:data-producto-id="${producto.id}">
 
-                            <div class="accordion-header">
+                            <div class="accordion producto-acordeon-card shadow-sm" th:id="'accordion-' + ${producto.id}">
+                                <div class="accordion-item">
 
-                                <button class="accordion-button"
-                                        type="button"
-                                        data-bs-toggle="collapse"
-                                        th:data-bs-target="'#panelsStayOpen-collapse' + ${producto.id}"
-                                        aria-expanded="true"
-                                        aria-controls="panelsStayOpen-collapseOne">
+                                    <div class="accordion-header">
+                                        <button class="accordion-button"
+                                                type="button"
+                                                data-bs-toggle="collapse"
+                                                th:data-bs-target="'#panelsStayOpen-collapse' + ${producto.id}"
+                                                aria-expanded="true"
+                                                th:aria-controls="'panelsStayOpen-collapse' + ${producto.id}">
 
-                                    <div class="container-fluid d-flex align-items-center">
+                                            <div class="d-flex align-items-center w-100 me-2">
+                                                <div class="me-3">
+                                                    <img th:if="${producto.imagen != null}"
+                                                         th:src="${producto.imagen}"
+                                                         class="producto-img" alt="">
+                                                    <img th:unless="${producto.imagen != null}"
+                                                         th:src="@{/imagenes/imagenesDefault/caramelo.png}"
+                                                         class="producto-img" alt="">
+                                                </div>
 
-                                        <div class="me-3">
-                                            <img th:if="${producto.imagen != null}"
-                                                 th:src="${producto.imagen}"
-                                                 class="producto-img" alt="">
-                                            <img th:unless="${producto.imagen != null}"
-                                                 th:src="@{/imagenes/imagenesDefault/caramelo.png}"
-                                                 class="producto-img" alt="">
-                                        </div>
-
-                                        <div>
-                                            <p th:text="${producto.nombre}" class="producto-nombre mb-0"></p>
-
-                                            <p th:text="${producto.precio}" class="producto-precio mb-0">$</p>
-                                        </div>
-                                    </div>
-                                </button>
-                            </div>
-
-                            <div th:id="'panelsStayOpen-collapse' + ${producto.id}" class="accordion-collapse collapse show">
-                                <div class="accordion-body">
-
-                                    <div th:each="hijo : ${hijos}" class="d-flex p-4 align-items-center border-bottom">
-                                        <div class="producto-cell d-flex align-items-center">
-
-                                            <div class="hijo-avatar"
-                                                 th:text="${#strings.substring(hijo.nombre,0,1)}">
+                                                <div>
+                                                    <p th:text="${producto.nombre}" class="producto-nombre mb-0" style="font-size: 0.95rem; line-height: 1.2;"></p>
+                                                    <p th:text="'$' + ${producto.precio}" class="producto-precio mb-0"></p>
+                                                </div>
                                             </div>
-                                            <span th:text="${hijo.nombre}" class="ms-3">
-                                            </span>
-                                        </div>
-
-                                        <div class="ms-auto">
-                                            <div class="qty-control" th:data-stock="${producto.cantidad}">
-                                                <button type="button" class="qty-btn" onclick="cambiar(this, -1)">−</button>
-                                                <input type="hidden"
-                                                       th:name="'hijoId'+ ${hijo.id}+'_prodId'+ ${producto.id}"
-                                                       th:data-hijo-id="${hijo.id}"
-                                                       class="qty-input" th:value="${cantidadesPrevias[hijo.id + '_' + producto.id] ?: 0}">
-                                                <span class="qty-num" th:text="${cantidadesPrevias[hijo.id + '_' + producto.id] ?: 0}" ></span>
-                                                <button type="button" class="qty-btn" onclick="cambiar(this, 1)">+</button>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <button type="button" class="btn-trash btn btn-danger d-flex align-items-center mt-4 mb-3"
-                                                onclick="eliminarFila(this)"
-                                                aria-label="Eliminar producto">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                                                 fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                            </svg>
-                                            <p class="mb-0 ms-2">Eliminar producto</p>
                                         </button>
+                                    </div>
+
+                                    <div th:id="'panelsStayOpen-collapse' + ${producto.id}" class="accordion-collapse collapse show">
+                                        <div class="accordion-body p-0">
+
+                                            <div th:each="hijo : ${hijos}" class="d-flex p-3 align-items-center border-bottom bg-white">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="hijo-avatar" th:text="${#strings.substring(hijo.nombre,0,1)}"></div>
+                                                    <span th:text="${hijo.nombre}" class="ms-2 fw-semibold text-secondary small"></span>
+                                                </div>
+
+                                                <div class="ms-auto">
+                                                    <div class="qty-control" th:data-stock="${producto.cantidad}">
+                                                        <button type="button" class="qty-btn" onclick="cambiar(this, -1)">−</button>
+                                                        <input type="hidden"
+                                                               th:name="'hijoId'+ ${hijo.id}+'_prodId'+ ${producto.id}"
+                                                               th:data-hijo-id="${hijo.id}"
+                                                               class="qty-input" th:value="${cantidadesPrevias[hijo.id + '_' + producto.id] ?: 0}">
+                                                        <span class="qty-num" th:text="${cantidadesPrevias[hijo.id + '_' + producto.id] ?: 0}"></span>
+                                                        <button type="button" class="qty-btn" onclick="cambiar(this, 1)">+</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="p-3 bg-white">
+                                                <button type="button" class="btn-trash btn btn-danger d-flex align-items-center justify-content-center w-100 m-0 py-2"
+                                                        onclick="eliminarFila(this)"
+                                                        aria-label="Eliminar producto"
+                                                        style="border-radius: 10px; font-size: 0.85rem; font-weight: 600;">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                         fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                    </svg>
+                                                    <span class="ms-2">Eliminar producto</span>
+                                                </button>
+                                            </div>
+
+                                        </div>
                                     </div>
 
                                 </div>
                             </div>
+
                         </div>
                     </div>
 
                     <div class="tabla-footer mt-3 mb-3">
-                        <a th:href="@{/home}" class="btn-agregar-productos">+ Agregar más productos</a>
+                        <button type="button" class="btn-agregar-productos" onclick="guardarYVolverAlHome()">
+                            + Agregar más productos
+                        </button>
                         <button type="submit" id="btnConfirmarPedido" class="btn-confirmar">
                             Confirmar pedido
                         </button>

@@ -8,15 +8,21 @@ import com.tallerwebi.dominio.Pedidos.ServicioPedido;
 import com.tallerwebi.dominio.Usuario.Usuario;
 import java.util.List;
 import javax.servlet.http.HttpSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class ControladorMercadoPago {
+
+  private static final Logger logger = LoggerFactory.getLogger(ControladorMercadoPago.class);
 
   private final ServicioMercadoPago servicioMercadoPago;
   private final ServicioCarrito servicioCarrito;
@@ -39,54 +45,81 @@ public class ControladorMercadoPago {
   }
 
   @RequestMapping(path = "/pagar", method = RequestMethod.GET)
-  public ModelAndView pagar(HttpSession session) {
+  public ModelAndView pagar(HttpSession session, RedirectAttributes flash) {
     Usuario usuario = (Usuario) session.getAttribute("USUARIO");
 
     if (usuario == null) {
       return new ModelAndView("redirect:/login");
     }
 
-    List<Pedido> pedidos = servicioPedido.obtenerPedidosPendientesDePago(usuario.getId());
+    List<Pedido> pedidosAPagar = servicioPedido.obtenerPedidosEnCarrito(usuario.getId());
 
-    if (pedidos.isEmpty()) {
-      ModelMap model = new ModelMap();
-      model.put("error", "No hay pedidos para pagar");
-      return new ModelAndView("redirect:/carrito", model);
+    if (pedidosAPagar.isEmpty()) {
+      flash.addFlashAttribute("errorDistribucion", "No hay pedidos para pagar");
+      return new ModelAndView("redirect:/carrito");
     }
 
-    String urlPago = servicioMercadoPago.crearPreferenciaDePago(pedidos);
+    // 2. IMPORTANTE: pasamos a PAGO_PENDIENTE ANTES de llamar a MercadoPago.
+    // Así, si la API de MercadoPago falla, el pedido ya quedó en un estado
+    // consistente (PAGO_PENDIENTE) en vez de perderse o quedar trabado en EN_CARRITO.
+    servicioPedido.marcarPedidosEnCarritoComoPendientes(usuario.getId());
+
+    // 3. Recién ahora intentamos generar el link de pago
+    String urlPago = servicioMercadoPago.crearPreferenciaDePago(pedidosAPagar);
 
     if (urlPago == null) {
-      ModelMap model = new ModelMap();
-      model.put("error", "No se pudo conectar con Mercado Pago. Intente más tarde.");
-      return new ModelAndView("redirect:/carrito", model);
+      // El pedido YA quedó en PAGO_PENDIENTE (paso 2), no lo revertimos.
+      // El usuario podrá verlo en "Mis Pedidos" y reintentar el pago más tarde.
+      flash.addFlashAttribute(
+        "mensajeError",
+        "No se pudo conectar con Mercado Pago. Tu pedido quedó guardado como pendiente de pago, podés reintentar el pago más tarde."
+      );
+      return new ModelAndView("redirect:/mis-pedidos");
     }
 
     return new ModelAndView("redirect:" + urlPago);
   }
 
   @RequestMapping(path = "/pago-exitoso", method = RequestMethod.GET)
-  public ModelAndView mostrarPagoExitoso(HttpSession session) {
+  public ModelAndView mostrarPagoExitoso(
+    HttpSession session,
+    @RequestParam(value = "external_reference", required = false) String externalReference
+  ) {
     Usuario usuario = (Usuario) session.getAttribute("USUARIO");
 
     if (usuario == null) {
       return new ModelAndView("redirect:/login");
     }
 
-    List<Pedido> pedidos = servicioPedido.obtenerPedidosPendientesDePago(usuario.getId());
+    // Como /pagar ya dejó estos pedidos en PAGO_PENDIENTE antes de mandar a MercadoPago,
+    // acá simplemente los tomamos y los pasamos a PAGADO.
+    List<Pedido> pedidosPagados = servicioPedido.obtenerPedidosPendientesDePago(usuario.getId());
 
-    if (pedidos == null || pedidos.isEmpty()) {
+    if (externalReference != null && !externalReference.isEmpty()) {
+      // Camino correcto: sabemos EXACTAMENTE qué pedidos se pagaron en este intento
+      for (String idStr : externalReference.split(",")) {
+        try {
+          Long id = Long.parseLong(idStr.trim());
+          Pedido pedido = servicioPedido.buscarPorId(id);
+          if (pedido != null) {
+            pedidosPagados.add(pedido);
+            servicioPedido.actualizarEstadoPedido(id, "PAGADO");
+          }
+        } catch (NumberFormatException e) {
+          logger.warn("No se pudo parsear un ID de pedido en external_reference: '{}'", idStr, e);
+        }
+      }
+    }
+
+    if (pedidosPagados.isEmpty()) {
       return new ModelAndView("redirect:/home");
     }
-    // Marcás los pedidos como pagados
     servicioPedido.marcarComoPagados(usuario.getId());
 
-    // Mandar un mail de confirmacion de pago
-
-    Double total = pedidos
+    Double total = pedidosPagados
       .stream()
       .flatMap(p -> p.getItems().stream())
-      .mapToDouble(i -> i.getCantidad() * i.getPrecioUnitario())
+      .mapToDouble(i -> i.getCantidad() * i.getProducto().getPrecio())
       .sum();
 
     String mensaje =
@@ -101,10 +134,10 @@ public class ControladorMercadoPago {
 
     servicioEmail.enviarEmail(usuario.getEmail(), "Pago recibido - Kionet", mensaje);
 
-    // Recién acá vaciás el carrito
     servicioCarrito.vaciarCarrito(usuario.getId());
+
     ModelMap model = new ModelMap();
-    model.put("pedidos", pedidos); // mostrás los pedidos, no el carrito
+    model.put("pedidos", pedidosPagados);
     return new ModelAndView("pago-exitoso", model);
   }
 }

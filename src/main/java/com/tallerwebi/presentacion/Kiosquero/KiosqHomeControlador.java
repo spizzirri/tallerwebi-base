@@ -1,11 +1,14 @@
 package com.tallerwebi.presentacion.Kiosquero;
 
+import com.tallerwebi.dominio.Pedidos.EstadoPedido;
 import com.tallerwebi.dominio.Pedidos.Pedido;
 import com.tallerwebi.dominio.Pedidos.ServicioPedido;
 import com.tallerwebi.dominio.Usuario.Usuario;
 import com.tallerwebi.dominio.excepcion.PedidoNoEncontradoException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -42,7 +45,12 @@ public class KiosqHomeControlador {
     ModelMap modelo = new ModelMap();
     modelo.put("usuario", usuario);
 
-    modelo.put("estados", com.tallerwebi.dominio.Pedidos.EstadoPedido.values());
+    List<EstadoPedido> estadosVisiblesParaKiosquero = Arrays
+      .stream(EstadoPedido.values())
+      .filter(e -> e != EstadoPedido.EN_CARRITO)
+      .collect(Collectors.toList());
+
+    modelo.put("estados", estadosVisiblesParaKiosquero);
     modelo.put("estadoActual", estadoPedido);
 
     this.cargarPedidosDeLosUsuariosCLientes(modelo, estadoPedido);

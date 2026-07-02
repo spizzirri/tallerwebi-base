@@ -46,9 +46,7 @@ public class CarritoControlador {
     try {
       servicioCarrito.agregarProducto(productoId, usuario.getId());
       return ResponseEntity.ok("ok");
-    } catch (ProductoNoEncontradoException e) {
-      return ResponseEntity.status(400).body(e.getMessage());
-    } catch (ProductoSinStockException e) {
+    } catch (ProductoNoEncontradoException | ProductoSinStockException e) {
       return ResponseEntity.status(400).body(e.getMessage());
     }
   }
@@ -59,7 +57,7 @@ public class CarritoControlador {
     if (usuario == null) {
       return new ModelAndView("redirect:/login");
     }
-    List<Pedido> pedidos = servicioPedido.obtenerPedidosPendientesDePago(usuario.getId());
+    List<Pedido> pedidos = servicioPedido.obtenerPedidosEnCarrito(usuario.getId());
 
     // Si no hay pedidos, no dejamos entrar al carrito
     if (pedidos == null || pedidos.isEmpty()) {
@@ -84,12 +82,22 @@ public class CarritoControlador {
   }
 
   @RequestMapping(path = "/carrito/eliminar", method = RequestMethod.POST)
-  public String eliminarProducto(@RequestParam(PRODUCTO_ID) Long productoId, HttpSession session) {
+  @ResponseBody
+  public ResponseEntity<String> eliminarProducto(
+    @RequestParam(PRODUCTO_ID) Long productoId,
+    HttpSession session
+  ) {
     Usuario usuario = (Usuario) session.getAttribute(USUARIO);
+    if (usuario == null) {
+      return ResponseEntity.status(401).body("Usuario no autenticado");
+    }
 
-    servicioCarrito.eliminarProducto(productoId, usuario.getId());
-
-    return "redirect:/carrito";
+    try {
+      servicioCarrito.eliminarProducto(productoId, usuario.getId());
+      return ResponseEntity.ok("ok");
+    } catch (Exception e) {
+      return ResponseEntity.status(400).body(e.getMessage());
+    }
   }
 
   @RequestMapping(path = "/carrito/aumentar", method = RequestMethod.POST)

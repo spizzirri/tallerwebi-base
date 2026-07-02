@@ -19,6 +19,7 @@ import javax.servlet.http.HttpSession;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 public class ControladorMercadoPagoTest {
 
@@ -29,6 +30,7 @@ public class ControladorMercadoPagoTest {
   private Usuario usuarioMock;
   private ServicioPedido servicioPedidoMock;
   private ServicioEmail servicioEmailMock;
+  private RedirectAttributes flashMock;
 
   @BeforeEach
   public void init() {
@@ -45,6 +47,7 @@ public class ControladorMercadoPagoTest {
         servicioEmailMock
       );
     this.sessionMock = mock(HttpSession.class);
+    this.flashMock = mock(RedirectAttributes.class);
 
     // Preparamos un usuario mockeado con ID ficticio
     this.usuarioMock = mock(Usuario.class);
@@ -56,20 +59,20 @@ public class ControladorMercadoPagoTest {
   }
 
   @Test
-  public void siNoHayPedidosPendientesDebeRedirigirAlCarritoConMensajeDeError() {
+  public void siNoHayPedidosEnCarritoDebeRedirigirAlCarritoConMensajeDeError() {
     // 1. Given
     when(servicioPedidoMock.obtenerPedidosPendientesDePago(1L)).thenReturn(new ArrayList<>());
 
     // 2. When:
-    ModelAndView modelAndView = this.controladorMercadoPago.pagar(this.sessionMock);
+    ModelAndView modelAndView = this.controladorMercadoPago.pagar(this.sessionMock, this.flashMock);
 
     // 3. Then
     assertThat(modelAndView.getViewName(), equalTo("redirect:/carrito"));
-    assertThat(modelAndView.getModel().get("error"), equalTo("No hay pedidos para pagar"));
+    verify(flashMock).addFlashAttribute("errorDistribucion", "No hay pedidos para pagar");
   }
 
   @Test
-  public void alPagarDebeBuscarElPedidoEnLaBaseDeDatosYRedirigirAlCheckoutDeMercadoPago() {
+  public void alPagarDebeMarcarLosPedidosComoPendientesYRedirigirAlCheckoutDeMercadoPago() {
     // 1. Given
     Pedido pedido = new Pedido();
     List<Pedido> pedidos = List.of(pedido);
@@ -78,10 +81,11 @@ public class ControladorMercadoPagoTest {
 
     when(servicioMercadoPago.crearPreferenciaDePago(pedidos)).thenReturn("https://mp.com/redirect");
     // 2. When
-    ModelAndView modelAndView = this.controladorMercadoPago.pagar(this.sessionMock);
+    ModelAndView modelAndView = this.controladorMercadoPago.pagar(this.sessionMock, this.flashMock);
 
     // 3. Then
     assertThat(modelAndView.getViewName(), equalTo("redirect:https://mp.com/redirect"));
+    verify(servicioPedidoMock).marcarPedidosEnCarritoComoPendientes(1L);
   }
 
   @Test
@@ -90,14 +94,14 @@ public class ControladorMercadoPagoTest {
     when(this.sessionMock.getAttribute("USUARIO")).thenReturn(null);
 
     // Intenta pagar
-    ModelAndView modelAndView = this.controladorMercadoPago.pagar(this.sessionMock);
+    ModelAndView modelAndView = this.controladorMercadoPago.pagar(this.sessionMock, this.flashMock);
 
     // Redirige al login (Cubre el primer IF del controlador)
     assertThat(modelAndView.getViewName(), equalTo("redirect:/login"));
   }
 
   @Test
-  public void siMercadoPagoFallaDebeRedirigirAlCarritoConMensajeDeError() {
+  public void siMercadoPagoFallaDebeMantenerElPedidoComoPendienteYRedirigirAMisPedidosConMensajeDeError() {
     // 1. Given
     Pedido pedido = new Pedido();
     List<Pedido> pedidos = List.of(pedido);
@@ -107,14 +111,16 @@ public class ControladorMercadoPagoTest {
     when(servicioMercadoPago.crearPreferenciaDePago(pedidos)).thenReturn(null);
 
     // 3. When
-    ModelAndView mav = controladorMercadoPago.pagar(sessionMock);
+    ModelAndView mav = controladorMercadoPago.pagar(sessionMock, this.flashMock);
 
     // 4. Then
-    assertThat(mav.getViewName(), equalTo("redirect:/carrito"));
-    assertThat(
-      mav.getModel().get("error").toString(),
-      equalTo("No se pudo conectar con Mercado Pago. Intente más tarde.")
-    );
+    assertThat(mav.getViewName(), equalTo("redirect:/mis-pedidos"));
+    verify(servicioPedidoMock).marcarPedidosEnCarritoComoPendientes(1L);
+    verify(flashMock)
+      .addFlashAttribute(
+        eq("mensajeError"),
+        contains("Tu pedido quedó guardado como pendiente de pago")
+      );
   }
 
   @Test
@@ -123,57 +129,56 @@ public class ControladorMercadoPagoTest {
     when(this.sessionMock.getAttribute("USUARIO")).thenReturn(null);
 
     // Intenta ingresar a pagar-exitoso sin estar logeado
-    ModelAndView modelAndView = this.controladorMercadoPago.mostrarPagoExitoso(this.sessionMock);
+    ModelAndView modelAndView =
+      this.controladorMercadoPago.mostrarPagoExitoso(this.sessionMock, "1");
     // Redirige al login ()
     assertThat(modelAndView.getViewName(), equalTo("redirect:/login"));
   }
 
   @Test
-  public void ElUsuarioEstaLogueadoCuandoEntraAlPagoExitosoSinItemsEnElCarrito() {
-    //    // La sesión ya tiene al usuario cargado
-    //    Carrito carritoVacio = new Carrito();
-    //    carritoVacio.setItems(new ArrayList<>());
-    //    //tiene carrito vacio
-    //    when(this.servicioCarrito.obtenerOCrearCarrito(1L)).thenReturn(carritoVacio);
-    //    // Intenta ingresar a pagar-exitoso estando logeado pero sin carrito con items
-    //    ModelAndView mav = this.controladorMercadoPago.mostrarPagoExitoso(this.sessionMock);
-    //    // Redirige al carrito con error ()
-    //    assertThat(mav.getViewName(), equalTo("redirect:/carrito"));
-    //    assertThat(
-    //      mav.getModel().get("error").toString(),
-    //      equalTo("Debés agregar items y realizar una compra primero.")
-    //    );
-    when(servicioPedidoMock.obtenerPedidosPendientesDePago(1L)).thenReturn(new ArrayList<>());
-
-    ModelAndView mav = controladorMercadoPago.mostrarPagoExitoso(sessionMock);
+  public void siNoHayExternalReferenceDebeRedirigirAHome() {
+    ModelAndView mav = controladorMercadoPago.mostrarPagoExitoso(sessionMock, null);
 
     assertThat(mav.getViewName(), equalTo("redirect:/home"));
   }
 
   @Test
-  public void ElUsuarioEstaLogueadoCuandoEntraAlPagoExitosoConItemsEnElCarritoDebeDevolverEstosEnElModel() {
-    //    Carrito carritoConProducto = new Carrito();
-    //    List<ItemCarrito> items = new ArrayList<>();
-    //    Producto producto = new Producto();
-    //    items.add(new ItemCarrito(producto, 1));
-    //    carritoConProducto.setItems(items);
-    //
-    //    when(this.servicioCarrito.obtenerOCrearCarrito(1L)).thenReturn(carritoConProducto);
-    //
-    //    // 2. When
-    //    ModelAndView modelAndView = this.controladorMercadoPago.mostrarPagoExitoso(this.sessionMock);
-    //
-    //    // 3. Then
-    //    assertThat(modelAndView.getViewName(), equalTo("pago-exitoso"));
-    //    assertThat(modelAndView.getModel().get("itemsComprados"), equalTo(items));
+  public void siExternalReferenceNoResuelveNingunPedidoDebeRedirigirAHome() {
+    when(servicioPedidoMock.buscarPorId(99L)).thenReturn(null);
 
+    ModelAndView mav = controladorMercadoPago.mostrarPagoExitoso(sessionMock, "99");
+
+    assertThat(mav.getViewName(), equalTo("redirect:/home"));
+  }
+
+  @Test
+  public void conExternalReferenceValidoDebeMarcarSoloEsosPedidosComoPagadosYDevolverlosEnElModel() {
     Pedido pedido = mock(Pedido.class);
-    List<Pedido> pedidos = List.of(pedido);
-    when(servicioPedidoMock.obtenerPedidosPendientesDePago(1L)).thenReturn(pedidos);
+    when(pedido.getItems()).thenReturn(new ArrayList<>());
+    when(servicioPedidoMock.buscarPorId(5L)).thenReturn(pedido);
 
-    ModelAndView mav = controladorMercadoPago.mostrarPagoExitoso(sessionMock);
+    ModelAndView mav = controladorMercadoPago.mostrarPagoExitoso(sessionMock, "5");
 
     assertThat(mav.getViewName(), equalTo("pago-exitoso"));
-    assertThat(mav.getModel().get("pedidos"), equalTo(pedidos));
+    assertThat(mav.getModel().get("pedidos"), equalTo(List.of(pedido)));
+    verify(servicioPedidoMock).actualizarEstadoPedido(5L, "PAGADO");
+    // No debe tocar otros pedidos del usuario que no vinieron en la referencia
+    verify(servicioPedidoMock, never()).marcarComoPagados(anyLong());
+  }
+
+  @Test
+  public void conVariosIdsEnExternalReferenceDebeMarcarTodosComoPagados() {
+    Pedido pedido1 = mock(Pedido.class);
+    Pedido pedido2 = mock(Pedido.class);
+    when(pedido1.getItems()).thenReturn(new ArrayList<>());
+    when(pedido2.getItems()).thenReturn(new ArrayList<>());
+    when(servicioPedidoMock.buscarPorId(5L)).thenReturn(pedido1);
+    when(servicioPedidoMock.buscarPorId(7L)).thenReturn(pedido2);
+
+    ModelAndView mav = controladorMercadoPago.mostrarPagoExitoso(sessionMock, "5,7");
+
+    assertThat(mav.getViewName(), equalTo("pago-exitoso"));
+    verify(servicioPedidoMock).actualizarEstadoPedido(5L, "PAGADO");
+    verify(servicioPedidoMock).actualizarEstadoPedido(7L, "PAGADO");
   }
 }

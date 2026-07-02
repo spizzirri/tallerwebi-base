@@ -73,42 +73,51 @@
     text-transform: capitalize;
     letter-spacing: 0.02em;
 }
+.estado-badge.EN_CARRITO {
+    background-color: #9c9cf6;
+    color: #1A1A2E;
+    border: 1px solid #1A1A2E;
+}
 
 .estado-badge.PAGO_PENDIENTE {
-    background-color: #FEF3C7;
-    color: #92400E;
-    border: 1px solid #FCD34D;
+    background-color: #ef8089;
+    color: #dc3545;
+    border: 1px solid #93232f;
+
 }
 
 .estado-badge.PAGADO {
-    background-color: #DBEAFE;
-    color: #1E40AF;
-    border: 1px solid #93C5FD;
+    background-color: #dbfede;
+    color: #1eaf51;
+    border: 1px solid #02460d;
 }
 
 .estado-badge.PEDIDO_VISTO {
-    background-color: var(--purple-lt);
-    color: var(--purple-dark);
-    border: 1px solid #C4B5FD;
+    background-color: #FEF3C7;
+    color: #92400E;
+    border: 1px solid #FCD34D;
+
 }
 
 .estado-badge.PEDIDO_ARMADO {
-    background-color: var(--purple);
-    color: var(--white);
-    border: 1px solid var(--purple-dark);
+    background-color: #f393d1;
+    color: #ad0474;
+    border: 1px solid #67024d;
+
 }
 
 .estado-badge.ENTREGADO {
-    background-color: var(--success-bg);
-    color: var(--success-text);
-    border: 1px solid var(--success-border);
+    background-color: #7bb1ff;
+    color: #2c6db6;
+    border: 1px solid #6699cc;
 }
 
 .estado-badge.CANCELADO {
-    background-color: var(--error-bg);
-    color: var(--error-text);
-    border: 1px solid var(--error-border);
+    background-color: #d9d9d9;
+    color: #2f2f2f;
+    border: 1px solid #1A1A2E;
 }
+
 
 .btn-guardar {
     background: var(--primary);

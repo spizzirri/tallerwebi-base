@@ -251,3 +251,26 @@ background: #F8F9FD;
 .btn-confirmar:hover {
     background: var(--purple-dark);
 }
+
+/* Ajustes para el acordeón en formato tarjeta */
+.producto-acordeon-card {
+    border-radius: 16px !important;
+    overflow: hidden;
+    border: none !important;
+}
+
+.producto-acordeon-card .accordion-item {
+    border: 1px solid var(--border) !important;
+    border-radius: 16px !important;
+    overflow: hidden;
+}
+
+.producto-acordeon-card .accordion-button {
+    background-color: #F8F9FD !important;
+    color: var(--text) !important;
+    box-shadow: none !important;
+}
+
+.producto-acordeon-card .accordion-button:not(.collapsed) {
+    border-bottom: 1px solid var(--border) !important;
+}

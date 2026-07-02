@@ -74,6 +74,14 @@ INSERT INTO Producto (id, nombre, descripcion, precio, categoria_id,imagen,canti
 VALUES (null, 'Cuaderno Éxito N°1', 'Cuaderno tapa dura de 48 hojas rayadas', 8000.00, 3,
         'https://res.cloudinary.com/dqrka5zry/image/upload/v1780514267/cuad-exito-n1_sra7m3.jpg',5);
 
+INSERT INTO Producto (id, nombre, descripcion, precio, categoria_id,imagen,cantidad)
+VALUES (null, 'Cuaderno', 'Cuaderno', 8000.00, 3,
+        null,0);
+
+INSERT INTO Producto (id, nombre, descripcion, precio, categoria_id,imagen,cantidad)
+VALUES (null, 'Cuaderno 2', 'Cuaderno 2', 8000.00, 3,
+        null,1);
+
 
 INSERT INTO Pedido(id,estado,fecha,subtotal,hijo_id,usuario_id,fecha_retiro)
 VALUES (1,'PAGO_PENDIENTE','2026-06-30 02:05:04.896000',600,1,1,'2026-06-30'),

@@ -13,6 +13,7 @@ public class RepositorioPedidoImpl implements RepositorioPedido {
   private static final String USUARIO_ID = "usuarioId";
   private static final String JOIN_ITEMS = "LEFT JOIN FETCH p.items i ";
   private static final String JOIN_PRODUCTO = "LEFT JOIN FETCH i.producto ";
+  private static final String WHERE_USUARIO = "WHERE p.usuario.id = :usuarioId ";
   private final SessionFactory sessionFactory;
 
   public RepositorioPedidoImpl(SessionFactory sessionFactory) {
@@ -32,12 +33,29 @@ public class RepositorioPedidoImpl implements RepositorioPedido {
         "select distinct p " +
         "from Pedido p " +
         "left join fetch p.items " +
-        "where p.usuario.id = :usuarioId " +
+        WHERE_USUARIO +
         "and p.estado = :estado",
         Pedido.class
       )
       .setParameter(USUARIO_ID, usuarioId)
       .setParameter("estado", EstadoPedido.PAGO_PENDIENTE)
+      .getResultList();
+  }
+
+  @Override
+  public List<Pedido> obtenerPedidosEnCarrito(Long usuarioId) {
+    return sessionFactory
+      .getCurrentSession()
+      .createQuery(
+        "select distinct p " +
+        "from Pedido p " +
+        "left join fetch p.items " +
+        WHERE_USUARIO +
+        "and p.estado = :estado",
+        Pedido.class
+      )
+      .setParameter(USUARIO_ID, usuarioId)
+      .setParameter("estado", EstadoPedido.EN_CARRITO)
       .getResultList();
   }
 
@@ -48,7 +66,7 @@ public class RepositorioPedidoImpl implements RepositorioPedido {
       .createQuery(
         "update Pedido p " +
         "set p.estado = :cancelado " +
-        "where p.usuario.id = :usuarioId " +
+        WHERE_USUARIO +
         "and p.estado = :pendiente"
       )
       .setParameter(USUARIO_ID, usuarioId)
@@ -71,9 +89,7 @@ public class RepositorioPedidoImpl implements RepositorioPedido {
     sessionFactory
       .getCurrentSession()
       .createQuery(
-        "update Pedido p set p.estado = :pagado " +
-        "where p.usuario.id = :usuarioId " +
-        "and p.estado = :pendiente"
+        "update Pedido p set p.estado = :pagado " + WHERE_USUARIO + "and p.estado = :pendiente"
       )
       .setParameter("pagado", EstadoPedido.PAGADO)
       .setParameter(USUARIO_ID, usuarioId)
@@ -85,7 +101,7 @@ public class RepositorioPedidoImpl implements RepositorioPedido {
   public void eliminarPorUsuario(Long usuarioId) {
     sessionFactory
       .getCurrentSession()
-      .createQuery("DELETE FROM Pedido p WHERE p.usuario.id = :usuarioId")
+      .createQuery("DELETE FROM Pedido p " + WHERE_USUARIO)
       .setParameter(USUARIO_ID, usuarioId)
       .executeUpdate();
   }
@@ -99,9 +115,11 @@ public class RepositorioPedidoImpl implements RepositorioPedido {
         "LEFT JOIN FETCH p.hijo " + // Trae los datos del alumno de una
         JOIN_ITEMS + // Trae los items del pedido
         JOIN_PRODUCTO + // Trae los datos de cada producto en el item
+        "WHERE p.estado != :enCarrito " + // 👈 nuevo
         "ORDER BY p.fecha DESC", // Siempre viene bien ver los más nuevos primero
         Pedido.class
       )
+      .setParameter("enCarrito", EstadoPedido.EN_CARRITO) // 👈 nuevo
       .getResultList();
   }
 
@@ -135,10 +153,12 @@ public class RepositorioPedidoImpl implements RepositorioPedido {
         JOIN_ITEMS +
         JOIN_PRODUCTO +
         "WHERE LOWER(CONCAT(h.nombre,'',h.apellido)) LIKE LOWER(:busqueda) " + // Búsqueda por coincidencia parcial e insensible a mayúsculas
+        "AND p.estado != :enCarrito " + // 👈 nuevo
         "ORDER BY p.fecha DESC",
         Pedido.class
       )
       .setParameter("busqueda", "%" + nombreApellidoAlumno.trim() + "%")
+      .setParameter("enCarrito", EstadoPedido.EN_CARRITO) // 👈 nuevo
       .getResultList();
   }
 
@@ -149,6 +169,19 @@ public class RepositorioPedidoImpl implements RepositorioPedido {
       pedido.setEstado(EstadoPedido.valueOf(estadoNuevo)); // Se convierte y se usa directo acá
       sessionFactory.getCurrentSession().update(pedido);
     }
+  }
+
+  @Override
+  public void marcarEnCarritoComoPendiente(Long usuarioId) {
+    sessionFactory
+      .getCurrentSession()
+      .createQuery(
+        "update Pedido p set p.estado = :pendiente " + WHERE_USUARIO + "and p.estado = :enCarrito"
+      )
+      .setParameter("pendiente", EstadoPedido.PAGO_PENDIENTE)
+      .setParameter(USUARIO_ID, usuarioId)
+      .setParameter("enCarrito", EstadoPedido.EN_CARRITO)
+      .executeUpdate();
   }
 
   @Override

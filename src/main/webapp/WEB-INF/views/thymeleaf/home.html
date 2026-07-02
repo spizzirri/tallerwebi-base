@@ -8,11 +8,12 @@
     <title>KioNet - Tu Kiosco Virtual</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+          rel="stylesheet">
 
-    <link rel="stylesheet" th:href="@{/css/login.css}" />
-    <link rel="stylesheet" th:href="@{/css/componentesYAlertas.css}" />
-    <link rel="stylesheet" th:href="@{/css/home.css}" />
+    <link rel="stylesheet" th:href="@{/css/login.css}"/>
+    <link rel="stylesheet" th:href="@{/css/componentesYAlertas.css}"/>
+    <link rel="stylesheet" th:href="@{/css/home.css}"/>
 
 </head>
 
@@ -48,18 +49,19 @@
                        th:classappend="${param.categoria != null && param.categoria[0] == categoriaProd.nombreCategoria} ? 'active' : ''"></a>
                 </th:block>
             </nav>
+
             <section class="products-section" th:if="${productosBuscados != null || errorBusquedaProductos != null}">
                 <h2 class="subtitulos">Resultados de la búsqueda:</h2>
                 <p th:if="${errorBusquedaProductos}" th:text="${errorBusquedaProductos}">
-
                 </p>
-
 
                 <div class="products-grid" th:unless="${#lists.isEmpty(productosBuscados)}">
                     <div class="product-card" th:each="producto : ${productosBuscados}">
                         <div class="product-image-wrapper">
                             <img th:if="${producto.imagen != null}" th:src="${producto.imagen}" alt="golo">
-                            <img th:unless="${producto.imagen != null}" th:src="'https://res.cloudinary.com/dqrka5zry/image/upload/v1780525780/caramelo_qzcvfy.png'" alt="golo">
+                            <img th:unless="${producto.imagen != null}"
+                                 th:src="'https://res.cloudinary.com/dqrka5zry/image/upload/v1780525780/caramelo_qzcvfy.png'"
+                                 alt="golo">
                         </div>
 
                         <div class="product-info">
@@ -67,23 +69,28 @@
                             <p class="product-desc" th:text="${producto.descripcion}"></p>
                             <span class="product-price">$ <th:block th:text="${producto.precio}"></th:block></span>
                         </div>
-                        <form action="carrito/agregar" method="post" class="add-to-cart-form">
-                            <input type="hidden" name="productoId" th:value="${producto.id}">
 
-                            <button
-                                    type="submit"
-                                    class="btn-add-product"
-                                    th:disabled="${producto.cantidad <= 0}"
-                                    th:text="${producto.cantidad <= 0 ? '¡No hay stock!' : '+ Agregar al carrito'}">
-                            </button>
-                        </form>
+                        <button
+                                type="button"
+                                th:data-producto-id="${producto.id}"
+                                th:classappend="${
+                                    producto.cantidad <= 0 ? 'btn-add-product sin-stock' :
+                                    (#lists.contains(idsEnCarrito, producto.id) ? 'btn-add-product agregado' : 'btn-add-product')
+                                }"
+                                th:text="${
+                                    producto.cantidad <= 0 ? '¡No hay stock!' :
+                                    (#lists.contains(idsEnCarrito, producto.id) ? '✓ Agregado (Quitar)' : '+ Agregar al carrito')
+                                }"
+                                th:disabled="${producto.cantidad <= 0}"
+                                onclick="alternarCarrito(this)">
+                        </button>
                     </div>
                 </div>
                 <hr class="section-divider">
             </section>
-
             <section class="products-section">
-                <h2 class="subtitulos" th:text="${param.categoria != null} ? ${param.categoria} : 'Todos los productos'"></h2>
+                <h2 class="subtitulos"
+                    th:text="${param.categoria != null} ? ${param.categoria} : 'Todos los productos'"></h2>
 
                 <p th:if="${errorCargaProductos}" th:text="${errorCargaProductos}"></p>
 
@@ -92,7 +99,8 @@
                     <div class="product-card" th:each="producto : ${productos}">
                         <div class="product-image-wrapper">
                             <img th:if="${producto.imagen != null}" th:src="${producto.imagen}" alt="golo">
-                            <img th:unless="${producto.imagen != null}" th:src="@{/imagenes/imagenesDefault/caramelo.png}" alt="golo">
+                            <img th:unless="${producto.imagen != null}"
+                                 th:src="@{/imagenes/imagenesDefault/caramelo.png}" alt="golo">
                         </div>
 
                         <div class="product-info">
@@ -100,23 +108,17 @@
                             <p class="product-desc" th:text="${producto.descripcion}"></p>
                             <span class="product-price">$ <th:block th:text="${producto.precio}"></th:block></span>
                         </div>
-
-                        <!--                        <form action="carrito/agregar" method="post" class="add-to-cart-form">-->
-                        <!--                            <input type="hidden" name="productoId" th:value="${producto.id}">-->
-                        <!--                            <button type="submit" class="btn-add-product">+ Agregar al carrito</button>-->
-                        <!--                        </form>-->
+                        <!--MODIFICACION PARA QUE DESDE EL BOTON SE PUEDA AGREGAR O ELIMINAR DEL CARRITO-->
                         <button type="button"
                                 th:data-producto-id="${producto.id}"
-                                th:classappend="${
-                                    producto.cantidad <= 0 ? 'btn-add-product sin-stock' :
-                                    (#lists.contains(idsEnCarrito, producto.id) ? 'btn-add-product agregado' : 'btn-add-product')
-                                }"
-                                th:text="${
-                                    producto.cantidad <= 0 ? '¡No hay stock!' :
-                                    (#lists.contains(idsEnCarrito, producto.id) ? '✓ Agregado' : '+ Agregar al carrito')
-                                }"
-                                th:disabled="${producto.cantidad <= 0 || #lists.contains(idsEnCarrito, producto.id)}"
-                                onclick="agregarAlCarrito(this)">
+                                th:classappend="${producto.cantidad <= 0 ? 'btn-add-product sin-stock' :
+                                                 (#lists.contains(idsEnCarrito, producto.id) ? 'btn-add-product agregado' : 'btn-add-product')
+                                               }"
+                                th:text="${ producto.cantidad <= 0 ? '¡No hay stock!' :
+                                            (#lists.contains(idsEnCarrito, producto.id) ? '✓ Agregado (Quitar)' : '+ Agregar al carrito')
+                                        }"
+                                th:disabled="${producto.cantidad <= 0}"
+                                onclick="alternarCarrito(this)">
                         </button>
                     </div>
                 </div>
@@ -129,28 +131,42 @@
 </body>
 <script>
 
-    function agregarAlCarrito(btn) {
+    function alternarCarrito(btn) {
         const productoId = btn.dataset.productoId;
-        btn.disabled = true;
-        btn.textContent = 'Agregando...';
+        const esAgregado = btn.classList.contains('agregado');
 
-        fetch('/spring/carrito/agregar', {
+        btn.disabled = true;
+        btn.textContent = esAgregado ? 'Quitando...' : 'Agregando...';
+
+        // Decidimos la URL según el estado actual del botón
+        const url = esAgregado ? '/spring/carrito/eliminar' : '/spring/carrito/agregar';
+
+        fetch(url, {
             method: 'POST',
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
             body: 'productoId=' + productoId
         })
             .then(res => {
                 if (res.ok) {
-                    btn.textContent = '✓ Agregado';
-                    btn.classList.add('agregado');
+                    if (esAgregado) {
+                        // Se eliminó con éxito
+                        btn.textContent = '+ Agregar al carrito';
+                        btn.classList.remove('agregado');
+                    } else {
+                        // Se agregó con éxito
+                        btn.textContent = '✓ Agregado (Quitar)';
+                        btn.classList.add('agregado');
+                    }
                 } else {
-                    btn.disabled = false;
-                    btn.textContent = '+ Agregar al carrito';
+                    // Si falla, revertimos al texto correspondiente
+                    btn.textContent = esAgregado ? '✓ Agregado (Quitar)' : '+ Agregar al carrito';
                 }
             })
             .catch(() => {
+                btn.textContent = esAgregado ? '✓ Agregado (Quitar)' : '+ Agregar al carrito';
+            })
+            .finally(() => {
                 btn.disabled = false;
-                btn.textContent = '+ Agregar al carrito';
             });
     }
 </script>
