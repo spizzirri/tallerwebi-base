@@ -78,7 +78,7 @@
                     <form th:action="@{/eliminarHijo}" method="post" style="display: inline;"
                         onsubmit="return confirm('¿Estás seguro de que deseas dar de baja a este hijo?')">
                         <input type="hidden" name="hijoId" th:value="${hijo.id}" />
-                        <button type="submit" class="btn-trash btn btn-danger d-flex align-items-center mt-4 mb-3"
+                        <button type="submit" class="boton-eliminarHijo d-flex align-items-center mt-4 mb-3"
                                 aria-label="Eliminar HIJO">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
                                  fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
