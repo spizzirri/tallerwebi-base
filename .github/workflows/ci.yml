@@ -14,11 +14,11 @@ jobs:
       - run: echo "🔎 El nombre de la rama es ${{ github.ref }} y tu repositorio es ${{ github.repository }}."
       - name: Descargando el codigo
         uses: actions/checkout@v4
-      - name: Configurar JDK 21
+      - name: Configurar JDK 25
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '21'
+          java-version: '25'
           cache: 'maven'
       - run: echo "💡 El repositorio ${{ github.repository }} ha sido clonado."
       - run: echo "🖥️ El workflow esta listo para testear el codigo"

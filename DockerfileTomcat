@@ -1,6 +1,6 @@
-FROM eclipse-temurin:21-jdk
+FROM eclipse-temurin:25-jdk
 
-ENV TOMCAT_VERSION=10.1.34
+ENV TOMCAT_VERSION=10.1.57
 ENV TOMCAT_HOME=/opt/tomcat
 
 RUN apt-get update && apt-get install -y wget && \
