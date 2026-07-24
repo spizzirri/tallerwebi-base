@@ -2,6 +2,7 @@ package com.tallerwebi.infraestructura;
 
 import com.tallerwebi.dominio.RepositorioUsuario;
 import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.excepcion.UsuarioNoEncontrado;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -42,6 +43,14 @@ public class RepositorioUsuarioImpl implements RepositorioUsuario {
 
   @Override
   public void modificar(Usuario usuario) {
-    sessionFactory.getCurrentSession().update(usuario);
+    Usuario existente = sessionFactory
+      .getCurrentSession()
+      .createQuery("from Usuario where id = :id", Usuario.class)
+      .setParameter("id", usuario.getId())
+      .uniqueResult();
+    if (existente == null) {
+      throw new UsuarioNoEncontrado();
+    }
+    sessionFactory.getCurrentSession().merge(usuario);
   }
 }
