@@ -5,12 +5,12 @@ Proyecto base Taller Web I (Maven and Thymeleaf)
 Antes de comenzar a trabajar con el proyecto, debemos instalar y configurar algunas herramientas:
 
 ### Java
-Java es el lenguaje de programación con el que trabajaremos. El proyecto esta configurado para funcionar con la version 11 de Java.
-* Descargar el JDK para el sistema operativo en uso: [JDK 11 para Linux](https://download.java.net/openjdk/jdk11.0.0.2/ri/openjdk-11.0.0.2_linux-x64.tar.gz), [JDK 11 para Windows](https://download.java.net/openjdk/jdk11.0.0.2/ri/openjdk-11.0.0.2_windows-x64.zip).
+Java es el lenguaje de programación con el que trabajaremos. El proyecto esta configurado para funcionar con la version 25 de Java (LTS).
+* Descargar el JDK para el sistema operativo en uso: [JDK 25 Temurin para Linux/Windows](https://adoptium.net/temurin/releases/?version=25).
 * Descomprimir el archivo descargado en una carpeta. 
     * Ejemplo: `/home/java` (En Linux) o `C:\java` (en Windows).
 * Configurar una variable de entorno con la clave `JAVA_HOME` indicando en el valor, la ruta donde se descomprimió el archivo descargado. 
-    * Ejemplo: `C:\java\jdk-11.0.0.2` (en Windows) o `/home/java/jdk-11.0.0.2` (en Linux).
+    * Ejemplo: `C:\java\jdk-25` (en Windows) o `/home/java/jdk-25` (en Linux).
 * Configurar la variable de entorno `PATH` incluyendo la variable `JAVA_HOME`: 
     * Agregamos: `%JAVA_HOME%\bin` al listado existente.
 * Luego de guardar la configuración de las variables de entorno, ejecutamos en el CMD o Terminal `java -version` y luego `javac -version`, debiendo visualizar como salida la versión de Java y la versión del compilador instaladas, respectivamente.
@@ -19,7 +19,7 @@ Java es el lenguaje de programación con el que trabajaremos. El proyecto esta c
 
 ### Maven
 Maven es una herramienta que permite la gestión de proyectos (principalmente proyectos Java). Simplifica y estandariza el proceso de construcción del producto software. 
-* Es requisito tener instalado Java (mínimo Java 8 para Maven, Java 11 para el proyecto) y configuradas las variables de entorno (`JAVA_HOME` y `PATH`).
+* Es requisito tener instalado Java (mínimo Java 17 para Maven, Java 25 para el proyecto) y configuradas las variables de entorno (`JAVA_HOME` y `PATH`).
 * Descargar Maven desde el [sitio oficial](https://dlcdn.apache.org/maven/maven-3/3.8.9/binaries/apache-maven-3.8.9-bin.zip) y luego descomprimirlo en una carpeta (Puede estar junto a la instalación de Java o en otra carpeta).
 * Configurar una variable de entorno con la clave `MAVEN_HOME` indicando en el valor, la ruta donde se descomprimió el archivo descargado. 
     * Ejemplo: `/home/maven/apache-maven-3.9.11` (en Linux) o `C:\maven\apache-maven-3.9.11` (en Windows).
@@ -66,7 +66,7 @@ $ mvn clean jetty:run
 * [Documentación](https://playwright.dev/java/docs/intro)
 
 ## 6. Jetty
-* [Documentación](https://eclipse.dev/jetty/documentation/jetty-9/index.html#maven-and-jetty)
+* [Documentación](https://eclipse.dev/jetty/documentation/jetty-12/)
 
 ## 7. ¿Cómo correr las pruebas de punta a punta?
 
@@ -296,25 +296,26 @@ rd /s /q .calidad-de-codigo\jacoco & mvn clean test
 
 ## Tecnologías:
 * Docker
-* Java 11
-* Spring 5.2.22.RELEASE
-* Thymeleaf 3.0.15.RELEASE
-* Embedded Jetty Server 9.4.45.v20220203
-* Servlet API 4.0.4
-* Bootstrap 5.2.0 (webjars)
+* Java 25 (LTS)
+* Spring 6.2.19
+* Thymeleaf 3.1.5.RELEASE (spring6)
+* Embedded Jetty Server EE10 12.0.37
+* Servlet API (Jakarta) 6.0.0
+* Bootstrap 5.2.0 (CDN)
 * IntelliJ IDEA | VS Code
-* Maven 3.8.6
-* Spring Test 5.2.22.RELEASE
+* Maven 3.9+ (sobre JDK 25)
+* Spring Test 6.2.19
 * Hamcrest 2.2
-* JUnit 5.9
-* Hibernate 5.4.24.Final
-* Mockito 5.3.1
-* Playwright 1.36.0
-* PMD 3.21.0 & CPD
-* Checkstyle 10.9.1 (Google Style)
+* JUnit 6.1.2
+* Hibernate 6.6.54.Final (org.hibernate.orm)
+* MySQL Connector/J 9.7.0
+* Mockito 5.23.0
+* Playwright 1.61.0
+* PMD 7.26.0 (plugin 3.28.0) & CPD
+* Checkstyle 13.8.0 (plugin 3.6.0, Google Style)
 * Prettier Maven Plugin 0.22 (Prettier-Java 2.5.0)
 * ESLint 9.x
-* JaCoCo 0.8.12
+* JaCoCo 0.8.15
 * Node 18.16.1 o superior <- Instalación manual desde la [página de node](https://nodejs.org/en) 
 * npm --> npm install -g npm
 

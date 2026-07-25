@@ -9,17 +9,18 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jdk.version>11</jdk.version>
-        <spring.version>5.2.22.RELEASE</spring.version>
-        <servletapi.version>4.0.4</servletapi.version>
-        <thymeleaf.spring.version>3.0.15.RELEASE</thymeleaf.spring.version>
+        <jdk.version>25</jdk.version>
+        <spring.version>6.2.19</spring.version>
+        <servletapi.version>6.0.0</servletapi.version>
+        <thymeleaf.spring.version>3.1.5.RELEASE</thymeleaf.spring.version>
         <hamcrest.version>2.2</hamcrest.version>
-        <junit.version>5.9.0</junit.version>
-        <mockito.version>5.3.1</mockito.version>
-        <hibernate.version>5.4.24.Final</hibernate.version>
-        <playwright.version>1.36.0</playwright.version>
-        <hsqldb.version>2.3.2</hsqldb.version>
-        <checkstyle.version>3.2.1</checkstyle.version>
+        <junit.version>6.1.2</junit.version>
+        <mockito.version>5.23.0</mockito.version>
+        <hibernate.version>6.6.54.Final</hibernate.version>
+        <playwright.version>1.61.0</playwright.version>
+        <hsqldb.version>2.7.4</hsqldb.version>
+        <checkstyle.version>3.6.0</checkstyle.version>
+        <checkstyle.runtime.version>13.8.0</checkstyle.runtime.version>
     </properties>
 
     <dependencies>
@@ -49,14 +50,14 @@
         </dependency>
 
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.33</version>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <version>9.7.0</version>
         </dependency>
 
         <dependency>
             <groupId>org.thymeleaf</groupId>
-            <artifactId>thymeleaf-spring5</artifactId>
+            <artifactId>thymeleaf-spring6</artifactId>
             <version>${thymeleaf.spring.version}</version>
         </dependency>
 
@@ -96,7 +97,7 @@
         </dependency>
 
         <dependency>
-            <groupId>org.hibernate</groupId>
+            <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-core</artifactId>
             <version>${hibernate.version}</version>
         </dependency>
@@ -124,17 +125,16 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.10.1</version>
+                <version>3.15.0</version>
                 <configuration>
-                    <source>${jdk.version}</source>
-                    <target>${jdk.version}</target>
+                    <release>${jdk.version}</release>
                 </configuration>
             </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>3.3.1</version>
+                <version>3.5.1</version>
                 <configuration>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                 </configuration>
@@ -144,7 +144,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0-M5</version> <!-- Ajusta la versión según tus necesidades -->
+                <version>3.5.3</version>
 
                 <configuration>
                     <!-- Configuración específica para las pruebas -->
@@ -185,6 +185,8 @@
                 <configuration>
                     <!-- Ubicación del archivo de configuración personalizado (basado en Google Style pero compatible con Prettier) -->
                     <configLocation>${project.basedir}/checkstyle-base.xml</configLocation>
+                    <!-- Version del runtime de Checkstyle (soporta Java 25 / JEP 512) -->
+                    <checkstyleVersion>${checkstyle.runtime.version}</checkstyleVersion>
                     <!-- Mostrar los errores de reglas directamente en la consola -->
                     <consoleOutput>true</consoleOutput>
                     <!-- Detener el build si se encuentra algun error de las reglas de estilo -->
@@ -222,7 +224,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
-                <version>3.21.0</version>
+                <version>3.28.0</version>
                 <configuration>
                     <!-- Mostrar los errores de reglas directamente en la consola de Maven -->
                     <printFailingErrors>true</printFailingErrors>
@@ -307,7 +309,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.12</version>
+                <version>0.8.15</version>
                 <executions>
                     <execution>
                         <!-- Fase de preparación: Configura el agente de JaCoCo para integrarse con el proceso de tests de la JVM -->
@@ -391,9 +393,9 @@
             </plugin>
 
             <plugin>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-maven-plugin</artifactId>
-                <version>9.4.45.v20220203</version>
+                <groupId>org.eclipse.jetty.ee10</groupId>
+                <artifactId>jetty-ee10-maven-plugin</artifactId>
+                <version>12.0.37</version>
                 <configuration>
                     <scanIntervalSeconds>2</scanIntervalSeconds>
                     <httpConnector>

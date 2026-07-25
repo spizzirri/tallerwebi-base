@@ -8,11 +8,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.tallerwebi.dominio.RepositorioUsuario;
 import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.excepcion.UsuarioNoEncontrado;
 import com.tallerwebi.infraestructura.config.HibernateInfraestructuraTestConfig;
-import javax.persistence.Query;
-import javax.transaction.Transactional;
+import jakarta.persistence.Query;
+import jakarta.transaction.Transactional;
 import org.hibernate.SessionFactory;
-import org.hibernate.TransientObjectException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -115,9 +115,9 @@ public class RepositorioUsuarioTest {
   public void deberiaLanzarUnaExcepcionAlIntentarModificarUnUsuarioInexistente() {
     Usuario usuario = this.dadoQueTengoUnUsuario("noexiste@test.com", "123", "USER");
 
-    // Al no tener ID (no estar persistido), llamar a update debe lanzar la
-    // excepción.
-    this.entoncesSeLanzaUnaTransientObjectException(usuario);
+    // Al no tener ID (no estar persistido), buscar por id devuelve null y
+    // modificar debe lanzar UsuarioNoEncontrado.
+    this.entoncesSeLanzaUnaUsuarioNoEncontrado(usuario);
   }
 
   private Usuario dadoQueTengoUnUsuario(String email, String password, String rol) {
@@ -129,7 +129,7 @@ public class RepositorioUsuarioTest {
   }
 
   private void dadoQueExisteElUsuario(Usuario usuario) {
-    this.sessionFactory.getCurrentSession().save(usuario);
+    this.sessionFactory.getCurrentSession().persist(usuario);
   }
 
   private void cuandoGuardoUnUsuario(Usuario usuario) {
@@ -170,9 +170,9 @@ public class RepositorioUsuarioTest {
     assertThat(obtenido, is(nullValue()));
   }
 
-  private void entoncesSeLanzaUnaTransientObjectException(Usuario usuario) {
+  private void entoncesSeLanzaUnaUsuarioNoEncontrado(Usuario usuario) {
     assertThrows(
-      TransientObjectException.class,
+      UsuarioNoEncontrado.class,
       () -> {
         this.cuandoModificoUnUsuario(usuario);
       }
