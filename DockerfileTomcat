@@ -1,32 +1,18 @@
-# Usa la imagen base de OpenJDK 11
-FROM openjdk:11
+FROM eclipse-temurin:25-jdk
 
-# Define variables de entorno para Tomcat
-ENV TOMCAT_VERSION=9.0.97
+ENV TOMCAT_VERSION=10.1.57
 ENV TOMCAT_HOME=/opt/tomcat
 
-# Descarga y extrae Tomcat
 RUN apt-get update && apt-get install -y wget && \
     mkdir -p $TOMCAT_HOME && \
-    wget https://dlcdn.apache.org/tomcat/tomcat-9/v${TOMCAT_VERSION}/bin/apache-tomcat-${TOMCAT_VERSION}.tar.gz && \
+    wget https://dlcdn.apache.org/tomcat/tomcat-10/v${TOMCAT_VERSION}/bin/apache-tomcat-${TOMCAT_VERSION}.tar.gz && \
     tar -xzvf apache-tomcat-${TOMCAT_VERSION}.tar.gz -C $TOMCAT_HOME --strip-components=1 && \
     rm apache-tomcat-${TOMCAT_VERSION}.tar.gz
 
-# Copia el archivo WAR al directorio webapps de Tomcat
 COPY target/tallerwebi-base-1.0-SNAPSHOT.war $TOMCAT_HOME/webapps/
 
-# Expone el puerto en el que Tomcat corre (por defecto 8080)
 EXPOSE 8080
 
-# Asigna permisos de ejecucion
 RUN chmod +x /opt/tomcat/bin/catalina.sh
 
-# Inicia el webserver
 CMD ["/opt/tomcat/bin/catalina.sh", "run"]
-
-# En Windows
-# Instalar Docker Desktop
-# Desde PowerShell o el terminal de IntelliJ/VS Code ejecutar: docker images -> nos muestra las imagenes existentes. Copiar el primer IMAGE ID o el correspondiente a la imagen deseada.
-# (opcional) Desde Docker Desktop: Ir a containers -> seleccionar el dato "image" del contenedor (si ya existe un contenedor para la imagen deseada) -> copiar el IMAGE ID (es el mismo que el paso anterior pero desde la app).
-# Ejecutar en PowerShell o el terminal de IntelliJ/VS Code: docker run -d -p 8080:8080 -it <IMAGE ID> -> vincula el puerto 8080 del contenedor con el puerto 8080 de nuestra maquina.
-# En el navegador: http://localhost:8080/tallerwebi-base-1.0-SNAPSHOT/login
