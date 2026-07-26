@@ -150,7 +150,7 @@ public class RepositorioUsuarioTest {
 
   private void entoncesSeGuardoElUsuario(String email, Usuario usuarioEsperado) {
     String hql = "FROM Usuario WHERE email = :email";
-    Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
+    Query query = this.sessionFactory.getCurrentSession().createQuery(hql, Usuario.class);
     query.setParameter("email", email);
     Usuario usuarioObtenido = (Usuario) query.getSingleResult();
     this.entoncesElUsuarioObtenidoEsCorrecto(usuarioEsperado, usuarioObtenido);
