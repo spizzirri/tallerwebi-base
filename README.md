@@ -19,10 +19,10 @@ Java es el lenguaje de programación con el que trabajaremos. El proyecto esta c
 
 ### Maven
 Maven es una herramienta que permite la gestión de proyectos (principalmente proyectos Java). Simplifica y estandariza el proceso de construcción del producto software. 
-* Es requisito tener instalado Java (mínimo Java 17 para Maven, Java 25 para el proyecto) y configuradas las variables de entorno (`JAVA_HOME` y `PATH`).
-* Descargar Maven desde el [sitio oficial](https://dlcdn.apache.org/maven/maven-3/3.8.9/binaries/apache-maven-3.8.9-bin.zip) y luego descomprimirlo en una carpeta (Puede estar junto a la instalación de Java o en otra carpeta).
+* Es requisito tener instalado Java 25 y configuradas las variables de entorno (`JAVA_HOME` y `PATH`).
+* Descargar Maven desde el [sitio oficial](https://dlcdn.apache.org/maven/maven-3/3.9.16/binaries/apache-maven-3.9.16-bin.zip) y luego descomprimirlo en una carpeta (Puede estar junto a la instalación de Java o en otra carpeta).
 * Configurar una variable de entorno con la clave `MAVEN_HOME` indicando en el valor, la ruta donde se descomprimió el archivo descargado. 
-    * Ejemplo: `/home/maven/apache-maven-3.9.11` (en Linux) o `C:\maven\apache-maven-3.9.11` (en Windows).
+    * Ejemplo: `/home/maven/apache-maven-3.9.16` (en Linux) o `C:\maven\apache-maven-3.9.16` (en Windows).
 * Configurar la variable de entorno `PATH` incluyendo la variable `MAVEN_HOME`: 
     * Agregamos: `%MAVEN_HOME%\bin` al listado existente.
 * Luego de guardar la configuración de las variables de entorno, ejecutamos en el CMD o Terminal `mvn -version`, debiendo visualizar como salida la versión de Maven descargada. Si el Terminal o CMD estaba abierto durante la configuración, hay que cerrarlo y abrir nuevamente.
@@ -47,7 +47,7 @@ Docker es una plataforma de contenedores que permite empaquetar aplicaciones con
 ```shell
 # Levantamos un BBDD con docker
 docker build -f DockerfileSQL -t mysql .
-docker run --env-file .env --name mysql-container -d -p 3306:3306 mysql
+docker run --env-file .env --name tallerwebi-mysql -d -p 3306:3306 mysql
 
 # Iniciamos el proyecto
 $ mvn clean jetty:run
@@ -94,7 +94,7 @@ $ npm run test
 ```
 
 ## 9. Docker:
-Los archivos de docker de este proyecto estan preparados para desplegar un archivo WAR usando el servido Jetty o Tomcat.
+Los archivos de docker de este proyecto estan preparados para desplegar un archivo WAR usando el servidor Jetty o Tomcat.
 El archivo de docker para Jetty y Tomcat esperan que el archivo WAR se debe llamar "tallerwebi-base-1.0-SNAPSHOT" para eso debemos modificar los atributos <artifactId> y <version> del archivo pom.xml. 
 
 Para generar un archivo WAR debemos ejecutar maven.
@@ -113,7 +113,7 @@ Una vez que tenemos la imagen generada, podemos instanciar un contenedor y ejecu
 docker run -p 8080:8080 tallerwebi
 ```
 
-### 9. Comandos básicos:
+### 9.1 Comandos básicos
 ```shell
 # Crear una imagen con el nombre "tallerwebi".
 docker build -f DockerfileJetty -t tallerwebi .
@@ -149,7 +149,7 @@ docker rmi <imageId>
 docker build -f DockerfileSQL -t mysql .
 
 # Instancia un contendor en base a la imagen mysql.
-docker run --env-file .env --name mysql-container -d -p 3306:3306 mysql # sudo apt install mysql-client
+docker run --env-file .env --name tallerwebi-mysql -d -p 3306:3306 mysql # sudo apt install mysql-client
 ```
 
 ## 10. docker-compose
@@ -160,8 +160,9 @@ mvn clean package
 # Invoco a docker-compose para que me genere contenedores de todos los servicios especificadas
 docker-compose up --build
 
-# Invoco a docker para que elimine los contenedores creados 
-docker-compose down
+# Invoco a docker para que elimine los contenedores creados
+# --rmi local indica que debe borrar los volumenes 
+docker-compose down --rmi local
 ```
 ## 11. Comandos de Maven
 Para ejecutar comandos de Maven, ya sea en el terminal integrado al IDE, o en otro terminal como el de Linux o Windows (CMD), se debe utilizar el comando principal `mvn` seguido del comando o fase del ciclo de vida a ejecutar. Ejemplo: `mvn clean`.
@@ -221,7 +222,7 @@ El proyecto integra varias herramientas para asegurar que el código sea limpio,
 
 ### PMD (Static Code Analyzer)
 Analiza el código Java en busca de problemas de diseño, variables no utilizadas, optimizaciones faltantes y malas prácticas.
-* **Se ejecuta en:** Fase `validate`.
+* **Se ejecuta en:** Fase `validate` (chequeo) y fase `test` (regeneración de reportes).
 * **Configuración:** Utiliza `pmd-reglas-de-codigo.xml`.
 * **Comandos:**
   * `mvn pmd:check`: Valida las reglas y falla si hay errores.
