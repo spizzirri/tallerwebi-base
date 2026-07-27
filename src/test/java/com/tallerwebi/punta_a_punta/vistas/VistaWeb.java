@@ -3,6 +3,7 @@ package com.tallerwebi.punta_a_punta.vistas;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 
 public class VistaWeb {
@@ -14,7 +15,7 @@ public class VistaWeb {
   }
 
   public URL obtenerURLActual() throws MalformedURLException {
-    URL url = new URL(page.url());
+    URL url = URI.create(page.url()).toURL();
     return url;
   }
 
