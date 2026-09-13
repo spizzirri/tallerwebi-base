@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Veterinarias adheridas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" th:href="@{/css/veterinarias.css}" />
+  </head>
+  <body class="veterinarias-page">
+    <header class="veterinarias-header">
+      <div class="veterinarias-header__brand">
+        <img
+          class="veterinarias-header__logo"
+          th:src="@{/img/logo.png}"
+          alt="Logo obra social veterinaria"
+          width="48"
+          height="48"
+        />
+        <div>
+          <p class="veterinarias-header__eyebrow">Obra social Medipet</p>
+          <h1 class="veterinarias-header__title">Veterinarias adheridas</h1>
+        </div>
+      </div>
+      <p class="veterinarias-header__subtitle">
+        Elegí dónde solicitar un turno para tu mascota.
+      </p>
+    </header>
+
+    <main class="veterinarias-main">
+      <section
+        th:if="${sinPrestadores}"
+        class="veterinarias-empty"
+        aria-live="polite"
+      >
+        <div class="veterinarias-empty__icon" aria-hidden="true">🐾</div>
+        <h2 class="veterinarias-empty__title">Sin prestadores por ahora</h2>
+        <p class="veterinarias-empty__text">
+          Todavía no hay veterinarias cargadas. Volvé a intentar más tarde.
+        </p>
+      </section>
+
+      <section th:unless="${sinPrestadores}" class="veterinarias-content">
+        <div class="veterinarias-search">
+          <label class="veterinarias-search__label" for="buscar-veterinaria">
+            Buscar por nombre o zona
+          </label>
+          <input
+            id="buscar-veterinaria"
+            class="veterinarias-search__input"
+            type="search"
+            placeholder="Ej: San Roque, San Justo..."
+            autocomplete="off"
+          />
+          <p
+            id="veterinarias-sin-resultados"
+            class="veterinarias-search__empty"
+            hidden
+          >
+            No encontramos veterinarias con ese criterio.
+          </p>
+        </div>
+        <!-- Lista de veterinarias -->
+        <!-- th:each="vet : ${veterinarias}" = recorre la lista de veterinarias y para cada una de ellas crea un elemento li -->
+        <ul class="veterinarias-list" id="veterinarias-lista">
+          <li
+            th:each="vet : ${veterinarias}"
+            class="veterinaria-card"
+            th:attr="data-nombre=${vet.nombre}, data-direccion=${vet.direccion}"
+          >
+            <div class="veterinaria-card__header">
+              <h2 class="veterinaria-card__nombre" th:text="${vet.nombre}">
+                Nombre
+              </h2>
+              <span
+                th:if="${vet.abiertoHoy}"
+                class="veterinaria-card__estado veterinaria-card__estado--abierto"
+                >Abierto hoy</span
+              >
+              <span
+                th:unless="${vet.abiertoHoy}"
+                class="veterinaria-card__estado veterinaria-card__estado--cerrado"
+                >Cerrado hoy</span
+              >
+            </div>
+
+            <div class="veterinaria-card__info">
+              <p class="veterinaria-card__fila">
+                <span class="veterinaria-card__icon" aria-hidden="true"
+                  >Icono de direccion</span
+                >
+                <span th:text="${vet.direccion}">Dirección</span>
+              </p>
+              <p class="veterinaria-card__fila">
+                <span class="veterinaria-card__icon" aria-hidden="true"
+                  >Icono de telefono</span
+                >
+                <a
+                  class="veterinaria-card__telefono"
+                  th:href="'tel:' + ${vet.telefono}"
+                  th:text="${vet.telefono}"
+                  >Teléfono</a
+                >
+              </p>
+            </div>
+
+            <div class="veterinaria-card__especialidades">
+              <span
+                th:each="esp : ${vet.especialidades}"
+                class="veterinaria-card__chip"
+                th:attr="data-especialidad=${esp.name()}"
+                th:text="${esp.name()}"
+                >Especialidad</span
+              >
+            </div>
+          </li>
+        </ul>
+      </section>
+
+      <a th:href="@{/home}" class="veterinarias-back">Volver al inicio</a>
+    </main>
+    <footer class="veterinarias-footer">
+      <p>Medipet - Todos los derechos reservados</p>
+    </footer>
+
+    <script th:src="@{/js/veterinarias.js}"></script>
+  </body>
+</html>

@@ -1,0 +1,12 @@
+package com.tallerwebi.dominio.entidades;
+
+public enum Especialidad {
+  CIRUGIA,
+  TRAUMATOLOGIA,
+  CIRUGIA_CARDIACA,
+  CIRUGIA_PLASTICA,
+  CIRUGIA_ESTETICA,
+  CIRUGIA_ORTOPEDICA,
+  CIRUGIA_TRAUMATOLOGICA,
+  CIRUGIA_NEUROSICA,
+}
