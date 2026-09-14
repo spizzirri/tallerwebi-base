@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Planes de cobertura</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+            href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap"
+            rel="stylesheet"
+    >
+
+    <link rel="stylesheet" th:href="@{/css/planes.css}">
+</head>
+
+<body>
+
+<header class="planes-header">
+
+    <div class="planes-header__brand">
+
+        <img
+                class="planes-header__logo"
+                th:src="@{/img/logo.png}"
+                alt="Logo Medipet"
+        >
+
+        <div>
+            <p class="planes-header__eyebrow">
+                Obra social Medipet
+            </p>
+
+            <h1 class="planes-header__title">
+                Nuestros planes
+            </h1>
+        </div>
+
+    </div>
+
+    <p class="planes-header__subtitle">
+        Cuidamos la salud de tu mascota en cada etapa de su vida.
+    </p>
+
+    <a th:href="@{/veterinarias}" class="planes-header__volver">
+        Volver a veterinarias
+    </a>
+
+</header>
+
+
+<main class="planes-main">
+
+    <section class="planes-intro">
+
+        <p class="planes-intro__eyebrow">
+            EL PLAN IDEAL PARA CADA NECESIDAD
+        </p>
+
+        <h2 class="planes-intro__title">
+            Elegí el mejor cuidado para tu mascota
+        </h2>
+
+        <div class="planes-intro__linea"></div>
+
+        <p class="planes-intro__texto">
+            Planes diseñados para acompañarlos en todas las etapas de su vida,
+            con la mejor atención veterinaria.
+        </p>
+
+    </section>
+
+
+    <section class="planes-container">
+
+        <!-- PLAN BÁSICO -->
+        <article class="plan-card">
+
+            <div class="plan-card__header">
+
+                <div class="plan-card__icon plan-card__icon--basico"></div>
+
+                <div>
+                    <h2 class="plan-card__nombre">
+                        Plan Básico
+                    </h2>
+
+                    <p class="plan-card__tipo">
+                        PREVENCIÓN Y BIENESTAR
+                    </p>
+                </div>
+
+            </div>
+
+            <p class="plan-card__descripcion">
+                Prevención y atención primaria.
+                Incluye clínica general y vacunación.
+            </p>
+
+            <ul class="plan-card__beneficios">
+                <li>Consultas de clínica general</li>
+                <li>Vacunación anual</li>
+                <li>Control de salud preventivo</li>
+                <li>Orientación veterinaria</li>
+                <li>Ideal para el cuidado cotidiano</li>
+            </ul>
+
+            <div class="plan-card__precio">
+                <span class="plan-card__precio-numero">
+                    $20.000
+                </span>
+
+                <span class="plan-card__precio-mes">
+                    / mes
+                </span>
+            </div>
+
+            <a href="#" class="plan-card__boton">
+                Elegir Plan Básico &#8594;
+            </a>
+
+        </article>
+
+
+        <!-- PLAN PREMIUM -->
+        <article class="plan-card plan-card--premium">
+
+            <div class="plan-card__header">
+
+                <div class="plan-card__icon plan-card__icon--premium"></div>
+
+                <div>
+                    <h2 class="plan-card__nombre">
+                        Plan Premium
+                    </h2>
+
+                    <p class="plan-card__tipo">
+                        COBERTURA COMPLETA
+                    </p>
+                </div>
+
+            </div>
+
+            <p class="plan-card__descripcion">
+                Cobertura de alta complejidad.
+                Incluye especialistas y estudios complejos.
+            </p>
+
+            <ul class="plan-card__beneficios">
+                <li>Consultas con especialistas</li>
+                <li>Estudios de alta complejidad</li>
+                <li>Cirugías y tratamientos avanzados</li>
+                <li>Vacunación y controles preventivos</li>
+                <li>Atención integral en todas las etapas</li>
+            </ul>
+
+            <div class="plan-card__precio">
+                <span class="plan-card__precio-numero">
+                    $50.000
+                </span>
+
+                <span class="plan-card__precio-mes">
+                    / mes
+                </span>
+            </div>
+
+            <a href="#" class="plan-card__boton">
+                Elegir Plan Premium &#8594;
+            </a>
+
+        </article>
+
+    </section>
+
+</main>
+
+</body>
+</html>
