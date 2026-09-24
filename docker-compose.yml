@@ -18,6 +18,12 @@ services:
     networks:
       - tallerwebi-network
     restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
 
   jetty-app:
     build:
@@ -27,7 +33,8 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     networks:
       - tallerwebi-network
     restart: unless-stopped
@@ -37,6 +44,8 @@ services:
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
+
+
 
 volumes:
   mysql_data:

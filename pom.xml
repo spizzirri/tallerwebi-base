@@ -145,6 +145,8 @@
                 <version>3.5.3</version>
 
                 <configuration>
+                    <!-- Permite a Mockito inyectar agentes en Java 25 sin pisar a Jacoco -->
+                    <argLine>@{argLine} -XX:+EnableDynamicAgentLoading</argLine>
                     <!-- Configuración específica para las pruebas -->
                     <includes>
                         <include>**/*Test.java</include>
