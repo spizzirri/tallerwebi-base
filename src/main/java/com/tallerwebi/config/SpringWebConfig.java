@@ -43,6 +43,7 @@ public class SpringWebConfig implements WebMvcConfigurer {
     templateResolver.setSuffix(".html");
     // HTML is the default value, added here for the sake of clarity.
     templateResolver.setTemplateMode(TemplateMode.HTML);
+    templateResolver.setCharacterEncoding("UTF-8");
     // Template cache is true by default. Set to false if you want
     // templates to be automatically updated when modified.
     templateResolver.setCacheable(true);
@@ -71,6 +72,9 @@ public class SpringWebConfig implements WebMvcConfigurer {
   public ThymeleafViewResolver viewResolver() {
     ThymeleafViewResolver viewResolver = new ThymeleafViewResolver();
     viewResolver.setTemplateEngine(templateEngine());
+    // Sin esto las páginas salen como ISO-8859-1 y los formularios con tildes
+    // (ej. "García") llegan como UTF-8 inválido y Jetty responde 400.
+    viewResolver.setCharacterEncoding("UTF-8");
     return viewResolver;
   }
 }

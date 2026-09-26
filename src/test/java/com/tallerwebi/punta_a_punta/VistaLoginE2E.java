@@ -6,7 +6,7 @@ import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
 
 import com.microsoft.playwright.*;
 import com.tallerwebi.punta_a_punta.vistas.VistaLogin;
-import com.tallerwebi.punta_a_punta.vistas.VistaNuevoUsuario;
+import com.tallerwebi.punta_a_punta.vistas.VistaRegistro;
 import java.net.MalformedURLException;
 import java.net.URL;
 import org.junit.jupiter.api.AfterAll;
@@ -112,9 +112,11 @@ public class VistaLoginE2E {
   }
 
   private void dadoQueElUsuarioSeRegistraCon(String email, String clave) {
-    VistaNuevoUsuario vistaNuevoUsuario = new VistaNuevoUsuario(context.pages().get(0));
-    vistaNuevoUsuario.escribirEMAIL(email);
-    vistaNuevoUsuario.escribirClave(clave);
-    vistaNuevoUsuario.darClickEnRegistrarme();
+    VistaRegistro vistaRegistro = new VistaRegistro(context.pages().get(0));
+    vistaRegistro.escribirDatosDelSocio("Juan", "Pérez", "30123456");
+    vistaRegistro.escribirEMAIL(email);
+    vistaRegistro.escribirClave(clave);
+    vistaRegistro.escribirDatosDeLaMascota("Firulais", "PERRO");
+    vistaRegistro.darClickEnRegistrarme();
   }
 }

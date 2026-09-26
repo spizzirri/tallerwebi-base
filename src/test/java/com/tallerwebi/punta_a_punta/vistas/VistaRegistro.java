@@ -2,10 +2,16 @@ package com.tallerwebi.punta_a_punta.vistas;
 
 import com.microsoft.playwright.Page;
 
-public class VistaNuevoUsuario extends VistaWeb {
+public class VistaRegistro extends VistaWeb {
 
-  public VistaNuevoUsuario(Page page) {
+  public VistaRegistro(Page page) {
     super(page);
+  }
+
+  public void escribirDatosDelSocio(String nombre, String apellido, String dni) {
+    this.escribirEnElElemento("#nombre", nombre);
+    this.escribirEnElElemento("#apellido", apellido);
+    this.escribirEnElElemento("#dni", dni);
   }
 
   public void escribirEMAIL(String email) {
@@ -14,6 +20,11 @@ public class VistaNuevoUsuario extends VistaWeb {
 
   public void escribirClave(String clave) {
     this.escribirEnElElemento("#password", clave);
+  }
+
+  public void escribirDatosDeLaMascota(String nombre, String especie) {
+    this.escribirEnElElemento("#nombreMascota", nombre);
+    this.page.selectOption("#especie", especie);
   }
 
   public void darClickEnRegistrarme() {
