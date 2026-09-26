@@ -29,4 +29,13 @@ public class RepositorioSocioImpl implements RepositorioSocio {
       .setParameter("dni", dni)
       .uniqueResult();
   }
+
+  @Override
+  public Socio buscarPorUsuario(Long usuarioId) {
+    return sessionFactory
+      .getCurrentSession()
+      .createQuery("select distinct s from Socio s where s.usuario.id = :usuarioId", Socio.class)
+      .setParameter("usuarioId", usuarioId)
+      .uniqueResult();
+  }
 }

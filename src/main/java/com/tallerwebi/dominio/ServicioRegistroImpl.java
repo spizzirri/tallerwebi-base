@@ -16,21 +16,28 @@ public class ServicioRegistroImpl implements ServicioRegistro {
 
   private RepositorioSocio repositorioSocio;
   private RepositorioUsuario repositorioUsuario;
+  private RepositorioPlan repositorioPlan;
 
   @Autowired
   public ServicioRegistroImpl(
     RepositorioSocio repositorioSocio,
-    RepositorioUsuario repositorioUsuario
+    RepositorioUsuario repositorioUsuario,
+    RepositorioPlan repositorioPlan
   ) {
     this.repositorioSocio = repositorioSocio;
     this.repositorioUsuario = repositorioUsuario;
+    this.repositorioPlan = repositorioPlan;
   }
 
   @Override
-  public void registrarSocio(Socio socio, Mascota mascota)
+  public void registrarSocio(Socio socio, Mascota mascota, Long planId)
     throws UsuarioExistente, SocioExistente, DatosDeRegistroInvalidos {
     validarSocio(socio);
     validarMascota(mascota);
+    Plan plan = planId == null ? null : repositorioPlan.buscarPorId(planId);
+    if (plan == null) {
+      throw new DatosDeRegistroInvalidos("Elegí un plan para tu mascota");
+    }
 
     if (repositorioUsuario.buscar(socio.getUsuario().getEmail()) != null) {
       throw new UsuarioExistente();
@@ -41,6 +48,7 @@ public class ServicioRegistroImpl implements ServicioRegistro {
 
     socio.getUsuario().setRol(ROL_SOCIO);
     socio.getUsuario().activar();
+    mascota.setPlan(plan);
     socio.agregarMascota(mascota);
     repositorioSocio.guardar(socio);
   }

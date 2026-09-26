@@ -9,6 +9,7 @@ import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.Especie;
 import com.tallerwebi.dominio.Mascota;
+import com.tallerwebi.dominio.ServicioPlan;
 import com.tallerwebi.dominio.ServicioRegistro;
 import com.tallerwebi.dominio.Socio;
 import com.tallerwebi.dominio.excepcion.DatosDeRegistroInvalidos;
@@ -22,12 +23,14 @@ public class ControladorRegistroTest {
 
   private ControladorRegistro controladorRegistro;
   private ServicioRegistro servicioRegistroMock;
+  private ServicioPlan servicioPlanMock;
   private DatosRegistro datosRegistro;
 
   @BeforeEach
   public void init() {
     servicioRegistroMock = mock(ServicioRegistro.class);
-    controladorRegistro = new ControladorRegistro(servicioRegistroMock);
+    servicioPlanMock = mock(ServicioPlan.class);
+    controladorRegistro = new ControladorRegistro(servicioRegistroMock, servicioPlanMock);
 
     datosRegistro = new DatosRegistro();
     datosRegistro.setNombre("Juan");
@@ -53,13 +56,14 @@ public class ControladorRegistroTest {
     throws Exception {
     ModelAndView modelAndView = controladorRegistro.registrarme(datosRegistro);
 
-    assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/login"));
-    verify(servicioRegistroMock, times(1)).registrarSocio(any(Socio.class), any(Mascota.class));
+    assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/login?registrado"));
+    verify(servicioRegistroMock, times(1))
+      .registrarSocio(any(Socio.class), any(Mascota.class), any());
   }
 
   @Test
   public void registrarmeConEmailExistenteDeberiaVolverAlFormularioConError() throws Exception {
-    doThrow(UsuarioExistente.class).when(servicioRegistroMock).registrarSocio(any(), any());
+    doThrow(UsuarioExistente.class).when(servicioRegistroMock).registrarSocio(any(), any(), any());
 
     ModelAndView modelAndView = controladorRegistro.registrarme(datosRegistro);
 
@@ -72,7 +76,7 @@ public class ControladorRegistroTest {
 
   @Test
   public void registrarmeConDniExistenteDeberiaVolverAlFormularioConError() throws Exception {
-    doThrow(SocioExistente.class).when(servicioRegistroMock).registrarSocio(any(), any());
+    doThrow(SocioExistente.class).when(servicioRegistroMock).registrarSocio(any(), any(), any());
 
     ModelAndView modelAndView = controladorRegistro.registrarme(datosRegistro);
 
@@ -88,7 +92,7 @@ public class ControladorRegistroTest {
     throws Exception {
     doThrow(new DatosDeRegistroInvalidos("Tenés que registrar al menos una mascota"))
       .when(servicioRegistroMock)
-      .registrarSocio(any(), any());
+      .registrarSocio(any(), any(), any());
 
     ModelAndView modelAndView = controladorRegistro.registrarme(datosRegistro);
 

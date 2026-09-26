@@ -1,0 +1,88 @@
+<!DOCTYPE HTML>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('Sacar turno')}"></head>
+
+<body>
+
+  <nav th:replace="~{fragments/layout :: nav}"></nav>
+
+  <main role="main" class="container" style="max-width:760px;">
+    <h1 class="h2">Sacar turno</h1>
+
+    <p th:if="${error != null}" id="error-turno" class="alert alert-danger" th:text="${error}"></p>
+
+    <!-- Cada cambio en mascota, veterinaria o fecha recarga la página (GET) para mostrar
+         los servicios y horarios que corresponden. El botón final envía por POST. -->
+    <form id="form-turno" th:action="@{/turnos/nuevo}" method="GET" th:object="${solicitud}">
+
+      <div class="mb-3">
+        <label for="mascotaId" class="form-label">1. Mascota</label>
+        <select th:field="*{mascotaId}" id="mascotaId" class="form-select" onchange="this.form.submit()" required>
+          <option value="">Elegí una mascota</option>
+          <option th:each="m : ${mascotas}" th:value="${m.id}"
+            th:text="${m.nombre} + ' (' + (${m.plan != null} ? ${m.plan.nombre} : 'sin plan') + ')'"></option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label for="veterinariaId" class="form-label">2. Veterinaria</label>
+        <select th:field="*{veterinariaId}" id="veterinariaId" class="form-select" onchange="this.form.submit()"
+          required>
+          <option value="">Elegí una veterinaria</option>
+          <option th:each="v : ${veterinarias}" th:value="${v.id}" th:text="${v.nombre} + ' — ' + ${v.direccion}">
+          </option>
+        </select>
+      </div>
+
+      <div class="mb-3" th:if="*{veterinariaId != null}">
+        <label for="servicioId" class="form-label">3. Servicio</label>
+        <p th:if="*{mascotaId == null}" class="text-muted mb-0">
+          Elegí la mascota para ver qué servicios cubre su plan.
+        </p>
+        <select th:unless="*{mascotaId == null}" th:field="*{servicioId}" id="servicioId" class="form-select"
+          required>
+          <option value="">Elegí un servicio</option>
+          <option th:each="item : ${servicios}" th:value="${item.servicio.id}" th:disabled="${!item.incluido}"
+            th:text="${item.servicio.nombre} + (${item.incluido} ? '' : ' — no incluido en el plan')"></option>
+        </select>
+      </div>
+
+      <div class="mb-3" th:if="*{veterinariaId != null}">
+        <label for="fecha" class="form-label">4. Fecha</label>
+        <input th:field="*{fecha}" id="fecha" type="date" class="form-control" th:min="${hoy}"
+          onchange="this.form.submit()" required />
+        <div class="form-text">Las veterinarias atienden de lunes a viernes.</div>
+      </div>
+
+      <div class="mb-3" th:if="*{fecha != null and veterinariaId != null}">
+        <span class="form-label d-block">5. Horario</span>
+        <p th:if="${#lists.isEmpty(horarios)}" class="text-muted">
+          No hay horarios disponibles ese día. Probá con otra fecha.
+        </p>
+        <div class="d-flex flex-wrap gap-2 horarios">
+          <th:block th:each="h, i : ${horarios}">
+            <input type="radio" class="btn-check" name="hora" th:id="'hora-' + ${i.index}" th:value="${h}"
+              th:checked="${h == solicitud.hora}" required>
+            <label class="btn btn-outline-primary btn-sm" th:for="'hora-' + ${i.index}" th:text="${h}">09:00</label>
+          </th:block>
+        </div>
+      </div>
+
+      <div class="mb-3" th:if="*{veterinariaId != null}">
+        <label for="observaciones" class="form-label">Observaciones (opcional)</label>
+        <textarea th:field="*{observaciones}" id="observaciones" class="form-control" rows="2"
+          maxlength="255"></textarea>
+      </div>
+
+      <button id="btn-confirmar-turno" class="btn btn-primary btn-lg" type="submit" th:formaction="@{/turnos}"
+        formmethod="post" th:disabled="${#lists.isEmpty(horarios)}">Confirmar turno</button>
+      <a class="btn btn-link" th:href="@{/home}">Cancelar</a>
+    </form>
+  </main>
+
+  <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+
+</body>
+
+</html>

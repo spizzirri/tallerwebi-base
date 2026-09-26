@@ -13,6 +13,15 @@ public class DatosRegistro {
   private String email;
   private String password;
   private Mascota mascota = new Mascota();
+  private Long planId;
+
+  public Long getPlanId() {
+    return planId;
+  }
+
+  public void setPlanId(Long planId) {
+    this.planId = planId;
+  }
 
   public Socio crearSocio() {
     Usuario usuario = new Usuario();

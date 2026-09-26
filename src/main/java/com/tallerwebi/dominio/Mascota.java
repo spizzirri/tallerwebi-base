@@ -32,6 +32,21 @@ public class Mascota {
   @ManyToOne
   private Socio socio;
 
+  @ManyToOne
+  private Plan plan;
+
+  public boolean tieneCubierto(Servicio servicio) {
+    return plan != null && plan.cubre(servicio);
+  }
+
+  public Plan getPlan() {
+    return plan;
+  }
+
+  public void setPlan(Plan plan) {
+    this.plan = plan;
+  }
+
   public Long getId() {
     return id;
   }

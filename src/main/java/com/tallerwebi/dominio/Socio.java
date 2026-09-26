@@ -3,6 +3,7 @@ package com.tallerwebi.dominio;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -31,12 +32,16 @@ public class Socio {
   @OneToOne(cascade = CascadeType.ALL)
   private Usuario usuario;
 
-  @OneToMany(mappedBy = "socio", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "socio", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   private List<Mascota> mascotas = new ArrayList<>();
 
   public void agregarMascota(Mascota mascota) {
     mascota.setSocio(this);
     mascotas.add(mascota);
+  }
+
+  public Mascota buscarMascota(Long mascotaId) {
+    return mascotas.stream().filter(m -> m.getId().equals(mascotaId)).findFirst().orElse(null);
   }
 
   public Long getId() {

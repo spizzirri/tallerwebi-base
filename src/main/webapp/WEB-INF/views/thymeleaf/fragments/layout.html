@@ -1,0 +1,53 @@
+<!DOCTYPE HTML>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:fragment="head(titulo)">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <title th:text="'MediPet - ' + ${titulo}">MediPet</title>
+
+  <!-- Boostrap core css -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+
+  <!-- custom style -->
+  <link rel="stylesheet" th:href="@{/css/main.css}" />
+  <link rel="stylesheet" th:href="@{/css/medipet.css}" />
+</head>
+
+<body>
+
+  <nav th:fragment="nav" class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+    <div class="container">
+      <a class="navbar-brand" th:href="@{/home}">MediPet</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu"
+        aria-controls="menu" aria-expanded="false" aria-label="Abrir menú"
+        th:if="${session.USUARIO_ID != null}">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="menu" th:if="${session.USUARIO_ID != null}">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item"><a class="nav-link" th:href="@{/veterinarias}">Veterinarias</a></li>
+          <li class="nav-item"><a class="nav-link" th:href="@{/servicios}">Servicios</a></li>
+          <li class="nav-item"><a class="nav-link" th:href="@{/turnos/nuevo}">Sacar turno</a></li>
+          <li class="nav-item"><a class="nav-link" th:href="@{/turnos}">Mis turnos</a></li>
+        </ul>
+        <span class="navbar-text me-3" th:text="${session.EMAIL}"></span>
+        <form th:action="@{/logout}" method="POST" class="d-flex">
+          <button id="btn-logout" class="btn btn-outline-light btn-sm" type="submit">Salir</button>
+        </form>
+      </div>
+    </div>
+  </nav>
+
+  <th:block th:fragment="scripts">
+    <!-- Boostrap core js -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
+      crossorigin="anonymous"></script>
+  </th:block>
+
+</body>
+
+</html>

@@ -49,9 +49,9 @@ public class VistaLoginE2E {
   }
 
   @Test
-  void deberiaDecirUNLAMEnElNavbar() throws MalformedURLException {
+  void deberiaDecirMediPetEnElNavbar() throws MalformedURLException {
     dadoQueElUsuarioEstaEnLaVistaDeLogin();
-    entoncesDeberiaVerUNLAMEnElNavbar();
+    entoncesDeberiaVerMediPetEnElNavbar();
   }
 
   @Test
@@ -78,9 +78,9 @@ public class VistaLoginE2E {
     entoncesDeberiaSerRedirigidoALaVistaDeHome();
   }
 
-  private void entoncesDeberiaVerUNLAMEnElNavbar() {
+  private void entoncesDeberiaVerMediPetEnElNavbar() {
     String texto = vistaLogin.obtenerTextoDeLaBarraDeNavegacion();
-    assertThat("UNLAM", equalToIgnoringCase(texto));
+    assertThat("MediPet", equalToIgnoringCase(texto));
   }
 
   private void dadoQueElUsuarioEstaEnLaVistaDeLogin() throws MalformedURLException {
@@ -117,6 +117,7 @@ public class VistaLoginE2E {
     vistaRegistro.escribirEMAIL(email);
     vistaRegistro.escribirClave(clave);
     vistaRegistro.escribirDatosDeLaMascota("Firulais", "PERRO");
+    vistaRegistro.elegirPlan("Plan Básico — $20.000 por mes");
     vistaRegistro.darClickEnRegistrarme();
   }
 }

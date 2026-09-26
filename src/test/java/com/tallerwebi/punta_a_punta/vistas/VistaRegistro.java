@@ -27,6 +27,11 @@ public class VistaRegistro extends VistaWeb {
     this.page.selectOption("#especie", especie);
   }
 
+  public void elegirPlan(String nombrePlan) {
+    this.page.locator("#plan")
+      .selectOption(new com.microsoft.playwright.options.SelectOption().setLabel(nombrePlan));
+  }
+
   public void darClickEnRegistrarme() {
     this.darClickEnElElemento("#btn-registrarme");
   }

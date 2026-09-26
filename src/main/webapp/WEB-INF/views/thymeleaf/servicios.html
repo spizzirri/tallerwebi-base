@@ -1,0 +1,56 @@
+<!DOCTYPE HTML>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('Servicios')}"></head>
+
+<body>
+
+  <nav th:replace="~{fragments/layout :: nav}"></nav>
+
+  <main role="main" class="container">
+    <h1 class="h2">Servicios</h1>
+    <p class="text-muted" th:if="${mascota != null}">
+      Cobertura según el plan de
+      <strong th:text="${mascota.nombre}">mascota</strong>:
+      <span class="badge bg-secondary" th:text="${mascota.plan != null} ? ${mascota.plan.nombre} : 'Sin plan'">Plan</span>
+    </p>
+
+    <form th:action="@{/servicios}" method="GET" class="row g-2 align-items-end my-3">
+      <div class="col-sm-6 col-md-4" th:unless="${#lists.isEmpty(mascotas)}">
+        <label for="mascotaId" class="form-label">Ver cobertura de</label>
+        <select id="mascotaId" name="mascotaId" class="form-select" onchange="this.form.submit()">
+          <option th:each="m : ${mascotas}" th:value="${m.id}" th:text="${m.nombre}"
+            th:selected="${mascota != null and m.id == mascota.id}"></option>
+        </select>
+      </div>
+      <div class="col-sm-6 col-md-4">
+        <label for="filtro" class="form-label">Mostrar</label>
+        <select id="filtro" name="filtro" class="form-select" onchange="this.form.submit()">
+          <option value="TODOS" th:selected="${filtro.name() == 'TODOS'}">Todos los servicios</option>
+          <option value="INCLUIDOS" th:selected="${filtro.name() == 'INCLUIDOS'}">Solo incluidos</option>
+          <option value="NO_INCLUIDOS" th:selected="${filtro.name() == 'NO_INCLUIDOS'}">Solo no incluidos</option>
+        </select>
+      </div>
+      <noscript><div class="col-auto"><button class="btn btn-secondary">Aplicar</button></div></noscript>
+    </form>
+
+    <p th:if="${#lists.isEmpty(items)}" class="alert alert-info">No hay servicios para mostrar con ese filtro.</p>
+
+    <ul class="list-group">
+      <li class="list-group-item d-flex justify-content-between align-items-start servicio"
+        th:each="item : ${items}" th:classappend="${item.incluido} ? 'incluido' : 'no-incluido'">
+        <div>
+          <strong th:text="${item.servicio.nombre}">Servicio</strong>
+          <div class="small text-muted" th:text="${item.servicio.descripcion}">Descripción</div>
+        </div>
+        <span th:if="${item.incluido}" class="badge text-bg-success">✅ Incluido en tu plan</span>
+        <span th:unless="${item.incluido}" class="badge text-bg-secondary">🔒 No incluido</span>
+      </li>
+    </ul>
+  </main>
+
+  <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+
+</body>
+
+</html>

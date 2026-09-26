@@ -1,11 +1,13 @@
 package com.tallerwebi.config;
 
+import com.tallerwebi.presentacion.InterceptorSesion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.thymeleaf.spring6.SpringTemplateEngine;
@@ -29,6 +31,13 @@ public class SpringWebConfig implements WebMvcConfigurer {
     registry.addResourceHandler("/css/**").addResourceLocations("/resources/core/css/");
     registry.addResourceHandler("/js/**").addResourceLocations("/resources/core/js/");
     registry.addResourceHandler("/webjars/**").addResourceLocations("/webjars/");
+  }
+
+  @Override
+  public void addInterceptors(InterceptorRegistry registry) {
+    registry
+      .addInterceptor(new InterceptorSesion())
+      .addPathPatterns("/home", "/veterinarias/**", "/servicios/**", "/turnos/**");
   }
 
   // https://www.thymeleaf.org/doc/tutorials/3.0/thymeleafspring.html

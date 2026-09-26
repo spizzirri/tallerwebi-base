@@ -16,15 +16,24 @@ import org.junit.jupiter.api.Test;
 
 public class ServicioRegistroTest {
 
+  private static final Long PLAN_ID = 1L;
+
   private ServicioRegistro servicioRegistro;
   private RepositorioSocio repositorioSocioMock;
   private RepositorioUsuario repositorioUsuarioMock;
+  private RepositorioPlan repositorioPlanMock;
+  private Plan planBasico;
 
   @BeforeEach
   public void init() {
     repositorioSocioMock = mock(RepositorioSocio.class);
     repositorioUsuarioMock = mock(RepositorioUsuario.class);
-    servicioRegistro = new ServicioRegistroImpl(repositorioSocioMock, repositorioUsuarioMock);
+    repositorioPlanMock = mock(RepositorioPlan.class);
+    planBasico = new Plan();
+    planBasico.setNivel(1);
+    when(repositorioPlanMock.buscarPorId(PLAN_ID)).thenReturn(planBasico);
+    servicioRegistro =
+      new ServicioRegistroImpl(repositorioSocioMock, repositorioUsuarioMock, repositorioPlanMock);
   }
 
   @Test
@@ -32,7 +41,7 @@ public class ServicioRegistroTest {
     Socio socio = dadoUnSocioValido();
     Mascota mascota = dadaUnaMascotaValida();
 
-    servicioRegistro.registrarSocio(socio, mascota);
+    servicioRegistro.registrarSocio(socio, mascota, PLAN_ID);
 
     verify(repositorioSocioMock, times(1)).guardar(socio);
     assertThat(socio.getMascotas(), contains(mascota));
@@ -40,10 +49,28 @@ public class ServicioRegistroTest {
   }
 
   @Test
+  public void registrarUnSocioDeberiaAsignarleElPlanElegidoASuMascota() throws Exception {
+    Mascota mascota = dadaUnaMascotaValida();
+
+    servicioRegistro.registrarSocio(dadoUnSocioValido(), mascota, PLAN_ID);
+
+    assertThat(mascota.getPlan(), is(planBasico));
+  }
+
+  @Test
+  public void registrarUnaMascotaSinPlanDeberiaLanzarDatosInvalidos() {
+    assertThrows(
+      DatosDeRegistroInvalidos.class,
+      () -> servicioRegistro.registrarSocio(dadoUnSocioValido(), dadaUnaMascotaValida(), 99L)
+    );
+    verify(repositorioSocioMock, never()).guardar(any());
+  }
+
+  @Test
   public void registrarUnSocioDeberiaDejarSuUsuarioActivoYConRolSocio() throws Exception {
     Socio socio = dadoUnSocioValido();
 
-    servicioRegistro.registrarSocio(socio, dadaUnaMascotaValida());
+    servicioRegistro.registrarSocio(socio, dadaUnaMascotaValida(), PLAN_ID);
 
     assertThat(socio.getUsuario().getRol(), equalTo("SOCIO"));
     assertThat(socio.getUsuario().getActivo(), is(true));
@@ -56,7 +83,7 @@ public class ServicioRegistroTest {
 
     assertThrows(
       UsuarioExistente.class,
-      () -> servicioRegistro.registrarSocio(socio, dadaUnaMascotaValida())
+      () -> servicioRegistro.registrarSocio(socio, dadaUnaMascotaValida(), PLAN_ID)
     );
     verify(repositorioSocioMock, never()).guardar(any());
   }
@@ -68,7 +95,7 @@ public class ServicioRegistroTest {
 
     assertThrows(
       SocioExistente.class,
-      () -> servicioRegistro.registrarSocio(socio, dadaUnaMascotaValida())
+      () -> servicioRegistro.registrarSocio(socio, dadaUnaMascotaValida(), PLAN_ID)
     );
     verify(repositorioSocioMock, never()).guardar(any());
   }
@@ -77,7 +104,7 @@ public class ServicioRegistroTest {
   public void registrarUnSocioSinMascotaDeberiaLanzarDatosInvalidos() {
     assertThrows(
       DatosDeRegistroInvalidos.class,
-      () -> servicioRegistro.registrarSocio(dadoUnSocioValido(), null)
+      () -> servicioRegistro.registrarSocio(dadoUnSocioValido(), null, PLAN_ID)
     );
   }
 
@@ -88,7 +115,7 @@ public class ServicioRegistroTest {
 
     assertThrows(
       DatosDeRegistroInvalidos.class,
-      () -> servicioRegistro.registrarSocio(dadoUnSocioValido(), mascota)
+      () -> servicioRegistro.registrarSocio(dadoUnSocioValido(), mascota, PLAN_ID)
     );
   }
 
@@ -99,7 +126,7 @@ public class ServicioRegistroTest {
 
     assertThrows(
       DatosDeRegistroInvalidos.class,
-      () -> servicioRegistro.registrarSocio(dadoUnSocioValido(), mascota)
+      () -> servicioRegistro.registrarSocio(dadoUnSocioValido(), mascota, PLAN_ID)
     );
   }
 
@@ -110,7 +137,7 @@ public class ServicioRegistroTest {
 
     assertThrows(
       DatosDeRegistroInvalidos.class,
-      () -> servicioRegistro.registrarSocio(dadoUnSocioValido(), mascota)
+      () -> servicioRegistro.registrarSocio(dadoUnSocioValido(), mascota, PLAN_ID)
     );
   }
 
@@ -121,7 +148,7 @@ public class ServicioRegistroTest {
 
     assertThrows(
       DatosDeRegistroInvalidos.class,
-      () -> servicioRegistro.registrarSocio(dadoUnSocioValido(), mascota)
+      () -> servicioRegistro.registrarSocio(dadoUnSocioValido(), mascota, PLAN_ID)
     );
   }
 
@@ -132,7 +159,7 @@ public class ServicioRegistroTest {
 
     assertThrows(
       DatosDeRegistroInvalidos.class,
-      () -> servicioRegistro.registrarSocio(socio, dadaUnaMascotaValida())
+      () -> servicioRegistro.registrarSocio(socio, dadaUnaMascotaValida(), PLAN_ID)
     );
   }
 
@@ -143,7 +170,7 @@ public class ServicioRegistroTest {
 
     assertThrows(
       DatosDeRegistroInvalidos.class,
-      () -> servicioRegistro.registrarSocio(socio, dadaUnaMascotaValida())
+      () -> servicioRegistro.registrarSocio(socio, dadaUnaMascotaValida(), PLAN_ID)
     );
   }
 
@@ -154,7 +181,7 @@ public class ServicioRegistroTest {
 
     assertThrows(
       DatosDeRegistroInvalidos.class,
-      () -> servicioRegistro.registrarSocio(socio, dadaUnaMascotaValida())
+      () -> servicioRegistro.registrarSocio(socio, dadaUnaMascotaValida(), PLAN_ID)
     );
   }
 

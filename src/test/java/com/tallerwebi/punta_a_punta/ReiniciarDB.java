@@ -14,12 +14,14 @@ public class ReiniciarDB {
         ? System.getenv("DB_PASSWORD")
         : "user";
 
+      // Deja solo los datos de data.sql: el admin de prueba (id 1), el socio de demo
+      // (usuario 2, socio 1, mascotas 1 y 2) y el catálogo, que no se modifica.
       String sqlCommands =
-        "DELETE FROM Mascota;\n" +
-        "DELETE FROM Socio;\n" +
-        "DELETE FROM Usuario;\n" +
-        "ALTER TABLE Usuario AUTO_INCREMENT = 1;\n" +
-        "INSERT INTO Usuario(id, email, password, rol, activo) VALUES(null, 'test@unlam.edu.ar', 'test', 'ADMIN', true);";
+        "DELETE FROM Turno;\n" +
+        "DELETE FROM Mascota WHERE id > 2;\n" +
+        "DELETE FROM Socio WHERE id > 1;\n" +
+        "DELETE FROM Usuario WHERE id > 2;\n" +
+        "ALTER TABLE Usuario AUTO_INCREMENT = 3;";
 
       String comando = String.format(
         "docker exec tallerwebi-mysql mysql -h %s -P %s -u %s -p%s %s -e \"%s\"",

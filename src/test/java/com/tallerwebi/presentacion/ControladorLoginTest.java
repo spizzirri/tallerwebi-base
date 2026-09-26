@@ -69,6 +69,30 @@ public class ControladorLoginTest {
   }
 
   @Test
+  public void loginCorrectoDeberiaGuardarElIdYElEmailDelUsuarioEnLaSesion() {
+    Usuario usuario = new Usuario();
+    usuario.setId(7L);
+    usuario.setEmail("dami@unlam.com");
+    when(requestMock.getSession()).thenReturn(sessionMock);
+    when(servicioLoginMock.consultarUsuario(anyString(), anyString())).thenReturn(usuario);
+
+    controladorLogin.validarLogin(datosLoginMock, requestMock);
+
+    verify(sessionMock).setAttribute(ControladorLogin.USUARIO_ID, 7L);
+    verify(sessionMock).setAttribute(ControladorLogin.EMAIL, "dami@unlam.com");
+  }
+
+  @Test
+  public void cerrarSesionDeberiaInvalidarLaSesionYVolverAlLogin() {
+    when(requestMock.getSession(false)).thenReturn(sessionMock);
+
+    ModelAndView modelAndView = controladorLogin.cerrarSesion(requestMock);
+
+    verify(sessionMock, times(1)).invalidate();
+    assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/login"));
+  }
+
+  @Test
   public void irALoginDeberiaRetornarVistaLoginConDatosLogin() {
     // ejecucion
     ModelAndView modelAndView = controladorLogin.irALogin();
@@ -76,15 +100,6 @@ public class ControladorLoginTest {
     // validacion
     assertThat(modelAndView.getViewName(), equalToIgnoringCase("login"));
     assertThat(modelAndView.getModel().get("datosLogin"), instanceOf(DatosLogin.class));
-  }
-
-  @Test
-  public void irAHomeDeberiaRetornarVistaHome() {
-    // ejecucion
-    ModelAndView modelAndView = controladorLogin.irAHome();
-
-    // validacion
-    assertThat(modelAndView.getViewName(), equalToIgnoringCase("home"));
   }
 
   @Test
