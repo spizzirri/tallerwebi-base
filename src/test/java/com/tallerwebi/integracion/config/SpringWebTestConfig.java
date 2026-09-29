@@ -28,6 +28,8 @@ public class SpringWebTestConfig implements WebMvcConfigurer {
   public void addResourceHandlers(final ResourceHandlerRegistry registry) {
     registry.addResourceHandler("/css/**").addResourceLocations("/resources/core/css/");
     registry.addResourceHandler("/js/**").addResourceLocations("/resources/core/js/");
+    // Para las imágenes que se encuentran en el directorio /resources/core/img/ (Axel)
+    registry.addResourceHandler("/img/**").addResourceLocations("/resources/core/img/");
     registry.addResourceHandler("/webjars/**").addResourceLocations("/webjars/");
   }
 
