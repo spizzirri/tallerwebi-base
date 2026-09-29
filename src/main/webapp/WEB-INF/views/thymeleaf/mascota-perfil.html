@@ -1,0 +1,30 @@
+<!DOCTYPE HTML>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('Perfil de mascota')}"></head>
+
+<body>
+
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+
+<main role="main" class="container">
+
+    <a th:href="@{/home}" class="btn btn-link ps-0 mb-3">&larr; Volver al inicio</a>
+
+    <h1 class="h2 mb-1" th:text="${mascota.nombre}">Firulais</h1>
+    <p class="text-muted"
+       th:text="${mascota.especie} + (${mascota.raza != null and !#strings.isEmpty(mascota.raza)} ? ' · ' + ${mascota.raza} : '')">PERRO</p>
+
+    <p>
+        Plan actual:
+        <span class="badge bg-secondary"
+              th:text="${mascota.plan != null} ? ${mascota.plan.nombre} : 'Sin plan'">Plan</span>
+    </p>
+
+</main>
+
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+
+</body>
+
+</html>

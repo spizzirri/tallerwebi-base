@@ -31,7 +31,7 @@
             <li class="list-group-item d-flex justify-content-between align-items-center"
               th:each="m : ${socio.mascotas}">
               <span>
-                <strong th:text="${m.nombre}">Firulais</strong>
+                <a th:href="@{/mascotas/{id}(id=${m.id})}" th:text="${m.nombre}" class="fw-bold text-decoration-none">Firulais</a>
                 <small class="text-muted"
                   th:text="${m.especie} + (${m.raza != null and !#strings.isEmpty(m.raza)} ? ' · ' + ${m.raza} : '')">PERRO</small>
               </span>
