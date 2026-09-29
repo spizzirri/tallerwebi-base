@@ -1,22 +1,5 @@
-/* Función para normalizar el texto de búsqueda (eliminar espacios y convertir a minúsculas) */
 const normalizarTexto = (texto) => texto.trim().toLowerCase();
 
-/* Función para aplicar las etiquetas de especialidades a las tarjetas de veterinarias */
-const aplicarEtiquetasEspecialidades = () => {
-  document.querySelectorAll("[data-especialidad]").forEach((chip) => {
-    console.log(chip, "Chip, aplicarEtiquetasEspecialidades()");
-    const codigo = chip.dataset.especialidad;
-    console.log(codigo, "Codigo, aplicarEtiquetasEspecialidades()");
-    if (!codigo) return;
-    chip.textContent = codigo.replaceAll("_", " ").toLowerCase();
-    console.log(
-      chip.textContent,
-      "Chip.textContent, aplicarEtiquetasEspecialidades()",
-    );
-  });
-};
-
-/* Buscador de veterinarias */
 const inicializarBusqueda = () => {
   const input = document.getElementById("buscar-veterinaria");
   const lista = document.getElementById("veterinarias-lista");
@@ -48,7 +31,4 @@ const inicializarBusqueda = () => {
   input.addEventListener("input", filtrarVeterinarias);
 };
 
-document.addEventListener("DOMContentLoaded", () => {
-  aplicarEtiquetasEspecialidades();
-  inicializarBusqueda();
-});
+document.addEventListener("DOMContentLoaded", inicializarBusqueda);

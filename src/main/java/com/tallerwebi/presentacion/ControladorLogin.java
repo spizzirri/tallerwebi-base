@@ -2,8 +2,8 @@ package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.ServicioLogin;
 import com.tallerwebi.dominio.Usuario;
-import com.tallerwebi.dominio.excepcion.UsuarioExistente;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -15,6 +15,10 @@ import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 public class ControladorLogin {
+
+  public static final String USUARIO_ID = "USUARIO_ID";
+  public static final String EMAIL = "EMAIL";
+  public static final String ROL = "ROL";
 
   private ServicioLogin servicioLogin;
 
@@ -40,7 +44,10 @@ public class ControladorLogin {
       datosLogin.getPassword()
     );
     if (usuarioBuscado != null) {
-      request.getSession().setAttribute("ROL", usuarioBuscado.getRol());
+      HttpSession sesion = request.getSession();
+      sesion.setAttribute(USUARIO_ID, usuarioBuscado.getId());
+      sesion.setAttribute(EMAIL, usuarioBuscado.getEmail());
+      sesion.setAttribute(ROL, usuarioBuscado.getRol());
       return new ModelAndView("redirect:/home");
     } else {
       Map<String, Object> model = new ModelMap();
@@ -49,31 +56,13 @@ public class ControladorLogin {
     }
   }
 
-  @RequestMapping(path = "/registrarme", method = RequestMethod.POST)
-  public ModelAndView registrarme(@ModelAttribute("usuario") Usuario usuario) {
-    Map<String, Object> model = new ModelMap();
-    try {
-      servicioLogin.registrar(usuario);
-    } catch (UsuarioExistente e) {
-      model.put("error", "El usuario ya existe");
-      return new ModelAndView("nuevo-usuario", model);
-    } catch (Exception e) {
-      model.put("error", "Error al registrar el nuevo usuario");
-      return new ModelAndView("nuevo-usuario", model);
+  @RequestMapping(path = "/logout", method = RequestMethod.POST)
+  public ModelAndView cerrarSesion(HttpServletRequest request) {
+    HttpSession sesion = request.getSession(false);
+    if (sesion != null) {
+      sesion.invalidate();
     }
     return new ModelAndView("redirect:/login");
-  }
-
-  @RequestMapping(path = "/nuevo-usuario", method = RequestMethod.GET)
-  public ModelAndView nuevoUsuario() {
-    Map<String, Object> model = new ModelMap();
-    model.put("usuario", new Usuario());
-    return new ModelAndView("nuevo-usuario", model);
-  }
-
-  @RequestMapping(path = "/home", method = RequestMethod.GET)
-  public ModelAndView irAHome() {
-    return new ModelAndView("home");
   }
 
   @RequestMapping(path = "/", method = RequestMethod.GET)

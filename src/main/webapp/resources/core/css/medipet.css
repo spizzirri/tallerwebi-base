@@ -1,0 +1,23 @@
+/* Estilos propios de MediPet (sobre main.css de la plantilla). */
+h1,
+h2 {
+  color: #1f4e79;
+}
+
+.navbar-brand {
+  margin: 0 1rem 0 0;
+  font-weight: 600;
+}
+
+.tarjeta-veterinaria .badge,
+.servicio .badge {
+  font-weight: 500;
+}
+
+.servicio.no-incluido {
+  opacity: 0.65;
+}
+
+.horarios .btn-check + .btn {
+  min-width: 4.5rem;
+}

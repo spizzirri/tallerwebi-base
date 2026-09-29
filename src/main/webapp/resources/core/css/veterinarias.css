@@ -359,3 +359,73 @@ body.veterinarias-page {
 .veterinarias-header {
   position: relative;
 }
+
+.veterinarias-filter {
+  margin-bottom: 1.5rem;
+}
+
+.veterinarias-filter__label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--color-azul-petroleo);
+}
+
+.veterinarias-filter__select {
+  width: 100%;
+  padding: 0.9rem 1rem;
+  border: 2px solid transparent;
+  border-radius: 14px;
+  background: var(--color-blanco);
+  color: var(--color-texto);
+  font-family: inherit;
+  font-size: 1rem;
+  box-shadow: 0 10px 30px rgba(21, 94, 117, 0.1);
+  cursor: pointer;
+}
+
+.veterinarias-filter__select:focus {
+  outline: none;
+  border-color: var(--color-turquesa);
+  box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.18);
+}
+
+.veterinarias-filter__btn {
+  margin-top: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  border: none;
+  border-radius: 14px;
+  background: var(--color-azul-petroleo);
+  color: var(--color-blanco);
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.veterinaria-card__turno {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-top: 1rem;
+  padding: 0.85rem 1rem;
+  border-radius: 14px;
+  background: var(--color-turquesa);
+  color: var(--color-blanco);
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 800;
+  text-decoration: none;
+  box-shadow: 0 10px 24px rgba(20, 184, 166, 0.28);
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+
+.veterinaria-card__turno:hover,
+.veterinaria-card__turno:focus {
+  background: #0d9488;
+  transform: translateY(-1px);
+}

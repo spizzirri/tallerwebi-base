@@ -34,19 +34,29 @@
     </header>
 
     <main class="veterinarias-main">
+      <form th:action="@{/veterinarias}" method="GET" class="veterinarias-filter">
+        <label class="veterinarias-filter__label" for="servicioId">Filtrar por servicio</label>
+        <select id="servicioId" name="servicioId" class="veterinarias-filter__select" onchange="this.form.submit()">
+          <option value="">Todos los servicios</option>
+          <option th:each="s : ${servicios}" th:value="${s.id}" th:text="${s.nombre}"
+            th:selected="${s.id == servicioId}"></option>
+        </select>
+        <noscript><button class="veterinarias-filter__btn" type="submit">Filtrar</button></noscript>
+      </form>
+
       <section
-        th:if="${sinPrestadores}"
+        th:if="${#lists.isEmpty(veterinarias)}"
         class="veterinarias-empty"
         aria-live="polite"
       >
         <div class="veterinarias-empty__icon" aria-hidden="true">🐾</div>
         <h2 class="veterinarias-empty__title">Sin prestadores por ahora</h2>
         <p class="veterinarias-empty__text">
-          Todavía no hay veterinarias cargadas. Volvé a intentar más tarde.
+          No hay veterinarias adheridas que ofrezcan ese servicio.
         </p>
       </section>
 
-      <section th:unless="${sinPrestadores}" class="veterinarias-content">
+      <section th:unless="${#lists.isEmpty(veterinarias)}" class="veterinarias-content">
         <div class="veterinarias-search">
           <label class="veterinarias-search__label" for="buscar-veterinaria">
             Buscar por nombre o zona
@@ -66,25 +76,22 @@
             No encontramos veterinarias con ese criterio.
           </p>
         </div>
-        <!-- Lista de veterinarias -->
-        <!-- th:each="vet : ${veterinarias}" = recorre la lista de veterinarias y para cada una de ellas crea un elemento li -->
+
         <ul class="veterinarias-list" id="veterinarias-lista">
           <li
-            th:each="vet : ${veterinarias}"
+            th:each="v : ${veterinarias}"
             class="veterinaria-card"
-            th:attr="data-nombre=${vet.nombre}, data-direccion=${vet.direccion}"
+            th:attr="data-nombre=${v.nombre}, data-direccion=${v.direccion}"
           >
             <div class="veterinaria-card__header">
-              <h2 class="veterinaria-card__nombre" th:text="${vet.nombre}">
-                Nombre
-              </h2>
+              <h2 class="veterinaria-card__nombre" th:text="${v.nombre}">Nombre</h2>
               <span
-                th:if="${vet.abiertoHoy}"
+                th:if="${v.atiendeEl(T(java.time.LocalDate).now())}"
                 class="veterinaria-card__estado veterinaria-card__estado--abierto"
                 >Abierto hoy</span
               >
               <span
-                th:unless="${vet.abiertoHoy}"
+                th:unless="${v.atiendeEl(T(java.time.LocalDate).now())}"
                 class="veterinaria-card__estado veterinaria-card__estado--cerrado"
                 >Cerrado hoy</span
               >
@@ -92,39 +99,48 @@
 
             <div class="veterinaria-card__info">
               <p class="veterinaria-card__fila">
-                <span class="veterinaria-card__icon" aria-hidden="true"
-                  >Icono de direccion</span
-                >
-                <span th:text="${vet.direccion}">Dirección</span>
+                <span class="veterinaria-card__icon" aria-hidden="true">📍</span>
+                <span th:text="${v.direccion}">Dirección</span>
               </p>
               <p class="veterinaria-card__fila">
-                <span class="veterinaria-card__icon" aria-hidden="true"
-                  >Icono de telefono</span
-                >
+                <span class="veterinaria-card__icon" aria-hidden="true">📞</span>
                 <a
                   class="veterinaria-card__telefono"
-                  th:href="'tel:' + ${vet.telefono}"
-                  th:text="${vet.telefono}"
+                  th:href="'tel:' + ${v.telefono}"
+                  th:text="${v.telefono}"
                   >Teléfono</a
+                >
+              </p>
+              <p class="veterinaria-card__fila">
+                <span class="veterinaria-card__icon" aria-hidden="true">🕐</span>
+                <span
+                  th:text="'Lunes a viernes de ' + ${v.horaApertura} + ' a ' + ${v.horaCierre} + ' hs'"
+                  >Horario</span
                 >
               </p>
             </div>
 
             <div class="veterinaria-card__especialidades">
               <span
-                th:each="esp : ${vet.especialidades}"
+                th:each="s : ${v.servicios}"
                 class="veterinaria-card__chip"
-                th:attr="data-especialidad=${esp.name()}"
-                th:text="${esp.name()}"
-                >Especialidad</span
+                th:text="${s.nombre}"
+                >Servicio</span
               >
             </div>
+
+            <a
+              class="veterinaria-card__turno"
+              th:href="@{/turnos/nuevo(veterinariaId=${v.id})}"
+              >Sacar turno acá</a
+            >
           </li>
         </ul>
       </section>
 
       <a th:href="@{/home}" class="veterinarias-back">Volver al inicio</a>
     </main>
+
     <footer class="veterinarias-footer">
       <p>Medipet - Todos los derechos reservados</p>
     </footer>
