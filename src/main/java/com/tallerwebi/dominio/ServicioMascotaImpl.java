@@ -1,5 +1,34 @@
 package com.tallerwebi.dominio;
 
+import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service("servicioMascota")
+@Transactional
 public class ServicioMascotaImpl implements ServicioMascota {
-  //   private final RepositorioMascota repositorioMascota;
+
+  private final RepositorioMascota repositorioMascota;
+  private final RepositorioPlan repositorioPlan;
+
+  @Autowired
+  public ServicioMascotaImpl(
+    RepositorioMascota repositorioMascota,
+    RepositorioPlan repositorioPlan
+  ) {
+    this.repositorioMascota = repositorioMascota;
+    this.repositorioPlan = repositorioPlan;
+  }
+
+  @Override
+  public void cambiarPlan(Socio socio, Long mascotaId, Long planId) {
+    if (socio == null || socio.buscarMascota(mascotaId) == null) {
+      return;
+    }
+    Mascota mascota = repositorioMascota.buscarPorId(mascotaId);
+    Plan plan = repositorioPlan.buscarPorId(planId);
+    if (mascota != null && plan != null) {
+      mascota.setPlan(plan);
+    }
+  }
 }

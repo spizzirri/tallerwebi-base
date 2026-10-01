@@ -2,12 +2,15 @@ package com.tallerwebi.infraestructura;
 
 import com.tallerwebi.dominio.Mascota;
 import com.tallerwebi.dominio.RepositorioMascota;
-import java.util.List;
+import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
-public class RepositorioMascotaImpl implements RepositorioMascota {
+@Repository("repositorioMascota")
+public class RepositorioMascotaImpl extends RepositorioBase<Mascota> implements RepositorioMascota {
 
-  @Override
-  public List<Mascota> buscarPorSocio(Long socioId) {
-    return List.of();
+  @Autowired
+  public RepositorioMascotaImpl(SessionFactory sessionFactory) {
+    super(sessionFactory, Mascota.class);
   }
 }
