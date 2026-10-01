@@ -21,6 +21,17 @@
               th:text="${mascota.plan != null} ? ${mascota.plan.nombre} : 'Sin plan'">Plan</span>
     </p>
 
+    <form th:action="@{/mascotas/{id}/cambiar-plan(id=${mascota.id})}" method="POST" class="mt-3">
+        <label for="planId" class="form-label">Cambiar plan</label>
+        <div class="d-flex gap-2">
+            <select id="planId" name="planId" class="form-select" style="max-width: 280px;">
+                <option th:each="p : ${planes}" th:value="${p.id}" th:text="${p.nombre}"
+                        th:selected="${mascota.plan != null and mascota.plan.id == p.id}">Plan</option>
+            </select>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+        </div>
+    </form>
+
 </main>
 
 <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
