@@ -31,4 +31,15 @@ public class ServicioMascotaImpl implements ServicioMascota {
       mascota.setPlan(plan);
     }
   }
+
+  @Override
+  public void darDeBaja(Socio socio, Long mascotaId) {
+    if (socio == null || socio.buscarMascota(mascotaId) == null) {
+      return;
+    }
+    Mascota mascota = repositorioMascota.buscarPorId(mascotaId);
+    if (mascota != null) {
+      mascota.setPlan(null);
+    }
+  }
 }

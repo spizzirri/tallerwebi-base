@@ -51,4 +51,10 @@ public class ControladorMascota extends ControladorConSocio {
     servicioMascota.cambiarPlan(socioLogueado(sesion), id, planId);
     return new ModelAndView("redirect:/mascotas/" + id);
   }
+
+  @RequestMapping(path = "/mascotas/{id}/baja", method = RequestMethod.POST)
+  public ModelAndView darDeBaja(@PathVariable("id") Long id, HttpSession sesion) {
+    servicioMascota.darDeBaja(socioLogueado(sesion), id);
+    return new ModelAndView("redirect:/mascotas/" + id);
+  }
 }
