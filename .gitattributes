@@ -1,0 +1,4 @@
+# Todos los archivos de texto se guardan y se bajan con fin de línea LF (estilo Linux),
+# igual que como los escribe Prettier al compilar. Evita que en Windows aparezcan
+# archivos "modificados" después de correr jetty:run sin haber cambiado nada.
+* text=auto eol=lf
