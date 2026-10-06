@@ -1,55 +1,120 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragments/layout :: head('Veterinarias adheridas')}"></head>
+  <body>
+    <header th:replace="~{fragments/layout :: encabezado('Veterinarias adheridas', 'Elegí dónde solicitar un turno para tu mascota.')}"></header>
 
-<head th:replace="~{fragments/layout :: head('Veterinarias')}"></head>
-
-<body>
-
-  <nav th:replace="~{fragments/layout :: nav}"></nav>
-
-  <main role="main" class="container">
-    <h1 class="h2">Veterinarias adheridas</h1>
-
-    <form th:action="@{/veterinarias}" method="GET" class="row g-2 align-items-end my-3">
-      <div class="col-sm-8 col-md-5">
-        <label for="servicioId" class="form-label">Filtrar por servicio</label>
-        <select id="servicioId" name="servicioId" class="form-select" onchange="this.form.submit()">
+    <main class="mp-main">
+      <form th:action="@{/veterinarias}" method="GET" class="veterinarias-filter">
+        <label class="veterinarias-filter__label" for="servicioId">Filtrar por servicio</label>
+        <select id="servicioId" name="servicioId" class="veterinarias-filter__select" onchange="this.form.submit()">
           <option value="">Todos los servicios</option>
           <option th:each="s : ${servicios}" th:value="${s.id}" th:text="${s.nombre}"
             th:selected="${s.id == servicioId}"></option>
         </select>
-      </div>
-      <noscript><div class="col-auto"><button class="btn btn-secondary">Filtrar</button></div></noscript>
-    </form>
+        <noscript><button class="veterinarias-filter__btn" type="submit">Filtrar</button></noscript>
+      </form>
 
-    <p th:if="${#lists.isEmpty(veterinarias)}" class="alert alert-warning">
-      No hay veterinarias adheridas que ofrezcan ese servicio.
-    </p>
+      <section
+        th:if="${#lists.isEmpty(veterinarias)}"
+        class="veterinarias-empty"
+        aria-live="polite"
+      >
+        <div class="veterinarias-empty__icon" aria-hidden="true">🐾</div>
+        <h2 class="veterinarias-empty__title">Sin prestadores por ahora</h2>
+        <p class="veterinarias-empty__text">
+          No hay veterinarias adheridas que ofrezcan ese servicio.
+        </p>
+      </section>
 
-    <div class="row g-3">
-      <div class="col-md-6 col-lg-4" th:each="v : ${veterinarias}">
-        <article class="card h-100 tarjeta-veterinaria">
-          <div class="card-body">
-            <h2 class="h5 card-title" th:text="${v.nombre}">Veterinaria</h2>
-            <p class="card-text mb-1" th:text="${v.direccion}">Dirección</p>
-            <p class="card-text mb-1">Tel: <span th:text="${v.telefono}">4444-4444</span></p>
-            <p class="card-text text-muted small"
-              th:text="'Lunes a viernes de ' + ${v.horaApertura} + ' a ' + ${v.horaCierre} + ' hs'">Horario</p>
-            <div class="d-flex flex-wrap gap-1">
-              <span class="badge text-bg-light border" th:each="s : ${v.servicios}"
-                th:text="${s.nombre}">Servicio</span>
+      <section th:unless="${#lists.isEmpty(veterinarias)}" class="veterinarias-content">
+        <div class="veterinarias-search">
+          <label class="veterinarias-search__label" for="buscar-veterinaria">
+            Buscar por nombre o zona
+          </label>
+          <input
+            id="buscar-veterinaria"
+            class="veterinarias-search__input"
+            type="search"
+            placeholder="Ej: San Roque, San Justo..."
+            autocomplete="off"
+          />
+          <p
+            id="veterinarias-sin-resultados"
+            class="veterinarias-search__empty"
+            hidden
+          >
+            No encontramos veterinarias con ese criterio.
+          </p>
+        </div>
+
+        <ul class="veterinarias-list" id="veterinarias-lista">
+          <li
+            th:each="v : ${veterinarias}"
+            class="veterinaria-card"
+            th:attr="data-nombre=${v.nombre}, data-direccion=${v.direccion}"
+          >
+            <div class="veterinaria-card__header">
+              <h2 class="veterinaria-card__nombre" th:text="${v.nombre}">Nombre</h2>
+              <span
+                th:if="${v.atiendeEl(T(java.time.LocalDate).now())}"
+                class="veterinaria-card__estado veterinaria-card__estado--abierto"
+                >Abierto hoy</span
+              >
+              <span
+                th:unless="${v.atiendeEl(T(java.time.LocalDate).now())}"
+                class="veterinaria-card__estado veterinaria-card__estado--cerrado"
+                >Cerrado hoy</span
+              >
             </div>
-          </div>
-          <div class="card-footer bg-transparent border-0 pb-3">
-            <a class="btn btn-primary btn-sm" th:href="@{/turnos/nuevo(veterinariaId=${v.id})}">Sacar turno acá</a>
-          </div>
-        </article>
-      </div>
-    </div>
-  </main>
 
-  <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+            <div class="veterinaria-card__info">
+              <p class="veterinaria-card__fila">
+                <span class="veterinaria-card__icon" aria-hidden="true">📍</span>
+                <span th:text="${v.direccion}">Dirección</span>
+              </p>
+              <p class="veterinaria-card__fila">
+                <span class="veterinaria-card__icon" aria-hidden="true">📞</span>
+                <a
+                  class="veterinaria-card__telefono"
+                  th:href="'tel:' + ${v.telefono}"
+                  th:text="${v.telefono}"
+                  >Teléfono</a
+                >
+              </p>
+              <p class="veterinaria-card__fila">
+                <span class="veterinaria-card__icon" aria-hidden="true">🕐</span>
+                <span
+                  th:text="'Lunes a viernes de ' + ${v.horaApertura} + ' a ' + ${v.horaCierre} + ' hs'"
+                  >Horario</span
+                >
+              </p>
+            </div>
 
-</body>
+            <div class="veterinaria-card__especialidades">
+              <span
+                th:each="s : ${v.servicios}"
+                class="veterinaria-card__chip"
+                th:text="${s.nombre}"
+                >Servicio</span
+              >
+            </div>
 
+            <a
+              class="veterinaria-card__turno"
+              th:href="@{/turnos/nuevo(veterinariaId=${v.id})}"
+              >Sacar turno acá</a
+            >
+          </li>
+        </ul>
+      </section>
+
+      <a th:href="@{/home}" class="veterinarias-back">Volver al inicio</a>
+    </main>
+
+    <footer th:replace="~{fragments/layout :: pie}"></footer>
+
+    <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+    <script th:src="@{/js/veterinarias.js}"></script>
+  </body>
 </html>

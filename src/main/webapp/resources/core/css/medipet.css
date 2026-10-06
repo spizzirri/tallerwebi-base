@@ -1,18 +1,329 @@
-/* Estilos propios de MediPet (sobre main.css de la plantilla). */
+/* ==========================================================================
+   Medipet - estilos comunes a todas las páginas.
+   Paleta del equipo: turquesa #14B8A6, azul petróleo #155E75,
+   coral #FB7185, blanco #FFFFFF. Fuente: Nunito.
+   ========================================================================== */
+
+:root {
+  --color-turquesa: #14b8a6;
+  --color-turquesa-oscuro: #0d9488;
+  --color-azul-petroleo: #155e75;
+  --color-coral: #fb7185;
+  --color-coral-oscuro: #f43f5e;
+  --color-blanco: #ffffff;
+  --color-fondo: #f0fdfa;
+  --color-texto: #134e4a;
+  --color-texto-suave: #5b7c7a;
+  --color-borde: rgba(21, 94, 117, 0.12);
+  --sombra: 0 10px 30px rgba(21, 94, 117, 0.1);
+  --radio: 20px;
+
+  /* Bootstrap toma estos valores para textos y links */
+  --bs-body-font-family: "Nunito", sans-serif;
+  --bs-body-color: var(--color-texto);
+  --bs-link-color: var(--color-azul-petroleo);
+  --bs-link-hover-color: var(--color-turquesa-oscuro);
+  --bs-border-radius: 12px;
+}
+
+/* ---------- Página ---------- */
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  margin: 0;
+  font-family: "Nunito", sans-serif;
+  color: var(--color-texto);
+  background:
+    radial-gradient(circle at top right, rgba(20, 184, 166, 0.18), transparent 28%),
+    linear-gradient(180deg, #ecfeff 0%, var(--color-fondo) 40%, #f8fafc 100%);
+  background-attachment: fixed;
+}
+
 h1,
-h2 {
-  color: #1f4e79;
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--color-azul-petroleo);
+  font-weight: 800;
 }
 
-.navbar-brand {
-  margin: 0 1rem 0 0;
-  font-weight: 600;
+.mp-main {
+  flex: 1;
+  width: min(100%, 1100px);
+  margin: 0 auto;
+  padding: 1.75rem 1rem 2.5rem;
 }
 
-.tarjeta-veterinaria .badge,
-.servicio .badge {
-  font-weight: 500;
+.mp-main--angosto {
+  width: min(100%, 760px);
 }
+
+.mp-main--login {
+  width: min(100%, 460px);
+}
+
+/* ---------- Encabezado (igual en todas las páginas) ---------- */
+
+.mp-header {
+  padding: 0.75rem 1rem 1.5rem;
+  color: var(--color-blanco);
+  background: linear-gradient(135deg, var(--color-azul-petroleo), var(--color-turquesa));
+  border-bottom-left-radius: 28px;
+  border-bottom-right-radius: 28px;
+  box-shadow: var(--sombra);
+}
+
+.mp-header__barra {
+  width: min(100%, 1100px);
+  margin: 0 auto;
+  padding: 0;
+}
+
+.mp-marca {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--color-blanco);
+}
+
+.mp-marca__logo {
+  width: 44px;
+  height: 44px;
+  padding: 5px;
+  border-radius: 14px;
+  background: var(--color-blanco);
+  object-fit: contain;
+}
+
+.mp-header .nav-link {
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.mp-header .nav-link:hover,
+.mp-header .nav-link:focus {
+  color: var(--color-blanco);
+}
+
+.mp-header__usuario {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+}
+
+.mp-header__email {
+  font-size: 0.85rem;
+  opacity: 0.9;
+  margin-right: 0.25rem;
+}
+
+.mp-header__titulo {
+  width: min(100%, 1100px);
+  margin: 1.25rem auto 0;
+}
+
+.mp-header__eyebrow {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.mp-header__h1 {
+  margin: 0.15rem 0 0;
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1.15;
+  color: var(--color-blanco);
+}
+
+.mp-header__subtitulo {
+  margin: 0.6rem 0 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  opacity: 0.95;
+}
+
+/* ---------- Pie de página ---------- */
+
+.mp-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  font-size: 0.85rem;
+  color: var(--color-texto-suave);
+  text-align: center;
+  background: var(--color-blanco);
+  border-top: 1px solid var(--color-borde);
+}
+
+.mp-footer__logo {
+  flex-shrink: 0;
+}
+
+/* ---------- Tarjetas ---------- */
+
+.mp-card {
+  padding: 1.5rem;
+  background: var(--color-blanco);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+}
+
+.mp-card + .mp-card {
+  margin-top: 1.25rem;
+}
+
+.mp-seccion-titulo {
+  margin: 0 0 1rem;
+  font-size: 1.1rem;
+}
+
+/* ---------- Botones ---------- */
+
+.btn {
+  font-weight: 700;
+  border-radius: 12px;
+}
+
+.btn-primary {
+  --bs-btn-bg: var(--color-turquesa);
+  --bs-btn-border-color: var(--color-turquesa);
+  --bs-btn-hover-bg: var(--color-turquesa-oscuro);
+  --bs-btn-hover-border-color: var(--color-turquesa-oscuro);
+  --bs-btn-active-bg: var(--color-turquesa-oscuro);
+  --bs-btn-active-border-color: var(--color-turquesa-oscuro);
+  --bs-btn-disabled-bg: var(--color-turquesa);
+  --bs-btn-disabled-border-color: var(--color-turquesa);
+  box-shadow: 0 8px 20px rgba(20, 184, 166, 0.25);
+}
+
+.btn-outline-primary {
+  --bs-btn-color: var(--color-azul-petroleo);
+  --bs-btn-border-color: var(--color-azul-petroleo);
+  --bs-btn-hover-bg: var(--color-azul-petroleo);
+  --bs-btn-hover-border-color: var(--color-azul-petroleo);
+  --bs-btn-active-bg: var(--color-azul-petroleo);
+  --bs-btn-active-border-color: var(--color-azul-petroleo);
+}
+
+.btn-outline-danger {
+  --bs-btn-color: var(--color-coral-oscuro);
+  --bs-btn-border-color: var(--color-coral);
+  --bs-btn-hover-bg: var(--color-coral);
+  --bs-btn-hover-border-color: var(--color-coral);
+}
+
+.btn-link {
+  --bs-btn-color: var(--color-azul-petroleo);
+  font-weight: 700;
+}
+
+/* Botones dentro del encabezado de color */
+.mp-btn-claro {
+  background: var(--color-blanco);
+  color: var(--color-azul-petroleo);
+  border: 1px solid var(--color-blanco);
+}
+
+.mp-btn-claro:hover,
+.mp-btn-claro:focus {
+  background: #ecfeff;
+  color: var(--color-azul-petroleo);
+}
+
+.mp-btn-borde {
+  background: transparent;
+  color: var(--color-blanco);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+}
+
+.mp-btn-borde:hover,
+.mp-btn-borde:focus {
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--color-blanco);
+}
+
+/* ---------- Formularios ---------- */
+
+.form-label {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--color-azul-petroleo);
+}
+
+.form-control,
+.form-select {
+  border-radius: 12px;
+  border-color: var(--color-borde);
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--color-turquesa);
+  box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.18);
+}
+
+/* ---------- Avisos, insignias y tablas ---------- */
+
+.alert {
+  border-radius: 14px;
+}
+
+.alert-success {
+  color: #115e59;
+  background: rgba(20, 184, 166, 0.12);
+  border-color: rgba(20, 184, 166, 0.3);
+}
+
+.alert-danger {
+  color: #9f1239;
+  background: rgba(251, 113, 133, 0.12);
+  border-color: rgba(251, 113, 133, 0.35);
+}
+
+.badge {
+  font-weight: 700;
+  border-radius: 999px;
+}
+
+.mp-badge-plan {
+  background: rgba(21, 94, 117, 0.1);
+  color: var(--color-azul-petroleo);
+}
+
+.text-bg-success {
+  background-color: var(--color-turquesa) !important;
+}
+
+.list-group-item {
+  border-color: var(--color-borde);
+}
+
+.table {
+  --bs-table-color: var(--color-texto);
+  margin-bottom: 0;
+}
+
+.table th {
+  color: var(--color-azul-petroleo);
+  font-size: 0.85rem;
+}
+
+/* ---------- Páginas puntuales ---------- */
 
 .servicio.no-incluido {
   opacity: 0.65;
@@ -20,4 +331,26 @@ h2 {
 
 .horarios .btn-check + .btn {
   min-width: 4.5rem;
+}
+
+.horarios .btn-check:checked + .btn {
+  background: var(--color-turquesa);
+  border-color: var(--color-turquesa);
+  color: var(--color-blanco);
+}
+
+/* ---------- Pantallas grandes ---------- */
+
+@media (min-width: 640px) {
+  .mp-header {
+    padding: 0.75rem 1.5rem 2rem;
+  }
+
+  .mp-header__h1 {
+    font-size: 1.9rem;
+  }
+
+  .mp-main {
+    padding-inline: 1.5rem;
+  }
 }

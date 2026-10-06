@@ -1,0 +1,265 @@
+/* Estilos del contenido de /planes.
+   Los colores (--color-*), la fuente, el fondo, el encabezado y el pie
+   son comunes a todas las páginas y están en medipet.css. */
+
+.planes-intro {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.planes-intro__eyebrow {
+    margin: 0;
+    color: var(--color-azul-petroleo);
+
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+}
+
+.planes-intro__title {
+    margin: 0.7rem 0;
+    color: var(--color-azul-petroleo);
+
+    font-size: 2rem;
+    font-weight: 800;
+}
+
+.planes-intro__linea {
+    width: 60px;
+    height: 5px;
+    margin: 1rem auto;
+
+    background: var(--color-turquesa);
+    border-radius: 10px;
+}
+
+.planes-intro__texto {
+    color: var(--color-texto-suave);
+    font-size: 1rem;
+}
+
+
+/* ---------- CONTENEDOR DE PLANES ---------- */
+
+.planes-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+
+
+.plan-card {
+    display: flex;
+    flex-direction: column;
+
+    min-height: 540px;
+    padding: 2rem;
+
+    background: var(--color-blanco);
+
+    border: 1px solid var(--color-borde);
+    border-radius: 24px;
+
+    box-shadow: 0 15px 35px rgba(21, 94, 117, 0.12);
+
+    transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
+}
+
+.plan-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 45px rgba(21, 94, 117, 0.18);
+}
+
+
+
+.plan-card__header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.plan-card__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 65px;
+    height: 65px;
+
+    border-radius: 16px;
+
+    background: rgba(20, 184, 166, 0.15);
+
+    font-size: 2rem;
+}
+
+.plan-card--premium .plan-card__icon {
+    background: rgba(251, 113, 133, 0.15);
+}
+
+.plan-card__nombre {
+    margin: 0;
+
+    color: var(--color-azul-petroleo);
+
+    font-size: 1.7rem;
+    font-weight: 800;
+}
+
+.plan-card__tipo {
+    margin: 0.2rem 0 0;
+
+    color: var(--color-azul-petroleo);
+
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+}
+
+
+
+.plan-card__descripcion {
+    min-height: 70px;
+
+    margin: 1.5rem 0 1rem;
+
+    color: var(--color-texto-suave);
+
+    line-height: 1.6;
+}
+
+
+
+.plan-card__beneficios {
+    list-style: none;
+
+    margin: 0;
+    padding: 1.3rem 0;
+
+    border-top: 1px solid var(--color-borde);
+}
+
+.plan-card__beneficios li {
+    margin-bottom: 0.9rem;
+
+    color: var(--color-texto);
+
+    font-size: 0.95rem;
+}
+
+.plan-card__beneficios li::before {
+    content: "\2713";
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 21px;
+    height: 21px;
+
+    margin-right: 0.7rem;
+
+    border-radius: 50%;
+
+    background: var(--color-turquesa);
+    color: var(--color-blanco);
+
+    font-size: 0.75rem;
+    font-weight: 800;
+}
+
+.plan-card--premium .plan-card__beneficios li::before {
+    background: var(--color-coral);
+}
+
+
+
+.plan-card__precio {
+    margin-top: auto;
+    margin-bottom: 1.5rem;
+
+    color: var(--color-azul-petroleo);
+}
+
+.plan-card__precio-numero {
+    font-size: 2.5rem;
+    font-weight: 800;
+}
+
+.plan-card__precio-mes {
+    color: var(--color-texto-suave);
+    font-size: 1rem;
+}
+
+
+
+
+.plan-card__boton {
+    display: block;
+
+    width: 100%;
+    padding: 1rem;
+
+    border: none;
+    border-radius: 999px;
+
+    background: var(--color-turquesa);
+    color: var(--color-blanco);
+
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 800;
+
+    text-align: center;
+    text-decoration: none;
+
+    cursor: pointer;
+
+    transition:
+            transform 0.2s ease,
+            opacity 0.2s ease;
+}
+
+.plan-card__boton:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+
+.plan-card--premium .plan-card__boton {
+    background: var(--color-coral);
+}
+
+
+/* ---------- RESPONSIVE ---------- */
+
+@media (max-width: 700px) {
+
+    .planes-container {
+        grid-template-columns: 1fr;
+    }
+
+    .plan-card {
+        min-height: 0;
+    }
+
+    .planes-intro__title {
+        font-size: 1.6rem;
+    }
+}
+
+/* Patita del Plan Básico */
+.plan-card__icon--basico::before {
+    content: "\1F43E";
+}
+
+/* Estrella del Plan Premium */
+.plan-card__icon--premium::before {
+    content: "\2605";
+    color: var(--color-coral);
+}
