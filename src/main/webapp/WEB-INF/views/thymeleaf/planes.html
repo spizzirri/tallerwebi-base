@@ -1,59 +1,14 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <title>Planes de cobertura</title>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <link
-            href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap"
-            rel="stylesheet"
-    >
-
-    <link rel="stylesheet" th:href="@{/css/planes.css}">
-</head>
+<head th:replace="~{fragments/layout :: head('Planes de cobertura')}"></head>
 
 <body>
 
-<header class="planes-header">
-
-    <div class="planes-header__brand">
-
-        <img
-                class="planes-header__logo"
-                th:src="@{/img/logo.png}"
-                alt="Logo Medipet"
-        >
-
-        <div>
-            <p class="planes-header__eyebrow">
-                Obra social Medipet
-            </p>
-
-            <h1 class="planes-header__title">
-                Nuestros planes
-            </h1>
-        </div>
-
-    </div>
-
-    <p class="planes-header__subtitle">
-        Cuidamos la salud de tu mascota en cada etapa de su vida.
-    </p>
-
-    <a th:href="@{/veterinarias}" class="planes-header__volver">
-        Volver a veterinarias
-    </a>
-
-</header>
+<header th:replace="~{fragments/layout :: encabezado('Nuestros planes', 'Cuidamos la salud de tu mascota en cada etapa de su vida.')}"></header>
 
 
-<main class="planes-main">
+<main class="mp-main">
 
     <section class="planes-intro">
 
@@ -119,7 +74,10 @@
                 </span>
             </div>
 
-            <a href="#" class="plan-card__boton">
+            <!-- Sin sesión lleva al registro (el plan se elige al registrar la mascota);
+                 con sesión, a ver qué cubre el plan de cada mascota. -->
+            <a th:href="${session.USUARIO_ID == null} ? @{/registro} : @{/servicios}" class="plan-card__boton"
+               th:text="${session.USUARIO_ID == null} ? 'Asociarme con el Plan Básico →' : 'Ver servicios cubiertos →'">
                 Elegir Plan Básico &#8594;
             </a>
 
@@ -168,7 +126,8 @@
                 </span>
             </div>
 
-            <a href="#" class="plan-card__boton">
+            <a th:href="${session.USUARIO_ID == null} ? @{/registro} : @{/servicios}" class="plan-card__boton"
+               th:text="${session.USUARIO_ID == null} ? 'Asociarme con el Plan Premium →' : 'Ver servicios cubiertos →'">
                 Elegir Plan Premium &#8594;
             </a>
 
@@ -177,6 +136,10 @@
     </section>
 
 </main>
+
+<footer th:replace="~{fragments/layout :: pie}"></footer>
+
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
 
 </body>
 </html>

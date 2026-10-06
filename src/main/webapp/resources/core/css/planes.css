@@ -1,117 +1,6 @@
-:root {
-    --color-turquesa: #14b8a6;
-    --color-azul-petroleo: #155e75;
-    --color-coral: #fb7185;
-    --color-blanco: #ffffff;
-    --color-fondo: #f0fdfa;
-    --color-texto: #134e4a;
-    --color-texto-suave: #5b7c7a;
-    --color-borde: rgba(21, 94, 117, 0.12);
-}
-
-*,
-*::before,
-*::after {
-    box-sizing: border-box;
-}
-
-body {
-    margin: 0;
-    min-height: 100vh;
-    font-family: "Nunito", sans-serif;
-    color: var(--color-texto);
-
-    background:
-            radial-gradient(
-                    circle at top right,
-                    rgba(20, 184, 166, 0.18),
-                    transparent 28%
-            ),
-            linear-gradient(
-                    180deg,
-                    #ecfeff 0%,
-                    var(--color-fondo) 40%,
-                    #f8fafc 100%
-            );
-}
-
-
-/* ---------- HEADER ---------- */
-
-.planes-header {
-    position: relative;
-    padding: 1.5rem 2rem;
-    color: var(--color-blanco);
-
-    background: linear-gradient(
-            135deg,
-            var(--color-azul-petroleo),
-            var(--color-turquesa)
-    );
-
-    border-bottom-left-radius: 28px;
-    border-bottom-right-radius: 28px;
-
-    box-shadow: 0 10px 30px rgba(21, 94, 117, 0.1);
-}
-
-.planes-header__brand {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.planes-header__logo {
-    width: 52px;
-    height: 52px;
-    border-radius: 16px;
-    background: var(--color-blanco);
-    padding: 6px;
-    object-fit: contain;
-}
-
-.planes-header__eyebrow {
-    margin: 0;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-}
-
-.planes-header__title {
-    margin: 0.15rem 0 0;
-    font-size: 2rem;
-    font-weight: 800;
-}
-
-.planes-header__subtitle {
-    margin: 0.7rem 0 0;
-    font-size: 0.95rem;
-}
-
-.planes-header__volver {
-    position: absolute;
-    right: 30px;
-    top: 50%;
-    transform: translateY(-50%);
-
-    padding: 10px 20px;
-
-    background: var(--color-blanco);
-    color: var(--color-azul-petroleo);
-
-    border-radius: 10px;
-    text-decoration: none;
-    font-weight: 700;
-}
-
-
-
-.planes-main {
-    width: min(1100px, 95%);
-    margin: 0 auto;
-    padding: 3rem 1rem;
-}
+/* Estilos del contenido de /planes.
+   Los colores (--color-*), la fuente, el fondo, el encabezado y el pie
+   son comunes a todas las páginas y están en medipet.css. */
 
 .planes-intro {
     text-align: center;
@@ -355,16 +244,8 @@ body {
         grid-template-columns: 1fr;
     }
 
-    .planes-header {
-        padding-bottom: 5rem;
-    }
-
-    .planes-header__volver {
-        top: auto;
-        bottom: 20px;
-        left: 2rem;
-        right: auto;
-        transform: none;
+    .plan-card {
+        min-height: 0;
     }
 
     .planes-intro__title {

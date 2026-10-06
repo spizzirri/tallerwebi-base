@@ -1,39 +1,10 @@
 <!doctype html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Veterinarias adheridas</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" th:href="@{/css/veterinarias.css}" />
-  </head>
-  <body class="veterinarias-page">
-    <header class="veterinarias-header">
-      <div class="veterinarias-header__brand">
-        <img
-          class="veterinarias-header__logo"
-          th:src="@{/img/logo.png}"
-          alt="Logo obra social veterinaria"
-          width="48"
-          height="48"
-        />
-        <div>
-          <p class="veterinarias-header__eyebrow">Obra social Medipet</p>
-          <h1 class="veterinarias-header__title">Veterinarias adheridas</h1>
-        </div>
-      </div>
-      <p class="veterinarias-header__subtitle">
-        Elegí dónde solicitar un turno para tu mascota.
-      </p>
-      <a th:href="@{/planes}" class="btn-planes">Ver planes</a>
-    </header>
+  <head th:replace="~{fragments/layout :: head('Veterinarias adheridas')}"></head>
+  <body>
+    <header th:replace="~{fragments/layout :: encabezado('Veterinarias adheridas', 'Elegí dónde solicitar un turno para tu mascota.')}"></header>
 
-    <main class="veterinarias-main">
+    <main class="mp-main">
       <form th:action="@{/veterinarias}" method="GET" class="veterinarias-filter">
         <label class="veterinarias-filter__label" for="servicioId">Filtrar por servicio</label>
         <select id="servicioId" name="servicioId" class="veterinarias-filter__select" onchange="this.form.submit()">
@@ -141,10 +112,9 @@
       <a th:href="@{/home}" class="veterinarias-back">Volver al inicio</a>
     </main>
 
-    <footer class="veterinarias-footer">
-      <p>Medipet - Todos los derechos reservados</p>
-    </footer>
+    <footer th:replace="~{fragments/layout :: pie}"></footer>
 
+    <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
     <script th:src="@{/js/veterinarias.js}"></script>
   </body>
 </html>

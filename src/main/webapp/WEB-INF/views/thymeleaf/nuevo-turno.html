@@ -5,16 +5,14 @@
 
 <body>
 
-  <nav th:replace="~{fragments/layout :: nav}"></nav>
+  <header th:replace="~{fragments/layout :: encabezado('Sacar turno', 'Elegí la mascota, la veterinaria, el servicio y el horario.')}"></header>
 
-  <main role="main" class="container" style="max-width:760px;">
-    <h1 class="h2">Sacar turno</h1>
-
+  <main role="main" class="mp-main mp-main--angosto">
     <p th:if="${error != null}" id="error-turno" class="alert alert-danger" th:text="${error}"></p>
 
     <!-- Cada cambio en mascota, veterinaria o fecha recarga la página (GET) para mostrar
          los servicios y horarios que corresponden. El botón final envía por POST. -->
-    <form id="form-turno" th:action="@{/turnos/nuevo}" method="GET" th:object="${solicitud}">
+    <form id="form-turno" class="mp-card" th:action="@{/turnos/nuevo}" method="GET" th:object="${solicitud}">
 
       <div class="mb-3">
         <label for="mascotaId" class="form-label">1. Mascota</label>
@@ -80,6 +78,8 @@
       <a class="btn btn-link" th:href="@{/home}">Cancelar</a>
     </form>
   </main>
+
+  <footer th:replace="~{fragments/layout :: pie}"></footer>
 
   <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
 

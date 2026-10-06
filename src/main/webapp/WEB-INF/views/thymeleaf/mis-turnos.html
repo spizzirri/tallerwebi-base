@@ -5,52 +5,55 @@
 
 <body>
 
-  <nav th:replace="~{fragments/layout :: nav}"></nav>
+  <header th:replace="~{fragments/layout :: encabezado('Mis turnos', 'Revisá o cancelá los turnos de tus mascotas.')}"></header>
 
-  <main role="main" class="container">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <h1 class="h2 mb-0">Mis turnos</h1>
+  <main role="main" class="mp-main">
+    <div class="d-flex justify-content-end mb-3">
       <a class="btn btn-primary" th:href="@{/turnos/nuevo}">Sacar turno</a>
     </div>
 
     <p th:if="${mensaje != null}" id="mensaje-turno" class="alert alert-success" th:text="${mensaje}"></p>
     <p th:if="${error != null}" class="alert alert-danger" th:text="${error}"></p>
 
-    <p th:if="${#lists.isEmpty(turnos)}" class="text-muted">Todavía no sacaste ningún turno.</p>
+    <section class="mp-card">
+      <p th:if="${#lists.isEmpty(turnos)}" class="text-muted mb-0">Todavía no sacaste ningún turno.</p>
 
-    <div class="table-responsive" th:unless="${#lists.isEmpty(turnos)}">
-      <table class="table align-middle">
-        <thead>
-          <tr>
-            <th>Fecha</th>
-            <th>Mascota</th>
-            <th>Servicio</th>
-            <th>Veterinaria</th>
-            <th>Estado</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr th:each="t : ${turnos}">
-            <td th:text="${#temporals.format(t.fecha, 'dd/MM/yyyy')} + ' ' + ${t.hora}">01/10/2026 10:00</td>
-            <td th:text="${t.mascota.nombre}">Mascota</td>
-            <td th:text="${t.servicio.nombre}">Servicio</td>
-            <td th:text="${t.veterinaria.nombre}">Veterinaria</td>
-            <td>
-              <span class="badge" th:text="${t.estado}"
-                th:classappend="${t.estado.name() == 'CONFIRMADO'} ? 'text-bg-success' : (${t.estado.name() == 'CANCELADO'} ? 'text-bg-secondary' : 'text-bg-info')">CONFIRMADO</span>
-            </td>
-            <td class="text-end">
-              <form th:if="${t.estaConfirmado()}" th:action="@{/turnos/{id}/cancelar(id=${t.id})}" method="POST"
-                onsubmit="return confirm('¿Seguro que querés cancelar este turno?')">
-                <button class="btn btn-outline-danger btn-sm" type="submit">Cancelar</button>
-              </form>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+      <div class="table-responsive" th:unless="${#lists.isEmpty(turnos)}">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Mascota</th>
+              <th>Servicio</th>
+              <th>Veterinaria</th>
+              <th>Estado</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="t : ${turnos}">
+              <td th:text="${#temporals.format(t.fecha, 'dd/MM/yyyy')} + ' ' + ${t.hora}">01/10/2026 10:00</td>
+              <td th:text="${t.mascota.nombre}">Mascota</td>
+              <td th:text="${t.servicio.nombre}">Servicio</td>
+              <td th:text="${t.veterinaria.nombre}">Veterinaria</td>
+              <td>
+                <span class="badge" th:text="${t.estado}"
+                  th:classappend="${t.estado.name() == 'CONFIRMADO'} ? 'text-bg-success' : (${t.estado.name() == 'CANCELADO'} ? 'text-bg-secondary' : 'text-bg-info')">CONFIRMADO</span>
+              </td>
+              <td class="text-end">
+                <form th:if="${t.estaConfirmado()}" th:action="@{/turnos/{id}/cancelar(id=${t.id})}" method="POST"
+                  onsubmit="return confirm('¿Seguro que querés cancelar este turno?')">
+                  <button class="btn btn-outline-danger btn-sm" type="submit">Cancelar</button>
+                </form>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
   </main>
+
+  <footer th:replace="~{fragments/layout :: pie}"></footer>
 
   <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
 
