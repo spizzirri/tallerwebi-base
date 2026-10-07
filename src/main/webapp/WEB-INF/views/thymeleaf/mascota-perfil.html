@@ -15,11 +15,28 @@
     <p class="text-muted"
        th:text="${mascota.especie} + (${mascota.raza != null and !#strings.isEmpty(mascota.raza)} ? ' · ' + ${mascota.raza} : '')">PERRO</p>
 
-    <p>
-        Plan actual:
-        <span class="badge bg-secondary"
-              th:text="${mascota.plan != null} ? ${mascota.plan.nombre} : 'Sin plan'">Plan</span>
-    </p>
+    <dl class="row mt-4">
+        <dt class="col-sm-3">Especie</dt>
+        <dd class="col-sm-9" th:text="${mascota.especie}">PERRO</dd>
+
+        <dt class="col-sm-3" th:if="${mascota.raza != null and !#strings.isEmpty(mascota.raza)}">Raza</dt>
+        <dd class="col-sm-9" th:if="${mascota.raza != null and !#strings.isEmpty(mascota.raza)}"
+            th:text="${mascota.raza}">Labrador</dd>
+
+        <dt class="col-sm-3" th:if="${mascota.fechaNacimiento != null}">Fecha de nacimiento</dt>
+        <dd class="col-sm-9" th:if="${mascota.fechaNacimiento != null}"
+            th:text="${#temporals.format(mascota.fechaNacimiento, 'dd/MM/yyyy')}">01/01/2020</dd>
+
+        <dt class="col-sm-3" th:if="${mascota.peso != null}">Peso</dt>
+        <dd class="col-sm-9" th:if="${mascota.peso != null}"
+            th:text="${mascota.peso} + ' kg'">10 kg</dd>
+
+        <dt class="col-sm-3">Plan actual</dt>
+        <dd class="col-sm-9">
+            <span class="badge bg-secondary"
+                  th:text="${mascota.plan != null} ? ${mascota.plan.nombre} : 'Sin plan'">Plan</span>
+        </dd>
+    </dl>
 
     <form th:action="@{/mascotas/{id}/cambiar-plan(id=${mascota.id})}" method="POST" class="mt-3">
         <label for="planId" class="form-label">Cambiar plan</label>

@@ -32,7 +32,7 @@ public class ControladorMascota extends ControladorConSocio {
   @RequestMapping(path = "/mascotas/{id}", method = RequestMethod.GET)
   public ModelAndView verPerfil(@PathVariable("id") Long id, HttpSession sesion) {
     Socio socio = socioLogueado(sesion);
-    Mascota mascota = socio == null ? null : socio.buscarMascota(id);
+    Mascota mascota = servicioMascota.buscarPorIdParaSocio(socio, id);
     if (mascota == null) {
       return new ModelAndView("redirect:/home");
     }
