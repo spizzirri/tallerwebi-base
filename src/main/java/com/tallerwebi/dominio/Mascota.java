@@ -10,7 +10,6 @@ import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
 import org.springframework.format.annotation.DateTimeFormat;
 
-
 /* Entidad de la base de datos
 
   Mascota tiene un socio y un plan.

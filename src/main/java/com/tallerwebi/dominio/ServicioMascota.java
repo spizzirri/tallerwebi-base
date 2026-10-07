@@ -20,6 +20,7 @@ public class ServicioMascota {
   }
 
   public Mascota buscarPorIdParaSocio(Socio socio, Long mascotaId) {
+   
     if (socio == null || mascotaId == null) {
       return null;
     }
