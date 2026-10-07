@@ -1,29 +1,12 @@
 package com.tallerwebi.dominio;
 
-import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-@Service("servicioMascota")
-@Transactional
-public class ServicioMascota {
-
-  private RepositorioMascota repositorioMascota;
-
-  @Autowired
-  public ServicioMascota(RepositorioMascota repositorioMascota) {
-    this.repositorioMascota = repositorioMascota;
-  }
-
-  public Mascota buscarPorId(Long id) {
-    return id == null ? null : repositorioMascota.buscarPorId(id);
-  }
-
-  public Mascota buscarPorIdParaSocio(Socio socio, Long mascotaId) {
-   
-    if (socio == null || mascotaId == null) {
-      return null;
-    }
-    return socio.buscarMascota(mascotaId);
-  }
+public interface ServicioMascota {
+  //obtener mascotas de socios
+  //agregar mascotas
+  // cambiar plan
+  void cambiarPlan(Socio socio, Long mascotaId, Long planId);
+  // dar de baja
+  void darDeBaja(Socio socio, Long mascotaId);
+  Mascota buscarPorId(Long id);
+  Mascota buscarPorIdParaSocio(Socio socio, Long mascotaId);
 }

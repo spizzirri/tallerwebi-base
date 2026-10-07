@@ -5,9 +5,9 @@
 
 <body>
 
-  <header th:replace="~{fragments/layout :: encabezado(${socio != null} ? '¡Hola, ' + ${socio.nombre} + '!' : 'Inicio', '¿Qué necesitás hacer hoy?')}"></header>
+  <nav th:replace="~{fragments/layout :: nav}"></nav>
 
-  <main role="main" class="mp-main">
+  <main role="main" class="container">
 
     <div th:if="${socio == null}" class="alert alert-info">
       Tu usuario no está asociado a un socio, así que no tiene mascotas ni turnos.
@@ -15,11 +15,13 @@
     </div>
 
     <th:block th:if="${socio != null}">
+      <h1 class="h2" th:text="'¡Hola, ' + ${socio.nombre} + '!'">¡Hola!</h1>
+      <p class="text-muted">¿Qué necesitás hacer hoy?</p>
+
       <div class="d-flex flex-wrap gap-2 mb-4">
         <a id="btn-sacar-turno" class="btn btn-primary" th:href="@{/turnos/nuevo}">Sacar turno</a>
         <a class="btn btn-outline-primary" th:href="@{/veterinarias}">Ver veterinarias</a>
         <a class="btn btn-outline-primary" th:href="@{/servicios}">Ver servicios</a>
-        <a class="btn btn-outline-primary" th:href="@{/planes}">Ver planes</a>
       </div>
 
       <div class="row g-4">
@@ -30,7 +32,7 @@
               <li class="list-group-item d-flex justify-content-between align-items-center"
                 th:each="m : ${socio.mascotas}">
                 <span>
-                  <strong th:text="${m.nombre}">Firulais</strong>
+                  <a th:href="@{/mascotas/{id}(id=${m.id})}" th:text="${m.nombre}" class="fw-bold text-decoration-none">Firulais</a>
                   <small class="text-muted"
                     th:text="${m.especie} + (${m.raza != null and !#strings.isEmpty(m.raza)} ? ' · ' + ${m.raza} : '')">PERRO</small>
                 </span>
@@ -41,27 +43,23 @@
         </section>
 
         <section class="col-lg-6">
-          <div class="mp-card h-100">
-            <h2 class="mp-seccion-titulo">Próximos turnos</h2>
-            <p th:if="${#lists.isEmpty(proximosTurnos)}" class="text-muted mb-0">
-              No tenés turnos pendientes.
-            </p>
-            <ul class="list-group" th:unless="${#lists.isEmpty(proximosTurnos)}">
-              <li class="list-group-item" th:each="t : ${proximosTurnos}">
-                <strong th:text="${#temporals.format(t.fecha, 'dd/MM/yyyy')} + ' ' + ${t.hora}">01/10 10:00</strong>
-                · <span th:text="${t.servicio.nombre}">Servicio</span>
-                para <span th:text="${t.mascota.nombre}">Mascota</span>
-                <div class="small text-muted" th:text="${t.veterinaria.nombre}">Veterinaria</div>
-              </li>
-            </ul>
-          </div>
+          <h2 class="h5">Próximos turnos</h2>
+          <p th:if="${#lists.isEmpty(proximosTurnos)}" class="text-muted">
+            No tenés turnos pendientes.
+          </p>
+          <ul class="list-group" th:unless="${#lists.isEmpty(proximosTurnos)}">
+            <li class="list-group-item" th:each="t : ${proximosTurnos}">
+              <strong th:text="${#temporals.format(t.fecha, 'dd/MM/yyyy')} + ' ' + ${t.hora}">01/10 10:00</strong>
+              · <span th:text="${t.servicio.nombre}">Servicio</span>
+              para <span th:text="${t.mascota.nombre}">Mascota</span>
+              <div class="small text-muted" th:text="${t.veterinaria.nombre}">Veterinaria</div>
+            </li>
+          </ul>
         </section>
       </div>
     </th:block>
 
   </main>
-
-  <footer th:replace="~{fragments/layout :: pie}"></footer>
 
   <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
 
