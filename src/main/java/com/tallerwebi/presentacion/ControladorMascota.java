@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import com.tallerwebi.dominio.excepcion.TurnoInvalido;
 
 @Controller
 public class ControladorMascota extends ControladorConSocio {
@@ -42,6 +43,11 @@ public class ControladorMascota extends ControladorConSocio {
     Map<String, Object> modelo = new ModelMap();
     modelo.put("mascota", mascota);
     modelo.put("planes", servicioPlan.listar());
+    try {
+      modelo.put("historial", servicioTurno.historialDe(socio, id));
+    } catch (TurnoInvalido e) {
+      return new ModelAndView("redirect:/home");
+    }
     return new ModelAndView("mascota-perfil", modelo);
   }
 
