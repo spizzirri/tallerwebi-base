@@ -17,16 +17,19 @@ public class ControladorMascota extends ControladorConSocio {
 
   private ServicioPlan servicioPlan;
   private ServicioMascota servicioMascota;
+  private ServicioTurno servicioTurno;
 
   @Autowired
   public ControladorMascota(
     ServicioSocio servicioSocio,
     ServicioPlan servicioPlan,
-    ServicioMascota servicioMascota
+    ServicioMascota servicioMascota,
+    ServicioTurno servicioTurno
   ) {
     super(servicioSocio);
     this.servicioPlan = servicioPlan;
     this.servicioMascota = servicioMascota;
+    this.servicioTurno = servicioTurno;
   }
 
   @RequestMapping(path = "/mascotas/{id}", method = RequestMethod.GET)
