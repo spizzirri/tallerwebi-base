@@ -1,6 +1,7 @@
 package com.tallerwebi.dominio;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
@@ -12,7 +13,7 @@ import org.junit.jupiter.api.Test;
 
 public class ServicioMascotaTest {
 
-  private ServicioMascotaImpl servicioMascota;
+  private ServicioMascota servicioMascota;
   private RepositorioMascota repositorioMascota;
   private RepositorioPlan repositorioPlan;
   private RepositorioSocio repositorioSocio;
@@ -40,6 +41,47 @@ public class ServicioMascotaTest {
 
     when(repositorioSocio.buscarPorUsuario(1L)).thenReturn(socio);
     when(repositorioPlan.buscarPorId(2L)).thenReturn(plan);
+  }
+
+  @Test
+  public void buscarPorIdDeberiaDevolverLaMascota() {
+    Mascota mascotaEsperada = new Mascota();
+    mascotaEsperada.setId(1L);
+    mascotaEsperada.setNombre("Firulais");
+    when(repositorioMascota.buscarPorId(1L)).thenReturn(mascotaEsperada);
+    Mascota mascotaObtenida = servicioMascota.buscarPorId(1L);
+    assertThat(mascotaObtenida, equalTo(mascotaEsperada));
+    verify(repositorioMascota, times(1)).buscarPorId(1L);
+  }
+
+  @Test
+  public void cambiarPlanDeberiaAsignarElPlan() {
+    Socio socioLocal = new Socio();
+    Mascota mascotaLocal = new Mascota();
+    mascotaLocal.setId(1L);
+    socioLocal.agregarMascota(mascotaLocal);
+    Plan planLocal = new Plan();
+    planLocal.setId(2L);
+    when(repositorioMascota.buscarPorId(1L)).thenReturn(mascotaLocal);
+    when(repositorioPlan.buscarPorId(2L)).thenReturn(planLocal);
+
+    servicioMascota.cambiarPlan(socioLocal, 1L, 2L);
+
+    assertThat(mascotaLocal.getPlan(), equalTo(planLocal));
+  }
+
+  @Test
+  public void darDeBajaDeberiaQuitarElPlan() {
+    Socio socioLocal = new Socio();
+    Mascota mascotaLocal = new Mascota();
+    mascotaLocal.setId(1L);
+    mascotaLocal.setPlan(new Plan());
+    socioLocal.agregarMascota(mascotaLocal);
+    when(repositorioMascota.buscarPorId(1L)).thenReturn(mascotaLocal);
+
+    servicioMascota.darDeBaja(socioLocal, 1L);
+
+    assertThat(mascotaLocal.getPlan(), equalTo(null));
   }
 
   @Test

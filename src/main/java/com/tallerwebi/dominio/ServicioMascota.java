@@ -10,4 +10,6 @@ public interface ServicioMascota {
   void cambiarPlan(Socio socio, Long mascotaId, Long planId);
   // dar de baja
   void darDeBaja(Socio socio, Long mascotaId);
+  Mascota buscarPorId(Long id);
+  Mascota buscarPorIdParaSocio(Socio socio, Long mascotaId);
 }

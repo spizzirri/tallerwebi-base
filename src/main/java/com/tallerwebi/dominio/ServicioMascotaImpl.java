@@ -53,6 +53,17 @@ public class ServicioMascotaImpl implements ServicioMascota {
   }
 
   @Override
+  public Mascota buscarPorId(Long id) {
+    return id == null ? null : repositorioMascota.buscarPorId(id);
+  }
+
+  @Override
+  public Mascota buscarPorIdParaSocio(Socio socio, Long mascotaId) {
+    if (socio == null || mascotaId == null) return null;
+    return socio.buscarMascota(mascotaId);
+  }
+
+  @Override
   public void cambiarPlan(Socio socio, Long mascotaId, Long planId) {
     if (socio == null || socio.buscarMascota(mascotaId) == null) {
       return;
