@@ -26,13 +26,24 @@ public class RepositorioTurnoImpl extends RepositorioBase<Turno> implements Repo
   @Override
   public List<Turno> listarPorSocio(Long socioId) {
     return sesion()
-      .createQuery(
-        "from Turno t where t.mascota.socio.id = :socioId order by t.fecha desc, t.hora desc",
-        Turno.class
-      )
-      .setParameter("socioId", socioId)
-      .getResultList();
+            .createQuery(
+                    "from Turno t where t.mascota.socio.id = :socioId order by t.fecha desc, t.hora desc",
+                    Turno.class
+            )
+            .setParameter("socioId", socioId)
+            .getResultList();
   }
+
+    @Override
+    public List<Turno> listarPorMascota(Long mascotaId) {
+      return sesion()
+              .createQuery(
+                      "from Turno t where t.mascota.id = :mascotaId order by t.fecha desc, t.hora desc",
+                      Turno.class
+              )
+              .setParameter("mascotaId", mascotaId)
+              .getResultList();
+    }
 
   @Override
   public List<LocalTime> horasOcupadas(Long veterinariaId, LocalDate fecha) {

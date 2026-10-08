@@ -18,6 +18,8 @@ import com.tallerwebi.infraestructura.config.HibernateInfraestructuraTestConfig;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -118,5 +120,22 @@ public class RepositorioTurnoTest {
     turno.setHora(hora);
     repositorioTurno.guardar(turno);
     return turno;
+  }
+
+  @Test
+  @Transactional
+  @Rollback
+  public void listarPorMascotaDeberiaDevolverSoloLosTurnosDeEsaMascota() {
+    // dado
+    Mascota mia = dadoUnSocioConMascota("30111222");
+    Mascota ajena = dadoUnSocioConMascota("30333444");
+    dadaUnaVeterinariaConServicio();
+    guardarTurno(mia, FECHA, DIEZ);
+    guardarTurno(mia, FECHA, LocalTime.of(11, 0));
+    guardarTurno(ajena, FECHA, LocalTime.of(12, 0));
+
+    List<Turno> turnos = repositorioTurno.listarPorMascota(mia.getId());
+
+    assertThat(turnos, hasSize(2));
   }
 }
