@@ -44,6 +44,11 @@ public class Socio {
     return mascotas.stream().filter(m -> m.getId().equals(mascotaId)).findFirst().orElse(null);
   }
 
+  public Mascota buscarPorIdParaSocio(Socio socio, Long mascotaId) {
+    if (socio == null || mascotaId == null) return null;
+    return socio.buscarMascota(mascotaId);
+  }
+
   public Long getId() {
     return id;
   }

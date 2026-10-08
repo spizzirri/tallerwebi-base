@@ -1,0 +1,36 @@
+<!DOCTYPE HTML>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('Agregar mascota')}"></head>
+
+<body>
+
+  <header th:replace="~{fragments/layout :: encabezado('Agregar mascota', 'Completá los datos de tu mascota y elegí su plan de cobertura.')}"></header>
+
+  <main role="main" class="mp-main mp-main--angosto">
+    <a th:href="@{/home}" class="btn btn-link ps-0 mb-3">&larr; Volver al inicio</a>
+
+    <form th:action="@{/mascotas}" method="POST">
+      <p th:if="${error != null}" class="alert alert-danger" th:text="${error}"></p>
+
+      <section class="mp-card">
+        <h2 class="mp-seccion-titulo">Tu mascota</h2>
+        <div
+          th:replace="~{fragments/mascota-form :: campos(${mascota}, '', 'alta-', ${planes}, ${especies}, ${planId})}">
+        </div>
+      </section>
+
+      <div class="d-flex flex-wrap align-items-center gap-2 mt-4">
+        <button class="btn btn-lg btn-primary" type="submit">Agregar mascota</button>
+        <a th:href="@{/home}" class="btn btn-link">Cancelar</a>
+      </div>
+    </form>
+  </main>
+
+  <footer th:replace="~{fragments/layout :: pie}"></footer>
+
+  <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+
+</body>
+
+</html>

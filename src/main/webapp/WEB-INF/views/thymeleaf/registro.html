@@ -45,40 +45,8 @@
 
       <section class="mp-card">
         <h2 class="mp-seccion-titulo">Tu mascota</h2>
-        <div class="row g-3">
-          <div class="col-md-6">
-            <label for="nombreMascota" class="form-label">Nombre</label>
-            <input th:field="*{mascota.nombre}" id="nombreMascota" class="form-control" required />
-          </div>
-          <div class="col-md-6">
-            <label for="especie" class="form-label">Especie</label>
-            <select th:field="*{mascota.especie}" id="especie" class="form-select" required>
-              <option value="">Elegí una especie</option>
-              <option th:each="e : ${especies}" th:value="${e}" th:text="${e}"></option>
-            </select>
-          </div>
-          <div class="col-md-4">
-            <label for="raza" class="form-label">Raza</label>
-            <input th:field="*{mascota.raza}" id="raza" class="form-control" />
-          </div>
-          <div class="col-md-4">
-            <label for="fechaNacimiento" class="form-label">Fecha de nacimiento</label>
-            <input th:field="*{mascota.fechaNacimiento}" id="fechaNacimiento" type="date" class="form-control" />
-          </div>
-          <div class="col-md-4">
-            <label for="peso" class="form-label">Peso (kg)</label>
-            <input th:field="*{mascota.peso}" id="peso" type="number" step="0.1" min="0.1" class="form-control" />
-          </div>
-          <div class="col-12">
-            <label for="plan" class="form-label">Plan de cobertura</label>
-            <select th:field="*{planId}" id="plan" class="form-select" required>
-              <option value="">Elegí un plan</option>
-              <option th:each="p : ${planes}" th:value="${p.id}"
-                th:text="${p.nombre} + ' — $' + ${#numbers.formatDecimal(p.precio, 1, 'POINT', 0, 'COMMA')} + ' por mes'">
-              </option>
-            </select>
-            <div class="form-text">¿No sabés cuál elegir? <a th:href="@{/planes}" target="_blank">Compará los planes</a>.</div>
-          </div>
+        <div
+          th:replace="~{fragments/mascota-form :: campos(${datosRegistro.mascota}, 'mascota.', 'registro-', ${planes}, ${especies}, ${datosRegistro.planId})}">
         </div>
       </section>
 

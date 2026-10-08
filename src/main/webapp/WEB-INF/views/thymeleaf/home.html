@@ -13,6 +13,7 @@
       Tu usuario no está asociado a un socio, así que no tiene mascotas ni turnos.
       Podés ver las <a th:href="@{/veterinarias}">veterinarias adheridas</a>.
     </div>
+    <div th:if="${mensaje != null}" class="alert alert-success" th:text="${mensaje}"></div>
 
     <th:block th:if="${socio != null}">
       <div class="d-flex flex-wrap gap-2 mb-4">
@@ -25,7 +26,10 @@
       <div class="row g-4">
         <section class="col-lg-6">
           <div class="mp-card h-100">
-            <h2 class="mp-seccion-titulo">Tus mascotas</h2>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h2 class="mp-seccion-titulo mb-0">Tus mascotas</h2>
+              <a class="btn btn-outline-primary btn-sm" th:href="@{/mascotas/nueva}">Agregar mascota</a>
+            </div>
             <ul class="list-group">
               <li class="list-group-item d-flex justify-content-between align-items-center"
                 th:each="m : ${socio.mascotas}">
