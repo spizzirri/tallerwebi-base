@@ -1,0 +1,68 @@
+<!DOCTYPE HTML>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('Agregar mascota')}"></head>
+
+<body>
+
+  <header th:replace="~{fragments/layout :: encabezado('Agregar mascota', 'Completá los datos de tu mascota y elegí su plan de cobertura.')}"></header>
+
+  <main role="main" class="mp-main mp-main--angosto">
+    <a th:href="@{/home}" class="btn btn-link ps-0 mb-3">&larr; Volver al inicio</a>
+
+    <form th:action="@{/mascotas}" method="POST" th:object="${mascota}">
+      <p th:if="${error != null}" class="alert alert-danger" th:text="${error}"></p>
+
+      <section class="mp-card">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label for="nombre" class="form-label">Nombre</label>
+            <input th:field="*{nombre}" id="nombre" class="form-control" required />
+          </div>
+          <div class="col-md-6">
+            <label for="especie" class="form-label">Especie</label>
+            <select th:field="*{especie}" id="especie" class="form-select" required>
+              <option value="">Elegí una especie</option>
+              <option th:each="e : ${especies}" th:value="${e}" th:text="${e}"></option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label for="raza" class="form-label">Raza</label>
+            <input th:field="*{raza}" id="raza" class="form-control" />
+          </div>
+          <div class="col-md-4">
+            <label for="fechaNacimiento" class="form-label">Fecha de nacimiento</label>
+            <input th:field="*{fechaNacimiento}" id="fechaNacimiento" type="date" class="form-control" />
+          </div>
+          <div class="col-md-4">
+            <label for="peso" class="form-label">Peso (kg)</label>
+            <input th:field="*{peso}" id="peso" type="number" step="0.1" min="0.1" class="form-control" />
+          </div>
+          <div class="col-12">
+            <label for="planId" class="form-label">Plan de cobertura</label>
+            <select id="planId" name="planId" class="form-select" required>
+              <option value="">Elegí un plan</option>
+              <option th:each="p : ${planes}" th:value="${p.id}"
+                th:text="${p.nombre} + ' — $' + ${#numbers.formatDecimal(p.precio, 1, 'POINT', 0, 'COMMA')} + ' por mes'"
+                th:selected="${planId != null and planId == p.id}">
+              </option>
+            </select>
+            <div class="form-text">¿No sabés cuál elegir? <a th:href="@{/planes}" target="_blank">Compará los planes</a>.</div>
+          </div>
+        </div>
+      </section>
+
+      <div class="d-flex flex-wrap align-items-center gap-2 mt-4">
+        <button class="btn btn-lg btn-primary" type="submit">Agregar mascota</button>
+        <a th:href="@{/home}" class="btn btn-link">Cancelar</a>
+      </div>
+    </form>
+  </main>
+
+  <footer th:replace="~{fragments/layout :: pie}"></footer>
+
+  <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+
+</body>
+
+</html>
