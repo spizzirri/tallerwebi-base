@@ -4,7 +4,9 @@ import com.tallerwebi.dominio.excepcion.TurnoInvalido;
 import jakarta.transaction.Transactional;
 import java.time.Clock;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -121,5 +123,35 @@ public class ServicioTurnoImpl implements ServicioTurno {
       throw new TurnoInvalido("Solo se pueden cancelar turnos confirmados");
     }
     turno.cancelar();
+  }
+
+  @Override
+  public HistorialTurnos historialDe(Socio socio, Long mascotaId) throws TurnoInvalido {
+    if (socio.buscarMascota(mascotaId) == null) {
+      throw new TurnoInvalido("No encontramos esa mascota");
+    }
+    List<Turno> turnos = repositorioTurno.listarPorMascota(mascotaId);
+    LocalDateTime ahora = LocalDateTime.now(reloj);
+    Comparator<Turno> porMomento = Comparator.comparing(this::momento);
+
+    List<Turno> proximos = turnos
+      .stream()
+      .filter(t -> esProximo(t, ahora))
+      .sorted(porMomento)
+      .collect(Collectors.toList());
+    List<Turno> pasados = turnos
+      .stream()
+      .filter(t -> !esProximo(t, ahora))
+      .sorted(porMomento.reversed())
+      .collect(Collectors.toList());
+    return new HistorialTurnos(proximos, pasados);
+  }
+
+  private boolean esProximo(Turno turno, LocalDateTime ahora) {
+    return turno.estaConfirmado() && momento(turno).isAfter(ahora);
+  }
+
+  private LocalDateTime momento(Turno turno) {
+    return turno.getFecha().atTime(turno.getHora());
   }
 }

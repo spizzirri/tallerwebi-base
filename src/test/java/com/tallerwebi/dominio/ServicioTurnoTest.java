@@ -254,4 +254,73 @@ public class ServicioTurnoTest {
     turno.setMascota(mascota);
     return turno;
   }
+
+  private Turno dadoUnTurno(LocalDate fecha, LocalTime hora, EstadoTurno estado) {
+    Turno turno = new Turno();
+    turno.setMascota(firulais);
+    turno.setFecha(fecha);
+    turno.setHora(hora);
+    turno.setEstado(estado);
+    return turno;
+  }
+
+  @Test
+  public void historialDeberiaPonerEnProximosUnTurnoConfirmadoFuturo() throws TurnoInvalido {
+    Turno turno = dadoUnTurno(JUEVES, DIEZ, EstadoTurno.CONFIRMADO);
+    when(repositorioTurnoMock.listarPorMascota(1L)).thenReturn(List.of(turno));
+
+    HistorialTurnos historial = servicioTurno.historialDe(socio, 1L);
+
+    assertThat(historial.getProximos(), contains(turno));
+    assertThat(historial.getPasados(), is(empty()));
+  }
+
+  @Test
+  public void historialDeberiaPonerEnPasadosUnTurnoDeAyer() throws TurnoInvalido {
+    Turno turno = dadoUnTurno(HOY.minusDays(1), DIEZ, EstadoTurno.CONFIRMADO);
+    when(repositorioTurnoMock.listarPorMascota(1L)).thenReturn(List.of(turno));
+
+    HistorialTurnos historial = servicioTurno.historialDe(socio, 1L);
+
+    assertThat(historial.getProximos(), is(empty()));
+    assertThat(historial.getPasados(), contains(turno));
+  }
+
+  @Test
+  public void historialDeberiaPonerEnPasadosUnTurnoCanceladoAunqueSeaFuturo() throws TurnoInvalido {
+    Turno turno = dadoUnTurno(JUEVES, DIEZ, EstadoTurno.CANCELADO);
+    when(repositorioTurnoMock.listarPorMascota(1L)).thenReturn(List.of(turno));
+
+    HistorialTurnos historial = servicioTurno.historialDe(socio, 1L);
+
+    assertThat(historial.getProximos(), is(empty()));
+    assertThat(historial.getPasados(), contains(turno));
+  }
+
+  @Test
+  public void historialDeberiaPonerEnPasadosUnTurnoDeHoyQueYaPaso() throws TurnoInvalido {
+    Turno turno = dadoUnTurno(HOY, DIEZ, EstadoTurno.CONFIRMADO);
+    when(repositorioTurnoMock.listarPorMascota(1L)).thenReturn(List.of(turno));
+
+    HistorialTurnos historial = servicioTurno.historialDe(socio, 1L);
+
+    assertThat(historial.getPasados(), contains(turno));
+    assertThat(historial.getProximos(), is(empty()));
+  }
+
+  @Test
+  public void historialDeberiaOrdenarLosProximosDelMasCercanoAlMasLejano() throws TurnoInvalido {
+    Turno once = dadoUnTurno(JUEVES, LocalTime.of(11, 0), EstadoTurno.CONFIRMADO);
+    Turno nueve = dadoUnTurno(JUEVES, LocalTime.of(9, 0), EstadoTurno.CONFIRMADO);
+    when(repositorioTurnoMock.listarPorMascota(1L)).thenReturn(List.of(once, nueve));
+
+    HistorialTurnos historial = servicioTurno.historialDe(socio, 1L);
+
+    assertThat(historial.getProximos(), contains(nueve, once));
+  }
+
+  @Test
+  public void historialDeUnaMascotaAjenaDeberiaLanzarTurnoInvalido() {
+    assertThrows(TurnoInvalido.class, () -> servicioTurno.historialDe(socio, 999L));
+  }
 }

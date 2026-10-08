@@ -10,4 +10,5 @@ public interface ServicioTurno {
   Turno reservar(Socio socio, SolicitudTurno solicitud) throws TurnoInvalido;
   List<Turno> turnosDe(Socio socio);
   void cancelar(Socio socio, Long turnoId) throws TurnoInvalido;
+  HistorialTurnos historialDe(Socio socio, Long mascotaId) throws TurnoInvalido;
 }
