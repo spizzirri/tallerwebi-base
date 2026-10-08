@@ -4,7 +4,6 @@ import com.tallerwebi.dominio.excepcion.DatosDeRegistroInvalidos;
 import com.tallerwebi.dominio.excepcion.SocioExistente;
 import com.tallerwebi.dominio.excepcion.UsuarioExistente;
 import jakarta.transaction.Transactional;
-import java.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,7 +32,7 @@ public class ServicioRegistroImpl implements ServicioRegistro {
   public void registrarSocio(Socio socio, Mascota mascota, Long planId)
     throws UsuarioExistente, SocioExistente, DatosDeRegistroInvalidos {
     validarSocio(socio);
-    validarMascota(mascota);
+    ValidadorMascota.validar(mascota, "Tenés que registrar al menos una mascota");
     Plan plan = planId == null ? null : repositorioPlan.buscarPorId(planId);
     if (plan == null) {
       throw new DatosDeRegistroInvalidos("Elegí un plan para tu mascota");
@@ -66,26 +65,6 @@ public class ServicioRegistroImpl implements ServicioRegistro {
   private void validarCredenciales(Usuario usuario) throws DatosDeRegistroInvalidos {
     if (usuario == null || algunoVacio(usuario.getEmail(), usuario.getPassword())) {
       throw new DatosDeRegistroInvalidos("Email y contraseña son obligatorios");
-    }
-  }
-
-  private void validarMascota(Mascota mascota) throws DatosDeRegistroInvalidos {
-    if (mascota == null || algunoVacio(mascota.getNombre()) || mascota.getEspecie() == null) {
-      throw new DatosDeRegistroInvalidos("Tenés que registrar al menos una mascota");
-    }
-    validarPeso(mascota.getPeso());
-    validarFechaNacimiento(mascota.getFechaNacimiento());
-  }
-
-  private void validarPeso(Double peso) throws DatosDeRegistroInvalidos {
-    if (peso != null && peso <= 0) {
-      throw new DatosDeRegistroInvalidos("El peso de la mascota debe ser mayor a cero");
-    }
-  }
-
-  private void validarFechaNacimiento(LocalDate fecha) throws DatosDeRegistroInvalidos {
-    if (fecha != null && fecha.isAfter(LocalDate.now())) {
-      throw new DatosDeRegistroInvalidos("La fecha de nacimiento no puede ser futura");
     }
   }
 

@@ -1,0 +1,42 @@
+<div xmlns:th="http://www.thymeleaf.org"
+  th:fragment="campos(mascota, namePrefix, idPrefix, planes, especies, planId)" class="row g-3">
+  <div class="col-md-6">
+    <label th:for="${idPrefix + 'nombre'}" class="form-label">Nombre</label>
+    <input th:name="${namePrefix + 'nombre'}" th:id="${idPrefix + 'nombre'}" th:value="${mascota.nombre}"
+      class="form-control" required />
+  </div>
+  <div class="col-md-6">
+    <label th:for="${idPrefix + 'especie'}" class="form-label">Especie</label>
+    <select th:name="${namePrefix + 'especie'}" th:id="${idPrefix + 'especie'}" class="form-select" required>
+      <option value="">Elegí una especie</option>
+      <option th:each="especie : ${especies}" th:value="${especie}" th:text="${especie}"
+        th:selected="${mascota.especie == especie}"></option>
+    </select>
+  </div>
+  <div class="col-md-4">
+    <label th:for="${idPrefix + 'raza'}" class="form-label">Raza</label>
+    <input th:name="${namePrefix + 'raza'}" th:id="${idPrefix + 'raza'}" th:value="${mascota.raza}"
+      class="form-control" />
+  </div>
+  <div class="col-md-4">
+    <label th:for="${idPrefix + 'fechaNacimiento'}" class="form-label">Fecha de nacimiento</label>
+    <input th:name="${namePrefix + 'fechaNacimiento'}" th:id="${idPrefix + 'fechaNacimiento'}"
+      th:value="${mascota.fechaNacimiento}" type="date" class="form-control" />
+  </div>
+  <div class="col-md-4">
+    <label th:for="${idPrefix + 'peso'}" class="form-label">Peso (kg)</label>
+    <input th:name="${namePrefix + 'peso'}" th:id="${idPrefix + 'peso'}" th:value="${mascota.peso}"
+      type="number" step="0.1" min="0.1" class="form-control" />
+  </div>
+  <div class="col-12">
+    <label th:for="${idPrefix + 'planId'}" class="form-label">Plan de cobertura</label>
+    <select name="planId" th:id="${idPrefix + 'planId'}" class="form-select" required>
+      <option value="">Elegí un plan</option>
+      <option th:each="plan : ${planes}" th:value="${plan.id}"
+        th:text="${plan.nombre} + ' — $' + ${#numbers.formatDecimal(plan.precio, 1, 'POINT', 0, 'COMMA')} + ' por mes'"
+        th:selected="${planId != null and planId == plan.id}">
+      </option>
+    </select>
+    <div class="form-text">¿No sabés cuál elegir? <a th:href="@{/planes}" target="_blank">Compará los planes</a>.</div>
+  </div>
+</div>

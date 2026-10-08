@@ -2,7 +2,6 @@ package com.tallerwebi.dominio;
 
 import com.tallerwebi.dominio.excepcion.DatosDeRegistroInvalidos;
 import jakarta.transaction.Transactional;
-import java.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +27,7 @@ public class ServicioMascotaImpl implements ServicioMascota {
   @Override
   public void agregarMascota(Socio socio, Mascota mascota, Long planId)
     throws DatosDeRegistroInvalidos {
-    validarMascota(mascota);
+    ValidadorMascota.validar(mascota, "El nombre y la especie de la mascota son obligatorios");
     mascota.setId(null);
     mascota.setPlan(buscarPlan(planId));
     buscarSocioActual(socio).agregarMascota(mascota);
@@ -51,39 +50,6 @@ public class ServicioMascotaImpl implements ServicioMascota {
       throw new DatosDeRegistroInvalidos("No se pudo identificar al socio");
     }
     return socioActual;
-  }
-
-  private void validarMascota(Mascota mascota) throws DatosDeRegistroInvalidos {
-    validarDatosObligatorios(mascota);
-    validarPeso(mascota.getPeso());
-    validarFechaNacimiento(mascota.getFechaNacimiento());
-  }
-
-  private void validarDatosObligatorios(Mascota mascota) throws DatosDeRegistroInvalidos {
-    if (mascota == null || algunoVacio(mascota.getNombre()) || mascota.getEspecie() == null) {
-      throw new DatosDeRegistroInvalidos("El nombre y la especie de la mascota son obligatorios");
-    }
-  }
-
-  private void validarPeso(Double peso) throws DatosDeRegistroInvalidos {
-    if (peso != null && peso <= 0) {
-      throw new DatosDeRegistroInvalidos("El peso de la mascota debe ser mayor a cero");
-    }
-  }
-
-  private void validarFechaNacimiento(LocalDate fechaNacimiento) throws DatosDeRegistroInvalidos {
-    if (fechaNacimiento != null && fechaNacimiento.isAfter(LocalDate.now())) {
-      throw new DatosDeRegistroInvalidos("La fecha de nacimiento no puede ser futura");
-    }
-  }
-
-  private boolean algunoVacio(String... valores) {
-    for (String valor : valores) {
-      if (valor == null || valor.isBlank()) {
-        return true;
-      }
-    }
-    return false;
   }
 
   @Override
