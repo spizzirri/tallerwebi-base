@@ -38,6 +38,51 @@
         </form>
     </section>
 
+    <!-- Historial de turnos: "historial" lo arma ServicioTurno.historialDe
+         (próximos = confirmados a futuro; pasados = el resto) -->
+    <section class="mp-card" id="turnos-proximos">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+            <h2 class="mp-seccion-titulo mb-0">Próximos turnos</h2>
+            <a class="btn btn-primary btn-sm" th:href="@{/turnos/nuevo(mascotaId=${mascota.id})}"
+               th:text="'Sacar turno para ' + ${mascota.nombre}">Sacar turno</a>
+        </div>
+
+        <p th:if="${#lists.isEmpty(historial.proximos)}" class="text-muted mb-0"
+           th:text="${mascota.nombre} + ' no tiene turnos próximos.'">No tiene turnos próximos.</p>
+
+        <ul class="list-group" th:unless="${#lists.isEmpty(historial.proximos)}">
+            <li class="list-group-item d-flex justify-content-between align-items-start gap-2"
+                th:each="t : ${historial.proximos}">
+                <div>
+                    <strong th:text="${#temporals.format(t.fecha, 'dd/MM/yyyy')} + ' ' + ${t.hora}">01/10/2026 10:00</strong>
+                    · <span th:text="${t.servicio.nombre}">Servicio</span>
+                    <div class="small text-muted" th:text="${t.veterinaria.nombre}">Veterinaria</div>
+                </div>
+                <span class="badge text-bg-success" th:text="${t.estado}">CONFIRMADO</span>
+            </li>
+        </ul>
+    </section>
+
+    <section class="mp-card" id="turnos-pasados">
+        <h2 class="mp-seccion-titulo">Turnos pasados</h2>
+
+        <p th:if="${#lists.isEmpty(historial.pasados)}" class="text-muted mb-0"
+           th:text="${mascota.nombre} + ' todavía no tiene turnos pasados.'">Todavía no tiene turnos pasados.</p>
+
+        <ul class="list-group" th:unless="${#lists.isEmpty(historial.pasados)}">
+            <li class="list-group-item d-flex justify-content-between align-items-start gap-2"
+                th:each="t : ${historial.pasados}">
+                <div>
+                    <strong th:text="${#temporals.format(t.fecha, 'dd/MM/yyyy')} + ' ' + ${t.hora}">01/09/2026 10:00</strong>
+                    · <span th:text="${t.servicio.nombre}">Servicio</span>
+                    <div class="small text-muted" th:text="${t.veterinaria.nombre}">Veterinaria</div>
+                </div>
+                <span class="badge" th:text="${t.estado}"
+                      th:classappend="${t.estado.name() == 'CONFIRMADO'} ? 'text-bg-success' : (${t.estado.name() == 'CANCELADO'} ? 'text-bg-secondary' : 'text-bg-info')">FINALIZADO</span>
+            </li>
+        </ul>
+    </section>
+
 </main>
 
 <footer th:replace="~{fragments/layout :: pie}"></footer>
