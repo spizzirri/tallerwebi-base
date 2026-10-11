@@ -1,5 +1,6 @@
 package com.valhalla.config;
 
+import com.valhalla.infrastructure.security.CustomAuthenticationFailureHandler;
 import com.valhalla.infrastructure.security.CustomAuthenticationSuccessHandler;
 import com.valhalla.infrastructure.security.HomeOnAccessDeniedHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,9 @@ public class SecurityConfig {
 
   @Autowired
   private CustomAuthenticationSuccessHandler successHandler;
+
+  @Autowired
+  private CustomAuthenticationFailureHandler failureHandler;
 
   @Autowired
   private HomeOnAccessDeniedHandler homeOnAccessDeniedHandler;
@@ -55,7 +59,7 @@ public class SecurityConfig {
           .usernameParameter("username")
           .passwordParameter("password")
           .successHandler(successHandler)
-          .failureUrl("/auth/login?error=true")
+          .failureHandler(failureHandler)
           .permitAll()
       )
       .logout(logout ->
@@ -150,7 +154,7 @@ public class SecurityConfig {
           .usernameParameter("username")
           .passwordParameter("password")
           .successHandler(successHandler)
-          .failureUrl("/auth/login?error=true")
+          .failureHandler(failureHandler)
           .permitAll()
       )
       .exceptionHandling(ex ->

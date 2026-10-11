@@ -58,6 +58,21 @@ public class CurrentUserControllerAdvice {
   }
 
   /**
+   * La ruta actual de la request, para que el link "Login" del navbar anónimo la pase como
+   * {@code redirect} y tras loguearse la sesión vuelva a la página donde estaba (el vínculo lo
+   * honora {@code CustomAuthenticationSuccessHandler}). Null en las páginas de auth/admin: volver
+   * allí tras el login no tiene sentido y crearía un salto extra.
+   */
+  @ModelAttribute("currentPath")
+  public String currentPath(HttpServletRequest request) {
+    String path = request.getRequestURI().substring(request.getContextPath().length());
+    if ("/auth".equals(path) || path.startsWith("/auth/") || isInAdminArea(request)) {
+      return null;
+    }
+    return path;
+  }
+
+  /**
    * La ruta pedida, sin el context path, preguntando por el segmento entero: {@code /admin} o
    * {@code /admin/...}. Un prefijo suelto alcanzaría a un hipotético {@code /administrator}.
    */

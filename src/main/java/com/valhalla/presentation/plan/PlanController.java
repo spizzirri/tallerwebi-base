@@ -12,6 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -78,11 +79,12 @@ public class PlanController {
 
   /**
    * Vista publica read-only de un plan compartido. La visibilidad la decide el servicio: un plan
-   * privado responde igual que un id inexistente. La autenticacion no se consulta todavia: los
-   * CTAs y los flags de sesion llegan con el ticket de la vista publica.
+   * privado responde igual que un id inexistente. Los CTAs se deciden por el estado real de la
+   * sesion (isLogged, isParticipant, isPlanAdministrator) y no por {@code authentication != null}:
+   * con anonimo ese objeto existe como AnonymousAuthenticationToken y seria siempre true.
    */
   @GetMapping("/{id}/public")
-  public ModelAndView showPublicPlan(@PathVariable Long id) {
+  public ModelAndView showPublicPlan(@PathVariable Long id, Authentication authentication) {
     Plan plan = planService.getPublicPlan(id);
     Map<String, Object> model = new ModelMap();
     model.put(ATTR_PLAN, plan);
@@ -90,7 +92,22 @@ public class PlanController {
       "itineraryPlaces",
       plan.getPlanPlaces().stream().map(PlanController::placeView).toList()
     );
+
+    String email = currentEmail(authentication);
+    model.put("isLogged", email != null);
+    model.put("isParticipant", plan.isParticipant(email));
+    model.put("isPlanAdministrator", plan.isAdministrator(email));
+    // El form de join necesita el codigo; en un plan publico compartirlo es el proposito.
+    model.put("shortCode", plan.getShortCode());
     return new ModelAndView(VIEW_PUBLIC_PLAN, model);
+  }
+
+  /** En anonimo el principal es el String "anonymousUser", no un UserDetails. */
+  private static String currentEmail(Authentication authentication) {
+    if (authentication == null || !(authentication.getPrincipal() instanceof UserDetails)) {
+      return null;
+    }
+    return authentication.getName();
   }
 
   @PostMapping

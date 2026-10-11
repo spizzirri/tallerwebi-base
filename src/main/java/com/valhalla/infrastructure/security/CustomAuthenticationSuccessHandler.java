@@ -12,6 +12,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
+  /** Parametro con la URL de origen que arma el navbar (ver CurrentUserControllerAdvice.currentPath). */
+  private static final String REDIRECT_PARAM = "redirect";
+
   @Override
   public void onAuthenticationSuccess(
     HttpServletRequest request,
@@ -20,9 +23,14 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
   ) throws IOException, ServletException {
     request.getSession().setAttribute("loginTime", System.currentTimeMillis());
 
-    // Un USER ya firmó su sesión y no vuelve a una landing estática: aterriza en /explore,
-    // el catálogo donde se exploran lugares y se arman planes. La regla es compartida con las
-    // dos páginas de login (LoginRedirects), así que las tres coinciden en el mismo destino.
-    response.sendRedirect(request.getContextPath() + LoginRedirects.landingFor(authentication));
+    // Si el login vino de una pagina concreta (el plan publico, /explore, etc.), se vuelve a esa
+    // ruta. Sin el parametro se cae en la landing comun: un USER aterriza en /explore, el catalogo
+    // donde se exploran lugares y se arman planes. La regla de la landing es compartida con las
+    // dos paginas de login (LoginRedirects), asi que las tres coinciden en el mismo destino.
+    String target = request.getParameter(REDIRECT_PARAM);
+    if (!LoginRedirects.isSafeInternalPath(target)) {
+      target = LoginRedirects.landingFor(authentication);
+    }
+    response.sendRedirect(request.getContextPath() + target);
   }
 }

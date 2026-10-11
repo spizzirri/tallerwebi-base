@@ -109,11 +109,13 @@ public class PlanServiceImpl implements PlanService {
       // Privado e inexistente responden igual: la vista publica no confirma que el plan exista.
       throw new PlanNotFoundException();
     }
-    // El detalle publico renderiza administrador y lugares despues de cerrar la transaccion.
+    // La vista y los CTAs leen administrador, lugares y participantes despues de cerrar la
+    // transaccion (isParticipant se consulta en el controller): hay que calentarlos aca.
     if (plan.getAdministrator() != null) {
       plan.getAdministrator().getEmail();
     }
     plan.getPlanPlaces().forEach(entry -> entry.getPlace().getName());
+    plan.getParticipants().forEach(user -> user.getEmail());
     return plan;
   }
 
