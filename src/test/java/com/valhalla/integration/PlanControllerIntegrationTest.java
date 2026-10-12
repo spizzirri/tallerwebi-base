@@ -14,6 +14,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrlPattern;
@@ -56,6 +57,7 @@ public class PlanControllerIntegrationTest {
   private static final String OTHER_EMAIL = "ajeno@test.com";
   private static final String PLAN_NAME = "Plan de integración";
   private static final String OTHER_PLAN_NAME = "Plan del otro usuario";
+  private static final String PUBLIC_PLAN_NAME = "Plan publico compartido";
 
   /**
    * Where {@code GlobalExceptionHandler} sends a {@code PlanNotFoundException}: the plans listing,
@@ -544,6 +546,72 @@ public class PlanControllerIntegrationTest {
     this.mockMvc.perform(post("/plans/" + planId + "/leave").with(csrf()).with(user(OWNER_EMAIL)))
       .andExpect(redirectedUrl(NOT_FOUND_REDIRECT));
     assertThat(this.planRepository.findById(planId).orElseThrow().getParticipants(), is(empty()));
+  }
+
+  @Test
+  public void T_PVP_003_getPlansIdPublic_conPlanPublicoDevuelve200ConLosDatos() throws Exception {
+    Long planId = givenPlanFor(this.ownerId, PUBLIC_PLAN_NAME);
+    Plan plan = this.planRepository.findById(planId).orElseThrow();
+    plan.setIsPublic(true);
+    plan.setDescription("Descripcion publica");
+    this.planRepository.save(plan);
+
+    this.mockMvc.perform(get("/plans/" + planId + "/public"))
+      .andExpect(status().isOk())
+      .andExpect(content().string(containsString(PUBLIC_PLAN_NAME)))
+      .andExpect(content().string(containsString("Descripcion publica")));
+  }
+
+  @Test
+  public void T_PVP_004_getPlansIdPublic_conPlanPrivadoRespondeIgualQueUnoInexistente()
+    throws Exception {
+    Long planId = givenPlanFor(this.ownerId, OTHER_PLAN_NAME);
+
+    this.mockMvc.perform(get("/plans/" + planId + "/public"))
+      .andExpect(status().is3xxRedirection())
+      .andExpect(redirectedUrl(NOT_FOUND_REDIRECT));
+
+    this.mockMvc.perform(get("/plans/999999/public"))
+      .andExpect(status().is3xxRedirection())
+      .andExpect(redirectedUrl(NOT_FOUND_REDIRECT));
+  }
+
+  @Test
+  public void T_PVP_005_getPlansIdPublic_sinSesionNoRedirigeALogin() throws Exception {
+    Long planId = givenPlanFor(this.ownerId, PUBLIC_PLAN_NAME);
+    Plan plan = this.planRepository.findById(planId).orElseThrow();
+    plan.setIsPublic(true);
+    this.planRepository.save(plan);
+
+    this.mockMvc.perform(get("/plans/" + planId + "/public")).andExpect(status().isOk());
+  }
+
+  @Test
+  public void T_PVP_006_getPlansIdPublic_conSesionDeNoParticipanteMuestraUnirseYClonar()
+    throws Exception {
+    Long planId = givenPlanFor(this.ownerId, PUBLIC_PLAN_NAME);
+    Plan plan = this.planRepository.findById(planId).orElseThrow();
+    plan.setIsPublic(true);
+    this.planRepository.save(plan);
+
+    this.mockMvc.perform(get("/plans/" + planId + "/public").with(user(OTHER_EMAIL)))
+      .andExpect(status().isOk())
+      .andExpect(content().string(containsString("Unirme al plan")))
+      .andExpect(content().string(containsString("Clonar plan")));
+  }
+
+  @Test
+  public void T_PVP_006_getPlansIdPublic_conSesionDeParticipanteNoMuestraUnirse() throws Exception {
+    Long planId = givenPlanFor(this.ownerId, PUBLIC_PLAN_NAME);
+    Plan plan = this.planRepository.findById(planId).orElseThrow();
+    plan.setIsPublic(true);
+    plan.getParticipants().add(this.userRepository.findById(this.otherId).orElseThrow());
+    this.planRepository.save(plan);
+
+    this.mockMvc.perform(get("/plans/" + planId + "/public").with(user(OTHER_EMAIL)))
+      .andExpect(status().isOk())
+      .andExpect(content().string(containsString("Ver mi plan")))
+      .andExpect(content().string(not(containsString("Unirme al plan"))));
   }
 
   // --- fixtures ---

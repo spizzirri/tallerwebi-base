@@ -130,6 +130,25 @@ public class PlanControllerTest {
     );
   }
 
+  @Test
+  public void T_PVP_001_showPublicPlan_retornaLaVistaYElPlanEnElModelo() {
+    Plan plan = plan(PLAN_ID, "Viaje publico");
+    when(this.planServiceMock.getPublicPlan(PLAN_ID)).thenReturn(plan);
+
+    ModelAndView view = this.controller.showPublicPlan(PLAN_ID, this.authentication);
+
+    assertThat(view.getViewName(), is(equalTo("pages/plans/public")));
+    assertThat(view.getModel().get("plan"), is(sameInstance(plan)));
+    verify(this.planServiceMock, times(1)).getPublicPlan(PLAN_ID);
+  }
+
+  @Test
+  public void T_PVP_002_showPublicPlan_propagaPlanNotFoundException() {
+    when(this.planServiceMock.getPublicPlan(999L)).thenThrow(new PlanNotFoundException());
+
+    assertThrows(PlanNotFoundException.class, () -> this.controller.showPublicPlan(999L, this.authentication));
+  }
+
   // --- POST /plans ---
 
   @Test
