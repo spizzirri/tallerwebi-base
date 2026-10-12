@@ -97,7 +97,6 @@ public class LoginRedirectsTest {
   }
 
   private static Authentication authenticationWithRoles(String... roles) {
-    List<GrantedAuthority> authorities = Arrays.stream(roles)
       .map(SimpleGrantedAuthority::new)
       .map(GrantedAuthority.class::cast)
       .toList();

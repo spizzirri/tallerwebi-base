@@ -146,7 +146,10 @@ public class PlanControllerTest {
   public void T_PVP_002_showPublicPlan_propagaPlanNotFoundException() {
     when(this.planServiceMock.getPublicPlan(999L)).thenThrow(new PlanNotFoundException());
 
-    assertThrows(PlanNotFoundException.class, () -> this.controller.showPublicPlan(999L, this.authentication));
+    assertThrows(
+      PlanNotFoundException.class,
+      () -> this.controller.showPublicPlan(999L, this.authentication)
+    );
   }
 
   // --- POST /plans ---
