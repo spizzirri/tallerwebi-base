@@ -101,8 +101,8 @@ sesion a `/auth/login`.
   vuelve un oracle de ids.
 - **Sin contador de vistas.** No hay `viewCount` en `Plan` y esta spec no agrega uno: la card
   [PPV] tampoco lo pide aun (ver `14-PPV.md`).
-- **CTA de clonar.** El boton apunta a `POST /plans/{id}/clone`, implementado por [CLO]. Hasta que
-  [CLO] entre, el boton puede quedar deshabilitado o el endpoint responder 404; [CLO] lo habilita.
+- **CTA de clonar.** El boton apunta a `POST /plans/{id}/clone`, implementado por [CLO] y ya
+  disponible: el form postea de verdad y redirige al detalle de la copia.
 - **Unirse reutiliza el join existente.** No se crea un flujo nuevo: `POST /plans/join` con
   `shortCode` ya existe (`PlanController.joinPlan`) y agrega al usuario como participant.
 
@@ -286,7 +286,7 @@ Sigue el layout compartido (`layouts/base :: head` + `layout`), Tailwind con los
 </html>
 ```
 
-> El form de clonar responde 404 hasta que [CLO] publique `POST /plans/{id}/clone`. El ternario de
+> El form de clonar postea a `POST /plans/{id}/clone`, que [CLO] ya implemento. El ternario de
 > AC-07 vive en el model (`isLogged`, calculado en el controller), no en Thymeleaf: con anonimo el
 > `Authentication` existe como `AnonymousAuthenticationToken`, y `#authentication != null` seria
 > siempre true.
