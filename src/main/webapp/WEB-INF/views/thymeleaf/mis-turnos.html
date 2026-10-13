@@ -5,7 +5,7 @@
 
 <body>
 
-  <header th:replace="~{fragments/layout :: encabezado('Mis turnos', 'Revisá o cancelá los turnos de tus mascotas.')}"></header>
+  <header th:replace="~{fragments/layout :: encabezado('Mis turnos', 'Revisá, reprogramá o cancelá los turnos de tus mascotas.')}"></header>
 
   <main role="main" class="mp-main">
     <div class="d-flex justify-content-end mb-3">
@@ -41,10 +41,13 @@
                   th:classappend="${t.estado.name() == 'CONFIRMADO'} ? 'text-bg-success' : (${t.estado.name() == 'CANCELADO'} ? 'text-bg-secondary' : 'text-bg-info')">CONFIRMADO</span>
               </td>
               <td class="text-end">
-                <form th:if="${t.estaConfirmado()}" th:action="@{/turnos/{id}/cancelar(id=${t.id})}" method="POST"
-                  onsubmit="return confirm('¿Seguro que querés cancelar este turno?')">
-                  <button class="btn btn-outline-danger btn-sm" type="submit">Cancelar</button>
-                </form>
+                <div th:if="${t.estaConfirmado()}" class="d-flex justify-content-end gap-2">
+                  <a class="btn btn-outline-primary btn-sm" th:href="@{/turnos/{id}/reprogramar(id=${t.id})}">Reprogramar</a>
+                  <form th:action="@{/turnos/{id}/cancelar(id=${t.id})}" method="POST"
+                    onsubmit="return confirm('¿Seguro que querés cancelar este turno?')">
+                    <button class="btn btn-outline-danger btn-sm" type="submit">Cancelar</button>
+                  </form>
+                </div>
               </td>
             </tr>
           </tbody>

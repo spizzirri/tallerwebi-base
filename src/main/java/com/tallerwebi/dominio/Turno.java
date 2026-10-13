@@ -42,6 +42,11 @@ public class Turno {
     estado = EstadoTurno.CANCELADO;
   }
 
+  public void reprogramar(LocalDate nuevaFecha, LocalTime nuevaHora) {
+    setFecha(nuevaFecha);
+    setHora(nuevaHora);
+  }
+
   public Long getId() {
     return id;
   }

@@ -1,25 +1,19 @@
 package com.tallerwebi.presentacion;
 
-import com.tallerwebi.dominio.ServicioCobertura;
-import com.tallerwebi.dominio.ServicioSocio;
-import com.tallerwebi.dominio.ServicioTurno;
-import com.tallerwebi.dominio.ServicioVeterinaria;
-import com.tallerwebi.dominio.Socio;
-import com.tallerwebi.dominio.SolicitudTurno;
-import com.tallerwebi.dominio.Veterinaria;
+import com.tallerwebi.dominio.*;
 import com.tallerwebi.dominio.excepcion.TurnoInvalido;
 import jakarta.servlet.http.HttpSession;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 
 @Controller
 public class ControladorTurno extends ControladorConSocio {
@@ -128,5 +122,55 @@ public class ControladorTurno extends ControladorConSocio {
       modelo.put(ERROR, error);
     }
     return new ModelAndView("nuevo-turno", modelo);
+  }
+
+  @RequestMapping(path = "/turnos/{id}/reprogramar", method = RequestMethod.POST)
+  public ModelAndView reprogramar(
+    @PathVariable("id") Long turnoId,
+    @RequestParam("fecha") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,
+    @RequestParam("hora") @DateTimeFormat(pattern = "HH:mm") LocalTime hora,
+    HttpSession sesion,
+    RedirectAttributes redirectAttributes
+  ) {
+    Socio socio = socioLogueado(sesion);
+
+    if (socio == null) {
+      return new ModelAndView(REDIRECT_HOME);
+    }
+    try {
+      servicioTurno.reprogramar(socio, turnoId, fecha, hora);
+      redirectAttributes.addFlashAttribute(MENSAJE, "Reprogramaste tu turno.");
+    } catch (TurnoInvalido e) {
+      redirectAttributes.addFlashAttribute(ERROR, e.getMessage());
+      return new ModelAndView("redirect:/turnos/" + turnoId + "/reprogramar");
+    }
+    return new ModelAndView(REDIRECT_TURNOS);
+  }
+
+  @RequestMapping(path = "/turnos/{id}/reprogramar", method = RequestMethod.GET)
+  public ModelAndView formularioReprogramar(
+    @PathVariable("id") Long turnoId,
+    @RequestParam(value = "fecha", required = false) @DateTimeFormat(
+      iso = DateTimeFormat.ISO.DATE
+    ) LocalDate fecha,
+    HttpSession sesion,
+    RedirectAttributes redirectAttributes
+  ) {
+    Socio socio = socioLogueado(sesion);
+    if (socio == null) {
+      return new ModelAndView(REDIRECT_HOME);
+    }
+    try {
+      Turno turno = servicioTurno.buscarTurnoDe(socio, turnoId);
+      Map<String, Object> modelo = new ModelMap();
+      modelo.put("turno", turno);
+      modelo.put("fecha", fecha);
+      modelo.put("horarios", servicioTurno.horariosDisponibles(turno.getVeterinaria(), fecha));
+      modelo.put("hoy", LocalDate.now());
+      return new ModelAndView("reprogramar-turno", modelo);
+    } catch (TurnoInvalido e) {
+      redirectAttributes.addFlashAttribute(ERROR, e.getMessage());
+      return new ModelAndView(REDIRECT_TURNOS);
+    }
   }
 }
