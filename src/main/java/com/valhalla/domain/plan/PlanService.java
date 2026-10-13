@@ -7,6 +7,7 @@ public interface PlanService {
   List<Plan> getPlansByUserEmail(String ownerEmail);
   Plan getOwnedPlan(Long id, String ownerEmail);
   Plan getParticipatingPlan(Long id, String userEmail);
+  Plan getPublicPlan(Long id);
   List<Plan> getParticipantPlans(String userEmail);
   void leavePlan(Long id, String userEmail);
   Plan joinPlan(String shortCode, String userEmail);

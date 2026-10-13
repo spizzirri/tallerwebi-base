@@ -1,0 +1,106 @@
+<!DOCTYPE HTML>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<!-- Vista publica read-only de un plan compartido [PVP]. Es el destino de /plans/{id}/public:
+     no hereda los formularios de edicion de pages/plans/detail.html. Usa el modelo que arma
+     PlanController.showPublicPlan: @plan + itineraryPlaces + administratorName + los flags de
+     sesion de los CTAs. -->
+<head th:replace="~{layouts/base :: head(${plan.name})}"></head>
+
+<body th:replace="~{layouts/base :: layout(~{::main})}">
+
+  <main class="mx-auto w-full max-w-3xl flex-1 px-4 py-8">
+    <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Plan público</p>
+    <h1 class="mt-1 text-3xl font-bold text-black" th:text="${plan.name}">Plan</h1>
+
+    <p class="mt-2 text-gray-600" th:if="${!#strings.isEmpty(plan.description)}"
+      th:text="${plan.description}"></p>
+
+    <p class="mt-2 text-gray-700" th:if="${plan.eventDate != null or plan.eventTime != null}">
+      <strong>Fecha:</strong>
+      <span th:if="${plan.eventDate != null}"
+        th:text="${#temporals.format(plan.eventDate, 'dd/MM/yyyy')}"></span>
+      <span th:if="${plan.eventTime != null}"
+        th:text="${#temporals.format(plan.eventTime, 'HH:mm')}"></span>
+    </p>
+
+    <!-- AC-03: el administrador firma el plan; el model siempre trae un valor no vacío
+         (displayName cae al email), así que la línea nunca queda en blanco. -->
+    <p class="mt-1 text-gray-600" th:if="${!#strings.isEmpty(administratorName)}">
+      <strong>Creado por:</strong>
+      <span th:text="${administratorName}"></span>
+    </p>
+
+    <section class="mt-6 rounded-lg bg-white p-6 shadow">
+      <h2 class="mb-4 text-xl font-bold text-black">Itinerario</h2>
+
+      <ol class="space-y-4" th:if="${!#lists.isEmpty(itineraryPlaces)}">
+        <li class="flex gap-3" th:each="stop, it : ${itineraryPlaces}">
+          <span class="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-gray-200 font-bold"
+            th:text="${it.count}">1</span>
+          <div>
+            <p class="font-semibold text-black" th:text="${stop.name}">Lugar</p>
+            <p class="text-xs uppercase tracking-wide text-gray-500" th:if="${stop.category != null}"
+              th:text="${stop.category}">CATEGORY</p>
+            <p class="text-sm text-gray-600" th:if="${!#strings.isEmpty(stop.description)}"
+              th:text="${stop.description}"></p>
+            <p class="text-sm text-gray-500" th:if="${stop.visitDate != null or stop.visitTime != null}">
+              <!--/* Las visitas llegan como texto ISO (placeView); se recortan en vez de parsearlas
+                   porque #temporals no expone parse() en esta version de Thymeleaf. */-->
+              <span th:if="${stop.visitDate != null}"
+                th:text="${#strings.substring(stop.visitDate, 8, 10) + '/' + #strings.substring(stop.visitDate, 5, 7) + '/' + #strings.substring(stop.visitDate, 0, 4)}"></span>
+              <span th:if="${stop.visitTime != null}"
+                th:text="${#strings.substring(stop.visitTime, 0, 5)}"></span>
+            </p>
+            <p class="text-sm text-gray-500" th:if="${stop.visitDate == null and stop.visitTime == null}">
+              Horario por definir
+            </p>
+          </div>
+        </li>
+      </ol>
+
+      <p class="text-gray-500" th:if="${#lists.isEmpty(itineraryPlaces)}">
+        Este plan todavía no tiene lugares.
+      </p>
+    </section>
+
+    <!-- CTAs segun el estado de sesion: join reutiliza el endpoint existente (POST /plans/join),
+         clone apunta a POST /plans/{id}/clone que implementa [CLO]. Sin sesion no se ofrece ningun
+         CTA que ejecute join/clone: el anonimo va al login con la vuelta a esta misma vista
+         (AC-07), con el mismo mecanismo ?redirect= que el link del navbar (currentPath).
+         La decision vive en el model (isLogged et al.), no en #authentication: con anonimo ese
+         objeto existe y "#authentication != null" seria true. -->
+    <div class="mt-6 flex flex-wrap gap-3">
+      <form th:if="${isLogged and !isParticipant and !isPlanAdministrator}" method="post"
+        th:action="@{/plans/join}" class="inline">
+        <input type="hidden" name="shortCode" th:value="${shortCode}">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+        <button type="submit"
+          class="rounded-md bg-primary px-4 py-2 font-medium text-white">Unirme al plan</button>
+      </form>
+
+      <form th:if="${isLogged and !isParticipant and !isPlanAdministrator}" method="post"
+        th:action="@{/plans/{id}/clone(id=${plan.id})}" class="inline">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+        <button type="submit"
+          class="rounded-md bg-primary px-4 py-2 font-medium text-white">
+          Clonar plan
+        </button>
+      </form>
+
+      <a th:if="${!isLogged}"
+        th:href="${#strings.isEmpty(currentPath)} ? @{/auth/login} : @{/auth/login(redirect=${currentPath})}"
+        class="rounded-md bg-primary px-4 py-2 font-medium text-white">
+        Inicia sesion para unirte o clonar
+      </a>
+
+      <a th:if="${isParticipant or isPlanAdministrator}" th:href="@{/plans/{id}(id=${plan.id})}"
+        class="rounded-md bg-gray-800 px-4 py-2 font-medium text-white">
+        Ver mi plan
+      </a>
+    </div>
+  </main>
+
+</body>
+
+</html>
