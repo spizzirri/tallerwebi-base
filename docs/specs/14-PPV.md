@@ -111,9 +111,12 @@ link exacto.
   navbar del landing, `/plans/public` redirige a `/auth/login` sin sesion, y login y registro
   aterrizan ahi (`LoginRedirects.USER_LANDING = "/plans/public"`). Los ACs de acceso anonimo
   quedan vacantes hasta que el equipo diga lo contrario.
-- **"Usar plan" = clonar (trae el [CLO]).** El boton de la tarjeta ejecuta
-  `POST /plans/{id}/clone` y deja al usuario en su copia editable; las tarjetas de planes propios
-  muestran ademas "Editar" (via el detalle). La vista `/plans/{id}/public` de [PVP] sigue pendiente.
+- **"Usar plan" = clonar (el endpoint es de [CLO]).** El boton de la tarjeta ejecuta
+  `POST /plans/{id}/clone`, que pertenece a [CLO]: lo implementa `PlanController` y sus pruebas de
+  seguridad son `integration/PlanCloneSecurityTest.java` (ver "Ownership del endpoint" en
+  15-CLO.md). Este card solo consume ese endpoint, no duplica la logica, y deja al usuario en su
+  copia editable; las tarjetas de planes propios muestran ademas "Editar" (via el detalle). La
+  vista `/plans/{id}/public` de [PVP] ya existe y es el destino de cada tarjeta.
 - **"Crear plan" desde el feed.** Boton "+ Crear plan" en la cabecera que lleva a `/explore`,
   donde vive el modal de creacion, para el caso "nada de lo que hay me interesa".
 - **Usuarios y planes fantasma de demo.** `PublicPlanDataSeeder` siembra 5 personajes con 6
