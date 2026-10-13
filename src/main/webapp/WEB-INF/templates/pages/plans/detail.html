@@ -34,6 +34,8 @@
         .stop-title { display: block; border: 0; padding: 0; margin: 0; background: none; color: var(--bs-body-color); font-size: 1rem; font-weight: 700; text-align: left; overflow-wrap: anywhere; }
         .stop-title:hover { color: var(--bs-secondary); }
         .stop-schedule { display: flex; flex-wrap: wrap; gap: 12px; color: var(--bs-secondary-color); font-size: .82rem; }
+        .visit-editor { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--bs-border-color); }
+        .visit-editor-heading { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--bs-secondary-color); margin-bottom: 8px; }
         .stop-description { color: var(--bs-secondary-color); font-size: .85rem; margin: 4px 0 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .stop-actions { display: flex; flex: 0 0 auto; align-items: center; gap: 6px; }
         .stop-details { border: 1px solid var(--bs-secondary); border-radius: 6px; background: var(--bs-secondary); color: white; padding: 5px 10px; font-size: .8rem; font-weight: 600; }
@@ -138,9 +140,8 @@
 
 <main class="container-fluid px-5">
     <div id="plan-app">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 mt-4">
         <h2 class="fw-bold m-0" th:text="${plan.name}">Nombre del plan</h2>
-        <a th:href="@{/plans}" class="btn btn-secondary">Volver a planes</a>
     </div>
 
     <div class="d-flex justify-content-end mb-4">
@@ -151,6 +152,10 @@
         <form th:unless="${isPlanAdministrator}" th:action="@{/plans/{id}/leave(id=${plan.id})}" method="POST">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
             <button type="submit" class="btn btn-outline-danger">Salir del plan</button>
+        </form>
+        <form th:action="@{/plans/{id}/clone(id=${plan.id})}" method="POST">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            <button type="submit" class="btn btn-outline-primary">Clonar plan</button>
         </form>
     </div>
 
@@ -329,6 +334,23 @@
                 <dt>Hora de visita</dt><dd>{{ selectedEntry.visitTime || 'Sin hora' }}</dd>
                 <dt>Posición en el itinerario</dt><dd>{{ selectedEntry.sortOrder }}</dd>
             </dl>
+            <div th:if="${isPlanAdministrator}" class="visit-editor">
+                <p class="visit-editor-heading">Editar horario de la visita</p>
+                <div class="row g-2">
+                    <div class="col-6">
+                        <label class="form-label small text-muted mb-1" :for="'visit-date-' + selectedEntry.id">Fecha</label>
+                        <input type="date" class="form-control form-control-sm" :id="'visit-date-' + selectedEntry.id"
+                            :value="selectedEntry.visitDate || ''"
+                            @change="updateDateTime(selectedEntry, 'visitDate', $event.target.value)">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label small text-muted mb-1" :for="'visit-time-' + selectedEntry.id">Hora</label>
+                        <input type="time" class="form-control form-control-sm" :id="'visit-time-' + selectedEntry.id"
+                            :value="selectedEntry.visitTime || ''"
+                            @change="updateDateTime(selectedEntry, 'visitTime', $event.target.value)">
+                    </div>
+                </div>
+            </div>
         </template>
     </dialog>
     </div>
@@ -427,6 +449,33 @@
                     if (!this.selectedEntry) throw new Error('Este lugar ya no pertenece al plan. Actualiza la página.');
                     this.$refs.placeDialog.showModal();
                 } catch (error) { this.requestError = error.message; }
+            },
+
+            async updateDateTime(entry, field, value) {
+                if (this.saving || !entry) return;
+                this.saving = true;
+                this.requestError = '';
+                // El PUT reemplaza fecha y hora juntas, así que se manda el par completo: el campo
+                // cambiado y el otro tal como estaba (si no, cambiar uno borra el otro).
+                const payload = {
+                    visitDate: field === 'visitDate' ? (value || null) : (entry.visitDate || null),
+                    visitTime: field === 'visitTime' ? (value || null) : (entry.visitTime || null)
+                };
+                try {
+                    const updated = await this.itineraryRequest('/' + entry.id, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    entry.visitDate = updated.visitDate;
+                    entry.visitTime = updated.visitTime;
+                    const item = this.planPlaces.find(p => p.entryId === entry.id);
+                    if (item) {
+                        item.visitDate = updated.visitDate;
+                        item.visitTime = updated.visitTime;
+                    }
+                } catch (error) { this.requestError = error.message; }
+                finally { this.saving = false; }
             },
             formatVisitDate(value) {
                 const [year, month, day] = value.split('-');

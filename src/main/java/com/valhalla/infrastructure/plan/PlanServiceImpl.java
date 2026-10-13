@@ -111,48 +111,22 @@ public class PlanServiceImpl implements PlanService {
     return planRepository.findByParticipantsEmail(userEmail);
   }
 
-  /**
-   * [CLO] Copia propia y editable de un plan accesible (publico, o privado donde soy admin o
-   * participant). La copia nace privada, con dueño nuevo, shortCode nuevo y sin participantes; el
-   * itinerario se copia referenciando los mismos Place del catalogo (AC-06 de 15-CLO.md).
-   */
   @Override
-  public Plan clonePlan(Long id, String clonerEmail) {
-    User cloner = userRepository.findByEmail(clonerEmail).orElseThrow(UserNotFoundException::new);
-    Plan source = planRepository.findById(id).orElseThrow(PlanNotFoundException::new);
-    boolean accessible =
-      source.getIsPublic() ||
-      source.isAdministrator(clonerEmail) ||
-      source.isParticipant(clonerEmail);
-    if (!accessible) {
-      // Mismo camino que un id inexistente: no se confirma la existencia del plan privado.
+  @Transactional(readOnly = true)
+  public Plan getPublicPlan(Long id) {
+    Plan plan = planRepository.findById(id).orElseThrow(PlanNotFoundException::new);
+    if (!plan.getIsPublic()) {
+      // Privado e inexistente responden igual: la vista publica no confirma que el plan exista.
       throw new PlanNotFoundException();
     }
-
-    Plan copy = new Plan();
-    copy.setName(source.getName());
-    copy.setDescription(source.getDescription());
-    copy.setEventDate(source.getEventDate());
-    copy.setEventTime(source.getEventTime());
-    // La copia nace privada: publicar es decision del nuevo dueño.
-    copy.setIsPublic(false);
-    copy.setAdministrator(cloner);
-    // participants queda vacio por defecto; el shortCode se genera abajo.
-
-    int order = 1;
-    for (PlanPlace entry : source.getPlanPlaces()) {
-      PlanPlace entryCopy = new PlanPlace();
-      entryCopy.setPlace(entry.getPlace()); // misma entidad Place persistida, no una copia
-      entryCopy.setDescription(entry.getDescription());
-      entryCopy.setVisitDate(entry.getVisitDate());
-      entryCopy.setVisitTime(entry.getVisitTime());
-      entryCopy.setSortOrder(order);
-      order++;
-      copy.addPlanPlace(entryCopy);
+    // La vista y los CTAs leen administrador, lugares y participantes despues de cerrar la
+    // transaccion (isParticipant se consulta en el controller): hay que calentarlos aca.
+    if (plan.getAdministrator() != null) {
+      plan.getAdministrator().getEmail();
     }
-
-    copy.setShortCode(generateUniqueShortCode());
-    return planRepository.save(copy);
+    plan.getPlanPlaces().forEach(entry -> entry.getPlace().getName());
+    plan.getParticipants().forEach(user -> user.getEmail());
+    return plan;
   }
 
   @Override
@@ -185,6 +159,46 @@ public class PlanServiceImpl implements PlanService {
   public void deleteOwnedPlan(Long id, String ownerEmail) {
     getOwnedPlan(id, ownerEmail);
     planRepository.deleteById(id);
+  }
+
+  @Override
+  @Transactional
+  public Plan clonePlan(Long id, String clonerEmail) {
+    User cloner = userRepository.findByEmail(clonerEmail).orElseThrow(UserNotFoundException::new);
+    Plan source = planRepository.findById(id).orElseThrow(PlanNotFoundException::new);
+    boolean accessible =
+      source.getIsPublic() ||
+      source.isAdministrator(clonerEmail) ||
+      source.isParticipant(clonerEmail);
+    if (!accessible) {
+      // Same path as a missing id: the answer must not confirm the private plan exists.
+      throw new PlanNotFoundException();
+    }
+
+    Plan copy = new Plan();
+    copy.setName(source.getName());
+    copy.setDescription(source.getDescription());
+    copy.setEventDate(source.getEventDate());
+    copy.setEventTime(source.getEventTime());
+    // The copy is born private: publishing is the new owner's decision (AC-04).
+    copy.setIsPublic(false);
+    copy.setAdministrator(cloner);
+    // Participants stay empty (AC-07); the shortCode is generated below (AC-03).
+
+    int order = 1;
+    for (PlanPlace entry : source.getPlanPlaces()) {
+      PlanPlace entryCopy = new PlanPlace();
+      entryCopy.setPlace(entry.getPlace()); // same persisted Place entity, not a copy (AC-06)
+      entryCopy.setDescription(entry.getDescription());
+      entryCopy.setVisitDate(entry.getVisitDate());
+      entryCopy.setVisitTime(entry.getVisitTime());
+      entryCopy.setSortOrder(order);
+      order++;
+      copy.addPlanPlace(entryCopy);
+    }
+
+    copy.setShortCode(generateUniqueShortCode());
+    return planRepository.save(copy);
   }
 
   /**

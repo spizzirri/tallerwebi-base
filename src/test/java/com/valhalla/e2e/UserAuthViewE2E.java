@@ -13,6 +13,7 @@ import com.valhalla.e2e.views.LoginPage;
 import com.valhalla.e2e.views.RecoveredPasswordPage;
 import com.valhalla.e2e.views.RegisterPage;
 import com.valhalla.e2e.views.WebPage;
+import com.valhalla.presentation.shared.LoginRedirects;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -75,15 +76,15 @@ public class UserAuthViewE2E extends E2eBase {
 
     givenUserSignsInWith(EMAIL, tempPassword);
 
-    thenShouldBeOnPath("/plans/public");
+    thenShouldBeOnPath(LoginRedirects.USER_LANDING);
   }
 
   @Test
   void shouldSignOutAndReturnToLogin() throws MalformedURLException {
     givenUserRegisters(EMAIL, PASSWORD);
-    // The constructor navigates, y /auth/login reenvía una sesión viva al home del usuario
-    // (/plans/public): la page object queda sobre el navbar que trae el botón Logout, y se queda
-    // en el navegador donde se va a renderizar el aviso de cierre.
+    // The constructor navigates, and /auth/login bounces a live session back to USER_LANDING: the
+    // page object ends up on the navbar that carries the Logout button, and stays on the browser
+    // the logout notice will render in.
     LoginPage loginPage = new LoginPage(page, "/auth/login");
 
     loginPage.clickLogout();
@@ -191,8 +192,8 @@ public class UserAuthViewE2E extends E2eBase {
     registerPage.clickRegister();
 
     // Registrarse deja la sesión abierta: el mismo redirect que haría un login normal, sin pasar
-    // por el formulario de login (AC-01). El home del usuario es el feed de planes públicos.
-    thenShouldBeOnPath("/plans/public");
+    // por el formulario de login (AC-01).
+    thenShouldBeOnPath(LoginRedirects.USER_LANDING);
   }
 
   /**

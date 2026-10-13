@@ -25,6 +25,16 @@
         <hsqldb.version>2.7.4</hsqldb.version>
         <checkstyle.version>3.6.0</checkstyle.version>
         <checkstyle.runtime.version>13.8.0</checkstyle.runtime.version>
+        <!-- Whether jacoco:check enforces the coverage thresholds. Its rules are written
+             for the whole suite (bundle at least 0.80 line, domain 1.00 line and branch,
+             presentation 1.00 line), but the goal sits in the test phase, which every
+             surefire run passes through. A run of a single layer therefore measured only
+             that layer and failed the build with all of its own tests green. gate.ps1 sets
+             this to true for unit, integration, e2e and all with a target; only a bare
+             `all` executes everything the thresholds assume. Not jacoco.skip: that one
+             also disarms prepare-agent and the report, and would cost the coverage
+             matrix. -->
+        <jacoco.gate.skip>false</jacoco.gate.skip>
     </properties>
 
     <dependencies>
@@ -235,6 +245,12 @@
                     <includes>
                         <include>**/e2e/*E2E.java</include>
                     </includes>
+                    <!-- No JaCoCo here on purpose: these tests drive the app through a real
+                         browser against the Jetty process, and the code under test runs in
+                         Jetty's JVM (not in this failsafe fork), so an agent on argLine
+                         would only measure Playwright driver calls, never the app. E2E
+                         contributes flow validation, not coverage; the coverage number is
+                         unit+integration only (see the jacoco report execution). -->
                     <!-- fail the build when the include pattern matches nothing, instead of
                          reporting BUILD SUCCESS for zero tests -->
                     <failIfNoTests>true</failIfNoTests>
@@ -415,14 +431,15 @@
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.15</version>
                 <configuration>
-                    <!-- Shared exclusions (report and check): classes without business logic
-                         are skipped so they don't skew the coverage metrics.
-                         DTOs and JPA entities are pure boilerplate (constructors/getters/setters). -->
+                    <!-- Shared exclusions (report and check): config wiring and the servlet
+                         initializer carry no business logic, and the DTOs are pure value
+                         holders (constructors/getters/setters) whose coverage would only
+                         pad the numbers. The JPA entities are deliberately NOT excluded:
+                         Plan (isAdministrator, isParticipant, updateFrom, getIsPublic) and
+                         User (activate) hold real behaviour the gate has to measure. -->
                     <excludes>
                         <exclude>com/valhalla/config/*</exclude>
                         <exclude>com/valhalla/MyServletInitializer.class</exclude>
-                        <exclude>com/valhalla/domain/user/User.class</exclude>
-                        <exclude>com/valhalla/domain/plan/Plan.class</exclude>
                         <exclude>com/valhalla/presentation/plan/PlanRequest.class</exclude>
                         <exclude>com/valhalla/presentation/plan/PlanPlaceRequest.class</exclude>
                         <exclude>com/valhalla/presentation/plan/PlanPlaceUpdateRequest.class</exclude>
@@ -444,11 +461,24 @@
                         <configuration>
                             <!-- Binary file where the collected execution data is stored -->
                             <destFile>${project.basedir}/.code-quality/jacoco/jacoco.exec</destFile>
+                            <!-- Replace, don't append. With the default (true) the agent appends
+                                 to whatever the previous run left behind, so a local `mvn test`
+                                 could pass the gate on coverage measured in an older run that
+                                 included lines since deleted. Safe because surefire forks once
+                                 (forkCount=1): one JVM replaces the file once. -->
+                            <append>false</append>
                         </configuration>
                     </execution>
                     <execution>
                         <id>report</id>
                         <!-- Phase where the binary data is processed into readable reports -->
+                        <!-- Bound to `test`, so this report covers ONLY surefire (unit +
+                             integration). The browser E2E suite runs later in `integration-test`
+                             (failsafe) and is deliberately not folded in: the app under test
+                             executes inside the Jetty JVM, which prepare-agent does not
+                             instrument (it only arms the surefire fork). So the CSV/HTML here
+                             are unit+integration numbers; do not read them as end-to-end
+                             coverage. -->
                         <phase>test</phase>
                         <goals>
                             <!-- Generates the coverage report (HTML, XML, CSV) -->
@@ -470,23 +500,59 @@
                             <goal>check</goal>
                         </goals>
                         <configuration>
+                            <!-- Gate toggle, see jacoco.gate.skip in <properties>. Written
+                                 here as explicit configuration because the goal's own user
+                                 property is jacoco.skip, which prepare-agent and the report
+                                 share: setting that to skip the gate would skip the report
+                                 with it. -->
+                            <skip>${jacoco.gate.skip}</skip>
                             <!-- Data file to validate -->
                             <dataFile>${project.basedir}/.code-quality/jacoco/jacoco.exec</dataFile>
                             <rules>
-                                <!-- Business logic must be fully covered (domain + presentation). -->
+                                <!-- Business logic must be fully covered (domain). Domain holds the
+                                     access-check predicates (Plan.isAdministrator/isParticipant,
+                                     getIsPublic) and the value rules, so LINE and BRANCH are both
+                                     pinned at 100%: a line-only rule lets a dead disjunct pass, and
+                                     these disjuncts are exactly what the clone access-check runs. -->
                                 <rule>
                                     <element>PACKAGE</element>
                                     <includes>
                                         <!-- The trailing .* is load-bearing. JaCoCo matches PACKAGE
-                                             names exactly, and there is no com.valhalla.domain or
-                                             com.valhalla.presentation package: the code lives in
-                                             .login, .user, .auth and friends. Without the wildcard
-                                             this rule evaluated nothing and every build reported
-                                             "All coverage checks have been met" while domain and
-                                             presentation sat untested. The old explicit
-                                             com.valhalla.domain.exception entry is what the
-                                             wildcard now subsumes. -->
+                                             names exactly, and there is no com.valhalla.domain:
+                                             the code lives in .plan, .user, .place and friends.
+                                             Without the wildcard this rule evaluated nothing and
+                                             every build reported "All coverage checks have been
+                                             met" while domain sat untested. The bare package
+                                             spelling sits alongside the wildcard for the same
+                                             reason infrastructure carries both: a class dropped
+                                             straight into com.valhalla.domain (no subpackage)
+                                             would otherwise escape the 100% rule entirely. -->
+                                        <include>com.valhalla.domain</include>
                                         <include>com.valhalla.domain.*</include>
+                                    </includes>
+                                    <limits>
+                                        <limit>
+                                            <counter>LINE</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>1.00</minimum>
+                                        </limit>
+                                        <limit>
+                                            <counter>BRANCH</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>1.00</minimum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                                <!-- Presentation is fully line-covered but not branch-pinned: its
+                                     missed branches are structural validation ternaries (null form
+                                     fields, default visibility), not access decisions. Pinning BRANCH
+                                     here would force tests on defensive wiring while the real access
+                                     logic lives in domain and infrastructure.plan, which carry their
+                                     own branch rules. -->
+                                <rule>
+                                    <element>PACKAGE</element>
+                                    <includes>
+                                        <include>com.valhalla.presentation</include>
                                         <include>com.valhalla.presentation.*</include>
                                     </includes>
                                     <limits>
@@ -666,6 +732,12 @@
                 <cpd.skip>true</cpd.skip>
                 <prettier.skip>true</prettier.skip>
                 <jacoco.skip>true</jacoco.skip>
+                <!-- jacoco.skip alone no longer reaches the check goal: the check-coverage
+                     execution spells its skip out as ${jacoco.gate.skip}, and an explicit
+                     configuration wins over the goal's user property. Without this line
+                     -Fast would skip the agent and the report but still evaluate the gate
+                     against a report that was never written, which fails on a clean clone. -->
+                <jacoco.gate.skip>true</jacoco.gate.skip>
             </properties>
         </profile>
     </profiles>

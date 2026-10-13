@@ -8,11 +8,12 @@ public interface PlanService {
   List<Plan> getPublicPlans();
   Plan getOwnedPlan(Long id, String ownerEmail);
   Plan getParticipatingPlan(Long id, String userEmail);
+  Plan getPublicPlan(Long id);
   List<Plan> getParticipantPlans(String userEmail);
-  /** [CLO] Copia propia y editable de un plan accesible: nuevo dueño, nuevo shortCode. */
-  Plan clonePlan(Long id, String clonerEmail);
   void leavePlan(Long id, String userEmail);
   Plan joinPlan(String shortCode, String userEmail);
   Plan updatePlan(Long id, Plan changes, String ownerEmail);
   void deleteOwnedPlan(Long id, String ownerEmail);
+  /** [CLO] Copia propia y editable de un plan accesible: nuevo dueño, nuevo shortCode. */
+  Plan clonePlan(Long id, String clonerEmail);
 }

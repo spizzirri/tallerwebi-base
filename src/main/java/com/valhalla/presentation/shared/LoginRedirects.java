@@ -15,9 +15,15 @@ import org.springframework.security.core.GrantedAuthority;
 public final class LoginRedirects {
 
   private static final String ADMIN_LANDING = "/admin/home";
-  // [PPV] El feed de planes publicos es el home del usuario: se loguea y lo primero que ve son
-  // los planes que armaron otros, tipo muro. Desde ahi se usa, edita o crea uno nuevo.
-  private static final String USER_LANDING = "/plans/public";
+  /**
+   * [PPV] Destino de un usuario sin rol admin: el feed de planes publicos es el home del usuario,
+   * se loguea y lo primero que ve son los planes que armaron otros, tipo muro. Desde ahi se usa,
+   * edita o crea uno nuevo.
+   *
+   * <p>Es publico porque los tests de aterrizaje (unitarios y E2E) afirman contra esta constante
+   * en vez de contra un literal: cuando el landing cambie las pruebas lo siguen sin editarse.
+   */
+  public static final String USER_LANDING = "/plans/public";
 
   private LoginRedirects() {}
 
@@ -62,5 +68,28 @@ public final class LoginRedirects {
       .stream()
       .map(GrantedAuthority::getAuthority)
       .anyMatch(role -> "ROLE_ADMIN".equals(role) || "ADMIN".equals(role));
+  }
+
+  /**
+   * Si una URL de retorno es una ruta interna segura. El {@code redirect} viaja en la URL, así que
+   * lo controla cualquiera: solo se aceptan rutas relativas que empiezan con {@code /} y no con
+   * {@code //} (protocol-relative), sin {@code ://}, backslashes ni CR/LF. Sin este corte, un POST
+   * con {@code redirect=https://otro-sitio} desviaría el login a un origen externo (open redirect).
+   *
+   * <p>La comparten los handlers de login exitoso y fallido: los dos reenvían el mismo parámetro.
+   *
+   * @param value la ruta candidata, tal como llegó en el parámetro
+   * @return true solo para una ruta interna de la app
+   */
+  public static boolean isSafeInternalPath(String value) {
+    if (value == null || value.isBlank() || !value.startsWith("/") || value.startsWith("//")) {
+      return false;
+    }
+    if (
+      value.contains("://") || value.contains("\\") || value.contains("\r") || value.contains("\n")
+    ) {
+      return false;
+    }
+    return true;
   }
 }

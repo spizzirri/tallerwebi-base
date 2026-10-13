@@ -1,5 +1,6 @@
 package com.valhalla.config;
 
+import com.valhalla.infrastructure.security.CustomAuthenticationFailureHandler;
 import com.valhalla.infrastructure.security.CustomAuthenticationSuccessHandler;
 import com.valhalla.infrastructure.security.HomeOnAccessDeniedHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,9 @@ public class SecurityConfig {
 
   @Autowired
   private CustomAuthenticationSuccessHandler successHandler;
+
+  @Autowired
+  private CustomAuthenticationFailureHandler failureHandler;
 
   @Autowired
   private HomeOnAccessDeniedHandler homeOnAccessDeniedHandler;
@@ -55,7 +59,7 @@ public class SecurityConfig {
           .usernameParameter("username")
           .passwordParameter("password")
           .successHandler(successHandler)
-          .failureUrl("/auth/login?error=true")
+          .failureHandler(failureHandler)
           .permitAll()
       )
       .logout(logout ->
@@ -130,9 +134,14 @@ public class SecurityConfig {
         auth
           .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/**", "/explore")
           .permitAll()
-          // [PPV, decision de producto] El feed de planes publicos es para usuarios con sesion:
-          // /plans/** entera vive detras de authenticated(), asi que un anonimo que llegue a
-          // /plans/public aterriza en /auth/login.
+          // [PPV, decision de producto] El feed /plans/public es para usuarios con sesion: cae en
+          // el anyRequest().authenticated() de abajo, junto al resto de /plans/**, asi que un
+          // anonimo que llegue a /plans/public aterriza en /auth/login.
+          // [PVP] En cambio la vista publica de un plan compartido es visible sin sesion. El
+          // allowlist es solo para GET: el POST de /plans/{id}/clone [CLO] sigue exigiendo estar
+          // autenticado.
+          .requestMatchers(org.springframework.http.HttpMethod.GET, "/plans/*/public")
+          .permitAll()
           .requestMatchers("/api/**")
           .authenticated()
           .requestMatchers("/", "/share/**", "/reload/**")
@@ -149,7 +158,7 @@ public class SecurityConfig {
           .usernameParameter("username")
           .passwordParameter("password")
           .successHandler(successHandler)
-          .failureUrl("/auth/login?error=true")
+          .failureHandler(failureHandler)
           .permitAll()
       )
       .exceptionHandling(ex ->

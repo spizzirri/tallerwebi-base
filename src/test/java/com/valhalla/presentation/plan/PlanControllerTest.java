@@ -38,8 +38,10 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.Validator;
@@ -136,6 +138,146 @@ public class PlanControllerTest {
       PlanNotFoundException.class,
       () -> this.controller.showPlan(999L, this.authentication)
     );
+  }
+
+  @Test
+  public void T_PVP_001_showPublicPlan_retornaLaVistaYElPlanEnElModelo() {
+    Plan plan = plan(PLAN_ID, "Viaje publico");
+    when(this.planServiceMock.getPublicPlan(PLAN_ID)).thenReturn(plan);
+
+    ModelAndView view = this.controller.showPublicPlan(PLAN_ID, this.authentication);
+
+    assertThat(view.getViewName(), is(equalTo("pages/plans/public")));
+    assertThat(view.getModel().get("plan"), is(sameInstance(plan)));
+    verify(this.planServiceMock, times(1)).getPublicPlan(PLAN_ID);
+  }
+
+  @Test
+  public void T_PVP_002_showPublicPlan_propagaPlanNotFoundException() {
+    when(this.planServiceMock.getPublicPlan(999L)).thenThrow(new PlanNotFoundException());
+
+    assertThrows(
+      PlanNotFoundException.class,
+      () -> this.controller.showPublicPlan(999L, this.authentication)
+    );
+  }
+
+  @Test
+  public void T_PVP_008_showPublicPlan_conIdInexistentePropagaPlanNotFoundException() {
+    // U-03: el id que nadie conoce sigue el mismo camino que un plan privado (U-02). La
+    // distinción real vive en el servicio; acá se prueba que el controller no la filtra.
+    when(this.planServiceMock.getPublicPlan(404L)).thenThrow(new PlanNotFoundException());
+
+    assertThrows(
+      PlanNotFoundException.class,
+      () -> this.controller.showPublicPlan(404L, this.authentication)
+    );
+    verify(this.planServiceMock, times(1)).getPublicPlan(404L);
+  }
+
+  @Test
+  public void T_PVP_009_showPublicPlan_armaElItinerarioEnOrdenSortOrder() {
+    // given: la colección viene ordenada por @OrderBy("sortOrder ASC") desde JPA
+    Plan plan = plan(PLAN_ID, "Viaje publico");
+    plan.addPlanPlace(stop(1L, "Aeropuerto", 1));
+    plan.addPlanPlace(stop(2L, "Centro historico", 2));
+    plan.addPlanPlace(stop(3L, "Mirador", 3));
+    when(this.planServiceMock.getPublicPlan(PLAN_ID)).thenReturn(plan);
+
+    // when
+    ModelAndView view = this.controller.showPublicPlan(PLAN_ID, this.authentication);
+
+    // then
+    List<?> stops = (List<?>) view.getModel().get("itineraryPlaces");
+    List<String> names = stops
+      .stream()
+      .map(item -> (String) ((Map<?, ?>) item).get("name"))
+      .toList();
+    assertThat(names, is(List.of("Aeropuerto", "Centro historico", "Mirador")));
+  }
+
+  @Test
+  public void T_PVP_010_showPublicPlan_anonimoDejaLosFlagsEnFalsoYSinAtributosDeEdicion() {
+    // given: con anonimo el Authentication existe, pero el principal no es un UserDetails
+    Plan plan = plan(PLAN_ID, "Viaje publico");
+    when(this.planServiceMock.getPublicPlan(PLAN_ID)).thenReturn(plan);
+    Authentication anonymous = new AnonymousAuthenticationToken(
+      "key",
+      "anonymousUser",
+      AuthorityUtils.createAuthorityList("ROLE_ANONYMOUS")
+    );
+
+    // when
+    ModelAndView view = this.controller.showPublicPlan(PLAN_ID, anonymous);
+
+    // then: los CTAs se deciden por estos flags y la vista es read-only
+    assertThat(view.getViewName(), is(equalTo("pages/plans/public")));
+    assertThat(view.getModel().get("isLogged"), is(false));
+    assertThat(view.getModel().get("isParticipant"), is(false));
+    assertThat(view.getModel().get("isPlanAdministrator"), is(false));
+    assertThat(view.getModel().containsKey("participantEmails"), is(false));
+  }
+
+  @Test
+  public void T_PVP_011_showPublicPlan_conSesionDeNoParticipanteExponeElShortCode() {
+    // given
+    Plan plan = plan(PLAN_ID, "Viaje publico");
+    plan.setShortCode("ABCD1234");
+    when(this.planServiceMock.getPublicPlan(PLAN_ID)).thenReturn(plan);
+    // El principal de una sesión real es un UserDetails, no un String (ver currentEmail)
+    Authentication visitor = new UsernamePasswordAuthenticationToken(
+      new org.springframework.security.core.userdetails.User(
+        "visitante@test.com",
+        "n/a",
+        AuthorityUtils.createAuthorityList("ROLE_USER")
+      ),
+      null
+    );
+
+    // when
+    ModelAndView view = this.controller.showPublicPlan(PLAN_ID, visitor);
+
+    // then: el form de join necesita el código, pero el visitante no es ni admin ni participante
+    assertThat(view.getModel().get("isLogged"), is(true));
+    assertThat(view.getModel().get("isParticipant"), is(false));
+    assertThat(view.getModel().get("isPlanAdministrator"), is(false));
+    assertThat(view.getModel().get("shortCode"), is(equalTo("ABCD1234")));
+  }
+
+  @Test
+  public void T_PVP_012_showPublicPlan_muestraElNombreCompletoDelAdministrador() {
+    // given
+    Plan plan = plan(PLAN_ID, "Viaje publico");
+    User admin = new User();
+    admin.setEmail("admin@test.com");
+    admin.setFirstName("Ana");
+    admin.setLastName("Gomez");
+    plan.setAdministrator(admin);
+    when(this.planServiceMock.getPublicPlan(PLAN_ID)).thenReturn(plan);
+
+    // when
+    ModelAndView view = this.controller.showPublicPlan(PLAN_ID, this.authentication);
+
+    // then
+    assertThat(view.getModel().get("administratorName"), is(equalTo("Ana Gomez")));
+  }
+
+  @Test
+  public void T_PVP_013_showPublicPlan_administradorSinNombreUsaElEmail() {
+    // given: sin nombre de visualización el "Creado por" nunca queda en blanco (14-PPV)
+    Plan plan = plan(PLAN_ID, "Viaje publico");
+    User admin = new User();
+    admin.setEmail("admin@test.com");
+    admin.setFirstName("   ");
+    admin.setLastName(null);
+    plan.setAdministrator(admin);
+    when(this.planServiceMock.getPublicPlan(PLAN_ID)).thenReturn(plan);
+
+    // when
+    ModelAndView view = this.controller.showPublicPlan(PLAN_ID, this.authentication);
+
+    // then
+    assertThat(view.getModel().get("administratorName"), is(equalTo("admin@test.com")));
   }
 
   // --- GET /plans/public [PPV] ---
@@ -408,36 +550,35 @@ public class PlanControllerTest {
     verify(this.planServiceMock, times(1)).deleteOwnedPlan(PLAN_ID, OWNER_EMAIL);
   }
 
-  // --- POST /plans/{id}/clone [CLO/PPV "Usar plan"] ---
+  // --- POST /plans/{id}/clone ---
 
-  /** CLO U-12: clonar responde con un redirect al detalle de la copia recién creada. */
   @Test
-  public void clonePlan_deberiaRedirigirAlDetalleDeLaCopiaCreada() {
-    // given
-    Plan copy = plan(99L, "Copia de Viaje a Bariloche");
+  public void T_PLN_069_clonePlan_redirigeAlDetalleDeLaCopia() {
+    // given (U-12)
+    Plan copy = plan(PLAN_ID + 1, "Viaje a Bariloche");
     when(this.planServiceMock.clonePlan(PLAN_ID, OWNER_EMAIL)).thenReturn(copy);
 
     // when
     ModelAndView view = this.controller.clonePlan(PLAN_ID, this.authentication);
 
     // then
-    assertThat(view.getViewName(), is(equalTo("redirect:/plans/99")));
+    assertThat(view.getViewName(), is(equalTo("redirect:/plans/" + copy.getId())));
+    verify(this.planServiceMock, times(1)).clonePlan(PLAN_ID, OWNER_EMAIL);
   }
 
-  /**
-   * CLO U-13: el endpoint no acepta ningún parametro de form — el email del clonador sale del
-   * Authentication de la sesión, así que un form inyectado no puede elegir el dueño de la copia.
-   */
   @Test
-  public void clonePlan_elEmailDebeSalirDeLaSesionNoDelForm() {
-    // given
-    when(this.planServiceMock.clonePlan(anyLong(), anyString())).thenReturn(plan(5L, "Copia"));
+  public void T_PLN_069b_clonePlan_tomaElEmailDeLaSesionYNoUnDuenoDelForm() {
+    // given (U-13): the cloner travels in the session; the endpoint takes no form body at all
+    Authentication clonerSession = new UsernamePasswordAuthenticationToken("cloner@test.com", null);
+    Plan copy = plan(PLAN_ID + 1, "Copia");
+    when(this.planServiceMock.clonePlan(PLAN_ID, "cloner@test.com")).thenReturn(copy);
 
     // when
-    this.controller.clonePlan(PLAN_ID, this.authentication);
+    ModelAndView view = this.controller.clonePlan(PLAN_ID, clonerSession);
 
     // then
-    verify(this.planServiceMock).clonePlan(PLAN_ID, OWNER_EMAIL);
+    assertThat(view.getViewName(), is(equalTo("redirect:/plans/" + copy.getId())));
+    verify(this.planServiceMock, times(1)).clonePlan(PLAN_ID, "cloner@test.com");
   }
 
   // --- helpers ---
@@ -479,5 +620,15 @@ public class PlanControllerTest {
 
   private static Map<?, ?> cardAt(ModelAndView view, int index) {
     return (Map<?, ?>) cardsOf(view).get(index);
+  }
+
+  private static PlanPlace stop(Long placeId, String placeName, int sortOrder) {
+    Place place = new Place();
+    place.setId(placeId);
+    place.setName(placeName);
+    PlanPlace entry = new PlanPlace();
+    entry.setPlace(place);
+    entry.setSortOrder(sortOrder);
+    return entry;
   }
 }
