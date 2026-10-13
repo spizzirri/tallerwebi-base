@@ -13,6 +13,7 @@ import com.valhalla.e2e.views.LoginPage;
 import com.valhalla.e2e.views.RecoveredPasswordPage;
 import com.valhalla.e2e.views.RegisterPage;
 import com.valhalla.e2e.views.WebPage;
+import com.valhalla.presentation.shared.LoginRedirects;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -74,13 +75,13 @@ public class UserAuthViewE2E extends E2eBase {
 
     givenUserSignsInWith(EMAIL, tempPassword);
 
-    thenShouldBeOnPath("/explore");
+    thenShouldBeOnPath(LoginRedirects.USER_LANDING);
   }
 
   @Test
   void shouldSignOutAndReturnToLogin() throws MalformedURLException {
     givenUserRegisters(EMAIL, PASSWORD);
-    // The constructor navigates, and /auth/login bounces a live session back to /explore: the
+    // The constructor navigates, and /auth/login bounces a live session back to USER_LANDING: the
     // page object ends up on the navbar that carries the Logout button, and stays on the browser
     // the logout notice will render in.
     LoginPage loginPage = new LoginPage(page, "/auth/login");
@@ -191,7 +192,7 @@ public class UserAuthViewE2E extends E2eBase {
 
     // Registrarse deja la sesión abierta: el mismo redirect que haría un login normal, sin pasar
     // por el formulario de login (AC-01).
-    thenShouldBeOnPath("/explore");
+    thenShouldBeOnPath(LoginRedirects.USER_LANDING);
   }
 
   /**

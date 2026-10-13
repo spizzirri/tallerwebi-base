@@ -8,8 +8,10 @@ import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
 import com.microsoft.playwright.*;
 import com.valhalla.e2e.views.LoginPage;
 import com.valhalla.e2e.views.UserFormPage;
+import com.valhalla.presentation.shared.LoginRedirects;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.regex.Pattern;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -55,7 +57,7 @@ public class LoginViewE2E extends E2eBase {
     givenUserIsOnLoginPage();
     givenUserFillsLoginFormWith("juan@unlam.edu.ar", generatedPassword);
     whenUserClicksSignIn();
-    // AC-04: juan is a USER, so LoginRedirects lands him on /explore and not /admin/home.
+    // AC-04: juan is a USER, so LoginRedirects lands him on USER_LANDING and not /admin/home.
     // Waiting for /admin/home here is what left this job red in CI (P-01); waiting for "/"
     // became equally wrong when 5839988 moved the USER landing to /explore.
     thenShouldBeRedirectedToLanding();
@@ -101,9 +103,15 @@ public class LoginViewE2E extends E2eBase {
   }
 
   private void thenShouldBeRedirectedToLanding() throws MalformedURLException {
-    loginPage.waitForPath("/explore");
+    // Contra la constante, no un literal: tolera el cambio de landing (p. ej. /plans/public).
+    loginPage.waitForPath(LoginRedirects.USER_LANDING);
     URL url = loginPage.getCurrentUrl();
-    assertThat(url.getPath(), matchesPattern("^/explore(?:;jsessionid=[^/\\s]+)?$"));
+    assertThat(
+      url.getPath(),
+      matchesPattern(
+        "^" + Pattern.quote(LoginRedirects.USER_LANDING) + "(?:;jsessionid=[^/\\s]+)?$"
+      )
+    );
   }
 
   private void thenShouldSeeAnErrorMessage() {

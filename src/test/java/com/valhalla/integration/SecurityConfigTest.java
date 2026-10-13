@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrlPattern;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.valhalla.presentation.shared.LoginRedirects;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,7 +77,7 @@ public class SecurityConfigTest {
   public void shouldRedirectACommonUserAwayFromTheAdminHome() throws Exception {
     this.mockMvc.perform(get("/admin/home"))
       .andExpect(status().is3xxRedirection())
-      .andExpect(redirectedUrl("/explore"));
+      .andExpect(redirectedUrl(LoginRedirects.USER_LANDING));
   }
 
   @Test
@@ -91,7 +92,7 @@ public class SecurityConfigTest {
   public void shouldRedirectACommonUserAwayFromAdminUsers() throws Exception {
     this.mockMvc.perform(get("/admin/users"))
       .andExpect(status().is3xxRedirection())
-      .andExpect(redirectedUrl("/explore"));
+      .andExpect(redirectedUrl(LoginRedirects.USER_LANDING));
   }
 
   /** Y al revés: un ADMIN que cruza a /auth/** vuelve a /admin/home, no a la landing. */

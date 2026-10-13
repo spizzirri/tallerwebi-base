@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import com.valhalla.e2e.views.PlansPage;
 import com.valhalla.e2e.views.RegisterPage;
 import com.valhalla.e2e.views.WebPage;
+import com.valhalla.presentation.shared.LoginRedirects;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -61,7 +62,7 @@ public class DetailPlanCloneE2E extends E2eBase {
     register.typePassword(PASSWORD);
     register.typeConfirmPassword(PASSWORD);
     register.clickRegister();
-    new WebPage(page).waitForPath("/explore");
+    new WebPage(page).waitForPath(LoginRedirects.USER_LANDING);
 
     PlansPage plans = new PlansPage(page);
     plans.navigateToPlans();

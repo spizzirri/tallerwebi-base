@@ -18,6 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.valhalla.domain.login.LoginService;
 import com.valhalla.domain.user.UserRepository;
 import com.valhalla.domain.user.UserService;
+import com.valhalla.presentation.shared.LoginRedirects;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -112,10 +113,10 @@ public class LoginControllerTest {
   /** Un usuario común no aterriza en /admin/home: ahí no tiene nada que ver. */
   @Test
   @WithMockUser(username = "user@unlam.edu.ar", roles = { "USER" })
-  public void shouldRedirectACommonUserToTheExploreWhenAlreadySignedIn() throws Exception {
+  public void shouldRedirectACommonUserToTheLandingWhenAlreadySignedIn() throws Exception {
     this.mockMvc.perform(get("/admin/login"))
       .andExpect(status().is3xxRedirection())
-      .andExpect(redirectedUrl("/explore"));
+      .andExpect(redirectedUrl(LoginRedirects.USER_LANDING));
   }
 
   /**

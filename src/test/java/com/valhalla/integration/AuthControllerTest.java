@@ -18,6 +18,7 @@ import com.valhalla.domain.login.LoginService;
 import com.valhalla.domain.user.User;
 import com.valhalla.domain.user.UserRepository;
 import com.valhalla.domain.user.UserService;
+import com.valhalla.presentation.shared.LoginRedirects;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -119,7 +120,7 @@ public class AuthControllerTest {
           .param("confirmPassword", PASSWORD)
       )
       .andExpect(status().is3xxRedirection())
-      .andExpect(redirectedUrl("/explore"));
+      .andExpect(redirectedUrl(LoginRedirects.USER_LANDING));
 
     this.mockMvc.perform(get("/plans").session(session))
       .andExpect(status().isOk())
@@ -199,7 +200,7 @@ public class AuthControllerTest {
           .param("password", USER_PASSWORD)
       )
       .andExpect(status().is3xxRedirection())
-      .andExpect(redirectedUrl("/explore"));
+      .andExpect(redirectedUrl(LoginRedirects.USER_LANDING));
   }
 
   @Test
@@ -271,7 +272,7 @@ public class AuthControllerTest {
 
     logIn(email, tempPassword)
       .andExpect(status().is3xxRedirection())
-      .andExpect(redirectedUrl("/explore"));
+      .andExpect(redirectedUrl(LoginRedirects.USER_LANDING));
   }
 
   // --- I-09 ---
@@ -297,7 +298,7 @@ public class AuthControllerTest {
           .param("username", USER_EMAIL)
           .param("password", USER_PASSWORD)
       )
-      .andExpect(redirectedUrl("/explore"));
+      .andExpect(redirectedUrl(LoginRedirects.USER_LANDING));
 
     this.mockMvc.perform(post("/auth/logout").session(session).with(csrf()))
       .andExpect(status().is3xxRedirection())
@@ -317,7 +318,7 @@ public class AuthControllerTest {
   public void shouldRedirectAwayFromTheUserLoginPageWhenAlreadySignedIn() throws Exception {
     this.mockMvc.perform(get("/auth/login"))
       .andExpect(status().is3xxRedirection())
-      .andExpect(redirectedUrl("/explore"));
+      .andExpect(redirectedUrl(LoginRedirects.USER_LANDING));
   }
 
   @Test
