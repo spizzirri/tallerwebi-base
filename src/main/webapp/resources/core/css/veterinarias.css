@@ -202,6 +202,7 @@
 
 .veterinarias-back:hover,
 .veterinarias-back:focus {
+  color: var(--color-blanco);
   background: #f43f5e;
   transform: translateY(-1px);
 }
@@ -291,6 +292,7 @@
 
 .veterinaria-card__turno:hover,
 .veterinaria-card__turno:focus {
+  color: var(--color-blanco);
   background: #0d9488;
   transform: translateY(-1px);
 }
