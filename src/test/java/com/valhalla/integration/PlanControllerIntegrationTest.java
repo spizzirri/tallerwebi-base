@@ -539,6 +539,54 @@ public class PlanControllerIntegrationTest {
     assertThat(original.getPlanPlaces(), hasSize(1));
   }
 
+  // --- AC-12: el CTA "Clonar plan" de la vista publica ---
+
+  @Test
+  public void T_CLN_001_getPlansIdPublic_conSesionElCtaDeClonarApuntaAlEndpointDeClonar()
+    throws Exception {
+    // given: un plan publico ajeno con itinerario
+    Long planId = givenPublicPlanWithPlace();
+
+    // when
+    String html =
+      this.mockMvc.perform(get("/plans/" + planId + "/public").with(user(OTHER_EMAIL)))
+        .andExpect(status().isOk())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+
+    // then (AC-12): el form de clonar existe y postea al endpoint de CLO, no a otro lado
+    assertThat(html, containsString("Clonar plan"));
+    assertThat(html, containsString("action=\"/plans/" + planId + "/clone\""));
+    assertThat(html, containsString("name=\"_csrf\""));
+  }
+
+  @Test
+  public void T_CLN_002_getPlansIdPublic_sinSesionElCtaDeClonarLlevaAlLoginConservandoLaVuelta()
+    throws Exception {
+    // given
+    Long planId = givenPublicPlanWithPlace();
+
+    // when: anonimo abre la vista publica
+    String html =
+      this.mockMvc.perform(get("/plans/" + planId + "/public"))
+        .andExpect(status().isOk())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+
+    // then (AC-12): el CTA no ejecuta clone, lleva al login con redirect de vuelta al plan.
+    // El parametro viaja url-encoded segun Thymeleaf, por eso el ternario / %2F.
+    assertThat(html, containsString("Inicia sesion para unirte o clonar"));
+    assertThat(html, not(containsString("action=\"/plans/" + planId + "/clone\"")));
+    assertThat(
+      html,
+      matchesPattern(
+        "(?s).*href=\"/auth/login\\?redirect=[^\"]*" + planId + "(/|%2F)public[^\"]*\".*"
+      )
+    );
+  }
+
   @Test
   @WithMockUser(username = OTHER_EMAIL)
   public void participantCanJoinReadAndLeaveWithoutDeletingPlan() throws Exception {
