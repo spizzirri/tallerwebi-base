@@ -15,7 +15,13 @@ import org.springframework.security.core.GrantedAuthority;
 public final class LoginRedirects {
 
   private static final String ADMIN_LANDING = "/admin/home";
-  private static final String USER_LANDING = "/explore";
+
+  /**
+   * Destino de un usuario sin rol admin. Es público porque los tests de aterrizaje (unitarios y
+   * E2E) afirman contra esta constante en vez de contra un literal: cuando el landing cambie
+   * (p. ej. a /plans/public en PR #15) las pruebas lo siguen sin editarse.
+   */
+  public static final String USER_LANDING = "/explore";
 
   private LoginRedirects() {}
 

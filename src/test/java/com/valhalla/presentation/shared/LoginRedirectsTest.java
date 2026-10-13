@@ -14,7 +14,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 public class LoginRedirectsTest {
 
   private static final String ADMIN_LANDING = "/admin/home";
-  private static final String USER_LANDING = "/explore";
 
   @Test
   public void shouldNotBeSignedInWithoutAnAuthentication() {
@@ -32,8 +31,12 @@ public class LoginRedirectsTest {
   }
 
   @Test
-  public void shouldLandACommonUserOnTheExploreView() {
-    assertThat(LoginRedirects.landingFor(authenticationWithRoles("ROLE_USER")), is(USER_LANDING));
+  public void shouldLandACommonUserOnTheUserLanding() {
+    // Contra la constante, no contra un literal: sobrevive el cambio de landing a /plans/public
+    assertThat(
+      LoginRedirects.landingFor(authenticationWithRoles("ROLE_USER")),
+      is(LoginRedirects.USER_LANDING)
+    );
   }
 
   @Test

@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.is;
 import com.valhalla.e2e.views.LoginPage;
 import com.valhalla.e2e.views.PlansPage;
 import com.valhalla.e2e.views.UserFormPage;
+import com.valhalla.presentation.shared.LoginRedirects;
 import java.net.URI;
 import org.junit.jupiter.api.Test;
 
@@ -48,7 +49,8 @@ public class PublicPlanViewE2E extends E2eBase {
     login.typeEmail("juan@unlam.edu.ar");
     login.typePassword(password);
     login.clickSignIn();
-    login.waitForPath("/explore");
+    // Contra la constante de landing, no un literal: tolera el cambio a /plans/public (PR #15)
+    login.waitForPath(LoginRedirects.USER_LANDING);
 
     page.navigate(planUrl);
 
