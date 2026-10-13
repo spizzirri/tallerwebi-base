@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 640" role="img" aria-labelledby="title">
+  <title id="title">Road trip</title>
+  <rect width="1200" height="640" fill="#dbe7fb" />
+  <circle cx="180" cy="130" r="64" fill="#ffffff" />
+  <path d="M760 380l170-230 170 230z" fill="#6681fc" />
+  <path d="M880 220l50-70 50 70-30-14-20 18-22-16z" fill="#eef3ff" />
+  <path d="M600 380l140-180 140 180z" fill="#004aad" />
+  <path d="M700 252l40-52 40 52-24-12-16 14-18-12z" fill="#eef3ff" />
+  <path d="M0 380c220-40 420-30 620 0h580v260H0z" fill="#a6bceb" />
+  <path d="M330 640 560 380h80l230 260z" fill="#111827" />
+  <path
+    d="M600 400v40m0 40v44m0 52v48m0 56v50"
+    stroke="#ffffff"
+    stroke-width="14"
+    stroke-linecap="round"
+  />
+  <g>
+    <rect x="486" y="520" width="228" height="64" rx="26" fill="#d16b50" />
+    <rect x="546" y="486" width="118" height="52" rx="20" fill="#e8836a" />
+    <rect x="560" y="498" width="44" height="30" rx="8" fill="#eef3ff" />
+    <rect x="614" y="498" width="40" height="30" rx="8" fill="#eef3ff" />
+    <circle cx="536" cy="586" r="30" fill="#111827" />
+    <circle cx="536" cy="586" r="13" fill="#b9cdf0" />
+    <circle cx="666" cy="586" r="30" fill="#111827" />
+    <circle cx="666" cy="586" r="13" fill="#b9cdf0" />
+  </g>
+</svg>

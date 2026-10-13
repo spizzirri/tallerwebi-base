@@ -49,9 +49,9 @@ link exacto.
 | # | Test | AC que cubre |
 |---|------|-------------|
 | U-01 | `publicPlans()` retorna la vista `pages/plans/public-list` con todos los planes publicos | AC-01 |
-| U-02 | `publicPlans()` arma las tarjetas con nombre, descripcion, fecha, cantidad de lugares y administrador | AC-03 |
+| U-02 | `publicPlans()` arma las tarjetas con nombre, descripcion, fecha, cantidad de lugares, administrador, `own` (si es del logueado) y `cover` (imagen generica) | AC-03 (decisiones en Notas) |
 | U-03 | `publicPlans()` con la base vacia deja la lista vacia (sin error) | AC-06 |
-| U-04 | `publicPlans()` no pone `shortCode` ni emails de participantes en el model | AC-09 |
+| U-04 | `publicPlans()` no pone `shortCode` ni emails de participantes en el model (claves exactas, incluye `cover`) | AC-09 |
 
 ### Tests Unitarios (`infrastructure/plan/PlanServiceImplTest.java`)
 
@@ -65,25 +65,28 @@ link exacto.
 
 | # | Test | AC que cubre |
 |---|------|-------------|
-| I-01 | `GET /plans/public` anonimo → 200 con el nombre de un plan publico | AC-01, AC-08 |
-| I-02 | `GET /plans/public` anonimo no contiene el nombre de ningun plan privado | AC-02 |
-| I-03 | `GET /plans/public` anonimo con cero planes publicos → 200 con el estado vacio | AC-06 |
+| I-01 | `GET /plans/public` anonimo → 302 a `/auth/login` (feed solo con sesion, ver Notas) | AC-07/AC-08 vacantes |
+| I-01b | `GET /plans/public` con sesion → 200 con el nombre de un plan publico | AC-01 |
+| I-02 | `GET /plans/public` no contiene el nombre de ningun plan privado | AC-02 |
+| I-03 | `GET /plans/public` con cero planes publicos → 200 con el estado vacio | AC-06 |
 | I-04 | Cada tarjeta del listado linkea a `/plans/{id}/public` | AC-04 |
-| I-05 | `GET /plans/public` con sesion responde igual que sin sesion | AC-10 |
+| I-05 | "Editar" aparece solo en los planes propios del usuario logueado | decision "Editar" |
+| I-06 | Cada tarjeta muestra su cover visual (`/images/plans/cover-N.svg`, `alt` = nombre) y el SVG se sirve | decision "cover" |
 
 ### Tests de Seguridad (`integration/PlanPublicSecurityTest.java`)
 
 | # | Test | AC que cubre |
 |---|------|-------------|
-| S-01 | `GET /plans/public` anonimo → 200 (regression guard del matcher `permitAll`) | AC-08 |
-| S-02 | `POST /plans/public` anonimo → redirige a login (el `permitAll` es solo GET) | AC-08 |
+| S-01 | `GET /plans/public` anonimo → 302 a `/auth/login` (matcher exige sesion) | AC-08 vacante |
+| S-01b | `GET /plans/public` con sesion → 200 | AC-01 |
+| S-02 | `POST /plans/public` anonimo → redirige a login | AC-08 |
 | S-03 | El listado no filtra informacion privada de los planes (emails, shortCode, participantes) | AC-09 |
 
 ### E2E (minimos)
 
 | # | Test | Flujo | AC que cubre |
 |---|------|-------|-------------|
-| E-01 | `PublicPlansListE2E` | Sin sesion, abrir `/plans/public` desde el navbar → ver una tarjeta → entrar a la vista publica del plan | AC-01, AC-04, AC-07 |
+| E-01 | `PublicPlansListE2E` (T-PPV-005) | Sin sesion: el navbar no ofrece el feed y la ruta cae en login. Con sesion: tarjeta con cover que carga, "Usar plan" clona y "Editar" abre el propio | AC-01, AC-03, AC-04, AC-09 |
 
 ## Notas / decisiones de diseño
 
@@ -102,6 +105,29 @@ link exacto.
 - **Tarjetas server-side.** No se agrega endpoint REST nuevo ni Vue: el listado se renderiza con
   Thymeleaf como `pages/plans/list.html`. No hay paginacion porque el volumen de un TP no la
   justifica; si crece, se agrega con `?page=` sin tocar los ACs de visibilidad.
+- **Feed solo con sesion (decision de producto posterior a la spec).** El AC-01/AC-07/AC-08
+  originales preveian acceso anonimo; el equipo decidio que el feed es el home del usuario
+  logueado, tipo muro de Instagram. Consecuencias: el link "Planes públicos" no aparece en el
+  navbar del landing, `/plans/public` redirige a `/auth/login` sin sesion, y login y registro
+  aterrizan ahi (`LoginRedirects.USER_LANDING = "/plans/public"`). Los ACs de acceso anonimo
+  quedan vacantes hasta que el equipo diga lo contrario.
+- **"Usar plan" = clonar (el endpoint es de [CLO]).** El boton de la tarjeta ejecuta
+  `POST /plans/{id}/clone`, que pertenece a [CLO]: lo implementa `PlanController` y sus pruebas de
+  seguridad son `integration/PlanCloneSecurityTest.java` (ver "Ownership del endpoint" en
+  15-CLO.md). Este card solo consume ese endpoint, no duplica la logica, y deja al usuario en su
+  copia editable; las tarjetas de planes propios muestran ademas "Editar" (via el detalle). La
+  vista `/plans/{id}/public` de [PVP] ya existe y es el destino de cada tarjeta.
+- **"Crear plan" desde el feed.** Boton "+ Crear plan" en la cabecera que lleva a `/explore`,
+  donde vive el modal de creacion, para el caso "nada de lo que hay me interesa".
+- **Usuarios y planes fantasma de demo.** `PublicPlanDataSeeder` siembra 5 personajes con 6
+  planes publicos para que el muro nunca arranque vacio. Apagado por defecto (no corre en las
+  suites): se enciende con `-Dseed.demoPlans=true`, que es lo que hace `docker-dev.sh`.
+- **Cover visual generico por tarjeta.** Cada tarjeta muestra una imagen fija de
+  `/images/plans/cover-N.svg` elegida con `id % 6` (deterministico, sin datos en la base y con
+  variantes repartidas entre los planes). No hay columna de imagen en `Plan`: cuando se quiera
+  personalizar por plan (o subir fotos de los usuarios), se agrega `imageUrl` a la entidad y el
+  `src` del `<img>` pasa a `${plan.imageUrl}` con el cover como fallback. Los SVGs son de la
+  paleta de marca (`resources/images/plans/cover-{1..6}.svg`).
 
 ## Referencia de Implementacion
 
@@ -198,6 +224,11 @@ en paralelo, se agrega una sola vez y se comparte.
 
 File: `src/main/webapp/WEB-INF/templates/pages/plans/public-list.html` (crear)
 
+> **Ronda 2:** el template final es el de `public-list.html` en el repo: tarjetas `article` con
+> cover (`<img th:src="${plan.cover}">`), boton "Usar plan" (form a `POST /plans/{id}/clone`),
+> "Editar" si `own`, boton "+ Crear plan" y estado vacio hacia `/explore`. El snippet de abajo es
+> el punto de partida original.
+
 ```html
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
@@ -241,7 +272,8 @@ File: `src/main/webapp/WEB-INF/templates/pages/plans/public-list.html` (crear)
 
 File: `src/main/webapp/WEB-INF/templates/components/navbar.html`
 
-Se agrega junto a los links existentes, **sin th:if de sesion** (AC-07):
+Dentro del bloque de sesion iniciada (`sec:authorize="isAuthenticated()"`), **no** en el navbar
+anonimo (decision de producto, ver Notas: sin sesion el link no existe y la ruta manda a login):
 
 ```html
 <a th:href="@{/plans/public}" class="...">Planes publicos</a>
@@ -256,11 +288,12 @@ Se agrega junto a los links existentes, **sin th:if de sesion** (AC-07):
 | `infrastructure/plan/PlanRepositoryImpl.java` | Actualizar (delegacion) |
 | `domain/plan/PlanService.java` | Actualizar (`getPublicPlans()`) |
 | `infrastructure/plan/PlanServiceImpl.java` | Actualizar (implementacion `readOnly`) |
-| `presentation/plan/PlanController.java` | Actualizar (`@GetMapping("/public")` + `planCard`) |
-| `templates/pages/plans/public-list.html` | Crear (grid de tarjetas + estado vacio) |
-| `templates/components/navbar.html` | Actualizar (link visible sin sesion) |
+| `presentation/plan/PlanController.java` | Actualizar (`@GetMapping("/public")` + `planCard` con `own` y `cover`) |
+| `templates/pages/plans/public-list.html` | Crear (grid de tarjetas + cover + estado vacio) |
+| `templates/components/navbar.html` | Actualizar (link solo autenticado) |
+| `resources/images/plans/cover-{1..6}.svg` | Crear (covers genericos de marca) |
 | `presentation/plan/PlanControllerTest.java` | Actualizar (U-01..U-04) |
 | `infrastructure/plan/PlanServiceImplTest.java` | Actualizar (U-05..U-07) |
-| `integration/PlanControllerIntegrationTest.java` | Actualizar (I-01..I-05) |
+| `integration/PlanControllerIntegrationTest.java` | Actualizar (I-01..I-06) |
 | `integration/PlanPublicSecurityTest.java` | Crear/actualizar (S-01..S-03) |
 | `e2e/PublicPlansListE2E.java` | Crear (E-01) |

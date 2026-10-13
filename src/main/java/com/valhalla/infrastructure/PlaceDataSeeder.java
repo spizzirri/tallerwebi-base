@@ -107,6 +107,15 @@ public class PlaceDataSeeder implements ApplicationListener<ContextRefreshedEven
 
   @Override
   public synchronized void onApplicationEvent(ContextRefreshedEvent event) {
+    ensureSeeded();
+  }
+
+  /**
+   * Idempotente: carga el catalogo solo si esta vacio. Es publico porque el seeder del feed
+   * [PPV] puede llegar a correr antes que este (el orden de los listeners no esta garantizado)
+   * y necesita los lugares ya cargados para armar los itinerarios.
+   */
+  public synchronized void ensureSeeded() {
     if (seeded || placeRepository.count() > 0) {
       return;
     }

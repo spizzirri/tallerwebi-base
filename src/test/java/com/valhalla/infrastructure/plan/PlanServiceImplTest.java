@@ -3,6 +3,7 @@ package com.valhalla.infrastructure.plan;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.Matchers.not;
@@ -244,6 +245,48 @@ public class PlanServiceImplTest {
     // then
     assertThat(result, is(empty()));
     verify(this.planRepositoryMock, never()).findByAdministratorId(any());
+  }
+
+  // --- getPublicPlans [PPV] ---
+
+  @Test
+  public void U05_getPublicPlans_devuelveLosPlanesQueExponeElRepositorio() {
+    // given: el filtro isPublic = true vive en la query del repositorio, no en el servicio
+    List<Plan> publicos = List.of(ownedPlan(PLAN_ID, owner(OWNER_ID, OWNER_EMAIL)));
+    when(this.planRepositoryMock.findByIsPublicTrue()).thenReturn(publicos);
+
+    // when
+    List<Plan> result = this.planService.getPublicPlans();
+
+    // then
+    assertThat(result, is(equalTo(publicos)));
+    verify(this.planRepositoryMock, times(1)).findByIsPublicTrue();
+  }
+
+  @Test
+  public void U06_getPublicPlans_sinNingunPlanPublicoDevuelveListaVacia() {
+    // given
+    when(this.planRepositoryMock.findByIsPublicTrue()).thenReturn(List.of());
+
+    // when
+    List<Plan> result = this.planService.getPublicPlans();
+
+    // then: la base vacia es un caso normal, no una excepcion (AC-06)
+    assertThat(result, is(empty()));
+    verify(this.planRepositoryMock, times(1)).findByIsPublicTrue();
+  }
+
+  @Test
+  public void U07_getPublicPlans_noLlamaASaveNiModificaPlanes() {
+    // given
+    when(this.planRepositoryMock.findByIsPublicTrue())
+      .thenReturn(List.of(ownedPlan(PLAN_ID, owner(OWNER_ID, OWNER_EMAIL))));
+
+    // when
+    this.planService.getPublicPlans();
+
+    // then: es una lectura, el listado no escribe ni ordena nada (AC-05)
+    assertNothingWasMutated();
   }
 
   // --- getOwnedPlan ---

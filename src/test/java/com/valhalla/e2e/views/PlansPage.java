@@ -77,6 +77,22 @@ public class PlansPage extends WebPage {
   }
 
   /**
+   * [PPV] Mismo flujo pero marcando "Hacer público este plan" (checkbox del paso 1), para que el
+   * listado público tenga una tarjeta que mostrar.
+   */
+  public void createPublicPlanViaExplore(String name, String description, String isoDate) {
+    navigateToCreatePlanModal();
+    typeName(name);
+    typeDescription(description);
+    typeEventDate(isoDate);
+    this.page.locator("#plan-public").check();
+    clickNextStep();
+    addFirstDraftPlace();
+    clickCreate();
+    waitForDetailPath();
+  }
+
+  /**
    * The create handler redirects to {@code /plans/{id} } and the id comes from the
    * backend, so the detail page can only be awaited as a shape. {@link #waitForPath(String)}
    * quotes its argument and therefore cannot express it, and a glob ending in {@code /plans}

@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 640" role="img" aria-labelledby="title">
+  <title id="title">Cafe break</title>
+  <rect width="1200" height="640" fill="#eef3ff" />
+  <circle cx="230" cy="150" r="72" fill="#dbe7fb" />
+  <rect x="880" y="90" width="180" height="140" rx="14" fill="#dbe7fb" />
+  <rect x="910" y="122" width="120" height="76" fill="#004aad" />
+  <rect x="944" y="198" width="52" height="26" fill="#6681fc" />
+  <path
+    d="M520 300c-40 0-70 32-70 74 0 62 46 106 108 106h164c62 0 108-44 108-106 0-42-30-74-70-74z"
+    fill="#ffffff"
+  />
+  <path
+    d="M520 300h260v40H520z"
+    fill="#004aad"
+  />
+  <path
+    d="M888 344c56-6 96 26 96 70s-44 76-104 68"
+    stroke="#ffffff"
+    stroke-width="34"
+    fill="none"
+    stroke-linecap="round"
+  />
+  <rect x="470" y="480" width="440" height="34" rx="17" fill="#b9cdf0" />
+  <path
+    d="M590 250c-18-22 18-38 0-60m70 60c-18-22 18-38 0-60m70 60c-18-22 18-38 0-60"
+    stroke="#6b7280"
+    stroke-width="12"
+    stroke-linecap="round"
+    fill="none"
+  />
+  <rect x="170" y="514" width="220" height="30" rx="15" fill="#d16b50" />
+  <rect x="170" y="544" width="220" height="16" fill="#b8563e" />
+  <rect y="560" width="1200" height="80" fill="#dbe7fb" />
+</svg>

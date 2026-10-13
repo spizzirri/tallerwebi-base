@@ -30,12 +30,14 @@ import org.springframework.web.servlet.ModelAndView;
 public class PlanController {
 
   private static final String VIEW_PLANS_LIST = "pages/plans/list";
+  private static final String VIEW_PUBLIC_LIST = "pages/plans/public-list";
   private static final String VIEW_PLAN_DETAIL = "pages/plans/detail";
   private static final String VIEW_PUBLIC_PLAN = "pages/plans/public";
   private static final String REDIRECT_PLANS = "redirect:/plans";
   private static final String REDIRECT_PLAN_DETAIL = "redirect:/plans/";
   private static final String REDIRECT_EXPLORE = "redirect:/explore";
   private static final String ATTR_PLANS = "plans";
+  private static final String ATTR_PUBLIC_PLANS = "publicPlans";
   private static final String ATTR_PLAN = "plan";
 
   private final PlanService planService;
@@ -53,6 +55,22 @@ public class PlanController {
     model.put(ATTR_PLANS, planService.getPlansByUserEmail(authentication.getName()));
     model.put("participantPlans", planService.getParticipantPlans(authentication.getName()));
     return new ModelAndView(VIEW_PLANS_LIST, model);
+  }
+
+  /**
+   * [PPV] Feed de planes publicos, con sesion iniciada (decision de producto: el visitante cae en
+   * /auth/login). El mapping literal {@code /public} tiene prioridad sobre {@code /{id}} en el
+   * orden de patrones de Spring, asi que nunca llega a parsearse como un Long.
+   */
+  @GetMapping("/public")
+  public ModelAndView publicPlans(Authentication authentication) {
+    String currentEmail = authentication.getName();
+    Map<String, Object> model = new ModelMap();
+    model.put(
+      ATTR_PUBLIC_PLANS,
+      planService.getPublicPlans().stream().map(plan -> planCard(plan, currentEmail)).toList()
+    );
+    return new ModelAndView(VIEW_PUBLIC_LIST, model);
   }
 
   @GetMapping("/{id}")
@@ -168,6 +186,10 @@ public class PlanController {
     return new ModelAndView(REDIRECT_PLANS);
   }
 
+  /**
+   * [CLO] "Usar plan": copia el plan como tuyo y caes en tu copia editable. El email sale de la
+   * sesion, nunca del form.
+   */
   @PostMapping("/{id}/clone")
   public ModelAndView clonePlan(@PathVariable Long id, Authentication authentication) {
     Plan copy = planService.clonePlan(id, authentication.getName());
@@ -212,6 +234,46 @@ public class PlanController {
       plan.addPlanPlace(entry);
     }
     return plan;
+  }
+
+  /** Cantidad de covers genericos en /images/plans: el id del plan elige uno, deterministico. */
+  private static final int COVER_COUNT = 6;
+
+  /**
+   * [PPV, AC-03/AC-09] Solo campos publicos de la tarjeta: nombre, descripcion, fecha, cantidad de
+   * lugares del itinerario y nombre del administrador. Ni shortCode, ni emails, ni participantes.
+   * {@code own} marca los planes que son del usuario logueado: esos muestran "Editar" en la tarjeta.
+   * {@code cover} es la imagen generica del plan (id % COVER_COUNT); a futuro, una columna
+   * {@code imageUrl} en Plan la reemplaza.
+   */
+  private static Map<String, Object> planCard(Plan plan, String currentEmail) {
+    Map<String, Object> card = new LinkedHashMap<>();
+    card.put("id", plan.getId());
+    card.put("name", plan.getName());
+    card.put("description", plan.getDescription());
+    card.put("eventDate", plan.getEventDate() == null ? null : plan.getEventDate().toString());
+    card.put("placeCount", plan.getPlanPlaces().size());
+    card.put("administratorName", feedDisplayName(plan.getAdministrator()));
+    card.put("own", plan.isAdministrator(currentEmail));
+    card.put(
+      "cover",
+      "/images/plans/cover-" + (Math.floorMod(plan.getId(), (long) COVER_COUNT) + 1) + ".svg"
+    );
+    return card;
+  }
+
+  /**
+   * [PPV] Nombre visible del administrador en el feed. Sin nombre registrado queda vacio y la vista
+   * oculta la linea: AC-09 prohibe exponer emails en el listado, aunque el helper de la vista
+   * publica {@link #displayName(User)} use el email como ultimo recurso.
+   */
+  private static String feedDisplayName(User user) {
+    if (user == null) {
+      return "";
+    }
+    String first = user.getFirstName() == null ? "" : user.getFirstName().trim();
+    String last = user.getLastName() == null ? "" : user.getLastName().trim();
+    return (first + " " + last).trim();
   }
 
   private static Map<String, Object> placeView(PlanPlace entry) {

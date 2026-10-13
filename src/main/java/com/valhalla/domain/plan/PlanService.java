@@ -5,6 +5,7 @@ import java.util.List;
 public interface PlanService {
   Plan createPlan(Plan plan, String ownerEmail);
   List<Plan> getPlansByUserEmail(String ownerEmail);
+  List<Plan> getPublicPlans();
   Plan getOwnedPlan(Long id, String ownerEmail);
   Plan getParticipatingPlan(Long id, String userEmail);
   Plan getPublicPlan(Long id);
@@ -13,5 +14,6 @@ public interface PlanService {
   Plan joinPlan(String shortCode, String userEmail);
   Plan updatePlan(Long id, Plan changes, String ownerEmail);
   void deleteOwnedPlan(Long id, String ownerEmail);
+  /** [CLO] Copia propia y editable de un plan accesible: nuevo dueño, nuevo shortCode. */
   Plan clonePlan(Long id, String clonerEmail);
 }

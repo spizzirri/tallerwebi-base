@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 640" role="img" aria-labelledby="title">
+  <title id="title">Park day</title>
+  <rect width="1200" height="640" fill="#eaf1ff" />
+  <circle cx="1030" cy="120" r="62" fill="#ffffff" />
+  <ellipse cx="260" cy="150" rx="90" ry="36" fill="#ffffff" />
+  <ellipse cx="330" cy="132" rx="60" ry="30" fill="#ffffff" />
+  <path d="M0 430c260-70 420-70 640 0s420 60 560 10v200H0z" fill="#a9c1b2" />
+  <path d="M0 500c300-60 520-40 760 10s300 40 440 10v120H0z" fill="#718f7d" />
+  <path d="M0 560c260-30 520 20 780 10s280-30 420-20v90H0z" fill="#4f6f5c" />
+  <g fill="#4f6f5c">
+    <path d="M170 470l60-110 60 110z" />
+    <path d="M170 500l60-110 60 110z" />
+    <rect x="222" y="500" width="16" height="34" fill="#718f7d" />
+  </g>
+  <g fill="#718f7d">
+    <path d="M920 430l54-100 54 100z" />
+    <path d="M920 462l54-100 54 100z" />
+    <rect x="966" y="462" width="16" height="34" fill="#4f6f5c" />
+  </g>
+  <path d="M470 640c40-90 150-120 260-140 90-16 160-50 200-90" stroke="#dce7e0" stroke-width="60" fill="none" />
+  <circle cx="380" cy="540" r="10" fill="#d16b50" />
+  <circle cx="430" cy="575" r="10" fill="#ffffff" />
+  <circle cx="760" cy="560" r="10" fill="#d16b50" />
+</svg>

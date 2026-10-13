@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 640" role="img" aria-labelledby="title">
+  <title id="title">Night out</title>
+  <rect width="1200" height="640" fill="#111827" />
+  <path d="M980 90a74 74 0 1 0 66 108 86 86 0 0 1-66-108z" fill="#eef3ff" />
+  <g fill="#eef3ff">
+    <circle cx="180" cy="110" r="6" />
+    <circle cx="320" cy="180" r="5" />
+    <circle cx="470" cy="90" r="7" />
+    <circle cx="620" cy="160" r="5" />
+    <circle cx="760" cy="80" r="6" />
+    <circle cx="880" cy="210" r="5" />
+    <circle cx="120" cy="250" r="5" />
+    <circle cx="560" cy="240" r="4" />
+  </g>
+  <rect x="0" y="380" width="150" height="260" fill="#1e3a6e" />
+  <rect x="170" y="320" width="130" height="320" fill="#004aad" />
+  <rect x="320" y="410" width="170" height="230" fill="#1e3a6e" />
+  <rect x="510" y="350" width="140" height="290" fill="#004aad" />
+  <rect x="670" y="420" width="160" height="220" fill="#1e3a6e" />
+  <rect x="850" y="330" width="150" height="310" fill="#004aad" />
+  <rect x="1020" y="400" width="180" height="240" fill="#1e3a6e" />
+  <g fill="#eef3ff">
+    <rect x="30" y="420" width="24" height="30" />
+    <rect x="80" y="480" width="24" height="30" />
+    <rect x="200" y="360" width="24" height="30" />
+    <rect x="250" y="430" width="24" height="30" />
+    <rect x="360" y="450" width="24" height="30" />
+    <rect x="430" y="510" width="24" height="30" />
+    <rect x="545" y="390" width="24" height="30" />
+    <rect x="600" y="470" width="24" height="30" />
+    <rect x="710" y="460" width="24" height="30" />
+    <rect x="770" y="520" width="24" height="30" />
+    <rect x="885" y="370" width="24" height="30" />
+    <rect x="945" y="450" width="24" height="30" />
+    <rect x="1060" y="440" width="24" height="30" />
+    <rect x="1130" y="500" width="24" height="30" />
+  </g>
+  <g fill="#6681fc">
+    <rect x="150" y="560" width="44" height="80" />
+    <rect x="214" y="520" width="44" height="120" />
+    <rect x="278" y="580" width="44" height="60" />
+    <rect x="342" y="540" width="44" height="100" />
+    <rect x="406" y="500" width="44" height="140" />
+    <rect x="470" y="560" width="44" height="80" />
+    <rect x="534" y="520" width="44" height="120" />
+    <rect x="598" y="580" width="44" height="60" />
+    <rect x="662" y="540" width="44" height="100" />
+    <rect x="726" y="500" width="44" height="140" />
+    <rect x="790" y="560" width="44" height="80" />
+    <rect x="854" y="520" width="44" height="120" />
+    <rect x="918" y="580" width="44" height="60" />
+    <rect x="982" y="540" width="44" height="100" />
+    <rect x="1046" y="500" width="44" height="140" />
+  </g>
+</svg>

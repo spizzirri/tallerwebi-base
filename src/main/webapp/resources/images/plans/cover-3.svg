@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 640" role="img" aria-labelledby="title">
+  <title id="title">Museum</title>
+  <rect width="1200" height="640" fill="#eef3ff" />
+  <ellipse cx="240" cy="140" rx="86" ry="34" fill="#dbe7fb" />
+  <ellipse cx="980" cy="120" rx="70" ry="30" fill="#dbe7fb" />
+  <path d="M600 170 940 300H260z" fill="#6681fc" />
+  <circle cx="600" cy="252" r="26" fill="#d16b50" />
+  <rect x="250" y="300" width="700" height="36" fill="#004aad" />
+  <g fill="#ffffff">
+    <rect x="300" y="346" width="76" height="214" />
+    <rect x="460" y="346" width="76" height="214" />
+    <rect x="620" y="346" width="76" height="214" />
+    <rect x="780" y="346" width="76" height="214" />
+  </g>
+  <g fill="#dbe7fb">
+    <rect x="316" y="346" width="10" height="214" />
+    <rect x="476" y="346" width="10" height="214" />
+    <rect x="636" y="346" width="10" height="214" />
+    <rect x="796" y="346" width="10" height="214" />
+  </g>
+  <rect x="250" y="560" width="700" height="26" fill="#b9cdf0" />
+  <rect x="220" y="586" width="760" height="26" fill="#a6bceb" />
+  <rect x="190" y="612" width="820" height="28" fill="#93aae2" />
+</svg>

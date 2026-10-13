@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+  <!-- [PPV] Feed de planes publicos, con sesion iniciada: es el home del usuario post-login.
+       Server-side con Thymeleaf, sin endpoint REST nuevo (ver 14-PPV.md, notas). -->
+
+  <head th:replace="~{layouts/base :: head('Planes públicos')}"></head>
+
+  <body th:replace="~{layouts/base :: layout(~{::main})}">
+    <main class="flex-1 p-4">
+      <div class="mx-auto max-w-5xl">
+        <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 class="text-2xl font-semibold text-gray-900">Encontrar Planes</h2>
+            <p class="mt-1 text-gray-600">
+              Planes que alguien decidió compartir con todo el mundo.
+            </p>
+          </div>
+          <!-- Como en un muro: si nada de lo que hay te interesa, armás el tuyo desde cero.
+               La creacion vive en el modal de /explore. -->
+          <a th:href="@{/explore}"
+            class="rounded-md bg-primary px-4 py-2 font-medium text-white transition hover:bg-secondary">
+            + Crear plan
+          </a>
+        </div>
+
+        <!-- Tarjetas: nombre, descripcion, fecha, cantidad de lugares y administrador (AC-03),
+             cada una linkeando a la vista publica del plan (AC-04). -->
+        <div th:if="${!publicPlans.isEmpty()}" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <article th:each="plan : ${publicPlans}"
+            class="flex flex-col overflow-hidden rounded-lg bg-white shadow-md transition hover:shadow-lg">
+            <a th:href="@{/plans/{id}/public(id=${plan.id})}" class="flex flex-1 flex-col">
+              <!-- Cover generico del plan (id -> /images/plans/cover-N.svg). A futuro, si Plan
+                   trae imageUrl propia, th:src cambia a ${plan.imageUrl} sin tocar el resto. -->
+              <img th:src="${plan.cover}" th:alt="${plan.name}" loading="lazy"
+                class="h-40 w-full border-b border-gray-100 object-cover" />
+              <div class="flex flex-1 flex-col p-5">
+                <h3 class="text-lg font-semibold text-gray-900"
+                  th:text="${plan.name}">Nombre del plan</h3>
+                <p class="mt-1 line-clamp-3 text-sm text-gray-600" th:text="${plan.description}">
+                  Descripción
+                </p>
+                <div class="mt-auto space-y-1 pt-3 text-xs text-gray-500">
+                  <p th:if="${plan.eventDate != null}">
+                    Fecha: <span th:text="${plan.eventDate}">0000-00-00</span>
+                  </p>
+                  <p>
+                    <span th:text="${plan.placeCount}">0</span>
+                    lugar(es) en el itinerario
+                  </p>
+                  <p th:if="${!#strings.isEmpty(plan.administratorName)}">
+                    Por <span th:text="${plan.administratorName}">Administrador</span>
+                  </p>
+                </div>
+              </div>
+            </a>
+
+            <!-- Acciones de la tarjeta: usar (clonar como base propia) y, si el plan es tuyo,
+                 editar en su detalle. -->
+            <div class="flex gap-2 border-t border-gray-100 p-3">
+              <!-- El CTA de usar = [CLO] POST /plans/{id}/clone: copia el plan como tuyo y caes en
+                   tu copia editable. Con CSRF via form nativo, como /plans/join. -->
+              <form th:action="@{/plans/{id}/clone(id=${plan.id})}" method="POST" class="flex-1">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <button type="submit"
+                  class="w-full cursor-pointer rounded-md bg-primary px-4 py-2 font-medium text-white transition hover:bg-secondary">
+                  Usar plan
+                </button>
+              </form>
+              <a th:if="${plan.own}" th:href="@{/plans/{id}(id=${plan.id})}"
+                class="rounded-md border border-primary px-4 py-2 font-medium text-primary transition hover:bg-primary hover:text-white">
+                Editar
+              </a>
+            </div>
+          </article>
+        </div>
+
+        <!-- Estado vacio (AC-06): amigable y con salida a la creacion, ya que quien llega aca
+             tiene sesion y no necesita registrarse de nuevo. -->
+        <div th:if="${publicPlans.isEmpty()}" class="rounded-md bg-white p-10 text-center shadow-md">
+          <p class="mb-4 text-lg text-gray-600">Todavía no hay planes públicos.</p>
+          <a th:href="@{/explore}"
+            class="inline-block rounded-md bg-primary px-6 py-3 font-medium text-white transition hover:bg-secondary">
+            Sé el primero en crear uno
+          </a>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

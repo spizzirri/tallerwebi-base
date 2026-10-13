@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -63,6 +64,13 @@ public class GlobalExceptionHandler {
     Map<String, Object> model = new ModelMap();
     model.put(ERROR_KEY, "Page not found");
     return new ModelAndView("pages/error", model, HttpStatus.NOT_FOUND);
+  }
+
+  @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+  public ModelAndView handleMethodNotAllowed() {
+    Map<String, Object> model = new ModelMap();
+    model.put(ERROR_KEY, "Method not allowed");
+    return new ModelAndView("pages/error", model, HttpStatus.METHOD_NOT_ALLOWED);
   }
 
   @ExceptionHandler(Exception.class)

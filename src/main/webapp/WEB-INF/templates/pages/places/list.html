@@ -31,6 +31,14 @@
         class="w-80 min-w-[20rem] min-h-0 overflow-y-auto overscroll-contain bg-white border-l border-gray-200 p-4 flex flex-col gap-4">
         <h1 class="text-2xl font-semibold text-gray-900">Places</h1>
 
+        <!-- [PPV-005] Del catalogo de lugares al listado de planes publicos; el link inverso
+             vive en la cabecera de pages/plans/public-list.html. -->
+        <a th:href="@{/plans/public}"
+          class="inline-flex items-center justify-between rounded-md bg-primary px-3 py-2 text-sm font-medium text-white transition hover:bg-secondary">
+          <span>Planes públicos</span>
+          <span aria-hidden="true">&rarr;</span>
+        </a>
+
         <!-- Filters -->
         <div class="flex flex-col gap-3">
           <select v-model="selectedCategory" @change="applyFilters"

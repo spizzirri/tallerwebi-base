@@ -3,8 +3,8 @@
 # and restart the container. Template hot-reload works via Thymeleaf cache=off.
 set -e
 
-# Start jetty in background
-mvn jetty:run -DskipTests -Pdev &
+# Start jetty in background. seed.demoPlans: [PPV] feed con usuarios/planes fantasma de demo.
+mvn jetty:run -DskipTests -Pdev -Dseed.demoPlans=true &
 JETTY_PID=$!
 
 # Wait for target/classes to exist (first compilation)

@@ -134,8 +134,12 @@ public class SecurityConfig {
         auth
           .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/**", "/explore")
           .permitAll()
-          // La vista publica de un plan compartido es visible sin sesion [PVP]. El allowlist es
-          // solo para GET: el POST de /plans/{id}/clone sigue exigiendo estar autenticado.
+          // [PPV, decision de producto] El feed /plans/public es para usuarios con sesion: cae en
+          // el anyRequest().authenticated() de abajo, junto al resto de /plans/**, asi que un
+          // anonimo que llegue a /plans/public aterriza en /auth/login.
+          // [PVP] En cambio la vista publica de un plan compartido es visible sin sesion. El
+          // allowlist es solo para GET: el POST de /plans/{id}/clone [CLO] sigue exigiendo estar
+          // autenticado.
           .requestMatchers(org.springframework.http.HttpMethod.GET, "/plans/*/public")
           .permitAll()
           .requestMatchers("/api/**")

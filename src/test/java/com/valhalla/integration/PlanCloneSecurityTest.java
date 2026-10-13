@@ -18,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 // Inherits the real database and filter-chain fixture; scenario ids S-01..S-03 of docs/specs/15-CLO.md.
+// S04 is [PPV]'s extra scenario ported here when both branches met under this FQN: an
+// authenticated GET reaches the POST-only mapping, so GlobalExceptionHandler answers 405.
 @WebIntegrationTest
 @Transactional
 class PlanCloneSecurityTest {
@@ -40,7 +42,6 @@ class PlanCloneSecurityTest {
     User owner = new User();
     owner.setEmail("apl@test.com");
     owner.setPassword("password");
-    owner.setRole("USER");
     users.save(owner);
     Plan plan = new Plan();
     plan.setName("Itinerary");
@@ -72,6 +73,16 @@ class PlanCloneSecurityTest {
       .perform(get(url))
       .andExpect(status().isFound())
       .andExpect(redirectedUrlPattern("**/auth/login"));
+    assertEquals(1, plans.findAll().size());
+  }
+
+  // [PPV] Signed in, the GET clears the login and CSRF gates and hits the POST-only mapping:
+  // the controller advice answers 405 and still nothing is cloned.
+  @Test
+  void S04_authenticatedGetOnCloneRouteIsMethodNotAllowed() throws Exception {
+    mvc
+      .perform(get(url).with(user("clonador@test.com")).with(csrf()))
+      .andExpect(status().isMethodNotAllowed());
     assertEquals(1, plans.findAll().size());
   }
 }

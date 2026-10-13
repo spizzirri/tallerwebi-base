@@ -64,6 +64,16 @@ public class PlanServiceImpl implements PlanService {
       .orElse(List.of());
   }
 
+  /**
+   * [PPV] Listado publico: solo {@code isPublic = true}, sin orden garantizado y sin escribir nada.
+   * El filtro vive en la query del repositorio, no aca — la vista nunca ve un plan privado.
+   */
+  @Override
+  @Transactional(readOnly = true)
+  public List<Plan> getPublicPlans() {
+    return planRepository.findByIsPublicTrue();
+  }
+
   @Override
   @Transactional(readOnly = true)
   public Plan getOwnedPlan(Long id, String ownerEmail) {

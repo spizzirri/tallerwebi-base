@@ -38,6 +38,11 @@ public class PlanRepositoryImpl implements PlanRepository {
   }
 
   @Override
+  public List<Plan> findByIsPublicTrue() {
+    return jpaPlanRepository.findByIsPublicTrue();
+  }
+
+  @Override
   public List<Plan> findByParticipantsEmail(String email) {
     return jpaPlanRepository.findByParticipantsEmail(email);
   }

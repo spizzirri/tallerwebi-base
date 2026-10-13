@@ -19,7 +19,8 @@
     <span>PlanIt</span>
   </a>
 
-  <!-- Usuario AUTENTICADO -->
+  <!-- Usuario AUTENTICADO: el link a /plans/public vive DENTRO de este bloque, asi que el
+       visitante del landing no lo ve (el feed es solo para sesion iniciada). -->
   <div sec:authorize="isAuthenticated()" class="flex items-center gap-4 text-sm">
     <!-- Front door to the admin panel; the only destination an admin needs, and only while
          inside /admin/**. Outside that area the admin gets the user menu instead. -->
@@ -28,9 +29,13 @@
       Users
     </a>
 
-    <!-- Rutas del usuario común: /explore es el catálogo y /plans su listado. 04a453d lo
-         habia sacado para no dejar un item de menu apuntando a un 404. Se muestran en todo el
-         área de usuario, también para una sesión ADMIN que la está navegando. -->
+    <!-- Rutas del usuario común: /plans/public es el feed (el home post-login) y /plans su
+         listado. /explore es el catálogo. Se muestran en todo el área de usuario, también
+         para una sesión ADMIN que la está navegando. -->
+    <a th:href="@{/plans/public}" th:unless="${showAdminNav}"
+      class="rounded-md bg-primary px-3 py-2 font-medium hover:bg-secondary">
+      Planes públicos
+    </a>
     <a th:href="@{/explore}" th:unless="${showAdminNav}"
       class="rounded-md bg-primary px-3 py-2 font-medium hover:bg-secondary">
       Explore

@@ -65,7 +65,7 @@ public class WebPage {
 
   /**
    * Brand text of the shared navbar, which every view carries. Anonymous state: the plain brand
-   * plus the Register and Login links.
+   * and the Register and Login links — sin el link de planes públicos, que es de sesión iniciada.
    */
   public String getNavbarBrand() {
     return this.getElementText("nav a.navbar-brand").replaceAll("\\s+", " ").trim();

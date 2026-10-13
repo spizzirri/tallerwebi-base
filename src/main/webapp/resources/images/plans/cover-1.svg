@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 640" role="img" aria-labelledby="title">
+  <title id="title">City skyline</title>
+  <rect width="1200" height="640" fill="#dbe7fb" />
+  <circle cx="1010" cy="118" r="64" fill="#eef3ff" />
+  <rect x="0" y="330" width="180" height="310" fill="#b9cdf0" />
+  <rect x="200" y="262" width="140" height="378" fill="#a6bceb" />
+  <rect x="360" y="360" width="200" height="280" fill="#b9cdf0" />
+  <rect x="760" y="300" width="160" height="340" fill="#a6bceb" />
+  <rect x="940" y="380" width="260" height="260" fill="#b9cdf0" />
+  <rect x="60" y="240" width="130" height="400" fill="#004aad" />
+  <rect x="240" y="180" width="120" height="460" fill="#6681fc" />
+  <rect x="420" y="270" width="150" height="370" fill="#1e3a6e" />
+  <rect x="600" y="220" width="130" height="420" fill="#004aad" />
+  <rect x="760" y="320" width="150" height="320" fill="#6681fc" />
+  <rect x="960" y="260" width="140" height="380" fill="#1e3a6e" />
+  <path
+    d="M90 280h34v44H90zm0 70h34v44H90zm0 70h34v44H90zM270 220h30v40h-30zm0 66h30v40h-30zm0 66h30v40h-30zm0 66h30v40h-30zM455 310h32v42h-32zm0 68h32v42h-32zm0 68h32v42h-32zM630 262h30v40h-30zm0 66h30v40h-30zm0 66h30v40h-30zM790 362h34v44h-34zm0 70h34v44h-34zM992 302h32v42h-32zm0 68h32v42h-32zm0 68h32v42h-32z"
+    fill="#eef3ff"
+  />
+  <rect y="560" width="1200" height="80" fill="#111827" />
+  <path
+    d="M40 602h110m60 0h110m60 0h110m60 0h110m60 0h110m60 0h110m60 0h110m60 0h110"
+    stroke="#eef3ff"
+    stroke-width="10"
+    stroke-linecap="round"
+  />
+</svg>

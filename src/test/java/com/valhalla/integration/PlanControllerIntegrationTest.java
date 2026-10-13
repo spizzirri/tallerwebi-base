@@ -142,6 +142,152 @@ public class PlanControllerIntegrationTest {
       .andExpect(redirectedUrlPattern("**/auth/login"));
   }
 
+  // --- GET /plans/public [PPV, feed solo con sesion] ---
+
+  @Test
+  public void I01_getPlansPublic_anonimoRedirigeALogin() throws Exception {
+    // given: sin @WithMockUser, la request es anonima — el feed no es para visitantes
+
+    // when/then
+    this.mockMvc.perform(get("/plans/public"))
+      .andExpect(status().is3xxRedirection())
+      .andExpect(redirectedUrlPattern("**/auth/login"));
+  }
+
+  @Test
+  public void I01b_getPlansPublic_logueadoResponde200ConElListado() throws Exception {
+    // given
+    Long planId = givenPublicPlanFor(this.ownerId, PLAN_NAME);
+
+    // when
+    MvcResult result =
+      this.mockMvc.perform(get("/plans/public").with(user(OTHER_EMAIL)))
+        .andExpect(status().isOk())
+        .andExpect(view().name("pages/plans/public-list"))
+        .andExpect(model().attributeExists("publicPlans"))
+        .andReturn();
+
+    // then
+    String html = result.getResponse().getContentAsString();
+    assertThat(html, containsString(PLAN_NAME));
+    assertThat(html, containsString("href=\"/plans/" + planId + "/public\""));
+    // El boton "Usar plan" es parte de la tarjeta, uno por plan listado.
+    assertThat(occurrences(html, "Usar plan"), is(1));
+  }
+
+  @Test
+  public void I02_getPlansPublic_noIncluyeNingunPlanPrivado() throws Exception {
+    // given: un plan publico y otro privado, ambos con nombre propio
+    givenPublicPlanFor(this.ownerId, PLAN_NAME);
+    givenPlanFor(this.otherId, OTHER_PLAN_NAME);
+
+    // when
+    MvcResult result =
+      this.mockMvc.perform(get("/plans/public").with(user(OTHER_EMAIL)))
+        .andExpect(status().isOk())
+        .andReturn();
+
+    // then: ni nombre, ni datos, ni cantidad del privado (AC-02)
+    String html = result.getResponse().getContentAsString();
+    assertThat(html, containsString(PLAN_NAME));
+    assertThat(html, not(containsString(OTHER_PLAN_NAME)));
+  }
+
+  @Test
+  public void I03_getPlansPublic_sinPlanesPublicosMuestraElEstadoVacio() throws Exception {
+    // given: solo planes privados, que para este listado es lo mismo que ninguno
+    givenPlanFor(this.ownerId, PLAN_NAME);
+
+    // when
+    MvcResult result =
+      this.mockMvc.perform(get("/plans/public").with(user(OWNER_EMAIL)))
+        .andExpect(status().isOk())
+        .andExpect(view().name("pages/plans/public-list"))
+        .andReturn();
+
+    // then: estado vacio amigable con salida a la creacion (AC-06; quien llega aca ya tiene sesion)
+    String html = result.getResponse().getContentAsString();
+    assertThat(html, containsString("Todavía no hay planes públicos"));
+    assertThat(html, containsString("href=\"/explore\""));
+    assertThat(html, not(containsString(PLAN_NAME)));
+  }
+
+  @Test
+  public void I04_cadaTarjetaLinkeaALaVistaPublicaDelPlan() throws Exception {
+    // given
+    Long publicId = givenPublicPlanFor(this.ownerId, PLAN_NAME);
+    Long anotherId = givenPublicPlanFor(this.ownerId, OTHER_PLAN_NAME);
+
+    // when
+    String html =
+      this.mockMvc.perform(get("/plans/public").with(user(OTHER_EMAIL)))
+        .andExpect(status().isOk())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+
+    // then (AC-04)
+    assertThat(html, containsString("href=\"/plans/" + publicId + "/public\""));
+    assertThat(html, containsString("href=\"/plans/" + anotherId + "/public\""));
+  }
+
+  @Test
+  public void I05_getPlansPublic_muestraEditarSoloEnLosPlanesPropios() throws Exception {
+    // given: un plan propio publico y uno ajeno publico
+    givenPublicPlanFor(this.ownerId, PLAN_NAME);
+    givenPublicPlanFor(this.otherId, OTHER_PLAN_NAME);
+
+    // when: como dueno del primero
+    String mio =
+      this.mockMvc.perform(get("/plans/public").with(user(OWNER_EMAIL)))
+        .andExpect(status().isOk())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+    // when: como ajeno a ambos
+    String ajeno =
+      this.mockMvc.perform(get("/plans/public").with(user("visita@test.com")))
+        .andExpect(status().isOk())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+
+    // then: "Editar" solo aparece al lado del plan que es tuyo (boton Usar plan esta en todos)
+    assertThat(occurrences(oneLine(mio), " Editar "), is(1));
+    assertThat(occurrences(oneLine(ajeno), " Editar "), is(0));
+    assertThat(occurrences(ajeno, "Usar plan"), is(2));
+  }
+
+  @Test
+  public void I06_cadaTarjetaMuestraUnCoverVisualConAltDelPlan() throws Exception {
+    // given: dos planes publicos (covers distintos porque el id elige uno)
+    Long publicId = givenPublicPlanFor(this.ownerId, PLAN_NAME);
+    Long anotherId = givenPublicPlanFor(this.otherId, OTHER_PLAN_NAME);
+
+    // when
+    String html =
+      this.mockMvc.perform(get("/plans/public").with(user("visita@test.com")))
+        .andExpect(status().isOk())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+
+    // then: un cover por tarjeta, con alt accesible igual al nombre del plan
+    assertThat(occurrences(html, "src=\"/images/plans/cover-"), is(2));
+    assertThat(occurrences(html, "alt=\"" + PLAN_NAME + "\""), is(1));
+    assertThat(occurrences(html, "alt=\"" + OTHER_PLAN_NAME + "\""), is(1));
+    // el id determina el cover (floorMod) y la imagen existe y se sirve
+    assertThat(
+      html,
+      containsString("src=\"/images/plans/cover-" + (Math.floorMod(publicId, 6L) + 1) + ".svg\"")
+    );
+    assertThat(
+      html,
+      containsString("src=\"/images/plans/cover-" + (Math.floorMod(anotherId, 6L) + 1) + ".svg\"")
+    );
+    this.mockMvc.perform(get("/images/plans/cover-1.svg")).andExpect(status().isOk());
+  }
+
   // --- POST /plans ---
 
   @Test
@@ -867,6 +1013,31 @@ public class PlanControllerIntegrationTest {
     plan.setName(name);
     plan.setAdministrator(this.userRepository.findById(administratorId).orElseThrow());
     return this.planRepository.save(plan).getId();
+  }
+
+  /** [PPV] Un plan visible para el listado publico. */
+  private Long givenPublicPlanFor(Long administratorId, String name) {
+    Long id = givenPlanFor(administratorId, name);
+    Plan plan = this.planRepository.findById(id).orElseThrow();
+    plan.setIsPublic(true);
+    return this.planRepository.save(plan).getId();
+  }
+
+  private static int occurrences(String haystack, String needle) {
+    int count = 0;
+    for (
+      int at = haystack.indexOf(needle);
+      at >= 0;
+      at = haystack.indexOf(needle, at + needle.length())
+    ) {
+      count++;
+    }
+    return count;
+  }
+
+  /** Colapsa el whitespace del HTML renderizado para poder contar texto con saltos de línea. */
+  private static String oneLine(String html) {
+    return html.replaceAll("\\s+", " ");
   }
 
   /** A public plan of the owner: itinerary entry included, the fixture the clone tests need. */
