@@ -323,4 +323,124 @@ public class ServicioTurnoTest {
   public void historialDeUnaMascotaAjenaDeberiaLanzarTurnoInvalido() {
     assertThrows(TurnoInvalido.class, () -> servicioTurno.historialDe(socio, 999L));
   }
+
+  @Test
+  public void reprogramarUnTurnoConfirmadoDeberiaCambiarleLaFechaYHora() throws TurnoInvalido {
+    LocalDate viernes = JUEVES.plusDays(1);
+    LocalTime nueveTreinta = LocalTime.of(9, 30);
+
+    Turno turno = dadoUnTurno(JUEVES, DIEZ, EstadoTurno.CONFIRMADO);
+    turno.setVeterinaria(veterinaria);
+    when(repositorioTurnoMock.buscarPorId(5L)).thenReturn(turno);
+
+    servicioTurno.reprogramar(socio, 5L, viernes, nueveTreinta);
+
+    assertThat(turno.getFecha(), is(viernes));
+    assertThat(turno.getHora(), is(nueveTreinta));
+  }
+
+  @Test
+  public void reprogramarUnTurnoCanceladoDeberiaFallar() {
+    LocalDate viernes = JUEVES.plusDays(1);
+    LocalTime nueveTreinta = LocalTime.of(9, 30);
+
+    Turno turno = dadoUnTurno(JUEVES, DIEZ, EstadoTurno.CANCELADO);
+    turno.setVeterinaria(veterinaria);
+    when(repositorioTurnoMock.buscarPorId(5L)).thenReturn(turno);
+
+    TurnoInvalido error = assertThrows(
+      TurnoInvalido.class,
+      () -> servicioTurno.reprogramar(socio, 5L, viernes, nueveTreinta)
+    );
+
+    assertThat(error.getMessage(), equalTo("Solo se pueden reprogramar turnos confirmados"));
+    assertThat(turno.getFecha(), is(JUEVES));
+  }
+
+  @Test
+  public void reprogramarUnTurnoDeOtroSocioDeberiaFallar() {
+    LocalDate viernes = JUEVES.plusDays(1);
+    LocalTime nueveTreinta = LocalTime.of(9, 30);
+
+    Mascota ajena = new Mascota();
+    ajena.setId(15L);
+    Turno turno = dadoUnTurno(JUEVES, DIEZ, EstadoTurno.CONFIRMADO);
+    turno.setMascota(ajena);
+    turno.setVeterinaria(veterinaria);
+
+    when(repositorioTurnoMock.buscarPorId(5L)).thenReturn(turno);
+
+    TurnoInvalido error = assertThrows(
+      TurnoInvalido.class,
+      () -> servicioTurno.reprogramar(socio, 5L, viernes, nueveTreinta)
+    );
+
+    assertThat(error.getMessage(), equalTo("No encontramos ese turno"));
+    assertThat(turno.getFecha(), is(JUEVES));
+  }
+
+  @Test
+  public void reprogramarAUnHorarioOcupadoDeberiaFallarYNoCambiarElTurno() throws TurnoInvalido {
+    LocalDate viernes = JUEVES.plusDays(1);
+    LocalTime nueveTreinta = LocalTime.of(9, 30);
+
+    Turno turno = dadoUnTurno(JUEVES, DIEZ, EstadoTurno.CONFIRMADO);
+    turno.setVeterinaria(veterinaria);
+    when(repositorioTurnoMock.buscarPorId(5L)).thenReturn(turno);
+
+    when(repositorioTurnoMock.horasOcupadas(veterinaria.getId(), viernes))
+      .thenReturn(List.of(nueveTreinta));
+
+    TurnoInvalido error = assertThrows(
+      TurnoInvalido.class,
+      () -> servicioTurno.reprogramar(socio, 5L, viernes, nueveTreinta)
+    );
+
+    assertThat(error.getMessage(), equalTo("El horario elegido ya no está disponible"));
+    assertThat(turno.getFecha(), is(JUEVES));
+    assertThat(turno.getHora(), is(DIEZ));
+  }
+
+  @Test
+  public void reprogramarSinFechaOSinHoraDeberiaFallar() {
+    Turno turno = dadoUnTurno(JUEVES, DIEZ, EstadoTurno.CONFIRMADO);
+    turno.setVeterinaria(veterinaria);
+    when(repositorioTurnoMock.buscarPorId(5L)).thenReturn(turno);
+
+    TurnoInvalido error = assertThrows(
+      TurnoInvalido.class,
+      () -> servicioTurno.reprogramar(socio, 5L, null, DIEZ)
+    );
+
+    assertThat(error.getMessage(), equalTo("Elegí fecha y horario"));
+    assertThrows(TurnoInvalido.class, () -> servicioTurno.reprogramar(socio, 5L, JUEVES, null));
+    assertThat(turno.getFecha(), is(JUEVES));
+    assertThat(turno.getHora(), is(DIEZ));
+  }
+
+  @Test
+  public void buscarTurnoDeDeberiaDevolverElTurnoDelSocio() throws TurnoInvalido {
+    Turno turno = dadoUnTurno(JUEVES, DIEZ, EstadoTurno.CONFIRMADO);
+    when(repositorioTurnoMock.buscarPorId(5L)).thenReturn(turno);
+
+    Turno encontrado = servicioTurno.buscarTurnoDe(socio, 5L);
+
+    assertThat(encontrado, is(turno));
+  }
+
+  @Test
+  public void buscarTurnoDeUnTurnoDeOtroSocioDeberiaFallar() {
+    Mascota ajena = new Mascota();
+    ajena.setId(15L);
+    Turno turno = dadoUnTurno(JUEVES, DIEZ, EstadoTurno.CONFIRMADO);
+    turno.setMascota(ajena);
+    when(repositorioTurnoMock.buscarPorId(5L)).thenReturn(turno);
+
+    TurnoInvalido error = assertThrows(
+      TurnoInvalido.class,
+      () -> servicioTurno.buscarTurnoDe(socio, 5L)
+    );
+
+    assertThat(error.getMessage(), equalTo("No encontramos ese turno"));
+  }
 }
