@@ -77,7 +77,7 @@
       class="rounded-md bg-primary px-3 py-2 font-medium hover:bg-secondary">
       Register
     </a>
-    <a th:href="@{/auth/login}"
+    <a th:href="${#strings.isEmpty(currentPath)} ? @{/auth/login} : @{/auth/login(redirect=${currentPath})}"
       class="rounded-md bg-secondary px-3 py-2 font-medium hover:bg-primary">
       Login
     </a>

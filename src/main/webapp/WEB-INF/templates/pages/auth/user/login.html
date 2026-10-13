@@ -18,6 +18,9 @@
 
       <form th:action="@{/auth/validate-login}" method="POST">
         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+        <!-- El navbar anonimo pasa ?redirect=<pagina de origen>; el POST del form lo reenvia al
+             success handler para que el login vuelva a donde estaba (no a la landing). -->
+        <input type="hidden" name="redirect" th:value="${param.redirect[0]}" th:if="${param.redirect != null}">
 
         <div class="mt-4">
           <label for="email" class="mb-1 block text-sm font-medium text-gray-700">Correo Electrónico</label>

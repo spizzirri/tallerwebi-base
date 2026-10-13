@@ -308,6 +308,65 @@ public class PlanServiceImplTest {
     assertNothingWasMutated();
   }
 
+  // --- getPublicPlan ---
+
+  @Test
+  public void T_PVP_016_getPublicPlan_devuelveElPlanPublico() {
+    // given
+    Plan plan = ownedPlan(PLAN_ID, owner(OWNER_ID, OWNER_EMAIL));
+    plan.setIsPublic(true);
+    when(this.planRepositoryMock.findById(PLAN_ID)).thenReturn(Optional.of(plan));
+
+    // when
+    Plan result = this.planService.getPublicPlan(PLAN_ID);
+
+    // then
+    assertThat(result, is(sameInstance(plan)));
+    verify(this.planRepositoryMock, times(1)).findById(PLAN_ID);
+  }
+
+  @Test
+  public void T_PVP_017_getPublicPlan_fallaSiElPlanEsPrivado() {
+    // given: un plan privado existe, pero la vista publica no debe confirmarlo
+    Plan privado = ownedPlan(PLAN_ID, owner(OWNER_ID, OWNER_EMAIL));
+    privado.setIsPublic(false);
+    when(this.planRepositoryMock.findById(PLAN_ID)).thenReturn(Optional.of(privado));
+
+    // when and then
+    assertThrows(PlanNotFoundException.class, () -> this.planService.getPublicPlan(PLAN_ID));
+    // effect check: el plan sigue intacto y no hubo escritura de ningun tipo
+    assertThat(privado.getName(), is(equalTo("Viaje a Bariloche")));
+    assertNothingWasMutated();
+  }
+
+  @Test
+  public void T_PVP_018_getPublicPlan_fallaSiElPlanNoExiste() {
+    // given
+    when(this.planRepositoryMock.findById(PLAN_ID)).thenReturn(Optional.empty());
+
+    // when and then: mismo tipo de excepcion que el plan privado (privado == inexistente)
+    assertThrows(PlanNotFoundException.class, () -> this.planService.getPublicPlan(PLAN_ID));
+    assertNothingWasMutated();
+  }
+
+  @Test
+  public void T_PVP_019_getPublicPlan_esReadOnlyYNoTocaLosParticipantes() {
+    // given
+    Plan plan = ownedPlan(PLAN_ID, owner(OWNER_ID, OWNER_EMAIL));
+    plan.setIsPublic(true);
+    plan.getParticipants().add(owner(OWNER_ID + 2, "participante@test.com"));
+    List<User> participantsBefore = List.copyOf(plan.getParticipants());
+    when(this.planRepositoryMock.findById(PLAN_ID)).thenReturn(Optional.of(plan));
+
+    // when
+    this.planService.getPublicPlan(PLAN_ID);
+
+    // then: solo lectura — ni save ni bajas ni altas de participantes
+    assertThat(plan.getParticipants(), is(participantsBefore));
+    verify(this.planRepositoryMock, never()).save(any(Plan.class));
+    verify(this.planRepositoryMock, never()).deleteById(any());
+  }
+
   // --- updatePlan ---
 
   @Test

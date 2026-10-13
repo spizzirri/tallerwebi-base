@@ -12,6 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -30,6 +31,7 @@ public class PlanController {
 
   private static final String VIEW_PLANS_LIST = "pages/plans/list";
   private static final String VIEW_PLAN_DETAIL = "pages/plans/detail";
+  private static final String VIEW_PUBLIC_PLAN = "pages/plans/public";
   private static final String REDIRECT_PLANS = "redirect:/plans";
   private static final String REDIRECT_PLAN_DETAIL = "redirect:/plans/";
   private static final String REDIRECT_EXPLORE = "redirect:/explore";
@@ -73,6 +75,55 @@ public class PlanController {
       plan.getPlanPlaces().stream().map(PlanController::placeView).toList()
     );
     return new ModelAndView(VIEW_PLAN_DETAIL, model);
+  }
+
+  /**
+   * Vista publica read-only de un plan compartido. La visibilidad la decide el servicio: un plan
+   * privado responde igual que un id inexistente. Los CTAs se deciden por el estado real de la
+   * sesion (isLogged, isParticipant, isPlanAdministrator) y no por {@code authentication != null}:
+   * con anonimo ese objeto existe como AnonymousAuthenticationToken y seria siempre true.
+   */
+  @GetMapping("/{id}/public")
+  public ModelAndView showPublicPlan(@PathVariable Long id, Authentication authentication) {
+    Plan plan = planService.getPublicPlan(id);
+    Map<String, Object> model = new ModelMap();
+    model.put(ATTR_PLAN, plan);
+    model.put(
+      "itineraryPlaces",
+      plan.getPlanPlaces().stream().map(PlanController::placeView).toList()
+    );
+    // AC-03: "Creado por" en la vista pública; sin nombre de visualización se usa el email.
+    model.put("administratorName", displayName(plan.getAdministrator()));
+
+    String email = currentEmail(authentication);
+    model.put("isLogged", email != null);
+    model.put("isParticipant", plan.isParticipant(email));
+    model.put("isPlanAdministrator", plan.isAdministrator(email));
+    // El form de join necesita el codigo; en un plan publico compartirlo es el proposito.
+    model.put("shortCode", plan.getShortCode());
+    return new ModelAndView(VIEW_PUBLIC_PLAN, model);
+  }
+
+  /** En anonimo el principal es el String "anonymousUser", no un UserDetails. */
+  private static String currentEmail(Authentication authentication) {
+    if (authentication == null || !(authentication.getPrincipal() instanceof UserDetails)) {
+      return null;
+    }
+    return authentication.getName();
+  }
+
+  /**
+   * Nombre con el que se firma el plan en la vista pública. Prefiere el nombre real y cae al
+   * email: el "Creado por" nunca queda en blanco (13-PVP AC-03, decisión de 14-PPV).
+   */
+  private static String displayName(User user) {
+    if (user == null) {
+      return "";
+    }
+    String first = user.getFirstName() == null ? "" : user.getFirstName().trim();
+    String last = user.getLastName() == null ? "" : user.getLastName().trim();
+    String full = (first + " " + last).trim();
+    return full.isEmpty() ? user.getEmail() : full;
   }
 
   @PostMapping
