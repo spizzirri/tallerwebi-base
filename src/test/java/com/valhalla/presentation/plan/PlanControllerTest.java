@@ -402,6 +402,37 @@ public class PlanControllerTest {
     verify(this.planServiceMock, times(1)).deleteOwnedPlan(PLAN_ID, OWNER_EMAIL);
   }
 
+  // --- POST /plans/{id}/clone ---
+
+  @Test
+  public void T_PLN_069_clonePlan_redirigeAlDetalleDeLaCopia() {
+    // given (U-12)
+    Plan copy = plan(PLAN_ID + 1, "Viaje a Bariloche");
+    when(this.planServiceMock.clonePlan(PLAN_ID, OWNER_EMAIL)).thenReturn(copy);
+
+    // when
+    ModelAndView view = this.controller.clonePlan(PLAN_ID, this.authentication);
+
+    // then
+    assertThat(view.getViewName(), is(equalTo("redirect:/plans/" + copy.getId())));
+    verify(this.planServiceMock, times(1)).clonePlan(PLAN_ID, OWNER_EMAIL);
+  }
+
+  @Test
+  public void T_PLN_069b_clonePlan_tomaElEmailDeLaSesionYNoUnDuenoDelForm() {
+    // given (U-13): the cloner travels in the session; the endpoint takes no form body at all
+    Authentication clonerSession = new UsernamePasswordAuthenticationToken("cloner@test.com", null);
+    Plan copy = plan(PLAN_ID + 1, "Copia");
+    when(this.planServiceMock.clonePlan(PLAN_ID, "cloner@test.com")).thenReturn(copy);
+
+    // when
+    ModelAndView view = this.controller.clonePlan(PLAN_ID, clonerSession);
+
+    // then
+    assertThat(view.getViewName(), is(equalTo("redirect:/plans/" + copy.getId())));
+    verify(this.planServiceMock, times(1)).clonePlan(PLAN_ID, "cloner@test.com");
+  }
+
   // --- helpers ---
 
   private static LocalValidatorFactoryBean localValidator() {

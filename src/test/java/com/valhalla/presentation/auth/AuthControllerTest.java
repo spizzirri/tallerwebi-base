@@ -20,6 +20,7 @@ import com.valhalla.domain.exception.UserAlreadyExists;
 import com.valhalla.domain.login.LoginService;
 import com.valhalla.infrastructure.security.ProgrammaticSignIn;
 import com.valhalla.infrastructure.user.RecoverPasswordService;
+import com.valhalla.presentation.shared.LoginRedirects;
 import com.valhalla.presentation.shared.RecoverPasswordRequest;
 import com.valhalla.presentation.shared.RegisterRequest;
 import jakarta.servlet.http.HttpServletRequest;
@@ -134,7 +135,7 @@ public class AuthControllerTest {
       )
     );
 
-    assertThat(view, is("redirect:/explore"));
+    assertThat(view, is("redirect:" + LoginRedirects.USER_LANDING));
   }
 
   // --- U-03, U-04 ---
@@ -156,10 +157,10 @@ public class AuthControllerTest {
   /**
    * U-04: registrar ya no termina en el form de login. El mismo paso que crea la cuenta la abre
    * (ProgrammaticSignIn) y el destino sale de la misma regla que un login normal, que para un
-   * rol USER es /explore.
+   * rol USER es {@link LoginRedirects#USER_LANDING}.
    */
   @Test
-  public void shouldSignInAndRedirectToTheExploreAfterSuccessfulRegistration() {
+  public void shouldSignInAndRedirectToTheLandingAfterSuccessfulRegistration() {
     RegisterRequest request = wellFormedRequest();
     when(programmaticSignIn.signIn(eq(EMAIL), same(httpRequest), same(httpResponse)))
       .thenReturn(
@@ -178,7 +179,7 @@ public class AuthControllerTest {
       httpResponse
     );
 
-    assertThat(view, is("redirect:/explore"));
+    assertThat(view, is("redirect:" + LoginRedirects.USER_LANDING));
     verify(loginService).register(EMAIL, PASSWORD, FIRST_NAME, LAST_NAME);
     verify(programmaticSignIn).signIn(EMAIL, httpRequest, httpResponse);
   }

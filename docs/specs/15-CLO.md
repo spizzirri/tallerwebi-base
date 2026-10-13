@@ -19,11 +19,13 @@ visto en un plan propio.
 
 - [PLN] completed (`Plan`, `PlanPlace`, `generateUniqueShortCode()` en `PlanServiceImpl`)
 - [AUT] completed
-- [PVP] (`GET /plans/{id}/public`) es donde vive el CTA "Clonar plan": sin esa vista no hay
-  superficie visible para esta accion. Si [PVP] entra despues, el endpoint puede existir y
-  probarse por integration hasta que el boton se agregue.
+- [PVP] (`GET /plans/{id}/public`) es donde vive el CTA "Clonar plan". Ya esta mergeado
+  (`task-12-PVP` integrado en esta rama): la vista existe y el CTA apunta a `POST /plans/{id}/clone`.
 - La card [PPV] (`14-PPV.md`) es la puerta de entrada para descubrir planes publicos que
   despues se clonan.
+- **Ownership del endpoint.** `POST /plans/{id}/clone` es de [CLO]: lo implementa `PlanController`
+  y sus pruebas de seguridad son `integration/PlanCloneSecurityTest.java` (S-01..S-03). El "Usar
+  plan" del feed [PPV] consume ese mismo endpoint; no duplica la logica.
 
 ## Criterios de Aceptacion
 
@@ -41,6 +43,7 @@ visto en un plan propio.
 | AC-10 | Un plan privado solo lo clona su administrator o un participant; para el resto la respuesta es identica a la de un id inexistente |
 | AC-11 | Sin sesion, `POST /plans/{id}/clone` redirige a `/auth/login` |
 | AC-12 | El CTA "Clonar plan" aparece en la vista publica [PVP]; sin sesion el CTA lleva a `/auth/login` |
+| AC-13 | El CTA "Clonar plan" aparece en la vista detalle (`/plans/{id}`) para todo el que puede verla (administrator y participants); la copia queda en `/plans/{nuevoId}` |
 
 ## Escenarios de Test
 
@@ -76,6 +79,8 @@ visto en un plan propio.
 | I-03 | La copia renderiza en `/plans/{id}` con el mismo itinerario que el original | AC-06 |
 | I-04 | Clonar un plan privado de otro usuario → mismo resultado que clonar un id inexistente | AC-10 |
 | I-05 | Despues de clonar, el plan original sigue con sus participantes y su itinerario | AC-08 |
+| I-06 | `GET /plans/{id}/public` con sesion: el form "Clonar plan" apunta a `POST /plans/{id}/clone` | AC-12 |
+| I-07 | `GET /plans/{id}/public` sin sesion: el CTA lleva a `/auth/login?redirect=...`, sin form de clone | AC-12 |
 
 ### Tests de Seguridad (`integration/PlanCloneSecurityTest.java`)
 
@@ -89,7 +94,8 @@ visto en un plan propio.
 
 | # | Test | Flujo | AC que cubre |
 |---|------|-------|-------------|
-| E-01 | `PublicPlanCloneE2E` | Sesión de un usuario sin acceso → abrir la vista publica de un plan → "Clonar plan" → caer en `/plans/{id}` de la copia con el itinerario | AC-01, AC-06, AC-12 |
+| E-01 | `PublicPlanCloneE2E` | Registro de un usuario sin acceso → abrir la vista publica de un plan → "Clonar plan" → caer en `/plans/{id}` de la copia con el itinerario | AC-01, AC-06, AC-12 |
+| E-02 | `DetailPlanCloneE2E` | Sesión de un participant → abrir `/plans/{id}` del plan → "Clonar plan" → caer en `/plans/{id}` de la copia con el itinerario | AC-01, AC-06, AC-13 |
 
 ## Notas / decisiones de diseño
 
@@ -110,6 +116,10 @@ visto en un plan propio.
   original; heredarlo pondria los joins de ambas copias en la misma canasta.
 - **El clon reutiliza `generateUniqueShortCode()`.** Es private en `PlanServiceImpl`; al estar la
   copia en la misma clase no hace falta exponerlo.
+- **El CTA de la vista detalle es incondicional (AC-13).** `showPlan()` ya filtra por
+  `getParticipatingPlan()`: solo administrator y participants pueden abrir la pagina, y ambos
+  benefician del clon (el participant no puede editar; el admin puede duplicar su plan como
+  plantilla). No se esconde a nadie que tenga acceso — decision de producto 2026-10-09.
 
 ## Referencia de Implementacion
 
@@ -194,14 +204,35 @@ Ya esta previsto en `13-PVP.md` (paso 4): el `form method="post"` con
 `th:action="@{/plans/{id}/clone(id=${plan.id})}"` y el CSRF token, condicionado a `isLogged`.
 No se repite aca.
 
-### 4. Prueba E2E
+### 3b. CTA en la vista detalle (AC-13)
 
-File: `src/test/java/com/valhalla/e2e/PublicPlanCloneE2E.java` (crear)
+File: `src/main/webapp/WEB-INF/templates/pages/plans/detail.html`
+
+`showPlan()` solo resuelve planes con `getParticipatingPlan()`: la pagina ya es visible
+exclusivamente para administrator y participants, asi que el form va sin condicional, junto a
+los forms de eliminar/salir:
+
+```html
+<form th:action="@{/plans/{id}/clone(id=${plan.id})}" method="POST">
+  <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+  <button type="submit" class="btn btn-outline-primary">Clonar plan</button>
+</form>
+```
+
+### 4. Pruebas E2E
+
+File: `src/test/java/com/valhalla/e2e/PublicPlanCloneE2E.java` (creado, E-01 — desbloqueado con [PVP])
 
 Flujo minimo: login como usuario sin acceso al plan → abrir `/plans/{id}/public` de un plan
 publico con lugares → submit del form "Clonar plan" → verificar que la URL es `/plans/{id}` de un
 plan distinto al original y que el itinerario se renderiza. Sigue la base de `e2e/E2eBase.java` y
 el estilo page-object de `e2e/views/PlansPage.java`.
+
+File: `src/test/java/com/valhalla/e2e/DetailPlanCloneE2E.java` (crear, E-02 — desbloqueado hoy)
+
+Flujo: login como participant de un plan con lugares → abrir `/plans/{id}` → submit del form
+"Clonar plan" de la vista detalle → verificar que la URL es `/plans/{id}` de un plan distinto,
+con el mismo itinerario renderizado.
 
 ## Archivos a crear/modificar
 
@@ -214,4 +245,6 @@ el estilo page-object de `e2e/views/PlansPage.java`.
 | `presentation/plan/PlanControllerTest.java` | Actualizar (U-12..U-13) |
 | `integration/PlanControllerIntegrationTest.java` | Actualizar (I-01..I-05) |
 | `integration/PlanCloneSecurityTest.java` | Crear (S-01..S-03) |
-| `e2e/PublicPlanCloneE2E.java` | Crear (E-01) |
+| `pages/plans/detail.html` | Actualizar (form "Clonar plan", AC-13) |
+| `e2e/PublicPlanCloneE2E.java` | Creado (E-01) |
+| `e2e/DetailPlanCloneE2E.java` | Crear (E-02) |

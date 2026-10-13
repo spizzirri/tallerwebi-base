@@ -13,6 +13,7 @@ import static org.mockito.Mockito.when;
 
 import com.valhalla.domain.exception.UserAlreadyExists;
 import com.valhalla.domain.login.LoginService;
+import com.valhalla.presentation.shared.LoginRedirects;
 import com.valhalla.presentation.shared.NewUserRequest;
 import jakarta.servlet.http.HttpSession;
 import java.util.Arrays;
@@ -130,7 +131,10 @@ public class LoginControllerTest {
   @Test
   public void shouldRedirectACommonUserToTheLandingWhenAlreadySignedIn() {
     ModelAndView modelAndView = controller.showLogin(null, authenticationWithRoles("ROLE_USER"));
-    assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/explore"));
+    assertThat(
+      modelAndView.getViewName(),
+      equalToIgnoringCase("redirect:" + LoginRedirects.USER_LANDING)
+    );
   }
 
   private Authentication authenticationWithRoles(String... roles) {

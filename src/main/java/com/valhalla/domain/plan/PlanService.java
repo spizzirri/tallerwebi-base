@@ -13,4 +13,5 @@ public interface PlanService {
   Plan joinPlan(String shortCode, String userEmail);
   Plan updatePlan(Long id, Plan changes, String ownerEmail);
   void deleteOwnedPlan(Long id, String ownerEmail);
+  Plan clonePlan(Long id, String clonerEmail);
 }

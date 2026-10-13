@@ -151,6 +151,46 @@ public class PlanServiceImpl implements PlanService {
     planRepository.deleteById(id);
   }
 
+  @Override
+  @Transactional
+  public Plan clonePlan(Long id, String clonerEmail) {
+    User cloner = userRepository.findByEmail(clonerEmail).orElseThrow(UserNotFoundException::new);
+    Plan source = planRepository.findById(id).orElseThrow(PlanNotFoundException::new);
+    boolean accessible =
+      source.getIsPublic() ||
+      source.isAdministrator(clonerEmail) ||
+      source.isParticipant(clonerEmail);
+    if (!accessible) {
+      // Same path as a missing id: the answer must not confirm the private plan exists.
+      throw new PlanNotFoundException();
+    }
+
+    Plan copy = new Plan();
+    copy.setName(source.getName());
+    copy.setDescription(source.getDescription());
+    copy.setEventDate(source.getEventDate());
+    copy.setEventTime(source.getEventTime());
+    // The copy is born private: publishing is the new owner's decision (AC-04).
+    copy.setIsPublic(false);
+    copy.setAdministrator(cloner);
+    // Participants stay empty (AC-07); the shortCode is generated below (AC-03).
+
+    int order = 1;
+    for (PlanPlace entry : source.getPlanPlaces()) {
+      PlanPlace entryCopy = new PlanPlace();
+      entryCopy.setPlace(entry.getPlace()); // same persisted Place entity, not a copy (AC-06)
+      entryCopy.setDescription(entry.getDescription());
+      entryCopy.setVisitDate(entry.getVisitDate());
+      entryCopy.setVisitTime(entry.getVisitTime());
+      entryCopy.setSortOrder(order);
+      order++;
+      copy.addPlanPlace(entryCopy);
+    }
+
+    copy.setShortCode(generateUniqueShortCode());
+    return planRepository.save(copy);
+  }
+
   /**
    * The unique constraint on {@code shortCode} is the real guard; this loop only narrows the race
    * window down to that constraint. Ten collisions on 8 characters are already far past the odds,

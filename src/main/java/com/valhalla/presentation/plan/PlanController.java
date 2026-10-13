@@ -168,6 +168,12 @@ public class PlanController {
     return new ModelAndView(REDIRECT_PLANS);
   }
 
+  @PostMapping("/{id}/clone")
+  public ModelAndView clonePlan(@PathVariable Long id, Authentication authentication) {
+    Plan copy = planService.clonePlan(id, authentication.getName());
+    return new ModelAndView(REDIRECT_PLAN_DETAIL + copy.getId());
+  }
+
   @PostMapping("/{id}/leave")
   public ModelAndView leavePlan(@PathVariable Long id, Authentication authentication) {
     planService.leavePlan(id, authentication.getName());

@@ -9,6 +9,7 @@ import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
 import com.valhalla.e2e.views.LoginPage;
 import com.valhalla.e2e.views.UserFormPage;
 import com.valhalla.e2e.views.WebPage;
+import com.valhalla.presentation.shared.LoginRedirects;
 import java.util.Map;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
@@ -49,8 +50,8 @@ public class BrandingViewE2E extends E2eBase {
     // El alta genera la clave; el panel la muestra una sola vez en /admin/users.
     login.typePassword(generatedPassword);
     login.clickSignIn();
-    // USER landing: LoginRedirects sends a signed-in USER to /explore, never to "/".
-    new WebPage(page).waitForPath("/explore");
+    // USER landing: LoginRedirects sends a signed-in USER to USER_LANDING, never to "/".
+    new WebPage(page).waitForPath(LoginRedirects.USER_LANDING);
 
     WebPage landing = new WebPage(page);
     assertThat("the user sees the brand too", landing.getNavbarBrand(), equalToIgnoringCase(BRAND));
