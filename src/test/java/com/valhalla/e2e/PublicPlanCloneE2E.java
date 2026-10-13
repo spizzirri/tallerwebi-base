@@ -3,6 +3,8 @@ package com.valhalla.e2e;
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+import com.microsoft.playwright.Locator;
+import com.microsoft.playwright.options.WaitForSelectorState;
 import com.valhalla.e2e.views.PlansPage;
 import com.valhalla.e2e.views.RegisterPage;
 import com.valhalla.e2e.views.WebPage;
@@ -67,7 +69,10 @@ public class PublicPlanCloneE2E extends E2eBase {
 
   private void makePlanPublic(PlansPage plans) {
     // The editor submits the itinerary rows from Vue, which mount after the page loads.
-    page.locator("input[name='places[0].placeId']").waitFor();
+    // The row inputs are type=hidden, so wait for attached rather than for visible.
+    page
+      .locator("input[name='places[0].placeId']")
+      .waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.ATTACHED));
     page.locator("#isPublic").check();
     page.locator("button:has-text('Guardar cambios')").click();
     plans.waitForDetailPath();

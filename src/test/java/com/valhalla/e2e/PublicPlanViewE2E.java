@@ -4,6 +4,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 
+import com.microsoft.playwright.Locator;
+import com.microsoft.playwright.options.WaitForSelectorState;
 import com.valhalla.e2e.views.LoginPage;
 import com.valhalla.e2e.views.PlansPage;
 import com.valhalla.e2e.views.UserFormPage;
@@ -73,13 +75,19 @@ public class PublicPlanViewE2E extends E2eBase {
 
   private void makePlanPublic(PlansPage plans) {
     // The editor submits the itinerary rows from Vue, which mount after the page loads.
-    page.locator("input[name='places[0].placeId']").waitFor();
+    // The row inputs are type=hidden, so wait for attached rather than for visible.
+    page
+      .locator("input[name='places[0].placeId']")
+      .waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.ATTACHED));
     page.locator("#isPublic").check();
     page.locator("button:has-text('Guardar cambios')").click();
     plans.waitForDetailPath();
   }
 
   private String givenANormalUser(String email) {
+    // The arrange that made the plan public left the admin session open, and /admin/login
+    // bounces an already signed-in user to its landing instead of rendering the form.
+    newContext();
     LoginPage adminLogin = signInAsAdmin();
     adminLogin.navigate(adminLogin.baseUrl() + "/admin/users/new");
     UserFormPage form = new UserFormPage(page);
