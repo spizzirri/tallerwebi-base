@@ -21,6 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
+import com.valhalla.domain.place.Place;
 import com.valhalla.domain.place.PlaceRepository;
 import com.valhalla.domain.plan.Plan;
 import com.valhalla.domain.plan.PlanRepository;
@@ -556,10 +557,23 @@ public class PlanControllerIntegrationTest {
     plan.setDescription("Descripcion publica");
     this.planRepository.save(plan);
 
-    this.mockMvc.perform(get("/plans/" + planId + "/public"))
-      .andExpect(status().isOk())
-      .andExpect(content().string(containsString(PUBLIC_PLAN_NAME)))
-      .andExpect(content().string(containsString("Descripcion publica")));
+    String html =
+      this.mockMvc.perform(get("/plans/" + planId + "/public"))
+        .andExpect(status().isOk())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+
+    assertThat(html, containsString(PUBLIC_PLAN_NAME));
+    assertThat(html, containsString("Descripcion publica"));
+    // AC-03: quien lo creó, visible en la vista pública (el fixture nombra al owner "Test User")
+    assertThat(html, containsString("Creado por"));
+    assertThat(html, containsString("Test User"));
+    // AC-07: el anónimo no ejecuta join/clone: el CTA va al login conservando la vuelta al plan
+    assertThat(
+      html,
+      matchesPattern("(?s).*href=\"/auth/login\\?redirect=[^\"]*" + planId + "[^\"]*\".*")
+    );
   }
 
   @Test
@@ -612,6 +626,68 @@ public class PlanControllerIntegrationTest {
       .andExpect(status().isOk())
       .andExpect(content().string(containsString("Ver mi plan")))
       .andExpect(content().string(not(containsString("Unirme al plan"))));
+  }
+
+  @Test
+  public void T_PVP_014_getPlansIdPublic_muestraElItinerarioConLosLugaresDelPlan()
+    throws Exception {
+    // given
+    Long planId = givenPlanFor(this.ownerId, PUBLIC_PLAN_NAME);
+    Plan plan = this.planRepository.findById(planId).orElseThrow();
+    plan.setIsPublic(true);
+    List<Place> catalog = this.placeRepository.findAll();
+    PlanPlace first = new PlanPlace();
+    first.setPlace(catalog.get(0));
+    first.setSortOrder(1);
+    first.setDescription("Parada uno");
+    PlanPlace second = new PlanPlace();
+    second.setPlace(catalog.get(1));
+    second.setSortOrder(2);
+    second.setDescription("Parada dos");
+    plan.addPlanPlace(first);
+    plan.addPlanPlace(second);
+    this.planRepository.save(plan);
+
+    // when
+    String html =
+      this.mockMvc.perform(get("/plans/" + planId + "/public"))
+        .andExpect(status().isOk())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+
+    // then: cada lugar del plan, y en el orden de su sortOrder
+    assertThat(html, containsString(catalog.get(0).getName()));
+    assertThat(html, containsString(catalog.get(1).getName()));
+    assertThat(html, containsString("Parada uno"));
+    assertThat(html, containsString("Parada dos"));
+    assertThat(html.indexOf("Parada uno") < html.indexOf("Parada dos"), is(true));
+  }
+
+  @Test
+  @WithMockUser(username = OWNER_EMAIL)
+  public void T_PVP_015_getPlansIdPublic_noRenderizaFormularioDeEdicionNiEliminarPlan()
+    throws Exception {
+    // given: hasta el administrador con sesión ve una vista read-only
+    Long planId = givenPlanFor(this.ownerId, PUBLIC_PLAN_NAME);
+    Plan plan = this.planRepository.findById(planId).orElseThrow();
+    plan.setIsPublic(true);
+    this.planRepository.save(plan);
+
+    // when
+    String html =
+      this.mockMvc.perform(get("/plans/" + planId + "/public"))
+        .andExpect(status().isOk())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+
+    // then
+    assertThat(html, containsString("Ver mi plan"));
+    assertThat(html, not(containsString("Eliminar plan")));
+    assertThat(html, not(containsString("Salir del plan")));
+    assertThat(html, not(containsString("Editar plan")));
+    assertThat(html, not(containsString("Agregar lugar al plan")));
   }
 
   // --- fixtures ---

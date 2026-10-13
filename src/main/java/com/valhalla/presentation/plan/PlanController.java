@@ -92,6 +92,8 @@ public class PlanController {
       "itineraryPlaces",
       plan.getPlanPlaces().stream().map(PlanController::placeView).toList()
     );
+    // AC-03: "Creado por" en la vista pública; sin nombre de visualización se usa el email.
+    model.put("administratorName", displayName(plan.getAdministrator()));
 
     String email = currentEmail(authentication);
     model.put("isLogged", email != null);
@@ -108,6 +110,20 @@ public class PlanController {
       return null;
     }
     return authentication.getName();
+  }
+
+  /**
+   * Nombre con el que se firma el plan en la vista pública. Prefiere el nombre real y cae al
+   * email: el "Creado por" nunca queda en blanco (13-PVP AC-03, decisión de 14-PPV).
+   */
+  private static String displayName(User user) {
+    if (user == null) {
+      return "";
+    }
+    String first = user.getFirstName() == null ? "" : user.getFirstName().trim();
+    String last = user.getLastName() == null ? "" : user.getLastName().trim();
+    String full = (first + " " + last).trim();
+    return full.isEmpty() ? user.getEmail() : full;
   }
 
   @PostMapping

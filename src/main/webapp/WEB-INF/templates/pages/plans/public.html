@@ -3,7 +3,8 @@
 
 <!-- Vista publica read-only de un plan compartido [PVP]. Es el destino de /plans/{id}/public:
      no hereda los formularios de edicion de pages/plans/detail.html. Usa el modelo que arma
-     PlanController.showPublicPlan: @plan + itineraryPlaces + los flags de sesion de los CTAs. -->
+     PlanController.showPublicPlan: @plan + itineraryPlaces + administratorName + los flags de
+     sesion de los CTAs. -->
 <head th:replace="~{layouts/base :: head(${plan.name})}"></head>
 
 <body th:replace="~{layouts/base :: layout(~{::main})}">
@@ -21,6 +22,13 @@
         th:text="${#temporals.format(plan.eventDate, 'dd/MM/yyyy')}"></span>
       <span th:if="${plan.eventTime != null}"
         th:text="${#temporals.format(plan.eventTime, 'HH:mm')}"></span>
+    </p>
+
+    <!-- AC-03: el administrador firma el plan; el model siempre trae un valor no vacío
+         (displayName cae al email), así que la línea nunca queda en blanco. -->
+    <p class="mt-1 text-gray-600" th:if="${!#strings.isEmpty(administratorName)}">
+      <strong>Creado por:</strong>
+      <span th:text="${administratorName}"></span>
     </p>
 
     <section class="mt-6 rounded-lg bg-white p-6 shadow">
@@ -58,7 +66,9 @@
 
     <!-- CTAs segun el estado de sesion: join reutiliza el endpoint existente (POST /plans/join),
          clone apunta a POST /plans/{id}/clone que implementa [CLO]. Sin sesion no se ofrece ningun
-         CTA. La decision vive en el model (isLogged et al.), no en #authentication: con anonimo ese
+         CTA que ejecute join/clone: el anonimo va al login con la vuelta a esta misma vista
+         (AC-07), con el mismo mecanismo ?redirect= que el link del navbar (currentPath).
+         La decision vive en el model (isLogged et al.), no en #authentication: con anonimo ese
          objeto existe y "#authentication != null" seria true. -->
     <div class="mt-6 flex flex-wrap gap-3">
       <form th:if="${isLogged and !isParticipant and !isPlanAdministrator}" method="post"
@@ -77,6 +87,12 @@
           Clonar plan
         </button>
       </form>
+
+      <a th:if="${!isLogged}"
+        th:href="${#strings.isEmpty(currentPath)} ? @{/auth/login} : @{/auth/login(redirect=${currentPath})}"
+        class="rounded-md bg-primary px-4 py-2 font-medium text-white">
+        Inicia sesion para unirte o clonar
+      </a>
 
       <a th:if="${isParticipant or isPlanAdministrator}" th:href="@{/plans/{id}(id=${plan.id})}"
         class="rounded-md bg-gray-800 px-4 py-2 font-medium text-white">
