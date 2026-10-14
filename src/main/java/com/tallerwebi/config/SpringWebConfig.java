@@ -56,7 +56,7 @@ public class SpringWebConfig implements WebMvcConfigurer {
     templateResolver.setCharacterEncoding("UTF-8");
     // Template cache is true by default. Set to false if you want
     // templates to be automatically updated when modified.
-    templateResolver.setCacheable(true); // Para que se vean los cambios en las plantillas sin reiniciar el servidor, poner en false
+    templateResolver.setCacheable(false); // Para que se vean los cambios en las plantillas sin reiniciar el servidor, poner en false
     return templateResolver;
   }
 

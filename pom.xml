@@ -108,6 +108,12 @@
             <version>${playwright.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.google.genai</groupId>
+            <artifactId>google-genai</artifactId>
+            <version>1.76.0</version>
+        </dependency>
+        
     </dependencies>
 
     <build>

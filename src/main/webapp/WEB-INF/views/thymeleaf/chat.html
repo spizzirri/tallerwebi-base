@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Chat</title>
+  </head>
+  <body>
+    <h1>Chat asistente</h1>
+
+    <p th:if="${socio == null}">Tenés que ser socio para usar el chat.</p>
+
+    <div
+      id="mensajes"
+      style="
+        border: 1px solid #ccc;
+        min-height: 200px;
+        padding: 8px;
+        margin-bottom: 8px;
+      "
+    ></div>
+
+    <form
+      id="form-chat"
+      th:if="${socio != null}"
+      th:attr="data-endpoint=@{/chat/mensaje}"
+    >
+      <input id="input-mensaje" type="text" size="60" autocomplete="off" />
+      <button type="submit">Enviar</button>
+    </form>
+
+    <p><a th:href="@{/home}">Volver</a></p>
+    <script th:src="@{/js/chat.js}"></script>
+  </body>
+</html>
