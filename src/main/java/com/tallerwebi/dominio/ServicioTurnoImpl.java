@@ -115,14 +115,25 @@ public class ServicioTurnoImpl implements ServicioTurno {
 
   @Override
   public void cancelar(Socio socio, Long turnoId) throws TurnoInvalido {
-    Turno turno = turnoId == null ? null : repositorioTurno.buscarPorId(turnoId);
-    if (turno == null || socio.buscarMascota(turno.getMascota().getId()) == null) {
-      throw new TurnoInvalido("No encontramos ese turno");
-    }
+    Turno turno = buscarTurnoDe(socio, turnoId);
     if (!turno.estaConfirmado()) {
       throw new TurnoInvalido("Solo se pueden cancelar turnos confirmados");
     }
     turno.cancelar();
+  }
+
+  @Override
+  public void reprogramar(Socio socio, Long turnoId, LocalDate diaNuevo, LocalTime horaNueva)
+    throws TurnoInvalido {
+    Turno turno = buscarTurnoDe(socio, turnoId);
+    if (!turno.estaConfirmado()) {
+      throw new TurnoInvalido("Solo se pueden reprogramar turnos confirmados");
+    }
+
+    Veterinaria veterinaria = turno.getVeterinaria();
+    validarHorario(veterinaria, diaNuevo, horaNueva);
+
+    turno.reprogramar(diaNuevo, horaNueva);
   }
 
   @Override
@@ -153,5 +164,14 @@ public class ServicioTurnoImpl implements ServicioTurno {
 
   private LocalDateTime momento(Turno turno) {
     return turno.getFecha().atTime(turno.getHora());
+  }
+
+  @Override
+  public Turno buscarTurnoDe(Socio socio, Long turnoId) throws TurnoInvalido {
+    Turno turno = turnoId == null ? null : repositorioTurno.buscarPorId(turnoId);
+    if (turno == null || socio.buscarMascota(turno.getMascota().getId()) == null) {
+      throw new TurnoInvalido("No encontramos ese turno");
+    }
+    return turno;
   }
 }

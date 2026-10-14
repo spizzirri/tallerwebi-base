@@ -5,16 +5,15 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
 
-import com.tallerwebi.dominio.ServicioCobertura;
-import com.tallerwebi.dominio.ServicioSocio;
-import com.tallerwebi.dominio.ServicioTurno;
-import com.tallerwebi.dominio.ServicioVeterinaria;
-import com.tallerwebi.dominio.Socio;
-import com.tallerwebi.dominio.SolicitudTurno;
+import com.tallerwebi.dominio.*;
 import com.tallerwebi.dominio.excepcion.TurnoInvalido;
 import jakarta.servlet.http.HttpSession;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.ui.Model;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 
@@ -116,5 +115,92 @@ public class ControladorTurnoTest {
       redirectAttributes.getFlashAttributes().get("error"),
       equalTo("No encontramos ese turno")
     );
+  }
+
+  @Test
+  public void reprogramarConExitoDeberiaIrAMisTurnosConMensaje() throws TurnoInvalido {
+    LocalDate fecha = LocalDate.of(2026, 10, 2);
+    LocalTime hora = LocalTime.of(9, 30);
+
+    ModelAndView mav = controladorTurno.reprogramar(
+      5L,
+      fecha,
+      hora,
+      sesionMock,
+      redirectAttributes
+    );
+
+    verify(servicioTurnoMock, times(1)).reprogramar(socio, 5L, fecha, hora);
+    assertThat(mav.getViewName(), equalTo("redirect:/turnos"));
+    assertThat(
+      redirectAttributes.getFlashAttributes().get("mensaje"),
+      equalTo("Reprogramaste tu turno.")
+    );
+  }
+
+  @Test
+  public void reprogramarConErrorDeberiaVolverAlFormularioMostrandoElMotivo() throws TurnoInvalido {
+    LocalDate fecha = LocalDate.of(2026, 10, 2);
+    LocalTime hora = LocalTime.of(9, 30);
+
+    doThrow(new TurnoInvalido("El horario elegido ya no está disponible"))
+      .when(servicioTurnoMock)
+      .reprogramar(socio, 5L, fecha, hora);
+
+    ModelAndView mav = controladorTurno.reprogramar(
+      5L,
+      fecha,
+      hora,
+      sesionMock,
+      redirectAttributes
+    );
+
+    assertThat(mav.getViewName(), equalTo("redirect:/turnos/5/reprogramar"));
+    assertThat(
+      redirectAttributes.getFlashAttributes().get("error"),
+      equalTo("El horario elegido ya no está disponible")
+    );
+  }
+
+  @Test
+  public void reprogramarSinSerSocioDeberiaVolverAlHome() {
+    when(servicioSocioMock.buscarPorUsuario(2L)).thenReturn(null);
+
+    LocalDate fecha = LocalDate.of(2026, 10, 2);
+    LocalTime hora = LocalTime.of(9, 30);
+
+    ModelAndView mav = controladorTurno.reprogramar(
+      5L,
+      fecha,
+      hora,
+      sesionMock,
+      redirectAttributes
+    );
+
+    assertThat(mav.getViewName(), equalTo("redirect:/home"));
+  }
+
+  @Test
+  public void formularioReprogramarDeberiaMostrarElTurnoYLosHorariosLibres() throws TurnoInvalido {
+    Veterinaria veterinaria = new Veterinaria();
+    Turno turno = new Turno();
+    turno.setVeterinaria(veterinaria);
+    when(servicioTurnoMock.buscarTurnoDe(socio, 5L)).thenReturn(turno);
+
+    LocalDate fecha = LocalDate.of(2026, 10, 2);
+    List<LocalTime> horarios = List.of(LocalTime.of(9, 0), LocalTime.of(9, 30));
+    when(servicioTurnoMock.horariosDisponibles(veterinaria, fecha)).thenReturn(horarios);
+
+    ModelAndView mav = controladorTurno.formularioReprogramar(
+      5L,
+      fecha,
+      sesionMock,
+      redirectAttributes
+    );
+
+    assertThat(mav.getViewName(), equalTo("reprogramar-turno"));
+    assertThat(mav.getModel().get("turno"), is(turno));
+    assertThat(mav.getModel().get("horarios"), is(horarios));
+    assertThat(mav.getModel().get("fecha"), is(fecha));
   }
 }
