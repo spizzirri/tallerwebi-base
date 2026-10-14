@@ -24,7 +24,9 @@ import com.valhalla.domain.exception.UserNotFoundException;
 import com.valhalla.domain.place.Place;
 import com.valhalla.domain.place.PlaceRepository;
 import com.valhalla.domain.plan.Plan;
+import com.valhalla.domain.plan.PlanInvitation;
 import com.valhalla.domain.plan.PlanRepository;
+import com.valhalla.domain.plan.PlanService;
 import com.valhalla.domain.planplace.PlanPlace;
 import com.valhalla.domain.user.User;
 import com.valhalla.domain.user.UserRepository;
@@ -32,6 +34,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -50,7 +53,8 @@ public class PlanServiceImplTest {
   private static final String OTHER_EMAIL = "otro@test.com";
   private static final String UNKNOWN_EMAIL = "nadie@test.com";
   private static final Long OWNER_ID = 7L;
-  private static final Long PLAN_ID = 42L;
+  private static final UUID PLAN_ID = UUID.fromString("0192f0a1-0000-7000-8000-00000000002a");
+  private static final UUID OTHER_PLAN_ID = UUID.fromString("0192f0a1-0000-7000-8000-00000000002b");
 
   /** The backend generates an 8 character uppercase alphanumeric code out of a UUID. */
   private static final String SHORT_CODE_PATTERN = "[A-Z0-9]{8}";
@@ -105,16 +109,26 @@ public class PlanServiceImplTest {
   }
 
   @Test
-  public void authenticatedVisitorCanInviteParticipantToPublicPlan() {
+  public void visitorCannotInviteParticipantToPublicPlan() {
     Plan plan = invitationPlan(true);
-    when(userRepositoryMock.findByEmail(OTHER_EMAIL))
-      .thenReturn(Optional.of(owner(9L, OTHER_EMAIL)));
-    when(userRepositoryMock.findByEmail(UNKNOWN_EMAIL))
-      .thenReturn(Optional.of(owner(10L, UNKNOWN_EMAIL)));
-    planService.inviteParticipant(PLAN_ID, OTHER_EMAIL, "guest", UNKNOWN_EMAIL);
+    assertThrows(
+      PlanNotFoundException.class,
+      () -> planService.inviteParticipant(PLAN_ID, OTHER_EMAIL, "guest", UNKNOWN_EMAIL)
+    );
+    assertThat(plan.getParticipants(), is(empty()));
+    assertThat(plan.getInvitations(), is(empty()));
+    verify(planRepositoryMock, never()).save(any());
+  }
+
+  @Test
+  public void ownerCanInviteParticipantToPublicPlan() {
+    Plan plan = invitationPlan(true);
+    User invited = owner(9L, OTHER_EMAIL);
+    when(userRepositoryMock.findByEmail(OTHER_EMAIL)).thenReturn(Optional.of(invited));
+    planService.inviteParticipant(PLAN_ID, OTHER_EMAIL, "guest", OWNER_EMAIL);
     assertThat(plan.isParticipant(OTHER_EMAIL), is(false));
-    assertThat(plan.isEditor(OTHER_EMAIL), is(false));
     assertThat(plan.getInvitations().size(), is(1));
+    assertThat(plan.getInvitations().getFirst().getRole(), is("guest"));
     verify(planRepositoryMock).save(plan);
   }
 
@@ -179,6 +193,55 @@ public class PlanServiceImplTest {
     when(userRepositoryMock.findByEmail(OWNER_EMAIL))
       .thenReturn(Optional.of(plan.getAdministrator()));
     return plan;
+  }
+
+  // --- getPendingInvitations ---
+
+  @Test
+  public void getPendingInvitations_dePlanPublicoMarcaIsPublicEnVerdadero() {
+    // given
+    Plan plan = invitationPlan(true);
+    plan.setId(PLAN_ID);
+    User recipient = owner(9L, UNKNOWN_EMAIL);
+    plan
+      .getInvitations()
+      .add(new PlanInvitation(plan, recipient, plan.getAdministrator(), "guest"));
+    when(this.planRepositoryMock.findByInvitationsRecipientEmail(UNKNOWN_EMAIL))
+      .thenReturn(List.of(plan));
+
+    // when
+    List<PlanService.PendingInvitation> pending =
+      this.planService.getPendingInvitations(UNKNOWN_EMAIL);
+
+    // then: isPublic sale del plan real para que la vista sepa si puede mostrar el enlace al detalle
+    assertThat(pending, hasSize(1));
+    assertThat(pending.getFirst().planId(), is(PLAN_ID));
+    assertThat(pending.getFirst().isPublic(), is(true));
+    verify(this.planRepositoryMock, times(1)).findByInvitationsRecipientEmail(UNKNOWN_EMAIL);
+    assertNothingWasMutated();
+  }
+
+  @Test
+  public void getPendingInvitations_dePlanPrivadoMarcaIsPublicEnFalso() {
+    // given
+    Plan plan = invitationPlan(false);
+    plan.setId(PLAN_ID);
+    User recipient = owner(9L, UNKNOWN_EMAIL);
+    plan
+      .getInvitations()
+      .add(new PlanInvitation(plan, recipient, plan.getAdministrator(), "editor"));
+    when(this.planRepositoryMock.findByInvitationsRecipientEmail(UNKNOWN_EMAIL))
+      .thenReturn(List.of(plan));
+
+    // when
+    List<PlanService.PendingInvitation> pending =
+      this.planService.getPendingInvitations(UNKNOWN_EMAIL);
+
+    // then
+    assertThat(pending, hasSize(1));
+    assertThat(pending.getFirst().isPublic(), is(false));
+    assertThat(pending.getFirst().role(), is("editor"));
+    assertNothingWasMutated();
   }
 
   @Test
@@ -327,7 +390,7 @@ public class PlanServiceImplTest {
   public void T_PLN_025_getPlansByUserEmail_buscaPorElIdDelDuenoResuelto() {
     // given
     User owner = owner(OWNER_ID, OWNER_EMAIL);
-    List<Plan> planes = List.of(ownedPlan(PLAN_ID, owner), ownedPlan(PLAN_ID + 1, owner));
+    List<Plan> planes = List.of(ownedPlan(PLAN_ID, owner), ownedPlan(OTHER_PLAN_ID, owner));
     when(this.userRepositoryMock.findByEmail(OWNER_EMAIL)).thenReturn(Optional.of(owner));
     when(this.planRepositoryMock.findByAdministratorId(OWNER_ID)).thenReturn(planes);
 
@@ -854,7 +917,7 @@ public class PlanServiceImplTest {
     return user;
   }
 
-  private Plan ownedPlan(Long id, User administrator) {
+  private Plan ownedPlan(UUID id, User administrator) {
     Plan plan = new Plan();
     plan.setId(id);
     plan.setName("Viaje a Bariloche");

@@ -9,6 +9,7 @@ import static org.hamcrest.Matchers.sameInstance;
 import com.valhalla.domain.user.User;
 import java.lang.reflect.Field;
 import java.time.LocalDate;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +26,7 @@ import org.junit.jupiter.api.Test;
  */
 public class PlanTest {
 
-  private static final Long PLAN_ID = 42L;
+  private static final UUID PLAN_ID = UUID.fromString("0192f0a1-0000-7000-8000-00000000002a");
   private static final String SHORT_CODE = "ABCD1234";
 
   private User administrator;
@@ -71,7 +72,7 @@ public class PlanTest {
     // given: a form post carries none of these, and a hostile one could set them
     Plan changes = new Plan();
     changes.setName("Nombre nuevo");
-    changes.setId(999L);
+    changes.setId(UUID.fromString("0192f0a1-0000-7000-8000-0000000003e7"));
     changes.setShortCode("IGNORADO");
     changes.setAdministrator(new User());
 

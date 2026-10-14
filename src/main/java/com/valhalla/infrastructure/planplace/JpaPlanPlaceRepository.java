@@ -2,12 +2,13 @@ package com.valhalla.infrastructure.planplace;
 
 import com.valhalla.domain.planplace.PlanPlace;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface JpaPlanPlaceRepository extends JpaRepository<PlanPlace, Long> {
   @EntityGraph(attributePaths = { "place" })
-  List<PlanPlace> findByPlanIdOrderBySortOrder(Long planId);
+  List<PlanPlace> findByPlanIdOrderBySortOrder(UUID planId);
 
-  boolean existsByPlanIdAndPlaceId(Long planId, Long placeId);
+  boolean existsByPlanIdAndPlaceId(UUID planId, Long placeId);
 }

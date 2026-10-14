@@ -31,15 +31,17 @@ sesion a `/auth/login`.
 |---|----------|
 | AC-01 | `GET /plans/{id}/public` sin sesion muestra el plan: nombre, descripcion, fecha y hora del evento |
 | AC-02 | Muestra el itinerario completo: cada `PlanPlace` en orden `sortOrder`, con nombre y categoria del lugar, descripcion de la parada y fecha/hora de visita |
-| AC-03 | Muestra el nombre del administrador del plan (quien lo creo) |
+| AC-03 | Muestra el nombre del administrador del plan (quien lo creo) y la cantidad de participantes; nunca la lista de participantes ni sus emails |
 | AC-04 | Un plan con `isPublic = false` responde **exactamente igual** que un id inexistente: la vista publica no revela que el plan exista |
 | AC-05 | La vista no expone controles de edicion: sin "Eliminar plan", sin "Salir del plan", sin alta/baja ni reorden de lugares |
-| AC-06 | Con sesion y sin ser participante, la vista ofrece "Unirse al plan" (`POST /plans/join` con el `shortCode`) y "Clonar plan" (`POST /plans/{id}/clone`, ver [CLO]) |
-| AC-07 | Sin sesion, los CTAs no ejecutan join/clone: llevan a `/auth/login` conservando a donde volver |
+| AC-06 | Los CTAs "Unirse al plan" (`POST /plans/join` con el `shortCode`) y "Clonar plan" (`POST /plans/{id}/clone`, ver [CLO]) estan siempre visibles bajo el titulo, arriba del contenido |
+| AC-07 | Sin sesion se ven los **mismos** CTAs ("Unirse al plan" y "Clonar plan"), pero como links a `/auth/login` conservando a donde volver; no ejecutan join/clone |
 | AC-08 | Si el usuario logueado ya es administrator o participant, no se muestra "Unirse"; se muestra el link "Ver mi plan" a `/plans/{id}` |
 | AC-09 | `GET /plans/{id}/public` es `permitAll`: responde 200 sin sesion y sin redirigir a login |
 | AC-10 | El resto de `/plans/**` sigue protegido: `GET /plans/{id}` y `POST /plans/{id}/clone` sin sesion siguen redirigiendo a `/auth/login` |
 | AC-11 | El link es copiable y compartible: no lleva tokens, ni shortCode en la URL, ni parametros de sesion |
+| AC-12 | Muestra un mapa (Leaflet) sobre el itinerario con un marcador numerado por parada (mismo estilo de circulo por categoria que el detalle del plan), usando las coordenadas de cada lugar del plan, y una linea que une las paradas en orden cuando hay 2 o mas |
+| AC-13 | Sin sesion el mapa y el itinerario se ven igual: la lectura no depende de la sesion |
 
 ## Escenarios de Test
 
@@ -53,6 +55,8 @@ sesion a `/auth/login`.
 | U-04 | `showPublicPlan()` arma `itineraryPlaces` respetando el orden `sortOrder` | AC-02 |
 | U-05 | `showPublicPlan()` sin sesion deja `isLogged`, `isPlanAdministrator` e `isParticipant` en false y no agrega atributos de edicion | AC-05, AC-07, AC-08 |
 | U-06 | `showPublicPlan()` con sesion de no-participante deja `isLogged` en true y el `shortCode` disponible para el form de join | AC-06 |
+| U-11 | `showPublicPlan()` expone `participantCount` con el tamanho de la lista de participantes, sin exponer emails ni la lista | AC-03 |
+| U-12 | `showPublicPlan()` expone `latitude`/`longitude` de cada parada en `itineraryPlaces` (lo que consume el mapa) | AC-12 |
 
 ### Tests Unitarios (`infrastructure/plan/PlanServiceImplTest.java`)
 
@@ -70,10 +74,13 @@ sesion a `/auth/login`.
 | I-01 | `GET /plans/{id}/public` anonimo con plan publico → 200 con el nombre del plan | AC-01, AC-09 |
 | I-02 | `GET /plans/{id}/public` anonimo con plan privado → misma respuesta que un id inexistente (mismo status y misma Location) | AC-04 |
 | I-03 | `GET /plans/{id}/public` anonimo muestra el itinerario con los lugares del plan | AC-02 |
-| I-04 | `GET /plans/{id}/public` con sesion de no-participante muestra los CTAs "Unirse" y "Clonar" | AC-06 |
+| I-04 | `GET /plans/{id}/public` con sesion de no-participante muestra los CTAs "Unirse" y "Clonar" como forms a los endpoints | AC-06 |
 | I-05 | `GET /plans/{id}/public` con sesion de participant no muestra "Unirse" y si el link al detalle | AC-08 |
 | I-06 | `GET /plans/{id}/public` no renderiza el form de edicion ni el boton "Eliminar plan" | AC-05 |
 | I-07 | `GET /plans/{id}` anonimo sigue redirigiendo a `/auth/login` | AC-10 |
+| I-08 | `GET /plans/{id}/public` anonimo muestra los mismos CTAs pero como links al login con `redirect`, sin forms ni CSRF | AC-07 |
+| I-09 | `GET /plans/{id}/public` muestra el contador de participantes sin exponer emails ni la lista | AC-03 |
+| I-10 | `GET /plans/{id}/public` renderiza el contenedor del mapa y las coordenadas de cada parada del itinerario | AC-12 |
 
 ### Tests de Seguridad (`integration/PlanPublicSecurityTest.java`)
 
@@ -88,7 +95,7 @@ sesion a `/auth/login`.
 
 | # | Test | Flujo | AC que cubre |
 |---|------|-------|-------------|
-| E-01 | `PublicPlanViewE2E` | Sin sesion, abrir el link publico de un plan → ver nombre, fecha e itinerario | AC-01, AC-02, AC-09 |
+| E-01 | `PublicPlanViewE2E` | Sin sesion, abrir el link publico → ver nombre, fecha, itinerario, mapa con marcadores y los CTAs al login; el CTA anonimo te lleva al login y te devuelve al plan | AC-01, AC-02, AC-07, AC-09, AC-12, AC-13 |
 
 ## Notas / decisiones de diseño
 
@@ -105,6 +112,19 @@ sesion a `/auth/login`.
   disponible: el form postea de verdad y redirige al detalle de la copia.
 - **Unirse reutiliza el join existente.** No se crea un flujo nuevo: `POST /plans/join` con
   `shortCode` ya existe (`PlanController.joinPlan`) y agrega al usuario como participant.
+- **Los CTAs son los mismos con o sin sesion (decision posterior).** El equipo decidio que el
+  anonimo no ve un texto propio ("Inicia sesion para unirte o clonar") sino los mismos botones
+  que el logueado; sin sesion cada uno es un link a `/auth/login?redirect=` con la vuelta a esta
+  vista. Asi el CTA que el usuario aprende a usar en la vista publica es el mismo siempre.
+- **Mapa read-only, sin el catalogo.** A diferencia de `pages/plans/detail.html` (que muestra
+  todos los lugares y los del plan resaltados), aca solo se marcan las paradas del plan,
+  numeradas en orden de visita: la vista es para mirar, no para editar. El JSON de paradas sale
+  del mismo `itineraryPlaces` del model; los popups se arman con DOM, nunca con string
+  concatenado, para que un nombre de lugar con HTML se renderice como texto. El estilo de los
+  marcadores y la linea que une las paradas replica al detalle (referencia visual): circulo con
+  color por categoria y borde amarillo `in-itinerary`, y polyline punteada solo con 2+ paradas.
+- **Participantes: solo el contador.** El model expone `participantCount`, nunca la lista ni
+  los emails (consistente con [PPV] AC-09 y con `PlanPublicSecurityTest` S-04).
 
 ## Referencia de Implementacion
 
@@ -254,7 +274,8 @@ Sigue el layout compartido (`layouts/base :: head` + `layout`), Tailwind con los
     <p class="text-gray-500" th:if="${itineraryPlaces.isEmpty()}">Este plan aun no tiene lugares.</p>
   </section>
 
-  <!-- CTAs: join reutiliza el endpoint existente, clone lo implementa [CLO].
+  <!-- CTAs: join reutiliza el endpoint existente, clone lo implementa [CLO]. Siempre visibles
+       bajo el titulo; sin sesion cada uno es un link al login con la vuelta al plan.
        Nunca se decide por #authentication: con anonimo ese objeto existe y seria siempre true. -->
   <div class="flex flex-wrap gap-3 mt-6">
     <form th:if="${isLogged and !isParticipant and !isPlanAdministrator}" method="post"
@@ -274,10 +295,13 @@ Sigue el layout compartido (`layouts/base :: head` + `layout`), Tailwind con los
       </button>
     </form>
 
-    <a th:if="${!isLogged}" th:href="@{/auth/login}"
-       class="bg-primary text-white px-4 py-2 rounded-md font-medium">
-      Inicia sesion para unirte o clonar
-    </a>
+    <a th:if="${!isLogged}"
+       th:href="${#strings.isEmpty(currentPath)} ? @{/auth/login} : @{/auth/login(redirect=${currentPath})}"
+       class="bg-primary text-white px-4 py-2 rounded-md font-medium">Unirme al plan</a>
+    <a th:if="${!isLogged}"
+       th:href="${#strings.isEmpty(currentPath)} ? @{/auth/login} : @{/auth/login(redirect=${currentPath})}"
+       class="bg-primary text-white px-4 py-2 rounded-md font-medium">Clonar plan</a>
+
     <a th:if="${isParticipant or isPlanAdministrator}" th:href="@{/plans/{id}(id=${plan.id})}"
        class="bg-gray-800 text-white px-4 py-2 rounded-md font-medium">Ver mi plan</a>
   </div>

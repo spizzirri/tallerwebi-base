@@ -4,6 +4,7 @@ import com.valhalla.domain.plan.Plan;
 import com.valhalla.domain.plan.PlanRepository;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -23,7 +24,7 @@ public class PlanRepositoryImpl implements PlanRepository {
   }
 
   @Override
-  public Optional<Plan> findById(Long id) {
+  public Optional<Plan> findById(UUID id) {
     return jpaPlanRepository.findById(id);
   }
 
@@ -63,7 +64,7 @@ public class PlanRepositoryImpl implements PlanRepository {
   }
 
   @Override
-  public void deleteById(Long id) {
+  public void deleteById(UUID id) {
     jpaPlanRepository.deleteById(id);
   }
 }

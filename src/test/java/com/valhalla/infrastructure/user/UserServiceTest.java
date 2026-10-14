@@ -22,6 +22,7 @@ import com.valhalla.domain.user.UserRepository;
 import com.valhalla.domain.user.UserService;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -30,6 +31,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 public class UserServiceTest {
+
+  private static final UUID PLAN_ID_A = UUID.fromString("0192f0a1-0000-7000-8000-00000000000a");
+  private static final UUID PLAN_ID_B = UUID.fromString("0192f0a1-0000-7000-8000-00000000000b");
 
   private UserService userService;
   private UserRepository userRepositoryMock;
@@ -219,15 +223,15 @@ public class UserServiceTest {
     Long id = 1L;
     when(this.userRepositoryMock.existsById(id)).thenReturn(true);
     when(this.planRepositoryMock.findByAdministratorId(id))
-      .thenReturn(List.of(planOwnedBy(id, 10L), planOwnedBy(id, 11L)));
+      .thenReturn(List.of(planOwnedBy(id, PLAN_ID_A), planOwnedBy(id, PLAN_ID_B)));
 
     // when
     this.userService.delete(id);
 
     // then
     InOrder inOrder = inOrder(this.planRepositoryMock, this.userRepositoryMock);
-    inOrder.verify(this.planRepositoryMock).deleteById(10L);
-    inOrder.verify(this.planRepositoryMock).deleteById(11L);
+    inOrder.verify(this.planRepositoryMock).deleteById(PLAN_ID_A);
+    inOrder.verify(this.planRepositoryMock).deleteById(PLAN_ID_B);
     inOrder.verify(this.userRepositoryMock).deleteById(id);
   }
 
@@ -242,7 +246,7 @@ public class UserServiceTest {
     Long id = 1L;
     when(this.userRepositoryMock.existsById(id)).thenReturn(true);
     when(this.planRepositoryMock.findByAdministratorId(id))
-      .thenReturn(List.of(planOwnedBy(id, 10L)));
+      .thenReturn(List.of(planOwnedBy(id, PLAN_ID_A)));
 
     // when
     this.userService.delete(id);
@@ -250,11 +254,11 @@ public class UserServiceTest {
     // then
     verify(this.planRepositoryMock, times(1)).findByAdministratorId(id);
     verify(this.planRepositoryMock, never()).findAll();
-    verify(this.planRepositoryMock, times(1)).deleteById(10L);
+    verify(this.planRepositoryMock, times(1)).deleteById(PLAN_ID_A);
     verify(this.userRepositoryMock, times(1)).deleteById(id);
   }
 
-  private Plan planOwnedBy(Long administratorId, Long planId) {
+  private Plan planOwnedBy(Long administratorId, UUID planId) {
     Plan plan = new Plan();
     plan.setId(planId);
     User administrator = new User();

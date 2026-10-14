@@ -102,7 +102,9 @@ public class PlansPage extends WebPage {
   public void waitForDetailPath() {
     page.waitForURL(
       Pattern.compile(
-        "[a-zA-Z][a-zA-Z0-9+.-]*://[^/]*" + Pattern.quote(LIST_PATH) + "/\\d+(?:[?;][^#]*)?$"
+        "[a-zA-Z][a-zA-Z0-9+.-]*://[^/]*" +
+        Pattern.quote(LIST_PATH) +
+        "/[0-9a-f-]{36}(?:[?;][^#]*)?$"
       )
     );
   }

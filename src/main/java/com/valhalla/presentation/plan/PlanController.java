@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -31,14 +32,12 @@ import org.springframework.web.servlet.ModelAndView;
 public class PlanController {
 
   private static final String VIEW_PLANS_LIST = "pages/plans/list";
-  private static final String VIEW_PUBLIC_LIST = "pages/plans/public-list";
   private static final String VIEW_PLAN_DETAIL = "pages/plans/detail";
   private static final String VIEW_PUBLIC_PLAN = "pages/plans/public";
   private static final String REDIRECT_PLANS = "redirect:/plans";
   private static final String REDIRECT_PLAN_DETAIL = "redirect:/plans/";
   private static final String REDIRECT_EXPLORE = "redirect:/explore";
   private static final String ATTR_PLANS = "plans";
-  private static final String ATTR_PUBLIC_PLANS = "publicPlans";
   private static final String ATTR_PLAN = "plan";
 
   private final PlanService planService;
@@ -60,23 +59,12 @@ public class PlanController {
   }
 
   /**
-   * [PPV] Feed de planes publicos, con sesion iniciada (decision de producto: el visitante cae en
-   * /auth/login). El mapping literal {@code /public} tiene prioridad sobre {@code /{id}} en el
-   * orden de patrones de Spring, asi que nunca llega a parsearse como un Long.
+   * [PPV] El feed de planes publicos se mudó a {@code GET /for-you} (ver {@link ForYouController}),
+   * fuera de /plans porque ahora es una ruta de primer nivel visible con y sin sesion.
    */
-  @GetMapping("/public")
-  public ModelAndView publicPlans(Authentication authentication) {
-    String currentEmail = authentication.getName();
-    Map<String, Object> model = new ModelMap();
-    model.put(
-      ATTR_PUBLIC_PLANS,
-      planService.getPublicPlans().stream().map(plan -> planCard(plan, currentEmail)).toList()
-    );
-    return new ModelAndView(VIEW_PUBLIC_LIST, model);
-  }
 
   @GetMapping("/{id}")
-  public ModelAndView showPlan(@PathVariable Long id, Authentication authentication) {
+  public ModelAndView showPlan(@PathVariable UUID id, Authentication authentication) {
     Map<String, Object> model = new ModelMap();
     String userEmail = authentication == null ? null : authentication.getName();
     Plan plan = planService.getParticipatingPlan(id, userEmail);
@@ -84,7 +72,7 @@ public class PlanController {
     model.put("canEditPlan", plan.canEdit(userEmail));
     model.put("isPlanAdministrator", plan.isAdministrator(userEmail));
     model.put("isPlanParticipant", plan.isParticipant(userEmail));
-    model.put("canInvite", userEmail != null && (plan.canEdit(userEmail) || plan.getIsPublic()));
+    model.put("canInvite", userEmail != null && plan.canEdit(userEmail));
     model.put(
       "participants",
       Stream
@@ -122,7 +110,7 @@ public class PlanController {
    * con anonimo ese objeto existe como AnonymousAuthenticationToken y seria siempre true.
    */
   @GetMapping("/{id}/public")
-  public ModelAndView showPublicPlan(@PathVariable Long id, Authentication authentication) {
+  public ModelAndView showPublicPlan(@PathVariable UUID id, Authentication authentication) {
     Plan plan = planService.getPublicPlan(id);
     Map<String, Object> model = new ModelMap();
     model.put(ATTR_PLAN, plan);
@@ -132,6 +120,9 @@ public class PlanController {
     );
     // AC-03: "Creado por" en la vista pública; sin nombre de visualización se usa el email.
     model.put("administratorName", displayName(plan.getAdministrator()));
+    // Cuánta gente acompaña el plan. Es el único dato de participantes que sale al HTML: la
+    // vista pública no expone emails ni la lista (PlanPublicSecurityTest S-04).
+    model.put("participantCount", plan.getParticipants().size());
 
     String email = currentEmail(authentication);
     model.put("isLogged", email != null);
@@ -181,7 +172,7 @@ public class PlanController {
 
   @RequestMapping(value = "/{id}", method = { RequestMethod.POST, RequestMethod.PUT })
   public ModelAndView updatePlan(
-    @PathVariable Long id,
+    @PathVariable UUID id,
     @Valid @ModelAttribute(ATTR_PLAN) PlanRequest planForm,
     BindingResult bindingResult,
     Authentication authentication
@@ -201,14 +192,14 @@ public class PlanController {
    * behaving identically whether or not {@code _method} is honoured.
    */
   @RequestMapping(value = "/{id}/delete", method = { RequestMethod.POST, RequestMethod.DELETE })
-  public ModelAndView deletePlan(@PathVariable Long id, Authentication authentication) {
+  public ModelAndView deletePlan(@PathVariable UUID id, Authentication authentication) {
     planService.deleteOwnedPlan(id, authentication.getName());
     return new ModelAndView(REDIRECT_PLANS);
   }
 
   @PostMapping("/{id}/participants/role")
   public ModelAndView changeParticipantRole(
-    @PathVariable Long id,
+    @PathVariable UUID id,
     @RequestParam String participantEmail,
     @RequestParam String role,
     Authentication authentication
@@ -219,7 +210,7 @@ public class PlanController {
 
   @PostMapping("/{id}/participants/remove")
   public ModelAndView removeParticipant(
-    @PathVariable Long id,
+    @PathVariable UUID id,
     @RequestParam String participantEmail,
     Authentication authentication,
     org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes
@@ -234,7 +225,7 @@ public class PlanController {
 
   @PostMapping("/{id}/participants/invite")
   public ModelAndView inviteParticipant(
-    @PathVariable Long id,
+    @PathVariable UUID id,
     @RequestParam String participantEmail,
     @RequestParam(defaultValue = "guest") String role,
     Authentication authentication,
@@ -258,24 +249,24 @@ public class PlanController {
   }
 
   /**
-   * [CLO] "Usar plan": copia el plan como tuyo y caes en tu copia editable. El email sale de la
+   * [CLO] "Clonar Plan": copia el plan como tuyo y caes en tu copia editable. El email sale de la
    * sesion, nunca del form.
    */
   @PostMapping("/{id}/clone")
-  public ModelAndView clonePlan(@PathVariable Long id, Authentication authentication) {
+  public ModelAndView clonePlan(@PathVariable UUID id, Authentication authentication) {
     Plan copy = planService.clonePlan(id, authentication.getName());
     return new ModelAndView(REDIRECT_PLAN_DETAIL + copy.getId());
   }
 
   @PostMapping("/{id}/leave")
-  public ModelAndView leavePlan(@PathVariable Long id, Authentication authentication) {
+  public ModelAndView leavePlan(@PathVariable UUID id, Authentication authentication) {
     planService.leavePlan(id, authentication.getName());
     return new ModelAndView(REDIRECT_PLANS);
   }
 
   @PostMapping("/{id}/invitations/{invitationId}/respond")
   public ModelAndView respondToInvitation(
-    @PathVariable Long id,
+    @PathVariable UUID id,
     @PathVariable Long invitationId,
     @RequestParam boolean accept,
     Authentication authentication,
@@ -321,46 +312,6 @@ public class PlanController {
       plan.addPlanPlace(entry);
     }
     return plan;
-  }
-
-  /** Cantidad de covers genericos en /images/plans: el id del plan elige uno, deterministico. */
-  private static final int COVER_COUNT = 6;
-
-  /**
-   * [PPV, AC-03/AC-09] Solo campos publicos de la tarjeta: nombre, descripcion, fecha, cantidad de
-   * lugares del itinerario y nombre del administrador. Ni shortCode, ni emails, ni participantes.
-   * {@code own} marca los planes que son del usuario logueado: esos muestran "Editar" en la tarjeta.
-   * {@code cover} es la imagen generica del plan (id % COVER_COUNT); a futuro, una columna
-   * {@code imageUrl} en Plan la reemplaza.
-   */
-  private static Map<String, Object> planCard(Plan plan, String currentEmail) {
-    Map<String, Object> card = new LinkedHashMap<>();
-    card.put("id", plan.getId());
-    card.put("name", plan.getName());
-    card.put("description", plan.getDescription());
-    card.put("eventDate", plan.getEventDate() == null ? null : plan.getEventDate().toString());
-    card.put("placeCount", plan.getPlanPlaces().size());
-    card.put("administratorName", feedDisplayName(plan.getAdministrator()));
-    card.put("own", plan.isAdministrator(currentEmail));
-    card.put(
-      "cover",
-      "/images/plans/cover-" + (Math.floorMod(plan.getId(), (long) COVER_COUNT) + 1) + ".svg"
-    );
-    return card;
-  }
-
-  /**
-   * [PPV] Nombre visible del administrador en el feed. Sin nombre registrado queda vacio y la vista
-   * oculta la linea: AC-09 prohibe exponer emails en el listado, aunque el helper de la vista
-   * publica {@link #displayName(User)} use el email como ultimo recurso.
-   */
-  private static String feedDisplayName(User user) {
-    if (user == null) {
-      return "";
-    }
-    String first = user.getFirstName() == null ? "" : user.getFirstName().trim();
-    String last = user.getLastName() == null ? "" : user.getLastName().trim();
-    return (first + " " + last).trim();
   }
 
   private static Map<String, Object> placeView(PlanPlace entry) {

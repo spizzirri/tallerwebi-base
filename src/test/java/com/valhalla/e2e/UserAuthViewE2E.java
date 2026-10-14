@@ -55,13 +55,30 @@ public class UserAuthViewE2E extends E2eBase {
     // could see the difference between a live item and a 404 waiting to be clicked. PlanController
     // landed in 03-PLN, so "Plans" belongs back in the set and now has somewhere to resolve to.
     // The Explore link arrived with the map feature in 03-PLC and resolves to /explore, so it
-    // belongs in the set too. "Planes públicos" llegó con 14-PPV y resuelve a /plans/public, el
-    // home del usuario logueado (el feed exige sesión, así que sin sesión ni siquiera aparece).
+    // belongs in the set too. "Para vos" resuelve a /for-you, el feed que es home del usuario
+    // (visible con y sin sesión); el label cambió de "Planes públicos" cuando el feed pasó a
+    // mostrar solo planes ajenos.
     assertThat(
       "the authenticated navbar offers only items that resolve",
       landing.getNavbarItems(),
-      contains("PlanIt", "Planes públicos", "Explore", "Plans", "Logout")
+      contains("PlanIt", "Para vos", "Explore", "Plans", "Logout")
     );
+  }
+
+  @Test
+  void shouldLandOnTheUserLandingWhenTheRedirectIsTheSiteRoot() throws MalformedURLException {
+    givenUserRegisters(EMAIL, PASSWORD);
+    signOut();
+
+    // El navbar de la landing arma /auth/login?redirect=/: el form de login reenvía ese valor
+    // en el POST y el success handler lo tiene que tratar como "sin destino" (aterrizar en /
+    // dejaría al USER en la home del sitio en vez del feed "Para vos", LoginRedirects.afterLogin).
+    LoginPage loginPage = new LoginPage(page, "/auth/login?redirect=/");
+    loginPage.typeEmail(EMAIL);
+    loginPage.typePassword(PASSWORD);
+    loginPage.clickSignIn();
+
+    thenShouldBeOnPath(LoginRedirects.USER_LANDING);
   }
 
   @Test

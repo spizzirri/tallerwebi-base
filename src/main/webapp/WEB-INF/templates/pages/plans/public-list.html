@@ -1,10 +1,12 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
-  <!-- [PPV] Feed de planes publicos, con sesion iniciada: es el home del usuario post-login.
-       Server-side con Thymeleaf, sin endpoint REST nuevo (ver 14-PPV.md, notas). -->
+  <!-- [PPV] Feed "Para vos" de planes publicos, visible con y sin sesion: es el home del usuario
+       post-login y tambien la puerta de descubrimiento del visitante. Server-side con Thymeleaf,
+       sin endpoint REST nuevo (ver 14-PPV.md, notas). -->
 
-  <head th:replace="~{layouts/base :: head('Planes públicos')}"></head>
+  <head th:replace="~{layouts/base :: head('Para vos')}"></head>
 
   <body th:replace="~{layouts/base :: layout(~{::main})}">
     <main class="flex-1 p-4">
@@ -27,8 +29,10 @@
         <!-- Tarjetas: nombre, descripcion, fecha, cantidad de lugares y administrador (AC-03),
              cada una linkeando a la vista publica del plan (AC-04). -->
         <div th:if="${!publicPlans.isEmpty()}" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <!-- La card entera se siente clickeable: el body ya linkea a la vista publica, y el
+               hover con lift + sombra mas fuerte comunica la accion antes de llegar al CTA. -->
           <article th:each="plan : ${publicPlans}"
-            class="flex flex-col overflow-hidden rounded-lg bg-white shadow-md transition hover:shadow-lg">
+            class="flex cursor-pointer flex-col overflow-hidden rounded-lg bg-white shadow-md transition duration-200 hover:-translate-y-1 hover:shadow-xl">
             <a th:href="@{/plans/{id}/public(id=${plan.id})}" class="flex flex-1 flex-col">
               <!-- Cover generico del plan (id -> /images/plans/cover-N.svg). A futuro, si Plan
                    trae imageUrl propia, th:src cambia a ${plan.imageUrl} sin tocar el resto. -->
@@ -55,21 +59,26 @@
               </div>
             </a>
 
-            <!-- Acciones de la tarjeta: usar (clonar como base propia) y, si el plan es tuyo,
-                 editar en su detalle. -->
+            <!-- Acciones de la tarjeta: clonar como base propia (los planes propios no llegan
+                 aca, asi que no hay CTA de edicion en el feed). El mismo CTA con y sin sesion
+                 [PPV]: logueado ejecuta el clone via form, anonimo va al login con la vuelta
+                 al feed (?redirect=, el mismo mecanismo que el navbar) y clona al volver. -->
             <div class="flex gap-2 border-t border-gray-100 p-3">
-              <!-- El CTA de usar = [CLO] POST /plans/{id}/clone: copia el plan como tuyo y caes en
+              <!-- El CTA de clonar = [CLO] POST /plans/{id}/clone: copia el plan como tuyo y caes en
                    tu copia editable. Con CSRF via form nativo, como /plans/join. -->
-              <form th:action="@{/plans/{id}/clone(id=${plan.id})}" method="POST" class="flex-1">
+              <form sec:authorize="isAuthenticated()"
+                th:action="@{/plans/{id}/clone(id=${plan.id})}" method="POST" class="flex-1">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                 <button type="submit"
                   class="w-full cursor-pointer rounded-md bg-primary px-4 py-2 font-medium text-white transition hover:bg-secondary">
-                  Usar plan
+                  Clonar Plan
                 </button>
               </form>
-              <a th:if="${plan.own}" th:href="@{/plans/{id}(id=${plan.id})}"
-                class="rounded-md border border-primary px-4 py-2 font-medium text-primary transition hover:bg-primary hover:text-white">
-                Editar
+
+              <a sec:authorize="!isAuthenticated()"
+                th:href="${#strings.isEmpty(currentPath)} ? @{/auth/login} : @{/auth/login(redirect=${currentPath})}"
+                class="flex-1 rounded-md bg-primary px-4 py-2 text-center font-medium text-white transition hover:bg-secondary">
+                Clonar Plan
               </a>
             </div>
           </article>

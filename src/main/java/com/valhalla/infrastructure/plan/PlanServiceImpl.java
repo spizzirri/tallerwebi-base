@@ -79,7 +79,7 @@ public class PlanServiceImpl implements PlanService { // NOPMD — intentional: 
 
   @Override
   @Transactional(readOnly = true)
-  public Plan getOwnedPlan(Long id, String ownerEmail) {
+  public Plan getOwnedPlan(UUID id, String ownerEmail) {
     Plan plan = planRepository.findById(id).orElseThrow(PlanNotFoundException::new);
     if (plan.getAdministrator() == null || !ownerEmail.equals(plan.getAdministrator().getEmail())) {
       // A plan owned by somebody else answers as missing: "forbidden" would confirm the id exists.
@@ -90,7 +90,7 @@ public class PlanServiceImpl implements PlanService { // NOPMD — intentional: 
 
   @Override
   @Transactional(readOnly = true)
-  public Plan getEditablePlan(Long id, String userEmail) {
+  public Plan getEditablePlan(UUID id, String userEmail) {
     Plan plan = planRepository.findById(id).orElseThrow(PlanNotFoundException::new);
     if (!plan.canEdit(userEmail)) {
       throw new PlanNotFoundException();
@@ -100,7 +100,7 @@ public class PlanServiceImpl implements PlanService { // NOPMD — intentional: 
 
   @Override
   public void changeParticipantRole(
-    Long id,
+    UUID id,
     String participantEmail,
     String role,
     String userEmail
@@ -126,7 +126,7 @@ public class PlanServiceImpl implements PlanService { // NOPMD — intentional: 
   }
 
   @Override
-  public void removeParticipant(Long id, String participantEmail, String userEmail) {
+  public void removeParticipant(UUID id, String participantEmail, String userEmail) {
     Plan plan = getEditablePlan(id, userEmail);
     if (
       plan.isAdministrator(participantEmail) ||
@@ -144,9 +144,9 @@ public class PlanServiceImpl implements PlanService { // NOPMD — intentional: 
   }
 
   @Override
-  public void inviteParticipant(Long id, String participantEmail, String role, String userEmail) {
+  public void inviteParticipant(UUID id, String participantEmail, String role, String userEmail) {
     Plan plan = planRepository.findById(id).orElseThrow(PlanNotFoundException::new);
-    validateInvitationPermissions(plan, role, userEmail);
+    validateInvitationPermissions(plan, userEmail);
     validateInvitationRole(role);
     User participant = findInvitationRecipient(participantEmail);
     validateInvitationRecipient(plan, participant.getEmail());
@@ -155,12 +155,9 @@ public class PlanServiceImpl implements PlanService { // NOPMD — intentional: 
     planRepository.save(plan);
   }
 
-  private void validateInvitationPermissions(Plan plan, String role, String userEmail) {
-    if (
-      userEmail == null ||
-      userEmail.isBlank() ||
-      (!plan.canEdit(userEmail) && (!plan.getIsPublic() || !PARTICIPANT_ROLE.equals(role)))
-    ) {
+  private void validateInvitationPermissions(Plan plan, String userEmail) {
+    if (userEmail == null || userEmail.isBlank() || !plan.canEdit(userEmail)) {
+      // Un plan sin permiso responde como inexistente: no se confirma que el id exista.
       throw new PlanNotFoundException();
     }
   }
@@ -214,6 +211,7 @@ public class PlanServiceImpl implements PlanService { // NOPMD — intentional: 
           invitation.getId(),
           invitation.getPlan().getId(),
           invitation.getPlan().getName(),
+          Boolean.TRUE.equals(invitation.getPlan().getIsPublic()),
           name,
           inviter.getEmail(),
           invitation.getRole()
@@ -225,7 +223,7 @@ public class PlanServiceImpl implements PlanService { // NOPMD — intentional: 
 
   @Override
   public void respondToInvitation(
-    Long planId,
+    UUID planId,
     Long invitationId,
     boolean accept,
     String userEmail
@@ -250,7 +248,7 @@ public class PlanServiceImpl implements PlanService { // NOPMD — intentional: 
   }
 
   @Override
-  public Plan updatePlan(Long id, Plan changes, String ownerEmail) {
+  public Plan updatePlan(UUID id, Plan changes, String ownerEmail) {
     Plan existing = getEditablePlan(id, ownerEmail);
     existing.updateFrom(changes);
     return planRepository.save(existing);
@@ -258,7 +256,7 @@ public class PlanServiceImpl implements PlanService { // NOPMD — intentional: 
 
   @Override
   @Transactional(readOnly = true)
-  public Plan getParticipatingPlan(Long id, String userEmail) {
+  public Plan getParticipatingPlan(UUID id, String userEmail) {
     Plan plan = planRepository.findById(id).orElseThrow(PlanNotFoundException::new);
     if (!plan.getIsPublic() && !plan.isAdministrator(userEmail) && !plan.isParticipant(userEmail)) {
       throw new PlanNotFoundException();
@@ -278,7 +276,7 @@ public class PlanServiceImpl implements PlanService { // NOPMD — intentional: 
 
   @Override
   @Transactional(readOnly = true)
-  public Plan getPublicPlan(Long id) {
+  public Plan getPublicPlan(UUID id) {
     Plan plan = planRepository.findById(id).orElseThrow(PlanNotFoundException::new);
     if (!plan.getIsPublic()) {
       // Privado e inexistente responden igual: la vista publica no confirma que el plan exista.
@@ -295,7 +293,7 @@ public class PlanServiceImpl implements PlanService { // NOPMD — intentional: 
   }
 
   @Override
-  public void leavePlan(Long id, String userEmail) {
+  public void leavePlan(UUID id, String userEmail) {
     Plan plan = getParticipatingPlan(id, userEmail);
     if (plan.isAdministrator(userEmail) || !plan.isParticipant(userEmail)) {
       throw new PlanNotFoundException();
@@ -322,14 +320,14 @@ public class PlanServiceImpl implements PlanService { // NOPMD — intentional: 
   }
 
   @Override
-  public void deleteOwnedPlan(Long id, String ownerEmail) {
+  public void deleteOwnedPlan(UUID id, String ownerEmail) {
     getOwnedPlan(id, ownerEmail);
     planRepository.deleteById(id);
   }
 
   @Override
   @Transactional
-  public Plan clonePlan(Long id, String clonerEmail) {
+  public Plan clonePlan(UUID id, String clonerEmail) {
     User cloner = userRepository.findByEmail(clonerEmail).orElseThrow(UserNotFoundException::new);
     Plan source = planRepository.findById(id).orElseThrow(PlanNotFoundException::new);
     boolean accessible =

@@ -87,7 +87,7 @@ public class PublicPlanCloneE2E extends E2eBase {
     register.typePassword(PASSWORD);
     register.typeConfirmPassword(PASSWORD);
     register.clickRegister();
-    // Contra la constante de landing, no un literal: tolera el cambio a /plans/public (PR #15)
+    // Contra la constante de landing, no un literal: tolera el cambio de landing (p. ej. /for-you)
     new WebPage(page).waitForPath(LoginRedirects.USER_LANDING);
 
     new WebPage(page).navigate(planUrl);

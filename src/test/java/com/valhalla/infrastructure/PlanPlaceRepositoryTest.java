@@ -8,6 +8,7 @@ import com.valhalla.domain.planplace.*;
 import com.valhalla.infrastructure.planplace.JpaPlanPlaceRepository;
 import com.valhalla.integration.JpaIntegrationTest;
 import jakarta.persistence.EntityManager;
+import java.util.UUID;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -103,7 +104,7 @@ class PlanPlaceRepositoryTest {
     plan.addPlanPlace(early);
     plans.save(plan);
     em.flush();
-    Long planId = plan.getId();
+    UUID planId = plan.getId();
     em.clear();
     Plan loaded = plans.findById(planId).orElseThrow();
     // The itinerary renders outside a session (controller builds the detail view model), so the

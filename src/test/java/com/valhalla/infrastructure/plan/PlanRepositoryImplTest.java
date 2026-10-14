@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 import com.valhalla.domain.plan.Plan;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -22,6 +23,9 @@ import org.junit.jupiter.api.Test;
  * coming back.
  */
 public class PlanRepositoryImplTest {
+
+  private static final UUID PLAN_ID = UUID.fromString("0192f0a1-0000-7000-8000-000000000001");
+  private static final UUID OTHER_PLAN_ID = UUID.fromString("0192f0a1-0000-7000-8000-000000000002");
 
   private JpaPlanRepository jpaPlanRepositoryMock;
   private PlanRepositoryImpl planRepository;
@@ -35,7 +39,7 @@ public class PlanRepositoryImplTest {
   @Test
   public void T_PLN_040_findAll_delegaEnJpaPlanRepository() {
     // given
-    List<Plan> planes = List.of(plan(1L), plan(2L));
+    List<Plan> planes = List.of(plan(PLAN_ID), plan(OTHER_PLAN_ID));
     when(this.jpaPlanRepositoryMock.findAll()).thenReturn(planes);
 
     // when
@@ -49,21 +53,21 @@ public class PlanRepositoryImplTest {
   @Test
   public void T_PLN_041_findById_delegaEnJpaPlanRepository() {
     // given
-    Plan plan = plan(1L);
-    when(this.jpaPlanRepositoryMock.findById(1L)).thenReturn(Optional.of(plan));
+    Plan plan = plan(PLAN_ID);
+    when(this.jpaPlanRepositoryMock.findById(PLAN_ID)).thenReturn(Optional.of(plan));
 
     // when
-    Optional<Plan> result = this.planRepository.findById(1L);
+    Optional<Plan> result = this.planRepository.findById(PLAN_ID);
 
     // then
     assertThat(result.orElseThrow(), is(sameInstance(plan)));
-    verify(this.jpaPlanRepositoryMock, times(1)).findById(1L);
+    verify(this.jpaPlanRepositoryMock, times(1)).findById(PLAN_ID);
   }
 
   @Test
   public void T_PLN_042_findByAdministratorId_delegaEnJpaPlanRepository() {
     // given
-    List<Plan> planes = List.of(plan(1L));
+    List<Plan> planes = List.of(plan(PLAN_ID));
     when(this.jpaPlanRepositoryMock.findByAdministratorId(7L)).thenReturn(planes);
 
     // when
@@ -77,7 +81,7 @@ public class PlanRepositoryImplTest {
   @Test
   public void T_PLN_043_findByShortCode_delegaEnJpaPlanRepository() {
     // given
-    Plan plan = plan(1L);
+    Plan plan = plan(PLAN_ID);
     when(this.jpaPlanRepositoryMock.findByShortCode("ABCD1234")).thenReturn(Optional.of(plan));
 
     // when
@@ -104,8 +108,8 @@ public class PlanRepositoryImplTest {
   @Test
   public void T_PLN_045_save_devuelveLoQueJpaPlanRepositoryGuardo() {
     // given
-    Plan plan = plan(1L);
-    Plan managed = plan(1L);
+    Plan plan = plan(PLAN_ID);
+    Plan managed = plan(PLAN_ID);
     when(this.jpaPlanRepositoryMock.save(plan)).thenReturn(managed);
 
     // when
@@ -119,13 +123,13 @@ public class PlanRepositoryImplTest {
   @Test
   public void T_PLN_046_deleteById_delegaEnJpaPlanRepository() {
     // when
-    this.planRepository.deleteById(1L);
+    this.planRepository.deleteById(PLAN_ID);
 
     // then
-    verify(this.jpaPlanRepositoryMock, times(1)).deleteById(1L);
+    verify(this.jpaPlanRepositoryMock, times(1)).deleteById(PLAN_ID);
   }
 
-  private Plan plan(Long id) {
+  private Plan plan(UUID id) {
     Plan plan = new Plan();
     plan.setId(id);
     plan.setName("Viaje a Bariloche");

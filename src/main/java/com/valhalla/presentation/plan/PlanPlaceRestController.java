@@ -9,6 +9,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -33,7 +34,7 @@ public class PlanPlaceRestController {
   }
 
   @GetMapping
-  public List<ItineraryEntry> getItinerary(@PathVariable Long planId, Principal principal) {
+  public List<ItineraryEntry> getItinerary(@PathVariable UUID planId, Principal principal) {
     return service
       .getItinerary(planId, principal == null ? null : principal.getName())
       .stream()
@@ -43,7 +44,7 @@ public class PlanPlaceRestController {
 
   @PostMapping
   public ItineraryEntry addPlace(
-    @PathVariable Long planId,
+    @PathVariable UUID planId,
     @RequestParam Long placeId,
     Principal principal
   ) {
@@ -52,7 +53,7 @@ public class PlanPlaceRestController {
 
   @PutMapping("/{id}")
   public ItineraryEntry updatePlanPlace(
-    @PathVariable Long planId,
+    @PathVariable UUID planId,
     @PathVariable Long id,
     @RequestBody PlanPlaceUpdateRequest request,
     Principal principal
@@ -69,13 +70,13 @@ public class PlanPlaceRestController {
   }
 
   @DeleteMapping("/{id}")
-  public void removePlace(@PathVariable Long planId, @PathVariable Long id, Principal principal) {
+  public void removePlace(@PathVariable UUID planId, @PathVariable Long id, Principal principal) {
     service.removePlaceFromPlan(planId, id, principal.getName());
   }
 
   @PostMapping("/reorder")
   public void reorderPlaces(
-    @PathVariable Long planId,
+    @PathVariable UUID planId,
     @RequestBody List<Long> placeIds,
     Principal principal
   ) {

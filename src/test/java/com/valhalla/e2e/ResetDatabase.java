@@ -25,7 +25,6 @@ public class ResetDatabase {
       "DELETE FROM plan_places",
       "ALTER SEQUENCE plan_places_id_seq RESTART WITH 1",
       "DELETE FROM plans",
-      "ALTER SEQUENCE plans_id_seq RESTART WITH 1",
       "DELETE FROM users",
       "ALTER SEQUENCE users_id_seq RESTART WITH 1",
       "INSERT INTO users(email, password, role, active) " +

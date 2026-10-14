@@ -132,19 +132,27 @@ public class SecurityConfig {
     http
       .authorizeHttpRequests(auth ->
         auth
-          .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/**", "/explore")
+          .requestMatchers(
+            org.springframework.http.HttpMethod.GET,
+            "/api/**",
+            "/explore",
+            "/for-you"
+          )
           .permitAll()
-          // [PPV, decision de producto] El feed /plans/public es para usuarios con sesion: cae en
-          // el anyRequest().authenticated() de abajo, junto al resto de /plans/**, asi que un
-          // anonimo que llegue a /plans/public aterriza en /auth/login.
-          // [PVP] En cambio la vista publica de un plan compartido es visible sin sesion. El
-          // allowlist es solo para GET: el POST de /plans/{id}/clone [CLO] sigue exigiendo estar
-          // autenticado.
+          // [PPV] El feed /for-you es visible con y sin sesion (decision de producto posterior al
+          // arranque, cuando era /plans/public y exigia sesion). El GET es permitAll; el resto de
+          // verbos sobre esa ruta cae en anyRequest().authenticated() de abajo.
+          // [PVP] La vista publica de un plan compartido tambien es visible sin sesion. La
+          // allowlist de ambas es solo para GET: el POST de /plans/{id}/clone [CLO] sigue
+          // exigiendo estar autenticado.
           .requestMatchers(org.springframework.http.HttpMethod.GET, "/plans/*/public")
           .permitAll()
           .requestMatchers("/api/**")
           .authenticated()
-          .requestMatchers(org.springframework.http.HttpMethod.GET, "/plans/{id:[0-9]+}")
+          .requestMatchers(
+            org.springframework.http.HttpMethod.GET,
+            "/plans/{id:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}"
+          )
           .permitAll()
           .requestMatchers("/", "/share/**", "/reload/**")
           .permitAll()

@@ -4,6 +4,7 @@ import com.valhalla.domain.planplace.PlanPlace;
 import com.valhalla.domain.planplace.PlanPlaceRepository;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -21,7 +22,7 @@ public class PlanPlaceRepositoryImpl implements PlanPlaceRepository {
   }
 
   @Override
-  public List<PlanPlace> findByPlanId(Long id) {
+  public List<PlanPlace> findByPlanId(UUID id) {
     return jpa.findByPlanIdOrderBySortOrder(id);
   }
 
@@ -31,7 +32,7 @@ public class PlanPlaceRepositoryImpl implements PlanPlaceRepository {
   }
 
   @Override
-  public boolean existsByPlanIdAndPlaceId(Long planId, Long placeId) {
+  public boolean existsByPlanIdAndPlaceId(UUID planId, Long placeId) {
     return jpa.existsByPlanIdAndPlaceId(planId, placeId);
   }
 

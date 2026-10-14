@@ -3,15 +3,42 @@
 
 <!-- Vista publica read-only de un plan compartido [PVP]. Es el destino de /plans/{id}/public:
      no hereda los formularios de edicion de pages/plans/detail.html. Usa el modelo que arma
-     PlanController.showPublicPlan: @plan + itineraryPlaces + administratorName + los flags de
-     sesion de los CTAs. -->
-<head th:replace="~{layouts/base :: head(${plan.name})}"></head>
+     PlanController.showPublicPlan: @plan + itineraryPlaces (con latitude/longitude para el
+     mapa) + administratorName + participantCount + los flags de sesion de los CTAs.
+
+     Como en detail.html, Leaflet va antes del stack Tailwind, asi el head propio la carga
+     primero y despues hereda las metas compartidas via headContent. -->
+<head>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    #plan-map {
+      height: 320px;
+      width: 100%;
+      border-radius: 0.5rem;
+    }
+  </style>
+  <th:block th:replace="~{layouts/base :: headContent(${plan.name})}"></th:block>
+</head>
 
 <body th:replace="~{layouts/base :: layout(~{::main})}">
 
   <main class="mx-auto w-full max-w-3xl flex-1 px-4 py-8">
     <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Plan público</p>
     <h1 class="mt-1 text-3xl font-bold text-black" th:text="${plan.name}">Plan</h1>
+
+    <!-- Metadatos del plan: quien lo creo (AC-03) y cuanta gente lo acompana. Es el unico
+         dato de participantes que sale al HTML: ni emails ni la lista (13-PVP). -->
+    <p class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-600">
+      <span th:if="${!#strings.isEmpty(administratorName)}">
+        <strong>Creado por:</strong>
+        <span th:text="${administratorName}"></span>
+      </span>
+      <span class="text-gray-300" th:if="${!#strings.isEmpty(administratorName)}"
+        aria-hidden="true">·</span>
+      <span>
+        <strong th:text="${participantCount == 1} ? '1 participante' : ${participantCount + ' participantes'}">0 participantes</strong>
+      </span>
+    </p>
 
     <p class="mt-2 text-gray-600" th:if="${!#strings.isEmpty(plan.description)}"
       th:text="${plan.description}"></p>
@@ -24,15 +51,47 @@
         th:text="${#temporals.format(plan.eventTime, 'HH:mm')}"></span>
     </p>
 
-    <!-- AC-03: el administrador firma el plan; el model siempre trae un valor no vacío
-         (displayName cae al email), así que la línea nunca queda en blanco. -->
-    <p class="mt-1 text-gray-600" th:if="${!#strings.isEmpty(administratorName)}">
-      <strong>Creado por:</strong>
-      <span th:text="${administratorName}"></span>
-    </p>
+    <!-- CTAs arriba, bajo el titulo. Mismo par de acciones en todos los estados: con sesion
+         son forms que ejecutan join/clone; sin sesion son links al login con la vuelta a
+         esta misma vista (?redirect=, el mismo mecanismo que el navbar). El anonimo ve los
+         mismos textos que el logueado, no un texto propio.
+         La decision vive en el model (isLogged et al.), no en #authentication: con anonimo
+         ese objeto existe y "#authentication != null" seria true. -->
+    <div class="mt-4 flex flex-wrap gap-3">
+      <form th:if="${isLogged and !isParticipant and !isPlanAdministrator}" method="post"
+        th:action="@{/plans/join}" class="inline">
+        <input type="hidden" name="shortCode" th:value="${shortCode}">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+        <button type="submit"
+          class="rounded-md bg-primary px-4 py-2 font-medium text-white">Unirme al plan</button>
+      </form>
+
+      <form th:if="${isLogged and !isParticipant and !isPlanAdministrator}" method="post"
+        th:action="@{/plans/{id}/clone(id=${plan.id})}" class="inline">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+        <button type="submit"
+          class="rounded-md bg-primary px-4 py-2 font-medium text-white">Clonar plan</button>
+      </form>
+
+      <a th:if="${!isLogged}"
+        th:href="${#strings.isEmpty(currentPath)} ? @{/auth/login} : @{/auth/login(redirect=${currentPath})}"
+        class="rounded-md bg-primary px-4 py-2 font-medium text-white">Unirme al plan</a>
+
+      <a th:if="${!isLogged}"
+        th:href="${#strings.isEmpty(currentPath)} ? @{/auth/login} : @{/auth/login(redirect=${currentPath})}"
+        class="rounded-md bg-primary px-4 py-2 font-medium text-white">Clonar plan</a>
+
+      <a th:if="${isParticipant or isPlanAdministrator}" th:href="@{/plans/{id}(id=${plan.id})}"
+        class="rounded-md bg-gray-800 px-4 py-2 font-medium text-white">Ver mi plan</a>
+    </div>
 
     <section class="mt-6 rounded-lg bg-white p-6 shadow">
       <h2 class="mb-4 text-xl font-bold text-black">Itinerario</h2>
+
+      <!-- Mapa read-only del itinerario: solo los lugares del plan, numerados en orden de
+           visita. Mismo Leaflet que pages/plans/detail.html, pero sin el catalogo entero ni
+           los controles de edicion. -->
+      <div id="plan-map" class="mb-6" th:if="${!#lists.isEmpty(itineraryPlaces)}"></div>
 
       <ol class="space-y-4" th:if="${!#lists.isEmpty(itineraryPlaces)}">
         <li class="flex gap-3" th:each="stop, it : ${itineraryPlaces}">
@@ -64,41 +123,138 @@
       </p>
     </section>
 
-    <!-- CTAs segun el estado de sesion: join reutiliza el endpoint existente (POST /plans/join),
-         clone apunta a POST /plans/{id}/clone que implementa [CLO]. Sin sesion no se ofrece ningun
-         CTA que ejecute join/clone: el anonimo va al login con la vuelta a esta misma vista
-         (AC-07), con el mismo mecanismo ?redirect= que el link del navbar (currentPath).
-         La decision vive en el model (isLogged et al.), no en #authentication: con anonimo ese
-         objeto existe y "#authentication != null" seria true. -->
-    <div class="mt-6 flex flex-wrap gap-3">
-      <form th:if="${isLogged and !isParticipant and !isPlanAdministrator}" method="post"
-        th:action="@{/plans/join}" class="inline">
-        <input type="hidden" name="shortCode" th:value="${shortCode}">
-        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-        <button type="submit"
-          class="rounded-md bg-primary px-4 py-2 font-medium text-white">Unirme al plan</button>
-      </form>
+    <!-- Leaflet va adentro de <main> como en detail.html: el layout(base :: layout) solo
+         copia <main>, cualquier tag hermano se descarta. -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-      <form th:if="${isLogged and !isParticipant and !isPlanAdministrator}" method="post"
-        th:action="@{/plans/{id}/clone(id=${plan.id})}" class="inline">
-        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-        <button type="submit"
-          class="rounded-md bg-primary px-4 py-2 font-medium text-white">
-          Clonar plan
-        </button>
-      </form>
+    <!-- th:inline pone itineraryPlaces como JSON en JS; los nombres llegan escapados como
+         string y se insertan via textContent, nunca como HTML. -->
+    <script th:inline="javascript">
+      const stops = /*[[${itineraryPlaces}]]*/ [] || [];
 
-      <a th:if="${!isLogged}"
-        th:href="${#strings.isEmpty(currentPath)} ? @{/auth/login} : @{/auth/login(redirect=${currentPath})}"
-        class="rounded-md bg-primary px-4 py-2 font-medium text-white">
-        Inicia sesion para unirte o clonar
-      </a>
+      (function () {
+        const container = document.getElementById('plan-map');
+        if (!container || stops.length === 0) {
+          return;
+        }
 
-      <a th:if="${isParticipant or isPlanAdministrator}" th:href="@{/plans/{id}(id=${plan.id})}"
-        class="rounded-md bg-gray-800 px-4 py-2 font-medium text-white">
-        Ver mi plan
-      </a>
-    </div>
+        const map = L.map('plan-map');
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
+
+        const bounds = [];
+        stops.forEach(function (stop, index) {
+          if (!stop.latitude || !stop.longitude) {
+            return;
+          }
+          // Mismo marcador que pages/plans/detail.html: circulo por categoria (cat-*), numerado
+          // por parada y con el borde amarillo de "en el itinerario" (todas las paradas lo son
+          // aca). El numero va en un nodo con textContent, no en un string con el nombre.
+          const badge = document.createElement('div');
+          badge.className =
+            'custom-map-icon cat-' + (stop.category || 'DEFAULT') + ' in-itinerary';
+          const number = document.createElement('span');
+          number.textContent = String(index + 1);
+          badge.appendChild(number);
+          const icon = L.divIcon({
+            html: badge,
+            className: 'custom-div-icon',
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
+          });
+          // El popup se arma con DOM, no con string concatenado: un nombre de lugar con
+          // "<script>" tiene que renderizarse como texto.
+          L.marker([stop.latitude, stop.longitude], { icon: icon })
+            .addTo(map)
+            .bindPopup(function () {
+              const content = document.createElement('div');
+              const title = document.createElement('strong');
+              title.textContent = stop.name;
+              content.appendChild(title);
+              if (stop.category) {
+                const lineBreak = document.createElement('br');
+                const label = document.createElement('small');
+                label.textContent = stop.category;
+                lineBreak.appendChild(label);
+                content.appendChild(lineBreak);
+              }
+              return content;
+            });
+          bounds.push([stop.latitude, stop.longitude]);
+        });
+
+        // Linea que une las paradas en orden, con las mismas opciones que el detalle. Como alla,
+        // solo con 2+ paradas: una sola parada no tiene trayecto que dibujar.
+        if (stops.length > 1) {
+          const routeLatLngs = [];
+          stops.forEach(function (stop) {
+            if (stop.latitude && stop.longitude) {
+              routeLatLngs.push([stop.latitude, stop.longitude]);
+            }
+          });
+          L.polyline(routeLatLngs, {
+            color: '#0d6efd',
+            weight: 3,
+            opacity: 0.8,
+            dashArray: '6, 6'
+          }).addTo(map);
+        }
+
+        if (bounds.length === 1) {
+          map.setView(bounds[0], 14);
+        } else if (bounds.length > 1) {
+          map.fitBounds(bounds, { padding: [30, 30] });
+        } else {
+          // Ningun lugar trae coordenadas: el mapa queda en un default y la lista de abajo
+          // sigue siendo la fuente de verdad del itinerario.
+          map.setView([-34.59, -58.40], 12);
+        }
+      })();
+    </script>
+
+    <style>
+      /* Mismo estilo de marcadores que pages/plans/detail.html (13-PVP: esa vista es la
+         referencia visual): circulo de 30px con borde blanco, color por categoria (cat-*) y
+         borde amarillo/scale para las paradas del itinerario. */
+      .custom-div-icon {
+        background: transparent !important;
+        border: none !important;
+      }
+
+      .custom-map-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        color: white;
+        font-weight: bold;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        border: 2px solid white;
+        font-size: 13px;
+        margin-top: -15px;
+        margin-left: -15px;
+        transition: transform 0.2s ease-in-out;
+      }
+
+      .cat-RESTAURANT { background-color: #dc3545; }
+      .cat-NIGHTLIFE  { background-color: #6f42c1; }
+      .cat-MUSEUM     { background-color: #0d6efd; }
+      .cat-SHOPPING   { background-color: #fd7e14; }
+      .cat-CAFE       { background-color: #d63384; }
+      .cat-PARK       { background-color: #198754; }
+      .cat-CULTURE    { background-color: #0dcaf0; }
+      .cat-BAR        { background-color: #ffc107; color: #000; }
+      .cat-DEFAULT    { background-color: #6c757d; }
+
+      .in-itinerary {
+        border: 3px solid #ffc107 !important;
+        transform: scale(1.15);
+        z-index: 1000 !important;
+      }
+    </style>
   </main>
 
 </body>

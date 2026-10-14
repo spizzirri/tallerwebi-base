@@ -1,13 +1,9 @@
 package com.valhalla.presentation.plan;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
@@ -34,6 +30,7 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -57,9 +54,15 @@ public class PlanControllerTest {
 
   private static final String OWNER_EMAIL = "dueno@test.com";
   private static final String LIST_VIEW = "pages/plans/list";
-  private static final String PUBLIC_LIST_VIEW = "pages/plans/public-list";
   private static final String DETAIL_VIEW = "pages/plans/detail";
-  private static final Long PLAN_ID = 7L;
+  private static final UUID PLAN_ID = UUID.fromString("0192f0a1-0000-7000-8000-000000000007");
+  private static final UUID OTHER_PLAN_ID = UUID.fromString("0192f0a1-0000-7000-8000-000000000008");
+  private static final UUID MISSING_PLAN_ID = UUID.fromString(
+    "00000000-0000-0000-0000-000000000999"
+  );
+  private static final UUID UNKNOWN_PLAN_ID = UUID.fromString(
+    "00000000-0000-0000-0000-000000000404"
+  );
 
   private static final Validator VALIDATOR = localValidator();
 
@@ -145,13 +148,13 @@ public class PlanControllerTest {
   @Test
   public void T_PLN_063_showPlan_propagaPlanNotFoundException() {
     // given
-    when(this.planServiceMock.getParticipatingPlan(999L, OWNER_EMAIL))
+    when(this.planServiceMock.getParticipatingPlan(MISSING_PLAN_ID, OWNER_EMAIL))
       .thenThrow(new PlanNotFoundException());
 
     // when and then
     assertThrows(
       PlanNotFoundException.class,
-      () -> this.controller.showPlan(999L, this.authentication)
+      () -> this.controller.showPlan(MISSING_PLAN_ID, this.authentication)
     );
   }
 
@@ -169,11 +172,12 @@ public class PlanControllerTest {
 
   @Test
   public void T_PVP_002_showPublicPlan_propagaPlanNotFoundException() {
-    when(this.planServiceMock.getPublicPlan(999L)).thenThrow(new PlanNotFoundException());
+    when(this.planServiceMock.getPublicPlan(MISSING_PLAN_ID))
+      .thenThrow(new PlanNotFoundException());
 
     assertThrows(
       PlanNotFoundException.class,
-      () -> this.controller.showPublicPlan(999L, this.authentication)
+      () -> this.controller.showPublicPlan(MISSING_PLAN_ID, this.authentication)
     );
   }
 
@@ -181,13 +185,14 @@ public class PlanControllerTest {
   public void T_PVP_008_showPublicPlan_conIdInexistentePropagaPlanNotFoundException() {
     // U-03: el id que nadie conoce sigue el mismo camino que un plan privado (U-02). La
     // distinción real vive en el servicio; acá se prueba que el controller no la filtra.
-    when(this.planServiceMock.getPublicPlan(404L)).thenThrow(new PlanNotFoundException());
+    when(this.planServiceMock.getPublicPlan(UNKNOWN_PLAN_ID))
+      .thenThrow(new PlanNotFoundException());
 
     assertThrows(
       PlanNotFoundException.class,
-      () -> this.controller.showPublicPlan(404L, this.authentication)
+      () -> this.controller.showPublicPlan(UNKNOWN_PLAN_ID, this.authentication)
     );
-    verify(this.planServiceMock, times(1)).getPublicPlan(404L);
+    verify(this.planServiceMock, times(1)).getPublicPlan(UNKNOWN_PLAN_ID);
   }
 
   @Test
@@ -295,148 +300,51 @@ public class PlanControllerTest {
     assertThat(view.getModel().get("administratorName"), is(equalTo("admin@test.com")));
   }
 
-  // --- GET /plans/public [PPV] ---
+  // --- GET /for-you [PPV] (el feed vive en ForYouControllerTest) ---
 
   @Test
-  public void U01_publicPlans_retornaLaVistaPublicListConUnaTarjetaPorPlanPublico() {
-    // given
-    List<Plan> planes = List.of(
-      plan(PLAN_ID, "Buenos Aires para todos"),
-      plan(PLAN_ID + 1, "Noche")
-    );
-    when(this.planServiceMock.getPublicPlans()).thenReturn(planes);
+  public void T_PVP_016_showPublicPlan_exponeElContadorDeParticipantes() {
+    // given: dos personas acompanan el plan, mas su administrador (que no es participant)
+    Plan plan = plan(PLAN_ID, "Viaje publico");
+    User admin = new User();
+    admin.setEmail("admin@test.com");
+    plan.setAdministrator(admin);
+    plan.getParticipants().add(new User());
+    plan.getParticipants().add(new User());
+    when(this.planServiceMock.getPublicPlan(PLAN_ID)).thenReturn(plan);
 
     // when
-    ModelAndView view = this.controller.publicPlans(this.authentication);
+    ModelAndView view = this.controller.showPublicPlan(PLAN_ID, this.authentication);
+
+    // then: la vista publica muestra cuanta gente lo acompana, nunca la lista ni los emails
+    assertThat(view.getModel().get("participantCount"), is(equalTo(2)));
+    assertThat(view.getModel().containsKey("participantEmails"), is(false));
+  }
+
+  @Test
+  public void T_PVP_017_showPublicPlan_exponeLasCoordenadasDeCadaParadaParaElMapa() {
+    // given: el unico stop trae lat/lng, que es lo que el mapa del template necesita
+    Plan plan = plan(PLAN_ID, "Viaje publico");
+    Place place = new Place();
+    place.setId(1L);
+    place.setName("Aeropuerto");
+    place.setLatitude(-34.8222);
+    place.setLongitude(-58.5358);
+    PlanPlace entry = new PlanPlace();
+    entry.setPlace(place);
+    plan.addPlanPlace(entry);
+    when(this.planServiceMock.getPublicPlan(PLAN_ID)).thenReturn(plan);
+
+    // when
+    ModelAndView view = this.controller.showPublicPlan(PLAN_ID, this.authentication);
 
     // then
-    assertThat(view.getViewName(), is(PUBLIC_LIST_VIEW));
-    assertThat(cardsOf(view), hasSize(2));
-    verify(this.planServiceMock, times(1)).getPublicPlans();
+    Map<?, ?> stop = (Map<?, ?>) ((List<?>) view.getModel().get("itineraryPlaces")).get(0);
+    assertThat(stop.get("latitude"), is(equalTo(Double.valueOf(-34.8222))));
+    assertThat(stop.get("longitude"), is(equalTo(Double.valueOf(-58.5358))));
   }
 
-  @Test
-  public void U02_publicPlans_armaCadaTarjetaConLosCamposPublicosDelPlan() {
-    // given
-    Plan plan = plan(PLAN_ID, "Feria de San Telmo");
-    plan.setDescription("Recorrido entre puestos");
-    plan.setEventDate(LocalDate.of(2026, 12, 31));
-    User administrator = new User();
-    administrator.setFirstName("Ana");
-    administrator.setLastName("Perez");
-    administrator.setEmail(OWNER_EMAIL);
-    plan.setAdministrator(administrator);
-    PlanPlace entry = new PlanPlace();
-    entry.setPlace(new Place());
-    plan.addPlanPlace(entry);
-    when(this.planServiceMock.getPublicPlans()).thenReturn(List.of(plan));
-
-    // when
-    ModelAndView view = this.controller.publicPlans(this.authentication);
-
-    // then: nombre, descripcion, fecha, cantidad de lugares y administrador (AC-03)
-    Map<?, ?> card = cardAt(view, 0);
-    assertThat(card.get("id"), is(equalTo(PLAN_ID)));
-    assertThat(card.get("name"), is(equalTo("Feria de San Telmo")));
-    assertThat(card.get("description"), is(equalTo("Recorrido entre puestos")));
-    assertThat(card.get("eventDate"), is(equalTo("2026-12-31")));
-    assertThat(card.get("placeCount"), is(equalTo(1)));
-    assertThat(card.get("administratorName"), is(equalTo("Ana Perez")));
-    // el plan es del usuario logueado (dueno@test.com): la tarjeta marca own para mostrar Editar
-    assertThat(card.get("own"), is(equalTo(true)));
-    // cover generico deterministico: id 7 -> 7 % 6 + 1 -> cover-2.svg
-    assertThat(card.get("cover"), is(equalTo("/images/plans/cover-2.svg")));
-  }
-
-  @Test
-  public void U02b_publicPlans_unPlanAjenoNoSeMarcaComoPropio() {
-    // given: el plan es de otra persona
-    Plan plan = plan(PLAN_ID, "Plan ajeno");
-    User administrator = new User();
-    administrator.setEmail("otra@persona.com");
-    plan.setAdministrator(administrator);
-    when(this.planServiceMock.getPublicPlans()).thenReturn(List.of(plan));
-
-    // when
-    Map<?, ?> card = cardAt(this.controller.publicPlans(this.authentication), 0);
-
-    // then: own en false — la tarjeta no ofrece Editar sobre un plan que no es mio
-    assertThat(card.get("own"), is(equalTo(false)));
-  }
-
-  @Test
-  public void U03_publicPlans_conLaBaseVaciaDevuelveLaListaVaciaSinError() {
-    // given
-    when(this.planServiceMock.getPublicPlans()).thenReturn(List.of());
-
-    // when
-    ModelAndView view = this.controller.publicPlans(this.authentication);
-
-    // then: el estado vacio lo decide la vista, el controller no lanza nada
-    assertThat(view.getViewName(), is(PUBLIC_LIST_VIEW));
-    assertThat(cardsOf(view), is(empty()));
-    verify(this.planServiceMock, times(1)).getPublicPlans();
-  }
-
-  @Test
-  public void U04_publicPlans_noExponeShortCodeNiEmailsNiParticipantes() {
-    // given: un plan publico con todo lo que AC-09 prohibe mostrar
-    Plan plan = plan(PLAN_ID, "Plan con secretos");
-    plan.setShortCode("SECRET01");
-    User administrator = new User();
-    administrator.setFirstName("Ana");
-    administrator.setLastName("Perez");
-    administrator.setEmail("ana@privado.com");
-    plan.setAdministrator(administrator);
-    User participant = new User();
-    participant.setEmail("invitado@privado.com");
-    plan.getParticipants().add(participant);
-    when(this.planServiceMock.getPublicPlans()).thenReturn(List.of(plan));
-
-    // when
-    ModelAndView view = this.controller.publicPlans(this.authentication);
-    Map<?, ?> card = cardAt(view, 0);
-
-    // then: ni la clave del codigo, ni rastro de los emails en los valores
-    List<String> keys = card.keySet().stream().map(String::valueOf).toList();
-    assertThat(
-      keys,
-      is(
-        equalTo(
-          List.of(
-            "id",
-            "name",
-            "description",
-            "eventDate",
-            "placeCount",
-            "administratorName",
-            "own",
-            "cover"
-          )
-        )
-      )
-    );
-    String values = card.values().stream().map(String::valueOf).collect(Collectors.joining(" "));
-    assertThat(values, not(containsString("SECRET01")));
-    assertThat(values, not(containsString("ana@privado.com")));
-    assertThat(values, not(containsString("invitado@privado.com")));
-  }
-
-  @Test
-  public void U04b_publicPlans_unAdministradorSinNombreNoFiltraSuEmail() {
-    // given: el seed de E2E reinserta usuarios sin nombre, y el listado no puede filtrar el email
-    Plan plan = plan(PLAN_ID, "Plan con administrador sin nombre");
-    User administrator = new User();
-    administrator.setEmail("anonimo@privado.com");
-    plan.setAdministrator(administrator);
-    when(this.planServiceMock.getPublicPlans()).thenReturn(List.of(plan));
-
-    // when
-    Map<?, ?> card = cardAt(this.controller.publicPlans(this.authentication), 0);
-
-    // then (AC-09): el nombre de administrador queda vacio, nunca el email
-    assertThat(card.get("administratorName"), is(equalTo("")));
-  }
+  // --- GET /for-you: el feed se mudo a ForYouController (/for-you, con y sin sesion) ---
 
   // --- POST /plans ---
   @Test
@@ -570,7 +478,7 @@ public class PlanControllerTest {
   @Test
   public void T_PLN_069_clonePlan_redirigeAlDetalleDeLaCopia() {
     // given (U-12)
-    Plan copy = plan(PLAN_ID + 1, "Viaje a Bariloche");
+    Plan copy = plan(OTHER_PLAN_ID, "Viaje a Bariloche");
     when(this.planServiceMock.clonePlan(PLAN_ID, OWNER_EMAIL)).thenReturn(copy);
 
     // when
@@ -585,7 +493,7 @@ public class PlanControllerTest {
   public void T_PLN_069b_clonePlan_tomaElEmailDeLaSesionYNoUnDuenoDelForm() {
     // given (U-13): the cloner travels in the session; the endpoint takes no form body at all
     Authentication clonerSession = new UsernamePasswordAuthenticationToken("cloner@test.com", null);
-    Plan copy = plan(PLAN_ID + 1, "Copia");
+    Plan copy = plan(OTHER_PLAN_ID, "Copia");
     when(this.planServiceMock.clonePlan(PLAN_ID, "cloner@test.com")).thenReturn(copy);
 
     // when
@@ -622,19 +530,11 @@ public class PlanControllerTest {
       .collect(Collectors.toSet());
   }
 
-  private Plan plan(Long id, String name) {
+  private Plan plan(UUID id, String name) {
     Plan plan = new Plan();
     plan.setId(id);
     plan.setName(name);
     return plan;
-  }
-
-  private static List<?> cardsOf(ModelAndView view) {
-    return (List<?>) view.getModel().get("publicPlans");
-  }
-
-  private static Map<?, ?> cardAt(ModelAndView view, int index) {
-    return (Map<?, ?>) cardsOf(view).get(index);
   }
 
   private static PlanPlace stop(Long placeId, String placeName, int sortOrder) {

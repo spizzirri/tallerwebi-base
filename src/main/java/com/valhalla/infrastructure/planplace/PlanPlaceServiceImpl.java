@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.HashSet;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,7 +39,7 @@ public class PlanPlaceServiceImpl implements PlanPlaceService {
   }
 
   @Override
-  public PlanPlace addPlaceToPlan(Long planId, Long placeId, String ownerEmail) {
+  public PlanPlace addPlaceToPlan(UUID planId, Long placeId, String ownerEmail) {
     Plan plan = planService.getEditablePlan(planId, ownerEmail);
     PlanPlace entry = new PlanPlace();
     plan.addPlanPlace(entry);
@@ -51,7 +52,7 @@ public class PlanPlaceServiceImpl implements PlanPlaceService {
 
   @Transactional(readOnly = true)
   @Override
-  public List<PlanPlace> getItinerary(Long planId, String ownerEmail) {
+  public List<PlanPlace> getItinerary(UUID planId, String ownerEmail) {
     Plan plan = plans.findById(planId).orElseThrow(PlanNotFoundException::new);
     if (!plan.getIsPublic()) {
       if (ownerEmail == null) {
@@ -68,7 +69,7 @@ public class PlanPlaceServiceImpl implements PlanPlaceService {
 
   @Override
   public PlanPlace updatePlanPlace(
-    Long planId,
+    UUID planId,
     Long id,
     LocalDate date,
     LocalTime time,
@@ -82,14 +83,14 @@ public class PlanPlaceServiceImpl implements PlanPlaceService {
   }
 
   @Override
-  public void removePlaceFromPlan(Long planId, Long id, String ownerEmail) {
+  public void removePlaceFromPlan(UUID planId, Long id, String ownerEmail) {
     PlanPlace entry = ownedEntry(planId, id, ownerEmail);
     entry.getPlan().getPlanPlaces().remove(entry);
     repository.deleteById(id);
   }
 
   @Override
-  public void reorderPlaces(Long planId, List<Long> entryIds, String ownerEmail) {
+  public void reorderPlaces(UUID planId, List<Long> entryIds, String ownerEmail) {
     planService.getEditablePlan(planId, ownerEmail);
     List<PlanPlace> entries = repository.findByPlanId(planId);
     // The same place can appear several times, so entries are identified by their own id.
@@ -109,11 +110,11 @@ public class PlanPlaceServiceImpl implements PlanPlaceService {
 
   @Transactional(readOnly = true)
   @Override
-  public boolean isPlaceInPlan(Long planId, Long placeId) {
+  public boolean isPlaceInPlan(UUID planId, Long placeId) {
     return repository.existsByPlanIdAndPlaceId(planId, placeId);
   }
 
-  private PlanPlace ownedEntry(Long planId, Long id, String ownerEmail) {
+  private PlanPlace ownedEntry(UUID planId, Long id, String ownerEmail) {
     planService.getEditablePlan(planId, ownerEmail);
     PlanPlace entry = repository.findById(id).orElseThrow(PlanNotFoundException::new);
     if (!planId.equals(entry.getPlan().getId())) {

@@ -103,7 +103,7 @@ public class LoginViewE2E extends E2eBase {
   }
 
   private void thenShouldBeRedirectedToLanding() throws MalformedURLException {
-    // Contra la constante, no un literal: tolera el cambio de landing (p. ej. /plans/public).
+    // Contra la constante, no un literal: tolera el cambio de landing (p. ej. /for-you).
     loginPage.waitForPath(LoginRedirects.USER_LANDING);
     URL url = loginPage.getCurrentUrl();
     assertThat(

@@ -15,15 +15,22 @@ import org.springframework.security.core.GrantedAuthority;
 public final class LoginRedirects {
 
   private static final String ADMIN_LANDING = "/admin/home";
+
   /**
-   * [PPV] Destino de un usuario sin rol admin: el feed de planes publicos es el home del usuario,
-   * se loguea y lo primero que ve son los planes que armaron otros, tipo muro. Desde ahi se usa,
-   * edita o crea uno nuevo.
+   * La home del sitio, tal como la arma el navbar en la landing: {@code currentPath} es "/"
+   * cuando el link de login nace en {@code /}.
+   */
+  private static final String HOME_PATH = "/";
+  /**
+   * [PPV] Destino de un usuario sin rol admin: el feed "Para vos" es el home del usuario, se loguea
+   * y lo primero que ve son los planes que armaron otros, tipo muro. Desde ahi se usa, edita o crea
+   * uno nuevo. La ruta es visible con y sin sesion, pero el landing post-login la resuelve ya
+   * autenticada.
    *
    * <p>Es publico porque los tests de aterrizaje (unitarios y E2E) afirman contra esta constante
    * en vez de contra un literal: cuando el landing cambie las pruebas lo siguen sin editarse.
    */
-  public static final String USER_LANDING = "/plans/public";
+  public static final String USER_LANDING = "/for-you";
 
   private LoginRedirects() {}
 
@@ -45,11 +52,28 @@ public final class LoginRedirects {
    * que pasa después de loguearse.
    *
    * @param authentication un principal ya autenticado
-   * @return {@code /admin/home} para un ADMIN, el feed de planes publicos (/plans/public) para el
-   *     resto
+   * @return {@code /admin/home} para un ADMIN, el feed "Para vos" (/for-you) para el resto
    */
   public static String landingFor(Authentication authentication) {
     return isAdmin(authentication) ? ADMIN_LANDING : USER_LANDING;
+  }
+
+  /**
+   * El destino que sigue un login exitoso: la ruta de vuelta pedida si es interna y no es la home
+   * del sitio, si no la landing común. {@code redirect=/} (lo que arma el navbar en la landing)
+   * significa "empecé en el home", no "vuelvo al home": seguirlo dejaría a un USER en {@code /}
+   * en vez del feed "Para vos". Los redirects profundos ({@code /plans/{id}/public},
+   * {@code /explore}, {@code /for-you}, ...) se conservan tal cual.
+   *
+   * @param requested el valor del parámetro redirect, tal como llegó (o null si no venía)
+   * @param authentication un principal ya autenticado
+   * @return la ruta pedida si hay que seguirla, si no {@code landingFor(authentication)}
+   */
+  public static String afterLogin(String requested, Authentication authentication) {
+    if (isSafeInternalPath(requested) && !HOME_PATH.equals(requested)) {
+      return requested;
+    }
+    return landingFor(authentication);
   }
 
   /**

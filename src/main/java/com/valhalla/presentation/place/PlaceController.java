@@ -3,8 +3,6 @@ package com.valhalla.presentation.place;
 import com.valhalla.domain.place.Place;
 import com.valhalla.domain.place.PlaceCategory;
 import com.valhalla.domain.place.PlaceService;
-import com.valhalla.domain.plan.PlanService;
-import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,32 +22,18 @@ public class PlaceController {
 
   private final PlaceService placeService;
 
-  private final PlanService planService;
-
   @Autowired
-  public PlaceController(PlaceService placeService, PlanService planService) {
+  public PlaceController(PlaceService placeService) {
     this.placeService = placeService;
-    this.planService = planService;
   }
 
   @GetMapping
   public ModelAndView listPlaces(
     @RequestParam(required = false) String category,
-    @RequestParam(required = false) String search,
-    Principal principal
+    @RequestParam(required = false) String search
   ) {
     Map<String, Object> model = new ModelMap();
     model.put(ATTR_PLACES, getPlaces(category, search));
-    if (principal != null) {
-      model.put(
-        "userPlans",
-        planService
-          .getPlansByUserEmail(principal.getName())
-          .stream()
-          .sorted(java.util.Comparator.comparing(com.valhalla.domain.plan.Plan::getId).reversed())
-          .toList()
-      );
-    }
     model.put("categories", PlaceCategory.values());
     model.put("category", category);
     model.put("search", search);

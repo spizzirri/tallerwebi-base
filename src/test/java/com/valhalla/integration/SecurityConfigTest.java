@@ -32,9 +32,7 @@ public class SecurityConfigTest {
 
   @Test
   public void shouldAllowPlacesWithoutSession() throws Exception {
-    this.mockMvc.perform(get("/explore"))
-      .andExpect(status().isOk())
-      .andExpect(model().attributeDoesNotExist("userPlans"));
+    this.mockMvc.perform(get("/explore")).andExpect(status().isOk());
   }
 
   @Test
@@ -58,6 +56,12 @@ public class SecurityConfigTest {
   @Test
   public void shouldAllowPublicAccessToLandingPage() throws Exception {
     this.mockMvc.perform(get("/")).andExpect(status().isOk());
+  }
+
+  /** [PPV] El feed "Para vos" es visible con y sin sesion: el visitante no rebota en el login. */
+  @Test
+  public void shouldAllowAnonymousAccessToTheForYouFeed() throws Exception {
+    this.mockMvc.perform(get("/for-you")).andExpect(status().isOk());
   }
 
   @Test

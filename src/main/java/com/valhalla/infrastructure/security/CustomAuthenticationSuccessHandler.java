@@ -24,14 +24,11 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
     request.getSession().setAttribute("loginTime", System.currentTimeMillis());
 
     // Si el login vino de una pagina concreta (el plan publico, /explore, etc.), se vuelve a esa
-    // ruta. Sin el parametro se cae en la landing comun: un USER aterriza en el feed de planes
-    // publicos (/plans/public), el home que define LoginRedirects.USER_LANDING. La regla de la
-    // landing es compartida con las dos paginas de login (LoginRedirects), asi que las tres
-    // coinciden en el mismo destino.
-    String target = request.getParameter(REDIRECT_PARAM);
-    if (!LoginRedirects.isSafeInternalPath(target)) {
-      target = LoginRedirects.landingFor(authentication);
-    }
+    // ruta. Sin el parametro, o con redirect=/ (lo que arma el navbar en la landing), se cae en la
+    // landing comun: un USER aterriza en el feed "Para vos" (/for-you), el home que define
+    // LoginRedirects.USER_LANDING. La regla vive en LoginRedirects, compartida con las dos paginas
+    // de login, asi que las tres coinciden en el mismo destino.
+    String target = LoginRedirects.afterLogin(request.getParameter(REDIRECT_PARAM), authentication);
     response.sendRedirect(request.getContextPath() + target);
   }
 }
