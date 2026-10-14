@@ -9,6 +9,7 @@ public interface PlanRepository {
   List<Plan> findByIsPublicTrue();
   List<Plan> findByAdministratorId(Long administratorId);
   List<Plan> findByParticipantsEmail(String email);
+  List<Plan> findByInvitationsRecipientEmail(String email);
   Optional<Plan> findByShortCode(String shortCode);
   boolean existsByShortCode(String shortCode);
   Plan save(Plan plan);

@@ -137,7 +137,7 @@ public class PlanPlaceDetailE2E extends E2eBase {
 
   /** Detail page form: picks the first place the itinerary does not hold yet and adds it. */
   private void addPlaceToPlan() {
-    page.locator("select.form-select").selectOption(new SelectOption().setIndex(1));
+    page.getByLabel("Lugar para agregar al plan").selectOption(new SelectOption().setIndex(1));
     page.getByText("+ Agregar", new Page.GetByTextOptions().setExact(true)).click();
   }
 

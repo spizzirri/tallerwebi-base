@@ -313,14 +313,15 @@ File: `src/main/java/com/valhalla/infrastructure/planplace/JpaPlanPlaceRepositor
 ```java
 package com.valhalla.infrastructure.planplace;
 
-import com.valhalla.domain.planplace.PlanPlace;
 import java.util.List;
+
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface JpaPlanPlaceRepository extends JpaRepository<PlanPlace, Long> {
     @EntityGraph(attributePaths = {"place"})
     List<PlanPlace> findByPlanIdOrderBySortOrder(Long planId);
+
     boolean existsByPlanIdAndPlaceId(Long planId, Long placeId);
 }
 ```
@@ -332,10 +333,11 @@ File: `src/main/java/com/valhalla/infrastructure/planplace/PlanPlaceRepositoryIm
 ```java
 package com.valhalla.infrastructure.planplace;
 
-import com.valhalla.domain.planplace.PlanPlace;
 import com.valhalla.domain.planplace.PlanPlaceRepository;
+
 import java.util.List;
 import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -383,10 +385,11 @@ File: `src/main/java/com/valhalla/presentation/plan/PlanPlaceRestController.java
 ```java
 package com.valhalla.presentation.plan;
 
-import com.valhalla.domain.planplace.PlanPlace;
 import com.valhalla.domain.planplace.PlanPlaceService;
+
 import java.util.List;
 import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -408,17 +411,17 @@ public class PlanPlaceRestController {
 
     @PostMapping
     public PlanPlace addPlace(
-        @PathVariable Long planId,
-        @RequestParam Long placeId
+            @PathVariable Long planId,
+            @RequestParam Long placeId
     ) {
         return planPlaceService.addPlaceToPlan(planId, placeId);
     }
 
     @PutMapping("/{id}")
     public PlanPlace updatePlanPlace(
-        @PathVariable Long planId,
-        @PathVariable Long id,
-        @RequestBody PlanPlace planPlace
+            @PathVariable Long planId,
+            @PathVariable Long id,
+            @RequestBody PlanPlace planPlace
     ) {
         planPlace.setId(id);
         return planPlaceService.updatePlanPlace(planPlace);
@@ -426,8 +429,8 @@ public class PlanPlaceRestController {
 
     @DeleteMapping("/{id}")
     public Map<String, Boolean> removePlace(
-        @PathVariable Long planId,
-        @PathVariable Long id
+            @PathVariable Long planId,
+            @PathVariable Long id
     ) {
         planPlaceService.removePlaceFromPlan(id);
         return Map.of("success", true);
@@ -435,8 +438,8 @@ public class PlanPlaceRestController {
 
     @PostMapping("/reorder")
     public Map<String, Boolean> reorder(
-        @PathVariable Long planId,
-        @RequestBody List<Long> placeIds
+            @PathVariable Long planId,
+            @RequestBody List<Long> placeIds
     ) {
         planPlaceService.reorderPlaces(planId, placeIds);
         return Map.of("success", true);

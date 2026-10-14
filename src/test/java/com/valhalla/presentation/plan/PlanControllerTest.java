@@ -128,6 +128,21 @@ public class PlanControllerTest {
   }
 
   @Test
+  public void showPlan_includesOwnerOnceWithoutChangingParticipants() {
+    Plan plan = plan(PLAN_ID, "Owner");
+    User owner = new User();
+    owner.setEmail(OWNER_EMAIL);
+    plan.setAdministrator(owner);
+    when(this.planServiceMock.getParticipatingPlan(PLAN_ID, OWNER_EMAIL)).thenReturn(plan);
+    ModelAndView view = this.controller.showPlan(PLAN_ID, this.authentication);
+    assertThat(view.getModel().get("participantEmails"), is(List.of(OWNER_EMAIL)));
+    assertThat(plan.getParticipants().isEmpty(), is(true));
+    plan.getParticipants().add(owner);
+    view = this.controller.showPlan(PLAN_ID, this.authentication);
+    assertThat(view.getModel().get("participantEmails"), is(List.of(OWNER_EMAIL)));
+  }
+
+  @Test
   public void T_PLN_063_showPlan_propagaPlanNotFoundException() {
     // given
     when(this.planServiceMock.getParticipatingPlan(999L, OWNER_EMAIL))

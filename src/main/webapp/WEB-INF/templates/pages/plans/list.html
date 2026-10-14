@@ -6,7 +6,8 @@
 <body th:replace="~{layouts/base :: layout(~{::main})}">
 
   <main class="flex-1 p-4">
-    <div class="mx-auto max-w-4xl">
+    <div class="mx-auto grid max-w-7xl grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
+      <div class="min-w-0">
       <div class="mb-6 flex items-center justify-between">
         <h2 class="text-2xl font-semibold text-gray-900">Mis planes</h2>
         <a th:href="@{/explore}"
@@ -92,6 +93,26 @@
       <p th:if="${#lists.isEmpty(plans) && (participantPlans == null || #lists.isEmpty(participantPlans))}" class="mt-8 text-center text-gray-500">
         Todavía no creaste ningún plan.
       </p>
+      </div>
+      <aside aria-labelledby="pending-invitations-heading" class="self-start rounded-lg border border-gray-200 bg-white p-5 shadow-md">
+        <h3 id="pending-invitations-heading" class="mb-4 text-lg font-semibold text-gray-900">Invitaciones pendientes</h3>
+        <p th:if="${invitationResponse}" th:text="${invitationResponse}" role="status" class="mb-4 rounded-md bg-green-100 p-3 text-sm text-green-700"></p>
+        <p th:if="${pendingInvitations == null or #lists.isEmpty(pendingInvitations)}" class="text-sm text-gray-500">No ten&eacute;s invitaciones pendientes.</p>
+        <ul th:unless="${pendingInvitations == null or #lists.isEmpty(pendingInvitations)}" class="space-y-4">
+          <li th:each="invitation : ${pendingInvitations}" class="rounded-md border border-gray-200 p-4">
+            <h4 class="font-semibold text-gray-900 break-words" th:text="${invitation.planName}">Nombre del plan</h4>
+            <p class="mt-2 text-sm text-gray-600">Te invit&oacute;:</p>
+            <p class="text-sm font-medium break-words" th:text="${invitation.inviterName}">Nombre completo</p>
+            <p class="text-sm text-gray-600 break-words" th:text="${invitation.inviterEmail}">correo@ejemplo.com</p>
+            <p class="mt-2 text-sm">Rol: <strong th:text="${invitation.role == 'editor' ? 'Editor' : 'Participante'}">Participante</strong></p>
+            <form th:action="@{/plans/{id}/invitations/{invitationId}/respond(id=${invitation.planId},invitationId=${invitation.id})}" method="POST" class="mt-4 flex flex-wrap gap-2">
+              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+              <button type="submit" name="accept" value="true" class="rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700">Aceptar</button>
+              <button type="submit" name="accept" value="false" class="rounded-md bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200">Rechazar</button>
+            </form>
+          </li>
+        </ul>
+      </aside>
     </div>
   </main>
 

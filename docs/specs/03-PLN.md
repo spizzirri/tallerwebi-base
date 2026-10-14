@@ -7,6 +7,90 @@
 
 El usuario puede crear, editar y eliminar planes con nombre, descripcion, fecha y visibilidad (publico/privado). Cada plan tiene un shortCode unico para compartir.
 
+## Invitaciones y participantes en el detalle
+
+Desde `/plans/{id}`, el dueño y los editores pueden incorporar a una persona
+registrada mediante su correo y elegir el rol Participante o Editor. La invitación
+queda pendiente hasta que el destinatario acepte o rechace en Mis planes. No se envía un email.
+
+En un plan público, cualquier usuario con sesión iniciada puede incorporar
+personas registradas con el rol Participante. La asignación del rol Editor queda
+reservada al dueño y a los editores. En un plan privado, solo ellos pueden invitar;
+el detalle es accesible al dueño y a los participantes.
+
+Los planes públicos se pueden consultar en `/plans/{id}` sin registrarse ni iniciar
+sesión. Para visitantes anónimos, el detalle es de solo lectura: no muestra formularios
+para invitar, editar, eliminar, cambiar roles o salir del plan. Los intentos de escritura
+sin sesión requieren iniciar sesión aunque se envíe un token CSRF válido. Los planes
+privados mantienen su restricción de acceso. Consultar información de los lugares
+y navegar por el mapa no modifica el plan.
+
+Si el detalle falla al evaluar `isPlanParticipant` con un valor nulo, comprobar que
+el controlador y la plantilla correspondan a la misma versión. En desarrollo con
+Docker, `docker compose restart app` recompila y carga las clases actualizadas.
+La condición del formulario para salir del plan compara explícitamente los valores
+booleanos para tolerar la ausencia de ese atributo durante una actualización.
+
+El formulario envía `POST /plans/{id}/participants/invite`, con `participantEmail`
+y `role` (`guest` para Participante, valor predeterminado; `editor` para Editor).
+La operación requiere una sesión iniciada, valida los permisos en el servicio y
+requiere un token CSRF. Si el correo no está registrado, la persona ya tiene una
+invitación pendiente para ese plan o ya pertenece
+al plan, muestra un mensaje en el detalle sin modificar los participantes ni sus roles.
+
+La lista incluye al dueño una sola vez y muestra primero el nombre completo y luego
+el correo de cada persona, junto con su rol. Mantiene el orden por correo sin
+distinguir mayúsculas y minúsculas. Solo quienes pertenecen al plan pueden salir;
+el dueño no puede hacerlo.
+
+Desde la lista de participantes, el dueño y los editores pueden eliminar participantes
+con el botón Eliminar del plan. Solo el dueño puede eliminar editores. El dueño no
+puede ser eliminado; un editor utiliza Salir del plan para retirarse por su cuenta.
+`POST /plans/{id}/participants/remove` recibe `participantEmail`, exige sesión y token
+CSRF, y valida estos permisos en el servicio. La eliminación quita la participación,
+el rol Editor y cualquier invitación pendiente de esa persona para el mismo plan.
+No elimina su cuenta ni modifica otros planes. En planes privados, la persona eliminada
+pierde el acceso al detalle; en planes públicos conserva el acceso de lectura público.
+
+En `/plans`, un panel lateral derecho muestra las invitaciones pendientes del usuario
+con sesión iniciada. En pantallas pequeñas aparece debajo de la lista de planes.
+Cada invitación muestra el nombre del plan, nombre completo y correo de quien invitó,
+el rol ofrecido y las acciones Aceptar y Rechazar. Una invitación a un plan privado
+no permite consultar su detalle antes de aceptar.
+
+`POST /plans/{id}/invitations/{invitationId}/respond` recibe `accept=true` o
+`accept=false`, exige sesión y token CSRF, y valida que la invitación corresponda
+al plan y al usuario que responde. Al aceptar se incorpora al destinatario con el
+rol ofrecido; al rechazar no se incorpora. En ambos casos se elimina la invitación
+pendiente y se vuelve a Mis planes con un mensaje. Una respuesta repetida no cambia
+la participación. Si la persona ya se unió por código, la respuesta no modifica
+su rol actual. Después de un rechazo se puede enviar una nueva invitación.
+
+Las invitaciones se guardan en `plan_invitations`, con plan, destinatario, remitente,
+rol y versión para controlar respuestas concurrentes. La combinación de plan y
+destinatario es única. Eliminar un plan elimina también sus invitaciones pendientes.
+Las participaciones existentes se mantienen; no se convierten en invitaciones.
+
+`Plan` agrupa participantes, editores e invitaciones en el componente embebido
+`PlanManager`. Las tablas `plan_participants`, `plan_editors` y `plan_invitations`
+conservan sus nombres, columnas, restricciones y relaciones; esta refactorización
+no necesita migrar datos. Los métodos públicos de `Plan` delegan en el componente.
+Las consultas de participación e invitaciones recorren `plan.planManager`.
+
+Los nombres de columnas y roles utilizados repetidamente se centralizan en constantes.
+La creación de invitaciones separa la validación de permisos, rol, búsqueda del
+destinatario y comprobación de pertenencia o invitación pendiente, conservando el
+comportamiento y los mensajes. Las reglas de PMD permanecen activadas sin supresiones.
+
+La cobertura en `PlanServiceImplTest` y `PlanControllerIntegrationTest` verifica
+invitaciones del dueño y de editores, invitaciones de usuarios con sesión a planes públicos,
+consulta anónima de solo lectura y rechazo de escrituras anónimas,
+rechazo de permisos insuficientes, correos desconocidos y duplicados, persistencia
+de roles, protección CSRF y visualización del nombre completo y correo.
+También verifica persistencia de invitaciones pendientes, aceptación como Editor
+o Participante, rechazo, aislamiento por destinatario, intentos de responder por otra
+persona, duplicados, respuestas repetidas y eliminación de invitaciones con el plan.
+
 ## Pre-requisitos
 
 - [LOG] completed (Spring Security configured)

@@ -21,6 +21,40 @@ import org.springframework.web.context.WebApplicationContext;
 @Transactional
 class PlanPlaceRestControllerTest extends PlanPlaceWebFixture {
 
+  @Autowired
+  private PlanPlaceService itineraryService;
+
+  @Test
+  void editorCanManageEveryItineraryOperation() {
+    User editor = new User();
+    editor.setEmail("editor@test.com");
+    editor.setPassword("password");
+    editor.setRole("USER");
+    users.save(editor);
+    plan.getParticipants().add(editor);
+    plan.getEditors().add(editor);
+    plans.save(plan);
+    String email = editor.getEmail();
+    PlanPlace firstEntry = itineraryService.addPlaceToPlan(plan.getId(), first, email);
+    PlanPlace secondEntry = itineraryService.addPlaceToPlan(plan.getId(), second, email);
+    itineraryService.updatePlanPlace(
+      plan.getId(),
+      firstEntry.getId(),
+      java.time.LocalDate.of(2026, 12, 1),
+      java.time.LocalTime.of(10, 30),
+      email
+    );
+    itineraryService.reorderPlaces(
+      plan.getId(),
+      java.util.List.of(secondEntry.getId(), firstEntry.getId()),
+      email
+    );
+    assertEquals(2, firstEntry.getSortOrder());
+    assertEquals(java.time.LocalTime.of(10, 30), firstEntry.getVisitTime());
+    itineraryService.removePlaceFromPlan(plan.getId(), firstEntry.getId(), email);
+    assertEquals(1, entries.findByPlanId(plan.getId()).size());
+  }
+
   @Test
   void detailIncludesPersistedVisitAndPlaceDataForParticipants() throws Exception {
     Long id = add(first);

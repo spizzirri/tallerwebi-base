@@ -53,6 +53,11 @@ public class PlanRepositoryImpl implements PlanRepository {
   }
 
   @Override
+  public List<Plan> findByInvitationsRecipientEmail(String email) {
+    return jpaPlanRepository.findByInvitationsRecipientEmail(email);
+  }
+
+  @Override
   public Plan save(Plan plan) {
     return jpaPlanRepository.save(plan);
   }

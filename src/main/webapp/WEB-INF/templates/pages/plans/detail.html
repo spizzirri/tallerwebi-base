@@ -149,7 +149,7 @@
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
             <button type="submit" class="btn btn-danger">Eliminar plan</button>
         </form>
-        <form th:unless="${isPlanAdministrator}" th:action="@{/plans/{id}/leave(id=${plan.id})}" method="POST">
+        <form th:if="${isPlanParticipant == true and isPlanAdministrator != true}" th:action="@{/plans/{id}/leave(id=${plan.id})}" method="POST">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
             <button type="submit" class="btn btn-outline-danger">Salir del plan</button>
         </form>
@@ -165,11 +165,11 @@
                 <div id="map"></div>
             </div>
 
-            <div th:if="${isPlanAdministrator}" class="card border-0 shadow-sm p-4 mb-4">
+            <div th:if="${canEditPlan}" class="card border-0 shadow-sm p-4 mb-4">
                 <h5 class="fw-bold mb-3">Agregar lugar al plan</h5>
                 <div class="row g-2">
                     <div class="col-md-9">
-                        <select v-model="selectedPlaceId" class="form-select">
+                        <select v-model="selectedPlaceId" class="form-select" aria-label="Lugar para agregar al plan">
                             <option :value="null" disabled>-- Seleccionar un lugar disponible --</option>
                             <option v-for="place in availablePlaces" :key="place.id" :value="place.id">
                                 {{ place.name }} ({{ place.category }})
@@ -189,7 +189,7 @@
                     <h5 id="itinerary-heading" class="itinerary-heading fw-bold m-0">Tu recorrido</h5>
                     <span class="itinerary-count">{{ planPlaces.length }} {{ planPlaces.length === 1 ? 'parada' : 'paradas' }}</span>
                 </div>
-                <p class="text-muted small mt-2 mb-0" th:if="${isPlanAdministrator}">Arrastr&aacute; las tarjetas para organizar tu recorrido.</p>
+                <p class="text-muted small mt-2 mb-0" th:if="${canEditPlan}">Arrastr&aacute; las tarjetas para organizar tu recorrido.</p>
                 <div v-if="planPlaces.length === 0" class="itinerary-empty">
                     <i class="fa-solid fa-map-location-dot fs-3 mb-3" aria-hidden="true"></i>
                     <p class="fw-semibold mb-1">El recorrido est&aacute; por comenzar</p>
@@ -199,7 +199,7 @@
                     <li v-for="(item, index) in planPlaces"
                         :key="item.entryId || index"
                         class="place-item"
-                        th:attr="draggable=${isPlanAdministrator}"
+                        th:attr="draggable=${canEditPlan}"
                         @dragstart="onDragStart(index)"
                         @dragover.prevent
                         @drop="onDrop(index)">
@@ -219,7 +219,7 @@
                             </div>
                             <div class="stop-actions">
                                 <button type="button" class="stop-details" @click="showPlace(item)">Ver m&aacute;s</button>
-                                <button th:if="${isPlanAdministrator}" @click="removePlace(index)" type="button" class="stop-remove" :disabled="saving">
+                                <button th:if="${canEditPlan}" @click="removePlace(index)" type="button" class="stop-remove" :disabled="saving">
                                     <i class="fa-regular fa-trash-can me-1" aria-hidden="true"></i>Eliminar
                                 </button>
                             </div>
@@ -261,16 +261,56 @@
             </div>
 
             <section class="card border-0 shadow-sm p-4 mb-4" aria-labelledby="participants-heading">
+                <div th:if="${participantSuccess}" class="alert alert-success" role="status" th:text="${participantSuccess}"></div>
+                <div th:if="${invitationSuccess}" class="alert alert-success" role="status" th:text="${invitationSuccess}"></div>
+                <div th:if="${invitationError}" class="alert alert-danger" role="alert" th:text="${invitationError}"></div>
+                <form th:if="${canInvite}" th:action="@{/plans/{id}/participants/invite(id=${plan.id})}" method="POST" class="mb-4">
+                    <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <h5 class="fw-bold mb-3">Invitar a alguien</h5>
+                    <label for="invitation-email" class="form-label">Correo electr&oacute;nico</label>
+                    <input id="invitation-email" name="participantEmail" type="email" required class="form-control mb-2" placeholder="persona@ejemplo.com" />
+                    <p class="text-muted small">La persona debe tener una cuenta registrada. Podr&aacute; aceptar o rechazar la invitaci&oacute;n en Mis planes.</p>
+                    <div th:if="${canEditPlan}" class="mb-3">
+                        <label for="invitation-role" class="form-label">Rol</label>
+                        <select id="invitation-role" name="role" class="form-select">
+                            <option value="guest">Participante</option>
+                            <option value="editor">Editor</option>
+                        </select>
+                    </div>
+                    <input th:unless="${canEditPlan}" type="hidden" name="role" value="guest" />
+                    <button type="submit" class="btn btn-primary">Invitar</button>
+                </form>
                 <h5 id="participants-heading" class="fw-bold mb-3">
                     Participantes <span class="badge bg-secondary" th:text="${participantEmails == null ? 0 : #lists.size(participantEmails)}">0</span>
                 </h5>
                 <p class="text-muted small mb-0" th:if="${#lists.isEmpty(participantEmails)}">Todav&iacute;a no se ha unido nadie al plan.</p>
                 <ol class="list-group list-group-numbered" th:unless="${#lists.isEmpty(participantEmails)}">
-                    <li class="list-group-item text-break" th:each="email : ${participantEmails}" th:text="${email}">usuario@ejemplo.com</li>
+                    <li class="list-group-item d-flex flex-wrap align-items-center gap-2" th:each="participant : ${participants}" th:with="email=${participant.email}">
+                        <div class="flex-grow-1 text-break" style="min-width: 0;">
+                            <strong class="d-block" th:text="${#strings.trim((participant.firstName == null ? '' : participant.firstName) + ' ' + (participant.lastName == null ? '' : participant.lastName))}">Nombre completo</strong>
+                            <span class="text-muted small" th:text="${email}">usuario@ejemplo.com</span>
+                        </div>
+                        <span th:if="${plan.isAdministrator(email)}" class="badge bg-primary flex-shrink-0">Due&ntilde;o</span>
+                        <span th:if="${!canEditPlan and !plan.isAdministrator(email)}" class="badge bg-secondary flex-shrink-0" th:text="${plan.isEditor(email) ? 'Editor' : 'Participante'}">Participante</span>
+                        <form th:if="${canEditPlan and !plan.isAdministrator(email)}" th:action="@{/plans/{id}/participants/role(id=${plan.id})}" method="POST" class="d-flex align-items-center gap-2 flex-shrink-0 mb-0">
+                            <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                            <input type="hidden" name="participantEmail" th:value="${email}" />
+                            <select name="role" class="form-select form-select-sm w-auto" aria-label="Rol del participante">
+                                <option value="guest" th:selected="${!plan.isEditor(email)}">Participante</option>
+                                <option value="editor" th:selected="${plan.isEditor(email)}">Editor</option>
+                            </select>
+                            <button type="submit" class="btn btn-sm btn-outline-primary text-nowrap">Guardar rol</button>
+                        </form>
+                        <form th:if="${canEditPlan and !plan.isAdministrator(email) and (isPlanAdministrator or !plan.isEditor(email))}" th:action="@{/plans/{id}/participants/remove(id=${plan.id})}" method="POST" class="mb-0">
+                            <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                            <input type="hidden" name="participantEmail" th:value="${email}" />
+                            <button type="submit" class="btn btn-sm btn-outline-danger text-nowrap" th:aria-label="${'Eliminar del plan a ' + email}">Eliminar del plan</button>
+                        </form>
+                    </li>
                 </ol>
             </section>
 
-            <div th:if="${isPlanAdministrator}" class="card border-0 shadow-sm p-4">
+            <div th:if="${canEditPlan}" class="card border-0 shadow-sm p-4">
                 <h5 class="fw-bold mb-3">Editar plan</h5>
 
                 <form th:action="@{/plans/{id}(id=${plan.id})}" th:object="${plan}" method="POST">

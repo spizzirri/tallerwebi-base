@@ -39,7 +39,7 @@ public class PlanPlaceServiceImpl implements PlanPlaceService {
 
   @Override
   public PlanPlace addPlaceToPlan(Long planId, Long placeId, String ownerEmail) {
-    Plan plan = planService.getOwnedPlan(planId, ownerEmail);
+    Plan plan = planService.getEditablePlan(planId, ownerEmail);
     PlanPlace entry = new PlanPlace();
     plan.addPlanPlace(entry);
     entry.setPlace(places.findById(placeId).orElseThrow(PlanNotFoundException::new));
@@ -58,7 +58,7 @@ public class PlanPlaceServiceImpl implements PlanPlaceService {
         throw new PlanNotFoundException();
       }
       if (!plan.isParticipant(ownerEmail)) {
-        planService.getOwnedPlan(planId, ownerEmail);
+        planService.getEditablePlan(planId, ownerEmail);
       }
     }
     List<PlanPlace> itinerary = repository.findByPlanId(planId);
@@ -90,7 +90,7 @@ public class PlanPlaceServiceImpl implements PlanPlaceService {
 
   @Override
   public void reorderPlaces(Long planId, List<Long> entryIds, String ownerEmail) {
-    planService.getOwnedPlan(planId, ownerEmail);
+    planService.getEditablePlan(planId, ownerEmail);
     List<PlanPlace> entries = repository.findByPlanId(planId);
     // The same place can appear several times, so entries are identified by their own id.
     if (
@@ -114,7 +114,7 @@ public class PlanPlaceServiceImpl implements PlanPlaceService {
   }
 
   private PlanPlace ownedEntry(Long planId, Long id, String ownerEmail) {
-    planService.getOwnedPlan(planId, ownerEmail);
+    planService.getEditablePlan(planId, ownerEmail);
     PlanPlace entry = repository.findById(id).orElseThrow(PlanNotFoundException::new);
     if (!planId.equals(entry.getPlan().getId())) {
       throw new PlanNotFoundException();

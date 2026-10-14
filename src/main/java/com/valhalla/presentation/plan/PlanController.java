@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -54,6 +55,7 @@ public class PlanController {
     Map<String, Object> model = new ModelMap();
     model.put(ATTR_PLANS, planService.getPlansByUserEmail(authentication.getName()));
     model.put("participantPlans", planService.getParticipantPlans(authentication.getName()));
+    model.put("pendingInvitations", planService.getPendingInvitations(authentication.getName()));
     return new ModelAndView(VIEW_PLANS_LIST, model);
   }
 
@@ -76,15 +78,33 @@ public class PlanController {
   @GetMapping("/{id}")
   public ModelAndView showPlan(@PathVariable Long id, Authentication authentication) {
     Map<String, Object> model = new ModelMap();
-    Plan plan = planService.getParticipatingPlan(id, authentication.getName());
+    String userEmail = authentication == null ? null : authentication.getName();
+    Plan plan = planService.getParticipatingPlan(id, userEmail);
     model.put(ATTR_PLAN, plan);
-    model.put("isPlanAdministrator", plan.isAdministrator(authentication.getName()));
+    model.put("canEditPlan", plan.canEdit(userEmail));
+    model.put("isPlanAdministrator", plan.isAdministrator(userEmail));
+    model.put("isPlanParticipant", plan.isParticipant(userEmail));
+    model.put("canInvite", userEmail != null && (plan.canEdit(userEmail) || plan.getIsPublic()));
+    model.put(
+      "participants",
+      Stream
+        .concat(Stream.ofNullable(plan.getAdministrator()), plan.getParticipants().stream())
+        .collect(
+          java.util.stream.Collectors.toMap(User::getEmail, user -> user, (first, second) -> first)
+        )
+        .values()
+        .stream()
+        .sorted(Comparator.comparing(User::getEmail, String.CASE_INSENSITIVE_ORDER))
+        .toList()
+    );
     model.put(
       "participantEmails",
-      plan
-        .getParticipants()
-        .stream()
-        .map(User::getEmail)
+      Stream
+        .concat(
+          Stream.ofNullable(plan.getAdministrator()).map(User::getEmail),
+          plan.getParticipants().stream().map(User::getEmail)
+        )
+        .distinct()
         .sorted(String.CASE_INSENSITIVE_ORDER.thenComparing(Comparator.naturalOrder()))
         .toList()
     );
@@ -186,6 +206,57 @@ public class PlanController {
     return new ModelAndView(REDIRECT_PLANS);
   }
 
+  @PostMapping("/{id}/participants/role")
+  public ModelAndView changeParticipantRole(
+    @PathVariable Long id,
+    @RequestParam String participantEmail,
+    @RequestParam String role,
+    Authentication authentication
+  ) {
+    planService.changeParticipantRole(id, participantEmail, role, authentication.getName());
+    return new ModelAndView(REDIRECT_PLAN_DETAIL + id);
+  }
+
+  @PostMapping("/{id}/participants/remove")
+  public ModelAndView removeParticipant(
+    @PathVariable Long id,
+    @RequestParam String participantEmail,
+    Authentication authentication,
+    org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes
+  ) {
+    planService.removeParticipant(id, participantEmail, authentication.getName());
+    redirectAttributes.addFlashAttribute(
+      "participantSuccess",
+      "La persona fue eliminada del plan."
+    );
+    return new ModelAndView(REDIRECT_PLAN_DETAIL + id);
+  }
+
+  @PostMapping("/{id}/participants/invite")
+  public ModelAndView inviteParticipant(
+    @PathVariable Long id,
+    @RequestParam String participantEmail,
+    @RequestParam(defaultValue = "guest") String role,
+    Authentication authentication,
+    org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes
+  ) {
+    try {
+      planService.inviteParticipant(
+        id,
+        participantEmail,
+        role,
+        authentication == null ? null : authentication.getName()
+      );
+      redirectAttributes.addFlashAttribute(
+        "invitationSuccess",
+        "Invitación enviada. La persona podrá aceptarla o rechazarla en Mis planes."
+      );
+    } catch (IllegalArgumentException exception) {
+      redirectAttributes.addFlashAttribute("invitationError", exception.getMessage());
+    }
+    return new ModelAndView(REDIRECT_PLAN_DETAIL + id);
+  }
+
   /**
    * [CLO] "Usar plan": copia el plan como tuyo y caes en tu copia editable. El email sale de la
    * sesion, nunca del form.
@@ -199,6 +270,22 @@ public class PlanController {
   @PostMapping("/{id}/leave")
   public ModelAndView leavePlan(@PathVariable Long id, Authentication authentication) {
     planService.leavePlan(id, authentication.getName());
+    return new ModelAndView(REDIRECT_PLANS);
+  }
+
+  @PostMapping("/{id}/invitations/{invitationId}/respond")
+  public ModelAndView respondToInvitation(
+    @PathVariable Long id,
+    @PathVariable Long invitationId,
+    @RequestParam boolean accept,
+    Authentication authentication,
+    org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes
+  ) {
+    planService.respondToInvitation(id, invitationId, accept, authentication.getName());
+    redirectAttributes.addFlashAttribute(
+      "invitationResponse",
+      accept ? "Invitación aceptada." : "Invitación rechazada."
+    );
     return new ModelAndView(REDIRECT_PLANS);
   }
 

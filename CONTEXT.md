@@ -8,6 +8,17 @@
 | **Place** | A location in Buenos Aires. Has name, description, category, address, coordinates, image. |
 | **Plan** | A curated collection of places with schedule. Owned by a User. Is public or private. |
 | **PlanPlace** | A place within a plan, with visit date, time, and order in the itinerary. |
+| **Plan participant** | Registered User who joins a Plan using its Short Code. Can read its detail and leave it; cannot edit or delete it unless assigned the Editor role. The administrator owns the Plan and can delete it. |
+
+**Editor**: A Plan participant who can modify the plan and itinerary and change participant roles. Only the administrator (owner) can delete the Plan. Leaving the Plan removes the Editor role.
+
+The owner and Editors can remove Participants from a Plan. Only the owner can remove
+Editors. The owner cannot be removed. Removal revokes participation and the Editor
+role for that Plan without deleting the User's account.
+
+**PlanManager**: Embedded component of a Plan that groups its Participants, Editors
+and pending Invitations. It preserves the existing persistence tables and the Plan's
+public methods for accessing these collections.
 
 ## Categories
 
@@ -31,9 +42,15 @@ Whether a plan can be read through its shared link. A boolean on the Plan, not a
 | Term | Definition |
 |------|------------|
 | **Public plan** | `isPublic` is true: the plan is accessible via shared URL without login |
-| **Private plan** | `isPublic` is false: the plan is visible only to its owner |
+| **Private plan** | `isPublic` is false: the plan is visible only to its owner and its participants |
 
 ## Key Concepts
+
+**Plan invitation**: A pending invitation sent by a registered User to another registered
+User for a Plan, with the proposed Participant or Editor role and the inviter's identity.
+Only the recipient can accept or reject it from My Plans. Sending an invitation does not
+grant participation or access to a private Plan. Acceptance grants the proposed role;
+rejection leaves participation unchanged. Both responses remove the pending invitation.
 
 | Term | Definition |
 |------|------------|
