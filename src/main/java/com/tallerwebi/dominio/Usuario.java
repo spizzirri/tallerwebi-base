@@ -8,6 +8,8 @@ import jakarta.persistence.Id;
 @Entity
 public class Usuario {
 
+  public static final String ROL_VETERINARIA = "VETERINARIA";
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;

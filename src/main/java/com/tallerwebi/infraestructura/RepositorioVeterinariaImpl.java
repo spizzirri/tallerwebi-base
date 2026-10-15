@@ -21,4 +21,25 @@ public class RepositorioVeterinariaImpl
   public List<Veterinaria> listar() {
     return listarOrdenadoPor("nombre");
   }
+
+  @Override
+  public Veterinaria buscarPorUsuario(Long usuarioId) {
+    return sesion()
+      .createQuery("select v from Veterinaria v where v.usuario.id = :usuarioId", Veterinaria.class)
+      .setParameter("usuarioId", usuarioId)
+      .uniqueResult();
+  }
+
+  @Override
+  public Veterinaria buscarPorCuit(String cuit) {
+    return sesion()
+      .createQuery("from Veterinaria where cuit = :cuit", Veterinaria.class)
+      .setParameter("cuit", cuit)
+      .uniqueResult();
+  }
+
+  @Override
+  public void guardar(Veterinaria veterinaria) {
+    sesion().persist(veterinaria);
+  }
 }
