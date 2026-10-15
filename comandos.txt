@@ -1,0 +1,9 @@
+
+Cargar variables de entorno y levantar proyecto
+set -a && source .env && set +a   # DB_HOST=localhost en .env
+mvn jetty:run
+
+
+
+Detener MySql linux
+sudo systemctl stop mysql
