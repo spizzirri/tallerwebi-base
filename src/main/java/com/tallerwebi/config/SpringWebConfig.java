@@ -38,7 +38,13 @@ public class SpringWebConfig implements WebMvcConfigurer {
   public void addInterceptors(InterceptorRegistry registry) {
     registry
       .addInterceptor(new InterceptorSesion())
-      .addPathPatterns("/home", "/veterinarias/**", "/servicios/**", "/turnos/**", "/mascotas/**", "/veterinaria/**"
+      .addPathPatterns(
+        "/home",
+        "/veterinarias/**",
+        "/servicios/**",
+        "/turnos/**",
+        "/mascotas/**",
+        "/veterinaria/**"
       );
   }
 
