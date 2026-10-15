@@ -120,10 +120,6 @@
                   >Horario</span
                 >
               </p>
-              <p class="veterinaria-card__fila" th:if="${v.usuario != null}">
-                <span class="veterinaria-card__icon" aria-hidden="true">✉️</span>
-                <a th:href="'mailto:' + ${v.usuario.email}" th:text="${v.usuario.email}">Email</a>
-              </p>
             </div>
 
             <div class="veterinaria-card__especialidades">
