@@ -1,0 +1,29 @@
+<!DOCTYPE HTML>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('Registro de veterinaria')}"></head>
+
+<body>
+
+  <header th:replace="~{fragments/layout :: encabezado('Adherí tu veterinaria', 'Creá una cuenta para aparecer en el listado y recibir turnos.')}"></header>
+
+  <main role="main" class="mp-main mp-main--angosto">
+    <form th:action="@{/registrar-veterinaria}" method="POST">
+      <p th:if="${error != null}" class="alert alert-danger" th:text="${error}"></p>
+      <section class="mp-card">
+        <h2 class="mp-seccion-titulo">Datos de la veterinaria</h2>
+        <div th:replace="~{fragments/veterinaria-form :: campos(${datosVeterinaria}, ${diasSemana}, ${servicios})}"></div>
+      </section>
+      <div class="d-flex flex-wrap align-items-center gap-2 mt-4">
+        <button class="btn btn-lg btn-primary" type="submit">Crear cuenta de veterinaria</button>
+        <a th:href="@{/login}" class="btn btn-link">Ya tengo cuenta</a>
+      </div>
+    </form>
+  </main>
+
+  <footer th:replace="~{fragments/layout :: pie}"></footer>
+  <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+
+</body>
+
+</html>

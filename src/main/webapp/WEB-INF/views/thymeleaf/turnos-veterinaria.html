@@ -1,0 +1,69 @@
+<!DOCTYPE HTML>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('Mis turnos')}"></head>
+
+<body>
+
+  <header th:replace="~{fragments/layout :: encabezado('Mis turnos', 'Consultá y administrá los turnos reservados en ' + ${veterinaria.nombre} + '.')}"></header>
+
+  <main role="main" class="mp-main">
+    <div class="d-flex justify-content-start mb-3">
+      <a class="btn btn-outline-primary" th:href="@{/veterinaria/inicio}">Volver al Inicio</a>
+    </div>
+    <p th:if="${mensaje != null}" class="alert alert-success" th:text="${mensaje}"></p>
+    <p th:if="${error != null}" class="alert alert-danger" th:text="${error}"></p>
+
+    <section class="mp-card">
+      <p th:if="${#lists.isEmpty(turnos)}" class="text-muted mb-0">Todavía no recibiste turnos.</p>
+      <div class="table-responsive" th:unless="${#lists.isEmpty(turnos)}">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th>Fecha y hora</th>
+              <th>Mascota</th>
+              <th>Socio</th>
+              <th>Servicio</th>
+              <th>Estado</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="t : ${turnos}">
+              <td th:text="${#temporals.format(t.fecha, 'dd/MM/yyyy')} + ' ' + ${t.hora}">01/10/2026 10:00</td>
+              <td>
+                <strong th:text="${t.mascota.nombre}">Mascota</strong>
+                <div class="small text-muted" th:text="${t.mascota.especie}">Especie</div>
+              </td>
+              <td>
+                <span th:text="${t.mascota.socio.nombre} + ' ' + ${t.mascota.socio.apellido}">Socio</span>
+                <div class="small text-muted" th:text="${t.mascota.socio.telefono}">Teléfono</div>
+              </td>
+              <td th:text="${t.servicio.nombre}">Servicio</td>
+              <td>
+                <span class="badge" th:text="${t.estado}"
+                  th:classappend="${t.estado.name() == 'CONFIRMADO'} ? 'text-bg-success' : 'text-bg-secondary'">CONFIRMADO</span>
+              </td>
+              <td class="text-end">
+                <div th:if="${t.estaConfirmado()}" class="d-flex justify-content-end gap-2">
+                  <a class="btn btn-outline-primary btn-sm"
+                    th:href="@{/veterinaria/turnos/{id}/reprogramar(id=${t.id})}">Reprogramar</a>
+                  <form th:action="@{/veterinaria/turnos/{id}/cancelar(id=${t.id})}" method="POST"
+                    onsubmit="return confirm('¿Seguro que querés cancelar este turno?')">
+                    <button class="btn btn-outline-danger btn-sm" type="submit">Cancelar</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer th:replace="~{fragments/layout :: pie}"></footer>
+  <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+
+</body>
+
+</html>

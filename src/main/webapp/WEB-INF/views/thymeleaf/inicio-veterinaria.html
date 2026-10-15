@@ -1,0 +1,64 @@
+<!DOCTYPE HTML>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('Inicio')}"></head>
+
+<body>
+
+  <header th:replace="~{fragments/layout :: encabezado('Inicio', 'Bienvenida, ' + ${veterinaria.nombre} + '. Gestioná tu veterinaria desde acá.')}"></header>
+
+  <main role="main" class="mp-main">
+    <section class="mp-card">
+      <h2 class="mp-seccion-titulo">¿Qué querés hacer?</h2>
+      <div class="d-flex flex-wrap gap-3">
+        <a class="btn btn-primary" th:href="@{/veterinaria/turnos}">Administrar mis turnos</a>
+        <a class="btn btn-outline-primary" th:href="@{/veterinaria/panel}">Editar mi perfil</a>
+      </div>
+    </section>
+
+    <section class="mp-card mt-4">
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+        <h2 class="mp-seccion-titulo mb-0">Mis turnos</h2>
+        <a class="btn btn-outline-primary btn-sm" th:href="@{/veterinaria/turnos}">Ver y administrar todos</a>
+      </div>
+      <p th:if="${#lists.isEmpty(turnos)}" class="text-muted mb-0">Todavía no tenés turnos reservados.</p>
+      <div class="table-responsive" th:unless="${#lists.isEmpty(turnos)}">
+        <table class="table align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Fecha y hora</th>
+              <th>Mascota</th>
+              <th>Socio</th>
+              <th>Servicio</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="t : ${turnos}">
+              <td th:text="${#temporals.format(t.fecha, 'dd/MM/yyyy')} + ' ' + ${t.hora}">01/10/2026 10:00</td>
+              <td>
+                <strong th:text="${t.mascota.nombre}">Mascota</strong>
+                <div class="small text-muted" th:text="${t.mascota.especie}">Especie</div>
+              </td>
+              <td>
+                <span th:text="${t.mascota.socio.nombre} + ' ' + ${t.mascota.socio.apellido}">Socio</span>
+                <div class="small text-muted" th:text="${t.mascota.socio.telefono}">Teléfono</div>
+              </td>
+              <td th:text="${t.servicio.nombre}">Servicio</td>
+              <td>
+                <span class="badge" th:text="${t.estado}"
+                  th:classappend="${t.estado.name() == 'CONFIRMADO'} ? 'text-bg-success' : 'text-bg-secondary'">CONFIRMADO</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer th:replace="~{fragments/layout :: pie}"></footer>
+  <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+
+</body>
+
+</html>

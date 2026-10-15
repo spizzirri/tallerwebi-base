@@ -52,15 +52,22 @@
         <!-- Socio con sesión iniciada -->
         <th:block th:if="${session.USUARIO_ID != null}">
           <ul class="navbar-nav me-auto">
-            <li class="nav-item"><a class="nav-link" th:href="@{/home}">Inicio</a></li>
-            <li class="nav-item"><a class="nav-link" th:href="@{/veterinarias}">Veterinarias</a></li>
-            <li class="nav-item"><a class="nav-link" th:href="@{/servicios}">Servicios</a></li>
-            <li class="nav-item"><a class="nav-link" th:href="@{/planes}">Planes</a></li>
-            <li class="nav-item"><a class="nav-link" th:href="@{/turnos}">Mis turnos</a></li>
+            <th:block th:if="${session.ROL == 'VETERINARIA'}">
+              <li class="nav-item"><a class="nav-link" th:href="@{/veterinaria/inicio}">Inicio</a></li>
+              <li class="nav-item"><a class="nav-link" th:href="@{/veterinaria/panel}">Mi perfil</a></li>
+              <li class="nav-item"><a class="nav-link" th:href="@{/veterinaria/turnos}">Mis turnos</a></li>
+            </th:block>
+            <th:block th:unless="${session.ROL == 'VETERINARIA'}">
+              <li class="nav-item"><a class="nav-link" th:href="@{/home}">Inicio</a></li>
+              <li class="nav-item"><a class="nav-link" th:href="@{/veterinarias}">Veterinarias</a></li>
+              <li class="nav-item"><a class="nav-link" th:href="@{/servicios}">Servicios</a></li>
+              <li class="nav-item"><a class="nav-link" th:href="@{/planes}">Planes</a></li>
+              <li class="nav-item"><a class="nav-link" th:href="@{/turnos}">Mis turnos</a></li>
+            </th:block>
           </ul>
           <div class="mp-header__usuario">
             <span class="mp-header__email" th:text="${session.EMAIL}">socio@medipet.com</span>
-            <a class="btn mp-btn-claro btn-sm" th:href="@{/turnos/nuevo}">Sacar turno</a>
+            <a th:unless="${session.ROL == 'VETERINARIA'}" class="btn mp-btn-claro btn-sm" th:href="@{/turnos/nuevo}">Sacar turno</a>
             <form th:action="@{/logout}" method="POST" class="d-inline">
               <button id="btn-logout" class="btn mp-btn-borde btn-sm" type="submit">Salir</button>
             </form>
@@ -74,7 +81,14 @@
           </ul>
           <div class="mp-header__usuario">
             <a class="btn mp-btn-borde btn-sm" th:href="@{/login}">Ingresar</a>
-            <a class="btn mp-btn-claro btn-sm" th:href="@{/registro}">Registrarme</a>
+            <div class="dropdown">
+              <button class="btn mp-btn-claro btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                aria-expanded="false">Registrarme</button>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" th:href="@{/registro}">Como socio</a></li>
+                <li><a class="dropdown-item" th:href="@{/registro-veterinaria}">Como veterinaria</a></li>
+              </ul>
+            </div>
           </div>
         </th:block>
       </div>
