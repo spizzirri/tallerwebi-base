@@ -48,7 +48,11 @@ public class ControladorLogin {
       sesion.setAttribute(USUARIO_ID, usuarioBuscado.getId());
       sesion.setAttribute(EMAIL, usuarioBuscado.getEmail());
       sesion.setAttribute(ROL, usuarioBuscado.getRol());
-      return new ModelAndView("redirect:/home");
+      return new ModelAndView(
+        com.tallerwebi.dominio.Usuario.ROL_VETERINARIA.equals(usuarioBuscado.getRol())
+          ? "redirect:/veterinaria/inicio"
+          : "redirect:/home"
+      );
     } else {
       Map<String, Object> model = new ModelMap();
       model.put("error", "Usuario o clave incorrecta");

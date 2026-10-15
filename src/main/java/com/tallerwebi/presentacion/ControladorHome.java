@@ -29,6 +29,13 @@ public class ControladorHome extends ControladorConSocio {
 
   @RequestMapping(path = "/home", method = RequestMethod.GET)
   public ModelAndView irAHome(HttpSession sesion) {
+    if (
+      com.tallerwebi.dominio.Usuario.ROL_VETERINARIA.equals(
+        sesion.getAttribute(ControladorLogin.ROL)
+      )
+    ) {
+      return new ModelAndView("redirect:/veterinaria/inicio");
+    }
     Map<String, Object> modelo = new ModelMap();
     Socio socio = socioLogueado(sesion);
     modelo.put("socio", socio);

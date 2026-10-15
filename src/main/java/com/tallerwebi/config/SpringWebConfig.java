@@ -38,7 +38,8 @@ public class SpringWebConfig implements WebMvcConfigurer {
   public void addInterceptors(InterceptorRegistry registry) {
     registry
       .addInterceptor(new InterceptorSesion())
-      .addPathPatterns("/home", "/veterinarias/**", "/servicios/**", "/turnos/**", "/mascotas/**");
+      .addPathPatterns("/home", "/veterinarias/**", "/servicios/**", "/turnos/**", "/mascotas/**", "/veterinaria/**"
+      );
   }
 
   // https://www.thymeleaf.org/doc/tutorials/3.0/thymeleafspring.html
