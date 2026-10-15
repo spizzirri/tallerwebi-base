@@ -3,6 +3,7 @@ package com.tallerwebi.presentacion;
 import com.tallerwebi.dominio.ServicioCobertura;
 import com.tallerwebi.dominio.ServicioVeterinaria;
 import com.tallerwebi.dominio.Veterinaria;
+import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +31,16 @@ public class ControladorVeterinaria {
 
   @RequestMapping(path = "/veterinarias", method = RequestMethod.GET)
   public ModelAndView listarVeterinarias(
-    @RequestParam(name = "servicioId", required = false) Long servicioId
+    @RequestParam(name = "servicioId", required = false) Long servicioId,
+    HttpSession sesion
   ) {
+    if (
+      com.tallerwebi.dominio.Usuario.ROL_VETERINARIA.equals(
+        sesion.getAttribute(ControladorLogin.ROL)
+      )
+    ) {
+      return new ModelAndView("redirect:/veterinaria/inicio");
+    }
     List<Veterinaria> veterinarias = servicioVeterinaria.listar(servicioId);
 
     Map<String, Object> modelo = new ModelMap();

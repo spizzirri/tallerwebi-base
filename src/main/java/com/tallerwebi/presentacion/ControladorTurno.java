@@ -167,6 +167,10 @@ public class ControladorTurno extends ControladorConSocio {
       modelo.put("fecha", fecha);
       modelo.put("horarios", servicioTurno.horariosDisponibles(turno.getVeterinaria(), fecha));
       modelo.put("hoy", LocalDate.now());
+      modelo.put("urlFormulario", "/turnos/" + turnoId + "/reprogramar");
+      modelo.put("urlPost", "/turnos/" + turnoId + "/reprogramar");
+      modelo.put("urlVolver", "/turnos");
+      modelo.put("esVeterinaria", false);
       return new ModelAndView("reprogramar-turno", modelo);
     } catch (TurnoInvalido e) {
       redirectAttributes.addFlashAttribute(ERROR, e.getMessage());

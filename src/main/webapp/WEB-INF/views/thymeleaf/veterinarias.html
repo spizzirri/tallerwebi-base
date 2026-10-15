@@ -107,7 +107,7 @@
                 <span class="veterinaria-card__icon" aria-hidden="true"
                   >📞</span
                 >
-                <a class="veterinaria-card__telefono" th:text="${v.telefono}"
+                <a class="veterinaria-card__telefono" th:href="'tel:' + ${v.telefono}" th:text="${v.telefono}"
                   >Teléfono</a
                 >
               </p>
@@ -116,7 +116,7 @@
                   >🕐</span
                 >
                 <span
-                  th:text="'Lunes a viernes de ' + ${v.horaApertura} + ' a ' + ${v.horaCierre} + ' hs'"
+                  th:text="${v.diasAtencionTexto} + ' de ' + ${v.horaApertura} + ' a ' + ${v.horaCierre} + ' hs'"
                   >Horario</span
                 >
               </p>

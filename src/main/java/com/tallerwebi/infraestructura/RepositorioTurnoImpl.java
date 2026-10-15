@@ -35,6 +35,17 @@ public class RepositorioTurnoImpl extends RepositorioBase<Turno> implements Repo
   }
 
   @Override
+  public List<Turno> listarPorVeterinaria(Long veterinariaId) {
+    return sesion()
+      .createQuery(
+        "from Turno t where t.veterinaria.id = :veterinariaId order by t.fecha, t.hora",
+        Turno.class
+      )
+      .setParameter("veterinariaId", veterinariaId)
+      .getResultList();
+  }
+
+  @Override
   public List<Turno> listarPorMascota(Long mascotaId) {
     return sesion()
       .createQuery(

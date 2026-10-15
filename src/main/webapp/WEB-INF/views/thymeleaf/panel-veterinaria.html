@@ -1,0 +1,34 @@
+<!DOCTYPE HTML>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('Mi perfil')}"></head>
+
+<body>
+
+  <header th:replace="~{fragments/layout :: encabezado('Mi perfil', 'Administrá los datos públicos, horarios y servicios de tu veterinaria.')}"></header>
+
+  <main role="main" class="mp-main mp-main--angosto">
+    <div class="d-flex justify-content-end mb-3">
+      <a class="btn btn-primary" th:href="@{/veterinaria/turnos}">Mis turnos</a>
+    </div>
+    <p th:if="${mensaje != null}" class="alert alert-success" th:text="${mensaje}"></p>
+    <p th:if="${error != null}" class="alert alert-danger" th:text="${error}"></p>
+
+    <form th:action="@{/veterinaria/perfil}" method="POST">
+      <section class="mp-card">
+        <h2 class="mp-seccion-titulo">Datos del perfil público</h2>
+        <div th:replace="~{fragments/veterinaria-form :: campos(${datosVeterinaria}, ${diasSemana}, ${servicios})}"></div>
+      </section>
+      <div class="d-flex flex-wrap align-items-center gap-2 mt-4">
+        <button class="btn btn-lg btn-primary" type="submit">Guardar cambios</button>
+        <a th:href="@{/veterinarias}" class="btn btn-link">Ver veterinarias</a>
+      </div>
+    </form>
+  </main>
+
+  <footer th:replace="~{fragments/layout :: pie}"></footer>
+  <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+
+</body>
+
+</html>

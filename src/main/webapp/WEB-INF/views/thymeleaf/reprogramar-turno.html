@@ -5,12 +5,12 @@
 
 <body>
 
-  <header th:replace="~{fragments/layout :: encabezado('Reprogramar turno', 'Elegí una nueva fecha y horario para tu turno confirmado.')}"></header>
+  <header th:replace="~{fragments/layout :: encabezado('Reprogramar turno', ${esVeterinaria} ? 'Elegí una nueva fecha y horario para el turno.' : 'Elegí una nueva fecha y horario para tu turno confirmado.')}"></header>
 
   <main role="main" class="mp-main mp-main--angosto">
     <p th:if="${error != null}" id="error-reprogramar" class="alert alert-danger" th:text="${error}"></p>
 
-    <form id="form-reprogramar" class="mp-card" th:action="@{/turnos/{id}/reprogramar(id=${turno.id})}" method="GET">
+    <form id="form-reprogramar" class="mp-card" th:action="@{${urlFormulario}}" method="GET">
 
       <dl class="mp-turno-actual">
         <div>
@@ -35,7 +35,7 @@
         <label for="fecha" class="form-label">Nueva fecha</label>
         <input id="fecha" name="fecha" type="date" class="form-control" th:value="${fecha}" th:min="${hoy}"
           onchange="this.form.submit()" required />
-        <div class="form-text">Las veterinarias atienden de lunes a viernes.</div>
+        <div class="form-text" th:if="${!esVeterinaria}">La veterinaria atiende los días indicados en su perfil.</div>
       </div>
 
       <div class="mb-3" th:if="${fecha != null}">
@@ -56,9 +56,10 @@
       </div>
 
       <button id="btn-confirmar-reprogramacion" class="btn btn-primary btn-lg" type="submit"
-        th:formaction="@{/turnos/{id}/reprogramar(id=${turno.id})}" formmethod="post"
+        th:formaction="@{${urlPost}}" formmethod="post"
         th:disabled="${fecha == null or #lists.isEmpty(horarios)}">Confirmar cambio</button>
-      <a class="btn btn-link" th:href="@{/turnos}">Volver a mis turnos</a>
+      <a class="btn btn-link" th:href="@{${urlVolver}}"
+        th:text="${esVeterinaria} ? 'Volver a turnos recibidos' : 'Volver a mis turnos'">Volver a mis turnos</a>
     </form>
   </main>
 

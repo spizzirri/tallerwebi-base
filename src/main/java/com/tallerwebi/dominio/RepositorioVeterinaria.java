@@ -5,4 +5,7 @@ import java.util.List;
 public interface RepositorioVeterinaria {
   List<Veterinaria> listar();
   Veterinaria buscarPorId(Long id);
+  Veterinaria buscarPorUsuario(Long usuarioId);
+  Veterinaria buscarPorCuit(String cuit);
+  void guardar(Veterinaria veterinaria);
 }

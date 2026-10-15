@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -114,8 +115,22 @@ public class ServicioTurnoImpl implements ServicioTurno {
   }
 
   @Override
+  public List<Turno> turnosDe(Veterinaria veterinaria) {
+    return repositorioTurno.listarPorVeterinaria(veterinaria.getId());
+  }
+
+  @Override
   public void cancelar(Socio socio, Long turnoId) throws TurnoInvalido {
     Turno turno = buscarTurnoDe(socio, turnoId);
+    if (!turno.estaConfirmado()) {
+      throw new TurnoInvalido("Solo se pueden cancelar turnos confirmados");
+    }
+    turno.cancelar();
+  }
+
+  @Override
+  public void cancelarPorVeterinaria(Veterinaria veterinaria, Long turnoId) throws TurnoInvalido {
+    Turno turno = buscarTurnoDeVeterinaria(veterinaria, turnoId);
     if (!turno.estaConfirmado()) {
       throw new TurnoInvalido("Solo se pueden cancelar turnos confirmados");
     }
@@ -134,6 +149,36 @@ public class ServicioTurnoImpl implements ServicioTurno {
     validarHorario(veterinaria, diaNuevo, horaNueva);
 
     turno.reprogramar(diaNuevo, horaNueva);
+  }
+
+  @Override
+  public void reprogramarPorVeterinaria(
+    Veterinaria veterinaria,
+    Long turnoId,
+    LocalDate diaNuevo,
+    LocalTime horaNueva
+  ) throws TurnoInvalido {
+    Turno turno = buscarTurnoDeVeterinaria(veterinaria, turnoId);
+    if (!turno.estaConfirmado()) {
+      throw new TurnoInvalido("Solo se pueden reprogramar turnos confirmados");
+    }
+    validarHorario(veterinaria, diaNuevo, horaNueva);
+    turno.reprogramar(diaNuevo, horaNueva);
+  }
+
+  @Override
+  public Turno buscarTurnoDeVeterinaria(Veterinaria veterinaria, Long turnoId)
+    throws TurnoInvalido {
+    Turno turno = turnoId == null ? null : repositorioTurno.buscarPorId(turnoId);
+    if (
+      veterinaria == null ||
+      turno == null ||
+      turno.getVeterinaria() == null ||
+      !Objects.equals(veterinaria.getId(), turno.getVeterinaria().getId())
+    ) {
+      throw new TurnoInvalido("No encontramos ese turno");
+    }
+    return turno;
   }
 
   @Override

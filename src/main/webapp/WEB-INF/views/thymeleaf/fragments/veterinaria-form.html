@@ -1,0 +1,59 @@
+<div xmlns:th="http://www.thymeleaf.org"
+  th:fragment="campos(datos, diasSemana, servicios)" class="row g-3">
+  <div class="col-md-6">
+    <label for="nombre" class="form-label">Nombre de la veterinaria</label>
+    <input id="nombre" name="nombre" th:value="${datos.nombre}" class="form-control" required />
+  </div>
+  <div class="col-md-6">
+    <label for="cuit" class="form-label">CUIT/CUIL (11 números)</label>
+    <input id="cuit" name="cuit" th:value="${datos.cuit}" class="form-control"
+      inputmode="numeric" pattern="[0-9 -]{11,13}" required />
+  </div>
+  <div class="col-md-8">
+    <label for="direccion" class="form-label">Dirección</label>
+    <input id="direccion" name="direccion" th:value="${datos.direccion}" class="form-control" required />
+  </div>
+  <div class="col-md-4">
+    <label for="telefono" class="form-label">Teléfono</label>
+    <input id="telefono" name="telefono" th:value="${datos.telefono}" type="tel" class="form-control" required />
+  </div>
+  <div class="col-md-6">
+    <label for="email" class="form-label">Email de acceso y contacto</label>
+    <input id="email" name="email" th:value="${datos.email}" type="email" class="form-control" required />
+  </div>
+  <div class="col-md-6" th:if="${mostrarPassword}">
+    <label for="password" class="form-label">Contraseña</label>
+    <input id="password" name="password" type="password" class="form-control" required />
+  </div>
+  <div class="col-md-6">
+    <label for="horaApertura" class="form-label">Abre</label>
+    <input id="horaApertura" name="horaApertura" th:value="${datos.horaApertura}"
+      type="time" step="1800" class="form-control" required />
+  </div>
+  <div class="col-md-6">
+    <label for="horaCierre" class="form-label">Cierra</label>
+    <input id="horaCierre" name="horaCierre" th:value="${datos.horaCierre}"
+      type="time" step="1800" class="form-control" required />
+  </div>
+  <fieldset class="col-12">
+    <legend class="form-label">Días de atención</legend>
+    <div class="d-flex flex-wrap gap-3">
+      <label th:each="dia : ${diasSemana}" class="form-check">
+        <input type="checkbox" class="form-check-input" name="diasAtencion" th:value="${dia}"
+          th:checked="${datos.diasAtencion.contains(dia)}" />
+        <span class="form-check-label" th:text="${T(com.tallerwebi.presentacion.DatosVeterinaria).nombreDia(dia)}">Día</span>
+      </label>
+    </div>
+  </fieldset>
+  <fieldset class="col-12">
+    <legend class="form-label">Servicios que ofrece</legend>
+    <div class="row g-2">
+      <label th:each="servicio : ${servicios}" class="col-md-6 form-check">
+        <input type="checkbox" class="form-check-input" name="serviciosIds" th:value="${servicio.id}"
+          th:checked="${datos.serviciosIds.contains(servicio.id)}" />
+        <span class="form-check-label" th:text="${servicio.nombre}">Servicio</span>
+      </label>
+    </div>
+  </fieldset>
+  <p class="form-text mb-0">Los turnos duran 30 minutos; se ofrecen dentro del horario que indiques.</p>
+</div>
