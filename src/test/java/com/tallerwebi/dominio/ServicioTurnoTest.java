@@ -184,6 +184,64 @@ public class ServicioTurnoTest {
   }
 
   @Test
+  public void turnosDeberiaDevolverLosTurnosDeLaVeterinaria() {
+    Turno turno = new Turno();
+    when(repositorioTurnoMock.listarPorVeterinaria(10L)).thenReturn(List.of(turno));
+
+    assertThat(servicioTurno.turnosDe(veterinaria), contains(turno));
+  }
+
+  @Test
+  public void cancelarPorVeterinariaDeberiaCancelarUnTurnoPropio() throws TurnoInvalido {
+    Turno turno = dadoUnTurnoDe(firulais);
+    turno.setVeterinaria(veterinaria);
+    when(repositorioTurnoMock.buscarPorId(5L)).thenReturn(turno);
+
+    servicioTurno.cancelarPorVeterinaria(veterinaria, 5L);
+
+    assertThat(turno.getEstado(), is(EstadoTurno.CANCELADO));
+  }
+
+  @Test
+  public void cancelarPorVeterinariaNoDeberiaPermitirCancelarUnTurnoAjeno() {
+    Veterinaria otra = dadaUnaVeterinariaQueAtiendeDe9A12(consulta);
+    otra.setId(11L);
+    Turno turno = dadoUnTurnoDe(firulais);
+    turno.setVeterinaria(otra);
+    when(repositorioTurnoMock.buscarPorId(5L)).thenReturn(turno);
+
+    assertThrows(TurnoInvalido.class, () -> servicioTurno.cancelarPorVeterinaria(veterinaria, 5L));
+  }
+
+  @Test
+  public void reprogramarPorVeterinariaDeberiaCambiarElTurnoPropio() throws TurnoInvalido {
+    LocalDate viernes = JUEVES.plusDays(1);
+    LocalTime nueveTreinta = LocalTime.of(9, 30);
+    Turno turno = dadoUnTurno(JUEVES, DIEZ, EstadoTurno.CONFIRMADO);
+    turno.setVeterinaria(veterinaria);
+    when(repositorioTurnoMock.buscarPorId(5L)).thenReturn(turno);
+
+    servicioTurno.reprogramarPorVeterinaria(veterinaria, 5L, viernes, nueveTreinta);
+
+    assertThat(turno.getFecha(), is(viernes));
+    assertThat(turno.getHora(), is(nueveTreinta));
+  }
+
+  @Test
+  public void reprogramarPorVeterinariaNoDeberiaPermitirTurnoAjeno() {
+    Veterinaria otra = dadaUnaVeterinariaQueAtiendeDe9A12(consulta);
+    otra.setId(11L);
+    Turno turno = dadoUnTurno(JUEVES, DIEZ, EstadoTurno.CONFIRMADO);
+    turno.setVeterinaria(otra);
+    when(repositorioTurnoMock.buscarPorId(5L)).thenReturn(turno);
+
+    assertThrows(
+      TurnoInvalido.class,
+      () -> servicioTurno.reprogramarPorVeterinaria(veterinaria, 5L, JUEVES, DIEZ)
+    );
+  }
+
+  @Test
   public void cancelarUnTurnoConfirmadoDelSocioDeberiaDejarloCancelado() throws TurnoInvalido {
     Turno turno = dadoUnTurnoDe(firulais);
     when(repositorioTurnoMock.buscarPorId(5L)).thenReturn(turno);

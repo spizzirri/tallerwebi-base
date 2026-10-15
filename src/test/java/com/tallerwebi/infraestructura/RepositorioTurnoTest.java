@@ -137,4 +137,19 @@ public class RepositorioTurnoTest {
 
     assertThat(turnos, hasSize(2));
   }
+
+  @Test
+  @Transactional
+  @Rollback
+  public void listarPorVeterinariaDeberiaDevolverSoloSusTurnosOrdenados() {
+    Mascota mascota = dadoUnSocioConMascota("30111222");
+    dadaUnaVeterinariaConServicio();
+    Turno temprano = guardarTurno(mascota, FECHA, LocalTime.of(9, 0));
+    Turno tarde = guardarTurno(mascota, FECHA, LocalTime.of(11, 0));
+
+    assertThat(
+      repositorioTurno.listarPorVeterinaria(veterinaria.getId()),
+      contains(temprano, tarde)
+    );
+  }
 }

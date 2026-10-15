@@ -69,6 +69,23 @@ public class ControladorLoginTest {
   }
 
   @Test
+  public void loginDeVeterinariaDeberiaLlevarAInicio() {
+    Usuario veterinaria = new Usuario();
+    veterinaria.setId(8L);
+    veterinaria.setEmail("vet@test.com");
+    veterinaria.setRol(Usuario.ROL_VETERINARIA);
+    when(requestMock.getSession()).thenReturn(sessionMock);
+    when(servicioLoginMock.consultarUsuario(anyString(), anyString())).thenReturn(veterinaria);
+
+    ModelAndView modelAndView = controladorLogin.validarLogin(datosLoginMock, requestMock);
+
+    assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/veterinaria/inicio"));
+    verify(sessionMock).setAttribute(ControladorLogin.USUARIO_ID, 8L);
+    verify(sessionMock).setAttribute(ControladorLogin.EMAIL, "vet@test.com");
+    verify(sessionMock).setAttribute(ControladorLogin.ROL, Usuario.ROL_VETERINARIA);
+  }
+
+  @Test
   public void loginCorrectoDeberiaGuardarElIdYElEmailDelUsuarioEnLaSesion() {
     Usuario usuario = new Usuario();
     usuario.setId(7L);
