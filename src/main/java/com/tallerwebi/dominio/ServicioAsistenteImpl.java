@@ -21,13 +21,16 @@ public class ServicioAsistenteImpl implements ServicioAsistente {
   }
 
   @Override
-  public String enviarMensaje(HttpSession sesion, String mensaje) {
+  public String enviarMensaje(Socio socio, HttpSession sesion, String mensaje) {
     if (mensaje == null || mensaje.isBlank()) {
       return "";
     }
     String textoUsuario = mensaje.trim();
     List<MensajeConversacion> historial = historialDe(sesion);
-    String respuesta = clienteGemini.completar(historial, textoUsuario);
+    String contextoMascotas = ResumenMascotasParaAsistente.formatear(socio);
+    String mensajeParaGemini =
+      "[CONTEXTO]\n" + contextoMascotas + "\n[/CONTEXTO]\n\nPregunta del usuario: " + textoUsuario;
+    String respuesta = clienteGemini.completar(historial, mensajeParaGemini);
     historial.add(new MensajeConversacion("user", textoUsuario));
     historial.add(new MensajeConversacion("model", respuesta));
     recortar(historial);

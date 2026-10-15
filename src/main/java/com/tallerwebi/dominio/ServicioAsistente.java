@@ -4,5 +4,5 @@ import jakarta.servlet.http.HttpSession;
 
 @FunctionalInterface
 public interface ServicioAsistente {
-  String enviarMensaje(HttpSession sesion, String mensaje);
+  String enviarMensaje(Socio socio, HttpSession sesion, String mensaje);
 }

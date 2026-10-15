@@ -1,6 +1,8 @@
 Proyecto base Taller Web I (Maven and Thymeleaf)
 ===============================
 
+Documentación del grupo (arquitectura, guía MediBot/IA): carpeta [`../docs/`](../docs/).
+
 ## Preparación del ambiente de desarrollo
 Antes de comenzar a trabajar con el proyecto, debemos instalar y configurar algunas herramientas:
 

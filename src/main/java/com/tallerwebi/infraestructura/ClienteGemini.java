@@ -29,6 +29,10 @@ public class ClienteGemini {
     No diagnosticás ni recetás. Ante signos graves (convulsiones, dificultad para respirar,
     sangrado abundante, intoxicación) indicá acudir de inmediato a una veterinaria de guardia.
     Recordá que esto no reemplaza una consulta presencial.
+
+    Cuando recibas un bloque [CONTEXTO] con mascotas, usá solo esa lista para responder
+    sobre mascotas del usuario. Si preguntan por mascotas y la lista está vacía, decílo.
+    No inventes nombres ni especies.
     """;
 
   private final Client client;
@@ -64,7 +68,7 @@ public class ClienteGemini {
     String key = System.getenv("GEMINI_API_KEY");
 
     if (key == null || key.isBlank()) {
-      throw new IllegalStateException("Definí GEMINI_API_KEY o GOOGLE_API_KEY en el entorno");
+      throw new IllegalStateException("Definí GEMINI_API_KEY en el entorno");
     }
     return key;
   }

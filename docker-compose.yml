@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   mysql:
@@ -37,6 +37,7 @@ services:
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
 
 volumes:
   mysql_data:
@@ -44,4 +45,4 @@ volumes:
 
 networks:
   tallerwebi-network:
-    driver: bridge 
+    driver: bridge

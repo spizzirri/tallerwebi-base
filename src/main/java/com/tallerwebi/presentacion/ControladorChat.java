@@ -41,7 +41,7 @@ public class ControladorChat extends ControladorConSocio {
     if (socio == null) {
       throw new ChatNoAutorizado();
     }
-    String respuesta = servicioAsistente.enviarMensaje(sesion, mensaje);
+    String respuesta = servicioAsistente.enviarMensaje(socio, sesion, mensaje);
     return Map.of("respuesta", respuesta);
   }
 

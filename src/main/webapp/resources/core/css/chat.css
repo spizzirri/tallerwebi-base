@@ -1,0 +1,27 @@
+.chat-mensaje-usuario {
+  background-color: #f0f0f0;
+  padding: 10px;
+  width: 50%;
+  align-self: flex-end;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.chat-mensaje-asistente {
+  background-color: #e0e0e0;
+  padding: 10px;
+  width: 50%;
+  align-self: flex-start;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+#mensajes {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  border: 1px solid #ccc;
+  min-height: 200px;
+  padding: 8px;
+  margin-bottom: 8px;
+}
