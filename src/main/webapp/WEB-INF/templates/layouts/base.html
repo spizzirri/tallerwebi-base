@@ -107,6 +107,75 @@
       --font-sans: var(--typeface-sans);
       --font-serif: var(--typeface-serif);
     }
+
+    /* [CAL] Calificaciones (16-CAL.md): estilos de los fragments de components/rating.html,
+       aca para que cualquier pagina que use el indicador o el widget no los repita.
+       Indicador: la capa amarilla se clipa con overflow hidden y width = promedio/5,
+       asi 4.5 cubre el 90% de la fila, sin JS ni glifos de media estrella.
+       Estrella SVG: se mide en em para seguir la font-size del contenedor
+       (text-2xl en la vista del plan, text-base en las cards). */
+    .rating-stars-base {
+      color: #d1d5db;
+    }
+
+    .rating-stars-fill {
+      position: absolute;
+      inset: 0;
+      color: #f59e0b;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .star-glyph {
+      display: inline-block;
+      width: 1em;
+      height: 1em;
+      vertical-align: -0.125em;
+    }
+
+    /* [CAL] Widget de voto (components/rating :: widget). Los radios van escondidos y el DOM
+       en orden inverso (5..1) con flex-row-reverse: la fila se ve 1..5, pero el combinator ~
+       pinta cada estrella junto con las DOM-previas a ella, que son las de valor menor: asi
+       hover y checked rellenan hasta esa estrella incluida. El hover avisa la interactividad
+       (AC-09) y, cuando la capa amarilla esta mostrando el promedio, hover sobre el widget
+       la esconde para que el preview de radios tome el control. */
+    .rating-star {
+      color: #d1d5db;
+      transition:
+        color 0.15s ease,
+        opacity 0.15s ease;
+    }
+
+    .rating-star-option:has(input:checked) .rating-star,
+    .rating-star-option:has(input:checked) ~ .rating-star-option .rating-star {
+      color: #f59e0b;
+    }
+
+    .rating-star-option:hover .rating-star,
+    .rating-star-option:hover ~ .rating-star-option .rating-star {
+      color: #f59e0b;
+      opacity: 0.7;
+    }
+
+    .rating-star-option:focus-within .rating-star {
+      outline: 2px solid #f59e0b;
+      outline-offset: 2px;
+      border-radius: 9999px;
+    }
+
+    .rating-widget:hover .rating-stars-fill {
+      visibility: hidden;
+    }
+
+    /* La variante anonima del widget es el link al login: el hover de la fila completa
+       avisa que las estrellas se pueden clikear, igual que el hover de los radios. */
+    .rating-widget-anon {
+      transition: opacity 0.15s ease;
+    }
+
+    .rating-widget-anon:hover {
+      opacity: 0.7;
+    }
   </style>
 
   <!-- Tailwind compiled in the browser: the vendored @tailwindcss/browser script

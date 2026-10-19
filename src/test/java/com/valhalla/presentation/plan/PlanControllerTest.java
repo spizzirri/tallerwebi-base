@@ -9,6 +9,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -24,6 +25,8 @@ import com.valhalla.domain.plan.Plan;
 import com.valhalla.domain.plan.PlanService;
 import com.valhalla.domain.planplace.PlanPlace;
 import com.valhalla.domain.planplace.PlanPlaceService;
+import com.valhalla.domain.rating.PlanRatingService;
+import com.valhalla.domain.rating.RatingSummary;
 import com.valhalla.domain.user.User;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -69,14 +72,24 @@ public class PlanControllerTest {
   private PlanController controller;
   private PlanService planServiceMock;
   private PlanPlaceService planPlaceServiceMock;
+  private PlanRatingService planRatingServiceMock;
   private Authentication authentication;
 
   @BeforeEach
   public void init() {
     this.planServiceMock = mock(PlanService.class);
     this.planPlaceServiceMock = mock(PlanPlaceService.class);
-    this.controller = new PlanController(this.planServiceMock, this.planPlaceServiceMock);
+    this.planRatingServiceMock = mock(PlanRatingService.class);
+    this.controller =
+      new PlanController(
+        this.planServiceMock,
+        this.planPlaceServiceMock,
+        this.planRatingServiceMock
+      );
     this.authentication = new UsernamePasswordAuthenticationToken(OWNER_EMAIL, null);
+    // Sin calificaciones es el default de cualquier plan en los tests de este archivo.
+    when(this.planRatingServiceMock.getSummary(any(UUID.class)))
+      .thenReturn(new RatingSummary(PLAN_ID, null, 0L));
   }
 
   // --- GET /plans, GET /plans/{id} ---
@@ -502,6 +515,97 @@ public class PlanControllerTest {
     // then
     assertThat(view.getViewName(), is(equalTo("redirect:/plans/" + copy.getId())));
     verify(this.planServiceMock, times(1)).clonePlan(PLAN_ID, "cloner@test.com");
+  }
+
+  // --- POST /plans/{id}/ratings [CAL] ---
+
+  @Test
+  public void T_CAL_010_showPublicPlan_exponeElPromedioLaCantidadYLaCalificacionPropia() {
+    // given
+    Plan plan = plan(PLAN_ID, "Viaje publico");
+    when(this.planServiceMock.getPublicPlan(PLAN_ID)).thenReturn(plan);
+    // El principal de una sesion real es un UserDetails, no un String (ver currentEmail)
+    Authentication visitor = new UsernamePasswordAuthenticationToken(
+      new org.springframework.security.core.userdetails.User(
+        "visitante@test.com",
+        "n/a",
+        AuthorityUtils.createAuthorityList("ROLE_USER")
+      ),
+      null
+    );
+    when(this.planRatingServiceMock.getSummary(PLAN_ID))
+      .thenReturn(new RatingSummary(PLAN_ID, 4.25, 3L));
+    when(this.planRatingServiceMock.getMyRating(PLAN_ID, "visitante@test.com")).thenReturn(4);
+
+    // when
+    ModelAndView view = this.controller.showPublicPlan(PLAN_ID, visitor);
+
+    // then: promedio redondeado a un decimal, count y autoría interna (AC-02/03/07)
+    assertThat(view.getModel().get("ratingAverage"), is(equalTo(4.3)));
+    assertThat(view.getModel().get("ratingCount"), is(equalTo(3L)));
+    assertThat(view.getModel().get("myRating"), is(equalTo(4)));
+  }
+
+  @Test
+  public void T_CAL_010b_showPublicPlan_sinCalificacionesDejaPromedioNullYCountCero() {
+    // given
+    Plan plan = plan(PLAN_ID, "Viaje publico");
+    when(this.planServiceMock.getPublicPlan(PLAN_ID)).thenReturn(plan);
+
+    // when
+    ModelAndView view = this.controller.showPublicPlan(PLAN_ID, this.authentication);
+
+    // then (AC-07): la vista muestra "Todavía sin calificaciones"
+    assertThat(view.getModel().get("ratingAverage"), is(nullValue()));
+    assertThat(view.getModel().get("ratingCount"), is(equalTo(0L)));
+  }
+
+  @Test
+  public void T_CAL_010c_showPublicPlan_anonimoNoTieneCalificacionPropia() {
+    // given: el anonimo ve el indicador pero nunca un widget de voto (AC-05)
+    Plan plan = plan(PLAN_ID, "Viaje publico");
+    when(this.planServiceMock.getPublicPlan(PLAN_ID)).thenReturn(plan);
+    Authentication anonymous = new AnonymousAuthenticationToken(
+      "key",
+      "anonymousUser",
+      AuthorityUtils.createAuthorityList("ROLE_ANONYMOUS")
+    );
+
+    // when
+    ModelAndView view = this.controller.showPublicPlan(PLAN_ID, anonymous);
+
+    // then
+    assertThat(view.getModel().get("myRating"), is(nullValue()));
+  }
+
+  @Test
+  public void T_CAL_011_ratePlan_calificaConElEmailDeLaSesionYVuelveALaVistaPublica() {
+    // given
+    RatingRequest form = new RatingRequest(4);
+    when(this.planServiceMock.getPublicPlan(PLAN_ID)).thenReturn(plan(PLAN_ID, "Viaje publico"));
+
+    // when
+    ModelAndView view =
+      this.controller.ratePlan(PLAN_ID, form, noErrors(form), this.authentication);
+
+    // then (AC-01)
+    assertThat(view.getViewName(), is(equalTo("redirect:/plans/" + PLAN_ID + "/public")));
+    verify(this.planRatingServiceMock, times(1)).rate(PLAN_ID, OWNER_EMAIL, 4);
+  }
+
+  @Test
+  public void T_CAL_011b_ratePlan_conScoreInvalidoNoTocaElServicioYVuelveALaVistaPublica() {
+    // given: tampering con el form (radio no permite score fuera de 1..5)
+    RatingRequest form = new RatingRequest(7);
+    BeanPropertyBindingResult errors = errorsOf(form);
+
+    // when
+    ModelAndView view = this.controller.ratePlan(PLAN_ID, form, errors, this.authentication);
+
+    // then
+    assertThat(view.getViewName(), is(equalTo("redirect:/plans/" + PLAN_ID + "/public")));
+    assertThat(fieldNames(errors), hasItem("score"));
+    verify(this.planRatingServiceMock, never()).rate(any(UUID.class), anyString(), anyInt());
   }
 
   // --- helpers ---

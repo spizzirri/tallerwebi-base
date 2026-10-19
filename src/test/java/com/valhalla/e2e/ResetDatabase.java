@@ -22,6 +22,9 @@ public class ResetDatabase {
       "ALTER SEQUENCE plan_invitations_id_seq RESTART WITH 1",
       "DELETE FROM plan_editors",
       "DELETE FROM plan_participants",
+      "DELETE FROM plan_ratings",
+      // [CAL] Las calificaciones referencian plan y user: las borro primero para no dejar la
+      // limpieza atrapada por la FK que introdujo 16-CAL.md (mismo cuidado que plan_places).
       "DELETE FROM plan_places",
       "ALTER SEQUENCE plan_places_id_seq RESTART WITH 1",
       "DELETE FROM plans",

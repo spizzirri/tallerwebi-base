@@ -19,6 +19,8 @@ import com.valhalla.domain.place.Place;
 import com.valhalla.domain.place.PlaceRepository;
 import com.valhalla.domain.plan.Plan;
 import com.valhalla.domain.plan.PlanRepository;
+import com.valhalla.domain.rating.PlanRating;
+import com.valhalla.domain.rating.PlanRatingRepository;
 import com.valhalla.domain.user.User;
 import com.valhalla.domain.user.UserRepository;
 import com.valhalla.domain.user.UserService;
@@ -26,6 +28,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,8 +41,8 @@ import org.mockito.InOrder;
  *
  * <p>El seeder esta apagado por defecto (las suites no lo quieren cerca), asi que la primera
  * pregunta es la llave: sin {@code -Dseed.demoPlans=true} no toca nada. Con la llave puesta,
- * cubre el caminito feliz — catalogo primero, fantasmas, planes publicos — y sus guardas de
- * idempotencia.
+ * cubre el caminito feliz — catalogo primero, fantasmas, planes publicos, calificaciones — y sus
+ * guardas de idempotencia: sobre una base ya sembrada solo faltan las calificaciones nuevas.
  */
 public class PublicPlanDataSeederTest {
 
@@ -66,11 +69,35 @@ public class PublicPlanDataSeederTest {
   /** Paradas por plan, en el orden de la lista PLANS del seeder. */
   private static final List<Integer> STOPS_PER_PLAN = List.of(2, 1, 2, 1, 1, 2);
 
+  /**
+   * Calificaciones fantasma por plan (16-CAL), en el orden de PLANS: {@code email:score}. La
+   * distribucion del demo deja agregados variados (4.0, vacio x3, 3.7, 4.5) sin tocar planes con
+   * calificaciones reales: son filas de exhibicion del feed.
+   */
+  private static final List<List<String>> EXPECTED_RATINGS = List.of(
+    List.of(
+      "mateo.rios@planit.demo:5",
+      "sofia.cabrera@planit.demo:4",
+      "tomas.ledesma@planit.demo:4",
+      "camila.ortega@planit.demo:3"
+    ),
+    List.of(),
+    List.of(),
+    List.of(),
+    List.of(
+      "camila.ortega@planit.demo:5",
+      "lucia.peralta@planit.demo:4",
+      "sofia.cabrera@planit.demo:2"
+    ),
+    List.of("tomas.ledesma@planit.demo:4", "mateo.rios@planit.demo:5")
+  );
+
   private UserService userServiceMock;
   private UserRepository userRepositoryMock;
   private PlanRepository planRepositoryMock;
   private PlaceRepository placeRepositoryMock;
   private PlaceDataSeeder placeDataSeederMock;
+  private PlanRatingRepository planRatingRepositoryMock;
   private PublicPlanDataSeeder seeder;
 
   @BeforeEach
@@ -80,14 +107,20 @@ public class PublicPlanDataSeederTest {
     this.planRepositoryMock = mock(PlanRepository.class);
     this.placeRepositoryMock = mock(PlaceRepository.class);
     this.placeDataSeederMock = mock(PlaceDataSeeder.class);
+    this.planRatingRepositoryMock = mock(PlanRatingRepository.class);
     this.seeder =
       new PublicPlanDataSeeder(
         this.userServiceMock,
         this.userRepositoryMock,
         this.planRepositoryMock,
         this.placeRepositoryMock,
-        this.placeDataSeederMock
+        this.placeDataSeederMock,
+        this.planRatingRepositoryMock
       );
+    // El seeder usa el Plan devuelto por save (con el id asignado) para colgarle calificaciones:
+    // el mock recicla el argumento, como hace Spring Data con una entidad nueva.
+    when(this.planRepositoryMock.save(any(Plan.class)))
+      .thenAnswer(invocation -> invocation.getArgument(0, Plan.class));
   }
 
   @AfterEach
@@ -108,7 +141,8 @@ public class PublicPlanDataSeederTest {
       this.userRepositoryMock,
       this.planRepositoryMock,
       this.placeRepositoryMock,
-      this.placeDataSeederMock
+      this.placeDataSeederMock,
+      this.planRatingRepositoryMock
     );
   }
 
@@ -149,27 +183,57 @@ public class PublicPlanDataSeederTest {
       assertThat(plan.getPlanPlaces().size(), is(equalTo(STOPS_PER_PLAN.get(i))));
       assertThat(plan.getPlanPlaces().get(0).getSortOrder(), is(equalTo(1)));
     }
+
+    // [CAL] las calificaciones fantasma acompanan a sus planes, en el orden de PLANS
+    ArgumentCaptor<PlanRating> ratingCaptor = ArgumentCaptor.forClass(PlanRating.class);
+    verify(this.planRatingRepositoryMock, times(9)).save(ratingCaptor.capture());
+    List<PlanRating> ratings = ratingCaptor.getAllValues();
+    int i = 0;
+    for (int planIndex = 0; planIndex < EXPECTED_RATINGS.size(); planIndex++) {
+      for (String expected : EXPECTED_RATINGS.get(planIndex)) {
+        int split = expected.indexOf(':');
+        PlanRating rating = ratings.get(i++);
+        assertThat(rating.getPlan(), is(equalTo(plans.get(planIndex))));
+        assertThat(rating.getUser().getEmail(), is(equalTo(expected.substring(0, split))));
+        assertThat(rating.getScore(), is(equalTo(Integer.parseInt(expected.substring(split + 1)))));
+      }
+    }
   }
 
   @Test
-  public void conLosFantasmasYaCreadosNoSeVuelveATocarNada() {
-    // given: la primera corrida ya dejo a Lucia en la base
+  public void conLosFantasmasYaCreadosSoloSeCompletanLasCalificaciones() {
+    // given: la primera corrida ya dejo Lucia (y al resto) en la base, con sus planes
     System.setProperty(ENABLE_PROPERTY, "true");
-    User existing = new User();
-    existing.setEmail(FIRST_GHOST);
-    when(this.userRepositoryMock.findByEmail(FIRST_GHOST)).thenReturn(Optional.of(existing));
+    givenGhostsCanBeLookedUp(0);
+    givenAllGhostPlansExist();
 
     // when
     this.seeder.onApplicationEvent(null);
 
-    // then: la unica consulta es la de la guarda; ni altas, ni catalogo, ni planes
-    verify(this.userRepositoryMock, times(1)).findByEmail(FIRST_GHOST);
-    verifyNoInteractions(
-      this.userServiceMock,
-      this.planRepositoryMock,
-      this.placeRepositoryMock,
-      this.placeDataSeederMock
-    );
+    // then: nada se vuelve a crear, aca solo faltan las 9 calificaciones del demo
+    verify(this.userServiceMock, never())
+      .create(anyString(), anyString(), anyString(), anyString(), anyString());
+    verify(this.placeDataSeederMock, never()).ensureSeeded();
+    verify(this.planRepositoryMock, never()).save(any(Plan.class));
+    ArgumentCaptor<PlanRating> ratingCaptor = ArgumentCaptor.forClass(PlanRating.class);
+    verify(this.planRatingRepositoryMock, times(9)).save(ratingCaptor.capture());
+    for (PlanRating rating : ratingCaptor.getAllValues()) {
+      assertThat(rating.getPlan().getId(), is(notNullValue()));
+      assertThat(rating.getUser(), is(notNullValue()));
+    }
+  }
+
+  @Test
+  public void lasCalificacionesYaSembradasNoSeDuplicanNiSePisan() {
+    // given: base de una corrida anterior que ya tiene las calificaciones de esta version
+    System.setProperty(ENABLE_PROPERTY, "true");
+    givenCompletelySeededDatabase();
+
+    // when
+    this.seeder.onApplicationEvent(null);
+
+    // then: la guarda por par (plan, rater) manda: ni una sola fila nueva ni updates
+    verify(this.planRatingRepositoryMock, never()).save(any(PlanRating.class));
   }
 
   @Test
@@ -186,6 +250,7 @@ public class PublicPlanDataSeederTest {
     verify(this.userServiceMock, never())
       .create(anyString(), anyString(), anyString(), anyString(), anyString());
     verify(this.planRepositoryMock, never()).save(any(Plan.class));
+    verify(this.planRatingRepositoryMock, never()).save(any(PlanRating.class));
 
     // when: en el segundo el catalogo aparece, con un lugar desconocido para el plan que lo
     // tolera (la parada que ya no existe se salta, el resto del itinerario se arma igual)
@@ -195,6 +260,7 @@ public class PublicPlanDataSeederTest {
 
     // then
     verify(this.planRepositoryMock, times(6)).save(any(Plan.class));
+    verify(this.planRatingRepositoryMock, times(9)).save(any(PlanRating.class));
   }
 
   // --- fixtures ---
@@ -203,6 +269,33 @@ public class PublicPlanDataSeederTest {
     when(this.placeRepositoryMock.count()).thenReturn(10L);
     when(this.placeRepositoryMock.findAll())
       .thenReturn(placesNamed(ALL_PLACE_NAMES.toArray(new String[0])));
+  }
+
+  /** Los 6 planes fantasma ya persistidos, con id y shortCode, como dejan las corridas previas. */
+  private static final List<String> SHORT_CODES = List.of(
+    "GHOST001",
+    "GHOST002",
+    "GHOST003",
+    "GHOST004",
+    "GHOST005",
+    "GHOST006"
+  );
+
+  private void givenAllGhostPlansExist() {
+    for (String shortCode : SHORT_CODES) {
+      Plan plan = new Plan();
+      plan.setId(UUID.randomUUID());
+      plan.setShortCode(shortCode);
+      when(this.planRepositoryMock.findByShortCode(shortCode)).thenReturn(Optional.of(plan));
+    }
+  }
+
+  /** Base totalmente sembrada: fantasmas, planes y las 9 calificaciones de esta version. */
+  private void givenCompletelySeededDatabase() {
+    givenGhostsCanBeLookedUp(0);
+    givenAllGhostPlansExist();
+    when(this.planRatingRepositoryMock.findByPlanIdAndUserEmail(any(UUID.class), anyString()))
+      .thenAnswer(invocation -> Optional.of(new PlanRating()));
   }
 
   private static List<Place> placesNamed(String... names) {

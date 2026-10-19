@@ -41,6 +41,8 @@ import org.springframework.web.context.WebApplicationContext;
  *   <li>[PVP] con prefijo {@code PVP_}: la vista {@code GET /plans/{id}/public}, escenarios
  *       S-01..S-04 de 13-PVP.md — {@code permitAll} solo para GET y sin volverse oraculo de ids
  *       ni filtro de datos privados.
+ *   <li>[CAL] con prefijo {@code CAL_}: escenarios S-01..S-03 de 16-CAL.md — el voto exige
+ *       sesion y la autoria de las calificaciones nunca sale al HTML, solo el agregado.
  * </ul>
  */
 @WebIntegrationTest
@@ -241,6 +243,63 @@ public class PlanPublicSecurityTest {
     assertThat(html, not(containsString(PUBLIC_SHORT_CODE)));
     assertThat(html, not(containsString(PRIVATE_PLAN_NAME)));
     assertThat(html, containsString(PUBLIC_PLAN_NAME));
+  }
+
+  // ============================================================
+  // [CAL] Calificaciones: S-01..S-03 de 16-CAL.md
+  // ============================================================
+
+  /** S-01 (AC-13): regression guard — el permitAll de la vista publica sigue igual con el widget. */
+  @Test
+  public void CAL_S01_getPlanPublicoConWidgetSiguePermitAllParaAnonimo() throws Exception {
+    this.mockMvc.perform(get("/plans/" + this.publicPlanId + "/public")).andExpect(status().isOk());
+  }
+
+  /** S-02 (AC-13): el voto exige sesion; el POST anonimo no llega a calificar. */
+  @Test
+  public void CAL_S02_postRatingsAnonimoRedirigeALogin() throws Exception {
+    this.mockMvc.perform(
+        post("/plans/" + this.publicPlanId + "/ratings").with(csrf()).param("score", "5")
+      )
+      .andExpect(status().is3xxRedirection())
+      .andExpect(redirectedUrlPattern("**/auth/login"));
+  }
+
+  /** S-03 (AC-02): la autoria de las calificaciones es interna, el HTML solo muestra agregados. */
+  @Test
+  public void CAL_S03_lasVistasNoExponenIdentidadesDeCalificadores() throws Exception {
+    String raterEmail = "votante.pvp@test.com";
+    User rater = givenUser(raterEmail);
+    rater.setFirstName("Votante");
+    rater.setLastName("Oculto");
+    this.userRepository.save(rater);
+    this.mockMvc.perform(
+        post("/plans/" + this.publicPlanId + "/ratings")
+          .with(user(raterEmail))
+          .with(csrf())
+          .param("score", "5")
+      )
+      .andExpect(status().is3xxRedirection());
+
+    String html =
+      this.mockMvc.perform(get("/plans/" + this.publicPlanId + "/public"))
+        .andExpect(status().isOk())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+    String feed =
+      this.mockMvc.perform(get("/for-you").with(user(VISITOR_EMAIL)))
+        .andExpect(status().isOk())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+
+    // ni el email, ni el nombre del votante aparecen en ninguna de las dos paginas
+    assertThat(html, not(containsString(raterEmail)));
+    assertThat(html, not(containsString("Votante Oculto")));
+    assertThat(feed, not(containsString(raterEmail)));
+    // en cambio, el agregado publico si sale
+    assertThat(html, containsString("5.0"));
   }
 
   // --- fixtures [PVP] ---

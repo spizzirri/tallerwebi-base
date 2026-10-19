@@ -99,6 +99,20 @@ database has neither. That difference is the time bomb for whoever implements th
 `04-APL-BE`: the same insert succeeds locally and fails against a database that predates it, with
 a constraint violation on a column the code no longer even mentions.
 
+**2026-10: databases created before commit `af0f96f` have `places.description` as an `oid`
+large-object column (the old `@Lob` mapping).** The mapping is now `varchar(2048)`, and
+`update` never converts the type of an existing column in place. On a stale volume, every read of
+a place description — including the ones the demo seeder does at startup — fails with-
+`Large Objects may not be used in auto-commit mode`; the `WebAppContext` never deploys and Jetty
+answers **HTTP 503 Service Unavailable** for every URI. The remedy is the usual one, run once:
+
+```shell
+pwsh -File scripts/gate.ps1 reset-db
+```
+
+The local data is reseeded automatically (`docker-dev.sh` seeds with `-Dseed.demoPlans=true`) and
+the Maven cache only costs a re-download.
+
 The only remedy for a local database is to throw it away:
 
 ```shell

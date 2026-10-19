@@ -1,6 +1,7 @@
 package com.valhalla.presentation.plan;
 
 import com.valhalla.domain.plan.Plan;
+import com.valhalla.domain.rating.RatingSummary;
 import com.valhalla.domain.user.User;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -23,6 +24,9 @@ public final class PlanFeedCards {
    * [PPV, AC-03/AC-09] Payload de la tarjeta: nombre, descripcion, fecha, cantidad de lugares del
    * itinerario y nombre del administrador. {@code cover} es la imagen generica del plan (hashCode
    * del id % COVER_COUNT); a futuro, una columna {@code imageUrl} en Plan la reemplaza.
+   *
+   * <p>[CAL] {@code ratingAverage}/{code ratingCount} es el agregado publico de calificaciones
+   * (16-CAL.md, AC-10): la autoria es interna, del feed solo sale el promedio y la cantidad.
    */
   public record Card(
     UUID id,
@@ -31,11 +35,13 @@ public final class PlanFeedCards {
     String eventDate,
     int placeCount,
     String administratorName,
-    String cover
+    String cover,
+    Double ratingAverage,
+    Long ratingCount
   ) {}
 
-  /** Construye la tarjeta del plan: unica fuente de campos para feed y API. */
-  public static Card card(Plan plan) {
+  /** Construye la tarjeta con el agregado de calificaciones del plan. */
+  public static Card card(Plan plan, RatingSummary summary) {
     return new Card(
       plan.getId(),
       plan.getName(),
@@ -43,16 +49,30 @@ public final class PlanFeedCards {
       plan.getEventDate() == null ? null : plan.getEventDate().toString(),
       plan.getPlanPlaces().size(),
       feedDisplayName(plan.getAdministrator()),
-      "/images/plans/cover-" + (Math.floorMod(plan.getId().hashCode(), COVER_COUNT) + 1) + ".svg"
+      "/images/plans/cover-" + (Math.floorMod(plan.getId().hashCode(), COVER_COUNT) + 1) + ".svg",
+      roundOneDecimal(summary.average()),
+      summary.count()
     );
   }
 
   /**
    * Misma tarjeta como mapa, con las claves en orden, para el modelo Thymeleaf de {@code /for-you}
-   * (la vista y sus tests leen claves, no componentes de record).
+   * (la vista y sus tests leen claves, no componentes de record). Los summaries de calificaciones
+   * arrive solo via ports/mocks: ver 16-CAL.md.
    */
-  static Map<String, Object> planCard(Plan plan) {
-    Card card = card(plan);
+  static Map<String, Object> planCard(Plan plan, Map<UUID, RatingSummary> summaries) {
+    RatingSummary summary = summaries.getOrDefault(
+      plan.getId(),
+      new RatingSummary(plan.getId(), null, 0L)
+    );
+    return modelOf(card(plan, summary));
+  }
+
+  /**
+   * Modelo Thymeleaf plano de una Card ya armada: la unica fuente de claves del feed. Los tests de
+   * [PPV] fijan la lista exacta, agregar una clave aca es un cambio de contrato.
+   */
+  static Map<String, Object> modelOf(Card card) {
     Map<String, Object> model = new LinkedHashMap<>();
     model.put("id", card.id());
     model.put("name", card.name());
@@ -61,7 +81,17 @@ public final class PlanFeedCards {
     model.put("placeCount", card.placeCount());
     model.put("administratorName", card.administratorName());
     model.put("cover", card.cover());
+    model.put("ratingAverage", card.ratingAverage());
+    model.put("ratingCount", card.ratingCount());
     return model;
+  }
+
+  /** Promedio con un solo decimal: el agregado se muestra redondeado, no se re-calcula. */
+  public static Double roundOneDecimal(Double average) {
+    if (average == null) {
+      return null;
+    }
+    return Math.round(average * 10.0) / 10.0;
   }
 
   /**
@@ -73,8 +103,8 @@ public final class PlanFeedCards {
     if (user == null) {
       return "";
     }
-    String first = user.getFirstName() == null ? "" : user.getFirstName().trim();
-    String last = user.getLastName() == null ? "" : user.getLastName().trim();
+    String first = user.getFirstName() == null ? "" : user.getFirstName();
+    String last = user.getLastName() == null ? "" : user.getLastName();
     return (first + " " + last).trim();
   }
 }

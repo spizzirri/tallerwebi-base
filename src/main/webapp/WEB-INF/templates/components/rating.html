@@ -1,0 +1,129 @@
+<!-- [CAL] Componente de calificaciones (16-CAL.md). Los estilos compartidos
+     (.rating-stars-base, .rating-stars-fill, .star-glyph y los del widget) viven una sola vez
+     en el bloque de Tailwind de layouts/base.html: este archivo solo trae markup.
+
+     :: indicator(average, count, starSize, textSize, showText)
+     Indicador de solo lectura del promedio: dos capas superpuestas de estrellas (la gris de
+     base y la amarilla clipada al ancho promedio/5 con overflow hidden), sin JS ni glifo de
+     media estrella. El promedio llega ya redondeado a 1 decimal (PlanFeedCards.roundOneDecimal).
+     Si average es null no renderiza nada: el caller decide si muestra su propio fallback
+     ("Todavia sin calificaciones"). showText agrega al lado el texto "avg · N calificaciones".
+
+     :: widget(planId, myRating, average, count, isLogged, currentPath)
+     Fila unica de estrellas que es indicador y control de voto a la vez (una sola fila, nunca
+     indicador + widget separados). Con sesion es un form de radios: mientras el usuario no
+     califico, la capa amarilla pinta el promedio; ya calificado, el radio propio preseleccionado
+     rellena las estrellas hasta su puntaje (AC-03). Al hacer click el form se envia solo (AC-01);
+     sin JS queda el boton de Calificar como fallback. Sin sesion (AC-05) la misma fila se
+     envuelve en el link al login conservando la vuelta (?redirect=), igual que los CTAs.
+
+     Regla de uso: los resumenes de plan (cards del feed, sidebar de /explore) solo consumen
+     el fragment :: indicator. El widget interactivo nunca se inserta dentro de un link o de
+     otro form (HTML no permite form/a anidados).
+
+     El sidebar de /explore renderiza sus cards con Vue (pages/places/list.html), ahi el
+     fragment no aplica: existe una copia del mismo markup como template de Vue, espejo de
+     :: indicator con los mismos estilos de base.html. Si cambia aca, cambia alla. -->
+<span class="inline-flex items-center gap-2" th:if="${average != null}"
+  th:fragment="indicator(average, count, starSize, textSize, showText)">
+
+  <span class="relative inline-block select-none leading-none" role="img"
+    th:attr="aria-label='Puntuación ' + ${average} + ' de 5, con ' + ${count} + (${count == 1} ? ' calificación' : ' calificaciones')">
+    <span class="rating-stars-base" th:classappend="${starSize}" aria-hidden="true"><th:block
+      th:each="s : ${#numbers.sequence(1, 5)}"
+      th:insert="~{components/stars :: star}"></th:block></span>
+    <span class="rating-stars-fill" th:classappend="${starSize}" aria-hidden="true"
+      th:style="'width:' + ${#numbers.formatDecimal(average * 20.0, 1, 2, 'POINT')} + '%'"><th:block
+      th:each="s : ${#numbers.sequence(1, 5)}"
+      th:insert="~{components/stars :: star}"></th:block></span>
+  </span>
+
+  <th:block th:if="${showText}">
+    <span class="whitespace-nowrap" th:classappend="${textSize}">
+      <strong class="text-gray-700" th:text="${average}">4.5</strong>
+      <span aria-hidden="true">·</span>
+      <span th:text="${count}">12</span>
+      <span th:text="${count == 1} ? 'calificación' : 'calificaciones'">calificaciones</span>
+    </span>
+  </th:block>
+</span>
+
+<div class="rating-row flex flex-wrap items-center gap-3"
+  th:fragment="widget(planId, myRating, average, count, isLogged, currentPath)">
+
+  <!-- Con sesion: form de radios con auto-submit (ver base.html para la tecnica del ~). -->
+  <form th:if="${isLogged}" class="rating-widget flex flex-wrap items-center gap-3"
+    th:action="@{/plans/{id}/ratings(id=${planId})}" method="post">
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+
+    <!-- DOM en orden inverso (5..1, el th:with recalcula el valor) + flex-row-reverse:
+         la fila se ve 1..5 pero el combinator ~ pinta las estrellas PREVIAS a la
+         hover/checked, que es el relleno hasta esa estrella incluida (ver base.html). -->
+    <span class="rating-widget-stars relative inline-flex flex-row-reverse select-none text-2xl leading-none"
+      role="radiogroup" aria-label="Tu calificación">
+      <!-- Capa del promedio: solo mientras el usuario no calificó; el hover la esconde
+           (.rating-widget:hover) para que se vea el preview de radios. -->
+      <span class="rating-stars-fill pointer-events-none" aria-hidden="true"
+        th:if="${myRating == null and average != null}"
+        th:style="'width:' + ${#numbers.formatDecimal(average * 20.0, 1, 2, 'POINT')} + '%'"><th:block
+        th:each="s : ${#numbers.sequence(1, 5)}"
+        th:insert="~{components/stars :: star}"></th:block></span>
+      <label th:each="s : ${#numbers.sequence(1, 5)}" th:with="star=${6 - s}"
+        class="rating-star-option cursor-pointer"
+        th:title="${star == 1} ? '1 estrella' : |${star} estrellas|">
+        <input type="radio" name="score" th:value="${star}" class="sr-only"
+          th:checked="${myRating != null and myRating == star}">
+        <span class="rating-star pointer-events-none" aria-hidden="true"
+          th:insert="~{components/stars :: star}"></span>
+      </label>
+    </span>
+
+    <!-- El click en una estrella envia el form (ver el script de abajo). Sin JS, el boton
+         de siempre sigue estando ahi: noscript solo se renderiza sin JS. -->
+    <noscript>
+      <button type="submit"
+        class="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-white hover:bg-primary/90">Calificar</button>
+    </noscript>
+  </form>
+
+  <!-- Sin sesion (AC-05): la MISMA fila, con el relleno del promedio, envuelta en el link
+       al login conservando la vuelta (?redirect=). Ese es el soft gate: el anonimo ve el
+       widget identico, el click lo primero manda a sesion y al volver ya puede votar. El
+       POST anonimo no existe (AC-13) y no se renderiza ningun form. -->
+  <a th:unless="${isLogged}" class="rating-widget-anon cursor-pointer"
+    th:href="${#strings.isEmpty(currentPath)} ? @{/auth/login} : @{/auth/login(redirect=${currentPath})}">
+    <span class="relative inline-block select-none text-2xl leading-none" role="img"
+      th:attr="aria-label=${average != null} ? 'Puntuación ' + ${average} + ' de 5, con ' + ${count} + (${count == 1} ? ' calificación' : ' calificaciones') + '. Iniciá sesión para calificar' : 'Todavía sin calificaciones. Iniciá sesión para calificar'">
+      <span class="rating-stars-base" aria-hidden="true"><th:block
+        th:each="s : ${#numbers.sequence(1, 5)}"
+        th:insert="~{components/stars :: star}"></th:block></span>
+      <span class="rating-stars-fill" aria-hidden="true" th:if="${average != null}"
+        th:style="'width:' + ${#numbers.formatDecimal(average * 20.0, 1, 2, 'POINT')} + '%'"><th:block
+        th:each="s : ${#numbers.sequence(1, 5)}"
+        th:insert="~{components/stars :: star}"></th:block></span>
+    </span>
+  </a>
+
+  <script>
+    document.querySelectorAll(".rating-widget").forEach(function (form) {
+      form.addEventListener("change", function (event) {
+        if (event.target && event.target.name === "score") {
+          form.submit();
+        }
+      });
+    });
+  </script>
+
+  <th:block th:switch="${average == null}">
+    <span class="text-sm text-gray-700 whitespace-nowrap" th:case="false">
+      <strong th:text="${average}">4.5</strong>
+      <span aria-hidden="true">·</span>
+      <span th:text="${count}">12</span>
+      <span th:text="${count == 1} ? 'calificación' : 'calificaciones'">calificaciones</span>
+    </span>
+    <span class="text-sm text-gray-500" th:case="*">
+      Todavía sin calificaciones
+    </span>
+  </th:block>
+</div>
+

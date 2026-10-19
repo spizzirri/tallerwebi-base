@@ -7,7 +7,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -24,7 +23,11 @@ public class Place {
   @Column(nullable = false)
   private String name;
 
-  @Lob
+  // Description comun, sin @Lob: en PostgreSQL ese mapeo es una columna oid (large object),
+  // que exige transaccion para leerse (Large Objects may not be used in auto-commit mode).
+  // Con length queda varchar(n) de toda la vida, legible en auto-commit en ambos dialectos
+  // (HSQLDB de las suites, PostgreSQL de docker-dev).
+  @Column(length = 2048)
   private String description;
 
   @NotNull(message = "Category is required")

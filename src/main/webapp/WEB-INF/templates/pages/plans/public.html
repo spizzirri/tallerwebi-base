@@ -40,6 +40,14 @@
       </span>
     </p>
 
+    <!-- [CAL] La fila de calificaciones vive en el bloque de info del plan: una linea de
+         metadatos mas, al mismo ritmo (mt-2) de Creado por / fecha, justo arriba de la
+         descripcion. Con sesion es el widget de voto; sin sesion, el soft gate del login
+         (16-CAL.md). El th:if externo: th:replace corre antes que condicionar el elemento. -->
+    <div class="mt-2">
+      <th:block th:replace="~{components/rating :: widget(${plan.id}, ${myRating}, ${ratingAverage}, ${ratingCount}, ${isLogged}, ${currentPath})}"></th:block>
+    </div>
+
     <p class="mt-2 text-gray-600" th:if="${!#strings.isEmpty(plan.description)}"
       th:text="${plan.description}"></p>
 
@@ -254,6 +262,10 @@
         transform: scale(1.15);
         z-index: 1000 !important;
       }
+
+      /* [CAL] Calificaciones (16-CAL.md). Los estilos del indicador, del glifo de estrella y
+         del widget de voto viven en layouts/base.html (compartidos con el feed y el sidebar
+         de /explore). Aca solo queda el estilo de marcadores del mapa. */
     </style>
   </main>
 

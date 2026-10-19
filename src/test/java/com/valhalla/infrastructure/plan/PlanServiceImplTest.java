@@ -28,6 +28,7 @@ import com.valhalla.domain.plan.PlanInvitation;
 import com.valhalla.domain.plan.PlanRepository;
 import com.valhalla.domain.plan.PlanService;
 import com.valhalla.domain.planplace.PlanPlace;
+import com.valhalla.domain.rating.PlanRatingRepository;
 import com.valhalla.domain.user.User;
 import com.valhalla.domain.user.UserRepository;
 import java.time.LocalDate;
@@ -63,17 +64,20 @@ public class PlanServiceImplTest {
   private PlanRepository planRepositoryMock;
   private UserRepository userRepositoryMock;
   private PlaceRepository placeRepositoryMock;
+  private PlanRatingRepository planRatingRepositoryMock;
 
   @BeforeEach
   public void init() {
     this.planRepositoryMock = mock(PlanRepository.class);
     this.userRepositoryMock = mock(UserRepository.class);
     this.placeRepositoryMock = mock(PlaceRepository.class);
+    this.planRatingRepositoryMock = mock(PlanRatingRepository.class);
     this.planService =
       new PlanServiceImpl(
         this.planRepositoryMock,
         this.userRepositoryMock,
-        this.placeRepositoryMock
+        this.placeRepositoryMock,
+        this.planRatingRepositoryMock
       );
   }
 

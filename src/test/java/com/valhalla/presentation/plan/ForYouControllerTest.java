@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -16,6 +17,8 @@ import com.valhalla.domain.place.Place;
 import com.valhalla.domain.plan.Plan;
 import com.valhalla.domain.plan.PlanService;
 import com.valhalla.domain.planplace.PlanPlace;
+import com.valhalla.domain.rating.PlanRatingService;
+import com.valhalla.domain.rating.RatingSummary;
 import com.valhalla.domain.user.User;
 import java.time.LocalDate;
 import java.util.List;
@@ -44,13 +47,16 @@ public class ForYouControllerTest {
 
   private ForYouController controller;
   private PlanService planServiceMock;
+  private PlanRatingService planRatingServiceMock;
   private Authentication authentication;
 
   @BeforeEach
   public void init() {
     this.planServiceMock = mock(PlanService.class);
-    this.controller = new ForYouController(this.planServiceMock);
+    this.planRatingServiceMock = mock(PlanRatingService.class);
+    this.controller = new ForYouController(this.planServiceMock, this.planRatingServiceMock);
     this.authentication = new UsernamePasswordAuthenticationToken(OWNER_EMAIL, null);
+    when(this.planRatingServiceMock.getSummariesByPlanId()).thenReturn(java.util.Map.of());
   }
 
   // --- GET /for-you ---
@@ -102,6 +108,25 @@ public class ForYouControllerTest {
     assertThat(card.get("administratorName"), is(equalTo("Ana Perez")));
     // cover generico deterministico: hash del id fijo 4 -> 4 % 6 + 1 -> cover-5.svg
     assertThat(card.get("cover"), is(equalTo("/images/plans/cover-5.svg")));
+    // [CAL] sin calificaciones el agregado es count 0 y promedio null (AC-07)
+    assertThat(card.get("ratingAverage"), is(nullValue()));
+    assertThat(card.get("ratingCount"), is(equalTo(0L)));
+  }
+
+  @Test
+  public void U02e_forYou_laTarjetaExponeElAgregadoDeCalificaciones() {
+    // given: dos calificaciones, promedio 4.25 → la tarjeta muestra 4.3 (un decimal)
+    Plan plan = plan(PLAN_ID, "Plan calificado");
+    when(this.planServiceMock.getPublicPlans()).thenReturn(List.of(plan));
+    when(this.planRatingServiceMock.getSummariesByPlanId())
+      .thenReturn(Map.of(PLAN_ID, new RatingSummary(PLAN_ID, 4.25, 12L)));
+
+    // when
+    Map<?, ?> card = cardAt(this.controller.forYou(this.authentication), 0);
+
+    // then (AC-10): el agregado sale al feed, jamas la autoria de los votantes
+    assertThat(card.get("ratingAverage"), is(equalTo(4.3)));
+    assertThat(card.get("ratingCount"), is(equalTo(12L)));
   }
 
   @Test
@@ -200,7 +225,9 @@ public class ForYouControllerTest {
             "eventDate",
             "placeCount",
             "administratorName",
-            "cover"
+            "cover",
+            "ratingAverage",
+            "ratingCount"
           )
         )
       )

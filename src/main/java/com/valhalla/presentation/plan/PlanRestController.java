@@ -3,9 +3,12 @@ package com.valhalla.presentation.plan;
 import com.valhalla.domain.plan.Plan;
 import com.valhalla.domain.plan.PlanService;
 import com.valhalla.domain.planplace.PlanPlace;
+import com.valhalla.domain.rating.PlanRatingService;
+import com.valhalla.domain.rating.RatingSummary;
 import java.security.Principal;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,9 +22,11 @@ public class PlanRestController {
   private static final int PUBLIC_PLANS_LIMIT = 5;
 
   private final PlanService planService;
+  private final PlanRatingService planRatingService;
 
-  public PlanRestController(PlanService planService) {
+  public PlanRestController(PlanService planService, PlanRatingService planRatingService) {
     this.planService = planService;
+    this.planRatingService = planRatingService;
   }
 
   @GetMapping
@@ -44,6 +49,9 @@ public class PlanRestController {
   @GetMapping("/public")
   public List<PlanFeedCards.Card> getPublicPlans(Principal principal) {
     String currentEmail = principal == null ? null : principal.getName();
+    // [CAL] El mismo agregado del feed Thymeleaf, una query para las cinco tarjetas:
+    // el JSON del sidebar expone el promedio, nunca la autoria de las calificaciones.
+    Map<UUID, RatingSummary> summaries = this.planRatingService.getSummariesByPlanId();
     return planService
       .getPublicPlans()
       .stream()
@@ -53,7 +61,12 @@ public class PlanRestController {
         Comparator.comparing(Plan::getEventDate, Comparator.nullsLast(Comparator.naturalOrder()))
       )
       .limit(PUBLIC_PLANS_LIMIT)
-      .map(PlanFeedCards::card)
+      .map(plan ->
+        PlanFeedCards.card(
+          plan,
+          summaries.getOrDefault(plan.getId(), new RatingSummary(plan.getId(), null, 0L))
+        )
+      )
       .toList();
   }
 

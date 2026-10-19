@@ -8,6 +8,7 @@ import com.valhalla.domain.plan.PlanInvitation;
 import com.valhalla.domain.plan.PlanRepository;
 import com.valhalla.domain.plan.PlanService;
 import com.valhalla.domain.planplace.PlanPlace;
+import com.valhalla.domain.rating.PlanRatingRepository;
 import com.valhalla.domain.user.User;
 import com.valhalla.domain.user.UserRepository;
 import java.util.List;
@@ -30,16 +31,19 @@ public class PlanServiceImpl implements PlanService { // NOPMD — intentional: 
   private final PlanRepository planRepository;
   private final UserRepository userRepository;
   private final PlaceRepository placeRepository;
+  private final PlanRatingRepository planRatingRepository;
 
   @Autowired
   public PlanServiceImpl(
     PlanRepository planRepository,
     UserRepository userRepository,
-    PlaceRepository placeRepository
+    PlaceRepository placeRepository,
+    PlanRatingRepository planRatingRepository
   ) {
     this.planRepository = planRepository;
     this.userRepository = userRepository;
     this.placeRepository = placeRepository;
+    this.planRatingRepository = planRatingRepository;
   }
 
   @Override
@@ -322,6 +326,9 @@ public class PlanServiceImpl implements PlanService { // NOPMD — intentional: 
   @Override
   public void deleteOwnedPlan(UUID id, String ownerEmail) {
     getOwnedPlan(id, ownerEmail);
+    // [CAL] Las calificaciones no cuelgan de Plan como coleccion: se borran explicito para no
+    // violar la FK owner (AC-12). Los planPlaces si viajan con la cascada de la coleccion.
+    planRatingRepository.deleteAllByPlanId(id);
     planRepository.deleteById(id);
   }
 

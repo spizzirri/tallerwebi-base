@@ -143,6 +143,28 @@
                 class="block rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition hover:bg-gray-50">
                 <h4 class="text-base font-medium text-gray-900">{{ plan.name }}</h4>
                 <p class="text-xs text-gray-500">{{ plan.eventDate || 'No date' }} &middot; {{ plan.placeCount }} places</p>
+                <!-- [CAL] Indicador read-only del agregado (16-CAL.md, AC-10): la version Vue
+                     del fragment components/rating :: indicator, con los mismos estilos de
+                     base.html. Solo lectura: el voto vive en la vista del plan. Sin
+                     calificaciones no se muestra, igual que en /for-you. -->
+                <p v-if="plan.ratingAverage != null" class="rating-line mt-1 flex items-center gap-1.5">
+                  <span class="relative inline-block select-none leading-none" role="img"
+                    :aria-label="'Puntuación ' + plan.ratingAverage.toFixed(1) + ' de 5, con ' + plan.ratingCount + (plan.ratingCount === 1 ? ' calificación' : ' calificaciones')">
+                    <span class="rating-stars-base text-base" aria-hidden="true">
+                      <svg v-for="s in 5" :key="s" xmlns="http://www.w3.org/2000/svg" class="star-glyph" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" focusable="false"><path fill-rule="evenodd" clip-rule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401Z"/></svg>
+                    </span>
+                    <span class="rating-stars-fill text-base" aria-hidden="true"
+                      :style="{ width: (plan.ratingAverage * 20) + '%' }">
+                      <svg v-for="s in 5" :key="s" xmlns="http://www.w3.org/2000/svg" class="star-glyph" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" focusable="false"><path fill-rule="evenodd" clip-rule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401Z"/></svg>
+                    </span>
+                  </span>
+                  <span class="text-xs whitespace-nowrap">
+                    <strong class="text-gray-700">{{ plan.ratingAverage.toFixed(1) }}</strong>
+                    <span aria-hidden="true">&middot;</span>
+                    {{ plan.ratingCount }}
+                    {{ plan.ratingCount === 1 ? 'calificación' : 'calificaciones' }}
+                  </span>
+                </p>
                 <p class="mt-1 text-sm text-gray-600 line-clamp-2">{{ plan.description }}</p>
               </a>
             </li>

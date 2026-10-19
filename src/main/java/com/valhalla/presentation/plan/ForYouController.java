@@ -2,7 +2,10 @@ package com.valhalla.presentation.plan;
 
 import com.valhalla.domain.plan.Plan;
 import com.valhalla.domain.plan.PlanService;
+import com.valhalla.domain.rating.PlanRatingService;
+import com.valhalla.domain.rating.RatingSummary;
 import java.util.Map;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -25,10 +28,12 @@ public class ForYouController {
   private static final String ATTR_PUBLIC_PLANS = "publicPlans";
 
   private final PlanService planService;
+  private final PlanRatingService planRatingService;
 
   @Autowired
-  public ForYouController(PlanService planService) {
+  public ForYouController(PlanService planService, PlanRatingService planRatingService) {
     this.planService = planService;
+    this.planRatingService = planRatingService;
   }
 
   @GetMapping("/for-you")
@@ -37,6 +42,8 @@ public class ForYouController {
     // (nombre "anonymousUser"), no null: ningun plan tiene ese administrador, asi que el filtro de
     // propios deja pasar todo igual. El corte por null cubre el caso sin anonymous habilitado.
     String currentEmail = authentication == null ? null : authentication.getName();
+    // [CAL] Un solo agregado agrupado alimenta el indicador de todas las tarjetas (sin N+1).
+    Map<UUID, RatingSummary> summaries = this.planRatingService.getSummariesByPlanId();
     Map<String, Object> model = new ModelMap();
     model.put(
       ATTR_PUBLIC_PLANS,
@@ -44,7 +51,7 @@ public class ForYouController {
         .getPublicPlans()
         .stream()
         .filter(plan -> currentEmail == null || !plan.isAdministrator(currentEmail))
-        .map(PlanFeedCards::planCard)
+        .map(plan -> PlanFeedCards.planCard(plan, summaries))
         .toList()
     );
     return new ModelAndView(VIEW_PUBLIC_LIST, model);

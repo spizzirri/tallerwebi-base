@@ -46,11 +46,14 @@ public class PlanRestControllerTest {
 
   private PlanRestController controller;
   private PlanService planServiceMock;
+  private com.valhalla.domain.rating.PlanRatingService planRatingServiceMock;
 
   @BeforeEach
   public void init() {
     planServiceMock = mock(PlanService.class);
-    controller = new PlanRestController(planServiceMock);
+    planRatingServiceMock = mock(com.valhalla.domain.rating.PlanRatingService.class);
+    when(planRatingServiceMock.getSummariesByPlanId()).thenReturn(java.util.Map.of());
+    controller = new PlanRestController(planServiceMock, planRatingServiceMock);
   }
 
   @Test
@@ -196,7 +199,9 @@ public class PlanRestControllerTest {
             "eventDate",
             "placeCount",
             "administratorName",
-            "cover"
+            "cover",
+            "ratingAverage",
+            "ratingCount"
           )
         )
       )

@@ -5,6 +5,8 @@ import com.valhalla.domain.plan.Plan;
 import com.valhalla.domain.plan.PlanService;
 import com.valhalla.domain.planplace.PlanPlace;
 import com.valhalla.domain.planplace.PlanPlaceService;
+import com.valhalla.domain.rating.PlanRatingService;
+import com.valhalla.domain.rating.RatingSummary;
 import com.valhalla.domain.user.User;
 import jakarta.validation.Valid;
 import java.util.Comparator;
@@ -42,11 +44,17 @@ public class PlanController {
 
   private final PlanService planService;
   private final PlanPlaceService planPlaceService;
+  private final PlanRatingService planRatingService;
 
   @Autowired
-  public PlanController(PlanService planService, PlanPlaceService planPlaceService) {
+  public PlanController(
+    PlanService planService,
+    PlanPlaceService planPlaceService,
+    PlanRatingService planRatingService
+  ) {
     this.planService = planService;
     this.planPlaceService = planPlaceService;
+    this.planRatingService = planRatingService;
   }
 
   @GetMapping
@@ -130,7 +138,33 @@ public class PlanController {
     model.put("isPlanAdministrator", plan.isAdministrator(email));
     // El form de join necesita el codigo; en un plan publico compartirlo es el proposito.
     model.put("shortCode", plan.getShortCode());
+    // [CAL] Calificaciones: promedio (1 decimal), cantidad y el puntaje propio del visitante
+    // (preselección del widget). La autoria es interna: del HTML solo sale el agregado.
+    RatingSummary summary = this.planRatingService.getSummary(id);
+    model.put("ratingAverage", PlanFeedCards.roundOneDecimal(summary.average()));
+    model.put("ratingCount", summary.count());
+    // Sin sesion no hay puntaje propio que buscar (AC-05): el anonimo nunca tiene widget de voto.
+    model.put("myRating", email == null ? null : this.planRatingService.getMyRating(id, email));
     return new ModelAndView(VIEW_PUBLIC_PLAN, model);
+  }
+
+  /** [CAL] "Calificar": upsert del puntaje del usuario logueado sobre el plan publico. Sin matcher
+   * nuevo en SecurityConfig: POST /plans/** ya exige sesion, un POST anonimo rebota a login.
+   * El email sale de la sesion, nunca del form.
+   */
+  @PostMapping("/{id}/ratings")
+  public ModelAndView ratePlan(
+    @PathVariable UUID id,
+    @Valid @ModelAttribute("ratingData") RatingRequest ratingData,
+    BindingResult bindingResult,
+    Authentication authentication
+  ) {
+    if (bindingResult.hasErrors()) {
+      // Tampering con el form (score inválido): de vuelta a la vista publica sin calificar.
+      return new ModelAndView(REDIRECT_PLAN_DETAIL + id + "/public");
+    }
+    this.planRatingService.rate(id, authentication.getName(), ratingData.getScore());
+    return new ModelAndView(REDIRECT_PLAN_DETAIL + id + "/public");
   }
 
   /** En anonimo el principal es el String "anonymousUser", no un UserDetails. */

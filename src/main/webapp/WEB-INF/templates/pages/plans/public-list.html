@@ -55,6 +55,12 @@
                   <p th:if="${!#strings.isEmpty(plan.administratorName)}">
                     Por <span th:text="${plan.administratorName}">Administrador</span>
                   </p>
+                  <!-- [CAL] Indicador de calificaciones de la tarjeta (16-CAL.md, AC-10): el mismo
+                       agregado de la vista publica, en version mini. Solo lectura: el vote vive en
+                       la vista del plan. Sin calificaciones el fragment no renderiza nada. -->
+                  <p th:if="${plan.ratingAverage != null}" class="rating-line flex items-center gap-1.5">
+                    <th:block th:replace="~{components/rating :: indicator(${plan.ratingAverage}, ${plan.ratingCount}, 'text-base', 'text-xs', true)}"></th:block>
+                  </p>
                 </div>
               </div>
             </a>

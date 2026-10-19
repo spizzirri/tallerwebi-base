@@ -412,6 +412,39 @@ public class PlanControllerIntegrationTest {
     this.mockMvc.perform(get("/images/plans/cover-1.svg")).andExpect(status().isOk());
   }
 
+  @Test
+  public void T_CAL_020_feedElIndicadorDeCalificacionesReflejaElAgregado() throws Exception {
+    // given: un plan calificado con 4 y 5 (promedio 4.5) y otro sin calificaciones
+    givenPublicPlanFor(this.ownerId, PLAN_NAME);
+    UUID ratedId = givenPublicPlanFor(this.otherId, OTHER_PLAN_NAME);
+    givenUser("votante@test.com");
+    this.mockMvc.perform(
+        post("/plans/" + ratedId + "/ratings")
+          .with(user(OWNER_EMAIL))
+          .with(csrf())
+          .param("score", "4")
+      );
+    this.mockMvc.perform(
+        post("/plans/" + ratedId + "/ratings")
+          .with(user("votante@test.com"))
+          .with(csrf())
+          .param("score", "5")
+      );
+
+    // when
+    String html =
+      this.mockMvc.perform(get("/for-you").with(user("visita@test.com")))
+        .andExpect(status().isOk())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+
+    // then (AC-10/AC-11): el agregado sale en la tarjeta del plan calificado; el feed no ordena
+    assertThat(html, containsString("4.5"));
+    assertThat(html, containsString(".rating-stars-fill {")); // la regla CSS vive en base.html, una sola fuente
+    assertThat(occurrences(html, "class=\"rating-stars-fill"), is(1)); // el span del plan calificado
+  }
+
   // --- POST /plans ---
 
   @Test
@@ -1178,6 +1211,202 @@ public class PlanControllerIntegrationTest {
     assertThat(html, containsString("leaflet"));
     assertThat(html, containsString(String.valueOf(catalog.get(0).getLatitude())));
     assertThat(html, containsString(String.valueOf(catalog.get(1).getLongitude())));
+  }
+
+  // --- POST /plans/{id}/ratings [CAL] ---
+
+  @Test
+  public void T_CAL_012_postRatings_calificaConSesionYLaVistaMuestraElAgregado() throws Exception {
+    UUID planId = givenPublicPlanFor(this.ownerId, PUBLIC_PLAN_NAME);
+    givenUser("votante2@test.com");
+
+    // Dos usuarios logueados califican: 4 y 5 → promedio 4.5 con 2 calificaciones
+    this.mockMvc.perform(
+        post("/plans/" + planId + "/ratings")
+          .with(user(OTHER_EMAIL))
+          .with(csrf())
+          .param("score", "4")
+      )
+      .andExpect(status().is3xxRedirection())
+      .andExpect(redirectedUrl("/plans/" + planId + "/public"));
+    this.mockMvc.perform(
+        post("/plans/" + planId + "/ratings")
+          .with(user("votante2@test.com"))
+          .with(csrf())
+          .param("score", "5")
+      )
+      .andExpect(status().is3xxRedirection());
+
+    String html =
+      this.mockMvc.perform(get("/plans/" + planId + "/public"))
+        .andExpect(status().isOk())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+
+    // AC-07: el agregado publico sale al HTML; AC-02: la autoria nunca (ni emails de votantes)
+    assertThat(html, containsString("4.5"));
+    assertThat(html, not(containsString(OTHER_EMAIL)));
+    assertThat(html, not(containsString("votante2@test.com")));
+  }
+
+  @Test
+  public void T_CAL_013_postRatings_recalificarReemplazaNuncaSumaOtraFila() throws Exception {
+    UUID planId = givenPublicPlanFor(this.ownerId, PUBLIC_PLAN_NAME);
+
+    this.mockMvc.perform(
+        post("/plans/" + planId + "/ratings")
+          .with(user(OTHER_EMAIL))
+          .with(csrf())
+          .param("score", "4")
+      );
+    this.mockMvc.perform(
+        post("/plans/" + planId + "/ratings")
+          .with(user(OTHER_EMAIL))
+          .with(csrf())
+          .param("score", "5")
+      )
+      .andExpect(status().is3xxRedirection());
+
+    // AC-04: misma cantidad de votos, promedio reemplazado por el nuevo puntaje
+    this.mockMvc.perform(get("/plans/" + planId + "/public").with(user(OTHER_EMAIL)))
+      .andExpect(status().isOk())
+      .andExpect(model().attribute("ratingCount", is(1L)))
+      .andExpect(model().attribute("ratingAverage", is(5.0)))
+      .andExpect(model().attribute("myRating", is(5)));
+  }
+
+  @Test
+  public void T_CAL_014_postRatings_anonimoNoCalifica() throws Exception {
+    UUID planId = givenPublicPlanFor(this.ownerId, PUBLIC_PLAN_NAME);
+
+    // Sin sesion el POST no califica: el filtro CSRF lo rebota y la cadena manda a login (AC-13)
+    this.mockMvc.perform(post("/plans/" + planId + "/ratings").param("score", "4"))
+      .andExpect(status().isForbidden());
+    this.mockMvc.perform(post("/plans/" + planId + "/ratings").with(csrf()).param("score", "4"))
+      .andExpect(redirectedUrlPattern("**/auth/login"));
+  }
+
+  @Test
+  public void T_CAL_015_postRatings_planPrivadoOnexistenteRespondeComoInexistente()
+    throws Exception {
+    UUID planId = givenPlanFor(this.ownerId, OTHER_PLAN_NAME);
+
+    // AC-06: calificar un plan privado es igual que calificar un id que no existe
+    this.mockMvc.perform(
+        post("/plans/" + planId + "/ratings")
+          .with(user(OWNER_EMAIL))
+          .with(csrf())
+          .param("score", "5")
+      )
+      .andExpect(status().is3xxRedirection())
+      .andExpect(redirectedUrl(NOT_FOUND_REDIRECT));
+
+    this.mockMvc.perform(
+        post("/plans/" + MISSING_PLAN_ID + "/ratings")
+          .with(user(OWNER_EMAIL))
+          .with(csrf())
+          .param("score", "5")
+      )
+      .andExpect(status().is3xxRedirection())
+      .andExpect(redirectedUrl(NOT_FOUND_REDIRECT));
+  }
+
+  @Test
+  public void T_CAL_016_widget_publicoSinRatingsMuestraElEstadoVacio() throws Exception {
+    UUID planId = givenPublicPlanFor(this.ownerId, PUBLIC_PLAN_NAME);
+
+    String html = oneLine(
+      this.mockMvc.perform(get("/plans/" + planId + "/public"))
+        .andExpect(status().isOk())
+        .andReturn()
+        .getResponse()
+        .getContentAsString()
+    );
+
+    // AC-07: sin calificaciones hay estado vacio explicito y sin capa de relleno
+    assertThat(html, containsString("Todavía sin calificaciones"));
+    assertThat(html, not(containsString("class=\"rating-stars-fill\"")));
+  }
+
+  @Test
+  public void T_CAL_017_widget_elRellenoAmarilloReflejaElPromedioEnProporcion() throws Exception {
+    UUID planId = givenPublicPlanFor(this.ownerId, PUBLIC_PLAN_NAME);
+    givenUser("votante@test.com");
+    // 4 + 5 = promedio 4.5 → la capa amarilla cubre el 90% de la fila (AC-08)
+    this.mockMvc.perform(
+        post("/plans/" + planId + "/ratings")
+          .with(user(OTHER_EMAIL))
+          .with(csrf())
+          .param("score", "4")
+      );
+    this.mockMvc.perform(
+        post("/plans/" + planId + "/ratings")
+          .with(user("votante@test.com"))
+          .with(csrf())
+          .param("score", "5")
+      );
+
+    String html =
+      this.mockMvc.perform(get("/plans/" + planId + "/public"))
+        .andExpect(status().isOk())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+
+    assertThat(html, containsString("width:90.00%"));
+    assertThat(html, containsString("4.5"));
+  }
+
+  @Test
+  public void T_CAL_018_widget_anonimoVeElIndicadorPeroNuncaUnFormDeVoto() throws Exception {
+    UUID planId = givenPublicPlanFor(this.ownerId, PUBLIC_PLAN_NAME);
+    givenUser("votante@test.com");
+    this.mockMvc.perform(
+        post("/plans/" + planId + "/ratings")
+          .with(user("votante@test.com"))
+          .with(csrf())
+          .param("score", "4")
+      );
+
+    String html =
+      this.mockMvc.perform(get("/plans/" + planId + "/public"))
+        .andExpect(status().isOk())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+
+    // AC-05: el anonimo ve la misma fila (la capa del promedio) como soft gate: el widget
+    // es un link al login con la vuelta, y el form de voto no existe
+    assertThat(html, not(containsString("action=\"/plans/" + planId + "/ratings\"")));
+    assertThat(html, not(containsString("name=\"score\"")));
+    assertThat(html, containsString("rating-stars-fill"));
+    assertThat(html, containsString("rating-widget-anon"));
+    assertThat(html, containsString("/auth/login?redirect=/plans/" + planId + "/public"));
+  }
+
+  @Test
+  public void T_CAL_019_widget_conSesionEsUnFormDeRadiosConElPuntajePropioPreseleccionado()
+    throws Exception {
+    UUID planId = givenPublicPlanFor(this.ownerId, PUBLIC_PLAN_NAME);
+    this.mockMvc.perform(
+        post("/plans/" + planId + "/ratings")
+          .with(user(OTHER_EMAIL))
+          .with(csrf())
+          .param("score", "4")
+      );
+
+    String html =
+      this.mockMvc.perform(get("/plans/" + planId + "/public").with(user(OTHER_EMAIL)))
+        .andExpect(status().isOk())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+
+    // AC-01/AC-03/AC-09: 5 radios de score, el propio preseleccionado, el POST de verdad
+    assertThat(html, containsString("action=\"/plans/" + planId + "/ratings\""));
+    assertThat(occurrences(html, "name=\"score\""), is(5));
+    assertThat(html, containsString("checked=\"checked\""));
   }
 
   // --- fixtures ---
