@@ -29,6 +29,12 @@ Issues and specs for this repo live on Trello. Use the Trello MCP tools for all 
 
 ## Card anatomy
 
+Trello is the single source of truth of the project. Any change to the code, the spec or the
+plan must be reflected in its Trello card **before or at the same time** it lands in the repo:
+description for scope/behavior changes, checklists for tasks landed (with their commit hash),
+comments for status, branches, gates and migrations. A commit without its card updated counts
+as incomplete.
+
 The spec is the source of truth (ACs, test scenarios); the card tracks the state of the work with
 two checklists, always in this order.
 
