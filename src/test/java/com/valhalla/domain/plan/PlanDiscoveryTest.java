@@ -9,6 +9,9 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
 
+import com.valhalla.domain.place.Place;
+import com.valhalla.domain.place.PlaceCategory;
+import com.valhalla.domain.planplace.PlanPlace;
 import com.valhalla.domain.rating.RatingSummary;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -24,6 +27,7 @@ import org.junit.jupiter.api.Test;
 public class PlanDiscoveryTest {
 
   private static final double EPSILON = 0.005;
+  private static final LocalDate TODAY = LocalDate.of(2026, 5, 10);
 
   @Test
   public void U01_popularityScore_sinCalificacionesDevuelveElPrior() {
@@ -249,11 +253,231 @@ public class PlanDiscoveryTest {
     assertThat(ordered.get(0).getId(), is(equalTo(first.getId())));
   }
 
+  @Test
+  public void searchMatchesTextByNameIgnoringCase() {
+    Plan museum = plan(101, "Museo de Arte", TODAY);
+    Plan bar = plan(102, "Bar Central", TODAY);
+
+    List<Plan> found = discover(
+      List.of(museum, bar),
+      PlanDiscoveryQuery.parse("MUSEO", null, null, null)
+    );
+
+    assertThat(found, hasSize(1));
+    assertThat(found.get(0).getId(), is(equalTo(museum.getId())));
+  }
+
+  @Test
+  public void searchMatchesTextByDescription() {
+    Plan plan = plan(103, "Salida del sabado", "Recorrido por el museo", TODAY);
+    Plan other = plan(104, "Cena", "Pizzeria del barrio", TODAY);
+
+    List<Plan> found = discover(
+      List.of(plan, other),
+      PlanDiscoveryQuery.parse("museo", null, null, null)
+    );
+
+    assertThat(found, hasSize(1));
+    assertThat(found.get(0).getId(), is(equalTo(plan.getId())));
+  }
+
+  @Test
+  public void searchWithoutMatchesReturnsEmptyList() {
+    List<Plan> found = discover(
+      List.of(plan(105, "Museo", TODAY)),
+      PlanDiscoveryQuery.parse("zzz", null, null, null)
+    );
+
+    assertThat(found, is(empty()));
+  }
+
+  @Test
+  public void searchBlankTextDoesNotFilter() {
+    Plan first = plan(106, "Primero", TODAY);
+    Plan second = plan(107, "Segundo", TODAY);
+
+    List<Plan> found = discover(
+      List.of(first, second),
+      PlanDiscoveryQuery.parse("   ", null, null, null)
+    );
+
+    assertThat(found, hasSize(2));
+  }
+
+  @Test
+  public void searchWithNullDescriptionDoesNotBreak() {
+    Plan withoutDescription = plan(108, "Museo", TODAY);
+
+    List<Plan> found = discover(
+      List.of(withoutDescription),
+      PlanDiscoveryQuery.parse("museo", null, null, null)
+    );
+    List<Plan> notFound = discover(
+      List.of(withoutDescription),
+      PlanDiscoveryQuery.parse("zzz", null, null, null)
+    );
+
+    assertThat(found, hasSize(1));
+    assertThat(notFound, is(empty()));
+  }
+
+  @Test
+  public void searchByCategoryReturnsOnlyPlansWithThatPlace() {
+    Plan bar = plan(109, "Noche de bares", TODAY);
+    addPlace(bar, PlaceCategory.BAR);
+    addPlace(bar, PlaceCategory.CAFE);
+    Plan park = plan(110, "Tarde de parque", TODAY);
+    addPlace(park, PlaceCategory.PARK);
+
+    List<Plan> found = discover(
+      List.of(bar, park),
+      PlanDiscoveryQuery.parse(null, "BAR", null, null)
+    );
+
+    assertThat(found, hasSize(1));
+    assertThat(found.get(0).getId(), is(equalTo(bar.getId())));
+  }
+
+  @Test
+  public void searchByCategoryExcludesPlanWithoutPlaces() {
+    Plan noPlaces = plan(111, "Sin lugares", TODAY);
+    Plan bar = plan(112, "Con bar", TODAY);
+    addPlace(bar, PlaceCategory.BAR);
+
+    List<Plan> found = discover(
+      List.of(noPlaces, bar),
+      PlanDiscoveryQuery.parse(null, "BAR", null, null)
+    );
+
+    assertThat(found, hasSize(1));
+    assertThat(found.get(0).getId(), is(equalTo(bar.getId())));
+  }
+
+  @Test
+  public void searchUpcomingIncludesTodayAndExcludesPast() {
+    Plan today = plan(113, "Hoy", TODAY);
+    Plan yesterday = plan(114, "Ayer", TODAY.minusDays(1));
+    Plan tomorrow = plan(115, "Manana", TODAY.plusDays(1));
+
+    List<Plan> found = discover(
+      List.of(today, yesterday, tomorrow),
+      PlanDiscoveryQuery.parse(null, null, "upcoming", null)
+    );
+
+    assertThat(found, hasSize(2));
+    assertThat(found.get(0).getId(), is(equalTo(today.getId())));
+    assertThat(found.get(1).getId(), is(equalTo(tomorrow.getId())));
+  }
+
+  @Test
+  public void searchPastIncludesOnlyDatesBeforeToday() {
+    Plan today = plan(116, "Hoy", TODAY);
+    Plan yesterday = plan(117, "Ayer", TODAY.minusDays(1));
+
+    List<Plan> found = discover(
+      List.of(today, yesterday),
+      PlanDiscoveryQuery.parse(null, null, "past", null)
+    );
+
+    assertThat(found, hasSize(1));
+    assertThat(found.get(0).getId(), is(equalTo(yesterday.getId())));
+  }
+
+  @Test
+  public void searchDateWindowExcludesPlansWithoutDate() {
+    Plan withDate = plan(118, "Con fecha", TODAY);
+    Plan withoutDate = plan(119, "Sin fecha", null);
+
+    List<Plan> upcoming = discover(
+      List.of(withDate, withoutDate),
+      PlanDiscoveryQuery.parse(null, null, "upcoming", null)
+    );
+    List<Plan> past = discover(
+      List.of(withDate, withoutDate),
+      PlanDiscoveryQuery.parse(null, null, "past", null)
+    );
+    List<Plan> all = discover(
+      List.of(withDate, withoutDate),
+      PlanDiscoveryQuery.parse(null, null, "all", null)
+    );
+
+    assertThat(upcoming, hasSize(1));
+    assertThat(past, is(empty()));
+    assertThat(all, hasSize(2));
+  }
+
+  @Test
+  public void searchCombinesTextCategoryAndDateWithAnd() {
+    Plan match = plan(120, "Noche de museo", "Museo y bar", TODAY.plusDays(1));
+    addPlace(match, PlaceCategory.BAR);
+    Plan wrongCategory = plan(121, "Museo sin bar", "Museo", TODAY.plusDays(1));
+    addPlace(wrongCategory, PlaceCategory.MUSEUM);
+    Plan wrongDate = plan(122, "Museo viejo", "Museo y bar", TODAY.minusDays(1));
+    addPlace(wrongDate, PlaceCategory.BAR);
+
+    List<Plan> found = discover(
+      List.of(match, wrongCategory, wrongDate),
+      PlanDiscoveryQuery.parse("museo", "BAR", "upcoming", null)
+    );
+
+    assertThat(found, hasSize(1));
+    assertThat(found.get(0).getId(), is(equalTo(match.getId())));
+  }
+
+  @Test
+  public void searchSortByDateOrdersAscendingWithNullsLast() {
+    Plan later = plan(123, "Despues", LocalDate.of(2026, 3, 1));
+    Plan sooner = plan(124, "Antes", LocalDate.of(2026, 1, 1));
+    Plan withoutDate = plan(125, "Sin fecha", null);
+
+    List<Plan> found = discover(
+      List.of(later, withoutDate, sooner),
+      PlanDiscoveryQuery.parse(null, null, null, "date")
+    );
+
+    assertThat(found.get(0).getId(), is(equalTo(sooner.getId())));
+    assertThat(found.get(1).getId(), is(equalTo(later.getId())));
+    assertThat(found.get(2).getId(), is(equalTo(withoutDate.getId())));
+  }
+
+  @Test
+  public void searchSortByNameOrdersCaseInsensitive() {
+    Plan beta = plan(126, "beta", TODAY);
+    Plan alfa = plan(127, "Alfa", TODAY);
+    Plan gama = plan(128, "gama", TODAY);
+
+    List<Plan> found = discover(
+      List.of(beta, gama, alfa),
+      PlanDiscoveryQuery.parse(null, null, null, "name")
+    );
+
+    assertThat(found.get(0).getId(), is(equalTo(alfa.getId())));
+    assertThat(found.get(1).getId(), is(equalTo(beta.getId())));
+    assertThat(found.get(2).getId(), is(equalTo(gama.getId())));
+  }
+
+  private List<Plan> discover(List<Plan> plans, PlanDiscoveryQuery query) {
+    return PlanDiscovery.discover(plans, Map.of(), Map.of(), query, TODAY);
+  }
+
   private Plan plan(int number, String name, LocalDate eventDate) {
+    return plan(number, name, null, eventDate);
+  }
+
+  private Plan plan(int number, String name, String description, LocalDate eventDate) {
     Plan plan = new Plan();
     plan.setId(UUID.fromString(String.format("0192f0a1-0000-7000-8000-%012d", number)));
     plan.setName(name);
+    plan.setDescription(description);
     plan.setEventDate(eventDate);
     return plan;
+  }
+
+  private void addPlace(Plan plan, PlaceCategory category) {
+    Place place = new Place();
+    place.setCategory(category);
+    PlanPlace planPlace = new PlanPlace();
+    planPlace.setPlace(place);
+    plan.addPlanPlace(planPlace);
   }
 }
