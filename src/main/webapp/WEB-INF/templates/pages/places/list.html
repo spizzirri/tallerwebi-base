@@ -639,9 +639,11 @@
                 // El icono usa stroke="currentColor", así que este color:white es lo que
                 // lo pinta de blanco sobre el fondo de categoría. Antes venía hardcodeado
                 // dentro de cada SVG.
+                // data-category es el hook estable del E2E (AC-09): el color sigue pintando
+                // el pin, pero el test no se ata a su hex.
                 const divIcon = L.divIcon({
                   className: 'custom-marker',
-                  html: '<div style="background-color:' + color + '; color:#fff; width:32px; height:32px; border-radius:50%; border:3px solid #fff; box-shadow:0 2px 6px rgba(0,0,0,0.3); display:flex; align-items:center; justify-content:center; font-size:16px;">' + icon + '</div>',
+                  html: '<div data-category="' + place.category + '" style="background-color:' + color + '; color:#fff; width:32px; height:32px; border-radius:50%; border:3px solid #fff; box-shadow:0 2px 6px rgba(0,0,0,0.3); display:flex; align-items:center; justify-content:center; font-size:16px;">' + icon + '</div>',
                   iconSize: [32, 32],
                   iconAnchor: [16, 16],
                   popupAnchor: [0, -16]

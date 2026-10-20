@@ -27,11 +27,9 @@ public class ResetDatabase {
       // limpieza atrapada por la FK que introdujo 16-CAL.md (mismo cuidado que plan_places).
       "DELETE FROM plan_places",
       "ALTER SEQUENCE plan_places_id_seq RESTART WITH 1",
-      // [12-DATA] El seeder de lugares solo corre sobre una base vacia: sin este DELETE el
-      // dataset nuevo nunca llega a la base de E2E. El orden de FK importa: plan_places
-      // (referencia places) se borre aun antes, ya lo hace arriba.
-      "DELETE FROM places",
-      "ALTER SEQUENCE places_id_seq RESTART WITH 1",
+      // [12-DATA] places no se borra: PlaceDataSeeder solo corre una vez por JVM, y el server
+      // arranca antes que cualquier test, asi que un DELETE aca dejaria la base de E2E sin
+      // dataset para siempre. El ABM E2E limpia el lugar que crea (E-06); el seed queda intacto.
       "DELETE FROM plans",
       "DELETE FROM users",
       "ALTER SEQUENCE users_id_seq RESTART WITH 1",
