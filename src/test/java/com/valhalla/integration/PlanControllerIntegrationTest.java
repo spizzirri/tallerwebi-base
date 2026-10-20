@@ -522,6 +522,22 @@ public class PlanControllerIntegrationTest {
   }
 
   @Test
+  public void I08_search_elFormularioOfreceLimpiarSoloCuandoHayAlgoAplicado() throws Exception {
+    // given: un plan publico para que el feed no caiga en el estado vacio
+    givenSearchablePublicPlan(this.ownerId, "Salida al museo", null, null);
+
+    // when
+    String conTexto = forYouHtml("/for-you?q=museo");
+    String conOrden = forYouHtml("/for-you?sort=name");
+    String sinNada = forYouHtml("/for-you");
+
+    // then (AC-13): la salida aparece con cualquier parametro no default y desaparece limpia
+    assertThat(conTexto, containsString("data-testid=\"clear-filters\""));
+    assertThat(conOrden, containsString("data-testid=\"clear-filters\""));
+    assertThat(sinNada, not(containsString("data-testid=\"clear-filters\"")));
+  }
+
+  @Test
   public void T_CAL_020_feedElIndicadorDeCalificacionesReflejaElAgregado() throws Exception {
     // given: un plan calificado con 4 y 5 (promedio 4.5) y otro sin calificaciones
     givenPublicPlanFor(this.ownerId, PLAN_NAME);

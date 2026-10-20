@@ -69,6 +69,14 @@
             <button type="submit" class="rounded-md bg-primary px-4 py-2 font-medium text-white">
               Buscar
             </button>
+
+            <!-- [SEARCH] Salida rapida mientras hay algo aplicado: vuelve al feed pelado. No aparece
+                 cuando la URL ya es la default, para no ofrecer limpiar lo que no esta sucio. -->
+            <a th:if="${filtersApplied or selectedSort != 'popular'}" th:href="@{/for-you}"
+              data-testid="clear-filters"
+              class="rounded-md px-3 py-2 font-medium text-gray-600 underline hover:text-gray-900">
+              Limpiar
+            </a>
           </form>
         </div>
 

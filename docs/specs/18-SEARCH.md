@@ -62,6 +62,7 @@ se aplican antes de ordenar, sobre el mismo conjunto publico que ya usa el feed.
 | AC-10 | La pagina no expone `shortCode`, emails ni identidades de participantes, con o sin filtros |
 | AC-11 | El orden `popular` es exactamente el de [TOP]: no existe un segundo algoritmo de popularidad |
 | AC-12 | Una categoria, `when` o `sort` invalidos no rompen la pagina: se ignoran o caen al default |
+| AC-13 | Con filtros activos o un orden distinto de `popular`, el formulario ofrece `Limpiar`, que vuelve a `/for-you` sin query string |
 
 ## Escenarios de Test
 
@@ -113,6 +114,7 @@ se aplican antes de ordenar, sobre el mismo conjunto publico que ya usa el feed.
 | I-05 | `GET /for-you?q=zzz` responde 200 con el estado "sin resultados" y el link para limpiar | AC-09 |
 | I-06 | `GET /for-you?category=NOPE&sort=nope` responde 200 sin error (parametros invalidos) | AC-12 |
 | I-07 | El HTML del listado filtrado no contiene `shortCode`, emails ni participantes | AC-10 |
+| I-08 | `GET /for-you?q=zzz` incluye el link `Limpiar` del formulario; `GET /for-you` no lo incluye | AC-13 |
 
 ### E2E (minimos)
 
@@ -387,7 +389,7 @@ El estado vacio historico de [PPV] queda con la condicion complementaria
 | `presentation/plan/ForYouController.java` | Actualizar (query params, modelo, categorias) |
 | `templates/pages/plans/public-list.html` | Actualizar (formulario GET, estados vacios, controles sticky) |
 | `presentation/plan/ForYouControllerTest.java` | Actualizar (U-19..U-22) |
-| `integration/PlanControllerIntegrationTest.java` | Actualizar (I-01..I-07) |
+| `integration/PlanControllerIntegrationTest.java` | Actualizar (I-01..I-08) |
 | `domain/plan/PlanDiscoveryTest.java` | Actualizar (U-01..U-13) |
 | `domain/plan/PlanDiscoveryQueryTest.java` | Crear (U-14..U-18) |
 | `e2e/PublicPlansSearchE2E.java` | Crear (E-01) |
