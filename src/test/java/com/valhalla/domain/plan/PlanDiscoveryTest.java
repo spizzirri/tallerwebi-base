@@ -1,0 +1,259 @@
+package com.valhalla.domain.plan;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.closeTo;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.sameInstance;
+
+import com.valhalla.domain.rating.RatingSummary;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import org.junit.jupiter.api.Test;
+
+/**
+ * Unit tests of {@link PlanDiscovery}: the score formula and the whole ordering chain. Pure Java, no
+ * Spring and no database, so every tie-break is exercised with data built by hand.
+ */
+public class PlanDiscoveryTest {
+
+  private static final double EPSILON = 0.005;
+
+  @Test
+  public void U01_popularityScore_sinCalificacionesDevuelveElPrior() {
+    assertThat(PlanDiscovery.popularityScore(null, 0L), is(closeTo(3.7, EPSILON)));
+  }
+
+  @Test
+  public void U02_popularityScore_cuatroVotosConPromedioCuatroDaTresComaOchentaYTres() {
+    // (5 * 3.7 + 4.0 * 4) / (5 + 4) = 34.5 / 9 = 3.8333...
+    assertThat(PlanDiscovery.popularityScore(4.0, 4L), is(closeTo(3.83, EPSILON)));
+  }
+
+  @Test
+  public void U03_unSoloVotoDeCincoQuedaDebajoDeVeinteVotosDeCuatroComaCinco() {
+    Plan singleVote = plan(1, "Un solo voto", null);
+    Plan manyVotes = plan(2, "Muchos votos", null);
+    Map<UUID, RatingSummary> summaries = Map.of(
+      singleVote.getId(),
+      new RatingSummary(singleVote.getId(), 5.0, 1L),
+      manyVotes.getId(),
+      new RatingSummary(manyVotes.getId(), 4.5, 20L)
+    );
+
+    // (5 * 3.7 + 5.0) / 6 = 3.92 contra (5 * 3.7 + 90) / 25 = 4.34
+    assertThat(PlanDiscovery.popularityScore(5.0, 1L), is(closeTo(3.92, EPSILON)));
+    assertThat(PlanDiscovery.popularityScore(4.5, 20L), is(closeTo(4.34, EPSILON)));
+
+    List<Plan> ordered = PlanDiscovery.orderByPopularity(
+      List.of(singleVote, manyVotes),
+      summaries,
+      Map.of()
+    );
+
+    assertThat(ordered.get(0).getId(), is(equalTo(manyVotes.getId())));
+  }
+
+  @Test
+  public void U04_sinCalificacionesQuedaDespuesDeUnCalificadoAunqueTengaMasParticipantes() {
+    Plan rated = plan(1, "Calificado", null);
+    Plan unrated = plan(2, "Sin calificar", null);
+    Map<UUID, RatingSummary> summaries = Map.of(
+      rated.getId(),
+      new RatingSummary(rated.getId(), 4.0, 4L)
+    );
+
+    List<Plan> ordered = PlanDiscovery.orderByPopularity(
+      List.of(unrated, rated),
+      summaries,
+      Map.of(rated.getId(), 0L, unrated.getId(), 10L)
+    );
+
+    assertThat(ordered.get(0).getId(), is(equalTo(rated.getId())));
+    assertThat(ordered.get(1).getId(), is(equalTo(unrated.getId())));
+  }
+
+  @Test
+  public void U05_mismaPopularidadEntreCalificadosGanaElDeMasParticipantes() {
+    Plan few = plan(1, "Pocos", null);
+    Plan many = plan(2, "Muchos", null);
+    Map<UUID, RatingSummary> summaries = Map.of(
+      few.getId(),
+      new RatingSummary(few.getId(), 4.0, 10L),
+      many.getId(),
+      new RatingSummary(many.getId(), 4.0, 10L)
+    );
+
+    List<Plan> ordered = PlanDiscovery.orderByPopularity(
+      List.of(few, many),
+      summaries,
+      Map.of(few.getId(), 2L, many.getId(), 5L)
+    );
+
+    assertThat(ordered.get(0).getId(), is(equalTo(many.getId())));
+  }
+
+  @Test
+  public void U06_mismoGrupoPopularidadYParticipantesGanaLaFechaMasProxima() {
+    Plan later = plan(1, "Despues", LocalDate.of(2026, 3, 1));
+    Plan sooner = plan(2, "Antes", LocalDate.of(2026, 1, 1));
+    Map<UUID, RatingSummary> summaries = Map.of(
+      later.getId(),
+      new RatingSummary(later.getId(), 4.0, 10L),
+      sooner.getId(),
+      new RatingSummary(sooner.getId(), 4.0, 10L)
+    );
+
+    List<Plan> ordered = PlanDiscovery.orderByPopularity(
+      List.of(later, sooner),
+      summaries,
+      Map.of(later.getId(), 3L, sooner.getId(), 3L)
+    );
+
+    assertThat(ordered.get(0).getId(), is(equalTo(sooner.getId())));
+  }
+
+  @Test
+  public void U07_fechasNulasVanAlFinalDelDesempatePorFecha() {
+    Plan withoutDate = plan(1, "Sin fecha", null);
+    Plan withDate = plan(2, "Con fecha", LocalDate.of(2026, 6, 1));
+    Map<UUID, RatingSummary> summaries = Map.of(
+      withoutDate.getId(),
+      new RatingSummary(withoutDate.getId(), 4.0, 10L),
+      withDate.getId(),
+      new RatingSummary(withDate.getId(), 4.0, 10L)
+    );
+
+    List<Plan> ordered = PlanDiscovery.orderByPopularity(
+      List.of(withoutDate, withDate),
+      summaries,
+      Map.of(withoutDate.getId(), 3L, withDate.getId(), 3L)
+    );
+
+    assertThat(ordered.get(0).getId(), is(equalTo(withDate.getId())));
+    assertThat(ordered.get(1).getId(), is(equalTo(withoutDate.getId())));
+  }
+
+  @Test
+  public void U08_empateTotalDesempataPorNombreCaseInsensitiveYDespuesPorId() {
+    Plan beta = plan(1, "Beta", LocalDate.of(2026, 6, 1));
+    Plan alfa = plan(2, "alfa", LocalDate.of(2026, 6, 1));
+    Map<UUID, RatingSummary> summaries = Map.of(
+      beta.getId(),
+      new RatingSummary(beta.getId(), 4.0, 10L),
+      alfa.getId(),
+      new RatingSummary(alfa.getId(), 4.0, 10L)
+    );
+    Map<UUID, Long> participants = Map.of(beta.getId(), 3L, alfa.getId(), 3L);
+
+    List<Plan> ordered = PlanDiscovery.orderByPopularity(
+      List.of(beta, alfa),
+      summaries,
+      participants
+    );
+
+    // "alfa" < "Beta" solo si la comparacion ignora mayusculas
+    assertThat(ordered.get(0).getId(), is(equalTo(alfa.getId())));
+
+    Plan sameNameLower = plan(2, "alfa", LocalDate.of(2026, 6, 1));
+    Plan sameNameUpper = plan(1, "ALFA", LocalDate.of(2026, 6, 1));
+    Map<UUID, RatingSummary> sameNameSummaries = Map.of(
+      sameNameLower.getId(),
+      new RatingSummary(sameNameLower.getId(), 4.0, 10L),
+      sameNameUpper.getId(),
+      new RatingSummary(sameNameUpper.getId(), 4.0, 10L)
+    );
+
+    List<Plan> byId = PlanDiscovery.orderByPopularity(
+      List.of(sameNameLower, sameNameUpper),
+      sameNameSummaries,
+      Map.of(sameNameLower.getId(), 3L, sameNameUpper.getId(), 3L)
+    );
+
+    assertThat(byId.get(0).getId(), is(equalTo(sameNameUpper.getId())));
+  }
+
+  @Test
+  public void U09_elMismoInputOrdenadoDosVecesProduceLaMismaLista() {
+    Plan first = plan(1, "Primero", LocalDate.of(2026, 2, 1));
+    Plan second = plan(2, "Segundo", LocalDate.of(2026, 1, 1));
+    Map<UUID, RatingSummary> summaries = Map.of(
+      first.getId(),
+      new RatingSummary(first.getId(), 5.0, 2L)
+    );
+    Map<UUID, Long> participants = Map.of(first.getId(), 4L, second.getId(), 1L);
+
+    List<Plan> once = PlanDiscovery.orderByPopularity(
+      List.of(second, first),
+      summaries,
+      participants
+    );
+    List<Plan> twice = PlanDiscovery.orderByPopularity(
+      List.of(second, first),
+      summaries,
+      participants
+    );
+
+    assertThat(twice, is(equalTo(once)));
+  }
+
+  @Test
+  public void U10_listaVaciaDevuelveListaVaciaSinError() {
+    List<Plan> ordered = PlanDiscovery.orderByPopularity(List.of(), Map.of(), Map.of());
+
+    assertThat(ordered, is(empty()));
+  }
+
+  @Test
+  public void U11_planSinParticipantesSeOrdenaConCeroYNoSeDescarta() {
+    Plan withoutParticipants = plan(1, "Sin participantes", null);
+    Plan withParticipants = plan(2, "Con participantes", null);
+    Map<UUID, RatingSummary> summaries = Map.of(
+      withoutParticipants.getId(),
+      new RatingSummary(withoutParticipants.getId(), 4.0, 10L),
+      withParticipants.getId(),
+      new RatingSummary(withParticipants.getId(), 4.0, 10L)
+    );
+
+    List<Plan> ordered = PlanDiscovery.orderByPopularity(
+      List.of(withoutParticipants, withParticipants),
+      summaries,
+      Map.of(withParticipants.getId(), 1L)
+    );
+
+    assertThat(ordered, hasSize(2));
+    assertThat(ordered.get(0).getId(), is(equalTo(withParticipants.getId())));
+    assertThat(ordered.get(1).getId(), is(equalTo(withoutParticipants.getId())));
+  }
+
+  @Test
+  public void U12_orderByPopularityNoModificaLaListaOriginal() {
+    Plan second = plan(1, "Segundo", LocalDate.of(2026, 2, 1));
+    Plan first = plan(2, "Primero", LocalDate.of(2026, 1, 1));
+    List<Plan> original = new ArrayList<>(List.of(second, first));
+    Map<UUID, RatingSummary> summaries = Map.of(
+      first.getId(),
+      new RatingSummary(first.getId(), 5.0, 3L)
+    );
+
+    List<Plan> ordered = PlanDiscovery.orderByPopularity(original, summaries, Map.of());
+
+    assertThat(ordered, is(not(sameInstance(original))));
+    assertThat(original.get(0).getId(), is(equalTo(second.getId())));
+    assertThat(ordered.get(0).getId(), is(equalTo(first.getId())));
+  }
+
+  private Plan plan(int number, String name, LocalDate eventDate) {
+    Plan plan = new Plan();
+    plan.setId(UUID.fromString(String.format("0192f0a1-0000-7000-8000-%012d", number)));
+    plan.setName(name);
+    plan.setEventDate(eventDate);
+    return plan;
+  }
+}
