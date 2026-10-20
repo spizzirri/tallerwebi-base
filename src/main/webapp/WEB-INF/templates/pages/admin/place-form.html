@@ -1,0 +1,133 @@
+<!DOCTYPE HTML>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{layouts/base :: head(${isEdit} ? 'Edit Place' : 'New Place')}"></head>
+
+<body th:replace="~{layouts/base :: layout(~{::main})}">
+
+  <main class="flex-1 flex items-center justify-center p-4">
+    <div id="place-form-app" class="w-full max-w-2xl rounded-lg bg-white p-8 shadow-md">
+      <h3 class="mb-2 text-2xl font-semibold text-gray-900"
+        th:text="${isEdit} ? 'Edit Place' : 'New Place'">Form Title</h3>
+      <hr class="mb-6 border-gray-200">
+
+      <form ref="form" @submit.prevent="submit"
+        th:action="${isEdit} ? @{/admin/places/{id}(id=${placeId})} : @{/admin/places}"
+        method="POST">
+        <input th:if="${isEdit}" type="hidden" name="_method" value="PUT" />
+
+        <div class="mt-4">
+          <label for="name" class="mb-1 block text-sm font-medium text-gray-700">Name</label>
+          <input v-model="name" id="name" name="name" type="text" required
+            class="mb-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none" />
+        </div>
+
+        <div class="mt-4">
+          <label for="category" class="mb-1 block text-sm font-medium text-gray-700">Category</label>
+          <select v-model="category" id="category" name="category" required
+            class="mb-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none">
+            <option value="" disabled>Select category</option>
+            <option th:each="c : ${categories}" th:value="${c}" th:text="${c}">CATEGORY</option>
+          </select>
+        </div>
+
+        <div class="mt-4">
+          <label for="description" class="mb-1 block text-sm font-medium text-gray-700">Description</label>
+          <textarea v-model="description" id="description" name="description" rows="3"
+            class="mb-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"></textarea>
+        </div>
+
+        <div class="mt-4">
+          <label for="address" class="mb-1 block text-sm font-medium text-gray-700">Address</label>
+          <input v-model="address" id="address" name="address" type="text"
+            class="mb-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none" />
+        </div>
+
+        <div class="mt-4">
+          <label for="imageUrl" class="mb-1 block text-sm font-medium text-gray-700">Image URL</label>
+          <input v-model="imageUrl" id="imageUrl" name="imageUrl" type="url"
+            class="mb-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none" />
+          <p class="text-xs text-gray-500">
+            Optional: leave it empty and the view falls back to /images/place-placeholder.svg
+          </p>
+        </div>
+
+        <div class="flex gap-4">
+          <div class="mt-4 flex-1">
+            <label for="latitude" class="mb-1 block text-sm font-medium text-gray-700">Latitude</label>
+            <input v-model="latitude" id="latitude" name="latitude" type="number" step="any"
+              class="mb-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none" />
+          </div>
+          <div class="mt-4 flex-1">
+            <label for="longitude" class="mb-1 block text-sm font-medium text-gray-700">Longitude</label>
+            <input v-model="longitude" id="longitude" name="longitude" type="number" step="any"
+              class="mb-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none" />
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <label for="openingHours" class="mb-1 block text-sm font-medium text-gray-700">Opening Hours</label>
+          <input v-model="openingHours" id="openingHours" name="openingHours" type="text"
+            class="mb-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none" />
+        </div>
+
+        <div class="flex gap-4">
+          <div class="mt-4 flex-1">
+            <label for="phone" class="mb-1 block text-sm font-medium text-gray-700">Phone</label>
+            <input v-model="phone" id="phone" name="phone" type="tel"
+              class="mb-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none" />
+          </div>
+          <div class="mt-4 flex-1">
+            <label for="website" class="mb-1 block text-sm font-medium text-gray-700">Website</label>
+            <input v-model="website" id="website" name="website" type="url"
+              class="mb-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none" />
+          </div>
+        </div>
+
+        <div class="mt-6 flex gap-3">
+          <button type="submit" id="btn-create" :disabled="loading"
+            class="flex-1 rounded-md bg-blue-600 py-2 font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">
+            <span v-if="loading">Saving...</span>
+            <span v-else th:text="${isEdit} ? 'Update' : 'Create'">Save</span>
+          </button>
+          <a th:href="@{/admin/places}"
+            class="flex-1 rounded-md bg-gray-200 py-2 text-center font-medium text-gray-700 transition hover:bg-gray-300">
+            Cancel
+          </a>
+        </div>
+
+        <p v-if="error" class="alert alert-danger my-4 rounded-md bg-red-100 px-4 py-3 text-sm text-red-700">{{ error }}</p>
+      </form>
+    </div>
+
+    <script>
+      Vue.createApp({
+        data() {
+          return {
+            name: '[[${placeForm.name}]]',
+            category: '[[${placeForm.category}]]',
+            description: '[[${placeForm.description}]]',
+            address: '[[${placeForm.address}]]',
+            imageUrl: '[[${placeForm.imageUrl}]]',
+            latitude: '[[${placeForm.latitude}]]',
+            longitude: '[[${placeForm.longitude}]]',
+            openingHours: '[[${placeForm.openingHours}]]',
+            phone: '[[${placeForm.phone}]]',
+            website: '[[${placeForm.website}]]',
+            error: '[[${error}]]',
+            loading: false
+          }
+        },
+        methods: {
+          submit() {
+            this.loading = true;
+            this.$refs.form.submit();
+          }
+        }
+      }).mount('#place-form-app');
+    </script>
+  </main>
+
+</body>
+
+</html>
