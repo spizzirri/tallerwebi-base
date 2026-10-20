@@ -131,6 +131,7 @@ sin dependencias de red en ningun test.
 | E-06 | `e2e/PlaceViewABME2E.java` | Admin da de baja el place → desaparece del listado y de `/explore` | AC-01 |
 | E-07 | `e2e/PlaceImportE2E.java` | Admin abre `/admin/places/import` con el proxy stubbeado por `page.route`: la lista muestra los 3 POIs del fixture, se dibujan solo los 2 con coordenadas, y elegir uno abre `/admin/places/new` con el form pre-llenado (nombre, categoria, direccion, lat/lng, horarios, telefono, web) | AC-04, AC-05, AC-10 |
 | E-08 | `e2e/PlaceImportE2E.java` | Con el proxy stubbeado en 502, la vista muestra el mensaje de error y la lista queda vacia | AC-04, AC-10 |
+| E-09 | `e2e/PlaceImportE2E.java` | El buscador por nombre filtra la lista y los markers en el acto: "PARRILLA" → 1, "cafe" encuentra "Café" (sin acentos ni mayusculas), "zzz" → 0 y limpiar el filtro devuelve los 3 | AC-04, AC-10 |
 
 El importador tiene E2E sin tocar la red: el navegador ejecuta la vista real y `page.route`
 intercepta `GET /admin/places/import/pois` antes de que salga, respondiendo un fixture (o un 502).
@@ -201,6 +202,11 @@ borde (red del browser / interfaz de dominio), nunca dentro de la logica de la v
   `PlaceCategory.fromOsm(key, value)` (ver Referencia, paso 4). Lo no mapeado cae en `OTHER`,
   y el admin siempre puede cambiarlo antes de guardar (el select del form es el mismo para el
   alta manual y la pre-llena): la categoria sugerida es una sugerencia, no una decision.
+- **Buscador del importador: filtro local, no otra consulta.** El input "Filtrar por nombre" tamiza
+  los POIs ya traidos (`computed` sobre `pois`), sin volver a golpear Overpass: cada consulta cuesta
+  ~30 s y el usuario escribe tecla por tecla. Compara sin acentos ni mayusculas ("cafe" encuentra
+  "Café") y mueve lista y markers a la vez, igual que los filtros de `/explore`. Al cambiar de
+  categoria el filtro se limpia.
 - **El importador depende del backend, nunca del navegador contra Overpass.** El mapa de la
   vista importa POIs desde `GET /admin/places/import/pois`, que es un proxy del backend sobre
   `OverpassClient`. La interfaz en el dominio permite mockearlo con `@MockBean` en los tests
@@ -480,7 +486,7 @@ Los archivos de test nuevos siguen los nombres y paquetes existentes:
 `integration/PlaceAdminSecurityTest.java`, `integration/PlaceImageTest.java`,
 `infrastructure/place/HttpOverpassClientTest.java`,
 `e2e/PlaceViewABME2E.java` (espejo de `e2e/UserViewABME2E.java`, con page objects en
-`e2e/views/`) y `e2e/PlaceImportE2E.java` (E-07..E-08: el proxy de Overpass se stubbea con
+`e2e/views/`) y `e2e/PlaceImportE2E.java` (E-07..E-09: el proxy de Overpass se stubbea con
 `page.route`, asi que la vista real corre en Chromium sin red). Los mock de `OverpassClient` en
 integracion son `@MockBean` (AC-10).
 
@@ -516,6 +522,6 @@ integracion son `@MockBean` (AC-10).
 | `integration/PlaceAdminSecurityTest.java` | Crear (S-01..S-04) |
 | `e2e/PlacesViewE2E.java` | Actualizar (E-01..E-03, recalibrado sin hex) |
 | `e2e/PlaceViewABME2E.java` | Crear (E-04..E-06) |
-| `e2e/PlaceImportE2E.java` | Crear (E-07..E-08, proxy stubbeado con `page.route`) |
+| `e2e/PlaceImportE2E.java` | Crear (E-07..E-09, proxy stubbeado con `page.route`) |
 | `e2e/views/PlaceImportPage.java` | Crear (page object de la vista de import) |
 | `e2e/ResetDatabase.java` | Actualizar (`DELETE FROM places` + `ALTER SEQUENCE` antes de `plans`) |

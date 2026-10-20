@@ -44,8 +44,16 @@
           </select>
         </div>
 
+        <!-- Filtro local sobre los POIs ya traidos: no vuelve a golpear Overpass (30s por consulta). -->
+        <div class="flex flex-col gap-1">
+          <label for="poi-search" class="text-sm font-medium text-gray-700">Filtrar por nombre</label>
+          <input v-model="search" id="poi-search" type="search" autocomplete="off"
+            placeholder="Ej. parrilla" :disabled="loading"
+            class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm" />
+        </div>
+
         <p class="text-sm text-gray-500" aria-live="polite">
-          {{ loading ? 'Buscando puntos...' : pois.length + ' punto(s) encontrados' }}
+          {{ loading ? 'Buscando puntos...' : statusText }}
         </p>
         <p v-if="error" role="alert" class="rounded-md bg-red-100 px-3 py-2 text-sm text-red-700">
           {{ error }}
@@ -53,7 +61,7 @@
 
         <!-- Misma navegacion que el click del marker, en texto: el mapa no es la unica via. -->
         <ul class="flex flex-col gap-2">
-          <li v-for="poi in pois" :key="poi.name + poi.latitude + poi.longitude">
+          <li v-for="poi in filtered" :key="poi.name + poi.latitude + poi.longitude">
             <a :href="formUrl(poi)"
               class="block rounded-lg border border-gray-200 bg-white p-3 shadow-sm transition hover:bg-gray-50">
               <span class="block text-sm font-medium text-gray-900">{{ poi.name }}</span>
@@ -64,6 +72,9 @@
         </ul>
         <p v-if="!loading && pois.length === 0 && !error" class="text-sm text-gray-500">
           No hay puntos para esta búsqueda. Probá con otra.
+        </p>
+        <p v-if="!loading && pois.length > 0 && filtered.length === 0" class="text-sm text-gray-500">
+          Ningún punto coincide con «{{ search.trim() }}». Probá con otro nombre.
         </p>
       </aside>
 
@@ -77,7 +88,7 @@
       integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
     <script>
-      const { createApp, ref, onMounted } = Vue;
+      const { createApp, ref, computed, watch, onMounted } = Vue;
 
       /* Consultas predefinidas: el par OSM que viaja a /admin/places/import/pois y la categoria que
          el importador sugiere en el form. La sugerencia no decide nada: el select del ABM deja
@@ -96,11 +107,29 @@
           const queries = QUERIES;
           const selected = ref(QUERIES[0]);
           const pois = ref([]);
+          const search = ref('');
           const error = ref('');
           const loading = ref(true);
           let map = null;
           let markers = [];
           let pending = 0;
+
+          /* Sin acentos ni mayusculas: "cafe" tiene que encontrar "Café". El filtro es local a
+             proposito — volver a Overpass por cada tecla costaria ~30s y no aporta nada sobre los
+             POIs que ya estan en memoria. */
+          const normalizeName = (text) => (text || '').normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase();
+
+          const filtered = computed(() => {
+            const term = normalizeName(search.value.trim());
+            if (!term) return pois.value;
+            return pois.value.filter((poi) => normalizeName(poi.name).includes(term));
+          });
+
+          const statusText = computed(() => search.value.trim()
+            ? filtered.value.length + ' de ' + pois.value.length + ' punto(s)'
+            : pois.value.length + ' punto(s) encontrados');
 
           /* El alta espera los mismos params que arma el marker. encodeURIComponent en cada valor:
              los nombres de OSM traen acentos, comas y parentesis. */
@@ -127,7 +156,7 @@
 
           const drawMarkers = () => {
             markers.forEach((marker) => map.removeLayer(marker));
-            markers = pois.value
+            markers = filtered.value
               .filter((poi) => poi.latitude !== null && poi.longitude !== null)
               .map((poi) => {
                 const color = brandColor();
@@ -146,10 +175,15 @@
               });
           };
 
+          /* Los markers se redibujan solos cuando cambia la lista filtrada. */
+          watch(filtered, drawMarkers);
+
           const loadPois = async () => {
             const current = ++pending;
             loading.value = true;
             error.value = '';
+            /* El filtro es de la lista anterior: al cambiar de categoria arranca vacio. */
+            search.value = '';
             try {
               const query = selected.value;
               const response = await fetch(
@@ -159,12 +193,10 @@
               const data = await response.json();
               if (current !== pending) return;
               pois.value = data;
-              drawMarkers();
             } catch (loadError) {
               if (current !== pending) return;
               console.error(loadError);
               pois.value = [];
-              drawMarkers();
               error.value =
                 'No se pudieron traer los puntos de OpenStreetMap. Probá de nuevo en unos segundos.';
             } finally {
@@ -184,7 +216,7 @@
             await loadPois();
           });
 
-          return { queries, selected, pois, error, loading, loadPois, formUrl };
+          return { queries, selected, pois, search, filtered, statusText, error, loading, loadPois, formUrl };
         }
       }).mount('#app');
     </script>

@@ -46,7 +46,7 @@ public class PlaceImportE2E extends E2eBase {
         "osmValue": "bar"
       },
       {
-        "name": "Sin Coordenadas",
+        "name": "Café Sin Coordenadas",
         "address": "Av. Rivadavia 100",
         "latitude": null,
         "longitude": null,
@@ -84,6 +84,35 @@ public class PlaceImportE2E extends E2eBase {
     assertThat(form.getOpeningHours(), is("Mo-Su 12:00-23:00"));
     assertThat(form.getPhone(), is("+54 11 4444-5555"));
     assertThat(form.getWebsite(), is("https://parrilla.example.com"));
+  }
+
+  @Test
+  void shouldFilterThePoisByName() {
+    signInAsAdmin();
+    stubPois(200, FIXTURE);
+
+    PlaceImportPage view = new PlaceImportPage(page);
+    view.navigateToImport();
+    view.waitForPois(3);
+
+    view.filterByName("PARRILLA");
+    view.waitForPois(1);
+    assertThat("el filtro no distingue mayusculas", view.poiCount(), is(1));
+    assertThat("el mapa muestra solo el punto filtrado", view.markerCount(), is(1));
+    assertThat(view.statusText(), is("1 de 3 punto(s)"));
+
+    view.filterByName("cafe");
+    view.waitForPois(1);
+    assertThat("el filtro no distingue acentos", view.poiCount(), is(1));
+    assertThat("el cafe no tiene coordenadas", view.markerCount(), is(0));
+
+    view.filterByName("zzz");
+    view.waitForPois(0);
+    assertThat(view.markerCount(), is(0));
+
+    view.filterByName("");
+    view.waitForPois(3);
+    assertThat("al limpiar el filtro vuelven todos", view.markerCount(), is(2));
   }
 
   @Test

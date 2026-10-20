@@ -56,4 +56,9 @@ public class PlaceImportPage extends WebPage {
       .filter(new Locator.FilterOptions().setHasText(name))
       .click();
   }
+
+  /** Filtro local por nombre: escribe en el input y Vue re-renderiza la lista. */
+  public void filterByName(String term) {
+    this.typeIntoElement("#poi-search", term);
+  }
 }
