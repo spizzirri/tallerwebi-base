@@ -10,11 +10,13 @@ import java.util.List;
 @FunctionalInterface
 public interface OverpassClient {
   /**
-   * POIs de CABA para un tag OSM concreto, por ejemplo {@code findCabaPois("amenity", "restaurant")}.
+   * POIs con nombre para un tag OSM dentro de una caja, por ejemplo
+   * {@code findPois("amenity", "restaurant", BoundingBox.CABA)}.
    *
    * @param osmKey "amenity" o "shop"
    * @param osmValue el valor del tag, por ejemplo "restaurant" o "clothes"
+   * @param box area visible del mapa, ya recortada a la ciudad
    * @return los POIs con nombre, sin elementos anonimos
    */
-  List<OsmPoi> findCabaPois(String osmKey, String osmValue);
+  List<OsmPoi> findPois(String osmKey, String osmValue, BoundingBox box);
 }

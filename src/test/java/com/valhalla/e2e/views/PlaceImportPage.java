@@ -1,6 +1,7 @@
 package com.valhalla.e2e.views;
 
 import com.microsoft.playwright.Locator;
+import com.microsoft.playwright.Mouse;
 import com.microsoft.playwright.Page;
 
 /**
@@ -23,6 +24,36 @@ public class PlaceImportPage extends WebPage {
       "(n) => document.querySelectorAll('#app > aside ul li').length === n",
       count
     );
+  }
+
+  /** El boton se habilita cuando el mapa ya tiene un area (y esa area toca CABA). */
+  public void waitForLoadButton() {
+    page.waitForSelector("#load-pois:not([disabled])");
+  }
+
+  public void clickLoad() {
+    this.clickElement("#load-pois");
+  }
+
+  /** El buscador existe recien cuando hay una lista que filtrar. */
+  public boolean hasSearchInput() {
+    return page.locator("#poi-search").count() > 0;
+  }
+
+  public String hintText() {
+    return this.getElementText("#load-hint").trim();
+  }
+
+  public boolean hasStaleNotice() {
+    return page.locator("#stale-area").count() > 0;
+  }
+
+  public void waitForStaleNotice() {
+    page.waitForSelector("#stale-area");
+  }
+
+  public void waitForStaleNoticeGone() {
+    page.waitForFunction("() => !document.querySelector('#stale-area')");
   }
 
   public void waitForError() {
@@ -62,9 +93,25 @@ public class PlaceImportPage extends WebPage {
     this.typeIntoElement("#poi-search", term);
   }
 
-  /** "Solo el área visible": al apagarlo la lista deja de seguir al mapa. */
-  public void onlyVisibleArea(boolean enabled) {
-    page.locator("#only-visible").setChecked(enabled);
+  /**
+   * Arrastra el mapa {@code dx} px desde el centro: es el gesto real de panear. Espera a que Leaflet
+   * cierre el movimiento (inclusive la inercia) antes de devolver, asi dos arrastres seguidos no se
+   * pisan.
+   */
+  public void dragMap(int dx) {
+    int before = moveCount();
+    var map = page.locator("#map").boundingBox();
+    double y = map.y + map.height / 2;
+    double from = map.x + map.width / 2;
+    page.mouse().move(from, y);
+    page.mouse().down();
+    page.mouse().move(from + dx, y, new Mouse.MoveOptions().setSteps(10));
+    page.mouse().up();
+    page.waitForFunction("(n) => Number(document.querySelector('#map').dataset.moves) > n", before);
+  }
+
+  private int moveCount() {
+    return Integer.parseInt(page.locator("#map").getAttribute("data-moves"));
   }
 
   /**

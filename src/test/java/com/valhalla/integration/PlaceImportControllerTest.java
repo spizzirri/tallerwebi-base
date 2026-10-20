@@ -3,10 +3,12 @@ package com.valhalla.integration;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -22,6 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.valhalla.domain.place.BoundingBox;
 import com.valhalla.domain.place.OsmPoi;
 import com.valhalla.domain.place.OverpassClient;
 import com.valhalla.domain.place.Place;
@@ -54,6 +57,11 @@ public class PlaceImportControllerTest {
   private static final String ADMIN_EMAIL = "admin@unlam.edu.ar";
   private static final String USER_EMAIL = "user@unlam.edu.ar";
   private static final String ERROR_FORBIDDEN_QUERY = "Unsupported query: use amenity or shop";
+  private static final String ERROR_OUTSIDE_CABA = "The visible area must be inside CABA";
+
+  /** Area visible de ejemplo, ya dentro de CABA: el recorte no la toca. */
+  private static final BoundingBox VISIBLE = new BoundingBox(-34.62, -58.45, -34.58, -58.37);
+  private static final String VISIBLE_PARAMS = "&south=-34.62&west=-58.45&north=-34.58&east=-58.37";
 
   private static final OsmPoi FIXTURE_POI = new OsmPoi(
     "Parrilla del Puerto",
@@ -93,7 +101,12 @@ public class PlaceImportControllerTest {
       .andExpect(view().name("pages/admin/place-import"))
       // La attribution ODbL es obligatoria en cualquier mapa que muestre datos OSM.
       .andExpect(content().string(containsString("OpenStreetMap")))
-      .andExpect(content().string(containsString("/admin/places/import/pois")));
+      .andExpect(content().string(containsString("/admin/places/import/pois")))
+      // El boton reemplaza a la carga automatica: sin click no hay consulta.
+      .andExpect(content().string(containsString("id=\"load-pois\"")))
+      // La caja de CABA viaja en el modelo hacia la vista, que decide si el boton se habilita.
+      .andExpect(model().attribute("cabaBounds", hasEntry("south", -34.7058)))
+      .andExpect(content().string(containsString("-34.7058")));
 
     verifyNoInteractions(this.overpassClient);
   }
@@ -103,10 +116,12 @@ public class PlaceImportControllerTest {
   @Test
   @WithMockUser(username = ADMIN_EMAIL, roles = { "ADMIN" })
   public void shouldProxyThePoisAsJsonWithoutTouchingTheNetwork() throws Exception {
-    given(this.overpassClient.findCabaPois("amenity", "restaurant"))
+    given(this.overpassClient.findPois("amenity", "restaurant", VISIBLE))
       .willReturn(List.of(FIXTURE_POI));
 
-    List<OsmPoi> pois = poisFrom(get("/admin/places/import/pois?amenity=restaurant"));
+    List<OsmPoi> pois = poisFrom(
+      get("/admin/places/import/pois?amenity=restaurant" + VISIBLE_PARAMS)
+    );
 
     assertThat(pois, hasSize(1));
     // equals del record: nombre, direccion, coordenadas, horarios, telefono, web y tags OSM.
@@ -116,19 +131,36 @@ public class PlaceImportControllerTest {
   @Test
   @WithMockUser(username = ADMIN_EMAIL, roles = { "ADMIN" })
   public void shouldAlsoAcceptTheShopKey() throws Exception {
-    given(this.overpassClient.findCabaPois("shop", "clothes")).willReturn(List.of());
+    given(this.overpassClient.findPois("shop", "clothes", VISIBLE)).willReturn(List.of());
 
-    assertThat(poisFrom(get("/admin/places/import/pois?shop=clothes")), hasSize(0));
+    assertThat(
+      poisFrom(get("/admin/places/import/pois?shop=clothes" + VISIBLE_PARAMS)),
+      hasSize(0)
+    );
+  }
+
+  /** Una vista mas grande que la ciudad se recorta: el importador no consulta fuera de CABA. */
+  @Test
+  @WithMockUser(username = ADMIN_EMAIL, roles = { "ADMIN" })
+  public void shouldClipTheVisibleAreaToCaba() throws Exception {
+    given(this.overpassClient.findPois("amenity", "restaurant", BoundingBox.CABA))
+      .willReturn(List.of(FIXTURE_POI));
+
+    List<OsmPoi> pois = poisFrom(
+      get("/admin/places/import/pois?amenity=restaurant&south=-35&west=-59&north=-34&east=-58")
+    );
+
+    assertThat(pois, hasSize(1));
   }
 
   @Test
   @WithMockUser(username = ADMIN_EMAIL, roles = { "ADMIN" })
   public void shouldAnswerBadGatewayWhenOverpassFails() throws Exception {
-    given(this.overpassClient.findCabaPois(anyString(), anyString()))
+    given(this.overpassClient.findPois(anyString(), anyString(), any(BoundingBox.class)))
       .willThrow(new IllegalStateException("Overpass answered HTTP 504"));
 
     String body =
-      this.mockMvc.perform(get("/admin/places/import/pois?amenity=restaurant"))
+      this.mockMvc.perform(get("/admin/places/import/pois?amenity=restaurant" + VISIBLE_PARAMS))
         .andExpect(status().isBadGateway())
         .andReturn()
         .getResponse()
@@ -255,19 +287,66 @@ public class PlaceImportControllerTest {
   @WithMockUser(username = ADMIN_EMAIL, roles = { "ADMIN" })
   public void shouldRejectAQueryOutsideTheAllowlistWithoutCallingTheClient() throws Exception {
     String body =
-      this.mockMvc.perform(get("/admin/places/import/pois?color=red"))
+      this.mockMvc.perform(get("/admin/places/import/pois?color=red" + VISIBLE_PARAMS))
         .andExpect(status().isBadRequest())
         .andReturn()
         .getResponse()
         .getContentAsString(StandardCharsets.UTF_8);
     assertThat(jsonOf(body).path("error").asText(), is(ERROR_FORBIDDEN_QUERY));
 
-    this.mockMvc.perform(get("/admin/places/import/pois?amenity=restaurant&evil=x"))
+    // Parametro desconocido al lado de uno valido.
+    this.mockMvc.perform(
+        get("/admin/places/import/pois?amenity=restaurant&evil=x" + VISIBLE_PARAMS)
+      )
+      .andExpect(status().isBadRequest());
+    // Dos tags en la misma consulta.
+    this.mockMvc.perform(
+        get("/admin/places/import/pois?amenity=restaurant&shop=clothes" + VISIBLE_PARAMS)
+      )
+      .andExpect(status().isBadRequest());
+    // Sin tag, o con el tag vacio.
+    this.mockMvc.perform(
+        get("/admin/places/import/pois?south=-34.62&west=-58.45&north=-34.58&east=-58.37")
+      )
+      .andExpect(status().isBadRequest());
+    this.mockMvc.perform(get("/admin/places/import/pois?amenity=" + VISIBLE_PARAMS))
       .andExpect(status().isBadRequest());
 
-    this.mockMvc.perform(get("/admin/places/import/pois")).andExpect(status().isBadRequest());
+    verifyNoInteractions(this.overpassClient);
+  }
 
-    this.mockMvc.perform(get("/admin/places/import/pois?amenity="))
+  /** La caja tambien es entrada del usuario: sin bordes, fuera de CABA o invertida es 400. */
+  @Test
+  @WithMockUser(username = ADMIN_EMAIL, roles = { "ADMIN" })
+  public void shouldRejectAVisibleAreaThatCannotBeQueried() throws Exception {
+    String body =
+      this.mockMvc.perform(get("/admin/places/import/pois?amenity=restaurant"))
+        .andExpect(status().isBadRequest())
+        .andReturn()
+        .getResponse()
+        .getContentAsString(StandardCharsets.UTF_8);
+    assertThat(jsonOf(body).path("error").asText(), is(ERROR_OUTSIDE_CABA));
+
+    // Rosario: la vista no toca CABA.
+    this.mockMvc.perform(
+        get(
+          "/admin/places/import/pois?amenity=restaurant&south=-33&west=-60.7&north=-32.9&east=-60.6"
+        )
+      )
+      .andExpect(status().isBadRequest());
+    // Caja invertida.
+    this.mockMvc.perform(
+        get(
+          "/admin/places/import/pois?amenity=restaurant&south=-34&west=-58.4&north=-35&east=-58.3"
+        )
+      )
+      .andExpect(status().isBadRequest());
+    // Coordenada que no es un numero.
+    this.mockMvc.perform(
+        get(
+          "/admin/places/import/pois?amenity=restaurant&south=sur&west=-58.4&north=-33&east=-58.3"
+        )
+      )
       .andExpect(status().isBadRequest());
 
     verifyNoInteractions(this.overpassClient);

@@ -30,17 +30,18 @@
         class="w-80 min-w-[20rem] min-h-0 overflow-y-auto overscroll-contain bg-white border-l border-gray-200 p-4 flex flex-col gap-4">
         <h1 class="text-2xl font-semibold text-gray-900">Importar del mapa</h1>
         <p class="text-sm text-gray-600">
-          Elegí una búsqueda y hacé click en un punto: el alta del ABM se abre pre-llenada con los
-          datos de OpenStreetMap. Podés revisar y cambiar cualquier campo antes de guardar.
+          Elegí el tipo de lugar y presioná Cargar: se consultan los puntos de OpenStreetMap que
+          están en la zona visible del mapa. Después hacé click en un punto y el alta del ABM se
+          abre pre-llenada con sus datos.
         </p>
         <p class="rounded-md bg-gray-50 px-3 py-2 text-xs text-gray-500">
-          Se traen hasta 300 puntos de CABA por categoría y la consulta tarda ~30 s. Mover el mapa
-          filtra lo ya cargado: no vuelve a consultar. El resultado se reutiliza por 10 minutos.
+          Cada consulta trae hasta 300 puntos de la zona visible y tarda ~30 s. La misma zona con el
+          mismo tipo se reutiliza por 10 minutos.
         </p>
 
         <div class="flex flex-col gap-1">
-          <label for="import-query" class="text-sm font-medium text-gray-700">Búsqueda</label>
-          <select v-model="selected" id="import-query" @change="loadPois"
+          <label for="import-tag" class="text-sm font-medium text-gray-700">Tipo de lugar</label>
+          <select v-model="selected" id="import-tag"
             class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm">
             <option v-for="query in queries" :key="query.key + query.value" :value="query">
               {{ query.label }}
@@ -48,25 +49,30 @@
           </select>
         </div>
 
-        <!-- Filtros locales sobre los POIs ya traidos: no vuelven a golpear Overpass (30s por consulta). -->
-        <div class="flex flex-col gap-1">
+        <button id="load-pois" type="button" @click="loadPois" :disabled="loading || !canLoad"
+          class="rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50">
+          {{ loading ? 'Cargando...' : 'Cargar puntos de esta zona' }}
+        </button>
+        <p v-if="!canLoad && !loading" id="outside-caba" class="text-xs text-amber-700">
+          La zona visible está fuera de CABA: acercate a la ciudad para buscar.
+        </p>
+
+        <!-- El buscador aparece recien cuando hay una lista que filtrar. -->
+        <div v-if="pois.length" class="flex flex-col gap-1">
           <label for="poi-search" class="text-sm font-medium text-gray-700">Filtrar por nombre</label>
           <input v-model="search" id="poi-search" type="search" autocomplete="off"
             placeholder="Ej. parrilla"
             class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm" />
         </div>
 
-        <label class="flex items-center gap-2 text-sm text-gray-700">
-          <input v-model="onlyVisible" id="only-visible" type="checkbox"
-            class="h-4 w-4 rounded border-gray-300" />
-          Solo el área visible del mapa
-        </label>
-
-        <p class="text-sm text-gray-500" aria-live="polite">
-          {{ loading ? 'Buscando puntos...' : statusText }}
-        </p>
+        <p class="text-sm text-gray-500" aria-live="polite">{{ statusText }}</p>
         <p v-if="error" role="alert" class="rounded-md bg-red-100 px-3 py-2 text-sm text-red-700">
           {{ error }}
+        </p>
+        <!-- La lista no se toca al mover el mapa: se avisa y se recarga a pedido. -->
+        <p v-if="staleArea" id="stale-area" role="status"
+          class="rounded-md bg-amber-50 px-3 py-2 text-xs text-amber-800">
+          Te moviste a otra zona: presioná «Cargar puntos de esta zona» para traer los puntos de acá.
         </p>
 
         <!-- Misma navegacion que el click del marker, en texto: el mapa no es la unica via. -->
@@ -81,16 +87,16 @@
             </a>
           </li>
         </ul>
-        <p v-if="!loading && pois.length === 0 && !error" class="text-sm text-gray-500">
-          No hay puntos para esta búsqueda. Probá con otra.
+        <p v-if="!loading && !loaded && !error" id="load-hint" class="text-sm text-gray-500">
+          Elegí un tipo de lugar y presioná «Cargar puntos de esta zona».
+        </p>
+        <p v-if="!loading && loaded && pois.length === 0 && !error" id="empty-area"
+          class="text-sm text-gray-500">
+          No hay puntos de este tipo en la zona visible.
         </p>
         <p v-if="!loading && pois.length > 0 && filtered.length === 0 && search.trim()"
           class="text-sm text-gray-500">
           Ningún punto coincide con «{{ search.trim() }}». Probá con otro nombre.
-        </p>
-        <p v-if="!loading && pois.length > 0 && filtered.length === 0 && !search.trim()"
-          class="text-sm text-gray-500">
-          No hay puntos cargados en esta área. Movete o desactivá «Solo el área visible del mapa».
         </p>
       </aside>
 
@@ -102,6 +108,11 @@
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
       integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <!-- La caja de CABA la manda el backend: una sola fuente de verdad para el recorte. -->
+    <script th:inline="javascript">
+      const CABA = /*[[${cabaBounds}]]*/ null;
+    </script>
 
     <script>
       const { createApp, ref, computed, watch, onMounted } = Vue;
@@ -124,18 +135,20 @@
           const selected = ref(QUERIES[0]);
           const pois = ref([]);
           const search = ref('');
-          const onlyVisible = ref(true);
           const error = ref('');
-          const loading = ref(true);
+          const loading = ref(false);
+          /* "Todavia no busque" no es lo mismo que "busque y no habia nada": cambia el texto. */
+          const loaded = ref(false);
           let map = null;
           let markers = [];
           let pending = 0;
           let controller = null;
 
-          /* El mapa es la fuente del "que se ve": se guardan los cuatro bordes en cada movimiento. Se
-             copian a numeros (y no el objeto de Leaflet) para que Vue no envuelva en proxy un objeto
-             ajeno, y porque asi la comparacion es aritmetica y no depende de la API de Leaflet. */
+          /* Bordes del area visible como numeros (no el objeto de Leaflet): Vue no envuelve en proxy
+             un objeto ajeno y la comparacion queda aritmetica. */
           const area = ref(null);
+          /* La zona que se consulto: sirve para avisar cuando el mapa se fue a otra parte. */
+          const loadedArea = ref(null);
           const refreshArea = () => {
             const bounds = map.getBounds();
             area.value = {
@@ -147,6 +160,10 @@
             /* Refleja el zoom en el DOM: sirve para ver el estado y para que el E2E espere el
                cambio sin dormir (mismo criterio que data-category en los markers de /explore). */
             map.getContainer().dataset.zoom = map.getZoom();
+            /* Cuenta los movimientos cerrados (inercia incluida): el E2E espera este numero para
+               panear dos veces seguidas sin pisar la animacion anterior. */
+            map.getContainer().dataset.moves =
+              (Number(map.getContainer().dataset.moves) || 0) + 1;
           };
           const debounce = (fn, wait) => {
             let timer = null;
@@ -157,36 +174,36 @@
           };
           const onMapMoved = debounce(refreshArea, 120);
 
-          /* Sin acentos ni mayusculas: "cafe" tiene que encontrar "Café". Los dos filtros son locales
-             a proposito — volver a Overpass por cada tecla o por cada paneo costaria ~30s. */
+          /* Sin acentos ni mayusculas: "cafe" tiene que encontrar "Café". El filtro es local a
+             proposito — volver a Overpass por cada tecla costaria ~30s sobre datos que ya estan. */
           const normalizeName = (text) => (text || '').normalize('NFD')
             .replace(/[\u0300-\u036f]/g, '')
             .toLowerCase();
 
-          /* Un POI sin coordenadas no se puede ubicar: se lista siempre, no se descarta por área. */
-          const inArea = (poi) => {
-            const box = area.value;
-            if (poi.latitude === null || poi.longitude === null || !box) return true;
-            return (
-              poi.latitude >= box.south &&
-              poi.latitude <= box.north &&
-              poi.longitude >= box.west &&
-              poi.longitude <= box.east
-            );
-          };
+          const intersects = (a, b) => a.south < b.north && a.north > b.south &&
+            a.west < b.east && a.east > b.west;
+
+          /* Cargar solo tiene sentido si la zona visible toca CABA: el backend recorta a la ciudad. */
+          const canLoad = computed(() => !!area.value && intersects(area.value, CABA));
+
+          /* El mapa se movio a una zona que la lista actual no cubre: se avisa, no se vacia. */
+          const staleArea = computed(() => !!loadedArea.value && !!area.value &&
+            !intersects(area.value, loadedArea.value));
 
           const filtered = computed(() => {
             const term = normalizeName(search.value.trim());
-            return pois.value.filter((poi) => {
-              if (onlyVisible.value && !inArea(poi)) return false;
-              return !term || normalizeName(poi.name).includes(term);
-            });
+            if (!term) return pois.value;
+            return pois.value.filter((poi) => normalizeName(poi.name).includes(term));
           });
 
-          /* "N de M" cuando algun filtro recorta; el total solo cuando no hay filtros activos. */
-          const statusText = computed(() => filtered.value.length < pois.value.length
-            ? filtered.value.length + ' de ' + pois.value.length + ' punto(s)'
-            : pois.value.length + ' punto(s) encontrados');
+          /* "N de M" cuando el filtro recorta; el total solo cuando no hay filtro activo. */
+          const statusText = computed(() => {
+            if (loading.value) return 'Buscando puntos en la zona visible...';
+            if (!loaded.value) return '';
+            return filtered.value.length < pois.value.length
+              ? filtered.value.length + ' de ' + pois.value.length + ' punto(s)'
+              : pois.value.length + ' punto(s) encontrados';
+          });
 
           /* El alta espera los mismos params que arma el marker. encodeURIComponent en cada valor:
              los nombres de OSM traen acentos, comas y parentesis. */
@@ -236,29 +253,33 @@
           watch(filtered, drawMarkers);
 
           const loadPois = async () => {
+            if (!canLoad.value) return;
             const current = ++pending;
-            /* Cambiar de categoria no espera a la anterior: se aborta y manda la ultima eleccion. */
+            /* Si se aprieta dos veces, la anterior no se espera: se aborta y manda la ultima. */
             if (controller) controller.abort();
             controller = new AbortController();
+            const box = area.value;
+            const query = selected.value;
+            const param = (name, value) => '&' + name + '=' + encodeURIComponent(value);
+            loadedArea.value = box;
             loading.value = true;
             error.value = '';
-            /* La lista y los markers que quedan son de otra categoria: se limpian. */
-            pois.value = [];
-            search.value = '';
             try {
-              const query = selected.value;
               const response = await fetch(
-                '/admin/places/import/pois?' + query.key + '=' + encodeURIComponent(query.value),
+                '/admin/places/import/pois?' + query.key + '=' + encodeURIComponent(query.value) +
+                  param('south', box.south) + param('west', box.west) +
+                  param('north', box.north) + param('east', box.east),
                 { signal: controller.signal }
               );
               if (!response.ok) throw new Error('HTTP ' + response.status);
               const data = await response.json();
               if (current !== pending) return;
               pois.value = data;
+              search.value = '';
+              loaded.value = true;
             } catch (loadError) {
               if (current !== pending || loadError.name === 'AbortError') return;
               console.error(loadError);
-              pois.value = [];
               error.value =
                 'No se pudieron traer los puntos de OpenStreetMap. Probá de nuevo en unos segundos.';
             } finally {
@@ -266,7 +287,8 @@
             }
           };
 
-          onMounted(async () => {
+          /* Al entrar no se consulta nada: el mapa queda listo y la consulta la dispara el boton. */
+          onMounted(() => {
             map = L.map('map', { center: [-34.6037, -58.3816], zoom: 13 });
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
               attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -274,12 +296,11 @@
             /* El compilador de Tailwind corre diferido: sin esto el mapa se crea midiendo 0 y queda
                centrado fuera de lugar (la misma razon que en /explore). El invalidateSize va con
                pan por defecto: conserva el centro geografico; con pan:false el paso de 0 al tamaño
-               real desplazaba la vista varios kilometros y el filtro por area arrancaba en otro lado. */
+               real desplazaba la vista varios kilometros. */
             new ResizeObserver(() => map.invalidateSize()).observe(map.getContainer());
             requestAnimationFrame(() => map.invalidateSize());
             map.on('moveend zoomend', onMapMoved);
             refreshArea();
-            await loadPois();
           });
 
           return {
@@ -287,11 +308,13 @@
             selected,
             pois,
             search,
-            onlyVisible,
             filtered,
             statusText,
             error,
             loading,
+            loaded,
+            canLoad,
+            staleArea,
             loadPois,
             formUrl
           };

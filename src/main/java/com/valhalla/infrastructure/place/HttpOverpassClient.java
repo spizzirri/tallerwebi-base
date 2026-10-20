@@ -3,6 +3,7 @@ package com.valhalla.infrastructure.place;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.valhalla.domain.place.BoundingBox;
 import com.valhalla.domain.place.OsmPoi;
 import com.valhalla.domain.place.OverpassClient;
 import java.io.IOException;
@@ -44,14 +45,6 @@ public class HttpOverpassClient implements OverpassClient {
   /** Los unicos tags que el importador ofrece; tambien ordena el osmKey que sale de la respuesta. */
   private static final Set<String> ALLOWED_KEYS = Set.of("amenity", "shop");
 
-  /**
-   * Caja de CABA en el orden que pide Overpass (sur,oeste,norte,este), tomada del bounding box de
-   * la relation 3082668 en Nominatim. Se usa bbox y no {@code area}: el endpoint publico rechaza
-   * las consultas por area cuando esta saturado y el id que traia la spec (3600345769) apuntaba a
-   * la relation de Huesca, no a CABA.
-   */
-  private static final String CABA_BBOX = "-34.7058,-58.5315,-34.5266,-58.3351";
-
   /** Solo POIs con nombre (el ABM no puede identificar los demas) y un tope para acotar la respuesta. */
   private static final int MAX_POIS = 300;
 
@@ -85,8 +78,9 @@ public class HttpOverpassClient implements OverpassClient {
   private static final ObjectMapper MAPPER = new ObjectMapper();
 
   /**
-   * Cada consulta cuesta ~30 s, asi que el resultado se guarda 10 minutos por par key=value: volver
-   * a una categoria ya cargada es instantaneo y de paso se golpea menos el endpoint publico.
+   * Cada consulta cuesta ~30 s, asi que el resultado se guarda 10 minutos por
+   * {@code key=value@caja}: repetir la misma zona con el mismo tag es instantaneo y de paso se
+   * golpea menos el endpoint publico.
    */
   private static final Duration CACHE_TTL = Duration.ofMinutes(10);
 
@@ -135,9 +129,9 @@ public class HttpOverpassClient implements OverpassClient {
   }
 
   @Override
-  public List<OsmPoi> findCabaPois(String osmKey, String osmValue) {
-    String query = buildQuery(osmKey, osmValue);
-    String cacheKey = normalize(osmKey) + "=" + normalize(osmValue);
+  public List<OsmPoi> findPois(String osmKey, String osmValue, BoundingBox box) {
+    String query = buildQuery(osmKey, osmValue, box);
+    String cacheKey = normalize(osmKey) + "=" + normalize(osmValue) + "@" + box.cacheKey();
     List<OsmPoi> cached = cachedPois(cacheKey);
     if (cached != null) {
       return cached;
@@ -186,10 +180,10 @@ public class HttpOverpassClient implements OverpassClient {
   }
 
   /**
-   * Arma la query de Overpass con el key validado contra el allowlist y el value validado por
-   * forma. Package-private para poder probarlo sin red.
+   * Arma la query de Overpass con el key validado contra el allowlist, el value validado por forma
+   * y la caja del area visible. Package-private para poder probarlo sin red.
    */
-  static String buildQuery(String osmKey, String osmValue) {
+  static String buildQuery(String osmKey, String osmValue, BoundingBox box) {
     String key = normalize(osmKey);
     if (!ALLOWED_KEYS.contains(key)) {
       throw new IllegalArgumentException("Unsupported OSM key: " + osmKey);
@@ -206,7 +200,7 @@ public class HttpOverpassClient implements OverpassClient {
       "\"=\"" +
       value +
       "\"][\"name\"](" +
-      CABA_BBOX +
+      box.toOverpass() +
       ");out center tags " +
       MAX_POIS +
       ";"

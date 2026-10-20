@@ -2,18 +2,23 @@ package com.valhalla.e2e;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.lessThan;
 
 import com.microsoft.playwright.Route;
 import com.valhalla.e2e.views.PlaceFormPage;
 import com.valhalla.e2e.views.PlaceImportPage;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 
 /**
- * E-07..E-08: el importador visto desde el navegador. El proxy de Overpass se stubbea con {@code
+ * E-07..E-10: el importador visto desde el navegador. El proxy de Overpass se stubbea con {@code
  * page.route}, asi que la vista real corre en Chromium pero el navegador nunca sale a internet
  * (AC-10). El stub tambien es el unico modo de ejercitar el error sin depender de que Overpass este
- * saturado justo en la corrida.
+ * saturado justo en la corrida, y de contar cuantas consultas se hicieron.
  */
 public class PlaceImportE2E extends E2eBase {
 
@@ -60,12 +65,35 @@ public class PlaceImportE2E extends E2eBase {
     """;
 
   @Test
+  void shouldQueryOnlyWhenTheLoadButtonIsPressed() {
+    signInAsAdmin();
+    List<String> requests = new ArrayList<>();
+    stubPois(200, FIXTURE, requests);
+
+    PlaceImportPage view = new PlaceImportPage(page);
+    view.navigateToImport();
+    view.waitForLoadButton();
+
+    assertThat("al entrar no se consulta nada", requests, hasSize(0));
+    assertThat("sin lista no hay buscador", view.hasSearchInput(), is(false));
+    assertThat(view.hintText(), containsString("Cargar puntos de esta zona"));
+
+    view.clickLoad();
+    view.waitForPois(3);
+
+    assertThat("una sola consulta por click", requests, hasSize(1));
+    assertThat("con resultados aparece el buscador", view.hasSearchInput(), is(true));
+  }
+
+  @Test
   void shouldListTheStubbedPoisAndOpenThePrefilledForm() {
     signInAsAdmin();
     stubPois(200, FIXTURE);
 
     PlaceImportPage view = new PlaceImportPage(page);
     view.navigateToImport();
+    view.waitForLoadButton();
+    view.clickLoad();
     view.waitForPois(3);
 
     assertThat(view.statusText(), is("3 punto(s) encontrados"));
@@ -93,6 +121,8 @@ public class PlaceImportE2E extends E2eBase {
 
     PlaceImportPage view = new PlaceImportPage(page);
     view.navigateToImport();
+    view.waitForLoadButton();
+    view.clickLoad();
     view.waitForPois(3);
 
     view.filterByName("PARRILLA");
@@ -115,23 +145,44 @@ public class PlaceImportE2E extends E2eBase {
     assertThat("al limpiar el filtro vuelven todos", view.markerCount(), is(2));
   }
 
+  /** La consulta viaja con el area visible y se repite solo cuando el usuario vuelve a pedirla. */
   @Test
-  void shouldFilterThePoisByTheVisibleMapArea() {
+  void shouldQueryTheAreaOnScreenAndNoticeWhenTheMapMoves() {
     signInAsAdmin();
-    stubPois(200, FIXTURE);
+    List<String> requests = new ArrayList<>();
+    stubPois(200, FIXTURE, requests);
 
     PlaceImportPage view = new PlaceImportPage(page);
     view.navigateToImport();
+    view.waitForLoadButton();
+    view.clickLoad();
     view.waitForPois(3);
-    assertThat("de entrada el area cubre los dos POIs con coordenadas", view.markerCount(), is(2));
+
+    String first = requests.get(0);
+    assertThat("la consulta lleva el area visible", hasAllBorders(first), is(true));
+    double citySpan = latitudeSpan(first);
 
     view.zoomTo(17);
-    view.waitForPois(2);
-    assertThat("al acercarse, el POI lejano sale de la lista", view.markerCount(), is(1));
+    assertThat("acercarse no invalida la lista ya cargada", view.hasStaleNotice(), is(false));
 
-    view.onlyVisibleArea(false);
-    view.waitForPois(3);
-    assertThat("sin el filtro vuelven todos, aunque el mapa siga cerca", view.markerCount(), is(2));
+    view.clickLoad();
+    page.waitForCondition(() -> requests.size() == 2);
+    assertThat(
+      "zoom 17 consulta una zona mas chica que la vista inicial",
+      latitudeSpan(requests.get(1)),
+      lessThan(citySpan)
+    );
+
+    /* Con la zona chica ya cargada, dos arrastres salen del area consultada. */
+    view.dragMap(600);
+    view.dragMap(600);
+    view.waitForStaleNotice();
+    assertThat("la lista no se vacia al mover el mapa", view.poiCount(), is(3));
+
+    view.clickLoad();
+    page.waitForCondition(() -> requests.size() == 3);
+    view.waitForStaleNoticeGone();
+    assertThat("al recargar la zona nueva se apaga el aviso", view.hasStaleNotice(), is(false));
   }
 
   @Test
@@ -141,6 +192,8 @@ public class PlaceImportE2E extends E2eBase {
 
     PlaceImportPage view = new PlaceImportPage(page);
     view.navigateToImport();
+    view.waitForLoadButton();
+    view.clickLoad();
     view.waitForError();
 
     assertThat(view.hasError(), is(true));
@@ -151,17 +204,47 @@ public class PlaceImportE2E extends E2eBase {
     assertThat("no queda ningun POI en la lista", view.poiCount(), is(0));
   }
 
+  private boolean hasAllBorders(String url) {
+    return Stream
+      .of("south", "west", "north", "east")
+      .allMatch(name -> urlParam(url, name) != null && !urlParam(url, name).isBlank());
+  }
+
+  private double latitudeSpan(String url) {
+    return Math.abs(
+      Double.parseDouble(urlParam(url, "north")) - Double.parseDouble(urlParam(url, "south"))
+    );
+  }
+
+  /** Valor crudo de un query param: los numeros no necesitan decodificacion. */
+  private String urlParam(String url, String name) {
+    for (String pair : url.substring(url.indexOf('?') + 1).split("&")) {
+      int separator = pair.indexOf('=');
+      if (separator > 0 && pair.substring(0, separator).equals(name)) {
+        return pair.substring(separator + 1);
+      }
+    }
+    return null;
+  }
+
   /** Intercepta el proxy en el navegador: el backend no participa y Overpass no se golpea. */
   private void stubPois(int status, String body) {
+    stubPois(status, body, new ArrayList<>());
+  }
+
+  /** Igual que {@link #stubPois}, guardando cada URL pedida: el test verifica si hubo consulta. */
+  private void stubPois(int status, String body, List<String> requested) {
     page.route(
       "**/admin/places/import/pois**",
-      route ->
+      route -> {
+        requested.add(route.request().url());
         route.fulfill(
           new Route.FulfillOptions()
             .setStatus(status)
             .setContentType("application/json; charset=utf-8")
             .setBody(body)
-        )
+        );
+      }
     );
   }
 }

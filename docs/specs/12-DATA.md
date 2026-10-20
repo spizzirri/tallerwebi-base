@@ -31,7 +31,7 @@ sin dependencias de red en ningun test.
 | AC-01 | `/admin/places` lista, crea, edita y da de baja places; los cambios persisten en la base y son visibles en `/explore` y `GET /api/places` |
 | AC-02 | `imageUrl` es opcional en el form: vacio guarda `null` y la vista cae al default `/images/place-placeholder.svg`; con una URL cargada, `/explore` muestra esa imagen |
 | AC-03 | Un usuario con rol USER no accede a `/admin/places*`: la cadena `/admin/**` lo redirige a su home sin renderizar el ABM; un anonimo queda redirigido sin renderizarlo tampoco |
-| AC-04 | La vista "Importar del mapa" muestra POIs reales de CABA (amenities/comercios) en un mapa Leaflet; la consulta a Overpass la hace el backend a traves de la interfaz `OverpassClient`, sin API key |
+| AC-04 | La vista "Importar del mapa" muestra POIs reales de CABA (amenities/comercios) en un mapa Leaflet; al entrar no consulta nada: el admin elige el tipo de lugar y presiona "Cargar puntos de esta zona", y la consulta a Overpass la hace el backend a traves de la interfaz `OverpassClient`, sin API key, acotada al area visible del mapa y recortada a CABA |
 | AC-05 | Al elegir un POI en el importador, el form del ABM queda pre-lleno con nombre, direccion, coordenadas, horarios, telefono, web y categoria OSM mapeada; el admin puede revisar y cambiar cualquier campo antes de guardar, y guardar crea el place con esos datos |
 | AC-06 | Tags OSM sin mapping explicito caen en `OTHER` y el admin siempre puede cambiar la categoria antes de guardar |
 | AC-07 | El dataset mantiene los 10 places actuales del seeder y agrega lugares nuevos; cada categoria de `PlaceCategory` tiene al menos un lugar (hoy `SPORT` y `OTHER` no tienen ninguno) |
@@ -68,8 +68,17 @@ sin dependencias de red en ningun test.
 | U-10 | Parsea una respuesta Overpass de fixture (elemento `nwr` con `center` y `tags`) al `OsmPoi` correcto: nombre, direccion armada desde `addr:*`, lat/lng del center | AC-04 |
 | U-11 | Tags ausentes dejan los campos en `null` (sin phone/web/horarios no hay excepcion); `contact:phone` es fallback de `phone` | AC-04, AC-05 |
 | U-12 | Elementos sin `name` se descartan | AC-04 |
-| U-13 | La query sale por bounding box de CABA (sin `area`) y valida key/value contra el allowlist | AC-04 |
+| U-13 | `buildQuery` arma la consulta con la caja que recibe (no con una constante) y valida key/value contra el allowlist | AC-04 |
 | U-14 | Reintenta una vez ante 429 (esperando el delay inyectado), una vez ante 502 y hasta dos veces en total; un 500 no se reintenta | AC-04 |
+| U-15 | El cache es por caja: la misma categoria en otra zona es otra consulta; la clave redondea a ~100 m | AC-04 |
+
+### Tests Unitarios (`domain/place/BoundingBoxTest.java`)
+
+| # | Test | AC que cubre |
+|---|------|-------------|
+| U-16 | La caja de CABA se serializa en el orden de Overpass (`sur,oeste,norte,este`) con `Locale.ROOT` | AC-04 |
+| U-17 | Rechaza latitud/longitud fuera de rango, coordenadas no numericas (`NaN`) y cajas invertidas | AC-04 |
+| U-18 | `intersection` recorta una caja que se sale de CABA y devuelve vacio cuando no se tocan | AC-04 |
 
 ### Tests de Integracion (`integration/PlaceRestControllerTest.java`)
 
@@ -105,10 +114,12 @@ sin dependencias de red en ningun test.
 | # | Test | AC que cubre |
 |---|------|-------------|
 | I-15 | `GET /admin/places/import` responde 200 con la vista del mapa | AC-04 |
-| I-16 | `GET /admin/places/import/pois?amenity=restaurant` con `OverpassClient` mockeado retorna los POIs del fixture como JSON — sin red | AC-04, AC-10 |
+| I-16 | `GET /admin/places/import/pois?amenity=restaurant&south=..&west=..&north=..&east=..` con `OverpassClient` mockeado retorna los POIs del fixture como JSON, y el cliente recibe exactamente esa caja — sin red | AC-04, AC-10 |
 | I-17 | `GET /admin/places/new?name=...&latitude=...&category=...` pre-llena el form (server-side, via query params) | AC-05 |
 | I-18 | `POST /admin/places` con los datos pre-llenos crea el place con coordenadas, horarios, telefono, web y categoria mapeada | AC-05 |
-| I-19 | `GET /admin/places/import/pois?color=red` (query param distinto de `amenity`/`shop`) responde 400 sin tocar al cliente | AC-04, AC-10 |
+| I-19 | `GET /admin/places/import/pois?color=red`, con dos tags o con un parametro de mas responde 400 sin tocar al cliente | AC-04, AC-10 |
+| I-20 | Una vista mas grande que CABA se recorta a la caja de la ciudad antes de consultar (el cliente recibe `BoundingBox.CABA`) | AC-04 |
+| I-21 | Una caja sin bordes, invertida, no numerica o fuera de CABA responde 400 sin tocar al cliente | AC-04, AC-10 |
 
 ### Tests de Seguridad (`integration/PlaceAdminSecurityTest.java`)
 
@@ -129,10 +140,10 @@ sin dependencias de red en ningun test.
 | E-04 | `e2e/PlaceViewABME2E.java` | Admin crea un place desde `/admin/places/new` → aparece en el listado del ABM y en `/explore` | AC-01 |
 | E-05 | `e2e/PlaceViewABME2E.java` | Admin edita el place creado → los cambios se ven en el listado y en `/explore` | AC-01 |
 | E-06 | `e2e/PlaceViewABME2E.java` | Admin da de baja el place → desaparece del listado y de `/explore` | AC-01 |
-| E-07 | `e2e/PlaceImportE2E.java` | Admin abre `/admin/places/import` con el proxy stubbeado por `page.route`: la lista muestra los 3 POIs del fixture, se dibujan solo los 2 con coordenadas, y elegir uno abre `/admin/places/new` con el form pre-llenado (nombre, categoria, direccion, lat/lng, horarios, telefono, web) | AC-04, AC-05, AC-10 |
-| E-08 | `e2e/PlaceImportE2E.java` | Con el proxy stubbeado en 502, la vista muestra el mensaje de error y la lista queda vacia | AC-04, AC-10 |
+| E-07 | `e2e/PlaceImportE2E.java` | Admin entra a `/admin/places/import` con el proxy stubbeado y el contador de pedidos en 0: no hay consulta ni buscador hasta apretar "Cargar puntos de esta zona"; con el click llega exactamente 1 pedido, aparecen los 3 POIs, el buscador se habilita y elegir uno abre `/admin/places/new` con el form pre-llenado (nombre, categoria, direccion, lat/lng, horarios, telefono, web) | AC-04, AC-05, AC-10 |
+| E-08 | `e2e/PlaceImportE2E.java` | Con el proxy stubbeado en 502, tras el click la vista muestra el mensaje de error y la lista queda vacia | AC-04, AC-10 |
 | E-09 | `e2e/PlaceImportE2E.java` | El buscador por nombre filtra la lista y los markers en el acto: "PARRILLA" → 1, "cafe" encuentra "Café" (sin acentos ni mayusculas), "zzz" → 0 y limpiar el filtro devuelve los 3 | AC-04, AC-10 |
-| E-10 | `e2e/PlaceImportE2E.java` | "Solo el área visible" sigue al mapa: al acercarse a zoom 17 el POI lejano sale de la lista y del mapa (2 de 3, 1 marker); al desactivarlo vuelven los 3 | AC-04, AC-10 |
+| E-10 | `e2e/PlaceImportE2E.java` | La consulta viaja con el area visible (`south`/`west`/`north`/`east` en la URL) y a zoom 17 pide una zona mas chica que la vista inicial; despues de dos arrastres aparece el aviso "te moviste a otra zona" sin vaciar la lista, y al volver a cargar el aviso se apaga | AC-04, AC-10 |
 
 El importador tiene E2E sin tocar la red: el navegador ejecuta la vista real y `page.route`
 intercepta `GET /admin/places/import/pois` antes de que salga, respondiendo un fixture (o un 502).
@@ -175,12 +186,13 @@ borde (red del browser / interfaz de dominio), nunca dentro de la logica de la v
 - **Overpass API — hechos.**
   - Endpoint principal: `https://overpass-api.de/api/interpreter`; mirror sin limites:
     `https://overpass.private.coffee/api/interpreter`. Sin API key.
-  - Query: `[out:json][timeout:60];nwr["amenity"="restaurant"]["name"](-34.7058,-58.5315,
-    -34.5266,-58.3351);out center tags 300;` — se consulta por **bounding box** de CABA
-    (sur,oeste,norte,este; sale del bbox de la relation 3082668 en Nominatim) y no por `area`:
-    el endpoint publico responde 502 a las consultas por area cuando esta saturado, y el area id
-    que decia esta spec (`3600345769`) era la relation de **Huesca, Espana** — devolvia cero
-    POIs. Con `["name"]` y `out ... 300` se acota la respuesta (99 KB en vez de 870 KB).
+  - Query: `[out:json][timeout:60];nwr["amenity"="restaurant"]["name"](<sur>,<oeste>,<norte>,<este>);
+    out center tags 300;` — el bounding box es el **area visible del mapa** que manda la vista,
+    recortada a CABA (sur,oeste,norte,este; CABA sale del bbox de la relation 3082668 en
+    Nominatim). Se consulta por **bounding box** y no por `area`: el endpoint publico responde 502
+    a las consultas por area cuando esta saturado, y el area id que decia esta spec
+    (`3600345769`) era la relation de **Huesca, Espana** — devolvia cero POIs. Con `["name"]` y
+    `out ... 300` se acota la respuesta (99 KB en vez de 870 KB).
   - Latencia real medida del endpoint publico: **25–47 s** por consulta sin cachear. Por eso el
     presupuesto del servidor es 60 s y el timeout del `HttpClient` 90 s: con 30 s el cliente
     cortaba antes de que Overpass contestara.
@@ -203,23 +215,35 @@ borde (red del browser / interfaz de dominio), nunca dentro de la logica de la v
   `PlaceCategory.fromOsm(key, value)` (ver Referencia, paso 4). Lo no mapeado cae en `OTHER`,
   y el admin siempre puede cambiarlo antes de guardar (el select del form es el mismo para el
   alta manual y la pre-llena): la categoria sugerida es una sugerencia, no una decision.
-- **Buscador y filtro por área del importador: locales, no otra consulta.** El input "Filtrar por
-  nombre" y el check "Solo el área visible" tamizan los POIs ya traidos (`computed` sobre `pois`),
-  sin volver a golpear Overpass: cada consulta cuesta ~30 s —medido en el endpoint público— y el
-  usuario escribe tecla por tecla o panea el mapa. El nombre compara sin acentos ni mayúsculas
-  ("cafe" encuentra "Café"); el área se recalcula con `moveend`/`zoomend` (debounce 120 ms) y mueve
-  lista y markers a la vez. Un POI sin coordenadas no se puede ubicar, así que se lista siempre.
-  Al cambiar de categoría el filtro se limpia y la lista anterior no queda visible.
-- **Los controles no se bloquean mientras carga.** El select y los filtros siguen usables: cambiar
-  de categoría aborta la consulta anterior (`AbortController`) y solo se aplica la última. El
-  estado se comunica con "Buscando puntos...", `aria-busy` y la lista atenuada.
+- **El importador no consulta al entrar: la consulta la dispara el admin.** La vista monta el mapa
+  (centrado en CABA, zoom 13) y no toca la red. Se elige el tipo de lugar y se presiona "Cargar
+  puntos de esta zona"; recién ahí sale un `GET /admin/places/import/pois` con el tag y los cuatro
+  bordes de la vista. El motivo es el costo: la consulta tarda ~30 s y no tiene sentido gastarla
+  antes de que el usuario elija qué buscar ni dónde. El buscador por nombre tampoco está: aparece
+  cuando hay una lista que filtrar (el buscador sobre una lista vacía solo confunde).
+- **La consulta es la zona visible, recortada a CABA.** El backend valida la caja (bordes
+  presentes, numéricos, no invertidos) y la intersecta con `BoundingBox.CABA`: una vista que se va
+  de la ciudad responde 400 y la vista deshabilita el botón con el motivo. Esa intersección es lo
+  que evita que un zoom out continental mande una consulta gigante al endpoint público, sin
+  necesidad de un tope de superficie aparte: el techo es la ciudad.
+- **Mover el mapa no vacía la lista: avisa.** La lista y los markers son la respuesta de la zona
+  que se consultó, así que panea o acerca el mapa y se quedan como están; cuando la vista deja de
+  cruzarse con el área cargada aparece el aviso "te moviste a otra zona, presioná Cargar" y el
+  usuario decide cuándo volver a gastar los ~30 s. Nada desaparece por mover el mouse.
+- **Buscador por nombre del importador: local, no otra consulta.** El input "Filtrar por nombre"
+  tamiza los POIs ya traídos (`computed` sobre `pois`), sin volver a golpear Overpass: el usuario
+  escribe tecla por tecla y cada consulta cuesta ~30 s. Compara sin acentos ni mayúsculas ("cafe"
+  encuentra "Café"). Al recargar se limpia, porque la lista es otra.
+- **Los controles no se bloquean mientras carga.** El select y el buscador siguen usables; solo el
+  botón se deshabilita y muestra "Cargando...". Apretar de nuevo aborta la consulta anterior
+  (`AbortController`) y solo se aplica la última. El estado se comunica además con `aria-busy` y la
+  lista atenuada.
 - **El mapa se centra bien desde el arranque.** El contenedor nace midiendo 0 (Tailwind diferido),
   así que `invalidateSize` va con `pan` por defecto para conservar el centro geográfico; con
-  `pan: false` el paso al tamaño real corría la vista ~5 km y el filtro por área arrancaba en otro
-  lado.
-- **El resultado se guarda 10 minutos por categoría.** `HttpOverpassClient` cachea en memoria el
-  par `key=value` (`ConcurrentHashMap` + TTL): volver a una categoría ya cargada es instantáneo y
-  de paso se golpea menos el endpoint público.
+  `pan: false` el paso al tamaño real corría la vista ~5 km.
+- **El resultado se guarda 10 minutos por `key=value@caja`.** `HttpOverpassClient` cachea en
+  memoria (`ConcurrentHashMap` + TTL) con la caja redondeada a ~100 m: repetir la misma zona con el
+  mismo tag es instantáneo y de paso se golpea menos el endpoint público.
 - **El importador depende del backend, nunca del navegador contra Overpass.** El mapa de la
   vista importa POIs desde `GET /admin/places/import/pois`, que es un proxy del backend sobre
   `OverpassClient`. La interfaz en el dominio permite mockearlo con `@MockBean` en los tests

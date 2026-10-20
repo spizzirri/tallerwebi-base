@@ -15,6 +15,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.valhalla.domain.place.BoundingBox;
 import com.valhalla.domain.place.OsmPoi;
 import java.io.IOException;
 import java.net.URI;
@@ -34,6 +35,9 @@ public class HttpOverpassClientTest {
 
   /** Tres elementos: un way con center y todos los tags, un node con lat/lon y solo contact:*, y
    * uno sin name. */
+  /** Caja concreta y distinta de CABA: prueba que la query usa la que recibe, no una constante. */
+  private static final BoundingBox BOX = new BoundingBox(-34.62, -58.45, -34.58, -58.37);
+
   private static final String FIXTURE =
     """
     {
@@ -175,17 +179,17 @@ public class HttpOverpassClientTest {
   // --- query: allowlist y escape ---
 
   @Test
-  public void shouldBuildTheCabaQueryForAnAllowedKey() {
+  public void shouldBuildTheQueryForTheBoxItReceives() {
     assertThat(
-      HttpOverpassClient.buildQuery("amenity", "restaurant"),
+      HttpOverpassClient.buildQuery("amenity", "restaurant", BOX),
       is(
-        "[out:json][timeout:60];nwr[\"amenity\"=\"restaurant\"][\"name\"](-34.7058,-58.5315,-34.5266,-58.3351);out center tags 300;"
+        "[out:json][timeout:60];nwr[\"amenity\"=\"restaurant\"][\"name\"](-34.620000,-58.450000,-34.580000,-58.370000);out center tags 300;"
       )
     );
     assertThat(
-      HttpOverpassClient.buildQuery(" shop ", "Clothes"),
+      HttpOverpassClient.buildQuery(" shop ", "Clothes", BOX),
       is(
-        "[out:json][timeout:60];nwr[\"shop\"=\"clothes\"][\"name\"](-34.7058,-58.5315,-34.5266,-58.3351);out center tags 300;"
+        "[out:json][timeout:60];nwr[\"shop\"=\"clothes\"][\"name\"](-34.620000,-58.450000,-34.580000,-58.370000);out center tags 300;"
       )
     );
   }
@@ -194,20 +198,23 @@ public class HttpOverpassClientTest {
   public void shouldRejectAKeyOutsideTheAllowlist() {
     assertThrows(
       IllegalArgumentException.class,
-      () -> HttpOverpassClient.buildQuery("color", "red")
+      () -> HttpOverpassClient.buildQuery("color", "red", BOX)
     );
-    assertThrows(IllegalArgumentException.class, () -> HttpOverpassClient.buildQuery(null, "red"));
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> HttpOverpassClient.buildQuery(null, "red", BOX)
+    );
   }
 
   @Test
   public void shouldRejectAValueThatWouldInjectQuerySyntax() {
     assertThrows(
       IllegalArgumentException.class,
-      () -> HttpOverpassClient.buildQuery("amenity", "restaurant\"](area=1);out;")
+      () -> HttpOverpassClient.buildQuery("amenity", "restaurant\"](area=1);out;", BOX)
     );
     assertThrows(
       IllegalArgumentException.class,
-      () -> HttpOverpassClient.buildQuery("amenity", " ")
+      () -> HttpOverpassClient.buildQuery("amenity", " ", BOX)
     );
   }
 
@@ -217,7 +224,7 @@ public class HttpOverpassClientTest {
   public void shouldPostTheQueryAsAFormBodyWithAnIdentifiableUserAgent() {
     HttpRequest request = HttpOverpassClient.buildRequest(
       "http://localhost:1234/api/interpreter",
-      HttpOverpassClient.buildQuery("amenity", "restaurant")
+      HttpOverpassClient.buildQuery("amenity", "restaurant", BOX)
     );
 
     assertThat(request.method(), is("POST"));
@@ -246,7 +253,7 @@ public class HttpOverpassClientTest {
       Duration.ofMinutes(10)
     );
 
-    List<OsmPoi> pois = overpass.findCabaPois("amenity", "restaurant");
+    List<OsmPoi> pois = overpass.findPois("amenity", "restaurant", BOX);
 
     assertThat(pois, hasSize(2));
     verify(httpClient, times(2)).send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class));
@@ -264,7 +271,7 @@ public class HttpOverpassClientTest {
       Duration.ofMinutes(10)
     );
 
-    List<OsmPoi> pois = overpass.findCabaPois("amenity", "restaurant");
+    List<OsmPoi> pois = overpass.findPois("amenity", "restaurant", BOX);
 
     assertThat(pois, hasSize(2));
     verify(httpClient, times(2)).send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class));
@@ -285,7 +292,7 @@ public class HttpOverpassClientTest {
 
     IllegalStateException error = assertThrows(
       IllegalStateException.class,
-      () -> overpass.findCabaPois("amenity", "restaurant")
+      () -> overpass.findPois("amenity", "restaurant", BOX)
     );
 
     assertThat(error.getMessage(), containsString("503"));
@@ -305,7 +312,7 @@ public class HttpOverpassClientTest {
       Duration.ofMinutes(10)
     );
 
-    assertThat(overpass.findCabaPois("amenity", "restaurant"), hasSize(2));
+    assertThat(overpass.findPois("amenity", "restaurant", BOX), hasSize(2));
     verify(httpClient, times(2)).send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class));
   }
 
@@ -322,12 +329,31 @@ public class HttpOverpassClientTest {
       Duration.ofMinutes(10)
     );
 
-    List<OsmPoi> first = overpass.findCabaPois("amenity", "restaurant");
-    List<OsmPoi> second = overpass.findCabaPois(" amenity ", "RESTAURANT");
+    List<OsmPoi> first = overpass.findPois("amenity", "restaurant", BOX);
+    List<OsmPoi> second = overpass.findPois(" amenity ", "RESTAURANT", BOX);
 
     assertThat(first, hasSize(2));
     assertThat(second, is(first));
     verify(httpClient, times(1)).send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class));
+  }
+
+  /** El cache es por caja: la misma categoria en otra zona es otra consulta. */
+  @Test
+  public void shouldNotShareTheCacheBetweenBoxes() throws Exception {
+    HttpClient httpClient = mock(HttpClient.class);
+    stubSend(httpClient, response(200, FIXTURE), response(200, SPARSE_FIXTURE));
+    HttpOverpassClient overpass = new HttpOverpassClient(
+      ENDPOINT,
+      httpClient,
+      0L,
+      0L,
+      Duration.ofMinutes(10)
+    );
+
+    assertThat(overpass.findPois("amenity", "restaurant", BOX), hasSize(2));
+    BoundingBox anotherNeighbourhood = new BoundingBox(-34.7, -58.5, -34.65, -58.45);
+    assertThat(overpass.findPois("amenity", "restaurant", anotherNeighbourhood), hasSize(1));
+    verify(httpClient, times(2)).send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class));
   }
 
   /** El cache vence: con TTL 0 la segunda llamada vuelve a consultar (y a fallar si el stub no alcanza). */
@@ -343,8 +369,8 @@ public class HttpOverpassClientTest {
       Duration.ZERO
     );
 
-    assertThat(overpass.findCabaPois("amenity", "restaurant"), hasSize(2));
-    assertThat(overpass.findCabaPois("amenity", "restaurant"), hasSize(1));
+    assertThat(overpass.findPois("amenity", "restaurant", BOX), hasSize(2));
+    assertThat(overpass.findPois("amenity", "restaurant", BOX), hasSize(1));
     verify(httpClient, times(2)).send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class));
   }
 
@@ -362,7 +388,7 @@ public class HttpOverpassClientTest {
 
     IllegalStateException error = assertThrows(
       IllegalStateException.class,
-      () -> overpass.findCabaPois("amenity", "restaurant")
+      () -> overpass.findPois("amenity", "restaurant", BOX)
     );
 
     assertThat(error.getMessage(), containsString("500"));
@@ -383,7 +409,7 @@ public class HttpOverpassClientTest {
 
     IllegalStateException error = assertThrows(
       IllegalStateException.class,
-      () -> overpass.findCabaPois("amenity", "restaurant")
+      () -> overpass.findPois("amenity", "restaurant", BOX)
     );
 
     assertThat(error.getMessage(), containsString("unreachable"));
@@ -404,7 +430,7 @@ public class HttpOverpassClientTest {
     try {
       IllegalStateException error = assertThrows(
         IllegalStateException.class,
-        () -> overpass.findCabaPois("amenity", "restaurant")
+        () -> overpass.findPois("amenity", "restaurant", BOX)
       );
 
       assertThat(error.getMessage(), containsString("interrupted"));
@@ -434,7 +460,7 @@ public class HttpOverpassClientTest {
     try {
       IllegalStateException error = assertThrows(
         IllegalStateException.class,
-        () -> overpass.findCabaPois("amenity", "restaurant")
+        () -> overpass.findPois("amenity", "restaurant", BOX)
       );
 
       assertThat(error.getMessage(), containsString("retry interrupted"));
