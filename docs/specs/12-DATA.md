@@ -68,6 +68,8 @@ sin dependencias de red en ningun test.
 | U-10 | Parsea una respuesta Overpass de fixture (elemento `nwr` con `center` y `tags`) al `OsmPoi` correcto: nombre, direccion armada desde `addr:*`, lat/lng del center | AC-04 |
 | U-11 | Tags ausentes dejan los campos en `null` (sin phone/web/horarios no hay excepcion); `contact:phone` es fallback de `phone` | AC-04, AC-05 |
 | U-12 | Elementos sin `name` se descartan | AC-04 |
+| U-13 | La query sale por bounding box de CABA (sin `area`) y valida key/value contra el allowlist | AC-04 |
+| U-14 | Reintenta una vez ante 429 (esperando el delay inyectado), una vez ante 502 y hasta dos veces en total; un 500 no se reintenta | AC-04 |
 
 ### Tests de Integracion (`integration/PlaceRestControllerTest.java`)
 
@@ -127,10 +129,13 @@ sin dependencias de red en ningun test.
 | E-04 | `e2e/PlaceViewABME2E.java` | Admin crea un place desde `/admin/places/new` → aparece en el listado del ABM y en `/explore` | AC-01 |
 | E-05 | `e2e/PlaceViewABME2E.java` | Admin edita el place creado → los cambios se ven en el listado y en `/explore` | AC-01 |
 | E-06 | `e2e/PlaceViewABME2E.java` | Admin da de baja el place → desaparece del listado y de `/explore` | AC-01 |
+| E-07 | `e2e/PlaceImportE2E.java` | Admin abre `/admin/places/import` con el proxy stubbeado por `page.route`: la lista muestra los 3 POIs del fixture, se dibujan solo los 2 con coordenadas, y elegir uno abre `/admin/places/new` con el form pre-llenado (nombre, categoria, direccion, lat/lng, horarios, telefono, web) | AC-04, AC-05, AC-10 |
+| E-08 | `e2e/PlaceImportE2E.java` | Con el proxy stubbeado en 502, la vista muestra el mensaje de error y la lista queda vacia | AC-04, AC-10 |
 
-El importador NO tiene E2E: su cobertura es integration con `OverpassClient` mockeado (AC-10).
-Un E2E del importador obligaria a golpear Overpass o a inyectar un doble en el contexto del
-servidor E2E, que hoy no tiene mecanismo para eso.
+El importador tiene E2E sin tocar la red: el navegador ejecuta la vista real y `page.route`
+intercepta `GET /admin/places/import/pois` antes de que salga, respondiendo un fixture (o un 502).
+Es el mismo criterio que usa la integracion con `OverpassClient` mockeado: el doble vive en el
+borde (red del browser / interfaz de dominio), nunca dentro de la logica de la vista.
 
 ## Notas / decisiones de diseño
 
@@ -168,14 +173,22 @@ servidor E2E, que hoy no tiene mecanismo para eso.
 - **Overpass API — hechos.**
   - Endpoint principal: `https://overpass-api.de/api/interpreter`; mirror sin limites:
     `https://overpass.private.coffee/api/interpreter`. Sin API key.
-  - Query estilo: `[out:json][timeout:20];nwr["amenity"="restaurant"](area=3600345769);out
-    center tags;` — `3600345769` es la relation de CABA en OSM (area id Overpass de una
-    relation = `3600000000 + id`); verificar/ajustar al implementar.
+  - Query: `[out:json][timeout:60];nwr["amenity"="restaurant"]["name"](-34.7058,-58.5315,
+    -34.5266,-58.3351);out center tags 300;` — se consulta por **bounding box** de CABA
+    (sur,oeste,norte,este; sale del bbox de la relation 3082668 en Nominatim) y no por `area`:
+    el endpoint publico responde 502 a las consultas por area cuando esta saturado, y el area id
+    que decia esta spec (`3600345769`) era la relation de **Huesca, Espana** — devolvia cero
+    POIs. Con `["name"]` y `out ... 300` se acota la respuesta (99 KB en vez de 870 KB).
+  - Latencia real medida del endpoint publico: **25–47 s** por consulta sin cachear. Por eso el
+    presupuesto del servidor es 60 s y el timeout del `HttpClient` 90 s: con 30 s el cliente
+    cortaba antes de que Overpass contestara.
   - Devuelve tags `name`, `addr:*`, `opening_hours`, `phone`/`contact:phone`, `website`,
     `cuisine`, y el tipo (`amenity=*` / `shop=*`). NO devuelve fotos ni ratings: importar
     imagenes o puntajes queda fuera de alcance.
-  - Uso automatizado moderado: ~100 queries/dia y 10 MB/dia en el server principal. En HTTP
-    429, esperar 30s y reintentar una vez.
+  - Uso automatizado moderado: ~100 queries/dia y 10 MB/dia en el server principal. Errores
+    transitorios: **429** (limite por IP: esperar 30 s) y **502/503/504** (cola llena: esperar
+    1 s). Se reintenta hasta dos veces en total; si sigue fallando, el proxy responde 502 y la
+    vista invita a probar de nuevo.
 - **Nominatim — hechos.** `https://nominatim.openstreetmap.org/search` (o Photon) hace
   geocoding por nombre; sin key, requiere un `User-Agent` identificable, 1 req/s. No es
   necesario en el flujo principal del importador (Overpass ya devuelve coordenadas del POI
@@ -329,8 +342,10 @@ unica implementacion con red, marcada `@Component`:
   `center.lat/center.lon` (por eso el `out center`); descarta los sin `name`; direccion
   armada de `addr:housenumber` + `addr:street`; telefono con fallback
   `contact:phone` → `phone`.
-- En HTTP 429: `Thread.sleep(30_000)` y un reintento; mas alla, propaga una excepcion que el
-  controller traduce a un mensaje visible en la vista de import (ver paso 6).
+- En errores transitorios del endpoint (429, 502, 503, 504) reintenta hasta dos veces: espera
+  30 s para el 429 y 1 s para el endpoint saturado. Mas alla, propaga una excepcion que el
+  controller traduce a un mensaje visible en la vista de import (ver paso 6) y deja el detalle
+  en el log con `java.util.logging`.
 
 Unit testable sin red: el parseo se deja en un metodo aparte (package-private o estatico)
 que recibe el body JSON y devuelve `List<OsmPoi>` — es lo que cubren U-10..U-12 con un
@@ -465,8 +480,9 @@ Los archivos de test nuevos siguen los nombres y paquetes existentes:
 `integration/PlaceAdminSecurityTest.java`, `integration/PlaceImageTest.java`,
 `infrastructure/place/HttpOverpassClientTest.java`,
 `e2e/PlaceViewABME2E.java` (espejo de `e2e/UserViewABME2E.java`, con page objects en
-`e2e/views/` si hace falta). Los mock de `OverpassClient` en integracion son `@MockBean`; en
-E2E no se testea el importador (AC-10).
+`e2e/views/`) y `e2e/PlaceImportE2E.java` (E-07..E-08: el proxy de Overpass se stubbea con
+`page.route`, asi que la vista real corre en Chromium sin red). Los mock de `OverpassClient` en
+integracion son `@MockBean` (AC-10).
 
 ## Archivos a crear/modificar
 
@@ -500,4 +516,6 @@ E2E no se testea el importador (AC-10).
 | `integration/PlaceAdminSecurityTest.java` | Crear (S-01..S-04) |
 | `e2e/PlacesViewE2E.java` | Actualizar (E-01..E-03, recalibrado sin hex) |
 | `e2e/PlaceViewABME2E.java` | Crear (E-04..E-06) |
+| `e2e/PlaceImportE2E.java` | Crear (E-07..E-08, proxy stubbeado con `page.route`) |
+| `e2e/views/PlaceImportPage.java` | Crear (page object de la vista de import) |
 | `e2e/ResetDatabase.java` | Actualizar (`DELETE FROM places` + `ALTER SEQUENCE` antes de `plans`) |

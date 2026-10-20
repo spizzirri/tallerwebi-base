@@ -3,6 +3,8 @@ package com.valhalla.presentation.place;
 import com.valhalla.domain.place.OverpassClient;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +32,9 @@ public class PlaceImportController {
   private static final String ERROR_KEY = "error";
   private static final String ERROR_QUERY = "Unsupported query: use amenity or shop";
   private static final String ERROR_OVERPASS = "Overpass is not available right now";
+
+  /** La vista no tiene como distinguir un timeout de un 502: el log es la unica pista. */
+  private static final Logger LOGGER = Logger.getLogger(PlaceImportController.class.getName());
 
   /** Mismo allowlist que {@code HttpOverpassClient}: el 400 se responde sin salir a la red. */
   private static final Set<String> ALLOWED_KEYS = Set.of("amenity", "shop");
@@ -68,6 +73,9 @@ public class PlaceImportController {
     try {
       return ResponseEntity.ok(overpassClient.findCabaPois(key, value));
     } catch (RuntimeException exception) {
+      if (LOGGER.isLoggable(Level.WARNING)) {
+        LOGGER.log(Level.WARNING, "Overpass failed for " + key + "=" + value, exception);
+      }
       return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(Map.of(ERROR_KEY, ERROR_OVERPASS));
     }
   }

@@ -31,6 +31,38 @@ public class PlaceFormPage extends WebPage {
     this.typeIntoElement("#longitude", longitude);
   }
 
+  public String getName() {
+    return page.inputValue("#name");
+  }
+
+  public String getCategory() {
+    return page.inputValue("#category");
+  }
+
+  public String getAddress() {
+    return page.inputValue("#address");
+  }
+
+  public String getLatitude() {
+    return page.inputValue("#latitude");
+  }
+
+  public String getLongitude() {
+    return page.inputValue("#longitude");
+  }
+
+  public String getOpeningHours() {
+    return page.inputValue("#openingHours");
+  }
+
+  public String getPhone() {
+    return page.inputValue("#phone");
+  }
+
+  public String getWebsite() {
+    return page.inputValue("#website");
+  }
+
   /** El mismo boton crea y actualiza; el label (Create/Update) cambia con {@code isEdit}. */
   public void clickSave() {
     this.clickElement("#btn-create");

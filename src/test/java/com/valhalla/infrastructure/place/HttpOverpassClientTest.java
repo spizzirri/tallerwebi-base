@@ -177,11 +177,15 @@ public class HttpOverpassClientTest {
   public void shouldBuildTheCabaQueryForAnAllowedKey() {
     assertThat(
       HttpOverpassClient.buildQuery("amenity", "restaurant"),
-      is("[out:json][timeout:20];nwr[\"amenity\"=\"restaurant\"](area=3600345769);out center tags;")
+      is(
+        "[out:json][timeout:60];nwr[\"amenity\"=\"restaurant\"][\"name\"](-34.7058,-58.5315,-34.5266,-58.3351);out center tags 300;"
+      )
     );
     assertThat(
       HttpOverpassClient.buildQuery(" shop ", "Clothes"),
-      is("[out:json][timeout:20];nwr[\"shop\"=\"clothes\"](area=3600345769);out center tags;")
+      is(
+        "[out:json][timeout:60];nwr[\"shop\"=\"clothes\"][\"name\"](-34.7058,-58.5315,-34.5266,-58.3351);out center tags 300;"
+      )
     );
   }
 
@@ -233,7 +237,7 @@ public class HttpOverpassClientTest {
   public void shouldRetryOnceAfterRateLimitAndReturnTheParsedPois() throws Exception {
     HttpClient httpClient = mock(HttpClient.class);
     stubSend(httpClient, response(429, ""), response(200, FIXTURE));
-    HttpOverpassClient overpass = new HttpOverpassClient(ENDPOINT, httpClient, 0L);
+    HttpOverpassClient overpass = new HttpOverpassClient(ENDPOINT, httpClient, 0L, 0L);
 
     List<OsmPoi> pois = overpass.findCabaPois("amenity", "restaurant");
 
@@ -242,10 +246,49 @@ public class HttpOverpassClientTest {
   }
 
   @Test
+  public void shouldRetryOnceWhenOverpassIsAtCapacity() throws Exception {
+    HttpClient httpClient = mock(HttpClient.class);
+    stubSend(httpClient, response(502, ""), response(200, FIXTURE));
+    HttpOverpassClient overpass = new HttpOverpassClient(ENDPOINT, httpClient, 0L, 0L);
+
+    List<OsmPoi> pois = overpass.findCabaPois("amenity", "restaurant");
+
+    assertThat(pois, hasSize(2));
+    verify(httpClient, times(2)).send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class));
+  }
+
+  /** Tope de reintentos: dos, ni uno mas; si el endpoint sigue saturado se propaga el status. */
+  @Test
+  public void shouldStopRetryingAfterTwoAttempts() throws Exception {
+    HttpClient httpClient = mock(HttpClient.class);
+    stubSend(httpClient, response(502, ""), response(503, ""));
+    HttpOverpassClient overpass = new HttpOverpassClient(ENDPOINT, httpClient, 0L, 0L);
+
+    IllegalStateException error = assertThrows(
+      IllegalStateException.class,
+      () -> overpass.findCabaPois("amenity", "restaurant")
+    );
+
+    assertThat(error.getMessage(), containsString("503"));
+    verify(httpClient, times(3)).send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class));
+  }
+
+  /** El gateway timeout tambien es transitorio: Overpass lo usa cuando se le pasa su presupuesto. */
+  @Test
+  public void shouldRetryWhenOverpassTimesOut() throws Exception {
+    HttpClient httpClient = mock(HttpClient.class);
+    stubSend(httpClient, response(504, ""), response(200, FIXTURE));
+    HttpOverpassClient overpass = new HttpOverpassClient(ENDPOINT, httpClient, 0L, 0L);
+
+    assertThat(overpass.findCabaPois("amenity", "restaurant"), hasSize(2));
+    verify(httpClient, times(2)).send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class));
+  }
+
+  @Test
   public void shouldThrowWhenOverpassAnswersSomethingOtherThanOk() throws Exception {
     HttpClient httpClient = mock(HttpClient.class);
     stubSend(httpClient, response(500, "upstream boom"));
-    HttpOverpassClient overpass = new HttpOverpassClient(ENDPOINT, httpClient, 0L);
+    HttpOverpassClient overpass = new HttpOverpassClient(ENDPOINT, httpClient, 0L, 0L);
 
     IllegalStateException error = assertThrows(
       IllegalStateException.class,
@@ -260,7 +303,7 @@ public class HttpOverpassClientTest {
   public void shouldWrapAnUnreachableOverpass() throws Exception {
     HttpClient httpClient = mock(HttpClient.class);
     doThrow(new IOException("connection reset")).when(httpClient).send(any(), any());
-    HttpOverpassClient overpass = new HttpOverpassClient(ENDPOINT, httpClient, 0L);
+    HttpOverpassClient overpass = new HttpOverpassClient(ENDPOINT, httpClient, 0L, 0L);
 
     IllegalStateException error = assertThrows(
       IllegalStateException.class,
@@ -274,7 +317,7 @@ public class HttpOverpassClientTest {
   public void shouldKeepTheInterruptFlagWhenTheRequestIsInterrupted() throws Exception {
     HttpClient httpClient = mock(HttpClient.class);
     doThrow(new InterruptedException()).when(httpClient).send(any(), any());
-    HttpOverpassClient overpass = new HttpOverpassClient(ENDPOINT, httpClient, 0L);
+    HttpOverpassClient overpass = new HttpOverpassClient(ENDPOINT, httpClient, 0L, 0L);
 
     try {
       IllegalStateException error = assertThrows(
@@ -297,7 +340,7 @@ public class HttpOverpassClientTest {
   public void shouldFailTheRetryWhenTheWaitIsInterrupted() throws Exception {
     HttpClient httpClient = mock(HttpClient.class);
     stubSend(httpClient, response(429, ""));
-    HttpOverpassClient overpass = new HttpOverpassClient(ENDPOINT, httpClient, 1L);
+    HttpOverpassClient overpass = new HttpOverpassClient(ENDPOINT, httpClient, 1L, 0L);
 
     Thread.currentThread().interrupt();
     try {
