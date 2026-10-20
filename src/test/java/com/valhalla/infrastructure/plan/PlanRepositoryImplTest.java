@@ -10,6 +10,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.valhalla.domain.plan.Plan;
+import com.valhalla.domain.plan.PlanParticipantCount;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -127,6 +128,24 @@ public class PlanRepositoryImplTest {
 
     // then
     verify(this.jpaPlanRepositoryMock, times(1)).deleteById(PLAN_ID);
+  }
+
+  @Test
+  public void U13_countParticipantsByPlanIds_delegaEnJpaPlanRepository() {
+    // given
+    List<UUID> planIds = List.of(PLAN_ID, OTHER_PLAN_ID);
+    List<PlanParticipantCount> counts = List.of(
+      new PlanParticipantCount(PLAN_ID, 4L),
+      new PlanParticipantCount(OTHER_PLAN_ID, 0L)
+    );
+    when(this.jpaPlanRepositoryMock.countParticipantsByPlanIds(planIds)).thenReturn(counts);
+
+    // when
+    List<PlanParticipantCount> result = this.planRepository.countParticipantsByPlanIds(planIds);
+
+    // then
+    assertThat(result, is(sameInstance(counts)));
+    verify(this.jpaPlanRepositoryMock, times(1)).countParticipantsByPlanIds(planIds);
   }
 
   private Plan plan(UUID id) {

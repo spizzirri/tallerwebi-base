@@ -1,6 +1,8 @@
 package com.valhalla.infrastructure.plan;
 
 import com.valhalla.domain.plan.Plan;
+import com.valhalla.domain.plan.PlanParticipantCount;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -31,4 +33,15 @@ public interface JpaPlanRepository extends JpaRepository<Plan, UUID> {
    */
   @Query("select p from Plan p where p.isPublic = true")
   List<Plan> findByIsPublicTrue();
+
+  /**
+   * [TOP] Participantes por plan, con {@code left join} para que un plan sin participantes
+   * aparezca con {@code 0} en vez de ausente. El owner no cuenta: no vive en esta tabla.
+   */
+  @Query(
+    "select new com.valhalla.domain.plan.PlanParticipantCount(plan.id, count(participant)) " +
+    "from Plan plan left join plan.planManager.participants participant " +
+    "where plan.id in :planIds group by plan.id"
+  )
+  List<PlanParticipantCount> countParticipantsByPlanIds(@Param("planIds") Collection<UUID> planIds);
 }

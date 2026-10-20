@@ -25,6 +25,7 @@ import com.valhalla.domain.place.Place;
 import com.valhalla.domain.place.PlaceRepository;
 import com.valhalla.domain.plan.Plan;
 import com.valhalla.domain.plan.PlanInvitation;
+import com.valhalla.domain.plan.PlanParticipantCount;
 import com.valhalla.domain.plan.PlanRepository;
 import com.valhalla.domain.plan.PlanService;
 import com.valhalla.domain.planplace.PlanPlace;
@@ -34,6 +35,7 @@ import com.valhalla.domain.user.UserRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -459,6 +461,38 @@ public class PlanServiceImplTest {
     this.planService.getPublicPlans();
 
     // then: es una lectura, el listado no escribe ni ordena nada (AC-05)
+    assertNothingWasMutated();
+  }
+
+  // --- getParticipantCounts [TOP] ---
+
+  @Test
+  public void U14_getParticipantCounts_mapeaLaListaDelRepositorioAMapDeUuidYLong() {
+    // given
+    List<UUID> planIds = List.of(PLAN_ID, OTHER_PLAN_ID);
+    when(this.planRepositoryMock.countParticipantsByPlanIds(planIds))
+      .thenReturn(
+        List.of(new PlanParticipantCount(PLAN_ID, 4L), new PlanParticipantCount(OTHER_PLAN_ID, 0L))
+      );
+
+    // when
+    Map<UUID, Long> counts = this.planService.getParticipantCounts(planIds);
+
+    // then
+    assertThat(counts, is(equalTo(Map.of(PLAN_ID, 4L, OTHER_PLAN_ID, 0L))));
+    verify(this.planRepositoryMock, times(1)).countParticipantsByPlanIds(planIds);
+  }
+
+  @Test
+  public void U15_getParticipantCounts_sinIdsDevuelveMapaVacioYNoConsultaElRepositorio() {
+    // when
+    Map<UUID, Long> emptyCounts = this.planService.getParticipantCounts(List.of());
+    Map<UUID, Long> nullCounts = this.planService.getParticipantCounts(null);
+
+    // then: el corte temprano es correccion, `in :planIds` vacio no es JPQL valido
+    assertThat(emptyCounts, is(equalTo(Map.of())));
+    assertThat(nullCounts, is(equalTo(Map.of())));
+    verify(this.planRepositoryMock, never()).countParticipantsByPlanIds(any());
     assertNothingWasMutated();
   }
 
