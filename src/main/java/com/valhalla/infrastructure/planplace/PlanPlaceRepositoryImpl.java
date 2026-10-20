@@ -37,6 +37,11 @@ public class PlanPlaceRepositoryImpl implements PlanPlaceRepository {
   }
 
   @Override
+  public boolean existsByPlaceId(Long placeId) {
+    return jpa.existsByPlaceId(placeId);
+  }
+
+  @Override
   public void deleteById(Long id) {
     jpa.deleteById(id);
   }

@@ -13,7 +13,7 @@ import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "places")
-public class Place {
+public class Place { // NOPMD — intentional: 11 fields vs maxfields=10; the 3 extra (openingHours, phone, website) are optional OSM-imported columns, one getter/setter pair each, no behaviour.
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,6 +42,15 @@ public class Place {
 
   private Double latitude;
   private Double longitude;
+
+  // Opcionales (nullable), como address: el importador de OpenStreetMap las trae y el ABM
+  // las edita. Sin @Lob por la razon documentada arriba en description.
+  @Column(name = "opening_hours")
+  private String openingHours;
+
+  private String phone;
+
+  private String website;
 
   public Long getId() {
     return id;
@@ -105,5 +114,29 @@ public class Place {
 
   public void setLongitude(Double longitude) {
     this.longitude = longitude;
+  }
+
+  public String getOpeningHours() {
+    return openingHours;
+  }
+
+  public void setOpeningHours(String openingHours) {
+    this.openingHours = openingHours;
+  }
+
+  public String getPhone() {
+    return phone;
+  }
+
+  public void setPhone(String phone) {
+    this.phone = phone;
+  }
+
+  public String getWebsite() {
+    return website;
+  }
+
+  public void setWebsite(String website) {
+    this.website = website;
   }
 }
