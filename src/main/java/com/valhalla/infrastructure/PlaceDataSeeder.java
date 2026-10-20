@@ -97,6 +97,22 @@ public class PlaceDataSeeder implements ApplicationListener<ContextRefreshedEven
       "Guatemala 4699",
       -34.5892,
       -58.4262
+    ),
+    new PlaceData(
+      "Obelisco de Buenos Aires",
+      "Monumento emblematico en el cruce de la Avenida 9 de Julio y Corrientes",
+      PlaceCategory.OTHER,
+      "Av. 9 de Julio y Corrientes",
+      -34.6054,
+      -58.3815
+    ),
+    new PlaceData(
+      "Estadio Monumental",
+      "Estadio de River Plate en el barrio de Belgrano",
+      PlaceCategory.SPORT,
+      "Av. Figueroa Alcorta 7597",
+      -34.5453,
+      -58.4497
     )
   );
 
@@ -132,6 +148,7 @@ public class PlaceDataSeeder implements ApplicationListener<ContextRefreshedEven
     place.setAddress(data.address());
     place.setLatitude(data.latitude());
     place.setLongitude(data.longitude());
+    place.setImageUrl(data.imageUrl()); // null en todo el dataset: la vista cae al placeholder
     placeRepository.save(place);
   }
 
@@ -141,6 +158,19 @@ public class PlaceDataSeeder implements ApplicationListener<ContextRefreshedEven
     PlaceCategory category,
     String address,
     double latitude,
-    double longitude
-  ) {}
+    double longitude,
+    String imageUrl
+  ) {
+    /** Los 10 lugares originales no cargan imagen: el placeholder es el default (U-09). */
+    PlaceData(
+      String name,
+      String description,
+      PlaceCategory category,
+      String address,
+      double latitude,
+      double longitude
+    ) {
+      this(name, description, category, address, latitude, longitude, null);
+    }
+  }
 }
