@@ -2,10 +2,12 @@ package com.valhalla.infrastructure.plan;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
 import com.valhalla.domain.plan.Plan;
+import com.valhalla.domain.plan.PlanParticipantCount;
 import com.valhalla.domain.user.User;
 import com.valhalla.infrastructure.user.JpaUserRepository;
 import com.valhalla.integration.JpaIntegrationTest;
@@ -105,5 +107,58 @@ public class JpaPlanRepositoryTest {
 
     assertThat(resultado.size(), is(equalTo(1)));
     assertThat(resultado.get(0).getName(), is(equalTo("Plan de user1")));
+  }
+
+  @Test
+  @Transactional
+  @Rollback
+  public void I01_countParticipantsByPlanIds_cuentaSoloParticipantesYNoAlOwner() {
+    User owner = saveUser("owner-top@test.com");
+    User participant = saveUser("participant-top@test.com");
+    User editor = saveUser("editor-top@test.com");
+
+    Plan plan = new Plan();
+    plan.setName("Plan con participantes");
+    plan.setShortCode("TOP00001");
+    plan.setAdministrator(owner);
+    plan.getParticipants().add(participant);
+    plan.getParticipants().add(editor);
+    plan.getEditors().add(editor);
+    Plan saved = this.planRepository.save(plan);
+
+    List<PlanParticipantCount> counts =
+      this.planRepository.countParticipantsByPlanIds(List.of(saved.getId()));
+
+    assertThat(counts, hasSize(1));
+    assertThat(counts.getFirst().planId(), is(equalTo(saved.getId())));
+    // el owner vive en administrator y el editor suma una fila en plan_participants
+    assertThat(counts.getFirst().count(), is(equalTo(2L)));
+  }
+
+  @Test
+  @Transactional
+  @Rollback
+  public void I02_countParticipantsByPlanIds_sinParticipantesDevuelveCero() {
+    User owner = saveUser("owner-alone@test.com");
+
+    Plan plan = new Plan();
+    plan.setName("Plan sin participantes");
+    plan.setShortCode("TOP00002");
+    plan.setAdministrator(owner);
+    Plan saved = this.planRepository.save(plan);
+
+    List<PlanParticipantCount> counts =
+      this.planRepository.countParticipantsByPlanIds(List.of(saved.getId()));
+
+    // el left join devuelve la fila con 0: no se completa el mapa con ceros en Java
+    assertThat(counts, hasSize(1));
+    assertThat(counts.getFirst().planId(), is(equalTo(saved.getId())));
+    assertThat(counts.getFirst().count(), is(equalTo(0L)));
+  }
+
+  private User saveUser(String email) {
+    User user = new User();
+    user.setEmail(email);
+    return this.userRepository.save(user);
   }
 }

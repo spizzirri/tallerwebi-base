@@ -1,7 +1,9 @@
 package com.valhalla.infrastructure.plan;
 
 import com.valhalla.domain.plan.Plan;
+import com.valhalla.domain.plan.PlanParticipantCount;
 import com.valhalla.domain.plan.PlanRepository;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -66,5 +68,10 @@ public class PlanRepositoryImpl implements PlanRepository {
   @Override
   public void deleteById(UUID id) {
     jpaPlanRepository.deleteById(id);
+  }
+
+  @Override
+  public List<PlanParticipantCount> countParticipantsByPlanIds(Collection<UUID> planIds) {
+    return jpaPlanRepository.countParticipantsByPlanIds(planIds);
   }
 }

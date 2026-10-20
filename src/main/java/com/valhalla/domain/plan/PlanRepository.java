@@ -1,5 +1,6 @@
 package com.valhalla.domain.plan;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -15,4 +16,5 @@ public interface PlanRepository {
   boolean existsByShortCode(String shortCode);
   Plan save(Plan plan);
   void deleteById(UUID id);
+  List<PlanParticipantCount> countParticipantsByPlanIds(Collection<UUID> planIds);
 }

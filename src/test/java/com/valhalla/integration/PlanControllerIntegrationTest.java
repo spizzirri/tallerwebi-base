@@ -22,6 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import com.valhalla.domain.place.Place;
+import com.valhalla.domain.place.PlaceCategory;
 import com.valhalla.domain.place.PlaceRepository;
 import com.valhalla.domain.plan.Plan;
 import com.valhalla.domain.plan.PlanRepository;
@@ -410,6 +411,130 @@ public class PlanControllerIntegrationTest {
       )
     );
     this.mockMvc.perform(get("/images/plans/cover-1.svg")).andExpect(status().isOk());
+  }
+
+  // --- GET /for-you con busqueda, filtros y orden [SEARCH] ---
+
+  @Test
+  public void I01_search_porTextoMuestraSoloLosPlanesQueMatchean() throws Exception {
+    // given: dos planes publicos, solo uno menciona el texto buscado
+    givenSearchablePublicPlan(this.ownerId, "Salida al museo", null, null);
+    givenSearchablePublicPlan(this.otherId, "Cena en el barrio", null, null);
+
+    // when
+    String html = forYouHtml("/for-you?q=museo");
+
+    // then (AC-01)
+    assertThat(html, containsString("Salida al museo"));
+    assertThat(html, not(containsString("Cena en el barrio")));
+  }
+
+  @Test
+  public void I02_search_porCategoriaMuestraSoloPlanesConUnLugarDeEsaCategoria() throws Exception {
+    // given: un plan con un lugar BAR y otro con un lugar MUSEUM
+    givenSearchablePublicPlan(this.ownerId, "Noche de bares", null, PlaceCategory.BAR);
+    givenSearchablePublicPlan(this.otherId, "Tarde de museo", null, PlaceCategory.MUSEUM);
+
+    // when
+    String html = forYouHtml("/for-you?category=BAR");
+
+    // then (AC-03)
+    assertThat(html, containsString("Noche de bares"));
+    assertThat(html, not(containsString("Tarde de museo")));
+  }
+
+  @Test
+  public void I03_search_porFechaPasadaMuestraSoloLosPlanesConFechaAnteriorAHoy() throws Exception {
+    // given: uno pasado, uno futuro y uno sin fecha (fuera de las dos ventanas)
+    LocalDate today = LocalDate.now();
+    givenSearchablePublicPlan(this.ownerId, "Plan pasado", today.minusDays(2), null);
+    givenSearchablePublicPlan(this.otherId, "Plan futuro", today.plusDays(2), null);
+    givenSearchablePublicPlan(this.ownerId, "Plan sin fecha", null, null);
+
+    // when
+    String html = forYouHtml("/for-you?when=past");
+
+    // then (AC-04)
+    assertThat(html, containsString("Plan pasado"));
+    assertThat(html, not(containsString("Plan futuro")));
+    assertThat(html, not(containsString("Plan sin fecha")));
+  }
+
+  @Test
+  public void I04_search_ordenarPorFechaRespetaElOrdenAscendente() throws Exception {
+    // given: el mas nuevo primero en la lista de entrada
+    givenSearchablePublicPlan(this.ownerId, "Plan de marzo", LocalDate.of(2026, 3, 1), null);
+    givenSearchablePublicPlan(this.otherId, "Plan de enero", LocalDate.of(2026, 1, 1), null);
+
+    // when
+    String html = forYouHtml("/for-you?sort=date");
+
+    // then (AC-05)
+    assertThat(html.indexOf("Plan de enero") < html.indexOf("Plan de marzo"), is(true));
+  }
+
+  @Test
+  public void I05_search_sinResultadosMuestraElEstadoVacioConLaSalidaParaLimpiar()
+    throws Exception {
+    // given
+    givenSearchablePublicPlan(this.ownerId, "Salida al museo", null, null);
+
+    // when
+    String html = forYouHtml("/for-you?q=zzz");
+
+    // then (AC-09): estado propio de los filtros, con el link que vuelve al feed completo
+    assertThat(html, containsString("No encontramos planes con esos filtros"));
+    assertThat(html, containsString("Limpiar filtros"));
+    assertThat(html, containsString("href=\"/for-you\""));
+    assertThat(html, not(containsString("Todavía no hay planes públicos")));
+  }
+
+  @Test
+  public void I06_search_parametrosInvalidosResponden200SinError() throws Exception {
+    // given
+    givenSearchablePublicPlan(this.ownerId, "Salida al museo", null, null);
+
+    // when/then (AC-12): categoria y orden desconocidos se ignoran, nunca un 400
+    this.mockMvc.perform(get("/for-you?category=NOPE&sort=nope"))
+      .andExpect(status().isOk())
+      .andExpect(view().name("pages/plans/public-list"))
+      .andExpect(model().attribute("filtersApplied", false));
+  }
+
+  @Test
+  public void I07_search_elListadoFiltradoNoExponeShortCodeNiEmailsNiParticipantes()
+    throws Exception {
+    // given: un plan publico con shortCode y un participante que no debe salir al HTML
+    UUID planId = givenSearchablePublicPlan(this.ownerId, "Salida al museo", null, null);
+    Plan plan = this.planRepository.findById(planId).orElseThrow();
+    plan.setShortCode("SECRET01");
+    plan.getParticipants().add(this.userRepository.findById(this.otherId).orElseThrow());
+    this.planRepository.save(plan);
+
+    // when
+    String html = forYouHtml("/for-you?q=museo");
+
+    // then (AC-10)
+    assertThat(html, containsString("Salida al museo"));
+    assertThat(html, not(containsString("SECRET01")));
+    assertThat(html, not(containsString(OWNER_EMAIL)));
+    assertThat(html, not(containsString(OTHER_EMAIL)));
+  }
+
+  @Test
+  public void I08_search_elFormularioOfreceLimpiarSoloCuandoHayAlgoAplicado() throws Exception {
+    // given: un plan publico para que el feed no caiga en el estado vacio
+    givenSearchablePublicPlan(this.ownerId, "Salida al museo", null, null);
+
+    // when
+    String conTexto = forYouHtml("/for-you?q=museo");
+    String conOrden = forYouHtml("/for-you?sort=name");
+    String sinNada = forYouHtml("/for-you");
+
+    // then (AC-13): la salida aparece con cualquier parametro no default y desaparece limpia
+    assertThat(conTexto, containsString("data-testid=\"clear-filters\""));
+    assertThat(conOrden, containsString("data-testid=\"clear-filters\""));
+    assertThat(sinNada, not(containsString("data-testid=\"clear-filters\"")));
   }
 
   @Test
@@ -1791,6 +1916,42 @@ public class PlanControllerIntegrationTest {
     Plan plan = this.planRepository.findById(id).orElseThrow();
     plan.setIsPublic(true);
     return this.planRepository.save(plan).getId();
+  }
+
+  /**
+   * [SEARCH] Plan publico con la fecha y el lugar que necesitan los filtros del feed: el plan no
+   * tiene categoria propia, matchea por la categoria del lugar de su itinerario.
+   */
+  private UUID givenSearchablePublicPlan(
+    Long administratorId,
+    String name,
+    LocalDate eventDate,
+    PlaceCategory category
+  ) {
+    UUID id = givenPublicPlanFor(administratorId, name);
+    Plan plan = this.planRepository.findById(id).orElseThrow();
+    plan.setEventDate(eventDate);
+    if (category != null) {
+      Place place = new Place();
+      place.setName("Lugar " + category + " de " + name);
+      place.setCategory(category);
+      this.placeRepository.save(place);
+      PlanPlace entry = new PlanPlace();
+      entry.setPlace(place);
+      entry.setSortOrder(1);
+      plan.addPlanPlace(entry);
+    }
+    return this.planRepository.save(plan).getId();
+  }
+
+  /** [SEARCH] HTML del feed pedido como anonimo: el visitante ve todos los planes publicos. */
+  private String forYouHtml(String url) throws Exception {
+    return this.mockMvc.perform(get(url))
+      .andExpect(status().isOk())
+      .andExpect(view().name("pages/plans/public-list"))
+      .andReturn()
+      .getResponse()
+      .getContentAsString();
   }
 
   private static int occurrences(String haystack, String needle) {

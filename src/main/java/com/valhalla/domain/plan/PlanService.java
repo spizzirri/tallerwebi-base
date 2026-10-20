@@ -1,6 +1,8 @@
 package com.valhalla.domain.plan;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public interface PlanService {
@@ -34,4 +36,6 @@ public interface PlanService {
   void deleteOwnedPlan(UUID id, String ownerEmail);
   /** [CLO] Copia propia y editable de un plan accesible: nuevo dueño, nuevo shortCode. */
   Plan clonePlan(UUID id, String clonerEmail);
+  /** [TOP] Participantes por plan, para el ranking del feed. Vacio si no hay ids. */
+  Map<UUID, Long> getParticipantCounts(Collection<UUID> planIds);
 }

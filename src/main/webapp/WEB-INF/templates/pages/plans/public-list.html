@@ -26,6 +26,60 @@
           </a>
         </div>
 
+        <!-- [SEARCH] Busqueda, filtro y orden del feed: un form GET a la misma ruta, sin
+             JavaScript, asi la URL resultante se comparte. El contenedor sticky mantiene los
+             controles visibles mientras se recorre la grilla. -->
+        <div class="sticky top-0 z-10 mb-6 bg-gray-100 pb-3 pt-1">
+          <form method="get" th:action="@{/for-you}" class="flex flex-wrap items-end gap-3">
+            <label class="flex flex-1 flex-col text-sm text-gray-600">
+              Buscar
+              <input type="search" name="q" th:value="${q}"
+                placeholder="Nombre o descripcion"
+                class="mt-1 rounded-md border border-gray-300 px-3 py-2" />
+            </label>
+
+            <label class="flex flex-col text-sm text-gray-600">
+              Categoria
+              <select name="category" class="mt-1 rounded-md border border-gray-300 px-3 py-2">
+                <option value="">Todas</option>
+                <option th:each="category : ${categories}" th:value="${category.name()}"
+                  th:text="${category.name()}"
+                  th:selected="${category.name() == selectedCategory}"></option>
+              </select>
+            </label>
+
+            <label class="flex flex-col text-sm text-gray-600">
+              Fecha
+              <select name="when" class="mt-1 rounded-md border border-gray-300 px-3 py-2">
+                <option value="all" th:selected="${selectedWhen == 'all'}">Cualquier fecha</option>
+                <option value="upcoming" th:selected="${selectedWhen == 'upcoming'}">Proximos</option>
+                <option value="past" th:selected="${selectedWhen == 'past'}">Pasados</option>
+              </select>
+            </label>
+
+            <label class="flex flex-col text-sm text-gray-600">
+              Ordenar por
+              <select name="sort" class="mt-1 rounded-md border border-gray-300 px-3 py-2">
+                <option value="popular" th:selected="${selectedSort == 'popular'}">Populares</option>
+                <option value="date" th:selected="${selectedSort == 'date'}">Fecha</option>
+                <option value="name" th:selected="${selectedSort == 'name'}">Nombre</option>
+              </select>
+            </label>
+
+            <button type="submit" class="rounded-md bg-primary px-4 py-2 font-medium text-white">
+              Buscar
+            </button>
+
+            <!-- [SEARCH] Salida rapida mientras hay algo aplicado: vuelve al feed pelado. No aparece
+                 cuando la URL ya es la default, para no ofrecer limpiar lo que no esta sucio. -->
+            <a th:if="${filtersApplied or selectedSort != 'popular'}" th:href="@{/for-you}"
+              data-testid="clear-filters"
+              class="rounded-md px-3 py-2 font-medium text-gray-600 underline hover:text-gray-900">
+              Limpiar
+            </a>
+          </form>
+        </div>
+
         <!-- Tarjetas: nombre, descripcion, fecha, cantidad de lugares y administrador (AC-03),
              cada una linkeando a la vista publica del plan (AC-04). -->
         <div th:if="${!publicPlans.isEmpty()}" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -90,9 +144,21 @@
           </article>
         </div>
 
-        <!-- Estado vacio (AC-06): amigable y con salida a la creacion, ya que quien llega aca
-             tiene sesion y no necesita registrarse de nuevo. -->
-        <div th:if="${publicPlans.isEmpty()}" class="rounded-md bg-white p-10 text-center shadow-md">
+        <!-- Estado vacio con filtros activos (AC-09): no es lo mismo que una base sin planes
+             publicos, asi que ofrece la salida de limpiar el query string. -->
+        <div th:if="${publicPlans.isEmpty() and filtersApplied}"
+          class="rounded-md bg-white p-10 text-center shadow-md">
+          <p class="mb-4 text-lg text-gray-600">No encontramos planes con esos filtros.</p>
+          <a th:href="@{/for-you}"
+            class="inline-block rounded-md bg-primary px-6 py-3 font-medium text-white transition hover:bg-secondary">
+            Limpiar filtros
+          </a>
+        </div>
+
+        <!-- Estado vacio historico (AC-06): amigable y con salida a la creacion, ya que quien llega
+             aca tiene sesion y no necesita registrarse de nuevo. -->
+        <div th:if="${publicPlans.isEmpty() and !filtersApplied}"
+          class="rounded-md bg-white p-10 text-center shadow-md">
           <p class="mb-4 text-lg text-gray-600">Todavía no hay planes públicos.</p>
           <a th:href="@{/explore}"
             class="inline-block rounded-md bg-primary px-6 py-3 font-medium text-white transition hover:bg-secondary">
