@@ -34,9 +34,10 @@ entren comentarios, extienden el modelo; no reutilizan un stub.
   propia creacion.
 - **Upsert**: recalificar reemplaza el puntaje anterior. Nunca hay dos filas por usuario y plan: la
   unique constraint es el guard real, el servicio hace find-or-create.
-- **Feed sin reordenar**: las tarjetas muestran el indicador, pero el feed sigue sin `ORDER BY` (la
-  decision de [PPV]: "sin criterio de relevancia"; rankear por promedio seria una decision nueva de
-  producto, no parte de esta card).
+- **Feed ordenado por [TOP], no por esta card.** Las tarjetas muestran el indicador; el criterio de
+  orden (calificacion bayesiana + participantes) vive en `17-TOP.md`. Esta card solo aporta el
+  insumo y la exhibicion: no define pesos ni desempates. `16-CAL` AC-11 queda superado por
+  `17-TOP.md` AC-01.
 
 ## Criterios de Aceptacion
 
@@ -52,7 +53,7 @@ entren comentarios, extienden el modelo; no reutilizan un stub.
 | AC-08 | La fila de estrellas se llena de amarillo en proporcion al promedio (no solo estrellas enteras) mientras el usuario no haya calificado; ya calificado, rellena hasta su puntaje propio |
 | AC-09 | El widget de voto es claramente interactivo al hover: las estrellas se rellenan hasta la hovered (preview del voto) y cambian de color/opacidad al pasar el mouse |
 | AC-10 | Cada tarjeta de `/for-you` muestra el mismo indicador de estrellas junto al promedio y la cantidad |
-| AC-11 | El feed de `/for-you` no se reordena por calificacion |
+| AC-11 | El orden del feed lo define [TOP] (`17-TOP.md`), no este widget: la card solo muestra el indicador de estrellas |
 | AC-12 | Al borrar un plan se borran sus calificaciones; no quedan filas huerfanas |
 | AC-13 | `POST /plans/{id}/ratings` exige sesion: un POST anonimo redirige a login y `GET /plans/*/public` sigue `permitAll` sin cambios |
 

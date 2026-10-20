@@ -15,9 +15,10 @@ planes propios (`getPlansByUserEmail`) mas los de los que el usuario participa
 (`getParticipantPlans`). Un plan con `isPublic = true` es inalcanzable salvo que alguien tenga el
 link exacto.
 
-> El nombre de la card es "planes publicos **mas vistos**". El equipo decidio que todavia no hay
-> un criterio para mostrar un plan por sobre otro: por ahora se muestran **todos** los planes
-> publicos, sin orden garantizado. El ranking queda pendiente de definicion (ver Notas).
+> El nombre de la card es "planes publicos **mas vistos**". Esta card se implemento sin criterio
+> de orden porque en ese momento no habia uno definido; el ranking se cerro despues en [TOP]
+> (`17-TOP.md`) y hoy el feed ordena por popularidad. La busqueda y los filtros son [SEARCH]
+> (`18-SEARCH.md`).
 
 ## Pre-requisitos
 
@@ -35,7 +36,7 @@ link exacto.
 | AC-02 | Ningun plan privado aparece en el listado: ni nombre, ni datos, ni cantidad |
 | AC-03 | Cada tarjeta muestra nombre, descripcion, fecha del evento, cantidad de lugares del itinerario y nombre del administrador |
 | AC-04 | Cada tarjeta linkea a la vista publica del plan (`/plans/{id}/public`) |
-| AC-05 | Se muestra el conjunto sin criterio de orden, con una sola excepcion: los planes propios del logueado quedan fuera del listado (decision posterior, ver Notas); no se pagina, no se prioriza ningun plan |
+| AC-05 | El listado se ordena por popularidad segun [TOP] (`17-TOP.md`) y los planes propios del logueado quedan fuera; no se pagina |
 | AC-06 | Sin planes publicos, la pagina muestra un estado vacio amigable con link al registro (`/auth/register`) |
 | AC-07 | El navbar tiene link "Para vos" a `/for-you`, visible siempre (con y sin sesion; fuera de la variante admin) |
 | AC-08 | `GET /for-you` es `permitAll`; cualquier otro verbo sobre esa ruta y el resto de `/plans/**` siguen exigiendo sesion |
@@ -94,10 +95,12 @@ link exacto.
 
 ## Notas / decisiones de diseño
 
-- **Sin ranking.** La card habla de "mas vistos"; no existe `viewCount` en `Plan` y el equipo
-  decidio no inventar un criterio. `findByIsPublicTrue()` no lleva `ORDER BY`: si dos
-  implementaciones devuelven distinto orden, ninguna es incorrecta. Cuando haya criterio (vistas,
-  fecha de creacion, relevancia) se cambia la query, no la spec.
+- **Ranking (actualizado por [TOP]).** Esta card se implemento sin criterio de orden porque no
+  existia uno definido; `findByIsPublicTrue()` sigue sin `ORDER BY` y no es el lugar del criterio.
+  [TOP] (`17-TOP.md`) define el orden: calificacion bayesiana con participantes como primer
+  desempate, aplicado en la capa de descubrimiento. `AC-05` de esta spec queda superado por
+  `17-TOP.md` AC-01. La busqueda, el filtrado y los selects de orden son [SEARCH]
+  (`18-SEARCH.md`).
 - **Pagina propia, no seccion del landing.** Se decidio una ruta propia (`/for-you`) en vez
   de un bloque en `pages/landing.html` o sumarlo a `/explore` (que es de lugares): el landing es
   contenido editorial y `/explore` ya tiene su propio modelo Vue. Si el equipo prefiere otra
