@@ -17,6 +17,9 @@ import org.junit.jupiter.api.Test;
 /** Browser coverage of the Places map, filters, selected-place panel, and scroll behavior. */
 public class PlacesViewE2E extends E2eBase {
 
+  /** Seed dataset size (AC-07). Pinned on purpose: a place added or removed must fail here. */
+  private static final int TOTAL_PLACES = 12;
+
   @BeforeEach
   void signInAndOpenPlaces() {
     signInAsAdmin();
@@ -28,7 +31,7 @@ public class PlacesViewE2E extends E2eBase {
       "#map.leaflet-container",
       new com.microsoft.playwright.Page.WaitForSelectorOptions().setTimeout(10000)
     );
-    waitForPlaceCount(10);
+    waitForPlaceCount(TOTAL_PLACES);
   }
 
   /**
@@ -47,10 +50,11 @@ public class PlacesViewE2E extends E2eBase {
   @Test
   void shouldRenderSeededPlacesAndKeepMarkersInSyncWithFilters() {
     assertThat(page.locator("#map .leaflet-tile").count(), is(greaterThan(0)));
-    assertThat(markers().count(), is(equalTo(10)));
-    assertThat(placeCards().count(), is(equalTo(10)));
+    assertThat(markers().count(), is(equalTo(TOTAL_PLACES)));
+    assertThat(placeCards().count(), is(equalTo(TOTAL_PLACES)));
+    // AC-09: el marker se identifica por su categoria, no por el hex que la pinta.
     assertThat(
-      page.locator("#map .leaflet-marker-icon div[style*='background-color:#e74c3c']").count(),
+      page.locator("#map .leaflet-marker-icon div[data-category='RESTAURANT']").count(),
       is(equalTo(2))
     );
 
@@ -70,7 +74,7 @@ public class PlacesViewE2E extends E2eBase {
       .locator("#app > aside button")
       .filter(new Locator.FilterOptions().setHasText("Clear Filters"))
       .click();
-    waitForPlaceCount(10);
+    waitForPlaceCount(TOTAL_PLACES);
   }
 
   @Test

@@ -16,5 +16,7 @@ public interface PlaceRepository {
 
   void save(Place place);
 
+  void deleteById(Long id);
+
   long count();
 }

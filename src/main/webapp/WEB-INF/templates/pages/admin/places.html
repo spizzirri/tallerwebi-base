@@ -1,0 +1,79 @@
+<!DOCTYPE HTML>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{layouts/base :: head('Places')}"></head>
+
+<body th:replace="~{layouts/base :: layout(~{::main})}">
+
+  <main class="flex-1 p-4">
+    <div id="places-app" class="mx-auto max-w-4xl">
+      <div class="mb-6 flex items-center justify-between">
+        <h2 class="text-2xl font-semibold text-gray-900">Places</h2>
+        <div class="flex items-center gap-2">
+          <a th:href="@{/admin/places/import}"
+            class="rounded-md bg-gray-200 px-4 py-2 font-medium text-gray-700 transition hover:bg-gray-300">
+            Importar del mapa
+          </a>
+          <a th:href="@{/admin/places/new}"
+            class="rounded-md bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700">
+            + New Place
+          </a>
+        </div>
+      </div>
+
+      <p v-if="error" class="mb-4 rounded-md bg-red-100 px-4 py-3 text-sm text-red-700">{{ error }}</p>
+
+      <table class="w-full border-collapse bg-white shadow-md">
+        <thead>
+          <tr class="border-b border-gray-200 bg-gray-50 text-left text-sm font-medium text-gray-600">
+            <th class="px-4 py-3">Name</th>
+            <th class="px-4 py-3">Category</th>
+            <th class="px-4 py-3">Address</th>
+            <th class="px-4 py-3">Image</th>
+            <th class="px-4 py-3 text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="p : ${places}" class="border-b border-gray-100 hover:bg-gray-50">
+            <td class="px-4 py-3 text-sm text-gray-900" th:text="${p.name}">name</td>
+            <td class="px-4 py-3 text-sm text-gray-700" th:text="${p.category}">category</td>
+            <td class="px-4 py-3 text-sm text-gray-700" th:text="${p.address}">address</td>
+            <td class="px-4 py-3">
+              <img th:src="${p.imageUrl ?: '/images/place-placeholder.svg'}" th:alt="${p.name}"
+                class="h-10 w-10 rounded-md object-cover" />
+            </td>
+            <td class="flex justify-end gap-2 px-4 py-3">
+              <a th:href="@{/admin/places/{id}/edit(id=${p.id})}"
+                class="rounded bg-gray-200 px-3 py-1 text-sm font-medium text-gray-700 transition hover:bg-gray-300">
+                Edit
+              </a>
+              <form th:action="@{/admin/places/{id}/delete(id=${p.id})}" method="POST">
+                <input type="hidden" name="_method" value="DELETE" />
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <button type="submit"
+                  class="rounded bg-red-100 px-3 py-1 text-sm font-medium text-red-700 transition hover:bg-red-200">
+                  Delete
+                </button>
+              </form>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p th:if="${#lists.isEmpty(places)}" class="mt-8 text-center text-gray-500">No places found.</p>
+    </div>
+
+    <script>
+      Vue.createApp({
+        data() {
+          return {
+            error: '[[${error}]]'
+          }
+        }
+      }).mount('#places-app');
+    </script>
+  </main>
+
+</body>
+
+</html>

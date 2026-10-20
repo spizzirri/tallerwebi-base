@@ -110,6 +110,43 @@
               </div>
             </div>
             <p v-if="selectedPlace.address" class="text-sm text-gray-600">{{ selectedPlace.address }}</p>
+            <!-- Datos que hoy solo cargan el importador y el ABM: se muestran si existen. -->
+            <dl v-if="selectedPlace.openingHours || selectedPlace.phone || selectedPlace.website"
+              class="flex flex-col gap-2 border-t border-gray-100 pt-4 text-sm text-gray-700">
+              <div v-if="selectedPlace.openingHours" class="flex gap-2">
+                <span class="mt-0.5 shrink-0 text-gray-400" v-html="lucideIcon('Clock')"></span>
+                <div>
+                  <dt class="sr-only">Hours</dt>
+                  <dd class="whitespace-pre-line">{{ selectedPlace.openingHours }}</dd>
+                </div>
+              </div>
+              <div v-if="selectedPlace.phone" class="flex gap-2">
+                <span class="mt-0.5 shrink-0 text-gray-400" v-html="lucideIcon('Phone')"></span>
+                <div>
+                  <dt class="sr-only">Phone</dt>
+                  <dd>
+                    <a :href="telHref(selectedPlace.phone)"
+                      class="text-gray-900 underline-offset-2 hover:underline">
+                      {{ selectedPlace.phone }}
+                    </a>
+                  </dd>
+                </div>
+              </div>
+              <!-- v-if por href: una web que no se puede abrir no se muestra como link roto. -->
+              <div v-if="websiteHref(selectedPlace.website)" class="flex gap-2">
+                <span class="mt-0.5 shrink-0 text-gray-400" v-html="lucideIcon('Globe')"></span>
+                <div class="min-w-0">
+                  <dt class="sr-only">Website</dt>
+                  <dd>
+                    <a :href="websiteHref(selectedPlace.website)" target="_blank"
+                      rel="noopener noreferrer"
+                      class="block truncate text-gray-900 underline-offset-2 hover:underline">
+                      {{ websiteLabel(selectedPlace.website) }}
+                    </a>
+                  </dd>
+                </div>
+              </div>
+            </dl>
             <p v-if="selectedPlace.description" class="whitespace-pre-line text-sm leading-6 text-gray-700">
               {{ selectedPlace.description }}
             </p>
@@ -458,6 +495,15 @@
              Lucide dibuja con stroke="currentColor", así que el color se hereda del CSS y
              desaparece el parámetro que antes viajaba por función: el marker pone el color en
              su div y el panel ya lo tiene en el contenedor. */
+          /* Un icono de Lucide listo para v-html. La librería dibuja con stroke="currentColor", así
+             que el color lo pone el contenedor. */
+          const lucideIcon = (name, size = 16) =>
+            lucide.createElement(lucide.icons[name], {
+              width: size,
+              height: size,
+              'aria-hidden': 'true'
+            }).outerHTML;
+
           const categoryIcon = (category, size = 16) => {
             const icons = {
               'RESTAURANT': 'Utensils',
@@ -471,13 +517,23 @@
               'SPORT': 'Trophy',
               'OTHER': 'MapPin'
             };
-            const name = icons[category] || icons['OTHER'];
-            return lucide.createElement(lucide.icons[name], {
-              width: size,
-              height: size,
-              'aria-hidden': 'true'
-            }).outerHTML;
+            return lucideIcon(icons[category] || icons['OTHER'], size);
           };
+
+          /* OSM suele traer la web sin esquema ("parrilla.example.com"). Se asume https y nunca se
+             navega a otro esquema: si el dato dice "javascript:...", el resultado es una URL HTTPS
+             inválida en vez de código. Una web vacía devuelve '' y la fila no se muestra. */
+          const websiteHref = (website) => {
+            const raw = (website || '').trim();
+            if (!raw) return '';
+            return /^https?:\/\//i.test(raw) ? raw : 'https://' + raw;
+          };
+
+          const websiteLabel = (website) =>
+            websiteHref(website).replace(/^https?:\/\//i, '').replace(/\/$/, '');
+
+          /* tel: no lleva espacios ni guiones; el número que se muestra sí los conserva. */
+          const telHref = (phone) => 'tel:' + (phone || '').replace(/[^\d+]/g, '');
 
           const clearFilters = () => {
             selectedCategory.value = '';
@@ -639,9 +695,11 @@
                 // El icono usa stroke="currentColor", así que este color:white es lo que
                 // lo pinta de blanco sobre el fondo de categoría. Antes venía hardcodeado
                 // dentro de cada SVG.
+                // data-category es el hook estable del E2E (AC-09): el color sigue pintando
+                // el pin, pero el test no se ata a su hex.
                 const divIcon = L.divIcon({
                   className: 'custom-marker',
-                  html: '<div style="background-color:' + color + '; color:#fff; width:32px; height:32px; border-radius:50%; border:3px solid #fff; box-shadow:0 2px 6px rgba(0,0,0,0.3); display:flex; align-items:center; justify-content:center; font-size:16px;">' + icon + '</div>',
+                  html: '<div data-category="' + place.category + '" style="background-color:' + color + '; color:#fff; width:32px; height:32px; border-radius:50%; border:3px solid #fff; box-shadow:0 2px 6px rgba(0,0,0,0.3); display:flex; align-items:center; justify-content:center; font-size:16px;">' + icon + '</div>',
                   iconSize: [32, 32],
                   iconAnchor: [16, 16],
                   popupAnchor: [0, -16]
@@ -808,6 +866,10 @@
             capitalize,
             categoryColor,
             categoryIcon,
+            lucideIcon,
+            websiteHref,
+            websiteLabel,
+            telHref,
             clearFilters,
             applyFilters,
             focusPlace,

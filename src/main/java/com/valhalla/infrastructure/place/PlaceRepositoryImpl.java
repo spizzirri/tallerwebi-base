@@ -52,6 +52,11 @@ public class PlaceRepositoryImpl implements PlaceRepository {
   }
 
   @Override
+  public void deleteById(Long id) {
+    jpaPlaceRepository.deleteById(id);
+  }
+
+  @Override
   public long count() {
     return jpaPlaceRepository.count();
   }

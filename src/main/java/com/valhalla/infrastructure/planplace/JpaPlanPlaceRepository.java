@@ -11,4 +11,6 @@ public interface JpaPlanPlaceRepository extends JpaRepository<PlanPlace, Long> {
   List<PlanPlace> findByPlanIdOrderBySortOrder(UUID planId);
 
   boolean existsByPlanIdAndPlaceId(UUID planId, Long placeId);
+
+  boolean existsByPlaceId(Long placeId);
 }

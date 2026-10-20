@@ -189,6 +189,32 @@ function Stop-With($message) {
     exit 1
 }
 
+# Maven and docker narrate on stderr (Maven's "No SLF4J providers were found", docker's
+# stop/start lines). Windows PowerShell 5.1 turns any native stderr into a
+# NativeCommandError, and this script runs with $ErrorActionPreference = 'Stop', so a green
+# build aborted with exit 1 at the `& mvn` line -- including the documented
+# `.\scripts\gate.ps1 integration=<Class>` invocation. Merging the two streams at the cmd
+# level keeps every byte off PowerShell's error stream, so there is no record to promote,
+# and $LASTEXITCODE still carries the command's real exit code.
+function Invoke-Native {
+    param(
+        [Parameter(Mandatory = $true)][string]$Command,
+        [string[]]$Arguments = @(),
+        [switch]$Quiet
+    )
+    $line = $Command
+    foreach ($argument in $Arguments) {
+        $quoted = if ($argument -match '[\s"&|<>^()]') { '"' + ($argument -replace '"', '\"') + '"' } else { $argument }
+        $line = "$line $quoted"
+    }
+    if ($Quiet) { cmd /c "$line 2>&1" | Out-Null } else { cmd /c "$line 2>&1" }
+
+    # Handed back through a script-scope variable, never `return`: the command's own output
+    # travels the pipeline, so `$code = Invoke-Native ...` would capture every one of its
+    # lines together with the exit code, and `exit $array` turns a failed gate into exit 0.
+    $script:nativeExitCode = $LASTEXITCODE
+}
+
 # One metric as a right-aligned percentage. JaCoCo reports zero branches for a class
 # with none, and 0/0 has to read `n/a`: 100.0% would claim branch coverage that was
 # never exercised, 0.0% would claim the opposite.
@@ -488,8 +514,8 @@ if ($command -eq 'check') {
     # that formats.
     $mvnArgs = @('checkstyle:check', 'pmd:check', 'pmd:cpd-check')
     $mvnArgs += if ($fix) { 'prettier:write' } else { 'prettier:check' }
-    & mvn @mvnArgs
-    $exitCode = $LASTEXITCODE
+    Invoke-Native 'mvn' $mvnArgs
+    $exitCode = $script:nativeExitCode
     Set-Location $originalLocation
     exit $exitCode
 }
@@ -512,19 +538,25 @@ if ($command -eq 'reset-db') {
     # very columns this command exists to remove. The maven_cache volume goes with it, which only
     # costs a re-download.
     Write-Host '[reset-db] docker compose down -v'
-    docker compose down -v
-    if ($LASTEXITCODE -ne 0) { Stop-With '[reset-db] docker compose down -v failed; nothing was rebuilt.' }
+    Invoke-Native 'docker' @('compose', 'down', '-v')
+    if ($script:nativeExitCode -ne 0) {
+        Stop-With '[reset-db] docker compose down -v failed; nothing was rebuilt.'
+    }
 
     Write-Host '[reset-db] starting an empty postgres'
-    docker compose up -d postgres
-    if ($LASTEXITCODE -ne 0) { Stop-With '[reset-db] docker compose up failed.' }
+    Invoke-Native 'docker' @('compose', 'up', '-d', 'postgres')
+    if ($script:nativeExitCode -ne 0) {
+        Stop-With '[reset-db] docker compose up failed.'
+    }
 
     # Same readiness probe the e2e gate uses, retried: a brand new container has not finished
     # initdb yet, and `up -d` returns the moment the container starts.
     $ready = $false
     foreach ($attempt in 1..20) {
-        docker compose exec -T postgres psql -U user -d postgres -tAc 'SELECT 1' | Out-Null
-        if ($LASTEXITCODE -eq 0) { $ready = $true; break }
+        Invoke-Native 'docker' @(
+            'compose', 'exec', '-T', 'postgres', 'psql', '-U', 'user', '-d', 'postgres', '-tAc', 'SELECT 1'
+        ) -Quiet
+        if ($script:nativeExitCode -eq 0) { $ready = $true; break }
         Start-Sleep -Seconds 1
     }
     if (-not $ready) { Stop-With '[reset-db] postgres never answered; is the image pulled?' }
@@ -550,8 +582,8 @@ if ($command -eq 'coverage') {
     # freshness check below exists for -- it refuses to pass an older csv off as this
     # run's, which is what this command did before.
     $stamp = Get-CoverageStamp
-    & mvn test '-Djacoco.haltOnFailure=false'
-    $exitCode = $LASTEXITCODE
+    Invoke-Native 'mvn' @('test', '-Djacoco.haltOnFailure=false')
+    $exitCode = $script:nativeExitCode
 
     if (Test-CoverageFresh $stamp) {
         Show-CoverageMatrix
@@ -650,8 +682,8 @@ if ($port -gt 0) { $mvnArgs += "-Djetty.port=$port" }
 # container, no env to mutate, nothing to tear down on Ctrl+C.
 if (-not $needsStack) {
     $stamp = Get-CoverageStamp
-    & mvn @mvnArgs
-    $exitCode = $LASTEXITCODE
+    Invoke-Native 'mvn' $mvnArgs
+    $exitCode = $script:nativeExitCode
     if (Test-CoverageFresh $stamp) { Show-CoverageMatrix }
     else { Write-Host '[coverage] no report from this run, so there is no matrix to show.' }
     Set-Location $originalLocation
@@ -660,8 +692,10 @@ if (-not $needsStack) {
 
 $e2eDb = 'valhalla_e2e'
 
-docker compose up -d postgres
-if ($LASTEXITCODE -ne 0) { throw 'docker compose up failed' }
+Invoke-Native 'docker' @('compose', 'up', '-d', 'postgres')
+if ($script:nativeExitCode -ne 0) {
+    throw 'docker compose up failed'
+}
 
 # From here on the container is up, so everything below runs inside try/finally: a failing
 # mvn, a throw, or Ctrl+C all still shut the database down and restore the caller's
@@ -683,8 +717,13 @@ try {
     # `npx playwright install` there pulls a throwaway package and prints a
     # "running without installing your project's dependencies" warning that reads like a
     # misconfiguration when it is just npx seeing a Java project.
-    mvn -q exec:java "-Dexec.mainClass=com.microsoft.playwright.CLI" "-Dexec.args=install chromium"
-    if ($LASTEXITCODE -ne 0) { throw 'playwright install failed' }
+    Invoke-Native 'mvn' @(
+        '-q',
+        'exec:java',
+        '-Dexec.mainClass=com.microsoft.playwright.CLI',
+        '-Dexec.args=install chromium'
+    )
+    if ($script:nativeExitCode -ne 0) { throw 'playwright install failed' }
 
     # Jetty and failsafe must agree: Jetty needs the schema, ResetDatabase needs the
     # same data. The name must contain "e2e" or ResetDatabase refuses to run.
@@ -694,8 +733,8 @@ try {
     $env:DB_PASSWORD = 'user'
 
     $stamp = Get-CoverageStamp
-    & mvn @mvnArgs
-    $exitCode = $LASTEXITCODE
+    Invoke-Native 'mvn' $mvnArgs
+    $exitCode = $script:nativeExitCode
 }
 finally {
     if ($keep) {
@@ -703,7 +742,7 @@ finally {
     }
     else {
         Write-Host '[e2e] stopping postgres'
-        docker compose stop postgres
+        Invoke-Native 'docker' @('compose', 'stop', 'postgres')
     }
 
     Set-Location $originalLocation

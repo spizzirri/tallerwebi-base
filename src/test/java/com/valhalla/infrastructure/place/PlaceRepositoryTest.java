@@ -27,7 +27,7 @@ public class PlaceRepositoryTest {
   public void shouldFindSeededPlaces() {
     List<Place> places = placeRepository.findAll();
 
-    assertThat(places.size(), is(equalTo(10)));
+    assertThat(places.size(), is(equalTo(12)));
   }
 
   @Test
