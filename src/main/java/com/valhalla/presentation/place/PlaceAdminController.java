@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -58,9 +59,9 @@ public class PlaceAdminController {
   }
 
   @GetMapping("/new")
-  public ModelAndView showNewPlaceForm() {
+  public ModelAndView showNewPlaceForm(@RequestParam Map<String, String> params) {
     Map<String, Object> model = new ModelMap();
-    model.put(ATTR_PLACE_FORM, new EditPlaceRequest());
+    model.put(ATTR_PLACE_FORM, formFromQuery(params));
     model.put(ATTR_IS_EDIT, false);
     model.put(ATTR_CATEGORIES, PlaceCategory.values());
     return new ModelAndView(VIEW_PLACE_FORM, model);
@@ -122,6 +123,39 @@ public class PlaceAdminController {
       redirectAttributes.addFlashAttribute(ATTR_ERROR, ERROR_PLACE_IN_USE);
     }
     return new ModelAndView(REDIRECT_PLACES);
+  }
+
+  /**
+   * I-17: el importador pre-llena el alta por query params. Sin params el form arranca vacio,
+   * igual que antes del importador (I-06..I-12).
+   */
+  private EditPlaceRequest formFromQuery(Map<String, String> params) {
+    EditPlaceRequest form = new EditPlaceRequest();
+    if (params.isEmpty()) {
+      return form;
+    }
+    form.setName(params.get("name"));
+    form.setAddress(params.get("address"));
+    form.setOpeningHours(params.get("openingHours"));
+    form.setPhone(params.get("phone"));
+    form.setWebsite(params.get("website"));
+    form.setLatitude(numberOrNull(params.get("latitude")));
+    form.setLongitude(numberOrNull(params.get("longitude")));
+    // AC-06: una categoria sin mapping (o desconocida) arranca en OTHER; el admin la cambia.
+    form.setCategory(PlaceCategory.fromCode(params.get("category")).orElse(PlaceCategory.OTHER));
+    return form;
+  }
+
+  private Double numberOrNull(String value) {
+    if (value == null || value.isBlank()) {
+      return null;
+    }
+    try {
+      return Double.valueOf(value);
+    } catch (NumberFormatException exception) {
+      // Un query param manipulado no puede romper el form: se ignora el valor.
+      return null;
+    }
   }
 
   private ModelAndView renderFormWithError(EditPlaceRequest form, boolean isEdit) {
