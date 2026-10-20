@@ -54,18 +54,32 @@ public class HttpOverpassClient implements OverpassClient {
 
   private final HttpClient httpClient;
   private final String endpoint;
+  private final long retryDelayMillis;
 
   @Autowired
   public HttpOverpassClient(
     @Value("${overpass.url:https://overpass-api.de/api/interpreter}") String endpoint
   ) {
+    this(endpoint, jdkHttpClient(), RETRY_DELAY_MILLIS);
+  }
+
+  /**
+   * Seam de tests: recibe el {@link HttpClient} y el delay del 429 para que el camino HTTP
+   * (reintento, error, IOException, interrupcion) se pruebe sin red y sin dormir. Package-private
+   * a proposito: produccion entra siempre por el constructor de arriba.
+   */
+  HttpOverpassClient(String endpoint, HttpClient httpClient, long retryDelayMillis) {
     this.endpoint = endpoint;
-    this.httpClient =
-      HttpClient
-        .newBuilder()
-        .connectTimeout(CONNECT_TIMEOUT)
-        .followRedirects(HttpClient.Redirect.NORMAL)
-        .build();
+    this.httpClient = httpClient;
+    this.retryDelayMillis = retryDelayMillis;
+  }
+
+  private static HttpClient jdkHttpClient() {
+    return HttpClient
+      .newBuilder()
+      .connectTimeout(CONNECT_TIMEOUT)
+      .followRedirects(HttpClient.Redirect.NORMAL)
+      .build();
   }
 
   @Override
@@ -213,12 +227,12 @@ public class HttpOverpassClient implements OverpassClient {
   }
 
   /**
-   * Espera del 429. Vive en su propio metodo para que el camino quede fuera de los tests: ninguna
-   * suite debe dormir 30 segundos (AC-10).
+   * Espera del 429. El delay viene del constructor para que los tests lo pongan en cero: ninguna
+   * suite duerme los 30 segundos reales (AC-10).
    */
   private void waitBeforeRetry() {
     try {
-      Thread.sleep(RETRY_DELAY_MILLIS);
+      Thread.sleep(retryDelayMillis);
     } catch (InterruptedException exception) {
       Thread.currentThread().interrupt();
       throw new IllegalStateException("Overpass retry interrupted", exception);

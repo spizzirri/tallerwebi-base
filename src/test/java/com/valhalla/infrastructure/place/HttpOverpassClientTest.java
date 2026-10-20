@@ -7,17 +7,27 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.valhalla.domain.place.OsmPoi;
+import java.io.IOException;
 import java.net.URI;
+import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
 /**
  * U-10..U-12: el parseo se prueba con un fixture de Overpass, sin red (AC-04, AC-10). El camino
- * HTTP y el reintento del 429 quedan fuera a proposito: ningun test debe dormir 30 segundos ni
- * depender de internet.
+ * HTTP se prueba con un {@link java.net.http.HttpClient} inyectado y el delay del 429 en cero, asi
+ * que ningun test duerme ni depende de internet.
  */
 public class HttpOverpassClientTest {
 
@@ -60,6 +70,27 @@ public class HttpOverpassClientTest {
           "lat": -34.62,
           "lon": -58.36,
           "tags": { "amenity": "cafe", "shop": "clothes" }
+        }
+      ]
+    }
+    """;
+
+  private static final String ENDPOINT = "http://overpass.test/api/interpreter";
+
+  /** Un POI con name pero sin categoria, sin coordenadas, sin numero y con tags raros. */
+  private static final String SPARSE_FIXTURE =
+    """
+    {
+      "elements": [
+        {
+          "type": "node",
+          "id": 9,
+          "tags": {
+            "name": "Kiosco de la esquina",
+            "addr:street": "Av. Rivadavia",
+            "opening_hours": 24,
+            "website": "   "
+          }
         }
       ]
     }
@@ -124,6 +155,22 @@ public class HttpOverpassClientTest {
     );
   }
 
+  // --- tolerancia del parseo: nada de lo que falte puede lanzar ---
+
+  @Test
+  public void shouldTolerateAnElementWithoutCategoryCoordinatesOrStreetNumber() {
+    OsmPoi poi = HttpOverpassClient.parsePois(SPARSE_FIXTURE).getFirst();
+
+    assertThat(poi.name(), is("Kiosco de la esquina"));
+    assertThat(poi.address(), is("Av. Rivadavia"));
+    assertThat(poi.latitude(), is(nullValue()));
+    assertThat(poi.longitude(), is(nullValue()));
+    assertThat(poi.osmKey(), is(nullValue()));
+    assertThat(poi.osmValue(), is(nullValue()));
+    assertThat(poi.openingHours(), is(nullValue()));
+    assertThat(poi.website(), is(nullValue()));
+  }
+
   // --- query: allowlist y escape ---
 
   @Test
@@ -178,5 +225,109 @@ public class HttpOverpassClientTest {
       request.headers().firstValue("User-Agent").orElseThrow(),
       containsString("Valhalla")
     );
+  }
+
+  // --- camino HTTP: cliente inyectado, sin red y con el delay del 429 en cero ---
+
+  @Test
+  public void shouldRetryOnceAfterRateLimitAndReturnTheParsedPois() throws Exception {
+    HttpClient httpClient = mock(HttpClient.class);
+    stubSend(httpClient, response(429, ""), response(200, FIXTURE));
+    HttpOverpassClient overpass = new HttpOverpassClient(ENDPOINT, httpClient, 0L);
+
+    List<OsmPoi> pois = overpass.findCabaPois("amenity", "restaurant");
+
+    assertThat(pois, hasSize(2));
+    verify(httpClient, times(2)).send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class));
+  }
+
+  @Test
+  public void shouldThrowWhenOverpassAnswersSomethingOtherThanOk() throws Exception {
+    HttpClient httpClient = mock(HttpClient.class);
+    stubSend(httpClient, response(500, "upstream boom"));
+    HttpOverpassClient overpass = new HttpOverpassClient(ENDPOINT, httpClient, 0L);
+
+    IllegalStateException error = assertThrows(
+      IllegalStateException.class,
+      () -> overpass.findCabaPois("amenity", "restaurant")
+    );
+
+    assertThat(error.getMessage(), containsString("500"));
+    verify(httpClient, times(1)).send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class));
+  }
+
+  @Test
+  public void shouldWrapAnUnreachableOverpass() throws Exception {
+    HttpClient httpClient = mock(HttpClient.class);
+    doThrow(new IOException("connection reset")).when(httpClient).send(any(), any());
+    HttpOverpassClient overpass = new HttpOverpassClient(ENDPOINT, httpClient, 0L);
+
+    IllegalStateException error = assertThrows(
+      IllegalStateException.class,
+      () -> overpass.findCabaPois("amenity", "restaurant")
+    );
+
+    assertThat(error.getMessage(), containsString("unreachable"));
+  }
+
+  @Test
+  public void shouldKeepTheInterruptFlagWhenTheRequestIsInterrupted() throws Exception {
+    HttpClient httpClient = mock(HttpClient.class);
+    doThrow(new InterruptedException()).when(httpClient).send(any(), any());
+    HttpOverpassClient overpass = new HttpOverpassClient(ENDPOINT, httpClient, 0L);
+
+    try {
+      IllegalStateException error = assertThrows(
+        IllegalStateException.class,
+        () -> overpass.findCabaPois("amenity", "restaurant")
+      );
+
+      assertThat(error.getMessage(), containsString("interrupted"));
+      assertThat(Thread.currentThread().isInterrupted(), is(true));
+    } finally {
+      Thread.interrupted();
+    }
+  }
+
+  /**
+   * El reintento tambien puede interrumpirse mientras espera: el delay es de 1ms, no de 30s, y la
+   * bandera se prende antes para que el sleep corte de inmediato.
+   */
+  @Test
+  public void shouldFailTheRetryWhenTheWaitIsInterrupted() throws Exception {
+    HttpClient httpClient = mock(HttpClient.class);
+    stubSend(httpClient, response(429, ""));
+    HttpOverpassClient overpass = new HttpOverpassClient(ENDPOINT, httpClient, 1L);
+
+    Thread.currentThread().interrupt();
+    try {
+      IllegalStateException error = assertThrows(
+        IllegalStateException.class,
+        () -> overpass.findCabaPois("amenity", "restaurant")
+      );
+
+      assertThat(error.getMessage(), containsString("retry interrupted"));
+    } finally {
+      Thread.interrupted();
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private static HttpResponse<String> response(int status, String body) {
+    HttpResponse<String> response = mock(HttpResponse.class);
+    when(response.statusCode()).thenReturn(status);
+    when(response.body()).thenReturn(body);
+    return response;
+  }
+
+  @SuppressWarnings("unchecked")
+  private static void stubSend(
+    HttpClient httpClient,
+    HttpResponse<String> first,
+    HttpResponse<String>... rest
+  ) throws IOException, InterruptedException {
+    doReturn(first, (Object[]) rest)
+      .when(httpClient)
+      .send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class));
   }
 }
