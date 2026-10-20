@@ -116,6 +116,25 @@ public class PlaceImportE2E extends E2eBase {
   }
 
   @Test
+  void shouldFilterThePoisByTheVisibleMapArea() {
+    signInAsAdmin();
+    stubPois(200, FIXTURE);
+
+    PlaceImportPage view = new PlaceImportPage(page);
+    view.navigateToImport();
+    view.waitForPois(3);
+    assertThat("de entrada el area cubre los dos POIs con coordenadas", view.markerCount(), is(2));
+
+    view.zoomTo(17);
+    view.waitForPois(2);
+    assertThat("al acercarse, el POI lejano sale de la lista", view.markerCount(), is(1));
+
+    view.onlyVisibleArea(false);
+    view.waitForPois(3);
+    assertThat("sin el filtro vuelven todos, aunque el mapa siga cerca", view.markerCount(), is(2));
+  }
+
+  @Test
   void shouldShowTheErrorMessageWhenTheProxyFails() {
     signInAsAdmin();
     stubPois(502, "{\"error\":\"Overpass is not available right now\"}");

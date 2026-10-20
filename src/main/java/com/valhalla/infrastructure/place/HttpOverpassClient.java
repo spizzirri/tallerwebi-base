@@ -15,10 +15,13 @@ import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -81,34 +84,47 @@ public class HttpOverpassClient implements OverpassClient {
   private static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(90);
   private static final ObjectMapper MAPPER = new ObjectMapper();
 
+  /**
+   * Cada consulta cuesta ~30 s, asi que el resultado se guarda 10 minutos por par key=value: volver
+   * a una categoria ya cargada es instantaneo y de paso se golpea menos el endpoint publico.
+   */
+  private static final Duration CACHE_TTL = Duration.ofMinutes(10);
+
   private final HttpClient httpClient;
   private final String endpoint;
   private final long rateLimitDelayMillis;
   private final long busyDelayMillis;
+  private final Duration cacheTtl;
+  private final Map<String, CachedPois> cache = new ConcurrentHashMap<>();
 
   @Autowired
   public HttpOverpassClient(
     @Value("${overpass.url:https://overpass-api.de/api/interpreter}") String endpoint
   ) {
-    this(endpoint, jdkHttpClient(), RATE_LIMIT_DELAY_MILLIS, BUSY_DELAY_MILLIS);
+    this(endpoint, jdkHttpClient(), RATE_LIMIT_DELAY_MILLIS, BUSY_DELAY_MILLIS, CACHE_TTL);
   }
 
   /**
-   * Seam de tests: recibe el {@link HttpClient} y las dos esperas para que el camino HTTP
-   * (reintentos, error, IOException, interrupcion) se pruebe sin red y sin dormir. Package-private
-   * a proposito: produccion entra siempre por el constructor de arriba.
+   * Seam de tests: recibe el {@link HttpClient}, las dos esperas y el TTL para que el camino HTTP
+   * (reintentos, error, IOException, interrupcion) y el cache se prueben sin red y sin dormir.
+   * Package-private a proposito: produccion entra siempre por el constructor de arriba.
    */
   HttpOverpassClient(
     String endpoint,
     HttpClient httpClient,
     long rateLimitDelayMillis,
-    long busyDelayMillis
+    long busyDelayMillis,
+    Duration cacheTtl
   ) {
     this.endpoint = endpoint;
     this.httpClient = httpClient;
     this.rateLimitDelayMillis = rateLimitDelayMillis;
     this.busyDelayMillis = busyDelayMillis;
+    this.cacheTtl = cacheTtl;
   }
+
+  /** Entrada del cache: la lista ya parseada y el instante en que deja de valer. */
+  private record CachedPois(List<OsmPoi> pois, Instant expiresAt) {}
 
   private static HttpClient jdkHttpClient() {
     return HttpClient
@@ -121,11 +137,24 @@ public class HttpOverpassClient implements OverpassClient {
   @Override
   public List<OsmPoi> findCabaPois(String osmKey, String osmValue) {
     String query = buildQuery(osmKey, osmValue);
+    String cacheKey = normalize(osmKey) + "=" + normalize(osmValue);
+    List<OsmPoi> cached = cachedPois(cacheKey);
+    if (cached != null) {
+      return cached;
+    }
     HttpResponse<String> response = postWithRetries(query);
     if (response.statusCode() != OK) {
       throw new IllegalStateException("Overpass answered HTTP " + response.statusCode());
     }
-    return parsePois(response.body());
+    List<OsmPoi> pois = List.copyOf(parsePois(response.body()));
+    cache.put(cacheKey, new CachedPois(pois, Instant.now().plus(cacheTtl)));
+    return pois;
+  }
+
+  /** {@code null} si no hay entrada o ya vencio; el TTL se mide desde que se guardo. */
+  private List<OsmPoi> cachedPois(String cacheKey) {
+    CachedPois entry = cache.get(cacheKey);
+    return entry != null && entry.expiresAt().isAfter(Instant.now()) ? entry.pois() : null;
   }
 
   /**

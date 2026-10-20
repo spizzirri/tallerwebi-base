@@ -21,6 +21,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -237,7 +238,13 @@ public class HttpOverpassClientTest {
   public void shouldRetryOnceAfterRateLimitAndReturnTheParsedPois() throws Exception {
     HttpClient httpClient = mock(HttpClient.class);
     stubSend(httpClient, response(429, ""), response(200, FIXTURE));
-    HttpOverpassClient overpass = new HttpOverpassClient(ENDPOINT, httpClient, 0L, 0L);
+    HttpOverpassClient overpass = new HttpOverpassClient(
+      ENDPOINT,
+      httpClient,
+      0L,
+      0L,
+      Duration.ofMinutes(10)
+    );
 
     List<OsmPoi> pois = overpass.findCabaPois("amenity", "restaurant");
 
@@ -249,7 +256,13 @@ public class HttpOverpassClientTest {
   public void shouldRetryOnceWhenOverpassIsAtCapacity() throws Exception {
     HttpClient httpClient = mock(HttpClient.class);
     stubSend(httpClient, response(502, ""), response(200, FIXTURE));
-    HttpOverpassClient overpass = new HttpOverpassClient(ENDPOINT, httpClient, 0L, 0L);
+    HttpOverpassClient overpass = new HttpOverpassClient(
+      ENDPOINT,
+      httpClient,
+      0L,
+      0L,
+      Duration.ofMinutes(10)
+    );
 
     List<OsmPoi> pois = overpass.findCabaPois("amenity", "restaurant");
 
@@ -262,7 +275,13 @@ public class HttpOverpassClientTest {
   public void shouldStopRetryingAfterTwoAttempts() throws Exception {
     HttpClient httpClient = mock(HttpClient.class);
     stubSend(httpClient, response(502, ""), response(503, ""));
-    HttpOverpassClient overpass = new HttpOverpassClient(ENDPOINT, httpClient, 0L, 0L);
+    HttpOverpassClient overpass = new HttpOverpassClient(
+      ENDPOINT,
+      httpClient,
+      0L,
+      0L,
+      Duration.ofMinutes(10)
+    );
 
     IllegalStateException error = assertThrows(
       IllegalStateException.class,
@@ -278,9 +297,54 @@ public class HttpOverpassClientTest {
   public void shouldRetryWhenOverpassTimesOut() throws Exception {
     HttpClient httpClient = mock(HttpClient.class);
     stubSend(httpClient, response(504, ""), response(200, FIXTURE));
-    HttpOverpassClient overpass = new HttpOverpassClient(ENDPOINT, httpClient, 0L, 0L);
+    HttpOverpassClient overpass = new HttpOverpassClient(
+      ENDPOINT,
+      httpClient,
+      0L,
+      0L,
+      Duration.ofMinutes(10)
+    );
 
     assertThat(overpass.findCabaPois("amenity", "restaurant"), hasSize(2));
+    verify(httpClient, times(2)).send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class));
+  }
+
+  /** Una consulta cuesta ~30 s: la segunda vez que se pide la misma categoria sale del cache. */
+  @Test
+  public void shouldServeASecondCallFromTheCache() throws Exception {
+    HttpClient httpClient = mock(HttpClient.class);
+    stubSend(httpClient, response(200, FIXTURE));
+    HttpOverpassClient overpass = new HttpOverpassClient(
+      ENDPOINT,
+      httpClient,
+      0L,
+      0L,
+      Duration.ofMinutes(10)
+    );
+
+    List<OsmPoi> first = overpass.findCabaPois("amenity", "restaurant");
+    List<OsmPoi> second = overpass.findCabaPois(" amenity ", "RESTAURANT");
+
+    assertThat(first, hasSize(2));
+    assertThat(second, is(first));
+    verify(httpClient, times(1)).send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class));
+  }
+
+  /** El cache vence: con TTL 0 la segunda llamada vuelve a consultar (y a fallar si el stub no alcanza). */
+  @Test
+  public void shouldNotServeAnExpiredCacheEntry() throws Exception {
+    HttpClient httpClient = mock(HttpClient.class);
+    stubSend(httpClient, response(200, FIXTURE), response(200, SPARSE_FIXTURE));
+    HttpOverpassClient overpass = new HttpOverpassClient(
+      ENDPOINT,
+      httpClient,
+      0L,
+      0L,
+      Duration.ZERO
+    );
+
+    assertThat(overpass.findCabaPois("amenity", "restaurant"), hasSize(2));
+    assertThat(overpass.findCabaPois("amenity", "restaurant"), hasSize(1));
     verify(httpClient, times(2)).send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class));
   }
 
@@ -288,7 +352,13 @@ public class HttpOverpassClientTest {
   public void shouldThrowWhenOverpassAnswersSomethingOtherThanOk() throws Exception {
     HttpClient httpClient = mock(HttpClient.class);
     stubSend(httpClient, response(500, "upstream boom"));
-    HttpOverpassClient overpass = new HttpOverpassClient(ENDPOINT, httpClient, 0L, 0L);
+    HttpOverpassClient overpass = new HttpOverpassClient(
+      ENDPOINT,
+      httpClient,
+      0L,
+      0L,
+      Duration.ofMinutes(10)
+    );
 
     IllegalStateException error = assertThrows(
       IllegalStateException.class,
@@ -303,7 +373,13 @@ public class HttpOverpassClientTest {
   public void shouldWrapAnUnreachableOverpass() throws Exception {
     HttpClient httpClient = mock(HttpClient.class);
     doThrow(new IOException("connection reset")).when(httpClient).send(any(), any());
-    HttpOverpassClient overpass = new HttpOverpassClient(ENDPOINT, httpClient, 0L, 0L);
+    HttpOverpassClient overpass = new HttpOverpassClient(
+      ENDPOINT,
+      httpClient,
+      0L,
+      0L,
+      Duration.ofMinutes(10)
+    );
 
     IllegalStateException error = assertThrows(
       IllegalStateException.class,
@@ -317,7 +393,13 @@ public class HttpOverpassClientTest {
   public void shouldKeepTheInterruptFlagWhenTheRequestIsInterrupted() throws Exception {
     HttpClient httpClient = mock(HttpClient.class);
     doThrow(new InterruptedException()).when(httpClient).send(any(), any());
-    HttpOverpassClient overpass = new HttpOverpassClient(ENDPOINT, httpClient, 0L, 0L);
+    HttpOverpassClient overpass = new HttpOverpassClient(
+      ENDPOINT,
+      httpClient,
+      0L,
+      0L,
+      Duration.ofMinutes(10)
+    );
 
     try {
       IllegalStateException error = assertThrows(
@@ -340,7 +422,13 @@ public class HttpOverpassClientTest {
   public void shouldFailTheRetryWhenTheWaitIsInterrupted() throws Exception {
     HttpClient httpClient = mock(HttpClient.class);
     stubSend(httpClient, response(429, ""));
-    HttpOverpassClient overpass = new HttpOverpassClient(ENDPOINT, httpClient, 1L, 0L);
+    HttpOverpassClient overpass = new HttpOverpassClient(
+      ENDPOINT,
+      httpClient,
+      1L,
+      0L,
+      Duration.ofMinutes(10)
+    );
 
     Thread.currentThread().interrupt();
     try {

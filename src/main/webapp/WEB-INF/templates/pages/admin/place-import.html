@@ -33,10 +33,14 @@
           Elegí una búsqueda y hacé click en un punto: el alta del ABM se abre pre-llenada con los
           datos de OpenStreetMap. Podés revisar y cambiar cualquier campo antes de guardar.
         </p>
+        <p class="rounded-md bg-gray-50 px-3 py-2 text-xs text-gray-500">
+          Se traen hasta 300 puntos de CABA por categoría y la consulta tarda ~30 s. Mover el mapa
+          filtra lo ya cargado: no vuelve a consultar. El resultado se reutiliza por 10 minutos.
+        </p>
 
         <div class="flex flex-col gap-1">
           <label for="import-query" class="text-sm font-medium text-gray-700">Búsqueda</label>
-          <select v-model="selected" id="import-query" @change="loadPois" :disabled="loading"
+          <select v-model="selected" id="import-query" @change="loadPois"
             class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm">
             <option v-for="query in queries" :key="query.key + query.value" :value="query">
               {{ query.label }}
@@ -44,13 +48,19 @@
           </select>
         </div>
 
-        <!-- Filtro local sobre los POIs ya traidos: no vuelve a golpear Overpass (30s por consulta). -->
+        <!-- Filtros locales sobre los POIs ya traidos: no vuelven a golpear Overpass (30s por consulta). -->
         <div class="flex flex-col gap-1">
           <label for="poi-search" class="text-sm font-medium text-gray-700">Filtrar por nombre</label>
           <input v-model="search" id="poi-search" type="search" autocomplete="off"
-            placeholder="Ej. parrilla" :disabled="loading"
+            placeholder="Ej. parrilla"
             class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm" />
         </div>
+
+        <label class="flex items-center gap-2 text-sm text-gray-700">
+          <input v-model="onlyVisible" id="only-visible" type="checkbox"
+            class="h-4 w-4 rounded border-gray-300" />
+          Solo el área visible del mapa
+        </label>
 
         <p class="text-sm text-gray-500" aria-live="polite">
           {{ loading ? 'Buscando puntos...' : statusText }}
@@ -60,7 +70,8 @@
         </p>
 
         <!-- Misma navegacion que el click del marker, en texto: el mapa no es la unica via. -->
-        <ul class="flex flex-col gap-2">
+        <ul class="flex flex-col gap-2 transition-opacity" :class="{ 'opacity-50': loading }"
+          :aria-busy="loading">
           <li v-for="poi in filtered" :key="poi.name + poi.latitude + poi.longitude">
             <a :href="formUrl(poi)"
               class="block rounded-lg border border-gray-200 bg-white p-3 shadow-sm transition hover:bg-gray-50">
@@ -73,8 +84,13 @@
         <p v-if="!loading && pois.length === 0 && !error" class="text-sm text-gray-500">
           No hay puntos para esta búsqueda. Probá con otra.
         </p>
-        <p v-if="!loading && pois.length > 0 && filtered.length === 0" class="text-sm text-gray-500">
+        <p v-if="!loading && pois.length > 0 && filtered.length === 0 && search.trim()"
+          class="text-sm text-gray-500">
           Ningún punto coincide con «{{ search.trim() }}». Probá con otro nombre.
+        </p>
+        <p v-if="!loading && pois.length > 0 && filtered.length === 0 && !search.trim()"
+          class="text-sm text-gray-500">
+          No hay puntos cargados en esta área. Movete o desactivá «Solo el área visible del mapa».
         </p>
       </aside>
 
@@ -108,26 +124,67 @@
           const selected = ref(QUERIES[0]);
           const pois = ref([]);
           const search = ref('');
+          const onlyVisible = ref(true);
           const error = ref('');
           const loading = ref(true);
           let map = null;
           let markers = [];
           let pending = 0;
+          let controller = null;
 
-          /* Sin acentos ni mayusculas: "cafe" tiene que encontrar "Café". El filtro es local a
-             proposito — volver a Overpass por cada tecla costaria ~30s y no aporta nada sobre los
-             POIs que ya estan en memoria. */
+          /* El mapa es la fuente del "que se ve": se guardan los cuatro bordes en cada movimiento. Se
+             copian a numeros (y no el objeto de Leaflet) para que Vue no envuelva en proxy un objeto
+             ajeno, y porque asi la comparacion es aritmetica y no depende de la API de Leaflet. */
+          const area = ref(null);
+          const refreshArea = () => {
+            const bounds = map.getBounds();
+            area.value = {
+              south: bounds.getSouth(),
+              west: bounds.getWest(),
+              north: bounds.getNorth(),
+              east: bounds.getEast()
+            };
+            /* Refleja el zoom en el DOM: sirve para ver el estado y para que el E2E espere el
+               cambio sin dormir (mismo criterio que data-category en los markers de /explore). */
+            map.getContainer().dataset.zoom = map.getZoom();
+          };
+          const debounce = (fn, wait) => {
+            let timer = null;
+            return () => {
+              clearTimeout(timer);
+              timer = setTimeout(fn, wait);
+            };
+          };
+          const onMapMoved = debounce(refreshArea, 120);
+
+          /* Sin acentos ni mayusculas: "cafe" tiene que encontrar "Café". Los dos filtros son locales
+             a proposito — volver a Overpass por cada tecla o por cada paneo costaria ~30s. */
           const normalizeName = (text) => (text || '').normalize('NFD')
             .replace(/[\u0300-\u036f]/g, '')
             .toLowerCase();
 
+          /* Un POI sin coordenadas no se puede ubicar: se lista siempre, no se descarta por área. */
+          const inArea = (poi) => {
+            const box = area.value;
+            if (poi.latitude === null || poi.longitude === null || !box) return true;
+            return (
+              poi.latitude >= box.south &&
+              poi.latitude <= box.north &&
+              poi.longitude >= box.west &&
+              poi.longitude <= box.east
+            );
+          };
+
           const filtered = computed(() => {
             const term = normalizeName(search.value.trim());
-            if (!term) return pois.value;
-            return pois.value.filter((poi) => normalizeName(poi.name).includes(term));
+            return pois.value.filter((poi) => {
+              if (onlyVisible.value && !inArea(poi)) return false;
+              return !term || normalizeName(poi.name).includes(term);
+            });
           });
 
-          const statusText = computed(() => search.value.trim()
+          /* "N de M" cuando algun filtro recorta; el total solo cuando no hay filtros activos. */
+          const statusText = computed(() => filtered.value.length < pois.value.length
             ? filtered.value.length + ' de ' + pois.value.length + ' punto(s)'
             : pois.value.length + ' punto(s) encontrados');
 
@@ -180,21 +237,26 @@
 
           const loadPois = async () => {
             const current = ++pending;
+            /* Cambiar de categoria no espera a la anterior: se aborta y manda la ultima eleccion. */
+            if (controller) controller.abort();
+            controller = new AbortController();
             loading.value = true;
             error.value = '';
-            /* El filtro es de la lista anterior: al cambiar de categoria arranca vacio. */
+            /* La lista y los markers que quedan son de otra categoria: se limpian. */
+            pois.value = [];
             search.value = '';
             try {
               const query = selected.value;
               const response = await fetch(
-                '/admin/places/import/pois?' + query.key + '=' + encodeURIComponent(query.value)
+                '/admin/places/import/pois?' + query.key + '=' + encodeURIComponent(query.value),
+                { signal: controller.signal }
               );
               if (!response.ok) throw new Error('HTTP ' + response.status);
               const data = await response.json();
               if (current !== pending) return;
               pois.value = data;
             } catch (loadError) {
-              if (current !== pending) return;
+              if (current !== pending || loadError.name === 'AbortError') return;
               console.error(loadError);
               pois.value = [];
               error.value =
@@ -210,13 +272,29 @@
               attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
             /* El compilador de Tailwind corre diferido: sin esto el mapa se crea midiendo 0 y queda
-               centrado fuera de lugar (la misma razon que en /explore). */
-            new ResizeObserver(() => map.invalidateSize({ pan: false })).observe(map.getContainer());
-            requestAnimationFrame(() => map.invalidateSize({ pan: false }));
+               centrado fuera de lugar (la misma razon que en /explore). El invalidateSize va con
+               pan por defecto: conserva el centro geografico; con pan:false el paso de 0 al tamaño
+               real desplazaba la vista varios kilometros y el filtro por area arrancaba en otro lado. */
+            new ResizeObserver(() => map.invalidateSize()).observe(map.getContainer());
+            requestAnimationFrame(() => map.invalidateSize());
+            map.on('moveend zoomend', onMapMoved);
+            refreshArea();
             await loadPois();
           });
 
-          return { queries, selected, pois, search, filtered, statusText, error, loading, loadPois, formUrl };
+          return {
+            queries,
+            selected,
+            pois,
+            search,
+            onlyVisible,
+            filtered,
+            statusText,
+            error,
+            loading,
+            loadPois,
+            formUrl
+          };
         }
       }).mount('#app');
     </script>

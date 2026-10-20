@@ -61,4 +61,28 @@ public class PlaceImportPage extends WebPage {
   public void filterByName(String term) {
     this.typeIntoElement("#poi-search", term);
   }
+
+  /** "Solo el área visible": al apagarlo la lista deja de seguir al mapa. */
+  public void onlyVisibleArea(boolean enabled) {
+    page.locator("#only-visible").setChecked(enabled);
+  }
+
+  /**
+   * Acerca el mapa hasta {@code level} con el control de zoom de Leaflet. Espera a que el zoom
+   * nuevo se refleje en {@code #map[data-zoom]} antes del click siguiente: con animacion en curso
+   * Leaflet ignora clicks y el test se volveria flaky.
+   */
+  public void zoomTo(int level) {
+    while (true) {
+      int current = Integer.parseInt(page.locator("#map").getAttribute("data-zoom"));
+      if (current >= level) {
+        return;
+      }
+      this.clickElement("a.leaflet-control-zoom-in");
+      page.waitForFunction(
+        "(zoom) => document.querySelector('#map').dataset.zoom === String(zoom)",
+        current + 1
+      );
+    }
+  }
 }
