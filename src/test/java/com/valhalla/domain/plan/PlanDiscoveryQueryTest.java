@@ -34,6 +34,21 @@ public class PlanDiscoveryQueryTest {
   }
 
   @Test
+  public void parseToleraNullYBlancoEnTodosLosParametros() {
+    PlanDiscoveryQuery empty = PlanDiscoveryQuery.parse(null, null, null, null);
+    assertThat(empty.text(), is(""));
+    assertThat(empty.category(), is(nullValue()));
+    assertThat(empty.when(), is(PlanDiscoveryQuery.When.ALL));
+    assertThat(empty.sort(), is(PlanDiscoveryQuery.Sort.POPULAR));
+
+    PlanDiscoveryQuery blank = PlanDiscoveryQuery.parse("   ", "   ", "   ", "   ");
+    assertThat(blank.text(), is(""));
+    assertThat(blank.category(), is(nullValue()));
+    assertThat(blank.when(), is(PlanDiscoveryQuery.When.ALL));
+    assertThat(blank.sort(), is(PlanDiscoveryQuery.Sort.POPULAR));
+  }
+
+  @Test
   public void U17_hasFiltersEsFalsoSinTextoNiCategoriaYConWhenAll() {
     PlanDiscoveryQuery query = PlanDiscoveryQuery.parse("   ", null, "all", "date");
 

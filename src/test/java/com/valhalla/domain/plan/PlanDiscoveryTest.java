@@ -254,6 +254,35 @@ public class PlanDiscoveryTest {
   }
 
   @Test
+  public void popularityScoreWithNullCountStillUsesThePrior() {
+    assertThat(PlanDiscovery.popularityScore(4.0, null), is(closeTo(3.7, EPSILON)));
+  }
+
+  @Test
+  public void popularityTreatsNullAndZeroVoteSummariesAsUnrated() {
+    Plan rated = plan(201, "Calificado", null);
+    Plan nullCount = plan(202, "Conteo nulo", null);
+    Plan zeroCount = plan(203, "Conteo cero", null);
+    Map<UUID, RatingSummary> summaries = Map.of(
+      rated.getId(),
+      new RatingSummary(rated.getId(), 4.0, 4L),
+      nullCount.getId(),
+      new RatingSummary(nullCount.getId(), 4.0, null),
+      zeroCount.getId(),
+      new RatingSummary(zeroCount.getId(), 4.0, 0L)
+    );
+
+    List<Plan> ordered = PlanDiscovery.orderByPopularity(
+      List.of(nullCount, zeroCount, rated),
+      summaries,
+      Map.of()
+    );
+
+    assertThat(ordered, hasSize(3));
+    assertThat(ordered.get(0).getId(), is(equalTo(rated.getId())));
+  }
+
+  @Test
   public void searchMatchesTextByNameIgnoringCase() {
     Plan museum = plan(101, "Museo de Arte", TODAY);
     Plan bar = plan(102, "Bar Central", TODAY);
@@ -346,6 +375,22 @@ public class PlanDiscoveryTest {
 
     List<Plan> found = discover(
       List.of(noPlaces, bar),
+      PlanDiscoveryQuery.parse(null, "BAR", null, null)
+    );
+
+    assertThat(found, hasSize(1));
+    assertThat(found.get(0).getId(), is(equalTo(bar.getId())));
+  }
+
+  @Test
+  public void searchByCategoryIgnoresEntriesWithoutPlace() {
+    Plan orphan = plan(204, "Entrada huerfana", TODAY);
+    orphan.addPlanPlace(new PlanPlace());
+    Plan bar = plan(205, "Con bar", TODAY);
+    addPlace(bar, PlaceCategory.BAR);
+
+    List<Plan> found = discover(
+      List.of(orphan, bar),
       PlanDiscoveryQuery.parse(null, "BAR", null, null)
     );
 
@@ -454,6 +499,34 @@ public class PlanDiscoveryTest {
     assertThat(found.get(0).getId(), is(equalTo(alfa.getId())));
     assertThat(found.get(1).getId(), is(equalTo(beta.getId())));
     assertThat(found.get(2).getId(), is(equalTo(gama.getId())));
+  }
+
+  @Test
+  public void searchSortByDateBreaksTiesByName() {
+    Plan zeta = plan(206, "Zeta", TODAY);
+    Plan alfa = plan(207, "Alfa", TODAY);
+
+    List<Plan> found = discover(
+      List.of(zeta, alfa),
+      PlanDiscoveryQuery.parse(null, null, null, "date")
+    );
+
+    assertThat(found.get(0).getId(), is(equalTo(alfa.getId())));
+    assertThat(found.get(1).getId(), is(equalTo(zeta.getId())));
+  }
+
+  @Test
+  public void searchSortByNameBreaksTiesByDate() {
+    Plan later = plan(208, "Museo", TODAY.plusDays(1));
+    Plan sooner = plan(209, "Museo", TODAY);
+
+    List<Plan> found = discover(
+      List.of(later, sooner),
+      PlanDiscoveryQuery.parse(null, null, null, "name")
+    );
+
+    assertThat(found.get(0).getId(), is(equalTo(sooner.getId())));
+    assertThat(found.get(1).getId(), is(equalTo(later.getId())));
   }
 
   private List<Plan> discover(List<Plan> plans, PlanDiscoveryQuery query) {

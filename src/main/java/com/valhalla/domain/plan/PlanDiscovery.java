@@ -147,7 +147,8 @@ public final class PlanDiscovery {
 
   private static Long votes(Plan plan, Map<UUID, RatingSummary> summaries) {
     RatingSummary summary = summaries.get(plan.getId());
-    return summary == null ? 0L : summary.count();
+    // `count` es Long: un agregado sin votos puede traer null y el score lo descompondria.
+    return summary == null || summary.count() == null ? 0L : summary.count();
   }
 
   private static long participants(Plan plan, Map<UUID, Long> participantCounts) {
