@@ -103,7 +103,7 @@ Las specs definen cada feature del proyecto. Cada una tiene Criterios de Aceptac
 | [09-BRD](docs/specs/09-BRD.md) | Branding e identidad visual | — (card pendiente) |
 | [10-LAND](docs/specs/10-LAND.md) | Landing Page | — (card pendiente) |
 | [11-PROF](docs/specs/11-PROF.md) | Perfil de usuario y cambio de contraseña | — (card pendiente) |
-| [12-DATA](docs/specs/12-DATA.md) | Contenido de lugares | — (card pendiente) |
+| [12-DATA](docs/specs/12-DATA.md) | ABM de lugares + importador desde OpenStreetMap | [DATA](https://trello.com/c/ExZAxLQ5) |
 
 LO, PLC, PLN y AUT (01, 02, 03, 08) ya estan mergeados; APL-BE, APL-FE, CMP y VPC (04 a 07) son
 backlog. Las 09 a 12 son las nuevas de user-facing. El costo en puntos y el sprint de cada card
