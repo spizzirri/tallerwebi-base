@@ -133,6 +133,24 @@ public class HttpOverpassClientTest {
     assertThat(poi.website(), is("https://bar.example.com"));
   }
 
+  /**
+   * OSM suele traer la web sin esquema y el form del ABM usa {@code type="url"}: sin normalizar,
+   * el alta pre-llenada queda bloqueada por el navegador.
+   */
+  @Test
+  public void shouldAssumeHttpsForAWebsiteWithoutScheme() {
+    String body =
+      """
+      {"elements":[{"type":"node","lat":-34.6,"lon":-58.38,
+      "tags":{"name":"Bar","amenity":"bar","website":"bar.example.com"}}]}
+      """;
+
+    assertThat(
+      HttpOverpassClient.parsePois(body).getFirst().website(),
+      is("https://bar.example.com")
+    );
+  }
+
   // --- U-12 ---
 
   @Test

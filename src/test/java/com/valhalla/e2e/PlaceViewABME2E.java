@@ -42,10 +42,15 @@ public class PlaceViewABME2E extends E2eBase {
     placeForm().selectCategory("RESTAURANT");
     placeForm().typeLatitude("-34.60");
     placeForm().typeLongitude("-58.38");
+    // Los tres datos opcionales del importador (la web, con el esquema que exige el form).
+    placeForm().typeOpeningHours("Mo-Su 12:00-23:00");
+    placeForm().typePhone("+54 11 4444-5555");
+    placeForm().typeWebsite("https://parrilla.example.com");
     placeForm().clickSave();
     places.waitForPath("/admin/places");
     assertThat(places.hasRowWithName(PLACE_NAME), is(true));
     thenExploreShows(PLACE_NAME, "RESTAURANT", seededPlaces + 1);
+    thenExploreDetailsShow(PLACE_NAME);
 
     // E-05: edicion del nombre y la categoria -> los cambios se ven en las dos vistas.
     places.navigateToPlaces();
@@ -57,6 +62,8 @@ public class PlaceViewABME2E extends E2eBase {
     places.waitForPath("/admin/places");
     assertThat(places.hasRowWithName(EDITED_NAME), is(true));
     thenExploreShows(EDITED_NAME, EDITED_CATEGORY, seededPlaces + 1);
+    // El update no pierde los campos opcionales: la tarjeta del sidebar los sigue mostrando.
+    thenExploreDetailsShow(EDITED_NAME);
 
     // E-06: baja desde el ABM -> desaparece de las dos vistas y el dataset vuelve a su tamano.
     places.navigateToPlaces();
@@ -91,6 +98,29 @@ public class PlaceViewABME2E extends E2eBase {
       "the card carries the place category",
       card.first().textContent(),
       containsString(category)
+    );
+  }
+
+  /**
+   * Abre el sidebar del place en /explore (click en la card, el mismo gesto del usuario) y verifica
+   * los tres datos opcionales: horarios, telefono y web. La web se guardo sin esquema y se espera
+   * abierta como https; el telefono, como tel: sin espacios.
+   */
+  private void thenExploreDetailsShow(String name) {
+    placeCards().filter(new Locator.FilterOptions().setHasText(name)).first().click();
+    Locator details = page.locator("#place-details-aside");
+    details.waitFor();
+    assertThat(details.textContent(), containsString("Mo-Su 12:00-23:00"));
+    assertThat(details.textContent(), containsString("+54 11 4444-5555"));
+    assertThat(
+      "el telefono se puede marcar",
+      details.locator("a[href='tel:+541144445555']").count(),
+      is(1)
+    );
+    assertThat(
+      "la web sin esquema se abre como https",
+      details.locator("a[href='https://parrilla.example.com']").count(),
+      is(1)
     );
   }
 

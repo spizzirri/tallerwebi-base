@@ -247,10 +247,23 @@ public class HttpOverpassClient implements OverpassClient {
       coordinate(element, "lon"),
       text(tags, "opening_hours"),
       firstText(tags, "phone", "contact:phone"),
-      firstText(tags, "website", "contact:website"),
+      website(tags),
       osmKey,
       osmKey == null ? null : text(tags, osmKey)
     );
+  }
+
+  /**
+   * OSM carga muchas veces {@code website} sin esquema ("bar.example.com"). El form del ABM valida
+   * {@code type="url"}, asi que ese valor bloquearia el guardado: se normaliza a https aca, en el
+   * borde por donde entra el dato, y no en cada vista que lo muestra.
+   */
+  private static String website(JsonNode tags) {
+    String website = firstText(tags, "website", "contact:website");
+    if (website == null || website.contains("://")) {
+      return website;
+    }
+    return "https://" + website;
   }
 
   /** {@code out center} da center.lat/lon para ways y relations; los nodes traen lat/lon directo. */

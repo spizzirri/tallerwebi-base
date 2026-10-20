@@ -33,6 +33,7 @@ sin dependencias de red en ningun test.
 | AC-03 | Un usuario con rol USER no accede a `/admin/places*`: la cadena `/admin/**` lo redirige a su home sin renderizar el ABM; un anonimo queda redirigido sin renderizarlo tampoco |
 | AC-04 | La vista "Importar del mapa" muestra POIs reales de CABA (amenities/comercios) en un mapa Leaflet; al entrar no consulta nada: el admin elige el tipo de lugar y presiona "Cargar puntos de esta zona", y la consulta a Overpass la hace el backend a traves de la interfaz `OverpassClient`, sin API key, acotada al area visible del mapa y recortada a CABA |
 | AC-05 | Al elegir un POI en el importador, el form del ABM queda pre-lleno con nombre, direccion, coordenadas, horarios, telefono, web y categoria OSM mapeada; el admin puede revisar y cambiar cualquier campo antes de guardar, y guardar crea el place con esos datos |
+| AC-05b | El panel de detalle de `/explore` muestra horarios, telefono y web de un place cuando existen (el telefono como `tel:`, la web como enlace `https`), y no muestra filas vacias para los que no los tienen |
 | AC-06 | Tags OSM sin mapping explicito caen en `OTHER` y el admin siempre puede cambiar la categoria antes de guardar |
 | AC-07 | El dataset mantiene los 10 places actuales del seeder y agrega lugares nuevos; cada categoria de `PlaceCategory` tiene al menos un lugar (hoy `SPORT` y `OTHER` no tienen ninguno) |
 | AC-08 | El filtro por categoria y la busqueda por nombre de `/explore` siguen funcionando sobre el dataset nuevo |
@@ -137,8 +138,8 @@ sin dependencias de red en ningun test.
 | E-01 | `e2e/PlacesViewE2E.java` (recalibrado) | Abrir `/explore`: 12 cards y 12 markers; markers de categoria RESTAURANT identificados por `data-category` (2), sin asertar el hex | AC-07, AC-09 |
 | E-02 | `e2e/PlacesViewE2E.java` (recalibrado) | Filtrar RESTAURANT → 2 lugares; buscar "Don" → 1; Clear Filters → 12 | AC-08, AC-09 |
 | E-03 | `e2e/PlacesViewE2E.java` (recalibrado) | Seleccionar un lugar del seeder (sin imagen): el panel muestra `/images/place-placeholder.svg` | AC-02 |
-| E-04 | `e2e/PlaceViewABME2E.java` | Admin crea un place desde `/admin/places/new` → aparece en el listado del ABM y en `/explore` | AC-01 |
-| E-05 | `e2e/PlaceViewABME2E.java` | Admin edita el place creado → los cambios se ven en el listado y en `/explore` | AC-01 |
+| E-04 | `e2e/PlaceViewABME2E.java` | Admin crea un place desde `/admin/places/new` (con horarios, telefono y web) → aparece en el listado del ABM y en `/explore`, y su panel de detalle muestra los tres datos (telefono como `tel:`, web como `https`) | AC-01, AC-05b |
+| E-05 | `e2e/PlaceViewABME2E.java` | Admin edita el place creado → los cambios se ven en el listado y en `/explore`, y los datos opcionales siguen en el panel de detalle | AC-01, AC-05b |
 | E-06 | `e2e/PlaceViewABME2E.java` | Admin da de baja el place → desaparece del listado y de `/explore` | AC-01 |
 | E-07 | `e2e/PlaceImportE2E.java` | Admin entra a `/admin/places/import` con el proxy stubbeado y el contador de pedidos en 0: no hay consulta ni buscador hasta apretar "Cargar puntos de esta zona"; con el click llega exactamente 1 pedido, aparecen los 3 POIs, el buscador se habilita y elegir uno abre `/admin/places/new` con el form pre-llenado (nombre, categoria, direccion, lat/lng, horarios, telefono, web) | AC-04, AC-05, AC-10 |
 | E-08 | `e2e/PlaceImportE2E.java` | Con el proxy stubbeado en 502, tras el click la vista muestra el mensaje de error y la lista queda vacia | AC-04, AC-10 |
@@ -199,6 +200,9 @@ borde (red del browser / interfaz de dominio), nunca dentro de la logica de la v
   - Devuelve tags `name`, `addr:*`, `opening_hours`, `phone`/`contact:phone`, `website`,
     `cuisine`, y el tipo (`amenity=*` / `shop=*`). NO devuelve fotos ni ratings: importar
     imagenes o puntajes queda fuera de alcance.
+  - `website` viene muchas veces **sin esquema** (`bar.example.com`). El parser le antepone
+    `https://`: el form del ABM usa `type="url"` y ese valor bloquearia el guardado del alta
+    pre-llenada. La normalizacion va en el borde (parser) y no en cada vista.
   - Uso automatizado moderado: ~100 queries/dia y 10 MB/dia en el server principal. Errores
     transitorios: **429** (limite por IP: esperar 30 s) y **502/503/504** (cola llena: esperar
     1 s). Se reintenta hasta dos veces en total; si sigue fallando, el proxy responde 502 y la
@@ -211,6 +215,11 @@ borde (red del browser / interfaz de dominio), nunca dentro de la logica de la v
   incluir `© OpenStreetMap contributors` en la attribution del tile layer, igual que ya hace
   `/explore` con
   `attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'`.
+- **El panel de detalle de `/explore` muestra los datos nuevos.** `GET /api/places` serializa el
+  domain `Place` completo, así que horarios, teléfono y web llegan sin cambios de contrato: el
+  sidebar los pinta solo si existen (una fila por dato, con ícono de Lucide). El teléfono va como
+  `tel:` sin espacios ni guiones (el texto mostrado los conserva) y la web se abre como `https`
+  aunque el dato guardado no traiga esquema: un `javascript:` cargado a mano nunca se navega.
 - **Mapping `amenity`/`shop` OSM → `PlaceCategory`.** Mapping explicito en
   `PlaceCategory.fromOsm(key, value)` (ver Referencia, paso 4). Lo no mapeado cae en `OTHER`,
   y el admin siempre puede cambiarlo antes de guardar (el select del form es el mismo para el

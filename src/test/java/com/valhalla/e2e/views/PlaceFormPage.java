@@ -63,6 +63,18 @@ public class PlaceFormPage extends WebPage {
     return page.inputValue("#website");
   }
 
+  public void typeOpeningHours(String openingHours) {
+    this.typeIntoElement("#openingHours", openingHours);
+  }
+
+  public void typePhone(String phone) {
+    this.typeIntoElement("#phone", phone);
+  }
+
+  public void typeWebsite(String website) {
+    this.typeIntoElement("#website", website);
+  }
+
   /** El mismo boton crea y actualiza; el label (Create/Update) cambia con {@code isEdit}. */
   public void clickSave() {
     this.clickElement("#btn-create");
