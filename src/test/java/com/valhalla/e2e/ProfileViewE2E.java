@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
  * el modal, "Ver perfil" llega a la URL con id, el editor persiste visible con el aviso, la vista
  * pública funciona con y sin sesión, y las entradas "Pronto" no navegan a ningún lado. Extra de
  * esta ronda: la guardia de z-order del modal en /explore, cuya barra sticky tapaba el panel.
+ * [MARK] "Guardados" ya no es un "Pronto": es un link activo al ancla del perfil propio.
  *
  * <p>El admin seed ("Admin Test", inicial A) es la única cuenta garantizada: ResetDatabase corre
  * en cada test y la seed se recarga.
@@ -52,13 +53,17 @@ public class ProfileViewE2E extends E2eBase {
 
     // AC-18: "Pronto" no es <a> ni <button> navegable: un span aria-disabled. El E2E no lo
     // clica (Playwright se niega sobre elementos deshabilitados y ahi esta el punto): fija en
-    // el DOM que la entrada no linkea a nada y que las dos "Pronto" siguen inertes.
+    // el DOM que la entrada no linkea a nada. [MARK] "Guardados" dejo de ser "Pronto" y ahora
+    // es un link real, asi que queda una sola entrada inerte ("Siguiendo").
     var disabledEntries = page.locator("#navbar-menu [role='menuitem'][aria-disabled='true']");
-    assertTrue(disabledEntries.count() >= 2);
-    assertEquals(
-      0,
-      page.locator("#navbar-menu a", new Page.LocatorOptions().setHasText("Guardados")).count()
-    );
+    assertEquals(1, disabledEntries.count());
+    assertTrue(disabledEntries.first().textContent().contains("Siguiendo"));
+    assertEquals("SPAN", String.valueOf(disabledEntries.first().evaluate("el => el.tagName")));
+
+    // [MARK] AC-17: Guardados es un link al ancla de la seccion en el perfil propio.
+    var bookmarksLink = page.locator("#navbar-menu a#menu-bookmarks");
+    assertEquals(1, bookmarksLink.count());
+    assertTrue(bookmarksLink.getAttribute("href").endsWith("/profile#bookmarks"));
 
     // El menú sigue abierto y la URL intacta: nada navegó.
     assertTrue(page.locator("#navbar-menu:not([hidden])").count() == 1);
