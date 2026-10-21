@@ -35,6 +35,7 @@ public final class PlanFeedCards {
     String eventDate,
     int placeCount,
     String administratorName,
+    Long administratorId,
     String cover,
     Double ratingAverage,
     Long ratingCount
@@ -49,6 +50,7 @@ public final class PlanFeedCards {
       plan.getEventDate() == null ? null : plan.getEventDate().toString(),
       plan.getPlanPlaces().size(),
       feedDisplayName(plan.getAdministrator()),
+      plan.getAdministrator() == null ? null : plan.getAdministrator().getId(),
       "/images/plans/cover-" + (Math.floorMod(plan.getId().hashCode(), COVER_COUNT) + 1) + ".svg",
       roundOneDecimal(summary.average()),
       summary.count()
@@ -60,7 +62,7 @@ public final class PlanFeedCards {
    * (la vista y sus tests leen claves, no componentes de record). Los summaries de calificaciones
    * arrive solo via ports/mocks: ver 16-CAL.md.
    */
-  static Map<String, Object> planCard(Plan plan, Map<UUID, RatingSummary> summaries) {
+  public static Map<String, Object> planCard(Plan plan, Map<UUID, RatingSummary> summaries) {
     RatingSummary summary = summaries.getOrDefault(
       plan.getId(),
       new RatingSummary(plan.getId(), null, 0L)
@@ -80,6 +82,7 @@ public final class PlanFeedCards {
     model.put("eventDate", card.eventDate());
     model.put("placeCount", card.placeCount());
     model.put("administratorName", card.administratorName());
+    model.put("administratorId", card.administratorId());
     model.put("cover", card.cover());
     model.put("ratingAverage", card.ratingAverage());
     model.put("ratingCount", card.ratingCount());

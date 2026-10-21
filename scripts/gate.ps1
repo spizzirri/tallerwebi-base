@@ -702,6 +702,17 @@ if ($script:nativeExitCode -ne 0) {
 # environment. Captured before the stop, because the stop overwrites $LASTEXITCODE and
 # that is the code the caller needs.
 try {
+    # A cold boot (fresh container or one that was stopped) keeps answering psql with
+    # "the database system is starting up" for a few seconds: wait it out instead of
+    # failing the whole gate on infrastructure timing.
+    $databaseReady = $false
+    foreach ($attempt in 1..30) {
+        $exists = docker compose exec -T postgres psql -U user -d postgres -tAc "SELECT 1" 2>$null
+        if ($LASTEXITCODE -eq 0) { $databaseReady = $true; break }
+        Start-Sleep -Seconds 1
+    }
+    if (-not $databaseReady) { throw 'postgres did not answer within 30s' }
+
     # createdb is not idempotent, so ask the catalog first. -d postgres is required:
     # without it psql connects to a database named after the user, which does not exist.
     $exists = docker compose exec -T postgres psql -U user -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='$e2eDb'"

@@ -199,6 +199,7 @@ public class PlanRestControllerTest {
             "eventDate",
             "placeCount",
             "administratorName",
+            "administratorId",
             "cover",
             "ratingAverage",
             "ratingCount"

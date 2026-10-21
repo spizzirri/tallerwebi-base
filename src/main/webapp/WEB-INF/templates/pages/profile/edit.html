@@ -1,0 +1,89 @@
+<!DOCTYPE HTML>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{layouts/base :: head('Mi perfil - PlanIt')}"></head>
+
+<body th:replace="~{layouts/base :: layout(~{::main})}">
+
+  <main class="flex-1 p-4">
+    <div class="mx-auto max-w-3xl space-y-6">
+
+      <p th:if="${param.updated}" class="rounded-md bg-green-100 px-4 py-3 text-sm text-green-800"
+        role="status">Perfil actualizado</p>
+      <p th:if="${param.passwordChanged}" class="rounded-md bg-green-100 px-4 py-3 text-sm text-green-800"
+        role="status">Contrasena actualizada</p>
+
+      <!-- [PROF] AC-16: el avatar junto al nombre es tambien el preview en vivo del picker de
+           abajo: el JS de components/avatar-picker le cambia el src y alterna con las iniciales
+           (ownerInitial viene del controller). Ambos elementos se renderizan siempre. -->
+      <div class="rounded-lg bg-white p-8 shadow-md">
+        <div class="flex items-center gap-4">
+          <img id="avatar-preview-img" th:src="${owner.avatarUrl}" alt="Avatar"
+            th:attr="hidden=${owner.avatarUrl == null}"
+            class="h-16 w-16 rounded-full object-cover" />
+          <span id="avatar-preview-initial"
+            th:attr="hidden=${owner.avatarUrl != null},aria-label=${owner.firstName + ' ' + (owner.lastName == null ? '' : owner.lastName)}"
+            class="navbar-avatar inline-flex h-16 w-16 items-center justify-center rounded-full bg-secondary font-serif text-2xl font-bold text-black"
+            th:text="${ownerInitial}" role="img">U</span>
+          <div>
+            <h1 class="text-2xl font-semibold text-gray-900">Mi perfil</h1>
+            <p class="text-sm text-gray-500" th:text="${owner.email}">email</p>
+            <p class="text-xs text-gray-400" th:text="${owner.role}">rol</p>
+          </div>
+        </div>
+
+        <form th:action="@{/profile}" th:object="${profileForm}" method="POST" class="mt-6 space-y-4">
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+
+          <div class="flex gap-4">
+            <div class="flex-1">
+              <label for="firstName" class="mb-1 block text-sm font-medium text-gray-700">Nombre</label>
+              <input type="text" id="firstName" th:field="*{firstName}" autocomplete="given-name" required
+                class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none" />
+              <span th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"
+                class="mt-1 block text-sm text-red-600"></span>
+            </div>
+            <div class="flex-1">
+              <label for="lastName" class="mb-1 block text-sm font-medium text-gray-700">Apellido</label>
+              <input type="text" id="lastName" th:field="*{lastName}" autocomplete="family-name" required
+                class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none" />
+              <span th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"
+                class="mt-1 block text-sm text-red-600"></span>
+            </div>
+          </div>
+
+          <div th:replace="~{components/avatar-picker :: picker(${profileForm.avatarUrl})}"></div>
+          <span th:if="${#fields.hasErrors('avatarUrl')}" th:errors="*{avatarUrl}"
+            class="block text-sm text-red-600"></span>
+
+          <div>
+            <a th:href="@{/profile/change-password}" class="text-sm text-blue-600 hover:underline">
+              Cambiar contrasena
+            </a>
+          </div>
+
+          <button type="submit"
+            class="w-full rounded-md bg-blue-600 py-2 font-medium text-white transition hover:bg-blue-700">
+            Guardar perfil
+          </button>
+        </form>
+      </div>
+
+      <!-- [PROF] AC-19: secciones placeholder, ancladas y listas para activar. Guardados es de [MARK] y Seguidores de [FOLLOW]: cuando cada feature aterrice activa su seccion
+           y la entrada del navbar la asigna, sin tocar este markup. El tema NO vive en la vista de
+           perfil (decision 2026-10-21): su unica entrada es el modal del navbar ([PROF+THEME]). -->
+      <section id="bookmarks" class="rounded-lg bg-white p-8 text-sm text-gray-500 shadow-md">
+        <h2 class="text-lg font-semibold text-gray-900">Guardados</h2>
+        <p class="mt-2">A futuro: los planes que marcaste como favoritos aparecen aca ([MARK]).</p>
+      </section>
+
+      <section id="follow" class="rounded-lg bg-white p-8 text-sm text-gray-500 shadow-md">
+        <h2 class="text-lg font-semibold text-gray-900">Seguidores</h2>
+        <p class="mt-2">A futuro: seguidores y seguidos de tu cuenta ([FOLLOW]).</p>
+      </section>
+    </div>
+  </main>
+
+</body>
+
+</html>

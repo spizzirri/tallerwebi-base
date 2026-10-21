@@ -40,11 +40,22 @@ public class LoginServiceImpl implements LoginService {
 
   @Override
   public void register(String email, String password) {
-    register(email, password, null, null);
+    register(email, password, null, null, null);
   }
 
   @Override
   public void register(String email, String password, String firstName, String lastName) {
+    register(email, password, firstName, lastName, null);
+  }
+
+  @Override
+  public void register(
+    String email,
+    String password,
+    String firstName,
+    String lastName,
+    String avatarUrl
+  ) {
     if (userRepository.findByEmail(email).isPresent()) {
       throw new UserAlreadyExists();
     }
@@ -55,6 +66,7 @@ public class LoginServiceImpl implements LoginService {
     user.setLastName(lastName);
     user.setRole(DEFAULT_ROLE);
     user.setActive(true);
+    user.setAvatarUrl(avatarUrl);
     userRepository.save(user);
   }
 }

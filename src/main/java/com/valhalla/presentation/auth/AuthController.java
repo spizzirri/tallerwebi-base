@@ -4,6 +4,7 @@ import com.valhalla.domain.exception.UserAlreadyExists;
 import com.valhalla.domain.login.LoginService;
 import com.valhalla.infrastructure.security.ProgrammaticSignIn;
 import com.valhalla.infrastructure.user.RecoverPasswordService;
+import com.valhalla.presentation.shared.AvatarUrlPolicy;
 import com.valhalla.presentation.shared.LoginRedirects;
 import com.valhalla.presentation.shared.RecoverPasswordRequest;
 import com.valhalla.presentation.shared.RegisterRequest;
@@ -83,12 +84,19 @@ public class AuthController {
       return REGISTER_VIEW;
     }
 
+    // [PROF] AC-25: formato del avatar, la misma regla única del perfil (AvatarUrlPolicy).
+    if (!AvatarUrlPolicy.isValid(request.getAvatarUrl())) {
+      bindingResult.rejectValue("avatarUrl", null, AvatarUrlPolicy.REJECT_MESSAGE);
+      return REGISTER_VIEW;
+    }
+
     try {
       loginService.register(
         request.getEmail(),
         request.getPassword(),
         request.getFirstName(),
-        request.getLastName()
+        request.getLastName(),
+        request.getAvatarUrl()
       );
       // Crear la cuenta no es sólo crearla: quien se registra queda adentro en el mismo paso, y
       // el destino lo decide la misma regla que a un login normal (LoginRedirects), no uno nuevo.

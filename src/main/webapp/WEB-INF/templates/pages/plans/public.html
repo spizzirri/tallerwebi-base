@@ -31,7 +31,9 @@
     <p class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-600">
       <span th:if="${!#strings.isEmpty(administratorName)}">
         <strong>Creado por:</strong>
-        <span th:text="${administratorName}"></span>
+        <!-- [PROF] AC-22/PROF-014: el autor del plan linkea a su perfil publico. -->
+        <a th:href="@{/profile/{id}(id=${administratorId})}" class="text-blue-600 hover:underline"
+          th:text="${administratorName}"></a>
       </span>
       <span class="text-gray-300" th:if="${!#strings.isEmpty(administratorName)}"
         aria-hidden="true">·</span>

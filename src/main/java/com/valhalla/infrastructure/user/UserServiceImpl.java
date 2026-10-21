@@ -45,6 +45,12 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
+  @Transactional(readOnly = true)
+  public User getByEmail(String email) {
+    return userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
+  }
+
+  @Override
   public void create(
     String email,
     String password,
@@ -120,5 +126,29 @@ public class UserServiceImpl implements UserService {
   @Override
   public String generatePassword() {
     return java.util.UUID.randomUUID().toString().substring(0, 8);
+  }
+
+  /** [PROF] Solo toca campos de perfil (User.updateProfile ya excluye email/role). */
+  @Override
+  public void updateProfile(Long id, String firstName, String lastName, String avatarUrl) {
+    User user = findById(id);
+    user.updateProfile(firstName, lastName, avatarUrl);
+    userRepository.update(user);
+  }
+
+  /**
+   * [PROF] Exigir la contraseña actual es obligatorio (11-PROF, decisión: XSS/dispositivo
+   * compartido). Se compara contra el mismo encoder del login; un mismatch NO escribe nada.
+   * {@code rotatePassword(id)} sigue como está: lo usa el panel admin y la recuperación.
+   */
+  @Override
+  public boolean changePassword(Long id, String currentRawPassword, String newRawPassword) {
+    User user = findById(id);
+    if (!passwordEncoder.matches(currentRawPassword, user.getPassword())) {
+      return false;
+    }
+    user.changePassword(newRawPassword, passwordEncoder);
+    userRepository.update(user);
+    return true;
   }
 }

@@ -45,7 +45,7 @@ public class PlacesViewE2E extends E2eBase {
   void shouldShowTheUserNavbarToAnAdminBrowsingTheExplore() {
     assertThat(
       new WebPage(page).getNavbarItems(),
-      contains("PlanIt", "Para vos", "Explore", "Plans", "Logout", "Cambiar tema")
+      contains("PlanIt", "Para vos", "Explore", "Plans", "A", "Cambiar tema")
     );
   }
 

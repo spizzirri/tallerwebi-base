@@ -340,4 +340,87 @@ public class UserServiceTest {
     String second = this.userService.generatePassword();
     assert !first.equals(second);
   }
+
+  // --- [PROF] U-07 ---
+
+  @Test
+  public void shouldPersistTheProfileUpdateForAnExistingUser() {
+    Long id = 1L;
+    User user = new User();
+    user.setId(id);
+    user.setEmail("profile@test.com");
+    when(this.userRepositoryMock.findById(id)).thenReturn(Optional.of(user));
+
+    this.userService.updateProfile(id, "Ada", "Lovelace", "/images/avatars/avatar-1.svg");
+
+    ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+    verify(this.userRepositoryMock, times(1)).update(captor.capture());
+    User saved = captor.getValue();
+    assertThat(saved.getFirstName(), is(equalTo("Ada")));
+    assertThat(saved.getLastName(), is(equalTo("Lovelace")));
+    assertThat(saved.getAvatarUrl(), is(equalTo("/images/avatars/avatar-1.svg")));
+  }
+
+  // --- [PROF] U-08 ---
+
+  @Test
+  public void shouldFailGracefullyWhenUpdatingTheProfileOfAMissingUser() {
+    Long id = 999L;
+    when(this.userRepositoryMock.findById(id)).thenReturn(Optional.empty());
+
+    assertThrows(
+      UserNotFoundException.class,
+      () -> this.userService.updateProfile(id, "Ada", "Lovelace", null)
+    );
+  }
+
+  // --- [PROF] U-09 ---
+
+  @Test
+  public void shouldRejectThePasswordChangeAndWriteNothingWhenTheCurrentOneIsWrong() {
+    Long id = 1L;
+    User user = new User();
+    user.setId(id);
+    user.setPassword(this.passwordEncoder.encode("la-correcta"));
+    when(this.userRepositoryMock.findById(id)).thenReturn(Optional.of(user));
+
+    boolean changed = this.userService.changePassword(id, "incorrecta", "la-nueva-123");
+
+    assertThat(changed, is(false));
+    verify(this.userRepositoryMock, never()).update(any(User.class));
+  }
+
+  // --- [PROF] U-10 ---
+
+  @Test
+  public void shouldPersistTheNewHashWhenTheCurrentPasswordIsCorrect() {
+    Long id = 1L;
+    User user = new User();
+    user.setId(id);
+    user.setPassword(this.passwordEncoder.encode("la-correcta"));
+    when(this.userRepositoryMock.findById(id)).thenReturn(Optional.of(user));
+
+    boolean changed = this.userService.changePassword(id, "la-correcta", "la-nueva-123");
+
+    assertThat(changed, is(true));
+    ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+    verify(this.userRepositoryMock, times(1)).update(captor.capture());
+    assertThat(
+      this.passwordEncoder.matches("la-nueva-123", captor.getValue().getPassword()),
+      is(true)
+    );
+  }
+
+  // --- [PROF] U-11 ---
+
+  @Test
+  public void shouldReturnTheSessionUserFindByEmail() {
+    User user = new User();
+    user.setId(7L);
+    user.setEmail("session@test.com");
+    when(this.userRepositoryMock.findByEmail("session@test.com")).thenReturn(Optional.of(user));
+
+    assertThat(this.userService.getByEmail("session@test.com"), is(equalTo(user)));
+    assertThrows(UserNotFoundException.class, () -> this.userService.getByEmail("nope@test.com"));
+  }
 }

@@ -180,7 +180,7 @@ public class AuthControllerTest {
     );
 
     assertThat(view, is("redirect:" + LoginRedirects.USER_LANDING));
-    verify(loginService).register(EMAIL, PASSWORD, FIRST_NAME, LAST_NAME);
+    verify(loginService).register(EMAIL, PASSWORD, FIRST_NAME, LAST_NAME, null);
     verify(programmaticSignIn).signIn(EMAIL, httpRequest, httpResponse);
   }
 
@@ -202,7 +202,7 @@ public class AuthControllerTest {
 
     assertThat(view, is(REGISTER_VIEW));
     assertThat(fieldNames(bindingResult), hasItem("email"));
-    verify(loginService, never()).register(EMAIL, PASSWORD, FIRST_NAME, LAST_NAME);
+    verify(loginService, never()).register(EMAIL, PASSWORD, FIRST_NAME, LAST_NAME, null);
   }
 
   @Test
@@ -222,7 +222,7 @@ public class AuthControllerTest {
 
     assertThat(view, is(REGISTER_VIEW));
     assertThat(fieldNames(bindingResult), hasItem("password"));
-    verify(loginService, never()).register(EMAIL, PASSWORD, FIRST_NAME, LAST_NAME);
+    verify(loginService, never()).register(EMAIL, PASSWORD, FIRST_NAME, LAST_NAME, null);
   }
 
   @Test
@@ -242,7 +242,7 @@ public class AuthControllerTest {
     assertThat(view, is(REGISTER_VIEW));
     assertThat(fieldNames(bindingResult), hasItem("firstName"));
     assertThat(fieldNames(bindingResult), hasItem("lastName"));
-    verify(loginService, never()).register(EMAIL, PASSWORD, FIRST_NAME, LAST_NAME);
+    verify(loginService, never()).register(EMAIL, PASSWORD, FIRST_NAME, LAST_NAME, null);
   }
 
   @Test
@@ -265,7 +265,7 @@ public class AuthControllerTest {
       bindingResult.getFieldError("confirmPassword").getDefaultMessage(),
       is("Las contraseñas no coinciden")
     );
-    verify(loginService, never()).register(EMAIL, PASSWORD, FIRST_NAME, LAST_NAME);
+    verify(loginService, never()).register(EMAIL, PASSWORD, FIRST_NAME, LAST_NAME, null);
   }
 
   // --- U-07 ---
@@ -275,7 +275,7 @@ public class AuthControllerTest {
     RegisterRequest request = wellFormedRequest();
     doThrow(new UserAlreadyExists())
       .when(loginService)
-      .register(EMAIL, PASSWORD, FIRST_NAME, LAST_NAME);
+      .register(EMAIL, PASSWORD, FIRST_NAME, LAST_NAME, null);
     ExtendedModelMap model = new ExtendedModelMap();
 
     String view = controller.handleRegister(

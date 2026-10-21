@@ -27,11 +27,10 @@ import org.junit.jupiter.api.Test;
  * del arrange, que es el admin: por eso el observador del feed es un usuario recien registrado en
  * un contexto aparte, para quien el plan del admin es ajeno.
  *
- * <p>El nombre del plan es ASCII a proposito, no por estetica: la app responde las paginas como
- * {@code text/html;charset=iso-8859-1}, asi que el browser arma el body del form en Latin-1 y
- * Jetty lo rechaza con 400 "Unable to parse form content: Invalid UTF-8" en cuanto un campo trae
- * un acento. Ese bug de codificacion es preexistente y le toca a la card de creacion de planes,
- * no a esta: agregarle un acento aca volveria rojo este E2E por un motivo que PPV no controla.
+ * <p>El nombre del plan es ASCII a proposito, por estilo del suite: la app ahora responde las
+ * paginas como {@code text/html;charset=UTF-8} (charset fijado en BaseWebConfig; hasta ese fix
+ * las paginas salian iso-8859-1, el browser armaba el body del form en Latin-1 y Jetty lo
+ * rechazaba con 400 "Unable to parse form content: Invalid UTF-8" al primer acento).
  */
 public class PublicPlansListE2E extends E2eBase {
 
@@ -55,6 +54,11 @@ public class PublicPlansListE2E extends E2eBase {
       "el link del navbar sin sesion apunta a /for-you",
       page.locator("body > nav a:has-text('Para vos')").getAttribute("href"),
       containsString("/for-you")
+    );
+    assertThat(
+      "el navbar sin sesion no ofrece el menu hamburguesa",
+      page.locator("#navbar-menu-btn").count(),
+      is(0)
     );
 
     // --- El plan publico lo arma el admin, y EL NO LO VE en su propio feed ---

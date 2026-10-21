@@ -83,7 +83,9 @@ public class WebPage {
   /**
    * Visible text of every navbar link and button, in document order. Pinned by the callers
    * instead of filtered: a menu item pointing at a route nobody maps still renders perfectly,
-   * so the only way to catch it is to name the items the navbar is allowed to have.
+   * so the only way to catch it is to name the items the navbar is allowed to have. Icon-only
+   * buttons (el disparador del menú modal de [PROF], que es un hamburguesa SVG sin texto)
+   * aportan un texto vacío y no integran el set: el menú se cubre por id en ProfileViewE2E.
    *
    * <p>Whitespace is collapsed the same way {@link #getNavbarAvatarInitial()} does it, because
    * {@code allTextContents()} returns the raw markup text and a template that wraps the label
@@ -101,6 +103,7 @@ public class WebPage {
       .allTextContents()
       .stream()
       .map(text -> text.replaceAll("\\s+", " ").trim())
+      .filter(text -> !text.isEmpty())
       .toList();
   }
 

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Avatar brújula">
+  <!-- [PROF] Avatar de galería 2/3: brújula de viaje. -->
+  <circle cx="32" cy="32" r="32" fill="#10B981" />
+  <circle cx="32" cy="32" r="15" fill="#FFFFFF" />
+  <path d="M32 17 L37 29 L32 26 L27 29 Z" fill="#065F46" />
+  <path d="M32 47 L27 35 L32 38 L37 35 Z" fill="#065F46" opacity="0.6" />
+  <circle cx="32" cy="32" r="2.5" fill="#065F46" />
+</svg>

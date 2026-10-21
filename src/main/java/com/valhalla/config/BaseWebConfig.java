@@ -112,6 +112,9 @@ public abstract class BaseWebConfig implements WebMvcConfigurer {
     // Template cache is off so template edits appear on refresh (F5) without
     // restarting the server. This is the dev-friendly default for a taller.
     templateResolver.setCacheable(false);
+    // Thymeleaf reads templates as ISO-8859-1 by default: without this, any
+    // non-ASCII byte in a template comment or text would render double-encoded.
+    templateResolver.setCharacterEncoding("UTF-8");
     return templateResolver;
   }
 
@@ -143,6 +146,13 @@ public abstract class BaseWebConfig implements WebMvcConfigurer {
   public ThymeleafViewResolver viewResolver() {
     ThymeleafViewResolver viewResolver = new ThymeleafViewResolver();
     viewResolver.setTemplateEngine(templateEngine());
+    // ThymeleafViewResolver answers text/html;charset=iso-8859-1 unless told
+    // otherwise. The browser honors the header over the <meta charset> tag, so
+    // pages rendered without this sent the page as Latin-1 and the browser
+    // built every form body in Latin-1 too: Jetty decodes form content as
+    // UTF-8, and the first accented value a user submitted blew up with 400
+    // "Unable to parse form content: Invalid UTF-8".
+    viewResolver.setCharacterEncoding("UTF-8");
     return viewResolver;
   }
 }

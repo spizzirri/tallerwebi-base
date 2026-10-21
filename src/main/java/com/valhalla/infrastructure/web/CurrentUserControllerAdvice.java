@@ -1,5 +1,8 @@
 package com.valhalla.infrastructure.web;
 
+import com.valhalla.domain.exception.UserNotFoundException;
+import com.valhalla.domain.user.User;
+import com.valhalla.domain.user.UserService;
 import com.valhalla.infrastructure.security.AppUserDetails;
 import com.valhalla.presentation.shared.LoginRedirects;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,6 +31,12 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 @ControllerAdvice
 public class CurrentUserControllerAdvice {
 
+  private final UserService userService;
+
+  public CurrentUserControllerAdvice(UserService userService) {
+    this.userService = userService;
+  }
+
   @ModelAttribute("userInitial")
   public String userInitial(Principal principal) {
     String name = displayNameOf(principal);
@@ -40,6 +49,31 @@ public class CurrentUserControllerAdvice {
   @ModelAttribute("userDisplayName")
   public String userDisplayName(Principal principal) {
     return displayNameOf(principal);
+  }
+
+  /**
+   * Avatar URL del usuario con sesion, o null para dejar el fallback de iniciales. La pide el
+   * navbar (trigger del modal) y el header del modal, porque el avatar actualizado en el perfil
+   * tiene que verse en ambas superficies en el render siguiente — la pagina se rinde por request,
+   * asi que el redirect del Guardar Perfil alcanza, sin JS ni cache.
+   *
+   * <p>Defensiva como el resto del advice: sin sesion o un principal que no reside en la tabla
+   * (nombres sinteticos de MockMvc, anonymous) devuelven null y el navbar sigue rindiendo
+   * iniciales. La consulta es un lookup indexado por email; el session id real de
+   * {@code AppUserDetails} no cambia ni se toca aqui.
+   */
+  @ModelAttribute("userAvatarUrl")
+  public String userAvatarUrl(Principal principal) {
+    if (principal == null || principal instanceof AnonymousAuthenticationToken) {
+      return null;
+    }
+    try {
+      User user = userService.getByEmail(principal.getName());
+      String avatarUrl = user.getAvatarUrl();
+      return avatarUrl == null || avatarUrl.isBlank() ? null : avatarUrl.trim();
+    } catch (UserNotFoundException syntheticPrincipal) {
+      return null;
+    }
   }
 
   /**

@@ -151,7 +151,13 @@
           const loadedArea = ref(null);
           const refreshArea = () => {
             const bounds = map.getBounds();
-            area.value = {
+            /* Antes de que Tailwind mida el mapa, el contenedor mide 0 y getBounds() devuelve
+             esquinas coincidentes. Ese "area" de cero intersecta CABA (un punto dentro de la
+             ciudad ya cumple a.south < b.north && a.north > b.south) y habilitaria el boton
+             para una consulta sin zona: no hay area hasta que Leaflet vea un tamaño real. */
+            const degenerate = bounds.getNorth() <= bounds.getSouth() ||
+              bounds.getEast() <= bounds.getWest();
+            area.value = degenerate ? null : {
               south: bounds.getSouth(),
               west: bounds.getWest(),
               north: bounds.getNorth(),

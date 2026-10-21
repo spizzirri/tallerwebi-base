@@ -27,6 +27,9 @@ public class RegisterRequest {
   @NotBlank(message = "Confirm password is required")
   private String confirmPassword;
 
+  /** [PROF] Avatar opcional al registrarse (AC-23): https://... o /images/avatars/... (AC-25). */
+  private String avatarUrl;
+
   public RegisterRequest() {}
 
   public RegisterRequest(String email, String password) {
@@ -52,6 +55,14 @@ public class RegisterRequest {
 
   public String getConfirmPassword() {
     return confirmPassword;
+  }
+
+  public String getAvatarUrl() {
+    return avatarUrl;
+  }
+
+  public void setAvatarUrl(String avatarUrl) {
+    this.avatarUrl = avatarUrl;
   }
 
   public void setConfirmPassword(String confirmPassword) {

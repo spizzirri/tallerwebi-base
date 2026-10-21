@@ -273,7 +273,13 @@
                     </div>
                     <div class="col-6 bg-light p-3 rounded">
                         <small class="text-muted d-block fw-bold text-uppercase" style="font-size: 0.75rem;">ADMINISTRADOR</small>
-                        <span th:text="${plan.administrator != null ? plan.administrator.email : 'Sin administrador'}">Administrador</span>
+                        <!-- [PROF] AC-22/PROF-014: el email del admin deja de ser la etiqueta; aca
+                             se ve el nombre y linkea al perfil publico (es un usuario real). -->
+                        <a th:if="${plan.administrator != null}"
+                          th:href="@{/profile/{id}(id=${plan.administrator.id})}"
+                          th:text="${#strings.trim((plan.administrator.firstName == null ? '' : plan.administrator.firstName) + ' ' + (plan.administrator.lastName == null ? '' : plan.administrator.lastName))}"
+                          class="text-decoration-none text-decoration-underline-hover">Administrador</a>
+                        <span th:if="${plan.administrator == null}">Sin administrador</span>
                     </div>
                     <div class="col-6 bg-light p-3 rounded">
                         <small class="text-muted d-block fw-bold text-uppercase" style="font-size: 0.75rem;">CÓDIGO</small>
@@ -309,7 +315,10 @@
                 <ol class="list-group list-group-numbered" th:unless="${#lists.isEmpty(participantEmails)}">
                     <li class="list-group-item d-flex flex-wrap align-items-center gap-2" th:each="participant : ${participants}" th:with="email=${participant.email}">
                         <div class="flex-grow-1 text-break" style="min-width: 0;">
-                            <strong class="d-block" th:text="${#strings.trim((participant.firstName == null ? '' : participant.firstName) + ' ' + (participant.lastName == null ? '' : participant.lastName))}">Nombre completo</strong>
+                            <!-- [PROF] AC-22/PROF-014: el nombre del participante linkea a su
+                                 perfil publico; el email queda como sub-linea interna. -->
+                            <a th:href="@{/profile/{id}(id=${participant.id})}" class="text-decoration-none"
+                              th:text="${#strings.trim((participant.firstName == null ? '' : participant.firstName) + ' ' + (participant.lastName == null ? '' : participant.lastName))}">Nombre completo</a>
                             <span class="text-muted small" th:text="${email}">usuario@ejemplo.com</span>
                         </div>
                         <span th:if="${plan.isAdministrator(email)}" class="badge bg-primary flex-shrink-0">Due&ntilde;o</span>

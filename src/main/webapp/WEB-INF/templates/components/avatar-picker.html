@@ -1,0 +1,113 @@
+<div th:fragment="picker(currentValue)" xmlns:th="http://www.thymeleaf.org"
+  th:with="isCustom=${currentValue != null and #strings.startsWith(currentValue, 'https://')}"
+  class="space-y-2" id="avatar-picker">
+
+  <!-- [PROF] AC-23: picker de avatar compartido por /auth/register y el edit del perfil. La
+       galeria son los 3 SVG de marca bundleados en /images/avatars (PROF-012); "ninguno" borra
+       el valor. Contrato de submission: el campo que viaja en el form es el input OCULTO
+       #avatarUrl (name="avatarUrl"), que carga siempre el valor persistido -sea el path interno
+       de la galeria o una URL propia-. El input VISIBLE #avatarUrlText no lleva name: es solo
+       para que el usuario escriba su propia URL https:// (AC-25 valida el formato server-side) y
+       nunca muestra los paths internos /images/avatars. El picker NO renderiza su propio preview:
+       el target (#avatar-preview-img / #avatar-preview-initial) lo pone la pagina -en /profile el
+       avatar junto al nombre- y el puntito de JS, vanilla y embebido, solo lo refresca junto con
+       la seleccion y el espejo visible -> oculto. No hay upload: el manejo de archivos es una
+       card propria a futuro. -->
+
+  <div class="flex flex-wrap items-center gap-3">
+    <!-- th:attr checked-states: marcar la opcion activa segun el valor actual -->
+    <button type="button" data-avatar-value="" data-avatar-none="true"
+      class="avatar-choice inline-flex h-14 w-14 items-center justify-center rounded-full border-2 border-dashed border-gray-300 text-gray-400 hover:border-blue-500 hover:text-blue-500"
+      th:classappend="${(currentValue == null or #strings.trim(currentValue) == '')} ? 'avatar-selected ring-2 ring-blue-500' : ''"
+      title="Sin avatar">
+      <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+    </button>
+
+    <!-- overflow-hidden + img que llena el boton: el preflight de Tailwire pone max-width:100%
+         en los img, y con la clase h-14 del img el alto no la pisaba -> ovalo (52x56 dentro del
+         boton bordeado). La geometria la manda el boton (rounded-full + clip), la imagen llena. -->
+    <button type="button" data-avatar-value="/images/avatars/avatar-1.svg"
+      class="avatar-choice h-14 w-14 rounded-full overflow-hidden border-2 border-transparent hover:border-blue-500"
+      th:classappend="${currentValue == '/images/avatars/avatar-1.svg'} ? 'avatar-selected border-blue-500 ring-2 ring-blue-500' : ''">
+      <img src="/images/avatars/avatar-1.svg" alt="Avatar 1" class="h-full w-full object-cover" />
+    </button>
+
+    <button type="button" data-avatar-value="/images/avatars/avatar-2.svg"
+      class="avatar-choice h-14 w-14 rounded-full overflow-hidden border-2 border-transparent hover:border-blue-500"
+      th:classappend="${currentValue == '/images/avatars/avatar-2.svg'} ? 'avatar-selected border-blue-500 ring-2 ring-blue-500' : ''">
+      <img src="/images/avatars/avatar-2.svg" alt="Avatar 2" class="h-full w-full object-cover" />
+    </button>
+
+    <button type="button" data-avatar-value="/images/avatars/avatar-3.svg"
+      class="avatar-choice h-14 w-14 rounded-full overflow-hidden border-2 border-transparent hover:border-blue-500"
+      th:classappend="${currentValue == '/images/avatars/avatar-3.svg'} ? 'avatar-selected border-blue-500 ring-2 ring-blue-500' : ''">
+      <img src="/images/avatars/avatar-3.svg" alt="Avatar 3" class="h-full w-full object-cover" />
+    </button>
+  </div>
+
+  <!-- El campo que se envia: conserva name/id avatarUrl, asi el form y los tests que buscan
+       #avatarUrl siguen leyendo el valor persistido. El visible es solo la URL propia. -->
+  <input type="hidden" id="avatarUrl" name="avatarUrl"
+    th:attr="value=${currentValue != null ? currentValue : ''}" />
+
+  <input type="text" id="avatarUrlText" aria-label="URL del avatar" autocomplete="off"
+    th:attr="value=${isCustom ? currentValue : ''}"
+    placeholder="URL del avatar (https://...) - opcional"
+    class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" />
+
+  <script>
+    (function () {
+      var picker = document.getElementById("avatar-picker");
+      if (!picker) return;
+      var hidden = document.getElementById("avatarUrl");
+      var text = document.getElementById("avatarUrlText");
+      var choices = picker.querySelectorAll(".avatar-choice");
+      var renderable = function (value) {
+        if (!value) return false;
+        return value.indexOf("https://") === 0 || value.indexOf("/images/avatars/") === 0;
+      };
+      // El preview vive en la pagina: en /profile el avatar junto al nombre. El partial solo lo
+      // refresca si existe; en /auth/register no hay preview y esta funcion es no-op.
+      // Se alterna con el atributo `hidden` y no con la clase `.hidden`: el circulo de iniciales
+      // lleva `inline-flex` y esa utilidad le gana a `.hidden` en la cascada del Tailwind del
+      // browser (mismo layer, declarada despues). Preflight fuerza `[hidden]` con !important.
+      var updatePreview = function (value) {
+        var image = document.getElementById("avatar-preview-img");
+        var initial = document.getElementById("avatar-preview-initial");
+        if (!image || !initial) return;
+        if (!renderable(value)) {
+          image.setAttribute("hidden", "");
+          initial.removeAttribute("hidden");
+          return;
+        }
+        image.src = value;
+        image.removeAttribute("hidden");
+        initial.setAttribute("hidden", "");
+      };
+      var clearSelection = function () {
+        for (var j = 0; j < choices.length; j++) {
+          choices[j].classList.remove("avatar-selected", "ring-2", "ring-blue-500", "border-blue-500");
+        }
+      };
+      for (var i = 0; i < choices.length; i++) {
+        choices[i].addEventListener("click", function () {
+          var value = this.getAttribute("data-avatar-value") || "";
+          // La galeria manda al campo oculto; el visible solo se llena con URLs https propias.
+          hidden.value = value;
+          text.value = value.indexOf("https://") === 0 ? value : "";
+          clearSelection();
+          this.classList.add("avatar-selected", "ring-2", "ring-blue-500");
+          this.classList.add(this.hasAttribute("data-avatar-none") ? "border-dashed" : "border-blue-500");
+          updatePreview(value);
+        });
+      }
+      // Escribir a mano es elegir una URL propia: pisa la seleccion de la galeria.
+      text.addEventListener("input", function () {
+        hidden.value = text.value;
+        clearSelection();
+        updatePreview(text.value);
+      });
+    })();
+  </script>
+</div>

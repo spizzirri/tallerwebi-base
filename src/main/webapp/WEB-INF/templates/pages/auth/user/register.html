@@ -52,6 +52,12 @@
           <span th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}" class="mt-1 block text-sm text-red-600"></span>
         </div>
 
+        <!-- [PROF] PROF-015: avatar opcional al registrarse. El partial forja el input
+             name=avatarUrl: lo toma RegisterRequest igual que los otros campos. -->
+        <div class="mt-4">
+          <div th:replace="~{components/avatar-picker :: picker(${registerRequest.avatarUrl})}"></div>
+        </div>
+
         <button id="btn-register" type="submit"
           class="mt-6 w-full rounded-md bg-blue-600 py-2 font-medium text-white transition hover:bg-blue-700">
           Registrarme

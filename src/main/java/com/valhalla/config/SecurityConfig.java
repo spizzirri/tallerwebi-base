@@ -147,6 +147,11 @@ public class SecurityConfig {
           // exigiendo estar autenticado.
           .requestMatchers(org.springframework.http.HttpMethod.GET, "/plans/*/public")
           .permitAll()
+          // [PROF] La vista publica del perfil es abierta (11-PROF v2.3: el link compartido
+          // funciona sin sesion). Solo el GET del id numerico; GET /profile (atajo "mi perfil")
+          // y el POST quedan en anyRequest().authenticated() de abajo.
+          .requestMatchers(org.springframework.http.HttpMethod.GET, "/profile/{id:[\\d]+}")
+          .permitAll()
           .requestMatchers("/api/**")
           .authenticated()
           .requestMatchers(

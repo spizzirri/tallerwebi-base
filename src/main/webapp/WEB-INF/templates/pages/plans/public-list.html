@@ -107,7 +107,12 @@
                     lugar(es) en el itinerario
                   </p>
                   <p th:if="${!#strings.isEmpty(plan.administratorName)}">
-                    Por <span th:text="${plan.administratorName}">Administrador</span>
+                    Por
+                    <!-- [PROF] AC-22: el nombre del autor linkea a su perfil publico (siempre
+                         tiene id: la tarjeta publica sale de un plan real con dueno). -->
+                    <a th:href="@{/profile/{id}(id=${plan.administratorId})}"
+                      class="text-blue-600 hover:underline"
+                      th:text="${plan.administratorName}">Administrador</a>
                   </p>
                   <!-- [CAL] Indicador de calificaciones de la tarjeta (16-CAL.md, AC-10): el mismo
                        agregado de la vista publica, en version mini. Solo lectura: el vote vive en

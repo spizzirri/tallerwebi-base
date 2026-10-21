@@ -46,8 +46,15 @@ public class LoginPage extends WebPage {
     this.clickElement("#btn-login");
   }
 
+  /**
+   * [PROF] El logout ya no vive directo en el navbar: está dentro del menú modal
+   * (components/navbar-menu.html), detrás del botón avatar. El helper abre el menú y recién
+   * entonces clica el botón rojo "Cerrar sesion" (id único btn-logout).
+   */
   public void clickLogout() {
-    this.clickElement("button:text-is('Logout')");
+    this.clickElement("#navbar-avatar");
+    this.page.waitForSelector("#navbar-menu:not([hidden]) #btn-logout");
+    this.clickElement("#navbar-menu:not([hidden]) #btn-logout");
   }
 
   public void clickRegister() {

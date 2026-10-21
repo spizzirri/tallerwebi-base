@@ -1,0 +1,71 @@
+<!DOCTYPE HTML>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{layouts/base :: head('Perfil - PlanIt')}"></head>
+
+<body th:replace="~{layouts/base :: layout(~{::main})}">
+
+  <!-- [PROF] Vista publica de un perfil (AC-13): read-only, SIN email ni rol, abierta tambien a
+       anonimos (v2.3). La superficie propia vive en edit.html, este es solo el escaparate. -->
+  <main class="flex-1 p-4">
+    <div class="mx-auto max-w-3xl space-y-6">
+
+      <div class="rounded-lg bg-white p-8 shadow-md">
+        <div class="flex items-center gap-4">
+          <img th:if="${profileAvatarUrl != null}" th:src="${profileAvatarUrl}" alt="Avatar"
+            class="h-16 w-16 rounded-full object-cover" />
+          <span th:unless="${profileAvatarUrl != null}"
+            class="navbar-avatar inline-flex h-16 w-16 items-center justify-center rounded-full bg-secondary font-serif text-2xl font-bold text-black"
+            th:text="${ownerInitial}" role="img" th:attr="aria-label=${profileName}">U</span>
+          <div>
+            <h1 class="text-2xl font-semibold text-gray-900" th:text="${profileName}">Nombre</h1>
+            <p class="text-sm text-gray-500">
+              <span th:text="${followerCount}">0</span> seguidores
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <section class="space-y-4">
+        <h2 class="text-lg font-semibold text-gray-900">Planes publicos</h2>
+
+        <!-- [PROF] AC-15: unicamente los plans PUBLICOS del dueno (PlanFeedCards.planCard, el
+             mismo payload del feed /for-you), con el link a la vista publica del plan. -->
+        <div th:if="${!profilePlans.isEmpty()}" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <article th:each="plan : ${profilePlans}"
+            class="flex flex-col overflow-hidden rounded-lg bg-white shadow-md transition duration-200 hover:-translate-y-1 hover:shadow-xl">
+            <a th:href="@{/plans/{id}/public(id=${plan.id})}" class="flex flex-1 flex-col">
+              <img th:src="${plan.cover}" th:alt="${plan.name}" loading="lazy"
+                class="h-40 w-full border-b border-gray-100 object-cover" />
+              <div class="flex flex-1 flex-col p-5">
+                <h3 class="text-lg font-semibold text-gray-900" th:text="${plan.name}">Nombre del plan</h3>
+                <p class="mt-1 line-clamp-3 text-sm text-gray-600" th:text="${plan.description}">
+                  Descripcion
+                </p>
+                <div class="mt-auto space-y-1 pt-3 text-xs text-gray-500">
+                  <p th:if="${plan.eventDate != null}">
+                    Fecha: <span th:text="${plan.eventDate}">0000-00-00</span>
+                  </p>
+                  <p>
+                    <span th:text="${plan.placeCount}">0</span> lugar(es) en el itinerario
+                  </p>
+                  <p th:if="${plan.ratingAverage != null}" class="rating-line flex items-center gap-1.5">
+                    <th:block th:replace="~{components/rating :: indicator(${plan.ratingAverage}, ${plan.ratingCount}, 'text-base', 'text-xs', true)}"></th:block>
+                  </p>
+                </div>
+              </div>
+            </a>
+          </article>
+        </div>
+
+        <div th:if="${profilePlans.isEmpty()}" class="rounded-md bg-white p-10 text-center shadow-md">
+          <p class="text-lg text-gray-600">Este usuario todavia no comparte planes publicos.</p>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+</body>
+
+</html>

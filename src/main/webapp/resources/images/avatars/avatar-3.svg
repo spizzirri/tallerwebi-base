@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Avatar plan de ruta">
+  <!-- [PROF] Avatar de galería 3/3: ruta con paradas, la metáfora del producto. -->
+  <circle cx="32" cy="32" r="32" fill="#F59E0B" />
+  <path d="M14 46 C 20 30, 44 34, 50 18" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-dasharray="1 7" stroke-linecap="round" />
+  <circle cx="14" cy="46" r="5" fill="#FFFFFF" />
+  <circle cx="50" cy="18" r="6" fill="#FFFFFF" />
+  <path d="M50 13 L52.5 18 L47.5 18 Z" fill="#B45309" />
+</svg>

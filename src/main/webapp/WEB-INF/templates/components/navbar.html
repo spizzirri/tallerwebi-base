@@ -52,35 +52,26 @@
       Plans
     </a>
 
-    <!-- Avatar with the first initial of the real name; userInitial/userDisplayName come from
-         CurrentUserControllerAdvice (AppUserDetails after a real login, login name otherwise).
-         Deliberately a span, not an <a>: the E2E helpers count navbar items as
-         "body > nav a, body > nav button", so the avatar must not join that set. The full
-         display name travels in aria-label/title for screen readers and hover tooltips. -->
-    <span th:if="${userInitial != null}"
-      class="navbar-avatar inline-flex h-9 w-9 items-center justify-center rounded-full bg-secondary font-serif font-bold text-black"
-      th:text="${userInitial}"
+    <!-- [PROF] El avatar pasa de <span> a <button>: abre el menú modal del navbar
+         (components/navbar-menu.html, renderizado fuera del <nav> en base.html). Muestra el
+         avatarUrl vigente del usuario (userAvatarUrl, resuelto por CurrentUserControllerAdvice)
+         y cae a la inicial si no hay: actualizar el perfil se refleja aca en el render del
+         redirect, sin JS. La inicial va en un span interno, no en th:text directo del
+         <button>: eso reemplazaria todo el contenido del nodo (incluido el <img>). La
+         geometría del círculo la manda el botón (overflow-hidden, misma defensa contra el
+         max-width del preflight que los botones del avatar-picker). El nombre completo sigue
+         viajando en aria-label/title para lectores de pantalla y tooltips. El logout ya no
+         vive en el navbar: está en el modal (navbar-menu), así que los helpers E2E que
+         pinnearon items no ven un "Logout" suelto que desapareció. -->
+    <button type="button" data-menu-toggle="navbar-menu" id="navbar-avatar"
+      class="navbar-avatar inline-flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-secondary font-serif font-bold text-black hover:ring-2 hover:ring-white/60"
+      th:if="${userInitial != null}"
       th:attr="aria-label=${userDisplayName}, title=${userDisplayName}"
-      role="img">U</span>
-
-    <!-- Logout según rol, NO según área: /auth/logout está cerrado para ADMIN (cadena 1 de
-         SecurityConfig), así que la sesión de un admin siempre se cierra por /admin/logout
-         aunque los links de al lado sean los del usuario. -->
-    <form sec:authorize="hasRole('ADMIN')" th:action="@{/admin/logout}" method="POST" class="inline">
-      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-      <button type="submit"
-        class="rounded-md bg-primary px-3 py-2 font-medium hover:bg-secondary">
-        Logout
-      </button>
-    </form>
-
-    <form sec:authorize="!hasRole('ADMIN')" th:action="@{/auth/logout}" method="POST" class="inline">
-      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-      <button type="submit"
-        class="rounded-md bg-primary px-3 py-2 font-medium hover:bg-secondary">
-        Logout
-      </button>
-    </form>
+      aria-haspopup="true" aria-expanded="false" aria-controls="navbar-menu">
+      <span th:unless="${userAvatarUrl != null}" th:text="${userInitial}">U</span>
+      <img th:if="${userAvatarUrl != null}" th:src="${userAvatarUrl}" alt=""
+        class="h-full w-full object-cover" />
+    </button>
 
     <!-- Toggle de modo oscuro: mismo control que en la rama anónima, duplicado por lo
          mismo que el resto del menú (el nav es flex de dos hijos). El data-theme-toggle

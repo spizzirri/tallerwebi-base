@@ -33,10 +33,14 @@ public class ResetDatabase {
       "DELETE FROM plans",
       "DELETE FROM users",
       "ALTER SEQUENCE users_id_seq RESTART WITH 1",
-      "INSERT INTO users(email, password, role, active) " +
+      // [12-DATA] ResetDatabase habla SQL directo: los nombres mapean a firstname/lastname,
+      // tal como Hibernate creó la tabla. [PROF] El perfil público muestra el nombre del
+      // dueño: sin nombres, la vista cae al círculo de iniciales y los E2E de perfil no
+      // tienen "Admin Test" qué mirar.
+      "INSERT INTO users(email, password, role, active, firstname, lastname) " +
       "VALUES('test@unlam.edu.ar', '" +
       bcryptHash +
-      "', 'ADMIN', TRUE) ON CONFLICT (email) DO NOTHING",
+      "', 'ADMIN', TRUE, 'Admin', 'Test') ON CONFLICT (email) DO NOTHING",
     };
 
     try (Connection connection = openConnection()) {

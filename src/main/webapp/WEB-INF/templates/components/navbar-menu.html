@@ -1,0 +1,155 @@
+<div th:fragment="navbar-menu" id="navbar-menu" hidden xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+  class="fixed right-2 top-16 z-[1100] w-64 overflow-hidden rounded-lg bg-white text-sm shadow-xl ring-1 ring-black/10">
+
+  <!-- [PROF] Menú modal del navbar (AC-17/AC-18). Renderizado como hermano del <nav> en
+       base.html: los helpers E2E cuentan "body > nav a, body > nav button", y este panel no
+       pertenece ahí. Cero <a>/<button> navegables entre las entradas "Pronto": son spans con
+       aria-disabled, se activan con MARK/FOLLOW (el anchor ya existe en /profile). -->
+
+  <!-- z 1100 y no 50: /explore (places/list.html) deja el <nav> sticky con z-index 1000 para
+       ganarle a las capas del mapa Leaflet (~800 max), y con el z-50 original el panel quedaba
+       DEBAJO del navbar al abrir el menu. 1100 gana a cualquier sticky de pagina y se mantiene
+       debajo del overlay full-screen del detalle de lugar (z-[2000]): jerarquia
+       overlay-pantalla > menu. -->
+
+  <!-- Variante AUTENTICADA -->
+  <div sec:authorize="isAuthenticated()">
+    <div class="flex items-center gap-3 border-b border-gray-100 bg-gray-50 px-4 py-3">
+      <span th:unless="${userAvatarUrl != null}"
+        class="navbar-avatar inline-flex h-9 w-9 items-center justify-center rounded-full bg-secondary font-serif font-bold text-black"
+        th:text="${userInitial}" aria-hidden="true">U</span>
+      <!-- El avatar del perfil no "vive" dentro del botón: el trigger muestra la imagen y el modal la repite en su header (mismo
+           userAvatarUrl, resuelto por CurrentUserControllerAdvice). src directo: URLs ajenas no pasan por @{...}. -->
+      <img th:if="${userAvatarUrl != null}" th:src="${userAvatarUrl}" alt=""
+        class="h-9 w-9 rounded-full object-cover" />
+      <div class="min-w-0">
+        <span class="block truncate font-medium text-gray-900" th:text="${userDisplayName}">Nombre</span>
+      </div>
+    </div>
+
+    <div class="py-1" role="menu">
+      <a role="menuitem" th:href="@{/profile}" id="menu-view-profile"
+        class="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100">
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" aria-hidden="true">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+        Ver perfil
+      </a>
+
+      <a role="menuitem" th:href="@{/profile/change-password}" id="menu-change-password"
+        class="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100" data-menu-item>
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M15 7a4 4 0 0 1-4 4H7v8"></path>
+          <circle cx="19" cy="5" r="2"></circle>
+          <circle cx="5" cy="15" r="2"></circle>
+        </svg>
+        Cambiar contrasena
+      </a>
+
+      <span role="menuitem" aria-disabled="true" data-soon="true"
+        class="flex items-center gap-2 px-4 py-2 text-gray-400">
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M6 3h12l2 6-8 12L4 9l2-6z"></path>
+        </svg>
+        Guardados
+        <span class="ml-auto rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-semibold text-gray-500">Pronto</span>
+      </span>
+
+      <span role="menuitem" aria-disabled="true" data-soon="true"
+        class="flex items-center gap-2 px-4 py-2 text-gray-400">
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+        </svg>
+        Siguiendo
+        <span class="ml-auto rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-semibold text-gray-500">Pronto</span>
+      </span>
+
+      <div class="border-t border-gray-100 my-1"></div>
+
+      <!-- AC-17: logout rojo y destacado; la ruta es por rol, NO por área (mismo comentario del
+           navbar de siempre: /auth/logout está cerrado para ADMIN). Cada botón con id compartido
+           porque el helper E2E clica "el" logout. -->
+      <div class="px-2 pb-2 pt-1">
+        <form sec:authorize="hasRole('ADMIN')" th:action="@{/admin/logout}" method="POST">
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+          <button id="btn-logout" type="submit" role="menuitem"
+            class="flex w-full items-center gap-2 rounded-md px-2 py-2 font-medium text-red-600 hover:bg-red-50">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <path d="M16 17l5-5-5-5"></path>
+              <path d="M21 12H9"></path>
+            </svg>
+            Cerrar sesion
+          </button>
+        </form>
+        <form sec:authorize="!hasRole('ADMIN')" th:action="@{/auth/logout}" method="POST">
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+          <button id="btn-logout" type="submit" role="menuitem"
+            class="flex w-full items-center gap-2 rounded-md px-2 py-2 font-medium text-red-600 hover:bg-red-50">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <path d="M16 17l5-5-5-5"></path>
+              <path d="M21 12H9"></path>
+            </svg>
+            Cerrar sesion
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Abrir/cerrar: click en cualquier [data-menu-toggle]; Esc y click-afuera cierran.
+       Vanilla y embebido: el fragment viaja con la página y no depende de bundles. -->
+  <script>
+    (function () {
+      var menu = document.getElementById("navbar-menu");
+      if (!menu) return;
+      var openers = document.querySelectorAll("[data-menu-toggle]");
+      var syncOpeners = function (open) {
+        for (var i = 0; i < openers.length; i++) {
+          openers[i].setAttribute("aria-expanded", open ? "true" : "false");
+        }
+      };
+      var setIsOpen = function (open) {
+        if (open) {
+          menu.removeAttribute("hidden");
+          syncOpeners(true);
+        } else {
+          menu.setAttribute("hidden", "");
+          syncOpeners(false);
+        }
+      };
+      for (var i = 0; i < openers.length; i++) {
+        openers[i].addEventListener("click", function () {
+          if (menu.hasAttribute("hidden")) {
+            setIsOpen(true);
+          } else {
+            setIsOpen(false);
+          }
+        });
+      }
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") setIsOpen(false);
+      });
+      document.addEventListener("click", function (e) {
+        if (menu.hasAttribute("hidden")) return;
+        if (menu.contains(e.target)) return;
+        var inOpener = false;
+        for (var j = 0; j < openers.length; j++) {
+          if (openers[j].contains(e.target)) inOpener = true;
+        }
+        if (!inOpener) setIsOpen(false);
+      });
+    })();
+  </script>
+</div>

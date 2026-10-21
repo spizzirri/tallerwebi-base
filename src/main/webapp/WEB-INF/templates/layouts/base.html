@@ -268,6 +268,10 @@
 
   <nav th:replace="~{components/navbar}"></nav>
 
+  <!-- [PROF] Menú del navbar: hermano del <nav>, no hijo, así que el conteo de items de los
+       helpers E2E ("body > nav a, body > nav button") no lo ve. -->
+  <div th:replace="~{components/navbar-menu}"></div>
+
   <th:block th:replace="${content}"></th:block>
 
 </body>

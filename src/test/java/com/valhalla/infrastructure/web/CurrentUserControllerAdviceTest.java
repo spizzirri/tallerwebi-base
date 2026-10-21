@@ -3,11 +3,16 @@ package com.valhalla.infrastructure.web;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.Mockito.when;
 
+import com.valhalla.domain.exception.UserNotFoundException;
+import com.valhalla.domain.user.User;
+import com.valhalla.domain.user.UserService;
 import com.valhalla.infrastructure.security.AppUserDetails;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,7 +21,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 /**
  * Unit tests of {@link CurrentUserControllerAdvice}. Every request renders the navbar through
- * these three attributes, so each principal the security layer can hand over gets its own case:
+ * these attributes, so each principal the security layer can hand over gets its own case:
  * a real login (the token Spring Security stores, whose inside is an {@link AppUserDetails}), a
  * synthetic MockMvc principal, and no session at all.
  */
@@ -25,10 +30,12 @@ public class CurrentUserControllerAdviceTest {
   private static final String EMAIL = "ana@test.com";
 
   private CurrentUserControllerAdvice advice;
+  private UserService userService;
 
   @BeforeEach
   public void init() {
-    advice = new CurrentUserControllerAdvice();
+    userService = Mockito.mock(UserService.class);
+    advice = new CurrentUserControllerAdvice(userService);
   }
 
   // --- userInitial / userDisplayName ---
@@ -70,6 +77,45 @@ public class CurrentUserControllerAdviceTest {
       ),
       is(nullValue())
     );
+  }
+
+  // --- userAvatarUrl: el navbar refleja el avatar vigente del usuario ---
+
+  @Test
+  public void shouldExposeTheAvatarUrlOfTheSignedInUser() {
+    User user = Mockito.mock(User.class);
+    when(user.getAvatarUrl()).thenReturn("/images/avatars/avatar-2.svg");
+    when(userService.getByEmail(EMAIL)).thenReturn(user);
+
+    assertThat(advice.userAvatarUrl(appUser("Ana", "Perez")), is("/images/avatars/avatar-2.svg"));
+  }
+
+  @Test
+  public void shouldFallBackToNullWithoutAvatarUrl() {
+    User user = Mockito.mock(User.class);
+    when(user.getAvatarUrl()).thenReturn("   ");
+    when(userService.getByEmail(EMAIL)).thenReturn(user);
+
+    assertThat(advice.userAvatarUrl(appUser("Ana", "Perez")), is(nullValue()));
+  }
+
+  @Test
+  public void shouldFallBackToNullWhenThePrincipalDoesNotResideInTheUserTable() {
+    when(userService.getByEmail(EMAIL)).thenThrow(new UserNotFoundException());
+
+    assertThat(advice.userAvatarUrl(appUser("Ana", "Perez")), is(nullValue()));
+  }
+
+  @Test
+  public void shouldNotConsultTheUserTableWithoutASession() {
+    assertThat(advice.userAvatarUrl(null), is(nullValue()));
+    assertThat(
+      advice.userAvatarUrl(
+        new AnonymousAuthenticationToken("key", "anonymousUser", roles("ROLE_ANONYMOUS"))
+      ),
+      is(nullValue())
+    );
+    Mockito.verifyNoInteractions(userService);
   }
 
   // --- showAdminNav ---
