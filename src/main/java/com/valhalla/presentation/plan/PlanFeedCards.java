@@ -55,7 +55,7 @@ public final class PlanFeedCards {
       plan.getPlanPlaces().size(),
       feedDisplayName(plan.getAdministrator()),
       plan.getAdministrator() == null ? null : plan.getAdministrator().getId(),
-      "/images/plans/cover-" + (Math.floorMod(plan.getId().hashCode(), COVER_COUNT) + 1) + ".svg",
+      coverFor(plan.getId()),
       roundOneDecimal(summary.average()),
       summary.count(),
       bookmarked
@@ -105,6 +105,14 @@ public final class PlanFeedCards {
       return null;
     }
     return Math.round(average * 10.0) / 10.0;
+  }
+
+  /**
+   * [MARK] Cover generico del plan, deterministico por id. Lo comparten las cards del feed y las
+   * de Guardados: el guardado no persiste una imagen, la elige el id del plan.
+   */
+  public static String coverFor(UUID planId) {
+    return "/images/plans/cover-" + (Math.floorMod(planId.hashCode(), COVER_COUNT) + 1) + ".svg";
   }
 
   /**

@@ -36,21 +36,4 @@
         th:text="${bookmarked ? 'Quitar de Guardados' : 'Guardar en Guardados'}">Guardar en Guardados</span>
     </button>
   </form>
-
-  <!-- Confirmacion al quitar: el listener se registra una sola vez por pagina aunque el fragmento
-       se monte en varias cards. Sin JS el submit sigue funcionando, solo no pregunta. -->
-  <script>
-    (function () {
-      if (window.__markRemoveConfirmBound) return;
-      window.__markRemoveConfirmBound = true;
-      document.addEventListener("submit", function (event) {
-        var form = event.target;
-        if (!form || !form.getAttribute) return;
-        if (form.getAttribute("data-bookmark-remove") !== "true") return;
-        if (!window.confirm("¿Quitar este plan de Guardados?")) {
-          event.preventDefault();
-        }
-      });
-    })();
-  </script>
 </div>

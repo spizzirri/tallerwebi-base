@@ -64,6 +64,9 @@ public class ProfileControllerIntegrationTest {
   @Autowired
   private PlanService planService;
 
+  @Autowired
+  private com.valhalla.domain.bookmark.PlanBookmarkService planBookmarkService;
+
   private MockMvc mockMvc;
 
   private Long selfId;
@@ -224,6 +227,60 @@ public class ProfileControllerIntegrationTest {
       .andExpect(status().isOk())
       .andExpect(content().string(not(containsString("data-bookmark-toggle"))))
       .andExpect(content().string(not(containsString("action=\"/bookmarks/"))));
+  }
+
+  // --- [MARK] seccion Guardados del perfil propio ---
+
+  @Test
+  @WithMockUser(username = SELF_EMAIL)
+  public void ownProfileListsTheBookmarkedPlansWithTheirCloneAndRemoveActions() throws Exception {
+    Plan publicPlan = bookmarkedPublicPlanOfGrace();
+
+    this.mockMvc.perform(get("/profile/" + selfId))
+      .andExpect(status().isOk())
+      .andExpect(view().name("pages/profile/edit"))
+      .andExpect(content().string(containsString("Plan publico de Grace")))
+      .andExpect(content().string(containsString("Clonar plan")))
+      .andExpect(
+        content().string(containsString("action=\"/bookmarks/" + publicPlan.getId() + "/clone\""))
+      )
+      .andExpect(
+        content().string(containsString("action=\"/bookmarks/" + publicPlan.getId() + "/remove\""))
+      )
+      .andExpect(content().string(not(containsString("data-bookmark-badge"))));
+  }
+
+  @Test
+  @WithMockUser(username = SELF_EMAIL)
+  public void aBookmarkWhosePlanWasDeletedKeepsTheCardWithTheBadge() throws Exception {
+    Plan publicPlan = bookmarkedPublicPlanOfGrace();
+    planService.deleteOwnedPlan(publicPlan.getId(), OTHER_EMAIL);
+
+    this.mockMvc.perform(get("/profile/" + selfId))
+      .andExpect(status().isOk())
+      .andExpect(content().string(containsString("Plan publico de Grace")))
+      .andExpect(content().string(containsString("data-bookmark-badge")))
+      .andExpect(content().string(containsString("Eliminado")))
+      .andExpect(
+        content()
+          .string(
+            containsString(
+              "El plan original ya no esta disponible. Podes clonarlo para seguir usandolo."
+            )
+          )
+      );
+  }
+
+  /** Plan publico de Grace (el otro usuario) guardado por Ada: card AVAILABLE en Guardados. */
+  private Plan bookmarkedPublicPlanOfGrace() {
+    Plan plan = new Plan();
+    plan.setName("Plan publico de Grace");
+    plan.setDescription("Una escapada compartida");
+    plan.setIsPublic(true);
+    plan.setAdministrator(userRepository.findById(otherId).orElseThrow());
+    Plan created = planService.createPlan(plan, OTHER_EMAIL);
+    planBookmarkService.save(created.getId(), SELF_EMAIL);
+    return created;
   }
 
   // --- PLANES: la vista de Grace muestra los planes de Grace, y los de Ada no aparecen ---

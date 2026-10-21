@@ -274,6 +274,24 @@
 
   <th:block th:replace="${content}"></th:block>
 
+  <!-- [MARK] Confirmacion al quitar un guardado: una sola vez para toda la app. Los forms de
+       Guardados (cards del perfil y toggle de las cards) marcan data-bookmark-remove="true".
+       Sin JS el POST sigue funcionando, solo no pregunta. -->
+  <script>
+    (function () {
+      if (window.__markRemoveConfirmBound) return;
+      window.__markRemoveConfirmBound = true;
+      document.addEventListener("submit", function (event) {
+        var form = event.target;
+        if (!form || !form.getAttribute) return;
+        if (form.getAttribute("data-bookmark-remove") !== "true") return;
+        if (!window.confirm("¿Quitar este plan de Guardados?")) {
+          event.preventDefault();
+        }
+      });
+    })();
+  </script>
+
 </body>
 
 </html>

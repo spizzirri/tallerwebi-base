@@ -6,6 +6,7 @@ import com.valhalla.domain.plan.Plan;
 import com.valhalla.domain.plan.PlanService;
 import com.valhalla.domain.user.User;
 import com.valhalla.domain.user.UserService;
+import com.valhalla.presentation.bookmark.BookmarkCards;
 import com.valhalla.presentation.plan.PlanFeedCards;
 import com.valhalla.presentation.shared.AvatarUrlPolicy;
 import jakarta.validation.Valid;
@@ -200,6 +201,15 @@ public class ProfileController {
     model.put("profileForm", form);
     model.put("owner", owner);
     model.put("ownerInitial", initialOf(owner));
+    // [MARK] Guardados es privado del dueno: esta seccion solo existe en el perfil propio
+    // (AC-09/AC-10). El servicio resuelve el estado de cada card por request.
+    model.put(
+      "bookmarks",
+      this.planBookmarkService.getBookmarks(owner.getEmail())
+        .stream()
+        .map(BookmarkCards::card)
+        .toList()
+    );
     return model;
   }
 
