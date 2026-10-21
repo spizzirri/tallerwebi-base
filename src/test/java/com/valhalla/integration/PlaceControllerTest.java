@@ -1,6 +1,8 @@
 package com.valhalla.integration;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
@@ -65,5 +67,18 @@ public class PlaceControllerTest {
   @WithMockUser
   public void shouldReturnNotFoundForPlaceDetailPage() throws Exception {
     mockMvc.perform(get("/explore/1")).andExpect(status().isNotFound());
+  }
+
+  // [MAPS] El panel de detalle de explore trae el link de directions (lo arma el Vue con la
+  // direccion del lugar que llega de /api/places): el markup y el helper tienen que estar en
+  // la pagina.
+  @Test
+  @WithMockUser
+  public void shouldShowTheMapsDirectionsLinkOnPlaceDetails() throws Exception {
+    mockMvc
+      .perform(get("/explore"))
+      .andExpect(status().isOk())
+      .andExpect(content().string(containsString("maps/dir/?api=1")))
+      .andExpect(content().string(containsString("directionsUrl")));
   }
 }

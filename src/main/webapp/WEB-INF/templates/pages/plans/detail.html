@@ -37,6 +37,9 @@
         .visit-editor { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--bs-border-color); }
         .visit-editor-heading { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--bs-secondary-color); margin-bottom: 8px; }
         .stop-description { color: var(--bs-secondary-color); font-size: .85rem; margin: 4px 0 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .stop-directions { display: inline-block; margin-top: 6px; color: var(--bs-primary); font-size: .85rem; font-weight: 600; text-decoration: none; }
+        .stop-directions:hover { text-decoration: underline; }
+        .stop-directions:focus-visible { outline: 3px solid var(--bs-primary); outline-offset: 2px; }
         .stop-actions { display: flex; flex: 0 0 auto; align-items: center; gap: 6px; }
         .stop-details { border: 1px solid var(--bs-secondary); border-radius: 6px; background: var(--bs-secondary); color: white; padding: 5px 10px; font-size: .8rem; font-weight: 600; }
         .stop-details:hover { background: #5c636a; }
@@ -134,6 +137,8 @@
         main h2 { font-size: 2rem; }
         main h4 { font-size: 1.5rem; }
         main h5 { font-size: 1.25rem; }
+        /* [MAPS] El popup del mapa separa el texto del link "Cómo llegar" que se agrega al final. */
+        .leaflet-popup-content a { display: inline-block; margin-top: 0.35rem; }
     </style>
 </head>
 <body th:replace="~{layouts/base :: layout(~{::main})}">
@@ -216,6 +221,12 @@
                                     <span v-if="!item.visitDate && !item.visitTime">Horario por definir</span>
                                 </div>
                                 <p v-if="item.description" class="stop-description">{{ item.description }}</p>
+                                <!-- [MAPS] Como llegar en la lista del itinerario, ademas del mapa:
+                                     mismo link que la ficha y el popup (direccion de texto). -->
+                                <a v-if="item.address" class="stop-directions" :href="directionsUrl(item)"
+                                    target="_blank" rel="noopener">
+                                    <i class="fa-solid fa-diamond-turn-right me-1" aria-hidden="true"></i>C&oacute;mo llegar
+                                </a>
                             </div>
                             <div class="stop-actions">
                                 <button type="button" class="stop-details" @click="showPlace(item)">Ver m&aacute;s</button>
@@ -367,6 +378,16 @@
             </div>
             <dl>
                 <dt>Dirección</dt><dd>{{ selectedEntry.address || 'Sin dirección' }}</dd>
+                <!-- [MAPS] Cómo llegar: directions de Google Maps usando la DIRECCION del lugar
+                     (la misma que se muestra arriba), no la coordenada: el dataset las trae
+                     desfasadas. El nombre delante desambigua direcciones vagas. Sin direccion,
+                     sin link. -->
+                <template v-if="selectedEntry.address">
+                    <dt>Cómo llegar</dt>
+                    <dd><a class="text-primary underline-offset-4 hover:underline"
+                        :href="'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent((selectedEntry.name + ' ' + selectedEntry.address).trim())"
+                        target="_blank" rel="noopener">Abrir en Google Maps</a></dd>
+                </template>
                 <dt>Categoría</dt><dd>{{ selectedEntry.category || 'Sin categoría' }}</dd>
                 <dt>Descripción del lugar</dt><dd>{{ selectedEntry.placeDescription || 'Sin descripción' }}</dd>
                 <dt>Descripción de la visita</dt><dd>{{ selectedEntry.description || 'Sin descripción' }}</dd>
@@ -431,6 +452,10 @@
                     id: target.id,
                     name: target.name || 'Sin nombre',
                     category: target.category || 'DEFAULT',
+                    // [MAPS] La direccion viaja en el modelo para armar el "Como llegar" de la ficha,
+                    // el popup y la lista del itinerario (el dataset trae direccion y coordenada
+                    // desfasadas, asi que el link usa el texto).
+                    address: target.address,
                     latitude: target.latitude || target.lat,
                     longitude: target.longitude || target.lng
                 };
@@ -521,6 +546,13 @@
                 const [year, month, day] = value.split('-');
                 return `${day}/${month}/${year}`;
             },
+            // [MAPS] Direccion de Google Maps para "Como llegar": usa la DIRECCION de texto del
+            // lugar (el dataset trae direccion y coordenada desfasadas), con el nombre delante
+            // para desambiguar las vagas. Mismo criterio que el mapa y el resto de las vistas.
+            directionsUrl(item) {
+                const query = `${item.name || ''} ${item.address || ''}`.trim();
+                return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(query)}`;
+            },
             getCategoryLabel(category) {
                 const labels = { RESTAURANT: 'Restaurante', BAR: 'Bar', CAFE: 'Café', MUSEUM: 'Museo', PARK: 'Parque', SHOPPING: 'Compras', NIGHTLIFE: 'Vida nocturna', CULTURE: 'Cultura', SPORT: 'Deporte', OTHER: 'Otro' };
                 return labels[category] || 'Lugar';
@@ -602,6 +634,15 @@
                                     popupText = '<b>Paso ' + (itineraryIndex + 1) + ': ' + place.name + '</b><br><small class="text-success">✔ En el itinerario</small>';
                                 }
                             }
+                            // [MAPS] Como llegar desde el propio popup del mapa: usa la direccion
+                            // de texto (no la coordenada, que el dataset trae desfasada), con el
+                            // nombre delante para desambiguar; mismo criterio que el resto.
+                            popupText =
+                                '<div>' + popupText + '</div>' +
+                                '<a class="text-primary underline-offset-4 text-decoration-none fw-medium" ' +
+                                'href="https://www.google.com/maps/dir/?api=1&destination=' +
+                                encodeURIComponent(((place.name || '') + ' ' + (place.address || '')).trim()) + '" ' +
+                                'target="_blank" rel="noopener">Cómo llegar</a>';
 
                             const marker = L.marker([place.latitude, place.longitude], { icon: customIcon })
                                 .addTo(this.map)

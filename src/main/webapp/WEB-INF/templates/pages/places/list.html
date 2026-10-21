@@ -111,7 +111,9 @@
             </div>
             <p v-if="selectedPlace.address" class="text-sm text-gray-600">{{ selectedPlace.address }}</p>
             <!-- Datos que hoy solo cargan el importador y el ABM: se muestran si existen. -->
-            <dl v-if="selectedPlace.openingHours || selectedPlace.phone || selectedPlace.website"
+            <!-- [MAPS] El dl tambien abre solo por coordenadas: es el unico dato que puede
+                 traer un lugar sin horarios, telefono ni web. -->
+            <dl v-if="selectedPlace.openingHours || selectedPlace.phone || selectedPlace.website || (selectedPlace.latitude && selectedPlace.longitude)"
               class="flex flex-col gap-2 border-t border-gray-100 pt-4 text-sm text-gray-700">
               <div v-if="selectedPlace.openingHours" class="flex gap-2">
                 <span class="mt-0.5 shrink-0 text-gray-400" v-html="lucideIcon('Clock')"></span>
@@ -143,6 +145,21 @@
                       class="block truncate text-gray-900 underline-offset-2 hover:underline">
                       {{ websiteLabel(selectedPlace.website) }}
                     </a>
+                  </dd>
+                </div>
+              </div>
+              <!-- [MAPS] Cómo llegar: directions de Google Maps usando la DIRECCION del lugar,
+                   la misma que se muestra arriba. El dataset trae direccion y coordenada que no
+                   coinciden, asi que el link sigue el texto para no mandar a otra calle. El
+                   nombre desambigua direcciones vagas (ej. "Palermo"). -->
+              <div v-if="selectedPlace.address" class="flex gap-2">
+                <span class="mt-0.5 shrink-0 text-gray-400" v-html="lucideIcon('Navigation')"></span>
+                <div class="min-w-0">
+                  <dt class="sr-only">Cómo llegar</dt>
+                  <dd>
+                    <a :href="directionsUrl(selectedPlace)"
+                      target="_blank" rel="noopener noreferrer"
+                      class="block text-gray-900 underline-offset-2 hover:underline">Cómo llegar</a>
                   </dd>
                 </div>
               </div>
@@ -532,6 +549,18 @@
           const websiteLabel = (website) =>
             websiteHref(website).replace(/^https?:\/\//i, '').replace(/\/$/, '');
 
+          /* [MAPS] Direccion de Google Maps para "Como llegar". El dataset trae direccion y
+             coordenada que no coinciden, asi que el destino es el TEXTO de la direccion (el
+             mismo que se muestra en la ficha), con el nombre delante para desambiguar las
+             vagas (ej. "Palermo"). */
+          const directionsUrl = (place) => {
+            const query = ((place.name || '') + ' ' + (place.address || '')).trim();
+            return (
+              'https://www.google.com/maps/dir/?api=1&destination=' +
+              encodeURIComponent(query)
+            );
+          };
+
           /* tel: no lleva espacios ni guiones; el número que se muestra sí los conserva. */
           const telHref = (phone) => 'tel:' + (phone || '').replace(/[^\d+]/g, '');
 
@@ -709,7 +738,14 @@
 
                 marker.bindPopup(
                   '<strong>' + place.name + '</strong><br>' +
-                  place.category,
+                  place.category +
+                  // [MAPS] Como llegar desde el popup del marcador, como en explore: usa la
+                  // direccion de texto (no la coordenada) para no mandar a otra calle, con el
+                  // nombre delante para desambiguar.
+                  '<br><a class="text-primary fw-medium d-inline-block mt-1"' +
+                  ' href="https://www.google.com/maps/dir/?api=1&destination=' +
+                  encodeURIComponent(((place.name || '') + ' ' + (place.address || '')).trim()) + '"' +
+                  ' target="_blank" rel="noopener">Cómo llegar</a>',
                   { autoPan: false }
                 );
                 marker.on('click', () => {
@@ -870,6 +906,7 @@
             websiteHref,
             websiteLabel,
             telHref,
+            directionsUrl,
             clearFilters,
             applyFilters,
             focusPlace,

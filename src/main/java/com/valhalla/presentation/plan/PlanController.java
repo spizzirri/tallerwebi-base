@@ -358,6 +358,7 @@ public class PlanController {
     view.put("visitTime", entry.getVisitTime() == null ? null : entry.getVisitTime().toString());
     view.put("name", place.getName());
     view.put("category", place.getCategory() == null ? null : place.getCategory().name());
+    view.put("address", place.getAddress());
     view.put("latitude", place.getLatitude());
     view.put("longitude", place.getLongitude());
     return view;

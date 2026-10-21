@@ -1018,6 +1018,68 @@ public class PlanControllerIntegrationTest {
     );
   }
 
+  // --- [MAPS] Link "Cómo llegar" con la direccion del lugar ---
+
+  @Test
+  public void T_MAPS_001_getPlansIdPublic_muestraElLinkDeMapsConLaDireccionDelLugar()
+    throws Exception {
+    // given: un plan publico con una parada que tiene direccion
+    UUID planId = givenPublicPlanWithPlace();
+    Place place =
+      this.planRepository.findById(planId).orElseThrow().getPlanPlaces().get(0).getPlace();
+
+    // when: cualquiera abre la vista publica
+    String html =
+      this.mockMvc.perform(get("/plans/" + planId + "/public"))
+        .andExpect(status().isOk())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+
+    // then: el link apunta a las directions de Google Maps con la DIRECCION del lugar (el
+    // dataset trae direccion y coordenada desfasadas, asi que el link sigue el texto). El
+    // destino va url-encoded; se decodifica para comparar sin atarse a %20 vs +.
+    assertThat(html, containsString("maps/dir/?api=1"));
+    java.util.regex.Matcher destino = java.util.regex.Pattern
+      .compile("destination=([^&\"']+)")
+      .matcher(html);
+    assertThat(destino.find(), is(true));
+    String esperado = (place.getName() + " " + place.getAddress()).trim();
+    assertThat(
+      java.net.URLDecoder.decode(destino.group(1), java.nio.charset.StandardCharsets.UTF_8),
+      is(esperado)
+    );
+  }
+
+  @Test
+  public void T_MAPS_002_getPlansIdPublic_sinDireccionNoMuestraElLinkDeMaps() throws Exception {
+    // given: un plan publico cuya unica parada no tiene direccion
+    UUID planId = givenPlanFor(this.ownerId, PUBLIC_PLAN_NAME);
+    Plan plan = this.planRepository.findById(planId).orElseThrow();
+    plan.setIsPublic(true);
+    Place sinDireccion = new Place();
+    sinDireccion.setName("Lugar sin direccion");
+    sinDireccion.setCategory(PlaceCategory.RESTAURANT);
+    this.placeRepository.save(sinDireccion);
+    PlanPlace entry = new PlanPlace();
+    entry.setPlace(sinDireccion);
+    plan.addPlanPlace(entry);
+    this.planRepository.save(plan);
+
+    // when
+    String html =
+      this.mockMvc.perform(get("/plans/" + planId + "/public"))
+        .andExpect(status().isOk())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+
+    // then: sin direccion la vista no ofrece el link. Se busca el href ya renderizado (el
+    // ancla), no el texto suelto: el popup del mapa arma su link en el script, asi que
+    // "maps/dir/" aparece como literal de JS aunque no haya parada con direccion.
+    assertThat(html, not(containsString("href=\"https://www.google.com/maps/dir")));
+  }
+
   @Test
   @WithMockUser(username = OTHER_EMAIL)
   public void participantCanJoinReadAndLeaveWithoutDeletingPlan() throws Exception {

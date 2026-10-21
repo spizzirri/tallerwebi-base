@@ -122,6 +122,13 @@
             <p class="text-sm text-gray-500" th:if="${stop.visitDate == null and stop.visitTime == null}">
               Horario por definir
             </p>
+            <!-- [MAPS] Cómo llegar: directions de Google Maps usando la DIRECCIÓN del lugar (la
+                 misma que se muestra en la ficha), no la coordenada: el dataset las trae
+                 desfasadas. El nombre delante desambigua direcciones vagas. Sin dirección, sin link. -->
+            <a class="mt-1 inline-block text-sm font-medium text-primary underline-offset-4 hover:underline"
+              th:if="${!#strings.isEmpty(stop.address)}"
+              th:href="|https://www.google.com/maps/dir/?api=1&destination=${#uris.escapeQueryParam(#strings.trim(stop.name + ' ' + stop.address))}|"
+              target="_blank" rel="noopener">Cómo llegar</a>
           </div>
         </li>
       </ol>
@@ -187,6 +194,20 @@
                 lineBreak.appendChild(label);
                 content.appendChild(lineBreak);
               }
+              // [MAPS] Como llegar desde el popup, igual que en el detalle y en explore. Se
+              // arma con DOM y no con string concatenado, por la misma razon que el popup.
+              // Usa la direccion de texto (no la coordenada) y el nombre delante para
+              // desambiguar.
+              const directions = document.createElement('a');
+              directions.href =
+                'https://www.google.com/maps/dir/?api=1&destination=' +
+                encodeURIComponent(((stop.name || '') + ' ' + (stop.address || '')).trim());
+              directions.target = '_blank';
+              directions.rel = 'noopener';
+              directions.textContent = 'Cómo llegar';
+              directions.className = 'text-primary fw-medium d-inline-block mt-1';
+              content.appendChild(document.createElement('br'));
+              content.appendChild(directions);
               return content;
             });
           bounds.push([stop.latitude, stop.longitude]);
