@@ -74,6 +74,9 @@ No se requiere borrar la base de datos. Los permisos nulos usan sus defaults.
 `.env.example` documenta APP_BASE_URL y SMTP_HOST/PORT/USERNAME/PASSWORD/FROM,
 SMTP_AUTH, SMTP_STARTTLS y SMTP_SSL; Compose los pasa al proceso de la app.
 En ejecución local con Maven deben definirse como variables del proceso.
+La configuración se resuelve mediante `Environment` de Spring, conservando las
+variables y los defaults anteriores. Las pruebas SMTP sustituyen el transporte
+para comprobar remitente, destinatario, URL, opciones y errores sin enviar correo.
 APP_BASE_URL debe ser la URL externa desde la que se abre PlanIt.
 Sin SMTP_HOST se usa LoggingEmailNotifier: la invitación queda en Mis planes,
 no se envía correo y no se imprimen tokens ni destinatarios en logs.
@@ -88,9 +91,44 @@ Trello disponibles en esta sesión.
 
 ## Verificación de esta ampliación
 
-`mvn test -Djacoco.gate.skip=true`: BUILD SUCCESS, 686 tests unitarios e
-integración, cero fallos y cero errores. Incluye comprobaciones de permisos por
-canal, destinatario del token, uso único, CSRF, persistencia y renderizado de los
-cuatro selectores. Formato, Checkstyle, PMD y CPD pasan; no se exige el umbral
-de cobertura en esta ejecución. El page object E2E se adaptó al tercer paso;
-no se ejecutaron pruebas de navegador ni envíos contra un SMTP real.
+La ampliación de pruebas incluye:
+
+- `PlanTest`: defaults, valores nulos heredados, validación, capacidades por rol
+  y conservación de permisos durante una edición ordinaria.
+- `PlanServiceImplTest`: solicitudes idempotentes sin acceso implícito, rechazo
+  de solicitudes con link deshabilitado o plan público, miembros existentes,
+  aceptación, rechazo, limpieza de invitaciones, delegación y settings del dueño.
+- `PlanControllerTest`: landing, identidad de sesión, mapeo de los cuatro permisos
+  al crear y mensaje de error ante fallos SMTP.
+- `PlanControllerIntegrationTest`: persistencia y renderizado de permisos,
+  actualización de settings, aceptación por token y protección CSRF.
+- `PlanJoinRequestSecurityTest`: seis escenarios de seguridad sobre login,
+  privacidad, link deshabilitado, CSRF, identidad de sesión y delegación. Agrega
+  integración de duplicados, aceptación, rechazo con reintento y resolución de
+  solicitudes existentes después de deshabilitar el link.
+- `EmailConfigurationTest`: fallback sin filtrar destinatarios ni tokens,
+  transporte SMTP simulado, URL de aceptación, defaults y propagación de errores.
+- `PublicPlanJoinRequestE2E`: enlace compartido por el dueño, solicitud desde otra
+  sesión, aceptación y acceso al itinerario privado desde el navegador.
+
+El gate descubre las nuevas clases automáticamente por paquete y sufijo:
+`*Test` para unitarias/integración y `*E2E` para navegador. No se modifican sus
+umbrales de cobertura ni se omiten capas. Comando de verificación completa:
+`powershell -File scripts/gate.ps1 all -Port 8081 -Keep`.
+
+La preparación de E2E elimina `plan_join_requests` antes que planes y usuarios,
+y reinicia su secuencia para evitar fallos de claves foráneas entre escenarios.
+El escenario de clonación desde el detalle crea un plan público para ingresar
+directamente por código; la entrada privada se prueba mediante solicitud y aceptación.
+El escenario de detalles de visita también avanza al nuevo paso de privacidad
+antes de crear el plan, conservando la hora de visita del paso anterior.
+
+Verificación final del 21/10/2026: `BUILD SUCCESS` con el comando completo anterior,
+716 pruebas unitarias/integración y 56 E2E, sin fallos, errores ni pruebas omitidas.
+Se agregaron 30 pruebas unitarias/integración y un flujo E2E. Pasan Prettier,
+Checkstyle, PMD, CPD y todos los umbrales JaCoCo: dominio al 100 % de líneas y ramas,
+presentación al 100 % de líneas y correo al 100 % de líneas. Cobertura global:
+99,4 % de líneas y 92,6 % de ramas. Registro local: `target/pet-full-gate.log`.
+
+Los escenarios de ban y quitar-ban siguen pendientes de integrar su funcionalidad;
+no se marcan como cubiertos. Tampoco se verifica la entrega con un SMTP real.

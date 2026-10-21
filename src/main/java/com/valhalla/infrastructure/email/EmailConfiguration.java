@@ -3,14 +3,21 @@ package com.valhalla.infrastructure.email;
 import com.valhalla.domain.plan.EmailNotifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 @Configuration
 public class EmailConfiguration {
 
-  private static String env(String name, String fallback) {
-    String value = System.getenv(name);
+  private final Environment environment;
+
+  public EmailConfiguration(Environment environment) {
+    this.environment = environment;
+  }
+
+  private String env(String name, String fallback) {
+    String value = environment.getProperty(name);
     return value == null || value.isBlank() ? fallback : value;
   }
 

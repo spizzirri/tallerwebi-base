@@ -49,7 +49,7 @@ public class DetailPlanCloneE2E extends E2eBase {
   private String givenAnAdminOwnsAPlanWithAPlace() {
     signInAsAdmin();
     PlansPage plans = new PlansPage(page);
-    plans.createPlanViaExplore(PLAN_NAME, "Plan con un lugar para clonar", "2026-12-31");
+    plans.createPublicPlanViaExplore(PLAN_NAME, "Plan con un lugar para clonar", "2026-12-31");
     return this.page.locator("small:has-text('CÓDIGO') + span").textContent().trim();
   }
 

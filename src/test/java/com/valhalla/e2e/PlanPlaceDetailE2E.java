@@ -162,6 +162,7 @@ public class PlanPlaceDetailE2E extends E2eBase {
     plans.clickNextStep();
     plans.addFirstDraftPlace();
     page.locator("#plans-aside ol li input[aria-label='Hora de visita']").fill(VISIT_TIME);
+    plans.clickNextStep();
     plans.clickCreate();
     plans.waitForDetailPath();
   }

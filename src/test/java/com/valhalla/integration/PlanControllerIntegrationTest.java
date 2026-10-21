@@ -199,6 +199,33 @@ public class PlanControllerIntegrationTest {
   }
 
   @Test
+  public void PET_ownerUpdatesAllSettingsAndValuesSurviveReload() throws Exception {
+    UUID id = givenPlanFor(ownerId, PLAN_NAME);
+    mockMvc
+      .perform(
+        post("/plans/" + id + "/settings")
+          .with(user(OWNER_EMAIL))
+          .with(csrf())
+          .param("shareLink", "PARTICIPANTS")
+          .param("handleRequests", "EDITORS")
+          .param("inviteInternal", "OWNER")
+          .param("inviteByEmail", "EDITORS")
+      )
+      .andExpect(redirectedUrl("/plans/" + id + "/settings?saved=true"));
+    entityManager.flush();
+    entityManager.clear();
+    Plan saved = planRepository.findById(id).orElseThrow();
+    assertThat(saved.getSettings().getShareLink().name(), is("PARTICIPANTS"));
+    assertThat(saved.getSettings().getHandleRequests().name(), is("EDITORS"));
+    assertThat(saved.getSettings().getInviteInternal().name(), is("OWNER"));
+    assertThat(saved.getSettings().getInviteByEmail().name(), is("EDITORS"));
+    mockMvc
+      .perform(get("/plans/" + id + "/settings?saved=true").with(user(OWNER_EMAIL)))
+      .andExpect(status().isOk())
+      .andExpect(content().string(containsString("Configuración guardada")));
+  }
+
+  @Test
   public void ownerAppearsInParticipantListAndCannotBeDemoted() throws Exception {
     UUID planId = givenPlanFor(this.ownerId, PLAN_NAME);
     mockMvc
