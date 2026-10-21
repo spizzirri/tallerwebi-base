@@ -5,13 +5,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -44,7 +45,7 @@ public class ControladorArchivosR2 {
    * @return Vista del gestor.
    */
   @GetMapping("/gestor-archivos")
-  public String irAGestorArchivos(ModelMap model) {
+  public String irAGestorArchivos(Map<String, Object> model) {
     model.put("archivos", this.servicioArchivosR2.listarArchivos());
     return "gestor-archivos";
   }
@@ -91,10 +92,15 @@ public class ControladorArchivosR2 {
 
     try (InputStream inputStream = this.servicioArchivosR2.obtenerArchivo(nombreDecodificado)) {
       byte[] bytes = inputStream.readAllBytes();
-      HttpHeaders headers = new HttpHeaders();
-      headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-      headers.setContentDispositionFormData("attachment", nombreDecodificado);
-      return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
+      ContentDisposition disposicion = ContentDisposition
+        .attachment()
+        .filename(nombreDecodificado, StandardCharsets.UTF_8)
+        .build();
+      return ResponseEntity
+        .ok()
+        .contentType(MediaType.APPLICATION_OCTET_STREAM)
+        .header(HttpHeaders.CONTENT_DISPOSITION, disposicion.toString())
+        .body(bytes);
     } catch (IOException e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }

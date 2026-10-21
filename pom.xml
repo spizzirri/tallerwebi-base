@@ -102,13 +102,6 @@
             <version>${hibernate.version}</version>
         </dependency>
 
-        <!-- Necesaria para soportar el manejo de carga de archivos (MultipartFile) -->
-        <dependency>
-            <groupId>commons-fileupload</groupId>
-            <artifactId>commons-fileupload</artifactId>
-            <version>1.4</version>
-        </dependency>
-
         <!-- SDK de AWS para interactuar con la API compatible S3 de Cloudflare R2 -->
         <dependency>
             <groupId>software.amazon.awssdk</groupId>

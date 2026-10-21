@@ -1,17 +1,25 @@
 package com.tallerwebi.presentacion;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.ServicioArchivosR2;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -19,14 +27,14 @@ public class ControladorArchivosR2Test {
 
   private ServicioArchivosR2 servicioArchivosR2;
   private ControladorArchivosR2 controlador;
-  private ModelMap model;
+  private Map<String, Object> model;
   private RedirectAttributes redirectAttributes;
 
   @BeforeEach
   public void init() {
     this.servicioArchivosR2 = mock(ServicioArchivosR2.class);
     this.controlador = new ControladorArchivosR2(this.servicioArchivosR2);
-    this.model = new ModelMap();
+    this.model = new HashMap<>();
     this.redirectAttributes = mock(RedirectAttributes.class);
   }
 
@@ -59,6 +67,42 @@ public class ControladorArchivosR2Test {
     ResponseEntity<byte[]> response = this.cuandoSolicitoLaDescarga("test.txt");
 
     this.entoncesElContenidoEsCorrecto(response, "contenido");
+  }
+
+  @Test
+  public void alIrAlGestorDeberiaMostrarLaVistaConLosArchivos() {
+    List<String> archivos = List.of("a.txt", "b.pdf");
+    when(this.servicioArchivosR2.listarArchivos()).thenReturn(archivos);
+
+    String vista = this.controlador.irAGestorArchivos(this.model);
+
+    assertEquals("gestor-archivos", vista);
+    assertEquals(archivos, this.model.get("archivos"));
+  }
+
+  @Test
+  public void alDescargarArchivoDeberiaRetornarHeadersDeDescarga() {
+    this.dadoQueExisteUnArchivoEnElServidor("informe ñ.txt", "contenido");
+
+    ResponseEntity<byte[]> response = this.cuandoSolicitoLaDescarga("informe%20%C3%B1.txt");
+
+    HttpHeaders headers = response.getHeaders();
+    assertEquals(MediaType.APPLICATION_OCTET_STREAM, headers.getContentType());
+    ContentDisposition disposicion = headers.getContentDisposition();
+    assertTrue(disposicion.isAttachment());
+    assertEquals("informe ñ.txt", disposicion.getFilename());
+  }
+
+  @Test
+  public void alDescargarArchivoConErrorDeLecturaDeberiaRetornarError500() throws IOException {
+    InputStream inputStreamConError = mock(InputStream.class);
+    when(inputStreamConError.readAllBytes()).thenThrow(new IOException("Error R2"));
+    when(this.servicioArchivosR2.obtenerArchivo("test.txt")).thenReturn(inputStreamConError);
+
+    ResponseEntity<byte[]> response = this.cuandoSolicitoLaDescarga("test.txt");
+
+    assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+    assertNull(response.getBody());
   }
 
   private MultipartFile dadoQueTengoUnArchivoASubir() {
