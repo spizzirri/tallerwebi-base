@@ -481,3 +481,18 @@ insertar), de modo que el scope Siguiendo tenga al menos dos planes publicos en 
 | `e2e/ProfileViewE2E.java` | Actualizar (E-02) |
 | `CONTEXT.md` | Actualizar (glosario Seguidor / Feed) |
 | `docs/specs/11-PROF.md` | Actualizar (el placeholder de `#follow` deja de serlo) |
+
+## Desvios de implementacion
+
+Registrados durante la implementacion, sin cambio de alcance ni de criterios de aceptacion.
+
+1. **E2E se arma sus propios datos.** \FollowE2E\ (E-01) registra al seguidor por UI y sigue a un
+   autor con planes publicos creado por el propio test: los usuarios fantasma del seeder solo
+   existen en el perfil demo/docker-dev, no bajo el gate.
+2. **\ResetDatabase\ borra \ollows\ antes de \users\.** Sin ese DELETE el reset de E2E fallaba por
+   la FK de \ollows\ en cuanto una corrida dejaba una relacion.
+3. **Sin DTO \PublicProfileView\.** El modelo del perfil lo arma \ProfileController\
+   (\publicModel\ / \editModel\ / \putFollowData\) sobre un \Map\, tal como ya estaba en 11-PROF. La
+   referencia stale a ese DTO se corrigio en 11-PROF v2.5.
+4. **Los conteos y las listas se resuelven en el controller con cuatro consultas agregadas**, no en
+   la entidad: \Follow\ no expone colecciones inversas ni \User\ las gana (AC-15).
