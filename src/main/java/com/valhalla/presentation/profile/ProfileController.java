@@ -201,7 +201,12 @@ public class ProfileController {
     model.put("followerCount", 0L);
     model.put(
       "profilePlans",
-      publicPlansOf(owner).stream().map(plan -> PlanFeedCards.planCard(plan, Map.of())).toList()
+      publicPlansOf(owner)
+        .stream()
+        // [MARK] El perfil publico monta el toggle en MARK-010: hasta entonces la card no pinta
+        // estado de Guardados y no consulta al servicio por cada visita.
+        .map(plan -> PlanFeedCards.planCard(plan, Map.of(), false))
+        .toList()
     );
     return model;
   }

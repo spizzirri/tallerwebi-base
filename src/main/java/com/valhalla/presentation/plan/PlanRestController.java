@@ -1,5 +1,6 @@
 package com.valhalla.presentation.plan;
 
+import com.valhalla.domain.bookmark.PlanBookmarkService;
 import com.valhalla.domain.plan.Plan;
 import com.valhalla.domain.plan.PlanService;
 import com.valhalla.domain.planplace.PlanPlace;
@@ -9,7 +10,10 @@ import java.security.Principal;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,10 +27,16 @@ public class PlanRestController {
 
   private final PlanService planService;
   private final PlanRatingService planRatingService;
+  private final PlanBookmarkService planBookmarkService;
 
-  public PlanRestController(PlanService planService, PlanRatingService planRatingService) {
+  public PlanRestController(
+    PlanService planService,
+    PlanRatingService planRatingService,
+    PlanBookmarkService planBookmarkService
+  ) {
     this.planService = planService;
     this.planRatingService = planRatingService;
+    this.planBookmarkService = planBookmarkService;
   }
 
   @GetMapping
@@ -52,6 +62,14 @@ public class PlanRestController {
     // [CAL] El mismo agregado del feed Thymeleaf, una query para las cinco tarjetas:
     // el JSON del sidebar expone el promedio, nunca la autoria de las calificaciones.
     Map<UUID, RatingSummary> summaries = this.planRatingService.getSummariesByPlanId();
+    // [MARK] El sidebar pinta el icono desde este flag: un lookup para las cinco tarjetas y
+    // ninguno sin sesion (el anonimo nunca ve el toggle).
+    boolean signedIn =
+      principal instanceof Authentication authentication &&
+      authentication.getPrincipal() instanceof UserDetails;
+    Set<UUID> bookmarkedPlanIds = signedIn
+      ? this.planBookmarkService.getBookmarkedPlanIds(currentEmail)
+      : Set.of();
     return planService
       .getPublicPlans()
       .stream()
@@ -64,7 +82,8 @@ public class PlanRestController {
       .map(plan ->
         PlanFeedCards.card(
           plan,
-          summaries.getOrDefault(plan.getId(), new RatingSummary(plan.getId(), null, 0L))
+          summaries.getOrDefault(plan.getId(), new RatingSummary(plan.getId(), null, 0L)),
+          bookmarkedPlanIds.contains(plan.getId())
         )
       )
       .toList();

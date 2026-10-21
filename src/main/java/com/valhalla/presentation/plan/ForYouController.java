@@ -1,5 +1,6 @@
 package com.valhalla.presentation.plan;
 
+import com.valhalla.domain.bookmark.PlanBookmarkService;
 import com.valhalla.domain.place.PlaceCategory;
 import com.valhalla.domain.plan.Plan;
 import com.valhalla.domain.plan.PlanDiscovery;
@@ -11,9 +12,11 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,11 +39,17 @@ public class ForYouController {
 
   private final PlanService planService;
   private final PlanRatingService planRatingService;
+  private final PlanBookmarkService planBookmarkService;
 
   @Autowired
-  public ForYouController(PlanService planService, PlanRatingService planRatingService) {
+  public ForYouController(
+    PlanService planService,
+    PlanRatingService planRatingService,
+    PlanBookmarkService planBookmarkService
+  ) {
     this.planService = planService;
     this.planRatingService = planRatingService;
+    this.planBookmarkService = planBookmarkService;
   }
 
   /**
@@ -72,15 +81,25 @@ public class ForYouController {
     // eso va por query, mientras los lugares ya vienen con el plan.
     Map<UUID, Long> participantCounts =
       this.planService.getParticipantCounts(publicPlans.stream().map(Plan::getId).toList());
+    // [MARK] Un solo lookup alimenta el icono de todas las cards. Sin sesion no hay nada que
+    // preguntar y el toggle no se renderiza (AC-05): no es un soft gate, es ausencia de control.
+    boolean signedIn =
+      authentication != null && authentication.getPrincipal() instanceof UserDetails;
+    Set<UUID> bookmarkedPlanIds = signedIn
+      ? this.planBookmarkService.getBookmarkedPlanIds(currentEmail)
+      : Set.of();
     Map<String, Object> model = new ModelMap();
     model.put(
       ATTR_PUBLIC_PLANS,
       PlanDiscovery
         .discover(publicPlans, summaries, participantCounts, query, LocalDate.now())
         .stream()
-        .map(plan -> PlanFeedCards.planCard(plan, summaries))
+        .map(plan ->
+          PlanFeedCards.planCard(plan, summaries, bookmarkedPlanIds.contains(plan.getId()))
+        )
         .toList()
     );
+    model.put("canBookmark", signedIn);
     model.put("q", query.text());
     model.put("selectedCategory", query.category() == null ? "" : query.category().name());
     model.put("selectedWhen", query.when().name().toLowerCase(Locale.ROOT));

@@ -86,7 +86,13 @@
           <!-- La card entera se siente clickeable: el body ya linkea a la vista publica, y el
                hover con lift + sombra mas fuerte comunica la accion antes de llegar al CTA. -->
           <article th:each="plan : ${publicPlans}"
-            class="flex cursor-pointer flex-col overflow-hidden rounded-lg bg-white shadow-md transition duration-200 hover:-translate-y-1 hover:shadow-xl">
+            class="relative flex cursor-pointer flex-col overflow-hidden rounded-lg bg-white shadow-md transition duration-200 hover:-translate-y-1 hover:shadow-xl">
+            <!-- [MARK] Guardar para clonar despues. Va fuera del <a> porque un form adentro de un
+                 anchor es HTML invalido; absoluto arriba a la derecha del cover. Sin sesion no se
+                 renderiza (AC-05) y el returnTo conserva los filtros del feed. -->
+            <div th:if="${canBookmark}" class="absolute right-3 top-3 z-10">
+              <div th:replace="~{components/bookmark-button :: toggle(${plan.id}, ${plan.bookmarked}, ${currentUrl})}"></div>
+            </div>
             <a th:href="@{/plans/{id}/public(id=${plan.id})}" class="flex flex-1 flex-col">
               <!-- Cover generico del plan (id -> /images/plans/cover-N.svg). A futuro, si Plan
                    trae imageUrl propia, th:src cambia a ${plan.imageUrl} sin tocar el resto. -->

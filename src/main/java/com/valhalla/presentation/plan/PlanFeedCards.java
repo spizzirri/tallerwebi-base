@@ -27,6 +27,9 @@ public final class PlanFeedCards {
    *
    * <p>[CAL] {@code ratingAverage}/{code ratingCount} es el agregado publico de calificaciones
    * (16-CAL.md, AC-10): la autoria es interna, del feed solo sale el promedio y la cantidad.
+   *
+   * <p>[MARK] {@code bookmarked} es el estado del usuario de la sesion sobre este plan. No es un
+   * dato del plan: viaja en la tarjeta para que el icono se pinte sin un pedido extra por card.
    */
   public record Card(
     UUID id,
@@ -38,11 +41,12 @@ public final class PlanFeedCards {
     Long administratorId,
     String cover,
     Double ratingAverage,
-    Long ratingCount
+    Long ratingCount,
+    boolean bookmarked
   ) {}
 
-  /** Construye la tarjeta con el agregado de calificaciones del plan. */
-  public static Card card(Plan plan, RatingSummary summary) {
+  /** Construye la tarjeta con el agregado de calificaciones y el estado de Guardados. */
+  public static Card card(Plan plan, RatingSummary summary, boolean bookmarked) {
     return new Card(
       plan.getId(),
       plan.getName(),
@@ -53,7 +57,8 @@ public final class PlanFeedCards {
       plan.getAdministrator() == null ? null : plan.getAdministrator().getId(),
       "/images/plans/cover-" + (Math.floorMod(plan.getId().hashCode(), COVER_COUNT) + 1) + ".svg",
       roundOneDecimal(summary.average()),
-      summary.count()
+      summary.count(),
+      bookmarked
     );
   }
 
@@ -62,12 +67,16 @@ public final class PlanFeedCards {
    * (la vista y sus tests leen claves, no componentes de record). Los summaries de calificaciones
    * arrive solo via ports/mocks: ver 16-CAL.md.
    */
-  public static Map<String, Object> planCard(Plan plan, Map<UUID, RatingSummary> summaries) {
+  public static Map<String, Object> planCard(
+    Plan plan,
+    Map<UUID, RatingSummary> summaries,
+    boolean bookmarked
+  ) {
     RatingSummary summary = summaries.getOrDefault(
       plan.getId(),
       new RatingSummary(plan.getId(), null, 0L)
     );
-    return modelOf(card(plan, summary));
+    return modelOf(card(plan, summary, bookmarked));
   }
 
   /**
@@ -86,6 +95,7 @@ public final class PlanFeedCards {
     model.put("cover", card.cover());
     model.put("ratingAverage", card.ratingAverage());
     model.put("ratingCount", card.ratingCount());
+    model.put("bookmarked", card.bookmarked());
     return model;
   }
 
