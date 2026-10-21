@@ -9,6 +9,8 @@ public interface PlanRepository {
   List<Plan> findAll();
   Optional<Plan> findById(UUID id);
   List<Plan> findByIsPublicTrue();
+  /** [FOLLOW] Planes publicos de un conjunto de autores: el scope Siguiendo en una sola query. */
+  List<Plan> findByIsPublicTrueAndAdministratorIdIn(Collection<Long> administratorIds);
   List<Plan> findByAdministratorId(Long administratorId);
   List<Plan> findByParticipantsEmail(String email);
   List<Plan> findByInvitationsRecipientEmail(String email);

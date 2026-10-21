@@ -9,6 +9,11 @@ public interface PlanService {
   Plan createPlan(Plan plan, String ownerEmail);
   List<Plan> getPlansByUserEmail(String ownerEmail);
   List<Plan> getPublicPlans();
+  /**
+   * [FOLLOW] Planes publicos de los autores indicados: la fuente del scope Siguiendo. Conjunto
+   * vacio cuando no se sigue a nadie; el orden y los filtros siguen siendo de {@code PlanDiscovery}.
+   */
+  List<Plan> getPublicPlansByAdministrators(Collection<Long> administratorIds);
   Plan getOwnedPlan(UUID id, String ownerEmail);
   Plan getEditablePlan(UUID id, String userEmail);
   void changeParticipantRole(UUID id, String participantEmail, String role, String userEmail);

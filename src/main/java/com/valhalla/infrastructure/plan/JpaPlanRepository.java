@@ -35,6 +35,19 @@ public interface JpaPlanRepository extends JpaRepository<Plan, UUID> {
   List<Plan> findByIsPublicTrue();
 
   /**
+   * [FOLLOW] Planes publicos de un conjunto de autores, en una sola consulta (AC-08, AC-15). Sin
+   * ORDER BY a proposito: el orden y los filtros siguen siendo de {@code PlanDiscovery}. La query
+   * es explicita por el mismo motivo que {@link #findByIsPublicTrue()}: el atributo se llama
+   * {@code isPublic} y la resolucion derived de ese prefijo es ambigua.
+   */
+  @Query(
+    "select plan from Plan plan where plan.isPublic = true and plan.administrator.id in :administratorIds"
+  )
+  List<Plan> findByIsPublicTrueAndAdministratorIdIn(
+    @Param("administratorIds") Collection<Long> administratorIds
+  );
+
+  /**
    * [TOP] Participantes por plan, con {@code left join} para que un plan sin participantes
    * aparezca con {@code 0} en vez de ausente. El owner no cuenta: no vive en esta tabla.
    */
