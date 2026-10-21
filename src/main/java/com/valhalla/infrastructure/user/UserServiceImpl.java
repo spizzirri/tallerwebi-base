@@ -1,5 +1,6 @@
 package com.valhalla.infrastructure.user;
 
+import com.valhalla.domain.bookmark.PlanBookmarkRepository;
 import com.valhalla.domain.exception.UserAlreadyExists;
 import com.valhalla.domain.exception.UserNotFoundException;
 import com.valhalla.domain.plan.PlanRepository;
@@ -19,16 +20,19 @@ public class UserServiceImpl implements UserService {
 
   private final UserRepository userRepository;
   private final PlanRepository planRepository;
+  private final PlanBookmarkRepository planBookmarkRepository;
   private final PasswordEncoder passwordEncoder;
 
   @Autowired
   public UserServiceImpl(
     UserRepository userRepository,
     PlanRepository planRepository,
+    PlanBookmarkRepository planBookmarkRepository,
     PasswordEncoder passwordEncoder
   ) {
     this.userRepository = userRepository;
     this.planRepository = planRepository;
+    this.planBookmarkRepository = planBookmarkRepository;
     this.passwordEncoder = passwordEncoder;
   }
 
@@ -101,8 +105,12 @@ public class UserServiceImpl implements UserService {
    * la app responde 500. La columna se llama {@code administrator_id} pero la llenan usuarios
    * comunes: cualquiera que haya armado un plan caía en ese 500.
    *
+   * <p>[MARK] Los guardados del usuario también cuelgan de {@code users.id}: se borran antes por la
+   * misma razón. Ojo, los guardados <em>ajenos</em> de sus planes no se tocan: sobreviven como
+   * snapshot y la card queda "Eliminado".
+   *
    * <p>El orden es lo único que importa acá, y la clase entera es {@code @Transactional}, así que
-   * las dos operaciones van o no van juntas.
+   * las operaciones van o no van juntas.
    */
   @Override
   public void delete(Long id) {
@@ -111,6 +119,7 @@ public class UserServiceImpl implements UserService {
     }
     this.planRepository.findByAdministratorId(id)
       .forEach(plan -> this.planRepository.deleteById(plan.getId()));
+    this.planBookmarkRepository.deleteAllByUserId(id);
     this.userRepository.deleteById(id);
   }
 
