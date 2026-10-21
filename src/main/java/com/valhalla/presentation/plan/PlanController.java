@@ -200,7 +200,10 @@ public class PlanController {
       // un POST inválido vuelve a esa vista en vez de re-renderizar pages/plans/new.
       return new ModelAndView(REDIRECT_EXPLORE);
     }
-    Plan created = planService.createPlan(toPlan(planForm), authentication.getName());
+    Plan created = planService.createPlan(
+      toPlanOrderedByVisitTime(planForm),
+      authentication.getName()
+    );
     return new ModelAndView(REDIRECT_PLAN_DETAIL + created.getId());
   }
 
@@ -318,6 +321,31 @@ public class PlanController {
   public ModelAndView joinPlan(@RequestParam String shortCode, Authentication authentication) {
     Plan plan = planService.joinPlan(shortCode, authentication.getName());
     return new ModelAndView(REDIRECT_PLAN_DETAIL + plan.getId());
+  }
+
+  /**
+   * El orden del formulario es el del mouse, no el del día: quien arma el plan agrega primero el
+   * lugar que vio primero y recién después le pone la hora. Así que al crear, el itinerario se
+   * ordena por hora de visita; los que no tienen hora quedan al final, en el orden en que se
+   * cargaron. Solo al crear: en la edición el orden ya es una decisión del usuario (el drag &amp;
+   * drop del detalle).
+   */
+  private Plan toPlanOrderedByVisitTime(PlanRequest planForm) {
+    Plan plan = toPlan(planForm);
+    plan
+      .getPlanPlaces()
+      .sort(
+        Comparator.comparing(
+          PlanPlace::getVisitTime,
+          Comparator.nullsLast(Comparator.naturalOrder())
+        )
+      );
+    int order = 1;
+    for (PlanPlace entry : plan.getPlanPlaces()) {
+      entry.setSortOrder(order);
+      order++;
+    }
+    return plan;
   }
 
   /** The form owns these fields and its itinerary rows only: id, shortCode and administrator never come from a post. */

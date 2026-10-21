@@ -49,7 +49,7 @@ public class PublicPlansListE2E extends E2eBase {
     assertThat(
       "el navbar sin sesion ofrece el feed",
       web.getNavbarItems(),
-      contains("PlanIt", "Para vos", "Register", "Login")
+      contains("PlanIt", "Para vos", "Register", "Login", "Cambiar tema")
     );
     assertThat(
       "el link del navbar sin sesion apunta a /for-you",

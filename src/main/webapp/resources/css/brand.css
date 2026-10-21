@@ -53,3 +53,95 @@
 body {
   font-family: var(--typeface-sans);
 }
+
+/* ============================ MODO OSCURO ============================
+ *
+ * Se enciende con html[data-theme="dark"], que escribe el script temprano de
+ * layouts/base :: headContent (localStorage "planit-theme", o el sistema si
+ * todavía no hay decisión). Igual que la paleta clara, los valores oscuros se
+ * declaran una sola vez, acá: los tokens --dark-*.
+ *
+ * Por qué los overrides van por nombre de utilidad (.bg-white, .text-gray-900)
+ * y no redefiniendo --color-gray-*: las utilidades de Tailwind v4 salen dentro
+ * de @layer utilities, y una regla sin layer —como cualquier regla de este
+ * archivo— la pisa sin importar la especificidad (el propio detail.html
+ * documenta ese comportamiento con el reboot de Bootstrap). Reasignar
+ * --color-gray-900 además mezclaría la escala neutra de Tailwind con la mitad
+ * oscura adentro de este archivo. La escala clara sigue siendo de Tailwind: lo
+ * de abajo es su complemento oscuro, valor por valor, y el test
+ * theNeutralScaleStaysOnTailwindAndSaysSo sigue frenando una rampa propia.
+ *
+ * Alcance: solo utilidades neutras (blanco, grises) que las plantillas usan hoy,
+ * más las variantes hover que ya existen. Los colores de marca (--primary,
+ * --secondary) y los de categoría (--category-*) no cambian de modo: son la
+ * identidad, el mapa y el pin del marcador. Las páginas con CSS propio que
+ * pintan hex a mano (landing.html, detail.html) llevan su propio override al
+ * lado de la regla original. */
+html[data-theme="dark"] {
+  /* Superficies: página y secciones, tarjetas, controles, bordes */
+  --dark-page: #030712;
+  --dark-surface: #111827;
+  --dark-card: #1f2937;
+  --dark-control: #374151;
+  --dark-control-hover: #4b5563;
+  --dark-border-soft: #111827;
+  --dark-border: #374151;
+  --dark-border-strong: #4b5563;
+  --dark-border-hover: #6b7280;
+
+  /* Texto: de principal a decorativo */
+  --dark-text: #f9fafb;
+  --dark-text-soft: #e5e7eb;
+  --dark-text-muted: #d1d5db;
+  --dark-text-faint: #9ca3af;
+  --dark-text-decor: #4b5563;
+
+  /* Color por defecto del texto. El preflight de Tailwind no declara ninguno, así que
+     todo lo sin clase text-* hereda el negro del navegador: en claro está bien, en
+     oscuro hay que darlo vuelta desde acá. Las utilidades explícitas siguen ganando
+     (son su propia declaración), y las páginas con su propio color de body
+     (detail.html, vía Bootstrap) también. */
+  color: var(--dark-text);
+}
+
+/* --- Superficies --- */
+html[data-theme="dark"] .bg-white { background-color: var(--dark-card); }
+html[data-theme="dark"] .bg-white\/90 { background-color: rgb(31 41 55 / 0.9); }
+html[data-theme="dark"] .bg-gray-50 { background-color: var(--dark-surface); }
+html[data-theme="dark"] .bg-gray-100 { background-color: var(--dark-page); }
+html[data-theme="dark"] .bg-gray-200 { background-color: var(--dark-control); }
+html[data-theme="dark"] .bg-gray-800 { background-color: var(--dark-control); }
+html[data-theme="dark"] .bg-gray-900 { background-color: var(--dark-control); }
+html[data-theme="dark"] .hover\:bg-white:hover { background-color: var(--dark-card); }
+html[data-theme="dark"] .hover\:bg-gray-50:hover { background-color: var(--dark-surface); }
+html[data-theme="dark"] .hover\:bg-gray-100:hover { background-color: var(--dark-surface); }
+html[data-theme="dark"] .hover\:bg-gray-200:hover { background-color: var(--dark-control); }
+html[data-theme="dark"] .hover\:bg-gray-300:hover { background-color: var(--dark-control-hover); }
+html[data-theme="dark"] .hover\:bg-gray-700:hover { background-color: var(--dark-control-hover); }
+
+/* --- Texto --- */
+html[data-theme="dark"] .text-gray-900 { color: var(--dark-text); }
+html[data-theme="dark"] .text-gray-800 { color: var(--dark-text); }
+html[data-theme="dark"] .text-gray-700 { color: var(--dark-text-soft); }
+html[data-theme="dark"] .text-gray-600 { color: var(--dark-text-muted); }
+html[data-theme="dark"] .text-gray-500 { color: var(--dark-text-faint); }
+html[data-theme="dark"] .text-gray-300 { color: var(--dark-text-decor); }
+html[data-theme="dark"] .hover\:text-gray-900:hover { color: var(--dark-text); }
+/* text-black solo donde cae el contenido principal: en el navbar es el avatar
+   sobre --secondary, que no cambia de modo, y detail.html además lo re-pinnea
+   con !important dentro de nav. */
+html[data-theme="dark"] main .text-black { color: var(--dark-text); }
+
+/* --- Bordes y divisores --- */
+html[data-theme="dark"] .border-gray-100 { border-color: var(--dark-border-soft); }
+html[data-theme="dark"] .border-gray-200 { border-color: var(--dark-border); }
+html[data-theme="dark"] .border-gray-300 { border-color: var(--dark-border-strong); }
+html[data-theme="dark"] .hover\:border-gray-300:hover { border-color: var(--dark-border-hover); }
+html[data-theme="dark"] .divide-gray-200 > * { border-color: var(--dark-border); }
+
+/* --- Toggle del navbar: los dos íconos viajan en el botón y el modo decide
+       cuál se ve, así el estado no se sincroniza desde JS. En claro se muestra
+       la luna (invita a oscurecer); en oscuro, el sol. --- */
+.theme-icon-sun { display: none; }
+html[data-theme="dark"] .theme-icon-moon { display: none; }
+html[data-theme="dark"] .theme-icon-sun { display: block; }

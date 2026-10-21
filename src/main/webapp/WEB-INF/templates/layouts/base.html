@@ -24,6 +24,36 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
+  <!-- Modo oscuro: el tema se resuelve acá, en línea y antes de cualquier stylesheet, para que
+       la primera pintura ya salga con el modo elegido y no haya destello claro. La decisión
+       vive en localStorage bajo la clave "planit-theme": si el usuario ya eligió una modo, esa
+       elección gana sobre la preferencia del sistema; si nunca eligió, sigue al sistema. Escribe
+       dos atributos con el mismo valor: data-theme es el que encienden los overrides de
+       brand.css, y data-bs-theme es la misma llave en la sintaxis que lee Bootstrap (solo
+       pages/plans/detail.html carga Bootstrap). El click del toggle del navbar se atiende por
+       delegación de eventos: el botón se renderiza después y así el script no se repite en el
+       body. Claves de icono y overrides viven en brand.css y components/navbar.html. -->
+  <script>
+    (function () {
+      var stored = null;
+      try { stored = localStorage.getItem("planit-theme"); } catch (e) { /* sin storage */ }
+      var dark = stored === "dark" ||
+        (stored !== "light" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+      var apply = function (mode) {
+        document.documentElement.setAttribute("data-theme", mode);
+        document.documentElement.setAttribute("data-bs-theme", mode);
+      };
+      apply(dark ? "dark" : "light");
+      document.addEventListener("click", function (event) {
+        var toggle = event.target.closest && event.target.closest("[data-theme-toggle]");
+        if (!toggle) return;
+        var next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+        apply(next);
+        try { localStorage.setItem("planit-theme", next); } catch (e) { /* sin storage */ }
+      });
+    })();
+  </script>
+
   <title th:text="${pageTitle != null} ? ${pageTitle} : 'PlanIt'">PlanIt</title>
   <!-- pageTitle es el único parámetro del fragmento, para no romper las llamadas de una sola
        variable de las demás páginas. La descripción se resuelve desde el modelo: la landing

@@ -672,6 +672,69 @@ public class PlanControllerIntegrationTest {
 
   @Test
   @WithMockUser(username = OWNER_EMAIL)
+  public void T_PLN_074c_postPlans_ordenaLosLugaresPorHoraDeVisitaYNoPorElOrdenDeCarga()
+    throws Exception {
+    // given: el lugar cargado primero es el de las 15:00 y el segundo el de las 12:00
+    Long afternoon = this.placeRepository.findAll().get(0).getId();
+    Long morning = this.placeRepository.findAll().get(1).getId();
+
+    // when
+    MvcResult result =
+      this.mockMvc.perform(
+          post("/plans")
+            .with(csrf())
+            .param("name", PLAN_NAME)
+            .param("places[0].placeId", afternoon.toString())
+            .param("places[0].visitTime", "15:00")
+            .param("places[1].placeId", morning.toString())
+            .param("places[1].visitTime", "12:00")
+        )
+        .andExpect(status().is3xxRedirection())
+        .andReturn();
+
+    // then: el itinerario sigue el día del plan, no el orden en que se vieron los lugares
+    Plan saved =
+      this.planRepository.findById(planIdOf(result.getResponse().getRedirectedUrl())).orElseThrow();
+    assertThat(saved.getPlanPlaces(), hasSize(2));
+    assertThat(saved.getPlanPlaces().get(0).getPlace().getId(), is(equalTo(morning)));
+    assertThat(saved.getPlanPlaces().get(0).getSortOrder(), is(1));
+    assertThat(saved.getPlanPlaces().get(0).getVisitTime(), is(equalTo(LocalTime.of(12, 0))));
+    assertThat(saved.getPlanPlaces().get(1).getPlace().getId(), is(equalTo(afternoon)));
+    assertThat(saved.getPlanPlaces().get(1).getSortOrder(), is(2));
+    assertThat(saved.getPlanPlaces().get(1).getVisitTime(), is(equalTo(LocalTime.of(15, 0))));
+  }
+
+  @Test
+  @WithMockUser(username = OWNER_EMAIL)
+  public void T_PLN_074d_postPlans_losLugaresSinHoraQuedanAlFinal() throws Exception {
+    // given: el cargado primero no tiene hora, así que el recorrido arranca por el que sí tiene
+    Long untimed = this.placeRepository.findAll().get(0).getId();
+    Long timed = this.placeRepository.findAll().get(1).getId();
+
+    // when
+    MvcResult result =
+      this.mockMvc.perform(
+          post("/plans")
+            .with(csrf())
+            .param("name", PLAN_NAME)
+            .param("places[0].placeId", untimed.toString())
+            .param("places[1].placeId", timed.toString())
+            .param("places[1].visitTime", "09:00")
+        )
+        .andExpect(status().is3xxRedirection())
+        .andReturn();
+
+    // then
+    Plan saved =
+      this.planRepository.findById(planIdOf(result.getResponse().getRedirectedUrl())).orElseThrow();
+    assertThat(saved.getPlanPlaces(), hasSize(2));
+    assertThat(saved.getPlanPlaces().get(0).getPlace().getId(), is(equalTo(timed)));
+    assertThat(saved.getPlanPlaces().get(1).getPlace().getId(), is(equalTo(untimed)));
+    assertThat(saved.getPlanPlaces().get(1).getVisitTime(), is(nullValue()));
+  }
+
+  @Test
+  @WithMockUser(username = OWNER_EMAIL)
   public void T_PLN_075_postPlans_conNombreVacioRedirigeAExploreYNoCreaNada() throws Exception {
     // when: sin formulario standalone, un POST inválido vuelve a la vista de creación (/explore)
     this.mockMvc.perform(post("/plans").with(csrf()).param("name", ""))

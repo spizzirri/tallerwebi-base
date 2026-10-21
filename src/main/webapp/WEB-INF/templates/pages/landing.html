@@ -30,6 +30,13 @@
         color: transparent;
       }
 
+      /* En modo oscuro la misma dirección de degradado, pero con los tokens de marca en sus
+         valores claros: sobre la tarjeta oscura el negro a gris quedaría ilegible. El estado
+         corresponde a html[data-theme="dark"], que escribe el script de layouts/base. */
+      html[data-theme="dark"] .hero-title {
+        background-image: linear-gradient(90deg, var(--white) 0%, var(--gray) 100%);
+      }
+
       /* Los bloques entran con un fade up pesado. El estado inicial solo existe si JavaScript
          está activo (html.reveal-ready), así que sin JS la página se ve completa. */
       html.reveal-ready [data-reveal] {
@@ -56,6 +63,18 @@
 
       html.reveal-ready .tagline-word.is-lit {
         color: #111827;
+      }
+
+      /* Modo oscuro: la misma escala al revés (apagado claro, encendido blanco). Los
+         selectores repiten .reveal-ready para que la especificidad gane por sí sola y no
+         dependan del orden dentro del bloque; --white es el token de brand.css. */
+      html[data-theme="dark"].reveal-ready .tagline-word {
+        color: rgb(249 250 251 / 0.28);
+        transition: color 700ms cubic-bezier(0.32, 0.72, 0, 1);
+      }
+
+      html[data-theme="dark"].reveal-ready .tagline-word.is-lit {
+        color: var(--white);
       }
 
       /* Los iconos de Lucide heredan el color y el grosor del texto. */

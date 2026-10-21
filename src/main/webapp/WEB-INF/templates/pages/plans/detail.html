@@ -24,7 +24,7 @@
         .place-item[draggable="true"] { cursor: grab; }
         .place-item[draggable="true"]:active { cursor: grabbing; }
         .itinerary-step { flex: 0 0 32px; height: 32px; display: grid; place-items: center; border-radius: 50%; background: var(--bs-secondary-bg); color: var(--bs-body-color); font-weight: 700; z-index: 1; }
-        .itinerary-stop { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; padding: 10px 12px; border: 1px solid var(--bs-border-color); border-radius: 8px; background: white; transition: transform .18s, box-shadow .18s; }
+        .itinerary-stop { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; padding: 10px 12px; border: 1px solid var(--bs-border-color); border-radius: 8px; background: var(--bs-body-bg); transition: transform .18s, box-shadow .18s; }
         .itinerary-stop:hover { transform: translateY(-2px); box-shadow: 0 3px 10px rgba(0,0,0,.06); }
         .stop-content { flex: 1; min-width: 0; }
         .stop-heading { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin-bottom: 4px; }
@@ -139,6 +139,17 @@
         main h5 { font-size: 1.25rem; }
         /* [MAPS] El popup del mapa separa el texto del link "Cómo llegar" que se agrega al final. */
         .leaflet-popup-content a { display: inline-block; margin-top: 0.35rem; }
+
+        /* Modo oscuro. data-bs-theme lo escribe el script temprano de layouts/base ::
+           headContent con el mismo valor que data-theme, así que Bootstrap re-colorea por su
+           cuenta body, bordes, formularios, cards y chips (el background de
+           .itinerary-stop sale de --bs-body-bg: blanco en claro, #212529 en oscuro, igual
+           que el panel donde vive). La excepción es --bs-light, que Bootstrap no redefine
+           en dark y se queda en #f8f9fa: las tres superficies que lo usan pasarían a ser
+           manchas blancas. --bs-tertiary-bg sí cambia (#2b3035). */
+        [data-bs-theme="dark"] .stop-category,
+        [data-bs-theme="dark"] .itinerary-empty,
+        [data-bs-theme="dark"] .stop-remove:hover { background: var(--bs-tertiary-bg); }
     </style>
 </head>
 <body th:replace="~{layouts/base :: layout(~{::main})}">

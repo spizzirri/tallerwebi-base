@@ -44,11 +44,16 @@ public class PlanPlaceDetailE2E extends E2eBase {
     createPlanWithAVisit();
 
     // Creation: the stop and the visit details typed into the create form are on screen right
-    // away, and the plan's own date reached the summary as well.
+    // away, and the plan's own date reached the summary as well. The stop rides on the plan's own
+    // date (the create form does not ask for one any more), so its schedule row carries the time
+    // only and there is no per-stop date left to show.
     assertEquals(planName, plans.getDetailHeading());
     assertThat(page.locator(".stop-details")).hasCount(1);
-    assertThat(page.locator(".stop-schedule").first()).containsText("01/12/2026");
-    assertThat(page.locator(".stop-schedule").first()).containsText(VISIT_TIME);
+    assertEquals(
+      VISIT_TIME,
+      page.locator(".stop-schedule").first().innerText(),
+      "a stop shows its time only; its date is the plan's own"
+    );
     assertThat(page.locator("#plan-summary")).containsText(EVENT_DATE);
     assertThat(page.locator("input[name='eventDate']")).hasValue(EVENT_DATE);
 
@@ -61,7 +66,6 @@ public class PlanPlaceDetailE2E extends E2eBase {
 
     // The details dialog fetches the itinerary instead of reading the rendered snapshot.
     Locator dialog = openStopDetails(0);
-    assertThat(dialog).containsText(EVENT_DATE);
     assertThat(dialog).containsText(VISIT_TIME);
     assertThat(dialog.locator("dd").last()).hasText("1");
     closeStopDetails();
@@ -157,7 +161,6 @@ public class PlanPlaceDetailE2E extends E2eBase {
     plans.typeEventDate(EVENT_DATE);
     plans.clickNextStep();
     plans.addFirstDraftPlace();
-    page.locator("#plans-aside ol li input[aria-label='Fecha de visita']").fill(EVENT_DATE);
     page.locator("#plans-aside ol li input[aria-label='Hora de visita']").fill(VISIT_TIME);
     plans.clickCreate();
     plans.waitForDetailPath();

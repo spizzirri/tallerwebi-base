@@ -57,11 +57,12 @@ public class UserAuthViewE2E extends E2eBase {
     // The Explore link arrived with the map feature in 03-PLC and resolves to /explore, so it
     // belongs in the set too. "Para vos" resuelve a /for-you, el feed que es home del usuario
     // (visible con y sin sesión); el label cambió de "Planes públicos" cuando el feed pasó a
-    // mostrar solo planes ajenos.
+    // mostrar solo planes ajenos. "Cambiar tema" es el toggle de modo oscuro, que entra como
+    // botón de solo ícono y su texto visible para el pin es el sr-only.
     assertThat(
       "the authenticated navbar offers only items that resolve",
       landing.getNavbarItems(),
-      contains("PlanIt", "Para vos", "Explore", "Plans", "Logout")
+      contains("PlanIt", "Para vos", "Explore", "Plans", "Logout", "Cambiar tema")
     );
   }
 

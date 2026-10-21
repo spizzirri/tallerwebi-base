@@ -343,7 +343,7 @@
                     </div>
                     <div class="mt-4">
                       <label for="plan-date" class="mb-1 block text-sm font-medium text-gray-700">Fecha</label>
-                      <input type="date" id="plan-date" name="eventDate"
+                      <input type="date" id="plan-date" name="eventDate" th:attr="min=${today}"
                         class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none" />
                     </div>
                     <div class="mt-4 flex items-center gap-2">
@@ -359,7 +359,9 @@
                   <div class="flex w-1/2 shrink-0 flex-col gap-3 overflow-y-auto px-1"
                     :inert="planStep !== 2 ? '' : null">
                     <p class="rounded-md bg-blue-50 px-3 py-2 text-xs text-blue-800">
-                      Usá el botón + de los lugares del panel derecho para agregarlos a este plan.</p>
+                      Usá el botón + de los lugares del panel derecho para agregarlos a este plan.
+                      Todos los lugares se visitan el mismo día que el plan: acá solo definís la hora
+                      de cada parada.</p>
 
                     <h3 class="text-sm font-semibold uppercase tracking-wide text-gray-500">
                       In this plan ({{ draftPlaces.length }})</h3>
@@ -384,13 +386,10 @@
                         <input type="text" v-model="item.description" :name="'places[' + index + '].description'"
                           placeholder="Nota (opcional)" aria-label="Nota"
                           class="mt-2 w-full rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm" />
-                        <div class="mt-2 flex gap-2">
-                          <input type="date" v-model="item.visitDate" :name="'places[' + index + '].visitDate'"
-                            aria-label="Fecha de visita"
-                            class="min-w-0 flex-1 rounded-md border border-gray-300 bg-white px-2 py-1.5 text-sm" />
+                        <div class="mt-2">
                           <input type="time" v-model="item.visitTime" :name="'places[' + index + '].visitTime'"
                             aria-label="Hora de visita"
-                            class="min-w-0 flex-1 rounded-md border border-gray-300 bg-white px-2 py-1.5 text-sm" />
+                            class="w-full rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm" />
                         </div>
                       </li>
                     </ol>
@@ -677,7 +676,7 @@
 
           // The same place may be added repeatedly, so rows are keyed by their own counter.
           const addToDraft = (place) => {
-            draftPlaces.value.push({ key: nextDraftKey++, place, description: '', visitDate: '', visitTime: '' });
+            draftPlaces.value.push({ key: nextDraftKey++, place, description: '', visitTime: '' });
           };
 
           const removeDraft = (index) => {

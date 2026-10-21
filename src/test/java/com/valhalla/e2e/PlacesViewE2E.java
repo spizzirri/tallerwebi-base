@@ -38,13 +38,14 @@ public class PlacesViewE2E extends E2eBase {
   /**
    * AC-13: el navbar se decide por área, no por rol. El arrange de esta clase es justo el caso
    * reportado —una sesión ADMIN parada en /explore— y tiene que ver el menú de usuario (sin
-   * "Users"); el conjunto se pinnea entero para que un item fantasma también falle.
+   * "Users"); el conjunto se pinnea entero para que un item fantasma también falle. El último
+   * item es el toggle de modo oscuro: un botón de solo ícono cuyo único texto es el sr-only.
    */
   @Test
   void shouldShowTheUserNavbarToAnAdminBrowsingTheExplore() {
     assertThat(
       new WebPage(page).getNavbarItems(),
-      contains("PlanIt", "Para vos", "Explore", "Plans", "Logout")
+      contains("PlanIt", "Para vos", "Explore", "Plans", "Logout", "Cambiar tema")
     );
   }
 
