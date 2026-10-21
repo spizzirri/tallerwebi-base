@@ -85,7 +85,7 @@ public class PlanBookmark {
     User author = plan.getAdministrator();
     if (author != null) {
       bookmark.header.setAdministratorId(author.getId());
-      bookmark.header.setAdministratorName(displayName(author));
+      bookmark.header.setAdministratorName(displayNameOf(author));
     }
     int order = 1;
     for (PlanPlace entry : plan.getPlanPlaces()) {
@@ -109,7 +109,8 @@ public class PlanBookmark {
     return row;
   }
 
-  private static String displayName(User user) {
+  /** Nombre para mostrar, con el email como ultimo recurso cuando no hay nombre cargado. */
+  public static String displayNameOf(User user) {
     String name =
       ((user.getFirstName() == null ? "" : user.getFirstName()) +
         " " +
