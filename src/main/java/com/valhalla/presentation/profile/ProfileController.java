@@ -1,5 +1,6 @@
 package com.valhalla.presentation.profile;
 
+import com.valhalla.domain.bookmark.PlanBookmarkService;
 import com.valhalla.domain.exception.UserNotFoundException;
 import com.valhalla.domain.plan.Plan;
 import com.valhalla.domain.plan.PlanService;
@@ -11,6 +12,8 @@ import jakarta.validation.Valid;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -45,11 +48,17 @@ public class ProfileController {
 
   private final UserService userService;
   private final PlanService planService;
+  private final PlanBookmarkService planBookmarkService;
 
   @Autowired
-  public ProfileController(UserService userService, PlanService planService) {
+  public ProfileController(
+    UserService userService,
+    PlanService planService,
+    PlanBookmarkService planBookmarkService
+  ) {
     this.userService = userService;
     this.planService = planService;
+    this.planBookmarkService = planBookmarkService;
   }
 
   /**
@@ -90,7 +99,7 @@ public class ProfileController {
       );
       return new ModelAndView(VIEW_EDIT, model);
     }
-    Map<String, Object> model = publicModel(owner);
+    Map<String, Object> model = publicModel(owner, viewerEmail(authentication));
     return new ModelAndView(VIEW_PUBLIC, model);
   }
 
@@ -168,11 +177,18 @@ public class ProfileController {
   }
 
   private boolean isSelf(Authentication authentication, User owner) {
+    String viewer = viewerEmail(authentication);
+    return viewer != null && viewer.equals(owner.getEmail());
+  }
+
+  /**
+   * Email del visitante con sesion, o null para un anonimo. El principal anonimo es el String
+   * "anonymousUser", no un {@link UserDetails}: mismo criterio que {@link #isSelf} para no tratar
+   * un nombre sintetico como identidad real.
+   */
+  private static String viewerEmail(Authentication authentication) {
     Object principal = authentication == null ? null : authentication.getPrincipal();
-    if (!(principal instanceof UserDetails)) {
-      return false; // anonimo: principal "anonymousUser", nunca self
-    }
-    return owner.getEmail().equals(authentication.getName());
+    return principal instanceof UserDetails ? authentication.getName() : null;
   }
 
   /**
@@ -191,21 +207,28 @@ public class ProfileController {
    * Modelo de la vista publica (AC-15): cards del feed para los plans publicos del dueno,
    * re-usando exactamente el mismo payload de /for-you (sin email ni participantes). El
    * contador de seguidores es placeholder (0) hasta que [FOLLOW] aterrice.
+   *
+   * <p>[MARK] El visitante con sesion ve el toggle de Guardados en cada card; el anonimo no. Un
+   * solo lookup alimenta todas las cards de la pagina.
    */
-  private Map<String, Object> publicModel(User owner) {
+  private Map<String, Object> publicModel(User owner, String viewer) {
+    Set<UUID> bookmarkedPlanIds = viewer == null
+      ? Set.of()
+      : this.planBookmarkService.getBookmarkedPlanIds(viewer);
     Map<String, Object> model = new LinkedHashMap<>();
     model.put("owner", owner);
     model.put("ownerInitial", initialOf(owner));
     model.put("profileName", displayName(owner));
     model.put("profileAvatarUrl", owner.getAvatarUrl());
     model.put("followerCount", 0L);
+    model.put("canBookmark", viewer != null);
     model.put(
       "profilePlans",
       publicPlansOf(owner)
         .stream()
-        // [MARK] El perfil publico monta el toggle en MARK-010: hasta entonces la card no pinta
-        // estado de Guardados y no consulta al servicio por cada visita.
-        .map(plan -> PlanFeedCards.planCard(plan, Map.of(), false))
+        .map(plan ->
+          PlanFeedCards.planCard(plan, Map.of(), bookmarkedPlanIds.contains(plan.getId()))
+        )
         .toList()
     );
     return model;

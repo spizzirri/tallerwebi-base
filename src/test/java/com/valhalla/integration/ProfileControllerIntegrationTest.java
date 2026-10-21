@@ -194,6 +194,38 @@ public class ProfileControllerIntegrationTest {
     assertThat(html, not(containsString("Plan privado de Ada")));
   }
 
+  // --- [MARK] toggle de Guardados en las cards del perfil publico ---
+
+  @Test
+  @WithMockUser(username = OTHER_EMAIL)
+  public void publicProfileShowsTheBookmarkToggleToSignedInVisitors() throws Exception {
+    Plan plan = new Plan();
+    plan.setName("Plan publico de Ada");
+    plan.setIsPublic(true);
+    plan.setAdministrator(userRepository.findById(selfId).orElseThrow());
+    planService.createPlan(plan, SELF_EMAIL);
+
+    this.mockMvc.perform(get("/profile/" + selfId))
+      .andExpect(status().isOk())
+      .andExpect(content().string(containsString("data-bookmark-toggle=\"true\"")))
+      .andExpect(content().string(containsString("action=\"/bookmarks/")))
+      .andExpect(content().string(containsString("aria-label=\"Guardar en Guardados\"")));
+  }
+
+  @Test
+  public void anonymousPublicProfileHasNoBookmarkToggle() throws Exception {
+    Plan plan = new Plan();
+    plan.setName("Plan publico de Ada");
+    plan.setIsPublic(true);
+    plan.setAdministrator(userRepository.findById(selfId).orElseThrow());
+    planService.createPlan(plan, SELF_EMAIL);
+
+    this.mockMvc.perform(get("/profile/" + selfId))
+      .andExpect(status().isOk())
+      .andExpect(content().string(not(containsString("data-bookmark-toggle"))))
+      .andExpect(content().string(not(containsString("action=\"/bookmarks/"))));
+  }
+
   // --- PLANES: la vista de Grace muestra los planes de Grace, y los de Ada no aparecen ---
 
   @Test

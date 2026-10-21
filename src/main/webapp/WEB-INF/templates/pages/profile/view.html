@@ -33,7 +33,12 @@
              mismo payload del feed /for-you), con el link a la vista publica del plan. -->
         <div th:if="${!profilePlans.isEmpty()}" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <article th:each="plan : ${profilePlans}"
-            class="flex flex-col overflow-hidden rounded-lg bg-white shadow-md transition duration-200 hover:-translate-y-1 hover:shadow-xl">
+            class="relative flex flex-col overflow-hidden rounded-lg bg-white shadow-md transition duration-200 hover:-translate-y-1 hover:shadow-xl">
+            <!-- [MARK] Guardar para clonar despues. Fuera del <a> (un form dentro de un anchor es
+                 HTML invalido); sin sesion el fragmento no se monta (AC-05). -->
+            <div th:if="${canBookmark}" class="absolute right-3 top-3 z-10">
+              <div th:replace="~{components/bookmark-button :: toggle(${plan.id}, ${plan.bookmarked}, ${currentUrl})}"></div>
+            </div>
             <a th:href="@{/plans/{id}/public(id=${plan.id})}" class="flex flex-1 flex-col">
               <img th:src="${plan.cover}" th:alt="${plan.name}" loading="lazy"
                 class="h-40 w-full border-b border-gray-100 object-cover" />
