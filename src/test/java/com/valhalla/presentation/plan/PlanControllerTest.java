@@ -19,6 +19,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.valhalla.domain.bookmark.PlanBookmarkService;
 import com.valhalla.domain.exception.PlanNotFoundException;
 import com.valhalla.domain.place.Place;
 import com.valhalla.domain.plan.Plan;
@@ -73,6 +74,7 @@ public class PlanControllerTest {
   private PlanService planServiceMock;
   private PlanPlaceService planPlaceServiceMock;
   private PlanRatingService planRatingServiceMock;
+  private PlanBookmarkService planBookmarkServiceMock;
   private Authentication authentication;
 
   @BeforeEach
@@ -80,11 +82,13 @@ public class PlanControllerTest {
     this.planServiceMock = mock(PlanService.class);
     this.planPlaceServiceMock = mock(PlanPlaceService.class);
     this.planRatingServiceMock = mock(PlanRatingService.class);
+    this.planBookmarkServiceMock = mock(PlanBookmarkService.class);
     this.controller =
       new PlanController(
         this.planServiceMock,
         this.planPlaceServiceMock,
-        this.planRatingServiceMock
+        this.planRatingServiceMock,
+        this.planBookmarkServiceMock
       );
     this.authentication = new UsernamePasswordAuthenticationToken(OWNER_EMAIL, null);
     // Sin calificaciones es el default de cualquier plan en los tests de este archivo.
@@ -122,6 +126,84 @@ public class PlanControllerTest {
     assertThat(view.getViewName(), is(DETAIL_VIEW));
     assertThat(view.getModel().get("plan"), is(sameInstance(plan)));
     verify(this.planServiceMock, times(1)).getParticipatingPlan(PLAN_ID, OWNER_EMAIL);
+  }
+
+  // --- [MARK] toggle de Guardados en el detalle y en la vista publica ---
+
+  @Test
+  public void T_MARK_007a_showPlan_marcaElPlanPublicoYaGuardado() {
+    Plan plan = plan(PLAN_ID, "Publico");
+    plan.setIsPublic(true);
+    when(this.planServiceMock.getParticipatingPlan(PLAN_ID, OWNER_EMAIL)).thenReturn(plan);
+    when(this.planBookmarkServiceMock.isBookmarked(PLAN_ID, OWNER_EMAIL)).thenReturn(true);
+
+    ModelAndView view = this.controller.showPlan(PLAN_ID, this.authentication);
+
+    assertThat(view.getModel().get("canBookmark"), is(true));
+    assertThat(view.getModel().get("isBookmarked"), is(true));
+  }
+
+  @Test
+  public void T_MARK_007b_showPlan_noOfreceGuardarUnPlanPrivado() {
+    Plan plan = plan(PLAN_ID, "Privado");
+    when(this.planServiceMock.getParticipatingPlan(PLAN_ID, OWNER_EMAIL)).thenReturn(plan);
+
+    ModelAndView view = this.controller.showPlan(PLAN_ID, this.authentication);
+
+    assertThat(view.getModel().get("canBookmark"), is(false));
+    assertThat(view.getModel().get("isBookmarked"), is(false));
+    verify(this.planBookmarkServiceMock, never()).isBookmarked(any(), any());
+  }
+
+  @Test
+  public void T_MARK_007c_showPlan_anonimoNoOfreceGuardar() {
+    Plan plan = plan(PLAN_ID, "Publico");
+    plan.setIsPublic(true);
+    when(this.planServiceMock.getParticipatingPlan(PLAN_ID, null)).thenReturn(plan);
+
+    ModelAndView view = this.controller.showPlan(PLAN_ID, null);
+
+    assertThat(view.getModel().get("canBookmark"), is(false));
+    assertThat(view.getModel().get("isBookmarked"), is(false));
+  }
+
+  @Test
+  public void T_MARK_007d_showPublicPlan_marcaElGuardadoDelVisitante() {
+    Plan plan = plan(PLAN_ID, "Publico");
+    plan.setIsPublic(true);
+    when(this.planServiceMock.getPublicPlan(PLAN_ID)).thenReturn(plan);
+    when(this.planBookmarkServiceMock.isBookmarked(PLAN_ID, OWNER_EMAIL)).thenReturn(true);
+    Authentication visitor = new UsernamePasswordAuthenticationToken(
+      new org.springframework.security.core.userdetails.User(
+        OWNER_EMAIL,
+        "n/a",
+        AuthorityUtils.createAuthorityList("ROLE_USER")
+      ),
+      "n/a"
+    );
+
+    ModelAndView view = this.controller.showPublicPlan(PLAN_ID, visitor);
+
+    assertThat(view.getModel().get("canBookmark"), is(true));
+    assertThat(view.getModel().get("isBookmarked"), is(true));
+  }
+
+  @Test
+  public void T_MARK_007e_showPublicPlan_anonimoNoConsultaElEstado() {
+    Plan plan = plan(PLAN_ID, "Publico");
+    plan.setIsPublic(true);
+    Authentication anonymous = new AnonymousAuthenticationToken(
+      "key",
+      "anonymousUser",
+      AuthorityUtils.createAuthorityList("ROLE_ANONYMOUS")
+    );
+    when(this.planServiceMock.getPublicPlan(PLAN_ID)).thenReturn(plan);
+
+    ModelAndView view = this.controller.showPublicPlan(PLAN_ID, anonymous);
+
+    assertThat(view.getModel().get("canBookmark"), is(false));
+    assertThat(view.getModel().get("isBookmarked"), is(false));
+    verify(this.planBookmarkServiceMock, never()).isBookmarked(any(), any());
   }
 
   @Test
