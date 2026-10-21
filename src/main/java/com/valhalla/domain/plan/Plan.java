@@ -50,6 +50,37 @@ public class Plan {
   @Embedded
   private PlanManager planManager = new PlanManager();
 
+  @Embedded
+  private PlanSettings settings = new PlanSettings();
+
+  public PlanSettings getSettings() {
+    if (settings == null) {
+      settings = new PlanSettings();
+    }
+    return settings;
+  }
+
+  public List<PlanJoinRequest> getJoinRequests() {
+    return planManager.getJoinRequests();
+  }
+
+  public boolean canShareLink(String email) {
+    return getSettings().getShareLink().allows(this, email);
+  }
+
+  public boolean canHandleRequests(String email) {
+    return getSettings().getHandleRequests().allows(this, email);
+  }
+
+  public boolean hasPendingJoinRequest(String email) {
+    return (
+      email != null &&
+      getJoinRequests()
+        .stream()
+        .anyMatch(request -> email.equals(request.getRequester().getEmail()))
+    );
+  }
+
   public List<PlanInvitation> getInvitations() {
     return planManager.getInvitations();
   }

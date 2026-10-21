@@ -6,6 +6,19 @@ import java.util.Map;
 import java.util.UUID;
 
 public interface PlanService {
+  Plan getSharedPlan(UUID id);
+  void requestToJoin(UUID id, String userEmail);
+  void respondToJoinRequest(UUID id, Long requestId, String action, String userEmail);
+  List<PendingJoinRequest> getPendingJoinRequests(UUID id, String userEmail);
+  void updateSettings(
+    UUID id,
+    PlanPermission shareLink,
+    PlanPermission handleRequests,
+    String userEmail
+  );
+
+  record PendingJoinRequest(Long id, Long requesterId, String requesterName) {}
+
   Plan createPlan(Plan plan, String ownerEmail);
   List<Plan> getPlansByUserEmail(String ownerEmail);
   List<Plan> getPublicPlans();

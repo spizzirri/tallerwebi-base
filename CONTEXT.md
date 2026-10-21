@@ -8,7 +8,7 @@
 | **Place** | A location in Buenos Aires. Has name, description, category, address, coordinates, image. |
 | **Plan** | A curated collection of places with schedule. Owned by a User. Is public or private. |
 | **PlanPlace** | A place within a plan, with visit date, time, and order in the itinerary. |
-| **Plan participant** | Registered User who joins a Plan using its Short Code. Can read its detail and leave it; cannot edit or delete it unless assigned the Editor role. The administrator owns the Plan and can delete it. |
+| **Plan participant** | Registered User who joins a public Plan using its Short Code, or a private Plan after an accepted join request or invitation. Can read its detail and leave it; cannot edit or delete it unless assigned the Editor role. The administrator owns the Plan and can delete it. |
 | **Rating** | A 1–5 star score a logged-in User gives to a public Plan. One per User per Plan (updatable). Authorship is stored but never shown: only the average and count are public. |
 
 **Editor**: A Plan participant who can modify the plan and itinerary and change participant roles. Only the administrator (owner) can delete the Plan. Leaving the Plan removes the Editor role.
@@ -18,8 +18,19 @@ Editors. The owner cannot be removed. Removal revokes participation and the Edit
 role for that Plan without deleting the User's account.
 
 **PlanManager**: Embedded component of a Plan that groups its Participants, Editors
-and pending Invitations. It preserves the existing persistence tables and the Plan's
+and pending Invitations and Join Requests. It preserves the existing persistence tables and the Plan's
 public methods for accessing these collections.
+
+**Plan join request**: A registered User's pending request to participate in a private
+Plan through its shared link or Short Code. It grants no access until the owner, or an Editor when
+authorized, accepts it. Rejection removes the request without granting participation.
+The visitor sees only the name, description, date, place count and generic cover.
+
+**Plan settings**: Owner-managed capability permissions. In the PET prototype,
+sharing the link and handling join requests default to Owner. Sharing can extend to
+Editors or all Participants; handling requests can extend only to Editors. Owner-only
+sharing disables the private landing summary and request form. Invitation channel
+permissions and bans are deferred to later PET work.
 
 ## Categories
 

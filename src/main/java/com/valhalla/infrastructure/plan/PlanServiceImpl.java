@@ -5,7 +5,9 @@ import com.valhalla.domain.exception.UserNotFoundException;
 import com.valhalla.domain.place.PlaceRepository;
 import com.valhalla.domain.plan.Plan;
 import com.valhalla.domain.plan.PlanInvitation;
+import com.valhalla.domain.plan.PlanJoinRequest;
 import com.valhalla.domain.plan.PlanParticipantCount;
+import com.valhalla.domain.plan.PlanPermission;
 import com.valhalla.domain.plan.PlanRepository;
 import com.valhalla.domain.plan.PlanService;
 import com.valhalla.domain.planplace.PlanPlace;
@@ -36,6 +38,107 @@ public class PlanServiceImpl implements PlanService { // NOPMD — intentional: 
   private final UserRepository userRepository;
   private final PlaceRepository placeRepository;
   private final PlanRatingRepository planRatingRepository;
+
+  @Override
+  @Transactional(readOnly = true)
+  public Plan getSharedPlan(UUID id) {
+    Plan plan = planRepository.findById(id).orElseThrow(PlanNotFoundException::new);
+    if (plan.getIsPublic()) {
+      return getPublicPlan(id);
+    }
+    plan.getParticipants().forEach(user -> user.getEmail());
+    plan.getEditors().forEach(user -> user.getEmail());
+    plan.getJoinRequests().forEach(request -> request.getRequester().getEmail());
+    return plan;
+  }
+
+  @Override
+  public void requestToJoin(UUID id, String userEmail) {
+    Plan plan = planRepository.findById(id).orElseThrow(PlanNotFoundException::new);
+    User requester = userRepository.findByEmail(userEmail).orElseThrow(UserNotFoundException::new);
+    if (plan.isAdministrator(userEmail) || plan.isParticipant(userEmail)) {
+      return;
+    }
+    if (plan.getIsPublic() || !plan.getSettings().isSharingEnabled()) {
+      throw new PlanNotFoundException();
+    }
+    addJoinRequest(plan, requester);
+  }
+
+  private void addJoinRequest(Plan plan, User requester) {
+    if (!plan.hasPendingJoinRequest(requester.getEmail())) {
+      plan.getJoinRequests().add(new PlanJoinRequest(plan, requester));
+      planRepository.save(plan);
+    }
+  }
+
+  @Override
+  public void respondToJoinRequest(UUID id, Long requestId, String action, String userEmail) {
+    Plan plan = planRepository.findById(id).orElseThrow(PlanNotFoundException::new);
+    requireRequestManager(plan, userEmail);
+    if (!"accept".equals(action) && !"reject".equals(action)) {
+      throw new IllegalArgumentException("Respuesta de solicitud inválida.");
+    }
+    PlanJoinRequest request = plan
+      .getJoinRequests()
+      .stream()
+      .filter(item -> item.getId().equals(requestId))
+      .findFirst()
+      .orElseThrow(PlanNotFoundException::new);
+    User requester = request.getRequester();
+    if (
+      "accept".equals(action) &&
+      !plan.isAdministrator(requester.getEmail()) &&
+      !plan.isParticipant(requester.getEmail())
+    ) {
+      plan.getParticipants().add(requester);
+      plan.getInvitations().removeIf(item -> item.getRecipient().getId().equals(requester.getId()));
+    }
+    plan.getJoinRequests().remove(request);
+    planRepository.save(plan);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public List<PendingJoinRequest> getPendingJoinRequests(UUID id, String userEmail) {
+    Plan plan = planRepository.findById(id).orElseThrow(PlanNotFoundException::new);
+    requireRequestManager(plan, userEmail);
+    return plan
+      .getJoinRequests()
+      .stream()
+      .map(request -> {
+        User user = request.getRequester();
+        String name =
+          ((user.getFirstName() == null ? "" : user.getFirstName()) +
+            " " +
+            (user.getLastName() == null ? "" : user.getLastName())).trim();
+        return new PendingJoinRequest(
+          request.getId(),
+          user.getId(),
+          name.isEmpty() ? "Ver perfil" : name
+        );
+      })
+      .toList();
+  }
+
+  @Override
+  public void updateSettings(
+    UUID id,
+    PlanPermission shareLink,
+    PlanPermission handleRequests,
+    String userEmail
+  ) {
+    Plan plan = getOwnedPlan(id, userEmail);
+    plan.getSettings().setShareLink(shareLink);
+    plan.getSettings().setHandleRequests(handleRequests);
+    planRepository.save(plan);
+  }
+
+  private void requireRequestManager(Plan plan, String userEmail) {
+    if (!plan.canHandleRequests(userEmail)) {
+      throw new PlanNotFoundException();
+    }
+  }
 
   @Autowired
   public PlanServiceImpl(
@@ -247,6 +350,7 @@ public class PlanServiceImpl implements PlanService { // NOPMD — intentional: 
       .orElseThrow(PlanNotFoundException::new);
     if (accept && !plan.isAdministrator(userEmail) && !plan.isParticipant(userEmail)) {
       plan.getParticipants().add(invitation.getRecipient());
+      plan.getJoinRequests().removeIf(item -> item.getRequester().getEmail().equals(userEmail));
       if (EDITOR_ROLE.equals(invitation.getRole())) {
         plan.getEditors().add(invitation.getRecipient());
       }
@@ -321,8 +425,13 @@ public class PlanServiceImpl implements PlanService { // NOPMD — intentional: 
       .orElseThrow(PlanNotFoundException::new);
     User user = userRepository.findByEmail(userEmail).orElseThrow(UserNotFoundException::new);
     if (!plan.isAdministrator(userEmail) && !plan.isParticipant(userEmail)) {
-      plan.getParticipants().add(user);
-      planRepository.save(plan);
+      if (plan.getIsPublic()) {
+        plan.getParticipants().add(user);
+        plan.getJoinRequests().removeIf(item -> item.getRequester().getEmail().equals(userEmail));
+        planRepository.save(plan);
+      } else {
+        addJoinRequest(plan, user);
+      }
     }
     return plan;
   }
