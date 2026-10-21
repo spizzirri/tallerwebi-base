@@ -333,6 +333,11 @@
                         </select>
                     </div>
                     <input th:unless="${canEditPlan}" type="hidden" name="role" value="guest" />
+                    <label for="invitation-channel" class="form-label">Enviar invitación</label>
+                    <select id="invitation-channel" name="channel" class="form-select mb-3">
+                        <option th:if="${canInviteInternal}" value="app">Dentro de la app</option>
+                        <option th:if="${canInviteByEmail}" value="email">Por email y en Mis planes</option>
+                    </select>
                     <button type="submit" class="btn btn-primary">Invitar</button>
                 </form>
                 <h5 id="participants-heading" class="fw-bold mb-3">

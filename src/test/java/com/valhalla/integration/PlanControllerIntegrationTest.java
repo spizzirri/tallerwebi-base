@@ -111,6 +111,94 @@ public class PlanControllerIntegrationTest {
   }
 
   @Test
+  public void permissionsPersistOnCreationAndSettingsAreOwnerOnly() throws Exception {
+    MvcResult result = mockMvc
+      .perform(
+        post("/plans")
+          .with(user(OWNER_EMAIL))
+          .with(csrf())
+          .param("name", "Plan con permisos")
+          .param("settings.shareLink", "PARTICIPANTS")
+          .param("settings.inviteInternal", "OWNER")
+          .param("settings.inviteByEmail", "EDITORS")
+          .param("settings.handleRequests", "EDITORS")
+      )
+      .andExpect(status().is3xxRedirection())
+      .andReturn();
+    UUID id = UUID.fromString(
+      result.getResponse().getRedirectedUrl().substring("/plans/".length())
+    );
+    entityManager.flush();
+    entityManager.clear();
+    Plan plan = planRepository.findById(id).orElseThrow();
+    assertThat(plan.getSettings().getInviteByEmail().name(), is("EDITORS"));
+    assertThat(plan.getSettings().getInviteInternal().name(), is("OWNER"));
+    assertThat(plan.getSettings().getShareLink().name(), is("PARTICIPANTS"));
+    mockMvc
+      .perform(get("/plans/" + id + "/settings").with(user(OWNER_EMAIL)))
+      .andExpect(status().isOk())
+      .andExpect(content().string(containsString("inviteByEmail")));
+    mockMvc
+      .perform(
+        post("/plans/" + id + "/settings")
+          .with(user(OTHER_EMAIL))
+          .with(csrf())
+          .param("shareLink", "OWNER")
+          .param("handleRequests", "OWNER")
+          .param("inviteInternal", "PARTICIPANTS")
+          .param("inviteByEmail", "PARTICIPANTS")
+      )
+      .andExpect(redirectedUrl(NOT_FOUND_REDIRECT));
+    assertThat(plan.getSettings().getInviteInternal().name(), is("OWNER"));
+  }
+
+  @Test
+  public void invitationLinkRequiresRecipientAndCsrfAndGetDoesNotAccept() throws Exception {
+    UUID id = givenPlanFor(ownerId, PLAN_NAME);
+    mockMvc
+      .perform(
+        post("/plans/" + id + "/participants/invite")
+          .with(user(OWNER_EMAIL))
+          .with(csrf())
+          .param("participantEmail", OTHER_EMAIL)
+          .param("channel", "email")
+      )
+      .andExpect(redirectedUrl("/plans/" + id));
+    Plan plan = planRepository.findById(id).orElseThrow();
+    String token = plan.getInvitations().getFirst().getToken();
+    String url = "/plans/" + id + "/invitations/" + token + "/accept";
+    mockMvc.perform(get(url)).andExpect(redirectedUrl("/auth/login?redirect=" + url));
+    mockMvc
+      .perform(get(url).with(user(OTHER_EMAIL)))
+      .andExpect(status().isOk())
+      .andExpect(view().name("pages/plans/accept-invitation"));
+    assertThat(plan.isParticipant(OTHER_EMAIL), is(false));
+    mockMvc.perform(post(url).with(user(OTHER_EMAIL))).andExpect(status().isForbidden());
+    mockMvc
+      .perform(post(url).with(user(OWNER_EMAIL)).with(csrf()))
+      .andExpect(redirectedUrl(NOT_FOUND_REDIRECT));
+    assertThat(plan.isParticipant(OTHER_EMAIL), is(false));
+    mockMvc
+      .perform(post(url).with(user(OTHER_EMAIL)).with(csrf()))
+      .andExpect(redirectedUrl("/plans/" + id));
+    assertThat(plan.isParticipant(OTHER_EMAIL), is(true));
+    mockMvc
+      .perform(post(url).with(user(OTHER_EMAIL)).with(csrf()))
+      .andExpect(redirectedUrl(NOT_FOUND_REDIRECT));
+  }
+
+  @Test
+  public void exploreRendersThirdStepAndAllPermissionFields() throws Exception {
+    mockMvc
+      .perform(get("/explore").with(user(OWNER_EMAIL)))
+      .andExpect(status().isOk())
+      .andExpect(content().string(containsString("settings.inviteInternal")))
+      .andExpect(content().string(containsString("settings.inviteByEmail")))
+      .andExpect(content().string(containsString("settings.handleRequests")))
+      .andExpect(content().string(containsString("settings.shareLink")));
+  }
+
+  @Test
   public void ownerAppearsInParticipantListAndCannotBeDemoted() throws Exception {
     UUID planId = givenPlanFor(this.ownerId, PLAN_NAME);
     mockMvc
@@ -1160,8 +1248,23 @@ public class PlanControllerIntegrationTest {
     this.planRepository.save(plan);
 
     this.mockMvc.perform(post("/plans/join").with(csrf()).param("shortCode", " join1234 "))
-      .andExpect(redirectedUrl("/plans/" + planId));
+      .andExpect(redirectedUrl("/plans/" + planId + "/public"));
     this.mockMvc.perform(post("/plans/join").with(csrf()).param("shortCode", "JOIN1234"))
+      .andExpect(redirectedUrl("/plans/" + planId + "/public"));
+    assertThat(plan.getJoinRequests(), hasSize(1));
+    assertThat(plan.isParticipant(OTHER_EMAIL), is(false));
+    this.mockMvc.perform(
+        post(
+          "/plans/" +
+          planId +
+          "/join-requests/" +
+          plan.getJoinRequests().getFirst().getId() +
+          "/respond"
+        )
+          .with(user(OWNER_EMAIL))
+          .with(csrf())
+          .param("action", "accept")
+      )
       .andExpect(redirectedUrl("/plans/" + planId));
     this.entityManager.flush();
     this.entityManager.clear();
@@ -1291,13 +1394,13 @@ public class PlanControllerIntegrationTest {
   }
 
   @Test
-  public void T_PVP_004_getPlansIdPublic_conPlanPrivadoRespondeIgualQueUnoInexistente()
+  public void T_PVP_004_getPlansIdPublic_privadoRedirigeALoginSinExponerContenido()
     throws Exception {
     UUID planId = givenPlanFor(this.ownerId, OTHER_PLAN_NAME);
 
     this.mockMvc.perform(get("/plans/" + planId + "/public"))
       .andExpect(status().is3xxRedirection())
-      .andExpect(redirectedUrl(NOT_FOUND_REDIRECT));
+      .andExpect(redirectedUrl("/auth/login?redirect=/plans/" + planId + "/public"));
 
     this.mockMvc.perform(get("/plans/" + MISSING_PLAN_ID + "/public"))
       .andExpect(status().is3xxRedirection())

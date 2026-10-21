@@ -41,6 +41,13 @@ public class PlanInvitation {
   @Column(nullable = false)
   private String role;
 
+  @Column(unique = true, length = 64)
+  private String token;
+
+  public String getToken() {
+    return token;
+  }
+
   protected PlanInvitation() {}
 
   public PlanInvitation(Plan plan, User recipient, User inviter, String role) {
@@ -48,6 +55,9 @@ public class PlanInvitation {
     this.recipient = recipient;
     this.inviter = inviter;
     this.role = role;
+    this.token =
+      java.util.UUID.randomUUID().toString() +
+      java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 28);
   }
 
   public Long getId() {

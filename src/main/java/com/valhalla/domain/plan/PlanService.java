@@ -14,6 +14,8 @@ public interface PlanService {
     UUID id,
     PlanPermission shareLink,
     PlanPermission handleRequests,
+    PlanPermission inviteInternal,
+    PlanPermission inviteByEmail,
     String userEmail
   );
 
@@ -27,6 +29,14 @@ public interface PlanService {
   void changeParticipantRole(UUID id, String participantEmail, String role, String userEmail);
   void removeParticipant(UUID id, String participantEmail, String userEmail);
   void inviteParticipant(UUID id, String participantEmail, String role, String userEmail);
+  void inviteParticipant(
+    UUID id,
+    String participantEmail,
+    String role,
+    String channel,
+    String userEmail
+  );
+  void acceptInvitationToken(UUID id, String token, String userEmail);
   List<PendingInvitation> getPendingInvitations(String userEmail);
   void respondToInvitation(UUID planId, Long invitationId, boolean accept, String userEmail);
 

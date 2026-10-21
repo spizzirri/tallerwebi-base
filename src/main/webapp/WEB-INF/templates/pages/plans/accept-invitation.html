@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head><th:block th:replace="~{layouts/base :: headContent('Aceptar invitación')}"></th:block></head>
+<body th:replace="~{layouts/base :: layout(~{::main})}">
+<main class="mx-auto w-full max-w-2xl flex-1 px-4 py-8">
+  <h1 class="text-2xl font-bold">Aceptar invitación</h1>
+  <p class="mt-4">Confirmá tu participación con la cuenta que recibió la invitación.</p>
+  <form th:action="@{/plans/{id}/invitations/{token}/accept(id=${planId},token=${token})}" method="post" class="mt-6">
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+    <button type="submit" class="rounded-md bg-primary px-4 py-2 font-medium text-white">Aceptar invitación</button>
+  </form>
+  <a th:href="@{/plans}" class="mt-6 inline-block text-blue-600 hover:underline">Volver a Mis planes</a>
+</main>
+</body>
+</html>

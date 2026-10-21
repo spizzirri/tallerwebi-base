@@ -36,6 +36,7 @@ public class PlaceController {
     Map<String, Object> model = new ModelMap();
     model.put(ATTR_PLACES, getPlaces(category, search));
     model.put("categories", PlaceCategory.values());
+    model.put("defaultPlanSettings", new com.valhalla.domain.plan.PlanSettings());
     model.put("category", category);
     model.put("search", search);
     // [WEA] El selector de fecha del plan no acepta días ya pasados.

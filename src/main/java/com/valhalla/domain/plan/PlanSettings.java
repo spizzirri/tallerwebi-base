@@ -38,6 +38,30 @@ public class PlanSettings {
     this.handleRequests = Objects.requireNonNull(handleRequests);
   }
 
+  @Enumerated(EnumType.STRING)
+  @Column(name = "invite_internal_permission")
+  private PlanPermission inviteInternal = PlanPermission.EDITORS;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "invite_email_permission")
+  private PlanPermission inviteByEmail = PlanPermission.OWNER;
+
+  public PlanPermission getInviteInternal() {
+    return inviteInternal == null ? PlanPermission.EDITORS : inviteInternal;
+  }
+
+  public void setInviteInternal(PlanPermission permission) {
+    inviteInternal = Objects.requireNonNull(permission);
+  }
+
+  public PlanPermission getInviteByEmail() {
+    return inviteByEmail == null ? PlanPermission.OWNER : inviteByEmail;
+  }
+
+  public void setInviteByEmail(PlanPermission permission) {
+    inviteByEmail = Objects.requireNonNull(permission);
+  }
+
   public boolean isSharingEnabled() {
     return getShareLink() != PlanPermission.OWNER;
   }

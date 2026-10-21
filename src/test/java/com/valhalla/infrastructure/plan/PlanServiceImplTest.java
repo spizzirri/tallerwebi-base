@@ -191,8 +191,86 @@ public class PlanServiceImplTest {
     verify(planRepositoryMock, never()).save(any());
   }
 
+  @Test
+  public void invitationChannelsEnforceIndependentPermissions() {
+    Plan plan = invitationPlan(false);
+    User editor = owner(9L, OTHER_EMAIL);
+    plan.getParticipants().add(editor);
+    plan.getEditors().add(editor);
+    User recipient = owner(10L, UNKNOWN_EMAIL);
+    when(userRepositoryMock.findByEmail(UNKNOWN_EMAIL)).thenReturn(Optional.of(recipient));
+    when(userRepositoryMock.findByEmail(OTHER_EMAIL)).thenReturn(Optional.of(editor));
+    assertThrows(
+      PlanNotFoundException.class,
+      () -> planService.inviteParticipant(PLAN_ID, UNKNOWN_EMAIL, "guest", "email", OTHER_EMAIL)
+    );
+    plan.getSettings().setInviteInternal(com.valhalla.domain.plan.PlanPermission.OWNER);
+    assertThrows(
+      PlanNotFoundException.class,
+      () -> planService.inviteParticipant(PLAN_ID, UNKNOWN_EMAIL, "guest", "app", OTHER_EMAIL)
+    );
+    plan.getSettings().setInviteInternal(com.valhalla.domain.plan.PlanPermission.PARTICIPANTS);
+    plan.getEditors().clear();
+    assertThrows(
+      PlanNotFoundException.class,
+      () -> planService.inviteParticipant(PLAN_ID, UNKNOWN_EMAIL, "editor", "app", OTHER_EMAIL)
+    );
+    planService.inviteParticipant(PLAN_ID, UNKNOWN_EMAIL, "guest", "app", OTHER_EMAIL);
+    assertThat(plan.getInvitations(), hasSize(1));
+  }
+
+  @Test
+  public void emailInvitationSendsTokenAndOnlyRecipientCanUseItOnce() {
+    Plan plan = invitationPlan(false);
+    User recipient = owner(9L, OTHER_EMAIL);
+    when(userRepositoryMock.findByEmail(OTHER_EMAIL)).thenReturn(Optional.of(recipient));
+    when(userRepositoryMock.findByEmail(OWNER_EMAIL))
+      .thenReturn(Optional.of(plan.getAdministrator()));
+    com.valhalla.domain.plan.EmailNotifier notifier = mock(
+      com.valhalla.domain.plan.EmailNotifier.class
+    );
+    org.springframework.test.util.ReflectionTestUtils.setField(
+      planService,
+      "emailNotifier",
+      notifier
+    );
+    planService.inviteParticipant(PLAN_ID, OTHER_EMAIL, "editor", "email", OWNER_EMAIL);
+    PlanInvitation invitation = plan.getInvitations().getFirst();
+    org.springframework.test.util.ReflectionTestUtils.setField(invitation, "id", 123L);
+    String token = invitation.getToken();
+    assertThat(token.length(), is(64));
+    verify(notifier).sendInvitation(OTHER_EMAIL, PLAN_ID, token);
+    assertThrows(
+      PlanNotFoundException.class,
+      () -> planService.acceptInvitationToken(PLAN_ID, token, UNKNOWN_EMAIL)
+    );
+    assertThrows(
+      PlanNotFoundException.class,
+      () -> planService.acceptInvitationToken(PLAN_ID, "invalid", OTHER_EMAIL)
+    );
+    planService.acceptInvitationToken(PLAN_ID, token, OTHER_EMAIL);
+    assertThat(plan.isParticipant(OTHER_EMAIL), is(true));
+    assertThat(plan.isEditor(OTHER_EMAIL), is(true));
+    assertThat(plan.getInvitations(), is(empty()));
+    assertThrows(
+      PlanNotFoundException.class,
+      () -> planService.acceptInvitationToken(PLAN_ID, token, OTHER_EMAIL)
+    );
+  }
+
+  @Test
+  public void invalidInvitationChannelDoesNotCreateInvitation() {
+    Plan plan = invitationPlan(false);
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> planService.inviteParticipant(PLAN_ID, OTHER_EMAIL, "guest", "unknown", OWNER_EMAIL)
+    );
+    assertThat(plan.getInvitations(), is(empty()));
+  }
+
   private Plan invitationPlan(boolean isPublic) {
     Plan plan = new Plan();
+    plan.setId(PLAN_ID);
     plan.setAdministrator(owner(OWNER_ID, OWNER_EMAIL));
     plan.setIsPublic(isPublic);
     when(planRepositoryMock.findById(PLAN_ID)).thenReturn(Optional.of(plan));

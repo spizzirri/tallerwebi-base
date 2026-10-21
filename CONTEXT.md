@@ -26,11 +26,12 @@ Plan through its shared link or Short Code. It grants no access until the owner,
 authorized, accepts it. Rejection removes the request without granting participation.
 The visitor sees only the name, description, date, place count and generic cover.
 
-**Plan settings**: Owner-managed capability permissions. In the PET prototype,
-sharing the link and handling join requests default to Owner. Sharing can extend to
-Editors or all Participants; handling requests can extend only to Editors. Owner-only
-sharing disables the private landing summary and request form. Invitation channel
-permissions and bans are deferred to later PET work.
+**Plan settings**: Owner-managed permissions for sharing links, inviting internally,
+inviting by email and handling join requests. Internal invitations default to Editors;
+other capabilities default to Owner. Sharing and inviting can extend to all Participants;
+handling requests can extend only to Editors. Owner-only sharing disables the private
+landing summary and request form. Only owners and Editors can propose the Editor role.
+Bans are deferred to their separate branch.
 
 ## Categories
 
@@ -60,7 +61,8 @@ Whether a plan can be read through its shared link. A boolean on the Plan, not a
 
 **Plan invitation**: A pending invitation sent by a registered User to another registered
 User for a Plan, with the proposed Participant or Editor role and the inviter's identity.
-Only the recipient can accept or reject it from My Plans. Sending an invitation does not
+Only the recipient can accept or reject it from My Plans. Email invitations also carry
+a single-use link: GET opens confirmation after login, POST accepts with CSRF protection. Sending an invitation does not
 grant participation or access to a private Plan. Acceptance grants the proposed role;
 rejection leaves participation unchanged. Both responses remove the pending invitation.
 

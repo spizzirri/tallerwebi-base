@@ -15,6 +15,9 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /** Shared JPA base between production and tests: only the DataSource and the dialect differ. */
 @Configuration
+@org.springframework.context.annotation.Import(
+  com.valhalla.infrastructure.email.EmailConfiguration.class
+)
 @EnableTransactionManagement
 @EnableJpaRepositories(basePackages = "com.valhalla.infrastructure")
 @ComponentScan("com.valhalla.infrastructure")

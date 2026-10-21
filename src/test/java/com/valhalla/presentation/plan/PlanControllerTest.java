@@ -174,18 +174,19 @@ public class PlanControllerTest {
   @Test
   public void T_PVP_001_showPublicPlan_retornaLaVistaYElPlanEnElModelo() {
     Plan plan = plan(PLAN_ID, "Viaje publico");
-    when(this.planServiceMock.getPublicPlan(PLAN_ID)).thenReturn(plan);
+    plan.setIsPublic(true);
+    when(this.planServiceMock.getSharedPlan(PLAN_ID)).thenReturn(plan);
 
     ModelAndView view = this.controller.showPublicPlan(PLAN_ID, this.authentication);
 
     assertThat(view.getViewName(), is(equalTo("pages/plans/public")));
     assertThat(view.getModel().get("plan"), is(sameInstance(plan)));
-    verify(this.planServiceMock, times(1)).getPublicPlan(PLAN_ID);
+    verify(this.planServiceMock, times(1)).getSharedPlan(PLAN_ID);
   }
 
   @Test
   public void T_PVP_002_showPublicPlan_propagaPlanNotFoundException() {
-    when(this.planServiceMock.getPublicPlan(MISSING_PLAN_ID))
+    when(this.planServiceMock.getSharedPlan(MISSING_PLAN_ID))
       .thenThrow(new PlanNotFoundException());
 
     assertThrows(
@@ -198,14 +199,14 @@ public class PlanControllerTest {
   public void T_PVP_008_showPublicPlan_conIdInexistentePropagaPlanNotFoundException() {
     // U-03: el id que nadie conoce sigue el mismo camino que un plan privado (U-02). La
     // distinción real vive en el servicio; acá se prueba que el controller no la filtra.
-    when(this.planServiceMock.getPublicPlan(UNKNOWN_PLAN_ID))
+    when(this.planServiceMock.getSharedPlan(UNKNOWN_PLAN_ID))
       .thenThrow(new PlanNotFoundException());
 
     assertThrows(
       PlanNotFoundException.class,
       () -> this.controller.showPublicPlan(UNKNOWN_PLAN_ID, this.authentication)
     );
-    verify(this.planServiceMock, times(1)).getPublicPlan(UNKNOWN_PLAN_ID);
+    verify(this.planServiceMock, times(1)).getSharedPlan(UNKNOWN_PLAN_ID);
   }
 
   @Test
@@ -215,7 +216,8 @@ public class PlanControllerTest {
     plan.addPlanPlace(stop(1L, "Aeropuerto", 1));
     plan.addPlanPlace(stop(2L, "Centro historico", 2));
     plan.addPlanPlace(stop(3L, "Mirador", 3));
-    when(this.planServiceMock.getPublicPlan(PLAN_ID)).thenReturn(plan);
+    plan.setIsPublic(true);
+    when(this.planServiceMock.getSharedPlan(PLAN_ID)).thenReturn(plan);
 
     // when
     ModelAndView view = this.controller.showPublicPlan(PLAN_ID, this.authentication);
@@ -233,7 +235,8 @@ public class PlanControllerTest {
   public void T_PVP_010_showPublicPlan_anonimoDejaLosFlagsEnFalsoYSinAtributosDeEdicion() {
     // given: con anonimo el Authentication existe, pero el principal no es un UserDetails
     Plan plan = plan(PLAN_ID, "Viaje publico");
-    when(this.planServiceMock.getPublicPlan(PLAN_ID)).thenReturn(plan);
+    plan.setIsPublic(true);
+    when(this.planServiceMock.getSharedPlan(PLAN_ID)).thenReturn(plan);
     Authentication anonymous = new AnonymousAuthenticationToken(
       "key",
       "anonymousUser",
@@ -256,7 +259,8 @@ public class PlanControllerTest {
     // given
     Plan plan = plan(PLAN_ID, "Viaje publico");
     plan.setShortCode("ABCD1234");
-    when(this.planServiceMock.getPublicPlan(PLAN_ID)).thenReturn(plan);
+    plan.setIsPublic(true);
+    when(this.planServiceMock.getSharedPlan(PLAN_ID)).thenReturn(plan);
     // El principal de una sesión real es un UserDetails, no un String (ver currentEmail)
     Authentication visitor = new UsernamePasswordAuthenticationToken(
       new org.springframework.security.core.userdetails.User(
@@ -286,7 +290,8 @@ public class PlanControllerTest {
     admin.setFirstName("Ana");
     admin.setLastName("Gomez");
     plan.setAdministrator(admin);
-    when(this.planServiceMock.getPublicPlan(PLAN_ID)).thenReturn(plan);
+    plan.setIsPublic(true);
+    when(this.planServiceMock.getSharedPlan(PLAN_ID)).thenReturn(plan);
 
     // when
     ModelAndView view = this.controller.showPublicPlan(PLAN_ID, this.authentication);
@@ -304,7 +309,8 @@ public class PlanControllerTest {
     admin.setFirstName("   ");
     admin.setLastName(null);
     plan.setAdministrator(admin);
-    when(this.planServiceMock.getPublicPlan(PLAN_ID)).thenReturn(plan);
+    plan.setIsPublic(true);
+    when(this.planServiceMock.getSharedPlan(PLAN_ID)).thenReturn(plan);
 
     // when
     ModelAndView view = this.controller.showPublicPlan(PLAN_ID, this.authentication);
@@ -324,7 +330,8 @@ public class PlanControllerTest {
     plan.setAdministrator(admin);
     plan.getParticipants().add(new User());
     plan.getParticipants().add(new User());
-    when(this.planServiceMock.getPublicPlan(PLAN_ID)).thenReturn(plan);
+    plan.setIsPublic(true);
+    when(this.planServiceMock.getSharedPlan(PLAN_ID)).thenReturn(plan);
 
     // when
     ModelAndView view = this.controller.showPublicPlan(PLAN_ID, this.authentication);
@@ -346,7 +353,8 @@ public class PlanControllerTest {
     PlanPlace entry = new PlanPlace();
     entry.setPlace(place);
     plan.addPlanPlace(entry);
-    when(this.planServiceMock.getPublicPlan(PLAN_ID)).thenReturn(plan);
+    plan.setIsPublic(true);
+    when(this.planServiceMock.getSharedPlan(PLAN_ID)).thenReturn(plan);
 
     // when
     ModelAndView view = this.controller.showPublicPlan(PLAN_ID, this.authentication);
@@ -523,7 +531,8 @@ public class PlanControllerTest {
   public void T_CAL_010_showPublicPlan_exponeElPromedioLaCantidadYLaCalificacionPropia() {
     // given
     Plan plan = plan(PLAN_ID, "Viaje publico");
-    when(this.planServiceMock.getPublicPlan(PLAN_ID)).thenReturn(plan);
+    plan.setIsPublic(true);
+    when(this.planServiceMock.getSharedPlan(PLAN_ID)).thenReturn(plan);
     // El principal de una sesion real es un UserDetails, no un String (ver currentEmail)
     Authentication visitor = new UsernamePasswordAuthenticationToken(
       new org.springframework.security.core.userdetails.User(
@@ -550,7 +559,8 @@ public class PlanControllerTest {
   public void T_CAL_010b_showPublicPlan_sinCalificacionesDejaPromedioNullYCountCero() {
     // given
     Plan plan = plan(PLAN_ID, "Viaje publico");
-    when(this.planServiceMock.getPublicPlan(PLAN_ID)).thenReturn(plan);
+    plan.setIsPublic(true);
+    when(this.planServiceMock.getSharedPlan(PLAN_ID)).thenReturn(plan);
 
     // when
     ModelAndView view = this.controller.showPublicPlan(PLAN_ID, this.authentication);
@@ -564,7 +574,8 @@ public class PlanControllerTest {
   public void T_CAL_010c_showPublicPlan_anonimoNoTieneCalificacionPropia() {
     // given: el anonimo ve el indicador pero nunca un widget de voto (AC-05)
     Plan plan = plan(PLAN_ID, "Viaje publico");
-    when(this.planServiceMock.getPublicPlan(PLAN_ID)).thenReturn(plan);
+    plan.setIsPublic(true);
+    when(this.planServiceMock.getSharedPlan(PLAN_ID)).thenReturn(plan);
     Authentication anonymous = new AnonymousAuthenticationToken(
       "key",
       "anonymousUser",
@@ -582,7 +593,7 @@ public class PlanControllerTest {
   public void T_CAL_011_ratePlan_calificaConElEmailDeLaSesionYVuelveALaVistaPublica() {
     // given
     RatingRequest form = new RatingRequest(4);
-    when(this.planServiceMock.getPublicPlan(PLAN_ID)).thenReturn(plan(PLAN_ID, "Viaje publico"));
+    when(this.planServiceMock.getSharedPlan(PLAN_ID)).thenReturn(plan(PLAN_ID, "Viaje publico"));
 
     // when
     ModelAndView view =

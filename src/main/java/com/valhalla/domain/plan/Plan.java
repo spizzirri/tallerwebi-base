@@ -68,6 +68,14 @@ public class Plan {
     return getSettings().getShareLink().allows(this, email);
   }
 
+  public boolean canInviteInternal(String email) {
+    return getSettings().getInviteInternal().allows(this, email);
+  }
+
+  public boolean canInviteByEmail(String email) {
+    return getSettings().getInviteByEmail().allows(this, email);
+  }
+
   public boolean canHandleRequests(String email) {
     return getSettings().getHandleRequests().allows(this, email);
   }

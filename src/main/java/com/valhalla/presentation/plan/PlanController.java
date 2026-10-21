@@ -82,7 +82,9 @@ public class PlanController {
     model.put("canEditPlan", plan.canEdit(userEmail));
     model.put("isPlanAdministrator", plan.isAdministrator(userEmail));
     model.put("isPlanParticipant", plan.isParticipant(userEmail));
-    model.put("canInvite", userEmail != null && plan.canEdit(userEmail));
+    model.put("canInviteInternal", plan.canInviteInternal(userEmail));
+    model.put("canInviteByEmail", plan.canInviteByEmail(userEmail));
+    model.put("canInvite", plan.canInviteInternal(userEmail) || plan.canInviteByEmail(userEmail));
     model.put(
       "canShareLink",
       plan.canShareLink(userEmail) && (plan.getIsPublic() || plan.getSettings().isSharingEnabled())
@@ -227,9 +229,18 @@ public class PlanController {
     @PathVariable UUID id,
     @RequestParam PlanPermission shareLink,
     @RequestParam PlanPermission handleRequests,
+    @RequestParam PlanPermission inviteInternal,
+    @RequestParam PlanPermission inviteByEmail,
     Authentication authentication
   ) {
-    planService.updateSettings(id, shareLink, handleRequests, authentication.getName());
+    planService.updateSettings(
+      id,
+      shareLink,
+      handleRequests,
+      inviteInternal,
+      inviteByEmail,
+      authentication.getName()
+    );
     return new ModelAndView(REDIRECT_PLAN_DETAIL + id + "/settings?saved=true");
   }
 
@@ -285,10 +296,12 @@ public class PlanController {
       // un POST inválido vuelve a esa vista en vez de re-renderizar pages/plans/new.
       return new ModelAndView(REDIRECT_EXPLORE);
     }
-    Plan created = planService.createPlan(
-      toPlanOrderedByVisitTime(planForm),
-      authentication.getName()
-    );
+    Plan draft = toPlanOrderedByVisitTime(planForm);
+    draft.getSettings().setShareLink(planForm.getSettings().getShareLink());
+    draft.getSettings().setHandleRequests(planForm.getSettings().getHandleRequests());
+    draft.getSettings().setInviteInternal(planForm.getSettings().getInviteInternal());
+    draft.getSettings().setInviteByEmail(planForm.getSettings().getInviteByEmail());
+    Plan created = planService.createPlan(draft, authentication.getName());
     return new ModelAndView(REDIRECT_PLAN_DETAIL + created.getId());
   }
 
@@ -345,11 +358,37 @@ public class PlanController {
     return new ModelAndView(REDIRECT_PLAN_DETAIL + id);
   }
 
+  @GetMapping("/{id}/invitations/{token}/accept")
+  public ModelAndView acceptInvitationLink(
+    @PathVariable UUID id,
+    @PathVariable String token,
+    Authentication authentication
+  ) {
+    String email = currentEmail(authentication);
+    if (email == null) {
+      return new ModelAndView(
+        "redirect:/auth/login?redirect=/plans/" + id + "/invitations/" + token + "/accept"
+      );
+    }
+    return new ModelAndView("pages/plans/accept-invitation", Map.of("planId", id, "token", token));
+  }
+
+  @PostMapping("/{id}/invitations/{token}/accept")
+  public ModelAndView acceptInvitationLinkPost(
+    @PathVariable UUID id,
+    @PathVariable String token,
+    Authentication authentication
+  ) {
+    planService.acceptInvitationToken(id, token, authentication.getName());
+    return new ModelAndView(REDIRECT_PLAN_DETAIL + id);
+  }
+
   @PostMapping("/{id}/participants/invite")
   public ModelAndView inviteParticipant(
     @PathVariable UUID id,
     @RequestParam String participantEmail,
     @RequestParam(defaultValue = "guest") String role,
+    @RequestParam(defaultValue = "app") String channel,
     Authentication authentication,
     org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes
   ) {
@@ -358,11 +397,17 @@ public class PlanController {
         id,
         participantEmail,
         role,
+        channel,
         authentication == null ? null : authentication.getName()
       );
       redirectAttributes.addFlashAttribute(
         "invitationSuccess",
         "Invitación enviada. La persona podrá aceptarla o rechazarla en Mis planes."
+      );
+    } catch (org.springframework.mail.MailException exception) {
+      redirectAttributes.addFlashAttribute(
+        "invitationError",
+        "No se pudo enviar el email. Revisá la configuración SMTP o usá la invitación dentro de la app."
       );
     } catch (IllegalArgumentException exception) {
       redirectAttributes.addFlashAttribute("invitationError", exception.getMessage());
