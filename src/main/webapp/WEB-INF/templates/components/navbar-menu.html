@@ -4,8 +4,8 @@
 
   <!-- [PROF] Menú modal del navbar (AC-17/AC-18). Renderizado como hermano del <nav> en
        base.html: los helpers E2E cuentan "body > nav a, body > nav button", y este panel no
-       pertenece ahí. Cero <a>/<button> navegables entre las entradas "Pronto": son spans con
-       aria-disabled, se activan con MARK/FOLLOW (el anchor ya existe en /profile). -->
+       pertenece ahí. Las entradas "Pronto" son spans con aria-disabled y siguen inertes; [FOLLOW]
+       ya activo "Siguiendo" como link a #follow del perfil. -->
 
   <!-- z 1100 y no 50: /explore (places/list.html) deja el <nav> sticky con z-index 1000 para
        ganarle a las capas del mapa Leaflet (~800 max), y con el z-50 original el panel quedaba
@@ -60,8 +60,10 @@
         <span class="ml-auto rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-semibold text-gray-500">Pronto</span>
       </span>
 
-      <span role="menuitem" aria-disabled="true" data-soon="true"
-        class="flex items-center gap-2 px-4 py-2 text-gray-400">
+      <!-- [FOLLOW] AC-06: "Siguiendo" ya es navegable y lleva a la seccion #follow del perfil
+           propio (el atajo /profile resuelve el id y el fragmento sobrevive al 302). -->
+      <a role="menuitem" th:href="@{/profile#follow}" id="menu-following"
+        class="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100" data-menu-item>
         <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -69,8 +71,7 @@
           <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
         </svg>
         Siguiendo
-        <span class="ml-auto rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-semibold text-gray-500">Pronto</span>
-      </span>
+      </a>
 
       <div class="border-t border-gray-100 my-1"></div>
 

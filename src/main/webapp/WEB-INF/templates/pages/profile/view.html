@@ -1,5 +1,6 @@
 <!DOCTYPE HTML>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head th:replace="~{layouts/base :: head('Perfil - PlanIt')}"></head>
 
@@ -11,18 +12,37 @@
     <div class="mx-auto max-w-3xl space-y-6">
 
       <div class="rounded-lg bg-white p-8 shadow-md">
-        <div class="flex items-center gap-4">
+        <div class="flex flex-wrap items-center gap-4">
           <img th:if="${profileAvatarUrl != null}" th:src="${profileAvatarUrl}" alt="Avatar"
             class="h-16 w-16 rounded-full object-cover" />
           <span th:unless="${profileAvatarUrl != null}"
             class="navbar-avatar inline-flex h-16 w-16 items-center justify-center rounded-full bg-secondary font-serif text-2xl font-bold text-black"
             th:text="${ownerInitial}" role="img" th:attr="aria-label=${profileName}">U</span>
-          <div>
+          <div class="flex-1">
             <h1 class="text-2xl font-semibold text-gray-900" th:text="${profileName}">Nombre</h1>
+            <!-- [FOLLOW] AC-04: los dos contadores son los reales, no el placeholder de [PROF]. -->
             <p class="text-sm text-gray-500">
-              <span th:text="${followerCount}">0</span> seguidores
+              <span th:text="${followerCount}">0</span> seguidores ·
+              <span th:text="${followingCount}">0</span> seguidos
             </p>
           </div>
+
+          <!-- [FOLLOW] AC-01/AC-13: seguir es un POST con CSRF y la identidad sale de la sesion;
+               el path solo nombra al seguido. AC-10: el anonimo hace soft gate al login. -->
+          <div sec:authorize="isAuthenticated()">
+            <form method="post"
+              th:action="${isFollowing} ? @{/profile/{id}/unfollow(id=${owner.id})} : @{/profile/{id}/follow(id=${owner.id})}">
+              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+              <button type="submit" id="btn-follow"
+                class="rounded-md bg-primary px-4 py-2 font-medium text-white transition hover:bg-secondary"
+                th:text="${isFollowing} ? 'Dejar de seguir' : 'Seguir'">Seguir</button>
+            </form>
+          </div>
+          <a sec:authorize="!isAuthenticated()" id="btn-follow-anon"
+            th:href="@{/auth/login(redirect=${'/profile/' + owner.id})}"
+            class="rounded-md bg-primary px-4 py-2 font-medium text-white transition hover:bg-secondary">
+            Seguir
+          </a>
         </div>
       </div>
 
@@ -60,6 +80,62 @@
 
         <div th:if="${profilePlans.isEmpty()}" class="rounded-md bg-white p-10 text-center shadow-md">
           <p class="text-lg text-gray-600">Este usuario todavia no comparte planes publicos.</p>
+        </div>
+      </section>
+
+      <!-- [FOLLOW] AC-05: las dos listas del perfil, cada entrada con avatar, nombre y link al
+           perfil del usuario. Sin email ni rol (AC-12) y sin paginacion (limitacion aceptada). -->
+      <section id="follow" class="rounded-lg bg-white p-8 shadow-md">
+        <h2 class="text-lg font-semibold text-gray-900">Seguidores y seguidos</h2>
+        <p class="mt-1 text-sm text-gray-500">
+          <span th:text="${followerCount}">0</span> seguidores ·
+          <span th:text="${followingCount}">0</span> seguidos
+        </p>
+
+        <div class="mt-6 grid gap-6 sm:grid-cols-2">
+          <div>
+            <h3 class="mb-2 text-sm font-semibold text-gray-700">Seguidores</h3>
+            <ul th:if="${!followers.isEmpty()}" data-testid="followers-list" class="space-y-2">
+              <li th:each="follower : ${followers}">
+                <a th:href="@{/profile/{id}(id=${follower.id})}"
+                  class="flex items-center gap-2 text-sm text-blue-600 hover:underline">
+                  <img th:if="${follower.avatarUrl != null}" th:src="${follower.avatarUrl}" alt=""
+                    class="h-8 w-8 rounded-full object-cover" />
+                  <span th:unless="${follower.avatarUrl != null}"
+                    class="navbar-avatar inline-flex h-8 w-8 items-center justify-center rounded-full bg-secondary font-serif text-sm font-bold text-black"
+                    th:text="${#strings.isEmpty(follower.firstName)} ? 'U' : ${#strings.substring(follower.firstName, 0, 1)}"
+                    aria-hidden="true">U</span>
+                  <span
+                    th:text="${((follower.firstName == null ? '' : follower.firstName) + ' ' + (follower.lastName == null ? '' : follower.lastName)).trim()}">Nombre</span>
+                </a>
+              </li>
+            </ul>
+            <p th:if="${followers.isEmpty()}" class="text-sm text-gray-500">
+              Todavía no tiene seguidores.
+            </p>
+          </div>
+
+          <div>
+            <h3 class="mb-2 text-sm font-semibold text-gray-700">Seguidos</h3>
+            <ul th:if="${!following.isEmpty()}" data-testid="following-list" class="space-y-2">
+              <li th:each="seguido : ${following}">
+                <a th:href="@{/profile/{id}(id=${seguido.id})}"
+                  class="flex items-center gap-2 text-sm text-blue-600 hover:underline">
+                  <img th:if="${seguido.avatarUrl != null}" th:src="${seguido.avatarUrl}" alt=""
+                    class="h-8 w-8 rounded-full object-cover" />
+                  <span th:unless="${seguido.avatarUrl != null}"
+                    class="navbar-avatar inline-flex h-8 w-8 items-center justify-center rounded-full bg-secondary font-serif text-sm font-bold text-black"
+                    th:text="${#strings.isEmpty(seguido.firstName)} ? 'U' : ${#strings.substring(seguido.firstName, 0, 1)}"
+                    aria-hidden="true">U</span>
+                  <span
+                    th:text="${((seguido.firstName == null ? '' : seguido.firstName) + ' ' + (seguido.lastName == null ? '' : seguido.lastName)).trim()}">Nombre</span>
+                </a>
+              </li>
+            </ul>
+            <p th:if="${following.isEmpty()}" class="text-sm text-gray-500">
+              Todavía no sigue a nadie.
+            </p>
+          </div>
         </div>
       </section>
 

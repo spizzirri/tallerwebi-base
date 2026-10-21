@@ -26,11 +26,28 @@
           </a>
         </div>
 
+        <!-- [FOLLOW] AC-07: dos scopes del mismo feed. El scope viaja en la URL (compartible) y
+             "Siguiendo" sin sesion rebota al login con vuelta a esta misma pestana (AC-10). -->
+        <nav class="mb-4 flex gap-2" aria-label="Alcance del feed">
+          <a th:href="@{/for-you}"
+            th:classappend="${followingScope} ? 'bg-white text-gray-700' : 'bg-primary text-white'"
+            class="rounded-full px-4 py-2 text-sm font-medium transition hover:bg-secondary">
+            Para vos
+          </a>
+          <a th:href="@{/for-you(scope='following')}"
+            th:classappend="${followingScope} ? 'bg-primary text-white' : 'bg-white text-gray-700'"
+            class="rounded-full px-4 py-2 text-sm font-medium transition hover:bg-secondary">
+            Siguiendo
+          </a>
+        </nav>
+
         <!-- [SEARCH] Busqueda, filtro y orden del feed: un form GET a la misma ruta, sin
              JavaScript, asi la URL resultante se comparte. El contenedor sticky mantiene los
              controles visibles mientras se recorre la grilla. -->
         <div class="sticky top-0 z-10 mb-6 bg-gray-100 pb-3 pt-1">
           <form method="get" th:action="@{/for-you}" class="flex flex-wrap items-end gap-3">
+            <!-- [FOLLOW] El scope no se pierde al buscar: viaja como hidden en el mismo GET. -->
+            <input type="hidden" name="scope" value="following" th:if="${followingScope}" />
             <label class="flex flex-1 flex-col text-sm text-gray-600">
               Buscar
               <input type="search" name="q" th:value="${q}"
@@ -149,9 +166,34 @@
           </article>
         </div>
 
+        <!-- [FOLLOW] AC-09: estado vacio propio del scope Siguiendo, distinto del de filtros de
+             [SEARCH] y del historico de [PPV]. Sin seguidos el problema no son los filtros. -->
+        <div th:if="${followingScope and followsNobody}"
+          data-testid="following-empty" class="rounded-md bg-white p-10 text-center shadow-md">
+          <p class="mb-4 text-lg text-gray-600">Todavía no seguís a nadie.</p>
+          <p class="mb-4 text-sm text-gray-500">
+            Seguí a otros usuarios desde su perfil y sus planes públicos aparecen acá.
+          </p>
+          <a th:href="@{/for-you}"
+            class="inline-block rounded-md bg-primary px-6 py-3 font-medium text-white transition hover:bg-secondary">
+            Ver todos los planes
+          </a>
+          <a th:href="@{/explore}"
+            class="ml-2 inline-block rounded-md px-6 py-3 font-medium text-gray-700 underline hover:text-gray-900">
+            Explorar usuarios
+          </a>
+        </div>
+
+        <!-- [FOLLOW] AC-09: los seguidos existen pero no publicaron nada publico todavia. -->
+        <div
+          th:if="${publicPlans.isEmpty() and followingScope and !followsNobody and !filtersApplied}"
+          data-testid="following-no-plans" class="rounded-md bg-white p-10 text-center shadow-md">
+          <p class="text-lg text-gray-600">Los usuarios que seguís no tienen planes públicos.</p>
+        </div>
+
         <!-- Estado vacio con filtros activos (AC-09): no es lo mismo que una base sin planes
              publicos, asi que ofrece la salida de limpiar el query string. -->
-        <div th:if="${publicPlans.isEmpty() and filtersApplied}"
+        <div th:if="${publicPlans.isEmpty() and filtersApplied and !(followingScope and followsNobody)}"
           class="rounded-md bg-white p-10 text-center shadow-md">
           <p class="mb-4 text-lg text-gray-600">No encontramos planes con esos filtros.</p>
           <a th:href="@{/for-you}"
@@ -162,7 +204,7 @@
 
         <!-- Estado vacio historico (AC-06): amigable y con salida a la creacion, ya que quien llega
              aca tiene sesion y no necesita registrarse de nuevo. -->
-        <div th:if="${publicPlans.isEmpty() and !filtersApplied}"
+        <div th:if="${publicPlans.isEmpty() and !filtersApplied and !followingScope}"
           class="rounded-md bg-white p-10 text-center shadow-md">
           <p class="mb-4 text-lg text-gray-600">Todavía no hay planes públicos.</p>
           <a th:href="@{/explore}"
