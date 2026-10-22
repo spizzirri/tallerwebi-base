@@ -9,18 +9,19 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.web.PathPatternRequestMatcherBuilderFactoryBean;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
+import org.springframework.security.web.SecurityFilterChain;
 
 /**
  * Configuración de seguridad para la aplicación.
  */
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+public class SecurityConfig {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SecurityConfig.class);
 
@@ -28,33 +29,47 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
   private ServicioGoogleOAuth2 servicioGoogleOAuth2;
 
   /**
+   * Hace que requestMatchers(String...) interprete las rutas con PathPattern. Sin este bean,
+   * Spring Security falla al arrancar si el contenedor registra más de un servlet (ej. el de JSP).
+   *
+   * @return la fábrica del constructor de matchers basados en PathPattern
+   */
+  @Bean
+  public static PathPatternRequestMatcherBuilderFactoryBean requestMatcherBuilder() {
+    return new PathPatternRequestMatcherBuilderFactoryBean();
+  }
+
+  /**
    * Configura las reglas de seguridad HTTP, incluyendo la protección CSRF,
    * las rutas públicas/privadas y la integración del flujo de inicio de sesión con OAuth2.
    *
    * @param http el objeto HttpSecurity utilizado para configurar la seguridad web
+   * @return la cadena de filtros de seguridad configurada
    * @throws Exception si ocurre un error en la configuración
    */
-  @Override
-  protected void configure(HttpSecurity http) throws Exception {
-    http
+  @Bean
+  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    return http
       // Protección CSRF omitida por fines pedagógicos para enfocarse en la integración de OAuth2 y Spring MVC. IMPORTANTE: Habilitar en entornos de producción.
-      .csrf()
-      .disable()
+      .csrf(csrf -> csrf.disable())
       // Configuramos qué rutas son públicas y cuáles requieren autenticación
-      .authorizeRequests()
-      .antMatchers("/login", "/registrarme", "/nuevo-usuario", "/css/**", "/js/**", "/home")
-      .permitAll()
-      .anyRequest()
-      .authenticated()
-      .and()
+      .authorizeHttpRequests(autorizacion ->
+        autorizacion
+          .requestMatchers("/login", "/registrarme", "/nuevo-usuario", "/css/**", "/js/**", "/home")
+          .permitAll()
+          .anyRequest()
+          .authenticated()
+      )
       // Configuramos el inicio de sesión con OAuth2/OpenID Connect (Google)
-      .oauth2Login()
-      .loginPage("/login")
-      .defaultSuccessUrl("/home", true)
-      .failureUrl("/login?error=true")
-      // Configuramos nuestro servicio personalizado para procesar la información del usuario tras el login
-      .userInfoEndpoint()
-      .oidcUserService(servicioGoogleOAuth2);
+      .oauth2Login(oauth2 ->
+        oauth2
+          .loginPage("/login")
+          .defaultSuccessUrl("/home", true)
+          .failureUrl("/login?error=true")
+          // Configuramos nuestro servicio personalizado para procesar la información del usuario tras el login
+          .userInfoEndpoint(userInfo -> userInfo.oidcUserService(servicioGoogleOAuth2))
+      )
+      .build();
   }
 
   /**
@@ -95,7 +110,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
       .clientId(clientId)
       .clientSecret(clientSecret)
       .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-      .redirectUriTemplate("{baseUrl}/login/oauth2/code/{registrationId}")
+      .redirectUri("{baseUrl}/login/oauth2/code/{registrationId}")
       .scope("openid", "profile", "email")
       .authorizationUri("https://accounts.google.com/o/oauth2/v2/auth?prompt=select_account")
       .tokenUri("https://www.googleapis.com/oauth2/v4/token")

@@ -3,7 +3,7 @@ package com.tallerwebi;
 import com.tallerwebi.config.DatabaseInitializationConfig;
 import com.tallerwebi.config.HibernateConfig;
 import com.tallerwebi.config.SpringWebConfig;
-import javax.servlet.Filter;
+import jakarta.servlet.Filter;
 import org.springframework.web.filter.DelegatingFilterProxy;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 

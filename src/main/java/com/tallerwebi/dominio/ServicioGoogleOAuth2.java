@@ -9,4 +9,5 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
  * Google OAuth2/OpenID Connect. Extiende de {@link OAuth2UserService} para integrar
  * el flujo de carga de usuario de Spring Security.
  */
+@SuppressWarnings("PMD.ImplicitFunctionalInterface")
 public interface ServicioGoogleOAuth2 extends OAuth2UserService<OidcUserRequest, OidcUser> {}
