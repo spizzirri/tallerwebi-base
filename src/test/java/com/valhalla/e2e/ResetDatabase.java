@@ -31,6 +31,10 @@ public class ResetDatabase {
       // arranca antes que cualquier test, asi que un DELETE aca dejaria la base de E2E sin
       // dataset para siempre. El ABM E2E limpia el lugar que crea (E-06); el seed queda intacto.
       "DELETE FROM plans",
+      // [FOLLOW] La relacion follower/followed apunta a users: sin este DELETE, borrar users
+      // falla por FK en cuanto un E2E dejo una relacion (el test siguiente moriria en el reset,
+      // no en el flujo).
+      "DELETE FROM follows",
       "DELETE FROM users",
       "ALTER SEQUENCE users_id_seq RESTART WITH 1",
       // [12-DATA] ResetDatabase habla SQL directo: los nombres mapean a firstname/lastname,

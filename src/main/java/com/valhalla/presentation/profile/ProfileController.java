@@ -2,6 +2,7 @@ package com.valhalla.presentation.profile;
 
 import com.valhalla.domain.bookmark.PlanBookmarkService;
 import com.valhalla.domain.exception.UserNotFoundException;
+import com.valhalla.domain.follow.FollowService;
 import com.valhalla.domain.plan.Plan;
 import com.valhalla.domain.plan.PlanService;
 import com.valhalla.domain.user.User;
@@ -20,7 +21,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -44,22 +44,27 @@ public class ProfileController {
   private static final String VIEW_EDIT = "pages/profile/edit";
   private static final String VIEW_PUBLIC = "pages/profile/view";
   private static final String VIEW_CHANGE_PASSWORD = "pages/profile/change-password";
+  private static final String VIEW_ERROR = "pages/error";
+  private static final String REDIRECT_PROFILE = "redirect:/profile/";
 
   private static final String ERROR_NOT_FOUND = "User not found";
 
   private final UserService userService;
   private final PlanService planService;
   private final PlanBookmarkService planBookmarkService;
+  private final FollowService followService;
 
   @Autowired
   public ProfileController(
     UserService userService,
     PlanService planService,
-    PlanBookmarkService planBookmarkService
+    PlanBookmarkService planBookmarkService,
+    FollowService followService
   ) {
     this.userService = userService;
     this.planService = planService;
     this.planBookmarkService = planBookmarkService;
+    this.followService = followService;
   }
 
   /**
@@ -69,7 +74,7 @@ public class ProfileController {
    */
   @GetMapping
   public String own(Authentication authentication) {
-    return "redirect:/profile/" + sessionUser(authentication).getId();
+    return REDIRECT_PROFILE + sessionUser(authentication).getId();
   }
 
   /**
@@ -86,11 +91,7 @@ public class ProfileController {
     } catch (UserNotFoundException e) {
       // AC-20: un perfil inexistente responde 404 real, no el redirect /admin/users del
       // GlobalExceptionHandler (esa pagina es del ABM admin, no del area de perfil).
-      return new ModelAndView(
-        "pages/error",
-        Map.of("error", ERROR_NOT_FOUND),
-        HttpStatus.NOT_FOUND
-      );
+      return notFound();
     }
 
     if (isSelf(authentication, owner)) {
@@ -100,8 +101,36 @@ public class ProfileController {
       );
       return new ModelAndView(VIEW_EDIT, model);
     }
-    Map<String, Object> model = publicModel(owner, viewerEmail(authentication));
-    return new ModelAndView(VIEW_PUBLIC, model);
+    return new ModelAndView(VIEW_PUBLIC, publicModel(owner, authentication));
+  }
+
+  /**
+   * [FOLLOW] Seguir al dueno del perfil: el path solo nombra al SEGUIDO, la identidad del
+   * seguidor sale de la sesion (AC-13). Seguirse a si mismo es un no-op (AC-03): el perfil propio
+   * no ofrece el boton y un POST directo no crea nada. Un id inexistente responde el mismo 404
+   * que la vista (AC-01).
+   */
+  @PostMapping("/{id:[\\d]+}/follow")
+  public ModelAndView follow(@PathVariable Long id, Authentication authentication) {
+    Long myId = sessionUser(authentication).getId();
+    if (!myId.equals(id)) {
+      try {
+        followService.follow(myId, id);
+      } catch (UserNotFoundException e) {
+        return notFound();
+      }
+    }
+    return new ModelAndView(REDIRECT_PROFILE + id);
+  }
+
+  /**
+   * [FOLLOW] Dejar de seguir: misma regla de identidad que el follow (AC-13) y no-op si la
+   * relacion no existia (AC-02).
+   */
+  @PostMapping("/{id:[\\d]+}/unfollow")
+  public ModelAndView unfollow(@PathVariable Long id, Authentication authentication) {
+    followService.unfollow(sessionUser(authentication).getId(), id);
+    return new ModelAndView(REDIRECT_PROFILE + id);
   }
 
   /**
@@ -132,7 +161,7 @@ public class ProfileController {
       form.getLastName(),
       form.getAvatarUrl()
     );
-    return new ModelAndView("redirect:/profile/" + me.getId() + "?updated=true");
+    return new ModelAndView(REDIRECT_PROFILE + me.getId() + "?updated=true");
   }
 
   /** [PROF] Form de cambio de contrasena (AC-06). Sin id en el path, por las mismas razones. */
@@ -168,7 +197,7 @@ public class ProfileController {
       bindingResult.rejectValue("currentPassword", null, "La contrasena actual no es correcta");
       return new ModelAndView(VIEW_CHANGE_PASSWORD);
     }
-    return new ModelAndView("redirect:/profile/" + me.getId() + "?passwordChanged=true");
+    return new ModelAndView(REDIRECT_PROFILE + me.getId() + "?passwordChanged=true");
   }
 
   /** Usuario en sesion. En autenticado real el principal es {@code UserDetails} y su nombre es
@@ -193,8 +222,9 @@ public class ProfileController {
   }
 
   /**
-   * Modelo del editor (AC-01): datos del dueño + form pre-cargado. El email y el rol viajan
-   * read-only: nadie los edita por este lado.
+   * Modelo del editor (AC-01): datos del dueno + form pre-cargado. El email y el rol viajan
+   * read-only: nadie los edita por este lado. [FOLLOW] suma los conteos y las listas del usuario
+   * en sesion para su seccion {@code #follow} (AC-05).
    */
   private Map<String, Object> editModel(User owner, ProfileForm form) {
     Map<String, Object> model = new LinkedHashMap<>();
@@ -210,18 +240,20 @@ public class ProfileController {
         .map(BookmarkCards::card)
         .toList()
     );
+    putFollowData(model, owner);
     return model;
   }
 
   /**
-   * Modelo de la vista publica (AC-15): cards del feed para los plans publicos del dueno,
-   * re-usando exactamente el mismo payload de /for-you (sin email ni participantes). El
-   * contador de seguidores es placeholder (0) hasta que [FOLLOW] aterrice.
+   * Modelo de la vista publica (AC-15): cards del feed para los planes publicos del dueno,
+   * re-usando exactamente el mismo payload de /for-you (sin email ni participantes). [FOLLOW] los
+   * conteos son los reales y el visitante con sesion sabe si ya lo sigue (AC-04).
    *
    * <p>[MARK] El visitante con sesion ve el toggle de Guardados en cada card; el anonimo no. Un
    * solo lookup alimenta todas las cards de la pagina.
    */
-  private Map<String, Object> publicModel(User owner, String viewer) {
+  private Map<String, Object> publicModel(User owner, Authentication authentication) {
+    String viewer = viewerEmail(authentication);
     Set<UUID> bookmarkedPlanIds = viewer == null
       ? Set.of()
       : this.planBookmarkService.getBookmarkedPlanIds(viewer);
@@ -230,8 +262,14 @@ public class ProfileController {
     model.put("ownerInitial", initialOf(owner));
     model.put("profileName", displayName(owner));
     model.put("profileAvatarUrl", owner.getAvatarUrl());
-    model.put("followerCount", 0L);
     model.put("canBookmark", viewer != null);
+    putFollowData(model, owner);
+    Long viewerId = sessionUserId(authentication);
+    // El anonimo nunca sigue a nadie: false sin tocar la tabla (AC-10).
+    model.put(
+      "isFollowing",
+      viewerId != null && followService.isFollowing(viewerId, owner.getId())
+    );
     model.put(
       "profilePlans",
       publicPlansOf(owner)
@@ -242,6 +280,31 @@ public class ProfileController {
         .toList()
     );
     return model;
+  }
+
+  /**
+   * [FOLLOW] Conteos agregados y listas ordenadas del perfil (AC-04, AC-05, AC-15). Al template
+   * solo llegan nombre, avatar y link al perfil: ni email ni rol (AC-12).
+   */
+  private void putFollowData(Map<String, Object> model, User owner) {
+    model.put("followerCount", followService.countFollowers(owner.getId()));
+    model.put("followingCount", followService.countFollowing(owner.getId()));
+    model.put("followers", followService.followers(owner.getId()));
+    model.put("following", followService.following(owner.getId()));
+  }
+
+  /** Id del visitante con sesion; {@code null} para el anonimo, que no tiene fila en users. */
+  private Long sessionUserId(Authentication authentication) {
+    Object principal = authentication == null ? null : authentication.getPrincipal();
+    if (!(principal instanceof UserDetails)) {
+      return null;
+    }
+    return userService.getByEmail(authentication.getName()).getId();
+  }
+
+  /** Mismo 404 que la vista del perfil: un id inexistente no es un error del servidor. */
+  private static ModelAndView notFound() {
+    return new ModelAndView(VIEW_ERROR, Map.of("error", ERROR_NOT_FOUND), HttpStatus.NOT_FOUND);
   }
 
   /** Solo planes PUBLICOS del dueño (AC-15): los privados no aparecen en ninguna vista. */

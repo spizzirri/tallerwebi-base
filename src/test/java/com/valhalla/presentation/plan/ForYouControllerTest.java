@@ -9,13 +9,17 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.valhalla.domain.bookmark.PlanBookmarkService;
+import com.valhalla.domain.follow.FollowService;
 import com.valhalla.domain.place.Place;
 import com.valhalla.domain.place.PlaceCategory;
 import com.valhalla.domain.plan.Plan;
@@ -24,6 +28,7 @@ import com.valhalla.domain.planplace.PlanPlace;
 import com.valhalla.domain.rating.PlanRatingService;
 import com.valhalla.domain.rating.RatingSummary;
 import com.valhalla.domain.user.User;
+import com.valhalla.domain.user.UserService;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -58,6 +63,8 @@ public class ForYouControllerTest {
   private PlanService planServiceMock;
   private PlanRatingService planRatingServiceMock;
   private PlanBookmarkService planBookmarkServiceMock;
+  private FollowService followServiceMock;
+  private UserService userServiceMock;
   private Authentication authentication;
 
   @BeforeEach
@@ -65,11 +72,15 @@ public class ForYouControllerTest {
     this.planServiceMock = mock(PlanService.class);
     this.planRatingServiceMock = mock(PlanRatingService.class);
     this.planBookmarkServiceMock = mock(PlanBookmarkService.class);
+    this.followServiceMock = mock(FollowService.class);
+    this.userServiceMock = mock(UserService.class);
     this.controller =
       new ForYouController(
         this.planServiceMock,
         this.planRatingServiceMock,
-        this.planBookmarkServiceMock
+        this.planBookmarkServiceMock,
+        this.followServiceMock,
+        this.userServiceMock
       );
     this.authentication = new UsernamePasswordAuthenticationToken(OWNER_EMAIL, null);
     when(this.planRatingServiceMock.getSummariesByPlanId()).thenReturn(java.util.Map.of());
@@ -87,7 +98,7 @@ public class ForYouControllerTest {
     when(this.planServiceMock.getPublicPlans()).thenReturn(planes);
 
     // when
-    ModelAndView view = this.controller.forYou(this.authentication, null, null, null, null);
+    ModelAndView view = this.controller.forYou(this.authentication, null, null, null, null, null);
 
     // then
     assertThat(view.getViewName(), is(PUBLIC_LIST_VIEW));
@@ -112,7 +123,7 @@ public class ForYouControllerTest {
     when(this.planServiceMock.getPublicPlans()).thenReturn(List.of(plan));
 
     // when
-    ModelAndView view = this.controller.forYou(this.authentication, null, null, null, null);
+    ModelAndView view = this.controller.forYou(this.authentication, null, null, null, null, null);
 
     // then: nombre, descripcion, fecha, cantidad de lugares y administrador (AC-03)
     Map<?, ?> card = cardAt(view, 0);
@@ -138,7 +149,10 @@ public class ForYouControllerTest {
       .thenReturn(Map.of(PLAN_ID, new RatingSummary(PLAN_ID, 4.25, 12L)));
 
     // when
-    Map<?, ?> card = cardAt(this.controller.forYou(this.authentication, null, null, null, null), 0);
+    Map<?, ?> card = cardAt(
+      this.controller.forYou(this.authentication, null, null, null, null, null),
+      0
+    );
 
     // then (AC-10): el agregado sale al feed, jamas la autoria de los votantes
     assertThat(card.get("ratingAverage"), is(equalTo(4.3)));
@@ -155,7 +169,7 @@ public class ForYouControllerTest {
     when(this.planServiceMock.getPublicPlans()).thenReturn(List.of(plan));
 
     // when
-    ModelAndView view = this.controller.forYou(this.authentication, null, null, null, null);
+    ModelAndView view = this.controller.forYou(this.authentication, null, null, null, null, null);
 
     // then: el feed es para descubrir planes de otros: el propio queda fuera
     assertThat(cardsOf(view), is(empty()));
@@ -176,7 +190,7 @@ public class ForYouControllerTest {
     );
 
     // when
-    ModelAndView view = this.controller.forYou(anon, null, null, null, null);
+    ModelAndView view = this.controller.forYou(anon, null, null, null, null, null);
 
     // then: el visitante no tiene planes propios, el filtro no le saca nada
     assertThat(cardsOf(view), hasSize(1));
@@ -189,7 +203,7 @@ public class ForYouControllerTest {
     when(this.planServiceMock.getPublicPlans()).thenReturn(List.of(plan));
 
     // when
-    ModelAndView view = this.controller.forYou(null, null, null, null, null);
+    ModelAndView view = this.controller.forYou(null, null, null, null, null, null);
 
     // then
     assertThat(cardsOf(view), hasSize(1));
@@ -201,7 +215,7 @@ public class ForYouControllerTest {
     when(this.planServiceMock.getPublicPlans()).thenReturn(List.of());
 
     // when
-    ModelAndView view = this.controller.forYou(this.authentication, null, null, null, null);
+    ModelAndView view = this.controller.forYou(this.authentication, null, null, null, null, null);
 
     // then: el estado vacio lo decide la vista, el controller no lanza nada
     assertThat(view.getViewName(), is(PUBLIC_LIST_VIEW));
@@ -225,7 +239,7 @@ public class ForYouControllerTest {
     when(this.planServiceMock.getPublicPlans()).thenReturn(List.of(plan));
 
     // when
-    ModelAndView view = this.controller.forYou(this.authentication, null, null, null, null);
+    ModelAndView view = this.controller.forYou(this.authentication, null, null, null, null, null);
     Map<?, ?> card = cardAt(view, 0);
 
     // then: ni la clave del codigo, ni rastro de los emails en los valores
@@ -266,7 +280,10 @@ public class ForYouControllerTest {
     when(this.planServiceMock.getPublicPlans()).thenReturn(List.of(plan));
 
     // when
-    Map<?, ?> card = cardAt(this.controller.forYou(this.authentication, null, null, null, null), 0);
+    Map<?, ?> card = cardAt(
+      this.controller.forYou(this.authentication, null, null, null, null, null),
+      0
+    );
 
     // then (AC-09): el nombre de administrador queda vacio, nunca el email
     assertThat(card.get("administratorName"), is(equalTo("")));
@@ -284,7 +301,8 @@ public class ForYouControllerTest {
       .thenReturn(Set.of(PLAN_ID));
 
     // when
-    ModelAndView view = this.controller.forYou(signedInAuthentication(), null, null, null, null);
+    ModelAndView view =
+      this.controller.forYou(signedInAuthentication(), null, null, null, null, null);
 
     // then
     assertThat(view.getModel().get("canBookmark"), is(true));
@@ -303,7 +321,7 @@ public class ForYouControllerTest {
     );
 
     // when
-    ModelAndView view = this.controller.forYou(anonymous, null, null, null, null);
+    ModelAndView view = this.controller.forYou(anonymous, null, null, null, null, null);
 
     // then (AC-05): sin sesion no hay control, no un control que rebote al login
     assertThat(view.getModel().get("canBookmark"), is(false));
@@ -339,7 +357,7 @@ public class ForYouControllerTest {
 
     // when
     ModelAndView view =
-      this.controller.forYou(this.authentication, "museo", "BAR", "upcoming", "date");
+      this.controller.forYou(this.authentication, "museo", "BAR", "upcoming", "date", null);
 
     // then (AC-01, AC-03, AC-04, AC-05): un solo plan y el conteo de participantes solo de los
     // planes publicos que llegan al descubrimiento
@@ -353,7 +371,7 @@ public class ForYouControllerTest {
   public void U20_forYou_elModeloExponeLosValoresAplicadosYFiltersApplied() {
     // when: texto con espacios, categoria en minusculas y order/fecha explicitos
     ModelAndView view =
-      this.controller.forYou(this.authentication, "  museo  ", "bar", "past", "name");
+      this.controller.forYou(this.authentication, "  museo  ", "bar", "past", "name", null);
 
     // then (AC-08, AC-09): el formulario refleja lo aplicado, normalizado
     assertThat(view.getModel().get("q"), is(equalTo("museo")));
@@ -374,9 +392,9 @@ public class ForYouControllerTest {
       .thenReturn(List.of(plan(PLAN_ID, "Plan visible"), plan(OTHER_PLAN_ID, "Otro plan")));
 
     // when: todos nulos, y despues basura en categoria, fecha y orden
-    ModelAndView nulls = this.controller.forYou(this.authentication, null, null, null, null);
+    ModelAndView nulls = this.controller.forYou(this.authentication, null, null, null, null, null);
     ModelAndView invalid =
-      this.controller.forYou(this.authentication, "  ", "NOPE", "ever", "random");
+      this.controller.forYou(this.authentication, "  ", "NOPE", "ever", "random", null);
 
     // then (AC-12): la pagina no rompe y el listado queda sin filtros
     assertThat(cardsOf(nulls), hasSize(2));
@@ -393,11 +411,113 @@ public class ForYouControllerTest {
     when(this.planServiceMock.getPublicPlans()).thenReturn(List.of(plan(PLAN_ID, "Museo de Arte")));
 
     // when
-    ModelAndView view = this.controller.forYou(this.authentication, "zzz", null, null, null);
+    ModelAndView view = this.controller.forYou(this.authentication, "zzz", null, null, null, null);
 
     // then (AC-09): la vista elige el estado vacio propio de los filtros
     assertThat(cardsOf(view), is(empty()));
     assertThat(view.getModel().get("filtersApplied"), is(equalTo(true)));
+  }
+
+  // --- GET /for-you?scope=following [FOLLOW] ---
+
+  @Test
+  public void U11_forYou_scopeFollowingPideLosPlanesDeLosSeguidosYMantieneFiltrosYOrden() {
+    // given: el usuario de la sesion sigue a dos autores
+    LocalDate today = LocalDate.now();
+    Long viewerId = 7L;
+    Plan match = plan(MUSEUM_PLAN_ID, "Noche de museo", "Museo y bar", today.plusDays(3));
+    addPlace(match, PlaceCategory.BAR);
+    Plan wrongCategory = plan(OTHER_PLAN_ID, "Museo sin bar", "Museo", today.plusDays(3));
+    addPlace(wrongCategory, PlaceCategory.MUSEUM);
+    Plan wrongDate = plan(PLAN_ID, "Museo viejo", "Museo y bar", today.minusDays(1));
+    addPlace(wrongDate, PlaceCategory.BAR);
+    Authentication session = authenticated(OWNER_EMAIL);
+    when(this.userServiceMock.getByEmail(OWNER_EMAIL)).thenReturn(user(viewerId, OWNER_EMAIL));
+    when(this.followServiceMock.followedIds(viewerId)).thenReturn(List.of(2L, 3L));
+    when(this.planServiceMock.getPublicPlansByAdministrators(List.of(2L, 3L)))
+      .thenReturn(List.of(match, wrongCategory, wrongDate));
+
+    // when: scope con mayusculas y espacios; los filtros y el orden de [SEARCH] siguen mandando
+    ModelAndView view =
+      this.controller.forYou(session, "museo", "BAR", "upcoming", "date", " Following ");
+
+    // then (AC-07, AC-08): solo el plan que matchea, del conjunto de autores seguidos
+    assertThat(cardsOf(view), hasSize(1));
+    assertThat(cardAt(view, 0).get("id"), is(equalTo(MUSEUM_PLAN_ID)));
+    assertThat(view.getModel().get("followingScope"), is(true));
+    assertThat(view.getModel().get("followsNobody"), is(false));
+    assertThat(view.getModel().get("selectedSort"), is(equalTo("date")));
+    assertThat(view.getModel().get("filtersApplied"), is(equalTo(true)));
+    verify(this.planServiceMock, times(1)).getPublicPlansByAdministrators(List.of(2L, 3L));
+    verify(this.planServiceMock, never()).getPublicPlans();
+    verify(this.planServiceMock, times(1))
+      .getParticipantCounts(List.of(MUSEUM_PLAN_ID, OTHER_PLAN_ID, PLAN_ID));
+  }
+
+  @Test
+  public void U12_forYou_scopeFollowingSinSeguidosMarcaElEstadoVacioPropio() {
+    // given: el usuario de la sesion no sigue a nadie
+    Long viewerId = 7L;
+    Authentication session = authenticated(OWNER_EMAIL);
+    when(this.userServiceMock.getByEmail(OWNER_EMAIL)).thenReturn(user(viewerId, OWNER_EMAIL));
+    when(this.followServiceMock.followedIds(viewerId)).thenReturn(List.of());
+    when(this.planServiceMock.getPublicPlansByAdministrators(List.of())).thenReturn(List.of());
+
+    // when
+    ModelAndView view = this.controller.forYou(session, null, null, null, null, "following");
+
+    // then (AC-09): la vista elige "Todavia no seguis a nadie", no el vacio de [PPV]/[SEARCH]
+    assertThat(view.getViewName(), is(PUBLIC_LIST_VIEW));
+    assertThat(cardsOf(view), is(empty()));
+    assertThat(view.getModel().get("followingScope"), is(true));
+    assertThat(view.getModel().get("followsNobody"), is(true));
+    verify(this.planServiceMock, never()).getPublicPlans();
+  }
+
+  @Test
+  public void U12b_forYou_scopeFollowingSinSesionRedirigeAlLoginConVueltaAlScope() {
+    // given: anonimo con la pestana Siguiendo en la URL
+    Authentication anon = new AnonymousAuthenticationToken(
+      "key",
+      "anonymousUser",
+      AuthorityUtils.createAuthorityList("ROLE_ANONYMOUS")
+    );
+
+    // when
+    ModelAndView view = this.controller.forYou(anon, null, null, null, null, "following");
+
+    // then (AC-10): soft gate, no 403
+    assertThat(
+      view.getViewName(),
+      is(equalTo("redirect:/auth/login?redirect=/for-you%3Fscope%3Dfollowing"))
+    );
+
+    // given: cadena de seguridad sin anonymous habilitado, el principal llega en null
+    // when
+    ModelAndView noPrincipal = this.controller.forYou(null, null, null, null, null, "following");
+
+    // then: mismo soft gate, sin resolver un usuario que no existe
+    assertThat(
+      noPrincipal.getViewName(),
+      is(equalTo("redirect:/auth/login?redirect=/for-you%3Fscope%3Dfollowing"))
+    );
+    verify(this.userServiceMock, never()).getByEmail(anyString());
+  }
+
+  @Test
+  public void U12c_forYou_unScopeDesconocidoCaeAlFeedCompleto() {
+    // given
+    when(this.planServiceMock.getPublicPlans()).thenReturn(List.of(plan(PLAN_ID, "Plan visible")));
+
+    // when
+    ModelAndView view = this.controller.forYou(this.authentication, null, null, null, null, "otro");
+
+    // then: el unico valor con efecto es "following"
+    assertThat(cardsOf(view), hasSize(1));
+    assertThat(view.getModel().get("followingScope"), is(false));
+    assertThat(view.getModel().get("followsNobody"), is(false));
+    verify(this.followServiceMock, never()).followedIds(anyLong());
+    verify(this.userServiceMock, never()).getByEmail(anyString());
   }
 
   private Plan plan(UUID id, String name) {
@@ -428,5 +548,21 @@ public class ForYouControllerTest {
 
   private static Map<?, ?> cardAt(ModelAndView view, int index) {
     return (Map<?, ?>) cardsOf(view).get(index);
+  }
+
+  /** Sesion real: el principal es un {@code UserDetails} cuyo nombre es el email. */
+  private static Authentication authenticated(String email) {
+    return new UsernamePasswordAuthenticationToken(
+      new org.springframework.security.core.userdetails.User(email, "n/a", List.of()),
+      null,
+      AuthorityUtils.createAuthorityList("ROLE_USER")
+    );
+  }
+
+  private static User user(Long id, String email) {
+    User user = new User();
+    user.setId(id);
+    user.setEmail(email);
+    return user;
   }
 }
