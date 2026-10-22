@@ -25,9 +25,11 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
       integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 
-    <div id="app" class="flex-1 min-h-0 min-w-0 flex flex-row-reverse overflow-hidden">
+    <!-- [MOBILE] AC-06: igual que /explore, en mobile el panel de import sube arriba del mapa
+         (columna, limitado a 45vh) y desde md vuelve al layout de escritorio. Solo CSS. -->
+    <div id="app" class="flex-1 min-h-0 min-w-0 flex flex-col md:flex-row-reverse overflow-hidden">
       <aside
-        class="w-80 min-w-[20rem] min-h-0 overflow-y-auto overscroll-contain bg-white border-l border-gray-200 p-4 flex flex-col gap-4">
+        class="w-full md:w-80 md:min-w-[20rem] max-h-[45vh] md:max-h-none min-h-0 overflow-y-auto overscroll-contain bg-white border-t md:border-t-0 md:border-l border-gray-200 p-4 flex flex-col gap-4">
         <h1 class="text-2xl font-semibold text-gray-900">Importar del mapa</h1>
         <p class="text-sm text-gray-600">
           Elegí el tipo de lugar y presioná Cargar: se consultan los puntos de OpenStreetMap que

@@ -1,6 +1,8 @@
+<!-- [MOBILE] flex-wrap: en pantallas angostas el segundo bloque (links) baja a su propia fila
+     en vez de forzar scroll horizontal (AC-01/AC-02 de 22-MOBILE). -->
 <nav th:fragment="navbar" xmlns:th="http://www.thymeleaf.org"
   xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
-  class="flex items-center justify-between bg-black px-4 text-white shadow">
+  class="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 bg-black px-4 text-white shadow">
 
   <!-- Logo principal: a /admin/home cuando el navbar rinde la variante admin (rol ADMIN
        dentro de /admin/**), a / en el resto. La variante se decide por rol Y por el área que se
@@ -23,8 +25,22 @@
        sesion (excepto la variante admin): es la puerta de descubrimiento del producto. El link
        duplica en los dos bloques porque el nav es flex de dos hijos (marca + menu) y sacarlo
        romperia el layout; los labels viven en WebPage.getNavbarItems para los E2E. -->
-  <!-- Usuario AUTENTICADO -->
-  <div sec:authorize="isAuthenticated()" class="flex items-center gap-4 text-sm">
+  <!-- [MOBILE] Hamburguesa del menu: solo con sesion (el E2E pinnea que el navbar anonimo NO la
+       tiene) y solo por debajo de md. Abre el mismo modal del avatar via data-menu-toggle, asi
+       que no hay JS nuevo: los destinos viajan dentro de #navbar-menu (bloque md:hidden).
+       Sin texto en el contenido (aria-label) para que getNavbarItems no la cuente en desktop. -->
+  <button type="button" id="navbar-menu-btn" data-menu-toggle="navbar-menu"
+    sec:authorize="isAuthenticated()"
+    class="navbar-menu-btn md:hidden inline-flex h-11 w-11 items-center justify-center rounded-md bg-primary hover:bg-secondary"
+    aria-label="Abrir menu" aria-haspopup="true" aria-expanded="false" aria-controls="navbar-menu">
+    <svg class="h-5 w-5" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round">
+      <path d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+  </button>
+
+  <!-- Usuario AUTENTICADO: en mobile los links se esconden (van al menu de la hamburguesa) -->
+  <div sec:authorize="isAuthenticated()" class="hidden md:flex items-center gap-4 text-sm">
     <!-- Front door to the admin panel; the only destination an admin needs, and only while
          inside /admin/**. Outside that area the admin gets the user menu instead. -->
     <a th:href="@{/admin/users}" th:if="${showAdminNav}"
@@ -94,8 +110,12 @@
     </button>
   </div>
 
-  <!-- Usuario NO AUTENTICADO -->
-  <div sec:authorize="!isAuthenticated()" class="flex items-center gap-4 text-sm">
+  <!-- Usuario NO AUTENTICADO: sin hamburguesa (decision fijada en PublicPlansListE2E), asi que
+       los links fluyen con flex-wrap en pantallas angostas. order-last + w-full en mobile: el
+       bloque baja a su propia fila completa; en desktop, md:order-none + md:ml-auto lo devuelve
+       a la derecha, pegado al toggle de tema. -->
+  <div sec:authorize="!isAuthenticated()"
+    class="order-last md:order-none md:ml-auto w-full md:w-auto flex flex-wrap items-center justify-end gap-x-4 gap-y-1 text-sm">
     <a th:href="@{/for-you}"
       class="rounded-md bg-primary px-3 py-2 font-medium hover:bg-secondary">
       Para vos
@@ -109,20 +129,25 @@
       Login
     </a>
 
-    <!-- Toggle de modo oscuro: ídem de la rama autenticada, duplicado porque el nav es
-         flex de dos hijos y el menú se renderiza completo en uno u otro caso. -->
-    <button type="button" data-theme-toggle title="Cambiar tema"
-      class="theme-toggle inline-flex items-center justify-center rounded-md bg-primary px-3 py-2 hover:bg-secondary">
-      <svg class="theme-icon-moon h-5 w-5" aria-hidden="true" viewBox="0 0 24 24" fill="none"
-        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
-      </svg>
-      <svg class="theme-icon-sun h-5 w-5" aria-hidden="true" viewBox="0 0 24 24" fill="none"
-        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="4" />
-        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
-      </svg>
-      <span class="sr-only">Cambiar tema</span>
-    </button>
   </div>
+
+  <!-- [MOBILE] Toggle de tema como hijo directo del nav, DESPUES de los links: el orden de
+       texto que pinnea WebPage.getNavbarItems queda identico (PlanIt, Para vos, Register,
+       Login, Cambiar tema). order-last lo deja, en mobile, en la fila del logo en vez de
+       huerfano en una tercera fila; en desktop md:order-none lo devuelve al cluster de la
+       derecha, que el ml-auto del bloque de links empuja contra el canto. El sr-only es el
+       nombre accesible y el texto que leen los helpers E2E. -->
+  <button type="button" data-theme-toggle title="Cambiar tema" sec:authorize="!isAuthenticated()"
+    class="theme-toggle inline-flex items-center justify-center rounded-md bg-primary px-3 py-2 hover:bg-secondary">
+    <svg class="theme-icon-moon h-5 w-5" aria-hidden="true" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+    </svg>
+    <svg class="theme-icon-sun h-5 w-5" aria-hidden="true" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+    </svg>
+    <span class="sr-only">Cambiar tema</span>
+  </button>
 </nav>

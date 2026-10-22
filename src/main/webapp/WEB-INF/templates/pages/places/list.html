@@ -26,11 +26,28 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
       integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 
-    <div id="app" class="flex-1 min-h-0 min-w-0 flex flex-row-reverse overflow-hidden">
+    <!-- [MOBILE] El mapa ocupa toda el area y Places/Plans se despliegan como pestañas desde la
+         barra de abajo: dos radios sr-only (uno dentro de cada label) y cada panel se controla
+         con group-has-[#id:checked] sobre este #app. Sin JS: ni el Vue ni los scripts se tocan
+         (AC-08). Sin tab activo al cargar, el mapa queda limpio de overlays. Desde md vuelve el
+         layout de escritorio (mapa a la izquierda, sidebar junto al borde, paneles siempre
+         visibles via md:visible). -->
+    <div id="app" class="group flex-1 min-h-0 min-w-0 flex flex-col md:flex-row-reverse overflow-hidden">
       <!-- Sidebar -->
       <aside
-        class="w-80 min-w-[20rem] min-h-0 overflow-y-auto overscroll-contain bg-white border-l border-gray-200 p-4 flex flex-col gap-4">
-        <h1 class="text-2xl font-semibold text-gray-900">Places</h1>
+        class="invisible pointer-events-none translate-y-4 opacity-0 transition-[opacity,transform] duration-200 group-has-[#tab-places:checked]:visible group-has-[#tab-places:checked]:pointer-events-auto group-has-[#tab-places:checked]:translate-y-0 group-has-[#tab-places:checked]:opacity-100 md:visible md:pointer-events-auto md:translate-y-0 md:opacity-100 absolute md:static inset-x-0 bottom-12 z-[1040] md:z-auto w-full md:w-80 md:min-w-[20rem] max-h-[40vh] md:max-h-none min-h-0 overflow-y-auto overscroll-contain bg-white border-t md:border-t-0 md:border-l border-gray-200 p-4 flex flex-col gap-4">
+        <div class="flex shrink-0 items-center justify-between">
+          <h1 class="text-2xl font-semibold text-gray-900">Places</h1>
+          <!-- Cierra el desplegable (tilda tab-none del grupo de pestañas); solo en mobile,
+               donde el panel es una pestaña. En desktop no existe la barra de tabs. -->
+          <label for="tab-none" title="Cerrar el panel"
+            class="inline-flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-md text-gray-400 hover:bg-gray-100 hover:text-gray-700 md:hidden">
+            <svg class="h-5 w-5" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round">
+              <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
+          </label>
+        </div>
 
         <!-- Filters -->
         <div class="flex flex-col gap-3">
@@ -85,8 +102,11 @@
       <!-- Map -->
       <div class="flex-1 min-w-0 relative">
         <div id="map" class="absolute inset-0 w-full h-full"></div>
+        <!-- [MOBILE] El detalle es una card superpuesta centrada sobre el mapa (margenes a los
+             costados, esquinas redondeadas, scroll interno); desde md vuelve al panel derecho
+             de altura completa. -->
         <aside v-if="selectedPlace" id="place-details-aside" role="complementary" :aria-label="'Details for ' + selectedPlace.name"
-          class="absolute inset-y-0 right-0 z-[1000] flex w-80 max-w-full flex-col overflow-y-auto bg-white shadow-xl"
+          class="absolute left-4 right-4 top-1/2 z-[1100] max-h-[60vh] -translate-y-1/2 rounded-2xl shadow-xl md:left-auto md:right-0 md:top-0 md:bottom-0 md:z-[1000] md:max-h-none md:translate-y-0 md:rounded-none flex w-auto md:w-80 max-w-full flex-col overflow-y-auto bg-white"
           :style="{ borderLeft: '5px solid ' + categoryColor(selectedPlace.category) }">
           <div class="relative shrink-0">
             <img :src="selectedPlace.imageUrl || '/images/place-placeholder.svg'" :alt="selectedPlace.name"
@@ -180,10 +200,20 @@
           </div>
         </aside>
 
-        <!-- Plans discovery -->
+        <!-- Plans discovery: en mobile se despliega desde la tab Plans; en desktop es sidebar. -->
         <aside v-if="!showCreatePlan && !activePlan" id="plans-aside" role="complementary" aria-label="Plans"
-          class="absolute inset-y-0 left-0 z-[1000] flex w-80 max-w-full flex-col gap-4 overflow-y-auto bg-white p-5 shadow-xl">
-          <h2 class="text-xl font-semibold text-gray-900">Plans</h2>
+          class="invisible pointer-events-none translate-y-4 opacity-0 transition-[opacity,transform] duration-200 group-has-[#tab-plans:checked]:visible group-has-[#tab-plans:checked]:pointer-events-auto group-has-[#tab-plans:checked]:translate-y-0 group-has-[#tab-plans:checked]:opacity-100 md:visible md:pointer-events-auto md:translate-y-0 md:opacity-100 absolute inset-x-0 bottom-12 md:top-0 md:right-auto md:bottom-0 z-[1040] max-h-[35vh] md:max-h-none flex w-auto md:w-80 max-w-full flex-col gap-4 overflow-y-auto overscroll-contain bg-white p-5 shadow-xl">
+          <div class="flex shrink-0 items-center justify-between">
+            <h2 class="text-xl font-semibold text-gray-900">Plans</h2>
+            <!-- Cierra el desplegable (tilda tab-none del grupo de pestañas); solo en mobile. -->
+            <label for="tab-none" title="Cerrar el panel"
+              class="inline-flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-md text-gray-400 hover:bg-gray-100 hover:text-gray-700 md:hidden">
+              <svg class="h-5 w-5" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round">
+                <path d="M18 6 6 18M6 6l12 12" />
+              </svg>
+            </label>
+          </div>
           <input v-model="plansQuery" type="search" placeholder="Search public plans..."
             aria-label="Search public plans"
             class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm" />
@@ -250,7 +280,7 @@
 
         <!-- Existing plan being edited: places are added from the Places aside -->
         <aside v-if="activePlan" id="plans-aside" role="complementary" aria-labelledby="active-plan-title"
-          class="absolute inset-y-0 left-0 z-[1000] flex w-80 max-w-full flex-col gap-3 overflow-y-auto bg-white p-5 shadow-xl">
+          class="invisible pointer-events-none translate-y-4 opacity-0 transition-[opacity,transform] duration-200 group-has-[#tab-plans:checked]:visible group-has-[#tab-plans:checked]:pointer-events-auto group-has-[#tab-plans:checked]:translate-y-0 group-has-[#tab-plans:checked]:opacity-100 md:visible md:pointer-events-auto md:translate-y-0 md:opacity-100 absolute inset-x-0 bottom-12 md:top-0 md:right-auto md:bottom-0 z-[1040] max-h-[35vh] md:max-h-none flex w-auto md:w-80 max-w-full flex-col gap-3 overflow-y-auto overscroll-contain bg-white p-5 shadow-xl">
           <div class="flex items-center justify-between gap-2">
             <h2 id="active-plan-title" class="min-w-0 truncate text-xl font-semibold text-gray-900">{{ activePlan.name }}</h2>
             <button type="button" @click="closeActivePlan" aria-label="Close plan"
@@ -323,7 +353,7 @@
 
         <!-- Create plan: replaces the Plans aside in place, leaving the map interactive -->
         <aside v-if="showCreatePlan" id="plans-aside" role="complementary" aria-labelledby="create-plan-title"
-          class="absolute inset-y-0 left-0 z-[1000] flex w-80 max-w-full flex-col overflow-hidden bg-white p-5 shadow-xl">
+          class="invisible pointer-events-none translate-y-4 opacity-0 transition-[opacity,transform] duration-200 group-has-[#tab-plans:checked]:visible group-has-[#tab-plans:checked]:pointer-events-auto group-has-[#tab-plans:checked]:translate-y-0 group-has-[#tab-plans:checked]:opacity-100 md:visible md:pointer-events-auto md:translate-y-0 md:opacity-100 absolute inset-x-0 bottom-12 md:top-0 md:right-auto md:bottom-0 z-[1040] max-h-[70vh] md:max-h-none flex w-auto md:w-80 max-w-full flex-col overflow-y-auto md:overflow-hidden bg-white p-5 shadow-xl">
           <div class="flex items-center justify-between gap-2">
             <h2 id="create-plan-title" class="text-xl font-semibold text-gray-900">Crear plan</h2>
             <button type="button" @click="closeCreatePlan" aria-label="Close create plan form"
@@ -450,6 +480,34 @@
               </div>
             </form>
         </aside>
+
+        <!-- [MOBILE] Barra de pestañas: Places y Plans despliegan su panel sobre el mapa. Los
+             radios viven dentro de su label (el activo se pinta con peer-checked en el span) y
+             los paneles, que estan en otros puntos del arbol, se enteran por las variantes
+             group-has-[#id:checked] declaradas en #app. Cero JS (AC-08); md:hidden la deja fuera
+             de escritorio. -->
+        <div class="absolute inset-x-0 bottom-0 z-[1050] flex h-12 border-t border-gray-200 bg-white shadow-[0_-2px_8px_rgba(0,0,0,0.10)] md:hidden">
+          <!-- Tercer estado del grupo: tildado = ninguna tab activa y ambos paneles ocultos.
+               Las cruzes de cada panel apuntan aca, porque un radio no se puede destildar con
+               su propio label pero si cambiarse por otro del mismo grupo. -->
+          <input type="radio" name="explore-tab" id="tab-none" class="sr-only" />
+          <label for="tab-places"
+            class="flex flex-1 cursor-pointer items-center justify-center border-r border-gray-200 text-sm font-medium text-gray-500 hover:text-gray-900">
+            <input type="radio" name="explore-tab" id="tab-places" class="peer sr-only" />
+            <span
+              class="rounded-md px-3 py-1.5 text-gray-500 transition-colors peer-checked:bg-blue-50 peer-checked:text-blue-700 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-blue-600">
+              Places
+            </span>
+          </label>
+          <label for="tab-plans"
+            class="flex flex-1 cursor-pointer items-center justify-center text-sm font-medium text-gray-500 hover:text-gray-900">
+            <input type="radio" name="explore-tab" id="tab-plans" class="peer sr-only" />
+            <span
+              class="rounded-md px-3 py-1.5 text-gray-500 transition-colors peer-checked:bg-blue-50 peer-checked:text-blue-700 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-blue-600">
+              Plans
+            </span>
+          </label>
+        </div>
       </div>
     </div>
 
@@ -912,8 +970,12 @@
               center: [-34.6037, -58.3816],
               zoom: 13
             });
-            // Plans aside overlays the left edge: center on the uncovered area.
-            map.panBy([-overlayWidth('plans-aside') / 2, 0], { animate: false });
+            // Plans aside overlays the left edge: center on the uncovered area. En mobile es un
+            // bottom-sheet a todo el ancho (no tapa un costado), asi que no hay costado que
+            // centrar: solo corre el mapa en escritorio. [MOBILE]
+            if (window.innerWidth >= 768) {
+                map.panBy([-overlayWidth('plans-aside') / 2, 0], { animate: false });
+            }
 
             mapResizeObserver = new ResizeObserver(() => {
               map.invalidateSize({ pan: false });
