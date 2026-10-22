@@ -4,6 +4,7 @@ import com.valhalla.domain.user.User;
 import com.valhalla.domain.user.UserRepository;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -23,7 +24,7 @@ public class UserRepositoryImpl implements UserRepository {
   }
 
   @Override
-  public Optional<User> findById(Long id) {
+  public Optional<User> findById(UUID id) {
     return jpaUserRepository.findById(id);
   }
 
@@ -38,7 +39,7 @@ public class UserRepositoryImpl implements UserRepository {
   }
 
   @Override
-  public boolean existsById(Long id) {
+  public boolean existsById(UUID id) {
     return jpaUserRepository.existsById(id);
   }
 
@@ -48,7 +49,7 @@ public class UserRepositoryImpl implements UserRepository {
   }
 
   @Override
-  public void deleteById(Long id) {
+  public void deleteById(UUID id) {
     jpaUserRepository.deleteById(id);
   }
 }

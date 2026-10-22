@@ -282,7 +282,7 @@ public class PlaceAdminControllerTest {
   @Test
   @WithMockUser(username = ADMIN_EMAIL, roles = { "ADMIN" })
   public void shouldRenderTheErrorPageWhenEditingAnUnknownPlace() throws Exception {
-    this.mockMvc.perform(get("/admin/places/999999/edit"))
+    this.mockMvc.perform(get("/admin/places/0192f0a1-0000-7000-8000-000000000999/edit"))
       .andExpect(status().isInternalServerError())
       .andExpect(view().name("pages/error"));
   }

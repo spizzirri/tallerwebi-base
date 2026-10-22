@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.UUID;
 
 /**
  * [MARK] Encabezado congelado del plan al momento de guardarlo.
@@ -30,7 +31,7 @@ public class PlanBookmarkHeader {
   private int placeCount;
 
   @Column(name = "administrator_id")
-  private Long administratorId;
+  private UUID administratorId;
 
   @Column(name = "administrator_name")
   private String administratorName;
@@ -75,11 +76,11 @@ public class PlanBookmarkHeader {
     this.placeCount = placeCount;
   }
 
-  public Long getAdministratorId() {
+  public UUID getAdministratorId() {
     return administratorId;
   }
 
-  public void setAdministratorId(Long administratorId) {
+  public void setAdministratorId(UUID administratorId) {
     this.administratorId = administratorId;
   }
 

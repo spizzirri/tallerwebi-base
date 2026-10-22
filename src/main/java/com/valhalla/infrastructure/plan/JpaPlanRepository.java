@@ -11,7 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface JpaPlanRepository extends JpaRepository<Plan, UUID> {
-  List<Plan> findByAdministratorId(Long administratorId);
+  List<Plan> findByAdministratorId(UUID administratorId);
 
   @Query(
     "select distinct plan from Plan plan join plan.planManager.participants participant where participant.email = :email"
@@ -44,7 +44,7 @@ public interface JpaPlanRepository extends JpaRepository<Plan, UUID> {
     "select plan from Plan plan where plan.isPublic = true and plan.administrator.id in :administratorIds"
   )
   List<Plan> findByIsPublicTrueAndAdministratorIdIn(
-    @Param("administratorIds") Collection<Long> administratorIds
+    @Param("administratorIds") Collection<UUID> administratorIds
   );
 
   /**

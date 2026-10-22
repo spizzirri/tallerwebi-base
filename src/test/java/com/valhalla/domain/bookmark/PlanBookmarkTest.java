@@ -18,6 +18,9 @@ import org.junit.jupiter.api.Test;
 public class PlanBookmarkTest {
 
   private static final UUID PLAN_ID = UUID.fromString("0192f0a1-0000-7000-8000-00000000000a");
+  private static final UUID PLACE_ID = UUID.fromString("0192f0a1-0000-7000-8000-000000000005");
+  private static final UUID AUTHOR_ID = UUID.fromString("0192f0a1-0000-7000-8000-000000000063");
+  private static final UUID BOOKMARK_ID = UUID.fromString("0192f0a1-0000-7000-8000-0000000000b1");
 
   @Test
   public void T_MARK_entity_snapshotOf_copiaEncabezadoEItinerario() {
@@ -43,13 +46,13 @@ public class PlanBookmarkTest {
     assertThat(bookmark.getHeader().getEventDate(), is(LocalDate.of(2026, 11, 7)));
     assertThat(bookmark.getHeader().getEventTime(), is(LocalTime.of(18, 30)));
     assertThat(bookmark.getHeader().getPlaceCount(), is(1));
-    assertThat(bookmark.getHeader().getAdministratorId(), is(99L));
+    assertThat(bookmark.getHeader().getAdministratorId(), is(AUTHOR_ID));
     assertThat(bookmark.getHeader().getAdministratorName(), is("Ada Lovelace"));
 
     PlanBookmarkPlace row = bookmark.getPlaces().get(0);
     assertThat(row.getId(), is((Long) null));
     assertThat(row.getBookmark(), is(bookmark));
-    assertThat(row.getPlaceId(), is(5L));
+    assertThat(row.getPlaceId(), is(PLACE_ID));
     assertThat(row.getPlaceName(), is("Cafe"));
     assertThat(row.getPlaceCategory(), is(PlaceCategory.CAFE));
     assertThat(row.getPlaceAddress(), is("Calle 1"));
@@ -68,7 +71,7 @@ public class PlanBookmarkTest {
     PlanBookmark bookmark = PlanBookmark.snapshotOf(plan, user("duenio@test.com", null, null));
 
     assertThat(bookmark.getHeader().getPlaceCount(), is(0));
-    assertThat(bookmark.getHeader().getAdministratorId(), is((Long) null));
+    assertThat(bookmark.getHeader().getAdministratorId(), is((UUID) null));
     assertThat(bookmark.getHeader().getAdministratorName(), is((String) null));
     assertThat(bookmark.getPlaces().isEmpty(), is(true));
   }
@@ -94,12 +97,24 @@ public class PlanBookmarkTest {
   }
 
   private static BookmarkEntry entry(BookmarkStatus status) {
-    return new BookmarkEntry(1L, PLAN_ID, "Plan", null, null, null, 0, null, null, status, false);
+    return new BookmarkEntry(
+      BOOKMARK_ID,
+      PLAN_ID,
+      "Plan",
+      null,
+      null,
+      null,
+      0,
+      null,
+      null,
+      status,
+      false
+    );
   }
 
   private static PlanPlace entry(int sortOrder) {
     Place place = new Place();
-    place.setId(5L);
+    place.setId(PLACE_ID);
     place.setName("Cafe");
     place.setCategory(PlaceCategory.CAFE);
     place.setAddress("Calle 1");
@@ -114,7 +129,7 @@ public class PlanBookmarkTest {
 
   private static User user(String email, String firstName, String lastName) {
     User user = new User();
-    user.setId(99L);
+    user.setId(AUTHOR_ID);
     user.setEmail(email);
     user.setFirstName(firstName);
     user.setLastName(lastName);

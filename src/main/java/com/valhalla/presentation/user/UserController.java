@@ -4,6 +4,7 @@ import com.valhalla.domain.user.User;
 import com.valhalla.domain.user.UserService;
 import jakarta.validation.Valid;
 import java.util.Map;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -77,7 +78,7 @@ public class UserController {
   }
 
   @GetMapping("/{id}/edit")
-  public ModelAndView showEditUserForm(@PathVariable Long id) {
+  public ModelAndView showEditUserForm(@PathVariable UUID id) {
     User user = userService.findById(id);
     Map<String, Object> model = new ModelMap();
     model.put(
@@ -91,7 +92,7 @@ public class UserController {
 
   @RequestMapping(value = "/{id}", method = { RequestMethod.POST, RequestMethod.PUT })
   public ModelAndView updateUser(
-    @PathVariable Long id,
+    @PathVariable UUID id,
     @Valid @ModelAttribute(ATTR_USER_FORM) EditUserRequest userForm,
     BindingResult bindingResult
   ) {
@@ -109,13 +110,13 @@ public class UserController {
   }
 
   @RequestMapping(value = "/{id}/deactivate", method = { RequestMethod.POST, RequestMethod.PUT })
-  public ModelAndView deactivateUser(@PathVariable Long id) {
+  public ModelAndView deactivateUser(@PathVariable UUID id) {
     userService.deactivate(id);
     return new ModelAndView(REDIRECT_USERS);
   }
 
   @RequestMapping(value = "/{id}/activate", method = { RequestMethod.POST, RequestMethod.PUT })
-  public ModelAndView activateUser(@PathVariable Long id) {
+  public ModelAndView activateUser(@PathVariable UUID id) {
     userService.activate(id);
     return new ModelAndView(REDIRECT_USERS);
   }
@@ -124,14 +125,14 @@ public class UserController {
     value = "/{id}/rotate-password",
     method = { RequestMethod.POST, RequestMethod.PUT }
   )
-  public ModelAndView rotatePassword(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+  public ModelAndView rotatePassword(@PathVariable UUID id, RedirectAttributes redirectAttributes) {
     String newPassword = userService.rotatePassword(id);
     redirectAttributes.addFlashAttribute(ATTR_GENERATED_PASSWORD, newPassword);
     return new ModelAndView(REDIRECT_USERS);
   }
 
   @RequestMapping(value = "/{id}/delete", method = { RequestMethod.POST, RequestMethod.DELETE })
-  public ModelAndView deleteUser(@PathVariable Long id) {
+  public ModelAndView deleteUser(@PathVariable UUID id) {
     userService.delete(id);
     return new ModelAndView(REDIRECT_USERS);
   }
@@ -140,7 +141,7 @@ public class UserController {
     return renderFormWithError(form, isEdit, null);
   }
 
-  private ModelAndView renderFormWithError(EditUserRequest form, boolean isEdit, Long id) {
+  private ModelAndView renderFormWithError(EditUserRequest form, boolean isEdit, UUID id) {
     Map<String, Object> model = new ModelMap();
     model.put(ATTR_USER_FORM, form);
     model.put(ATTR_IS_EDIT, isEdit);

@@ -12,14 +12,14 @@ import java.util.UUID;
  * card: la publica o el detalle privado para dueno/participante.
  */
 public record BookmarkEntry(
-  Long bookmarkId,
+  UUID bookmarkId,
   UUID planId,
   String name,
   String description,
   LocalDate eventDate,
   LocalTime eventTime,
   int placeCount,
-  Long administratorId,
+  UUID administratorId,
   String administratorName,
   BookmarkStatus status,
   boolean publicPlan

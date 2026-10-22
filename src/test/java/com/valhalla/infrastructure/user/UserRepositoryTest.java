@@ -11,6 +11,7 @@ import com.valhalla.domain.exception.UserNotFoundException;
 import com.valhalla.domain.user.User;
 import com.valhalla.domain.user.UserRepository;
 import com.valhalla.integration.JpaIntegrationTest;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Rollback;
@@ -90,7 +91,7 @@ public class UserRepositoryTest {
   @Rollback
   public void shouldThrowWhenUpdatingUserWithUnknownId() {
     User user = this.givenAUser("missing@test.com", "123", "USER");
-    user.setId(999L);
+    user.setId(UUID.fromString("0192f0a1-0000-7000-8000-0000000003e7"));
 
     // With an ID but no associated record, update must throw UserNotFoundException.
     this.thenUserNotFoundExceptionIsThrown(user);

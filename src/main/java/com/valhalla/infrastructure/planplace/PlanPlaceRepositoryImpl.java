@@ -27,22 +27,22 @@ public class PlanPlaceRepositoryImpl implements PlanPlaceRepository {
   }
 
   @Override
-  public Optional<PlanPlace> findById(Long id) {
+  public Optional<PlanPlace> findById(UUID id) {
     return jpa.findById(id);
   }
 
   @Override
-  public boolean existsByPlanIdAndPlaceId(UUID planId, Long placeId) {
+  public boolean existsByPlanIdAndPlaceId(UUID planId, UUID placeId) {
     return jpa.existsByPlanIdAndPlaceId(planId, placeId);
   }
 
   @Override
-  public boolean existsByPlaceId(Long placeId) {
+  public boolean existsByPlaceId(UUID placeId) {
     return jpa.existsByPlaceId(placeId);
   }
 
   @Override
-  public void deleteById(Long id) {
+  public void deleteById(UUID id) {
     jpa.deleteById(id);
   }
 }

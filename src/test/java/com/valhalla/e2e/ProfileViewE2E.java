@@ -51,7 +51,7 @@ public class ProfileViewE2E extends E2eBase {
     page.locator("#menu-view-profile").click();
 
     // La URL canónica siempre lleva el id (AC-12): /profile es solo el atajo.
-    page.waitForURL(Pattern.compile(".*/profile/\\d+.*"));
+    page.waitForURL(Pattern.compile(".*/profile/[0-9a-f-]{36}.*"));
     page.waitForSelector("main h1");
     assertTrue(page.textContent("main h1").contains("Mi perfil"));
   }
@@ -93,7 +93,7 @@ public class ProfileViewE2E extends E2eBase {
     followingEntry.click();
 
     // /profile resuelve el id propio con un 302 y el fragmento sobrevive al redirect.
-    page.waitForURL(Pattern.compile(".*/profile/\\d+#follow"));
+    page.waitForURL(Pattern.compile(".*/profile/[0-9a-f-]{36}#follow"));
     page.waitForSelector("#follow");
     assertTrue(page.locator("#follow").isVisible());
     assertEquals("Seguidores y seguidos", page.textContent("#follow h2").trim());
@@ -237,7 +237,7 @@ public class ProfileViewE2E extends E2eBase {
   private String currentOwnProfileUrl() {
     WebPage nav = new WebPage(page);
     page.navigate(nav.baseUrl() + "/profile");
-    page.waitForURL(Pattern.compile(".*/profile/\\d+.*"));
+    page.waitForURL(Pattern.compile(".*/profile/[0-9a-f-]{36}.*"));
     return page.url();
   }
 

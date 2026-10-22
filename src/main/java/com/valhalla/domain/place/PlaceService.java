@@ -3,11 +3,12 @@ package com.valhalla.domain.place;
 import com.valhalla.presentation.place.EditPlaceRequest;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface PlaceService {
   List<Place> getAllPlaces();
 
-  Optional<Place> getPlaceById(Long id);
+  Optional<Place> getPlaceById(UUID id);
 
   List<Place> getPlacesByCategory(PlaceCategory category);
 
@@ -17,7 +18,7 @@ public interface PlaceService {
 
   Place create(EditPlaceRequest request);
 
-  Place update(Long id, EditPlaceRequest request);
+  Place update(UUID id, EditPlaceRequest request);
 
-  void delete(Long id);
+  void delete(UUID id);
 }

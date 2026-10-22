@@ -2,12 +2,13 @@ package com.valhalla.presentation.plan;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.UUID;
 import org.springframework.format.annotation.DateTimeFormat;
 
 /** One itinerary row of the create-plan form, bound from {@code places[i].*}. */
 public class PlanPlaceRequest {
 
-  private Long placeId;
+  private UUID placeId;
 
   private String description;
 
@@ -20,7 +21,7 @@ public class PlanPlaceRequest {
   public PlanPlaceRequest() {}
 
   public PlanPlaceRequest(
-    Long placeId,
+    UUID placeId,
     String description,
     LocalDate visitDate,
     LocalTime visitTime
@@ -31,11 +32,11 @@ public class PlanPlaceRequest {
     this.visitTime = visitTime;
   }
 
-  public Long getPlaceId() {
+  public UUID getPlaceId() {
     return placeId;
   }
 
-  public void setPlaceId(Long placeId) {
+  public void setPlaceId(UUID placeId) {
     this.placeId = placeId;
   }
 

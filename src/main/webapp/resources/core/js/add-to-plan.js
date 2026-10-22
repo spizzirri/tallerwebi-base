@@ -23,7 +23,7 @@
     // Emit custom event for Vue to handle
     const addToPlanEvent = new CustomEvent('add-to-plan', {
       detail: {
-        id: parseInt(placeId, 10),
+        id: placeId,
         name: placeName,
         category: placeCategory,
         latitude: placeLatitude ? parseFloat(placeLatitude) : null,

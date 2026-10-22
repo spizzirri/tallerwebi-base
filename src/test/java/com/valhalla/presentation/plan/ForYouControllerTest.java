@@ -9,7 +9,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -58,6 +58,9 @@ public class ForYouControllerTest {
   private static final UUID MUSEUM_PLAN_ID = UUID.fromString(
     "0192f0a1-0000-7000-8000-000000000009"
   );
+  private static final UUID VIEWER_ID = UUID.fromString("0192f0a1-0000-7000-8000-00000000000e");
+  private static final UUID FOLLOWED_ID_A = UUID.fromString("0192f0a1-0000-7000-8000-000000000002");
+  private static final UUID FOLLOWED_ID_B = UUID.fromString("0192f0a1-0000-7000-8000-000000000003");
 
   private ForYouController controller;
   private PlanService planServiceMock;
@@ -424,7 +427,7 @@ public class ForYouControllerTest {
   public void U11_forYou_scopeFollowingPideLosPlanesDeLosSeguidosYMantieneFiltrosYOrden() {
     // given: el usuario de la sesion sigue a dos autores
     LocalDate today = LocalDate.now();
-    Long viewerId = 7L;
+    UUID viewerId = VIEWER_ID;
     Plan match = plan(MUSEUM_PLAN_ID, "Noche de museo", "Museo y bar", today.plusDays(3));
     addPlace(match, PlaceCategory.BAR);
     Plan wrongCategory = plan(OTHER_PLAN_ID, "Museo sin bar", "Museo", today.plusDays(3));
@@ -433,8 +436,9 @@ public class ForYouControllerTest {
     addPlace(wrongDate, PlaceCategory.BAR);
     Authentication session = authenticated(OWNER_EMAIL);
     when(this.userServiceMock.getByEmail(OWNER_EMAIL)).thenReturn(user(viewerId, OWNER_EMAIL));
-    when(this.followServiceMock.followedIds(viewerId)).thenReturn(List.of(2L, 3L));
-    when(this.planServiceMock.getPublicPlansByAdministrators(List.of(2L, 3L)))
+    when(this.followServiceMock.followedIds(viewerId))
+      .thenReturn(List.of(FOLLOWED_ID_A, FOLLOWED_ID_B));
+    when(this.planServiceMock.getPublicPlansByAdministrators(List.of(FOLLOWED_ID_A, FOLLOWED_ID_B)))
       .thenReturn(List.of(match, wrongCategory, wrongDate));
 
     // when: scope con mayusculas y espacios; los filtros y el orden de [SEARCH] siguen mandando
@@ -448,7 +452,8 @@ public class ForYouControllerTest {
     assertThat(view.getModel().get("followsNobody"), is(false));
     assertThat(view.getModel().get("selectedSort"), is(equalTo("date")));
     assertThat(view.getModel().get("filtersApplied"), is(equalTo(true)));
-    verify(this.planServiceMock, times(1)).getPublicPlansByAdministrators(List.of(2L, 3L));
+    verify(this.planServiceMock, times(1))
+      .getPublicPlansByAdministrators(List.of(FOLLOWED_ID_A, FOLLOWED_ID_B));
     verify(this.planServiceMock, never()).getPublicPlans();
     verify(this.planServiceMock, times(1))
       .getParticipantCounts(List.of(MUSEUM_PLAN_ID, OTHER_PLAN_ID, PLAN_ID));
@@ -457,7 +462,7 @@ public class ForYouControllerTest {
   @Test
   public void U12_forYou_scopeFollowingSinSeguidosMarcaElEstadoVacioPropio() {
     // given: el usuario de la sesion no sigue a nadie
-    Long viewerId = 7L;
+    UUID viewerId = VIEWER_ID;
     Authentication session = authenticated(OWNER_EMAIL);
     when(this.userServiceMock.getByEmail(OWNER_EMAIL)).thenReturn(user(viewerId, OWNER_EMAIL));
     when(this.followServiceMock.followedIds(viewerId)).thenReturn(List.of());
@@ -516,7 +521,7 @@ public class ForYouControllerTest {
     assertThat(cardsOf(view), hasSize(1));
     assertThat(view.getModel().get("followingScope"), is(false));
     assertThat(view.getModel().get("followsNobody"), is(false));
-    verify(this.followServiceMock, never()).followedIds(anyLong());
+    verify(this.followServiceMock, never()).followedIds(any(UUID.class));
     verify(this.userServiceMock, never()).getByEmail(anyString());
   }
 
@@ -559,7 +564,7 @@ public class ForYouControllerTest {
     );
   }
 
-  private static User user(Long id, String email) {
+  private static User user(UUID id, String email) {
     User user = new User();
     user.setId(id);
     user.setEmail(email);

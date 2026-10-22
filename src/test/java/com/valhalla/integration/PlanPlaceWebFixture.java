@@ -10,6 +10,7 @@ import com.valhalla.domain.place.*;
 import com.valhalla.domain.plan.*;
 import com.valhalla.domain.planplace.*;
 import com.valhalla.domain.user.*;
+import java.util.UUID;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
@@ -38,8 +39,8 @@ abstract class PlanPlaceWebFixture {
 
   MockMvc mvc;
   Plan plan;
-  Long first;
-  Long second;
+  UUID first;
+  UUID second;
   String url;
 
   @BeforeEach
@@ -76,7 +77,7 @@ abstract class PlanPlaceWebFixture {
     url = "/api/plans/" + plan.getId() + "/places";
   }
 
-  Long add(Long placeId) throws Exception {
+  UUID add(UUID placeId) throws Exception {
     mvc
       .perform(
         post(url).param("placeId", placeId.toString()).with(user("apl@test.com")).with(csrf())

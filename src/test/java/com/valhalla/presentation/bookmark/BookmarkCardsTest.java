@@ -21,6 +21,8 @@ import org.junit.jupiter.api.Test;
  */
 public class BookmarkCardsTest {
 
+  private static final UUID ADMIN_ID = UUID.fromString("0192f0a1-0000-7000-8000-000000000005");
+  private static final UUID BOOKMARK_ID = UUID.fromString("0192f0a1-0000-7000-8000-000000000007");
   private static final UUID PLAN_ID = UUID.fromString("0192f0a1-0000-7000-8000-000000000010");
 
   @Test
@@ -56,13 +58,13 @@ public class BookmarkCardsTest {
   public void theCardCarriesTheSnapshotFieldsAndAGenericCover() {
     Map<String, Object> card = BookmarkCards.card(entry(BookmarkStatus.AVAILABLE, true));
 
-    assertThat(card.get("bookmarkId"), is(equalTo(7L)));
+    assertThat(card.get("bookmarkId"), is(equalTo(BOOKMARK_ID)));
     assertThat(card.get("planId"), is(equalTo(PLAN_ID)));
     assertThat(card.get("name"), is(equalTo("Bariloche")));
     assertThat(card.get("description"), is(equalTo("Una escapada")));
     assertThat(card.get("eventDate"), is(equalTo("2026-12-31")));
     assertThat(card.get("placeCount"), is(equalTo(3)));
-    assertThat(card.get("administratorId"), is(equalTo(5L)));
+    assertThat(card.get("administratorId"), is(equalTo(ADMIN_ID)));
     assertThat(card.get("administratorName"), is(equalTo("Ada Lovelace")));
     assertThat(String.valueOf(card.get("cover")), startsWith("/images/plans/cover-"));
   }
@@ -71,14 +73,14 @@ public class BookmarkCardsTest {
   public void anUndatedPlanLeavesTheDateEmpty() {
     Map<String, Object> card = BookmarkCards.card(
       new BookmarkEntry(
-        7L,
+        BOOKMARK_ID,
         PLAN_ID,
         "Bariloche",
         "Una escapada",
         null,
         null,
         3,
-        5L,
+        ADMIN_ID,
         "Ada Lovelace",
         BookmarkStatus.AVAILABLE,
         true
@@ -90,14 +92,14 @@ public class BookmarkCardsTest {
 
   private static BookmarkEntry entry(BookmarkStatus status, boolean publicPlan) {
     return new BookmarkEntry(
-      7L,
+      BOOKMARK_ID,
       PLAN_ID,
       "Bariloche",
       "Una escapada",
       LocalDate.of(2026, 12, 31),
       LocalTime.of(9, 0),
       3,
-      5L,
+      ADMIN_ID,
       "Ada Lovelace",
       status,
       publicPlan

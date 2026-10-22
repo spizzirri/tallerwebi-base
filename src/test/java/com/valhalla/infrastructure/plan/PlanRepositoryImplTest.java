@@ -27,6 +27,7 @@ public class PlanRepositoryImplTest {
 
   private static final UUID PLAN_ID = UUID.fromString("0192f0a1-0000-7000-8000-000000000001");
   private static final UUID OTHER_PLAN_ID = UUID.fromString("0192f0a1-0000-7000-8000-000000000002");
+  private static final UUID ADMIN_ID = UUID.fromString("0192f0a1-0000-7000-8000-000000000007");
 
   private JpaPlanRepository jpaPlanRepositoryMock;
   private PlanRepositoryImpl planRepository;
@@ -69,14 +70,14 @@ public class PlanRepositoryImplTest {
   public void T_PLN_042_findByAdministratorId_delegaEnJpaPlanRepository() {
     // given
     List<Plan> planes = List.of(plan(PLAN_ID));
-    when(this.jpaPlanRepositoryMock.findByAdministratorId(7L)).thenReturn(planes);
+    when(this.jpaPlanRepositoryMock.findByAdministratorId(ADMIN_ID)).thenReturn(planes);
 
     // when
-    List<Plan> result = this.planRepository.findByAdministratorId(7L);
+    List<Plan> result = this.planRepository.findByAdministratorId(ADMIN_ID);
 
     // then
     assertThat(result, is(sameInstance(planes)));
-    verify(this.jpaPlanRepositoryMock, times(1)).findByAdministratorId(7L);
+    verify(this.jpaPlanRepositoryMock, times(1)).findByAdministratorId(ADMIN_ID);
   }
 
   @Test

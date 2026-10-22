@@ -120,6 +120,18 @@ public class ThemeModeTest {
       tokens,
       containsString("html[data-theme=\"dark\"] main .text-black")
     );
+    // Los dos cromáticas que van sueltas sobre tarjetas: links y errores de formulario, que
+    // en oscuro no llegaban a AA con blue-600/red-600. Los chips con fondo pastel no entran.
+    assertThat(
+      "los links azules sueltos se dan vuelta en oscuro",
+      tokens,
+      containsString("html[data-theme=\"dark\"] .text-blue-600 { color: var(--dark-link); }")
+    );
+    assertThat(
+      "los errores rojos sueltos también",
+      tokens,
+      containsString("html[data-theme=\"dark\"] .text-red-600 { color: var(--dark-danger); }")
+    );
     // El toggle no sincroniza íconos desde JS: los dos viajan en el botón y los muestra el modo.
     assertThat(tokens, containsString(".theme-icon-sun { display: none; }"));
     // El color por defecto del texto: el preflight de Tailwind no declara ninguno, así que lo

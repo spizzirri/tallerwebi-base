@@ -32,7 +32,10 @@ public class Plan {
   @Column(nullable = false)
   private String name;
 
-  @Column
+  // Mismo motivo que Place.description: sin @Lob (oid en PostgreSQL) y con largo explicito, para
+  // que una descripcion escrita por el usuario (el detalle demo siembra ~1500 caracteres) entre
+  // en ambos dialectos.
+  @Column(length = 2048)
   private String description;
 
   @Embedded

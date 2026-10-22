@@ -77,7 +77,7 @@ public class PlanServiceImpl implements PlanService { // NOPMD — intentional: 
   }
 
   @Override
-  public void respondToJoinRequest(UUID id, Long requestId, String action, String userEmail) {
+  public void respondToJoinRequest(UUID id, UUID requestId, String action, String userEmail) {
     Plan plan = planRepository.findById(id).orElseThrow(PlanNotFoundException::new);
     requireRequestManager(plan, userEmail);
     if (!"accept".equals(action) && !"reject".equals(action)) {
@@ -202,7 +202,7 @@ public class PlanServiceImpl implements PlanService { // NOPMD — intentional: 
    */
   @Override
   @Transactional(readOnly = true)
-  public List<Plan> getPublicPlansByAdministrators(Collection<Long> administratorIds) {
+  public List<Plan> getPublicPlansByAdministrators(Collection<UUID> administratorIds) {
     // `in :administratorIds` con una coleccion vacia no es JPQL valido: el early return es correcto.
     if (administratorIds == null || administratorIds.isEmpty()) {
       return List.of();
@@ -377,7 +377,7 @@ public class PlanServiceImpl implements PlanService { // NOPMD — intentional: 
   @Override
   public void respondToInvitation(
     UUID planId,
-    Long invitationId,
+    UUID invitationId,
     boolean accept,
     String userEmail
   ) {

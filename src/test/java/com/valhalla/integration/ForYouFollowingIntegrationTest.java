@@ -69,9 +69,9 @@ public class ForYouFollowingIntegrationTest {
 
   private MockMvc mockMvc;
 
-  private Long viewerId;
-  private Long authorId;
-  private Long strangerId;
+  private UUID viewerId;
+  private UUID authorId;
+  private UUID strangerId;
 
   @BeforeEach
   public void setUp() {
@@ -215,7 +215,7 @@ public class ForYouFollowingIntegrationTest {
       .getContentAsString();
   }
 
-  private Long givenUser(String email, String firstName, String lastName) {
+  private UUID givenUser(String email, String firstName, String lastName) {
     User user = new User();
     user.setEmail(email);
     user.setPassword("password123");
@@ -228,7 +228,7 @@ public class ForYouFollowingIntegrationTest {
   }
 
   private UUID givenPublicPlan(
-    Long administratorId,
+    UUID administratorId,
     String name,
     LocalDate eventDate,
     PlaceCategory category
@@ -236,7 +236,7 @@ public class ForYouFollowingIntegrationTest {
     return givenPlan(administratorId, name, eventDate, category, true);
   }
 
-  private UUID givenPlan(Long administratorId, String name, boolean isPublic) {
+  private UUID givenPlan(UUID administratorId, String name, boolean isPublic) {
     return givenPlan(administratorId, name, null, null, isPublic);
   }
 
@@ -245,7 +245,7 @@ public class ForYouFollowingIntegrationTest {
    * itinerario, igual que el fixture del feed general.
    */
   private UUID givenPlan(
-    Long administratorId,
+    UUID administratorId,
     String name,
     LocalDate eventDate,
     PlaceCategory category,

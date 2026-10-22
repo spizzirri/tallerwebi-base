@@ -20,17 +20,17 @@ public class PlanBookmarkRepositoryImpl implements PlanBookmarkRepository {
   }
 
   @Override
-  public Optional<PlanBookmark> findByUserIdAndPlanId(Long userId, UUID planId) {
+  public Optional<PlanBookmark> findByUserIdAndPlanId(UUID userId, UUID planId) {
     return jpaPlanBookmarkRepository.findByUserIdAndPlanId(userId, planId);
   }
 
   @Override
-  public List<PlanBookmark> findByUserId(Long userId) {
+  public List<PlanBookmark> findByUserId(UUID userId) {
     return jpaPlanBookmarkRepository.findByUserIdOrderByCreatedAtDescIdDesc(userId);
   }
 
   @Override
-  public Set<UUID> findPlanIdsByUserId(Long userId) {
+  public Set<UUID> findPlanIdsByUserId(UUID userId) {
     return jpaPlanBookmarkRepository.findPlanIdsByUserId(userId);
   }
 
@@ -40,12 +40,12 @@ public class PlanBookmarkRepositoryImpl implements PlanBookmarkRepository {
   }
 
   @Override
-  public void deleteByUserIdAndPlanId(Long userId, UUID planId) {
+  public void deleteByUserIdAndPlanId(UUID userId, UUID planId) {
     jpaPlanBookmarkRepository.deleteByUserIdAndPlanId(userId, planId);
   }
 
   @Override
-  public void deleteAllByUserId(Long userId) {
+  public void deleteAllByUserId(UUID userId) {
     jpaPlanBookmarkRepository.deleteAllByUserId(userId);
   }
 }

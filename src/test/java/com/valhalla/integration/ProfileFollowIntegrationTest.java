@@ -17,6 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.valhalla.domain.follow.FollowService;
 import com.valhalla.domain.user.User;
 import com.valhalla.domain.user.UserRepository;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,8 +52,8 @@ public class ProfileFollowIntegrationTest {
 
   private MockMvc mockMvc;
 
-  private Long followerId;
-  private Long followedId;
+  private UUID followerId;
+  private UUID followedId;
 
   @BeforeEach
   public void setUp() {
@@ -183,7 +184,7 @@ public class ProfileFollowIntegrationTest {
     return html.substring(start);
   }
 
-  private Long givenUser(String email, String firstName, String lastName) {
+  private UUID givenUser(String email, String firstName, String lastName) {
     User user = new User();
     user.setEmail(email);
     user.setPassword("password123");

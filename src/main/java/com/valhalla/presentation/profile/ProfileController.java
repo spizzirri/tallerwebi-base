@@ -35,7 +35,7 @@ import org.springframework.web.servlet.ModelAndView;
  * <p>La regla de seguridad del modulo: el usuario de la ESCRITURA sale SIEMPRE de la sesion
  * (AC-04); el path {@code /profile/{id}} solo alimenta la LECTURA. Con sesion propia muestra el
  * editor; con otro id o anonimo muestra la vista publica — abierta, el link compartido funciona
- * sin sesion (v2.3, SecurityConfig tiene el GET permitAll para el id numerico).
+ * sin sesion (v2.3, SecurityConfig tiene el GET permitAll para el id UUID).
  */
 @Controller
 @RequestMapping("/profile")
@@ -83,8 +83,8 @@ public class ProfileController {
    * {@code AppUserDetails} no expone el id y extenderlo tocaria el contrato de igualdad que
    * usa el {@code SessionRegistry}, no vale la pena para esto.
    */
-  @GetMapping("/{id:[\\d]+}")
-  public ModelAndView view(@PathVariable Long id, Authentication authentication) {
+  @GetMapping("/{id}")
+  public ModelAndView view(@PathVariable UUID id, Authentication authentication) {
     User owner;
     try {
       owner = userService.findById(id);
@@ -110,9 +110,9 @@ public class ProfileController {
    * no ofrece el boton y un POST directo no crea nada. Un id inexistente responde el mismo 404
    * que la vista (AC-01).
    */
-  @PostMapping("/{id:[\\d]+}/follow")
-  public ModelAndView follow(@PathVariable Long id, Authentication authentication) {
-    Long myId = sessionUser(authentication).getId();
+  @PostMapping("/{id}/follow")
+  public ModelAndView follow(@PathVariable UUID id, Authentication authentication) {
+    UUID myId = sessionUser(authentication).getId();
     if (!myId.equals(id)) {
       try {
         followService.follow(myId, id);
@@ -127,8 +127,8 @@ public class ProfileController {
    * [FOLLOW] Dejar de seguir: misma regla de identidad que el follow (AC-13) y no-op si la
    * relacion no existia (AC-02).
    */
-  @PostMapping("/{id:[\\d]+}/unfollow")
-  public ModelAndView unfollow(@PathVariable Long id, Authentication authentication) {
+  @PostMapping("/{id}/unfollow")
+  public ModelAndView unfollow(@PathVariable UUID id, Authentication authentication) {
     followService.unfollow(sessionUser(authentication).getId(), id);
     return new ModelAndView(REDIRECT_PROFILE + id);
   }
@@ -264,7 +264,7 @@ public class ProfileController {
     model.put("profileAvatarUrl", owner.getAvatarUrl());
     model.put("canBookmark", viewer != null);
     putFollowData(model, owner);
-    Long viewerId = sessionUserId(authentication);
+    UUID viewerId = sessionUserId(authentication);
     // El anonimo nunca sigue a nadie: false sin tocar la tabla (AC-10).
     model.put(
       "isFollowing",
@@ -294,7 +294,7 @@ public class ProfileController {
   }
 
   /** Id del visitante con sesion; {@code null} para el anonimo, que no tiene fila en users. */
-  private Long sessionUserId(Authentication authentication) {
+  private UUID sessionUserId(Authentication authentication) {
     Object principal = authentication == null ? null : authentication.getPrincipal();
     if (!(principal instanceof UserDetails)) {
       return null;

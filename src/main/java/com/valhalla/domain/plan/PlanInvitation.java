@@ -3,14 +3,14 @@ package com.valhalla.domain.plan;
 import com.valhalla.domain.user.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.persistence.Version;
+import java.util.UUID;
+import org.hibernate.annotations.UuidGenerator;
 
 @Entity
 @Table(
@@ -20,8 +20,8 @@ import jakarta.persistence.Version;
 public class PlanInvitation {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  @UuidGenerator(algorithm = UuidVersion7Generator.class)
+  private UUID id;
 
   @Version
   private long version;
@@ -60,7 +60,7 @@ public class PlanInvitation {
       java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 28);
   }
 
-  public Long getId() {
+  public UUID getId() {
     return id;
   }
 

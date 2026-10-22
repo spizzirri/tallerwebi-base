@@ -51,7 +51,7 @@ public class BookmarkE2E extends E2eBase {
     page.locator("#navbar-avatar").click();
     page.waitForSelector("#navbar-menu:not([hidden])");
     page.locator("#menu-bookmarks").click();
-    page.waitForURL(Pattern.compile(".*/profile/\\d+.*"));
+    page.waitForURL(Pattern.compile(".*/profile/[0-9a-f-]{36}.*"));
     page.waitForSelector("#bookmarks");
     assertTrue(
       page.url().endsWith("#bookmarks"),
@@ -70,7 +70,7 @@ public class BookmarkE2E extends E2eBase {
 
     // --- quitar con la confirmacion nativa: la seccion vuelve al estado vacio
     page.navigate(plans.baseUrl() + "/profile");
-    page.waitForURL(Pattern.compile(".*/profile/\\d+.*"));
+    page.waitForURL(Pattern.compile(".*/profile/[0-9a-f-]{36}.*"));
     page.waitForSelector("#bookmarks button:has-text('Quitar')");
     page.onDialog(dialog -> dialog.accept());
     page.locator("#bookmarks button:has-text('Quitar')").click();

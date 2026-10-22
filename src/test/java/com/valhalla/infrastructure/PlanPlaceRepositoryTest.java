@@ -86,7 +86,7 @@ class PlanPlaceRepositoryTest {
 
   @Test
   void findAndDelete() {
-    Long id = save(first, 1).getId();
+    UUID id = save(first, 1).getId();
     assertTrue(entries.findById(id).isPresent());
     entries.deleteById(id);
     assertTrue(entries.findById(id).isEmpty());
@@ -116,8 +116,8 @@ class PlanPlaceRepositoryTest {
     assertEquals(2, loaded.getPlanPlaces().get(0).getSortOrder());
     assertEquals(8, loaded.getPlanPlaces().get(1).getSortOrder());
     assertEquals(first.getId(), loaded.getPlanPlaces().get(1).getPlace().getId());
-    Long earlyId = loaded.getPlanPlaces().get(0).getId();
-    Long lateId = loaded.getPlanPlaces().get(1).getId();
+    UUID earlyId = loaded.getPlanPlaces().get(0).getId();
+    UUID lateId = loaded.getPlanPlaces().get(1).getId();
     assertEquals(planId, loaded.getPlanPlaces().get(0).getPlan().getId());
     loaded.setName("Updated plan");
     plans.save(loaded);

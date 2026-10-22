@@ -19,6 +19,7 @@ import com.valhalla.domain.follow.FollowRepository;
 import com.valhalla.domain.user.User;
 import com.valhalla.domain.user.UserService;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -26,10 +27,10 @@ import org.mockito.ArgumentCaptor;
 /** [FOLLOW] Unit tests of {@link FollowServiceImpl} against mocked ports (19-FOLLOW.md). */
 public class FollowServiceImplTest {
 
-  private static final Long FOLLOWER_ID = 11L;
-  private static final Long FOLLOWED_ID = 22L;
-  private static final Long OTHER_ID = 33L;
-  private static final Long MISSING_ID = 99L;
+  private static final UUID FOLLOWER_ID = UUID.fromString("0192f0a1-0000-7000-8000-00000000000b");
+  private static final UUID FOLLOWED_ID = UUID.fromString("0192f0a1-0000-7000-8000-000000000016");
+  private static final UUID OTHER_ID = UUID.fromString("0192f0a1-0000-7000-8000-000000000021");
+  private static final UUID MISSING_ID = UUID.fromString("0192f0a1-0000-7000-8000-000000000063");
 
   private FollowServiceImpl followService;
   private FollowRepository followRepositoryMock;
@@ -206,7 +207,7 @@ public class FollowServiceImplTest {
     verify(this.followRepositoryMock, times(1)).findFollowedIds(FOLLOWER_ID);
   }
 
-  private static User user(Long id, String firstName, String lastName) {
+  private static User user(UUID id, String firstName, String lastName) {
     User user = new User();
     user.setId(id);
     user.setFirstName(firstName);

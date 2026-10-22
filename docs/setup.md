@@ -125,3 +125,24 @@ Hibernate builds the schema again from the entities. There is no way to clean th
 Adopting Flyway (or Liquibase) is the durable fix — versioned, reviewable, reversible migrations.
 It is a project-wide decision, and this ticket deliberately does not make it.
 
+## Demo data
+
+`docker-dev.sh` starts the app with `-Dseed.demoPlans=true`. The flag is read by two seeders at
+startup and is off by default, so the test suites and a plain `mvn jetty:run` never seed anything.
+
+- `PublicPlanDataSeeder` seeds the feed: five ghost accounts, six public plans (`GHOST001` to
+  `GHOST006`), their fake ratings and the follows between the ghosts.
+- `DemoInteractionSeeder` seeds what a reset database cannot reach by clicking:
+  three bookmark states (`GHOST002` available, `GHOST010` private, `GHOST011` deleted), the
+  permission matrix of a plan (an editor, three settings variants, one pending join request and
+  two invitations), two weird layouts (`GHOST012` with no stops and a ~1500 character
+  description, `GHOST013` in the past with a working and a broken place photo) and unusual
+  accounts (`inactivo@planit.demo`, deactivated, and Camila with three followers).
+
+`GHOST010` is the idempotency marker: once it exists, neither seeder writes anything again. A
+half-finished seed is repaired with `reset-db`, not by hand.
+
+The long demo description does not fit in the old `plans.description` column: the mapping is now
+`varchar(2048)`, and `hbm2ddl.auto=update` never widens a column that already exists. On a volume
+created before that change the insert fails and the app does not start, so run `reset-db` once.
+

@@ -7,6 +7,7 @@ import com.valhalla.domain.place.PlaceCategory;
 import com.valhalla.domain.place.PlaceService;
 import jakarta.validation.Valid;
 import java.util.Map;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -80,7 +81,7 @@ public class PlaceAdminController {
   }
 
   @GetMapping("/{id}/edit")
-  public ModelAndView showEditPlaceForm(@PathVariable Long id) {
+  public ModelAndView showEditPlaceForm(@PathVariable UUID id) {
     Place place = placeService.getPlaceById(id).orElseThrow(PlaceNotFoundException::new);
     EditPlaceRequest form = new EditPlaceRequest();
     form.setName(place.getName());
@@ -103,7 +104,7 @@ public class PlaceAdminController {
 
   @RequestMapping(value = "/{id}", method = { RequestMethod.POST, RequestMethod.PUT })
   public ModelAndView updatePlace(
-    @PathVariable Long id,
+    @PathVariable UUID id,
     @Valid @ModelAttribute(ATTR_PLACE_FORM) EditPlaceRequest placeForm,
     BindingResult bindingResult
   ) {
@@ -115,7 +116,7 @@ public class PlaceAdminController {
   }
 
   @RequestMapping(value = "/{id}/delete", method = { RequestMethod.POST, RequestMethod.DELETE })
-  public ModelAndView deletePlace(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+  public ModelAndView deletePlace(@PathVariable UUID id, RedirectAttributes redirectAttributes) {
     try {
       placeService.delete(id);
     } catch (PlaceInUseException exception) {
@@ -162,7 +163,7 @@ public class PlaceAdminController {
     return renderFormWithError(form, isEdit, null);
   }
 
-  private ModelAndView renderFormWithError(EditPlaceRequest form, boolean isEdit, Long id) {
+  private ModelAndView renderFormWithError(EditPlaceRequest form, boolean isEdit, UUID id) {
     Map<String, Object> model = new ModelMap();
     model.put(ATTR_PLACE_FORM, form);
     model.put(ATTR_IS_EDIT, isEdit);

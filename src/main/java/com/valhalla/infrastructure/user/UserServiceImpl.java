@@ -8,6 +8,7 @@ import com.valhalla.domain.user.User;
 import com.valhalla.domain.user.UserRepository;
 import com.valhalla.domain.user.UserService;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -44,7 +45,7 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional(readOnly = true)
-  public User findById(Long id) {
+  public User findById(UUID id) {
     return userRepository.findById(id).orElseThrow(UserNotFoundException::new);
   }
 
@@ -76,7 +77,7 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public void update(Long id, String email, String role, String firstName, String lastName) {
+  public void update(UUID id, String email, String role, String firstName, String lastName) {
     User user = findById(id);
     user.setEmail(email);
     user.setRole(role);
@@ -86,14 +87,14 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public void deactivate(Long id) {
+  public void deactivate(UUID id) {
     User user = findById(id);
     user.setActive(false);
     userRepository.update(user);
   }
 
   @Override
-  public void activate(Long id) {
+  public void activate(UUID id) {
     User user = findById(id);
     user.setActive(true);
     userRepository.update(user);
@@ -113,7 +114,7 @@ public class UserServiceImpl implements UserService {
    * las operaciones van o no van juntas.
    */
   @Override
-  public void delete(Long id) {
+  public void delete(UUID id) {
     if (!userRepository.existsById(id)) {
       throw new UserNotFoundException();
     }
@@ -124,7 +125,7 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public String rotatePassword(Long id) {
+  public String rotatePassword(UUID id) {
     User user = findById(id);
     String newPassword = generatePassword();
     user.setPassword(passwordEncoder.encode(newPassword));
@@ -139,7 +140,7 @@ public class UserServiceImpl implements UserService {
 
   /** [PROF] Solo toca campos de perfil (User.updateProfile ya excluye email/role). */
   @Override
-  public void updateProfile(Long id, String firstName, String lastName, String avatarUrl) {
+  public void updateProfile(UUID id, String firstName, String lastName, String avatarUrl) {
     User user = findById(id);
     user.updateProfile(firstName, lastName, avatarUrl);
     userRepository.update(user);
@@ -151,7 +152,7 @@ public class UserServiceImpl implements UserService {
    * {@code rotatePassword(id)} sigue como está: lo usa el panel admin y la recuperación.
    */
   @Override
-  public boolean changePassword(Long id, String currentRawPassword, String newRawPassword) {
+  public boolean changePassword(UUID id, String currentRawPassword, String newRawPassword) {
     User user = findById(id);
     if (!passwordEncoder.matches(currentRawPassword, user.getPassword())) {
       return false;

@@ -45,7 +45,7 @@ public class PlanPlaceRestController {
   @PostMapping
   public ItineraryEntry addPlace(
     @PathVariable UUID planId,
-    @RequestParam Long placeId,
+    @RequestParam UUID placeId,
     Principal principal
   ) {
     return ItineraryEntry.from(service.addPlaceToPlan(planId, placeId, principal.getName()));
@@ -54,7 +54,7 @@ public class PlanPlaceRestController {
   @PutMapping("/{id}")
   public ItineraryEntry updatePlanPlace(
     @PathVariable UUID planId,
-    @PathVariable Long id,
+    @PathVariable UUID id,
     @RequestBody PlanPlaceUpdateRequest request,
     Principal principal
   ) {
@@ -70,14 +70,14 @@ public class PlanPlaceRestController {
   }
 
   @DeleteMapping("/{id}")
-  public void removePlace(@PathVariable UUID planId, @PathVariable Long id, Principal principal) {
+  public void removePlace(@PathVariable UUID planId, @PathVariable UUID id, Principal principal) {
     service.removePlaceFromPlan(planId, id, principal.getName());
   }
 
   @PostMapping("/reorder")
   public void reorderPlaces(
     @PathVariable UUID planId,
-    @RequestBody List<Long> placeIds,
+    @RequestBody List<UUID> placeIds,
     Principal principal
   ) {
     service.reorderPlaces(planId, placeIds, principal.getName());
@@ -102,8 +102,8 @@ public class PlanPlaceRestController {
 
   // Returning entities would serialize Plan.administrator (including password) and lazy Hibernate proxies.
   public record ItineraryEntry(
-    Long id,
-    Long placeId,
+    UUID id,
+    UUID placeId,
     String name,
     Integer sortOrder,
     String visitDate,

@@ -1,15 +1,16 @@
 package com.valhalla.domain.follow;
 
+import com.valhalla.domain.plan.UuidVersion7Generator;
 import com.valhalla.domain.user.User;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import java.util.UUID;
+import org.hibernate.annotations.UuidGenerator;
 
 /**
  * [FOLLOW] Arista dirigida follower -> followed: un usuario sigue a otro.
@@ -26,8 +27,8 @@ import jakarta.persistence.UniqueConstraint;
 public class Follow {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  @UuidGenerator(algorithm = UuidVersion7Generator.class)
+  private UUID id;
 
   @ManyToOne(fetch = FetchType.EAGER, optional = false)
   @JoinColumn(name = "follower_id", nullable = false)
@@ -44,7 +45,7 @@ public class Follow {
     this.followed = followed;
   }
 
-  public Long getId() {
+  public UUID getId() {
     return id;
   }
 

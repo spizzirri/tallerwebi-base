@@ -6,16 +6,16 @@ import java.util.List;
 import java.util.UUID;
 
 public interface PlanPlaceService {
-  PlanPlace addPlaceToPlan(UUID planId, Long placeId, String ownerEmail);
+  PlanPlace addPlaceToPlan(UUID planId, UUID placeId, String ownerEmail);
   List<PlanPlace> getItinerary(UUID planId, String ownerEmail);
   PlanPlace updatePlanPlace(
     UUID planId,
-    Long id,
+    UUID id,
     LocalDate date,
     LocalTime time,
     String ownerEmail
   );
-  void removePlaceFromPlan(UUID planId, Long id, String ownerEmail);
-  void reorderPlaces(UUID planId, List<Long> entryIds, String ownerEmail);
-  boolean isPlaceInPlan(UUID planId, Long placeId);
+  void removePlaceFromPlan(UUID planId, UUID id, String ownerEmail);
+  void reorderPlaces(UUID planId, List<UUID> entryIds, String ownerEmail);
+  boolean isPlaceInPlan(UUID planId, UUID placeId);
 }

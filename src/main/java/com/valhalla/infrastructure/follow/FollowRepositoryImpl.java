@@ -4,6 +4,7 @@ import com.valhalla.domain.follow.Follow;
 import com.valhalla.domain.follow.FollowRepository;
 import com.valhalla.domain.user.User;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -24,37 +25,37 @@ public class FollowRepositoryImpl implements FollowRepository {
   }
 
   @Override
-  public boolean existsByFollowerIdAndFollowedId(Long followerId, Long followedId) {
+  public boolean existsByFollowerIdAndFollowedId(UUID followerId, UUID followedId) {
     return jpaFollowRepository.existsByFollowerIdAndFollowedId(followerId, followedId);
   }
 
   @Override
-  public void deleteByFollowerIdAndFollowedId(Long followerId, Long followedId) {
+  public void deleteByFollowerIdAndFollowedId(UUID followerId, UUID followedId) {
     jpaFollowRepository.deleteByFollowerIdAndFollowedId(followerId, followedId);
   }
 
   @Override
-  public long countByFollowedId(Long followedId) {
+  public long countByFollowedId(UUID followedId) {
     return jpaFollowRepository.countByFollowedId(followedId);
   }
 
   @Override
-  public long countByFollowerId(Long followerId) {
+  public long countByFollowerId(UUID followerId) {
     return jpaFollowRepository.countByFollowerId(followerId);
   }
 
   @Override
-  public List<User> findFollowers(Long followedId) {
+  public List<User> findFollowers(UUID followedId) {
     return jpaFollowRepository.findFollowers(followedId);
   }
 
   @Override
-  public List<User> findFollowing(Long followerId) {
+  public List<User> findFollowing(UUID followerId) {
     return jpaFollowRepository.findFollowing(followerId);
   }
 
   @Override
-  public List<Long> findFollowedIds(Long followerId) {
+  public List<UUID> findFollowedIds(UUID followerId) {
     return jpaFollowRepository.findFollowedIds(followerId);
   }
 }

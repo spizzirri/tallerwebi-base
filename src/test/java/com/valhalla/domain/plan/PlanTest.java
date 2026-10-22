@@ -35,7 +35,7 @@ public class PlanTest {
   @BeforeEach
   public void init() {
     this.administrator = new User();
-    this.administrator.setId(7L);
+    this.administrator.setId(UUID.fromString("0192f0a1-0000-7000-8000-000000000007"));
     this.administrator.setEmail("dueno@test.com");
 
     this.plan = new Plan();

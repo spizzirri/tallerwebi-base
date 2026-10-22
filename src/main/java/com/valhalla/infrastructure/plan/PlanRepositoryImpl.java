@@ -31,7 +31,7 @@ public class PlanRepositoryImpl implements PlanRepository {
   }
 
   @Override
-  public List<Plan> findByAdministratorId(Long administratorId) {
+  public List<Plan> findByAdministratorId(UUID administratorId) {
     return jpaPlanRepository.findByAdministratorId(administratorId);
   }
 
@@ -46,7 +46,7 @@ public class PlanRepositoryImpl implements PlanRepository {
   }
 
   @Override
-  public List<Plan> findByIsPublicTrueAndAdministratorIdIn(Collection<Long> administratorIds) {
+  public List<Plan> findByIsPublicTrueAndAdministratorIdIn(Collection<UUID> administratorIds) {
     return jpaPlanRepository.findByIsPublicTrueAndAdministratorIdIn(administratorIds);
   }
 
