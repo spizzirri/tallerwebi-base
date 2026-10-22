@@ -1,7 +1,7 @@
 # PET: primera versión funcional
 
 Esta entrega en `task-20-PET` implementa el pedido de acceso a planes privados.
-No incorpora la rama `task-19-BAN`.
+No incorpora la rama `task-19-BAN`. Spec: `docs/specs/21-PET.md`.
 
 ## Cómo probar el flujo manualmente
 
@@ -85,9 +85,9 @@ mensaje para reintentar o utilizar el canal interno.
 
 ## Fuera de alcance
 
-Bans, bannedUsers y quitar-ban se integrarán desde la rama correspondiente.
-La sincronización de la tarjeta PET queda pendiente: no hay herramientas de
-Trello disponibles en esta sesión.
+Bans, bannedUsers, la decisión ban y quitar-ban se integrarán desde `task-19-BAN`
+(AC-05, AC-10, AC-14 y AC-15 de la spec). Esta rama no los implementa ni los
+declara cubiertos.
 
 ## Verificación de esta ampliación
 
@@ -114,7 +114,7 @@ La ampliación de pruebas incluye:
 El gate descubre las nuevas clases automáticamente por paquete y sufijo:
 `*Test` para unitarias/integración y `*E2E` para navegador. No se modifican sus
 umbrales de cobertura ni se omiten capas. Comando de verificación completa:
-`powershell -File scripts/gate.ps1 all -Port 8081 -Keep`.
+`powershell -File scripts/gate.ps1 all -Port 8081`.
 
 La preparación de E2E elimina `plan_join_requests` antes que planes y usuarios,
 y reinicia su secuencia para evitar fallos de claves foráneas entre escenarios.
@@ -123,12 +123,14 @@ directamente por código; la entrada privada se prueba mediante solicitud y acep
 El escenario de detalles de visita también avanza al nuevo paso de privacidad
 antes de crear el plan, conservando la hora de visita del paso anterior.
 
-Verificación final del 21/10/2026: `BUILD SUCCESS` con el comando completo anterior,
-716 pruebas unitarias/integración y 56 E2E, sin fallos, errores ni pruebas omitidas.
-Se agregaron 30 pruebas unitarias/integración y un flujo E2E. Pasan Prettier,
-Checkstyle, PMD, CPD y todos los umbrales JaCoCo: dominio al 100 % de líneas y ramas,
-presentación al 100 % de líneas y correo al 100 % de líneas. Cobertura global:
-99,4 % de líneas y 92,6 % de ramas. Registro local: `target/pet-full-gate.log`.
+Verificación final del 22/10/2026, sobre `main` ya integrado (bookmarks de
+[MARK] y seguidos de [FOLLOW] incluidos): `BUILD SUCCESS` con el comando completo
+anterior, 823 pruebas unitarias/integración y 60 E2E, sin fallos, errores ni
+pruebas omitidas. Se agregaron 30 pruebas unitarias/integración y un flujo E2E
+sobre la base de `main`. Pasan Prettier, Checkstyle, PMD, CPD y todos los umbrales
+JaCoCo: dominio al 100 % de líneas y ramas, presentación al 100 % de líneas y
+correo al 100 % de líneas. Cobertura global: 99,4 % de líneas y 93,1 % de ramas.
+Registro local: `target/pet-full-gate.log`.
 
 Los escenarios de ban y quitar-ban siguen pendientes de integrar su funcionalidad;
 no se marcan como cubiertos. Tampoco se verifica la entrega con un SMTP real.
