@@ -69,17 +69,69 @@
         </form>
       </div>
 
-      <!-- [PROF] AC-19: secciones placeholder, ancladas y listas para activar. Guardados es de [MARK] y Seguidores de [FOLLOW]: cuando cada feature aterrice activa su seccion
-           y la entrada del navbar la asigna, sin tocar este markup. El tema NO vive en la vista de
-           perfil (decision 2026-10-21): su unica entrada es el modal del navbar ([PROF+THEME]). -->
+      <!-- [PROF] AC-19: Guardados sigue siendo el placeholder de [MARK], anclado y listo para
+           activar; Seguidores ya es real y vive en #follow ([FOLLOW]). El tema NO vive en la vista
+           de perfil (decision 2026-10-21): su unica entrada es el modal del navbar ([PROF+THEME]). -->
       <section id="bookmarks" class="rounded-lg bg-white p-8 text-sm text-gray-500 shadow-md">
         <h2 class="text-lg font-semibold text-gray-900">Guardados</h2>
         <p class="mt-2">A futuro: los planes que marcaste como favoritos aparecen aca ([MARK]).</p>
       </section>
 
-      <section id="follow" class="rounded-lg bg-white p-8 text-sm text-gray-500 shadow-md">
-        <h2 class="text-lg font-semibold text-gray-900">Seguidores</h2>
-        <p class="mt-2">A futuro: seguidores y seguidos de tu cuenta ([FOLLOW]).</p>
+      <section id="follow" class="rounded-lg bg-white p-8 shadow-md">
+        <h2 class="text-lg font-semibold text-gray-900">Seguidores y seguidos</h2>
+        <p class="mt-1 text-sm text-gray-500">
+          <span th:text="${followerCount}">0</span> seguidores ·
+          <span th:text="${followingCount}">0</span> seguidos
+        </p>
+
+        <!-- [FOLLOW] AC-05: las mismas dos listas que la vista publica, con los datos del usuario
+             en sesion. Solo nombre, avatar y link al perfil (AC-12). -->
+        <div class="mt-6 grid gap-6 sm:grid-cols-2">
+          <div>
+            <h3 class="mb-2 text-sm font-semibold text-gray-700">Seguidores</h3>
+            <ul th:if="${!followers.isEmpty()}" data-testid="followers-list" class="space-y-2">
+              <li th:each="follower : ${followers}">
+                <a th:href="@{/profile/{id}(id=${follower.id})}"
+                  class="flex items-center gap-2 text-sm text-blue-600 hover:underline">
+                  <img th:if="${follower.avatarUrl != null}" th:src="${follower.avatarUrl}" alt=""
+                    class="h-8 w-8 rounded-full object-cover" />
+                  <span th:unless="${follower.avatarUrl != null}"
+                    class="navbar-avatar inline-flex h-8 w-8 items-center justify-center rounded-full bg-secondary font-serif text-sm font-bold text-black"
+                    th:text="${#strings.isEmpty(follower.firstName)} ? 'U' : ${#strings.substring(follower.firstName, 0, 1)}"
+                    aria-hidden="true">U</span>
+                  <span
+                    th:text="${((follower.firstName == null ? '' : follower.firstName) + ' ' + (follower.lastName == null ? '' : follower.lastName)).trim()}">Nombre</span>
+                </a>
+              </li>
+            </ul>
+            <p th:if="${followers.isEmpty()}" class="text-sm text-gray-500">
+              Todavía no tenés seguidores.
+            </p>
+          </div>
+
+          <div>
+            <h3 class="mb-2 text-sm font-semibold text-gray-700">Seguidos</h3>
+            <ul th:if="${!following.isEmpty()}" data-testid="following-list" class="space-y-2">
+              <li th:each="seguido : ${following}">
+                <a th:href="@{/profile/{id}(id=${seguido.id})}"
+                  class="flex items-center gap-2 text-sm text-blue-600 hover:underline">
+                  <img th:if="${seguido.avatarUrl != null}" th:src="${seguido.avatarUrl}" alt=""
+                    class="h-8 w-8 rounded-full object-cover" />
+                  <span th:unless="${seguido.avatarUrl != null}"
+                    class="navbar-avatar inline-flex h-8 w-8 items-center justify-center rounded-full bg-secondary font-serif text-sm font-bold text-black"
+                    th:text="${#strings.isEmpty(seguido.firstName)} ? 'U' : ${#strings.substring(seguido.firstName, 0, 1)}"
+                    aria-hidden="true">U</span>
+                  <span
+                    th:text="${((seguido.firstName == null ? '' : seguido.firstName) + ' ' + (seguido.lastName == null ? '' : seguido.lastName)).trim()}">Nombre</span>
+                </a>
+              </li>
+            </ul>
+            <p th:if="${following.isEmpty()}" class="text-sm text-gray-500">
+              Todavía no seguís a nadie. <a th:href="@{/for-you(scope='following')}"
+                class="text-blue-600 hover:underline">Ver los planes de la gente que seguís</a>.
+            </p>
+          </div>
+        </div>
       </section>
     </div>
   </main>
