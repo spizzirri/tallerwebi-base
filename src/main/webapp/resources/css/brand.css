@@ -71,10 +71,11 @@ body {
  * de abajo es su complemento oscuro, valor por valor, y el test
  * theNeutralScaleStaysOnTailwindAndSaysSo sigue frenando una rampa propia.
  *
- * Alcance: solo utilidades neutras (blanco, grises) que las plantillas usan hoy,
- * más las variantes hover que ya existen. Los colores de marca (--primary,
- * --secondary) y los de categoría (--category-*) no cambian de modo: son la
- * identidad, el mapa y el pin del marcador. Las páginas con CSS propio que
+ * Alcance: utilidades neutras (blanco, grises) que las plantillas usan hoy, sus
+ * variantes hover, y las dos cromáticas que van sueltas sobre tarjetas —los links
+ * text-blue-600 y los errores text-red-600, que en oscuro no llegaban a AA—. Los
+ * colores de marca (--primary, --secondary) y los de categoría (--category-*) no
+ * cambian de modo: son la identidad, el mapa y el pin del marcador. Las páginas con CSS propio que
  * pintan hex a mano (landing.html, detail.html) llevan su propio override al
  * lado de la regla original. */
 html[data-theme="dark"] {
@@ -95,6 +96,14 @@ html[data-theme="dark"] {
   --dark-text-muted: #d1d5db;
   --dark-text-faint: #9ca3af;
   --dark-text-decor: #4b5563;
+
+  /* UI cromática que va SUELTA sobre tarjetas/página: los links (text-blue-600) y los
+     errores de formulario (text-red-600), en claro, sobre fondo oscuro no llegan a AA.
+     Se les da su complemento legible. Los chips con fondo pastel no entran: su fondo
+     se queda claro y su texto oscuro sigue leyéndose. */
+  --dark-link: #60a5fa;
+  --dark-danger: #f87171;
+  --dark-danger-surface: #7f1d1d;
 
   /* Color por defecto del texto. El preflight de Tailwind no declara ninguno, así que
      todo lo sin clase text-* hereda el negro del navegador: en claro está bien, en
@@ -118,6 +127,8 @@ html[data-theme="dark"] .hover\:bg-gray-100:hover { background-color: var(--dark
 html[data-theme="dark"] .hover\:bg-gray-200:hover { background-color: var(--dark-control); }
 html[data-theme="dark"] .hover\:bg-gray-300:hover { background-color: var(--dark-control-hover); }
 html[data-theme="dark"] .hover\:bg-gray-700:hover { background-color: var(--dark-control-hover); }
+html[data-theme="dark"] .hover\:bg-red-50:hover { background-color: var(--dark-danger-surface); }
+html[data-theme="dark"] .hover\:bg-red-100:hover { background-color: var(--dark-danger-surface); }
 
 /* --- Texto --- */
 html[data-theme="dark"] .text-gray-900 { color: var(--dark-text); }
@@ -127,6 +138,8 @@ html[data-theme="dark"] .text-gray-600 { color: var(--dark-text-muted); }
 html[data-theme="dark"] .text-gray-500 { color: var(--dark-text-faint); }
 html[data-theme="dark"] .text-gray-300 { color: var(--dark-text-decor); }
 html[data-theme="dark"] .hover\:text-gray-900:hover { color: var(--dark-text); }
+html[data-theme="dark"] .text-blue-600 { color: var(--dark-link); }
+html[data-theme="dark"] .text-red-600 { color: var(--dark-danger); }
 /* text-black solo donde cae el contenido principal: en el navbar es el avatar
    sobre --secondary, que no cambia de modo, y detail.html además lo re-pinnea
    con !important dentro de nav. */
