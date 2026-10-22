@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 
 import com.microsoft.playwright.Locator;
@@ -178,6 +179,19 @@ public class MobileLayoutE2E extends E2eBase {
     web.navigate(web.baseUrl() + "/");
     awaitStyles();
     assertThat("anonimo no tiene hamburguesa", page.locator("#navbar-menu-btn").count(), is(0));
+    // [MOBILE] El toggle de tema es hijo directo del nav con order-last: en mobile comparte
+    // fila con el logo en vez de quedar huerfano en una tercera fila debajo de los links.
+    Locator anonTheme = page.locator("nav > button[data-theme-toggle]");
+    assertThat("el toggle de tema esta en el navbar anonimo", anonTheme.isVisible(), is(true));
+    double rowDelta = Math.abs(
+      anonTheme.boundingBox().y - page.locator(".navbar-brand").first().boundingBox().y
+    );
+    assertThat(
+      "el toggle comparte fila con el logo (<40px de diferencia)",
+      rowDelta,
+      is(lessThan(40.0))
+    );
+    page.screenshot(new Page.ScreenshotOptions().setPath(Path.of("target/navbar-anon-mobile.png")));
 
     // con sesion: la hamburguesa esta, mide 44px y abre el menu con los destinos del nav
     signInAsAdmin();
