@@ -23,7 +23,7 @@
         Error
       </p>
 
-      <form th:action="@{/plans/join}" method="POST" class="mb-2 flex items-end gap-3">
+      <form th:action="@{/plans/join}" method="POST" class="mb-2 flex flex-wrap items-end gap-3">
         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
         <div>
           <label for="shortCode" class="mb-1 block text-sm font-medium">Código del plan</label>
@@ -36,11 +36,14 @@
       </form>
       <p id="join-code-help" class="mb-6 text-sm text-gray-600">Si el plan es privado, se enviará una solicitud y deberás esperar a que la acepten.</p>
 
-      <table class="w-full border-collapse bg-white shadow-md">
-        <thead>
-          <tr class="border-b border-gray-200 bg-gray-50 text-left text-sm font-medium text-gray-600">
-            <th class="px-4 py-3">Nombre</th>
-            <th class="px-4 py-3">Descripción</th>
+      <!-- [MOBILE] AC-04: la tabla se desborda a 390px, asi que vive en un contenedor con scroll
+           horizontal propio: la pagina nunca scrollea de lado, solo la tabla. -->
+      <div class="overflow-x-auto">
+        <table class="w-full border-collapse bg-white shadow-md">
+          <thead>
+            <tr class="border-b border-gray-200 bg-gray-50 text-left text-sm font-medium text-gray-600">
+              <th class="px-4 py-3">Nombre</th>
+              <th class="px-4 py-3">Descripción</th>
             <th class="px-4 py-3">Fecha</th>
             <th class="px-4 py-3">Visibilidad</th>
             <th class="px-4 py-3 text-right">Acciones</th>
@@ -77,7 +80,8 @@
             </td>
           </tr>
         </tbody>
-      </table>
+        </table>
+      </div>
 
       <section th:if="${participantPlans != null && !#lists.isEmpty(participantPlans)}" class="mt-8">
         <h3 class="mb-4 text-xl font-semibold text-gray-900">Planes en los que participo</h3>

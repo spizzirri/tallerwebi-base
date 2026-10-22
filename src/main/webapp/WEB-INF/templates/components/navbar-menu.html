@@ -29,6 +29,48 @@
     </div>
 
     <div class="py-1" role="menu">
+      <!-- [MOBILE] Destinos del navbar: visibles solo por debajo de md, donde los links del
+           <nav> estan ocultos tras la hamburguesa. En desktop el panel los ignora (md:hidden)
+           y el usuario sigue viendo los links de siempre en la barra. -->
+      <div class="md:hidden">
+        <a role="menuitem" th:if="${showAdminNav}" th:href="@{/admin/users}" data-menu-item
+          class="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100">
+          Users
+        </a>
+        <a role="menuitem" th:if="${showAdminNav}" th:href="@{/admin/places}" data-menu-item
+          class="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100">
+          Places
+        </a>
+        <a role="menuitem" th:unless="${showAdminNav}" th:href="@{/for-you}" data-menu-item
+          class="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100">
+          Para vos
+        </a>
+        <a role="menuitem" th:unless="${showAdminNav}" th:href="@{/explore}" data-menu-item
+          class="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100">
+          Explore
+        </a>
+        <a role="menuitem" th:unless="${showAdminNav}" th:href="@{/plans}" data-menu-item
+          class="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100">
+          Plans
+        </a>
+        <!-- El toggle de tema del nav tambien se esconde en mobile: se replica aca. Mismo
+             data-theme-toggle lo engancha el handler por delegacion de base.html. -->
+        <button type="button" data-theme-toggle title="Cambiar tema" data-menu-item
+          class="theme-toggle flex w-full items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100">
+          <svg class="theme-icon-moon h-4 w-4" aria-hidden="true" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+          </svg>
+          <svg class="theme-icon-sun h-4 w-4" aria-hidden="true" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4" />
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+          </svg>
+          <span>Cambiar tema</span>
+        </button>
+        <div class="border-t border-gray-100 my-1"></div>
+      </div>
+
       <a role="menuitem" th:href="@{/profile}" id="menu-view-profile"
         class="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100">
         <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"

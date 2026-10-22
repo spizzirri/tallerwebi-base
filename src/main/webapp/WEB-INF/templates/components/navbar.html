@@ -1,6 +1,8 @@
+<!-- [MOBILE] flex-wrap: en pantallas angostas el segundo bloque (links) baja a su propia fila
+     en vez de forzar scroll horizontal (AC-01/AC-02 de 22-MOBILE). -->
 <nav th:fragment="navbar" xmlns:th="http://www.thymeleaf.org"
   xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
-  class="flex items-center justify-between bg-black px-4 text-white shadow">
+  class="flex flex-wrap items-center justify-between gap-y-1 bg-black px-4 text-white shadow">
 
   <!-- Logo principal: a /admin/home cuando el navbar rinde la variante admin (rol ADMIN
        dentro de /admin/**), a / en el resto. La variante se decide por rol Y por el área que se
@@ -23,8 +25,22 @@
        sesion (excepto la variante admin): es la puerta de descubrimiento del producto. El link
        duplica en los dos bloques porque el nav es flex de dos hijos (marca + menu) y sacarlo
        romperia el layout; los labels viven en WebPage.getNavbarItems para los E2E. -->
-  <!-- Usuario AUTENTICADO -->
-  <div sec:authorize="isAuthenticated()" class="flex items-center gap-4 text-sm">
+  <!-- [MOBILE] Hamburguesa del menu: solo con sesion (el E2E pinnea que el navbar anonimo NO la
+       tiene) y solo por debajo de md. Abre el mismo modal del avatar via data-menu-toggle, asi
+       que no hay JS nuevo: los destinos viajan dentro de #navbar-menu (bloque md:hidden).
+       Sin texto en el contenido (aria-label) para que getNavbarItems no la cuente en desktop. -->
+  <button type="button" id="navbar-menu-btn" data-menu-toggle="navbar-menu"
+    sec:authorize="isAuthenticated()"
+    class="navbar-menu-btn md:hidden inline-flex h-11 w-11 items-center justify-center rounded-md bg-primary hover:bg-secondary"
+    aria-label="Abrir menu" aria-haspopup="true" aria-expanded="false" aria-controls="navbar-menu">
+    <svg class="h-5 w-5" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round">
+      <path d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+  </button>
+
+  <!-- Usuario AUTENTICADO: en mobile los links se esconden (van al menu de la hamburguesa) -->
+  <div sec:authorize="isAuthenticated()" class="hidden md:flex items-center gap-4 text-sm">
     <!-- Front door to the admin panel; the only destination an admin needs, and only while
          inside /admin/**. Outside that area the admin gets the user menu instead. -->
     <a th:href="@{/admin/users}" th:if="${showAdminNav}"
@@ -94,8 +110,9 @@
     </button>
   </div>
 
-  <!-- Usuario NO AUTENTICADO -->
-  <div sec:authorize="!isAuthenticated()" class="flex items-center gap-4 text-sm">
+  <!-- Usuario NO AUTENTICADO: sin hamburguesa (decision fijada en PublicPlansListE2E), asi que
+       los links fluyen con flex-wrap en pantallas angostas. -->
+  <div sec:authorize="!isAuthenticated()" class="flex flex-wrap items-center justify-end gap-x-4 gap-y-1 text-sm">
     <a th:href="@{/for-you}"
       class="rounded-md bg-primary px-3 py-2 font-medium hover:bg-secondary">
       Para vos

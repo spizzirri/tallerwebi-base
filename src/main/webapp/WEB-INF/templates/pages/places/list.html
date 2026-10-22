@@ -26,10 +26,13 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
       integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 
-    <div id="app" class="flex-1 min-h-0 min-w-0 flex flex-row-reverse overflow-hidden">
+    <!-- [MOBILE] AC-06: en mobile los filtros van ARRIBA y el mapa abajo (columna, con el panel
+         de filtros limitado a 45vh para no tapar el mapa); desde md vuelve al layout de escritorio
+         (mapa a la derecha, sidebar junto al borde). Solo CSS: el Vue no se toca. -->
+    <div id="app" class="flex-1 min-h-0 min-w-0 flex flex-col md:flex-row-reverse overflow-hidden">
       <!-- Sidebar -->
       <aside
-        class="w-80 min-w-[20rem] min-h-0 overflow-y-auto overscroll-contain bg-white border-l border-gray-200 p-4 flex flex-col gap-4">
+        class="w-full md:w-80 md:min-w-[20rem] max-h-[45vh] md:max-h-none min-h-0 overflow-y-auto overscroll-contain bg-white border-t md:border-t-0 md:border-l border-gray-200 p-4 flex flex-col gap-4">
         <h1 class="text-2xl font-semibold text-gray-900">Places</h1>
 
         <!-- Filters -->
@@ -85,8 +88,10 @@
       <!-- Map -->
       <div class="flex-1 min-w-0 relative">
         <div id="map" class="absolute inset-0 w-full h-full"></div>
+        <!-- [MOBILE] AC-06: en mobile el detalle es un bottom-sheet (banda inferior hasta 60vh);
+             desde md vuelve al panel derecho de altura completa. -->
         <aside v-if="selectedPlace" id="place-details-aside" role="complementary" :aria-label="'Details for ' + selectedPlace.name"
-          class="absolute inset-y-0 right-0 z-[1000] flex w-80 max-w-full flex-col overflow-y-auto bg-white shadow-xl"
+          class="absolute inset-x-0 bottom-0 z-[1000] max-h-[60vh] md:inset-x-auto md:inset-y-0 md:right-0 md:left-auto md:max-h-none flex w-auto md:w-80 max-w-full flex-col overflow-y-auto bg-white shadow-xl"
           :style="{ borderLeft: '5px solid ' + categoryColor(selectedPlace.category) }">
           <div class="relative shrink-0">
             <img :src="selectedPlace.imageUrl || '/images/place-placeholder.svg'" :alt="selectedPlace.name"

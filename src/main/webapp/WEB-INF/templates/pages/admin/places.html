@@ -23,7 +23,9 @@
 
       <p v-if="error" class="mb-4 rounded-md bg-red-100 px-4 py-3 text-sm text-red-700">{{ error }}</p>
 
-      <table class="w-full border-collapse bg-white shadow-md">
+      <!-- [MOBILE] AC-04: scroll horizontal propio de la tabla; la pagina no se desborda. -->
+      <div class="overflow-x-auto">
+        <table class="w-full border-collapse bg-white shadow-md">
         <thead>
           <tr class="border-b border-gray-200 bg-gray-50 text-left text-sm font-medium text-gray-600">
             <th class="px-4 py-3">Name</th>
@@ -58,7 +60,8 @@
             </td>
           </tr>
         </tbody>
-      </table>
+        </table>
+      </div>
 
       <p th:if="${#lists.isEmpty(places)}" class="mt-8 text-center text-gray-500">No places found.</p>
     </div>
