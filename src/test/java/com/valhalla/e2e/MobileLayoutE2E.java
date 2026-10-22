@@ -5,11 +5,14 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.lessThanOrEqualTo;
 
 import com.microsoft.playwright.Locator;
+import com.microsoft.playwright.Page;
 import com.valhalla.e2e.views.LoginPage;
 import com.valhalla.e2e.views.PlansPage;
 import com.valhalla.e2e.views.WebPage;
+import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -101,18 +104,48 @@ public class MobileLayoutE2E extends E2eBase {
       map.boundingBox().height,
       is(greaterThan(150.0))
     );
-    double sidebarWidth = page.locator("#app > aside").first().boundingBox().width;
+    Locator sidebar = page.locator("#app > aside").first();
     assertThat(
       "el panel de filtros no puede exceder la pantalla",
-      sidebarWidth,
+      sidebar.boundingBox().width,
       is(greaterThan(0.0))
     );
-    assertThat("el panel de filtros entra en la pantalla", sidebarWidth <= PHONE_W, is(true));
+    assertThat(
+      "el panel de filtros entra en la pantalla",
+      sidebar.boundingBox().width <= PHONE_W,
+      is(true)
+    );
+    assertThat(
+      "el panel de filtros esta capado a 40vh (sino tapa el mapa)",
+      sidebar.boundingBox().height,
+      is(lessThanOrEqualTo(PHONE_H * 0.40 + 1))
+    );
+    // El descubrimiento de planes es un bottom-sheet sobre el mapa, no un overlay a altura
+    // completa: si no, en mobile tapaba el mapa entero. Tiene que verse una franja de mapa
+    // arriba del sheet.
+    Locator plansSheet = page.locator("#plans-aside");
+    assertThat(
+      "el sheet de planes esta capado a 35vh",
+      plansSheet.boundingBox().height,
+      is(lessThanOrEqualTo(PHONE_H * 0.35 + 1))
+    );
+    double mapStrip = plansSheet.boundingBox().y - map.boundingBox().y;
+    assertThat(
+      "queda una franja de mapa visible arriba del sheet",
+      mapStrip,
+      is(greaterThan(100.0))
+    );
+    page.screenshot(new Page.ScreenshotOptions().setPath(Path.of("target/explore-mobile.png")));
 
     // AC-07: en desktop vuelve al layout de dos paneles (sidebar de 320px)
     page.setViewportSize(DESKTOP_W, DESKTOP_H);
-    double desktopSidebar = page.locator("#app > aside").first().boundingBox().width;
+    double desktopSidebar = sidebar.boundingBox().width;
     assertThat("sidebar de escritorio w-80", Math.round(desktopSidebar), is(320L));
+    assertThat(
+      "en desktop el sheet de planes vuelve a overlay lateral de altura completa",
+      plansSheet.boundingBox().height > PHONE_H * 0.5,
+      is(true)
+    );
   }
 
   @Test
@@ -174,6 +207,43 @@ public class MobileLayoutE2E extends E2eBase {
       web.getNavbarItems(),
       contains("PlanIt", "Para vos", "Explore", "Plans", "A", "Cambiar tema")
     );
+  }
+
+  /**
+   * [MOBILE] T-MOB-008: el detalle del plan a 320px, el ancho de los modelos viejos. Con los
+   * paddings encadenados (container px-5 + #plan-app + panel) la parada quedaba en ~156px y las
+   * acciones le robaban ~70: el titulo, con overflow-wrap: anywhere, se partia letra por letra
+   * sin desbordar (por eso el fitsOnPhone existente no lo veia). El ancho del titulo es la
+   * asercion; target/detail-mobile-320.png es la prueba visual.
+   */
+  @Test
+  void T_MOB_008_detalleDelPlanLegibleA320() {
+    signInAsAdmin();
+    PlansPage plans = new PlansPage(page);
+    plans.navigateToCreatePlanModal();
+    plans.typeName("Detalle chico 320");
+    plans.typeDescription("Para ver el itinerario en una pantalla angosta");
+    plans.typeEventDate("2026-12-05");
+    plans.clickNextStep();
+    plans.addFirstDraftPlace();
+    plans.clickNextStep();
+    plans.clickCreate();
+    plans.waitForDetailPath();
+
+    page.setViewportSize(320, 752);
+    page.waitForSelector(".stop-title");
+    awaitStyles();
+    assertNoSideScroll("/plans/{id} a 320px");
+
+    double titleWidth = page.locator(".stop-title").first().boundingBox().width;
+    assertThat(
+      "el titulo de la parada no se parte letra por letra (>= 60px)",
+      titleWidth,
+      is(greaterThan(60.0))
+    );
+
+    page.locator(".itinerary-panel").scrollIntoViewIfNeeded();
+    page.screenshot(new Page.ScreenshotOptions().setPath(Path.of("target/detail-mobile-320.png")));
   }
 
   private void assertNoSideScroll(String where) {

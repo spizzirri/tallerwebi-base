@@ -51,10 +51,18 @@
             #plan-app { padding-left: 16px !important; padding-right: 16px !important; }
             #plan-app > .d-flex:first-child { flex-wrap: wrap; gap: 12px; }
             #plan-app h2 { overflow-wrap: anywhere; max-width: 100%; }
-            .itinerary-panel { padding: 18px; }
+            /* [MOBILE] Con px-5 (48px) del container + 32 de #plan-app + 36 del panel, la parada
+               quedaba en ~156px y las acciones (flex: 0 0 auto) le robaban ~70: el titulo, con
+               overflow-wrap: anywhere, se partia letra por letra. Aflojo los paddings y las
+               acciones bajan a su propia fila debajo del contenido. */
+            /* El px-5 de Bootstrap es !important: sin lo propio el override pierde y sobran
+               48px por costado. */
+            main.container-fluid { padding-left: 12px !important; padding-right: 12px !important; }
+            .itinerary-panel { padding: 14px; }
             .place-item { gap: 8px; }
-            .stop-actions { flex-direction: column; gap: 2px; }
-            .itinerary-stop { padding: 10px; gap: 8px; }
+            .itinerary-stop { padding: 8px; gap: 8px; flex-wrap: wrap; }
+            .stop-content { flex: 1 1 100%; }
+            .stop-actions { flex: 1 1 100%; flex-direction: row; justify-content: flex-start; gap: 6px; }
         }
         @media (prefers-reduced-motion: reduce) { .itinerary-stop { transition: none; } .itinerary-stop:hover { transform: none; } }
 

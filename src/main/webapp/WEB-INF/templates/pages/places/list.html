@@ -27,12 +27,12 @@
       integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 
     <!-- [MOBILE] AC-06: en mobile los filtros van ARRIBA y el mapa abajo (columna, con el panel
-         de filtros limitado a 45vh para no tapar el mapa); desde md vuelve al layout de escritorio
+         de filtros limitado a 40vh para dejar lugar al mapa y al bottom-sheet de planes); desde md vuelve al layout de escritorio
          (mapa a la derecha, sidebar junto al borde). Solo CSS: el Vue no se toca. -->
     <div id="app" class="flex-1 min-h-0 min-w-0 flex flex-col md:flex-row-reverse overflow-hidden">
       <!-- Sidebar -->
       <aside
-        class="w-full md:w-80 md:min-w-[20rem] max-h-[45vh] md:max-h-none min-h-0 overflow-y-auto overscroll-contain bg-white border-t md:border-t-0 md:border-l border-gray-200 p-4 flex flex-col gap-4">
+        class="w-full md:w-80 md:min-w-[20rem] max-h-[40vh] md:max-h-none min-h-0 overflow-y-auto overscroll-contain bg-white border-t md:border-t-0 md:border-l border-gray-200 p-4 flex flex-col gap-4">
         <h1 class="text-2xl font-semibold text-gray-900">Places</h1>
 
         <!-- Filters -->
@@ -187,7 +187,7 @@
 
         <!-- Plans discovery -->
         <aside v-if="!showCreatePlan && !activePlan" id="plans-aside" role="complementary" aria-label="Plans"
-          class="absolute inset-y-0 left-0 z-[1000] flex w-80 max-w-full flex-col gap-4 overflow-y-auto bg-white p-5 shadow-xl">
+          class="absolute left-0 right-0 bottom-0 md:top-0 md:right-auto z-[1000] max-h-[35vh] md:max-h-none flex w-auto md:w-80 max-w-full flex-col gap-4 overflow-y-auto bg-white p-5 shadow-xl">
           <h2 class="text-xl font-semibold text-gray-900">Plans</h2>
           <input v-model="plansQuery" type="search" placeholder="Search public plans..."
             aria-label="Search public plans"
@@ -255,7 +255,7 @@
 
         <!-- Existing plan being edited: places are added from the Places aside -->
         <aside v-if="activePlan" id="plans-aside" role="complementary" aria-labelledby="active-plan-title"
-          class="absolute inset-y-0 left-0 z-[1000] flex w-80 max-w-full flex-col gap-3 overflow-y-auto bg-white p-5 shadow-xl">
+          class="absolute left-0 right-0 bottom-0 md:top-0 md:right-auto z-[1000] max-h-[35vh] md:max-h-none flex w-auto md:w-80 max-w-full flex-col gap-3 overflow-y-auto bg-white p-5 shadow-xl">
           <div class="flex items-center justify-between gap-2">
             <h2 id="active-plan-title" class="min-w-0 truncate text-xl font-semibold text-gray-900">{{ activePlan.name }}</h2>
             <button type="button" @click="closeActivePlan" aria-label="Close plan"
@@ -328,7 +328,7 @@
 
         <!-- Create plan: replaces the Plans aside in place, leaving the map interactive -->
         <aside v-if="showCreatePlan" id="plans-aside" role="complementary" aria-labelledby="create-plan-title"
-          class="absolute inset-y-0 left-0 z-[1000] flex w-80 max-w-full flex-col overflow-hidden bg-white p-5 shadow-xl">
+          class="absolute left-0 right-0 bottom-0 md:top-0 md:right-auto z-[1000] max-h-[70vh] md:max-h-none flex w-auto md:w-80 max-w-full flex-col overflow-y-auto md:overflow-hidden bg-white p-5 shadow-xl">
           <div class="flex items-center justify-between gap-2">
             <h2 id="create-plan-title" class="text-xl font-semibold text-gray-900">Crear plan</h2>
             <button type="button" @click="closeCreatePlan" aria-label="Close create plan form"
@@ -917,8 +917,12 @@
               center: [-34.6037, -58.3816],
               zoom: 13
             });
-            // Plans aside overlays the left edge: center on the uncovered area.
-            map.panBy([-overlayWidth('plans-aside') / 2, 0], { animate: false });
+            // Plans aside overlays the left edge: center on the uncovered area. En mobile es un
+            // bottom-sheet a todo el ancho (no tapa un costado), asi que no hay costado que
+            // centrar: solo corre el mapa en escritorio. [MOBILE]
+            if (window.innerWidth >= 768) {
+                map.panBy([-overlayWidth('plans-aside') / 2, 0], { animate: false });
+            }
 
             mapResizeObserver = new ResizeObserver(() => {
               map.invalidateSize({ pan: false });
