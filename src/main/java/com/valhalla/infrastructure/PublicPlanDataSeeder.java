@@ -1,5 +1,7 @@
 package com.valhalla.infrastructure;
 
+import com.valhalla.domain.follow.Follow;
+import com.valhalla.domain.follow.FollowRepository;
 import com.valhalla.domain.place.Place;
 import com.valhalla.domain.place.PlaceRepository;
 import com.valhalla.domain.plan.Plan;
@@ -82,6 +84,20 @@ public class PublicPlanDataSeeder implements ApplicationListener<ContextRefreshe
 
   /** [CAL] Calificacion fantasma: el fantasma en el indice {@code raterIndex} da score estrellas. */
   private record RatingSeed(int raterIndex, int score) {}
+
+  /** [FOLLOW] Arista demo: el fantasma {@code followerIndex} sigue al {@code followedIndex}. */
+  private record FollowSeed(int followerIndex, int followedIndex) {}
+
+  /**
+   * [FOLLOW] Relaciones demo entre fantasmas: el scope Siguiendo arranca con al menos dos planes
+   * publicos (lucia sigue a mateo y a sofia, duenos de GHOST002 y GHOST003).
+   */
+  private static final List<FollowSeed> FOLLOWS = List.of(
+    new FollowSeed(0, 1),
+    new FollowSeed(0, 2),
+    new FollowSeed(1, 0),
+    new FollowSeed(2, 3)
+  );
 
   private static final List<GhostPlan> PLANS = List.of(
     new GhostPlan(
@@ -167,6 +183,7 @@ public class PublicPlanDataSeeder implements ApplicationListener<ContextRefreshe
   private final PlaceRepository placeRepository;
   private final PlaceDataSeeder placeDataSeeder;
   private final PlanRatingRepository planRatingRepository;
+  private final FollowRepository followRepository;
 
   private boolean seeded;
 
@@ -176,7 +193,8 @@ public class PublicPlanDataSeeder implements ApplicationListener<ContextRefreshe
     PlanRepository planRepository,
     PlaceRepository placeRepository,
     PlaceDataSeeder placeDataSeeder,
-    PlanRatingRepository planRatingRepository
+    PlanRatingRepository planRatingRepository,
+    FollowRepository followRepository
   ) {
     this.userService = userService;
     this.userRepository = userRepository;
@@ -184,6 +202,7 @@ public class PublicPlanDataSeeder implements ApplicationListener<ContextRefreshe
     this.placeRepository = placeRepository;
     this.placeDataSeeder = placeDataSeeder;
     this.planRatingRepository = planRatingRepository;
+    this.followRepository = followRepository;
   }
 
   @Override
@@ -205,6 +224,8 @@ public class PublicPlanDataSeeder implements ApplicationListener<ContextRefreshe
       for (GhostPlan data : PLANS) {
         seedRatings(savePlan(data, ghosts, placesByName), data, ghosts);
       }
+      // [FOLLOW] Relaciones demo: el scope Siguiendo del feed arranca con contenido real.
+      seedFollows(ghosts);
       if (LOGGER.isLoggable(Level.INFO)) {
         LOGGER.info(
           "Public demo feed seeded: " + GHOST_EMAILS.size() + " ghosts, " + PLANS.size() + " plans"
@@ -216,7 +237,10 @@ public class PublicPlanDataSeeder implements ApplicationListener<ContextRefreshe
     // calificaciones de esta version del seeder. Idempotente por par (plan shortCode, rater):
     // lo ya calificado no se toca.
     seeded = true;
-    int added = completeRatings();
+    Map<String, User> ghosts = existingGhosts();
+    int added = completeRatings(ghosts);
+    // [FOLLOW] Misma logica para las relaciones: solo se crean las que faltan (AC-14).
+    seedFollows(ghosts);
     if (added > 0 && LOGGER.isLoggable(Level.INFO)) {
       LOGGER.info("Public demo ratings topped up: " + added);
     }
@@ -307,12 +331,40 @@ public class PublicPlanDataSeeder implements ApplicationListener<ContextRefreshe
     return added;
   }
 
-  /** Completar calificaciones sobre planes y fantasmas ya existentes (corridas previas). */
-  private int completeRatings() {
+  /**
+   * [FOLLOW] Siembra las relaciones demo que falten. Idempotente por par (follower, followed):
+   * el unique de la tabla es la ultima defensa, esta consulta es la primera (AC-14).
+   *
+   * @return la cantidad de relaciones nuevas
+   */
+  private int seedFollows(Map<String, User> ghosts) {
+    int added = 0;
+    for (FollowSeed seed : FOLLOWS) {
+      User follower = ghosts.get(GHOST_EMAILS.get(seed.followerIndex()));
+      User followed = ghosts.get(GHOST_EMAILS.get(seed.followedIndex()));
+      if (follower == null || followed == null) {
+        continue; // Base a medio sembrar: se completa en la proxima corrida.
+      }
+      if (followRepository.existsByFollowerIdAndFollowedId(follower.getId(), followed.getId())) {
+        continue;
+      }
+      followRepository.save(new Follow(follower, followed));
+      added++;
+    }
+    return added;
+  }
+
+  /** Fantasmas ya persistidos, indexados por email como los devuelve {@code createGhosts}. */
+  private Map<String, User> existingGhosts() {
     Map<String, User> ghosts = new LinkedHashMap<>();
     for (String email : GHOST_EMAILS) {
       userRepository.findByEmail(email).ifPresent(user -> ghosts.put(email, user));
     }
+    return ghosts;
+  }
+
+  /** Completar calificaciones sobre planes y fantasmas ya existentes (corridas previas). */
+  private int completeRatings(Map<String, User> ghosts) {
     int added = 0;
     for (GhostPlan data : PLANS) {
       Plan plan = planRepository.findByShortCode(data.shortCode()).orElse(null);

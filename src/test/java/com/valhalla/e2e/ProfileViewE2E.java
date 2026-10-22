@@ -6,7 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.WaitUntilState;
+import com.valhalla.e2e.views.LoginPage;
+import com.valhalla.e2e.views.RegisterPage;
 import com.valhalla.e2e.views.WebPage;
+import com.valhalla.presentation.shared.LoginRedirects;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,13 +17,23 @@ import org.junit.jupiter.api.Test;
 /**
  * [PROF] Browser coverage del perfil (docs/specs/11-PROF.md, E-01..E-04): el menú del navbar abre
  * el modal, "Ver perfil" llega a la URL con id, el editor persiste visible con el aviso, la vista
- * pública funciona con y sin sesión, y las entradas "Pronto" no navegan a ningún lado. Extra de
- * esta ronda: la guardia de z-order del modal en /explore, cuya barra sticky tapaba el panel.
+ * pública funciona con y sin sesión. Extra de esta ronda: la guardia de z-order del modal en
+ * /explore, cuya barra sticky tapaba el panel.
+ *
+ * <p>[MARK] "Guardados" ya no es un "Pronto": es un link activo al ancla del perfil propio.
+ *
+ * <p>[FOLLOW] E-02 (docs/specs/19-FOLLOW.md): "Siguiendo" ya es un link a `/profile#follow`, y la
+ * vista pública muestra los contadores reales con las dos listas de `#follow`.
  *
  * <p>El admin seed ("Admin Test", inicial A) es la única cuenta garantizada: ResetDatabase corre
  * en cada test y la seed se recarga.
  */
 public class ProfileViewE2E extends E2eBase {
+
+  private static final String FOLLOWED_FIRST_NAME = "Rosa";
+  private static final String FOLLOWED_LAST_NAME = "Seguidora";
+  private static final String FOLLOWED_EMAIL = "rosa.seguida@unlam.edu.ar";
+  private static final String FOLLOWED_PASSWORD = "secret123";
 
   @BeforeEach
   void signInAsSeedAdmin() {
@@ -43,26 +56,87 @@ public class ProfileViewE2E extends E2eBase {
     assertTrue(page.textContent("main h1").contains("Mi perfil"));
   }
 
-  // --- E-03: las entradas "Pronto" están deshabilitadas y NO navegan ---
+  // --- E-03: no quedan entradas "Pronto": cada ancla del modal es un link real ---
 
   @Test
-  void soonEntriesAreDisabledAndDoNotNavigate() {
+  void noSoonEntriesRemainInTheMenuAndTheAnchorsAreLinks() {
     page.locator("#navbar-avatar").click();
     page.waitForSelector("#navbar-menu:not([hidden])");
 
-    // AC-18: "Pronto" no es <a> ni <button> navegable: un span aria-disabled. El E2E no lo
-    // clica (Playwright se niega sobre elementos deshabilitados y ahi esta el punto): fija en
-    // el DOM que la entrada no linkea a nada y que las dos "Pronto" siguen inertes.
+    // [MARK] activo "Guardados" y [FOLLOW] activo "Siguiendo": el modal ya no tiene placeholders.
     var disabledEntries = page.locator("#navbar-menu [role='menuitem'][aria-disabled='true']");
-    assertTrue(disabledEntries.count() >= 2);
-    assertEquals(
-      0,
-      page.locator("#navbar-menu a", new Page.LocatorOptions().setHasText("Guardados")).count()
-    );
+    assertEquals(0, disabledEntries.count());
+
+    // [MARK] AC-17: Guardados es un link al ancla de la seccion en el perfil propio.
+    var bookmarksLink = page.locator("#navbar-menu a#menu-bookmarks");
+    assertEquals(1, bookmarksLink.count());
+    assertTrue(bookmarksLink.getAttribute("href").endsWith("/profile#bookmarks"));
 
     // El menú sigue abierto y la URL intacta: nada navegó.
     assertTrue(page.locator("#navbar-menu:not([hidden])").count() == 1);
     assertFalse(page.url().contains("/profile"));
+  }
+
+  // --- E-02 ([FOLLOW] AC-06): "Siguiendo" es navegable y lleva al anchor del perfil ---
+
+  @Test
+  void followingEntryInTheMenuNavigatesToTheFollowSection() {
+    page.locator("#navbar-avatar").click();
+    page.waitForSelector("#navbar-menu:not([hidden])");
+
+    var followingEntry = page.locator("#navbar-menu a#menu-following");
+    assertEquals(1, followingEntry.count());
+    assertTrue(followingEntry.getAttribute("href").endsWith("/profile#follow"));
+    // Dejo de ser un span "Pronto": el badge ya no esta dentro de la entrada.
+    assertFalse(followingEntry.innerText().contains("Pronto"));
+
+    followingEntry.click();
+
+    // /profile resuelve el id propio con un 302 y el fragmento sobrevive al redirect.
+    page.waitForURL(Pattern.compile(".*/profile/\\d+#follow"));
+    page.waitForSelector("#follow");
+    assertTrue(page.locator("#follow").isVisible());
+    assertEquals("Seguidores y seguidos", page.textContent("#follow h2").trim());
+  }
+
+  // --- E-02 ([FOLLOW] AC-04/AC-05): contadores reales y las dos listas en la vista publica ---
+
+  @Test
+  void publicProfileShowsRealFollowCountersAndLists() {
+    // Segundo usuario real: ResetDatabase deja solo al admin, asi que el seguido se registra por
+    // UI (el mismo patron que el resto del suite) y su URL canonica sale del atajo /profile.
+    newContext();
+    WebPage web = new WebPage(page);
+    registerSecondUser(web);
+    String followedProfileUrl = currentOwnProfileUrl();
+
+    // Vuelvo a la sesion del admin para seguir a ese usuario desde su perfil publico.
+    new LoginPage(page).clickLogout();
+    page.waitForSelector("#btn-login");
+    signInAsAdmin();
+    page.navigate(followedProfileUrl);
+    page.waitForSelector("#btn-follow:text-is('Seguir')");
+    page.locator("#btn-follow").click();
+    page.waitForSelector("#btn-follow:text-is('Dejar de seguir')");
+
+    // Vista publica del seguido: contadores reales (AC-04) y las dos listas (AC-05).
+    assertTrue(page.textContent("#follow").contains("1 seguidores"));
+    assertTrue(page.textContent("#follow").contains("0 seguidos"));
+    var followersList = page.locator("[data-testid='followers-list']");
+    assertEquals(1, followersList.count());
+    assertTrue(followersList.innerText().contains("Admin Test"));
+    // El seguido no sigue a nadie: su lista vacia muestra su propio mensaje y no se renderiza.
+    assertEquals(0, page.locator("[data-testid='following-list']").count());
+    assertTrue(page.textContent("#follow").contains("Todavía no sigue a nadie."));
+    // AC-12 de [FOLLOW]: la seccion expone nombre, avatar y link, nunca el email del usuario.
+    assertFalse(page.textContent("main").contains(FOLLOWED_EMAIL));
+
+    // La otra cara de la misma relacion: el perfil propio (edit.html) lista al seguido.
+    page.navigate(web.baseUrl() + "/profile");
+    page.waitForSelector("[data-testid='following-list']");
+    assertTrue(
+      page.locator("[data-testid='following-list']").innerText().contains("Rosa Seguidora")
+    );
   }
 
   // --- z del modal: /explore deja el <nav> sticky con z-index 1000 y el panel queda ENCIMA ---
@@ -165,5 +239,17 @@ public class ProfileViewE2E extends E2eBase {
     page.navigate(nav.baseUrl() + "/profile");
     page.waitForURL(Pattern.compile(".*/profile/\\d+.*"));
     return page.url();
+  }
+
+  /** Registra al segundo usuario por UI: el alta abre la sesion y aterriza en el feed ([PPV]). */
+  private void registerSecondUser(WebPage web) {
+    RegisterPage register = new RegisterPage(page);
+    register.typeFirstName(FOLLOWED_FIRST_NAME);
+    register.typeLastName(FOLLOWED_LAST_NAME);
+    register.typeEmail(FOLLOWED_EMAIL);
+    register.typePassword(FOLLOWED_PASSWORD);
+    register.typeConfirmPassword(FOLLOWED_PASSWORD);
+    register.clickRegister();
+    web.waitForPath(LoginRedirects.USER_LANDING);
   }
 }

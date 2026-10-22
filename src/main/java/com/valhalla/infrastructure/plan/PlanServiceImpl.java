@@ -196,6 +196,20 @@ public class PlanServiceImpl implements PlanService { // NOPMD — intentional: 
     return planRepository.findByIsPublicTrue();
   }
 
+  /**
+   * [FOLLOW] Planes publicos de los autores seguidos: el conjunto lo elige el follow, el orden y
+   * los filtros siguen siendo de {@code PlanDiscovery}, asi que la query no ordena (AC-08, AC-15).
+   */
+  @Override
+  @Transactional(readOnly = true)
+  public List<Plan> getPublicPlansByAdministrators(Collection<Long> administratorIds) {
+    // `in :administratorIds` con una coleccion vacia no es JPQL valido: el early return es correcto.
+    if (administratorIds == null || administratorIds.isEmpty()) {
+      return List.of();
+    }
+    return planRepository.findByIsPublicTrueAndAdministratorIdIn(administratorIds);
+  }
+
   @Override
   @Transactional(readOnly = true)
   public Plan getOwnedPlan(UUID id, String ownerEmail) {

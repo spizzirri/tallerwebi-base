@@ -46,6 +46,11 @@ public class PlanRepositoryImpl implements PlanRepository {
   }
 
   @Override
+  public List<Plan> findByIsPublicTrueAndAdministratorIdIn(Collection<Long> administratorIds) {
+    return jpaPlanRepository.findByIsPublicTrueAndAdministratorIdIn(administratorIds);
+  }
+
+  @Override
   public List<Plan> findByParticipantsEmail(String email) {
     return jpaPlanRepository.findByParticipantsEmail(email);
   }

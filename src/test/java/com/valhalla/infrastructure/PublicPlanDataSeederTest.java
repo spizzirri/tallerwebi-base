@@ -15,6 +15,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.valhalla.domain.follow.Follow;
+import com.valhalla.domain.follow.FollowRepository;
 import com.valhalla.domain.place.Place;
 import com.valhalla.domain.place.PlaceRepository;
 import com.valhalla.domain.plan.Plan;
@@ -98,6 +100,7 @@ public class PublicPlanDataSeederTest {
   private PlaceRepository placeRepositoryMock;
   private PlaceDataSeeder placeDataSeederMock;
   private PlanRatingRepository planRatingRepositoryMock;
+  private FollowRepository followRepositoryMock;
   private PublicPlanDataSeeder seeder;
 
   @BeforeEach
@@ -108,6 +111,7 @@ public class PublicPlanDataSeederTest {
     this.placeRepositoryMock = mock(PlaceRepository.class);
     this.placeDataSeederMock = mock(PlaceDataSeeder.class);
     this.planRatingRepositoryMock = mock(PlanRatingRepository.class);
+    this.followRepositoryMock = mock(FollowRepository.class);
     this.seeder =
       new PublicPlanDataSeeder(
         this.userServiceMock,
@@ -115,7 +119,8 @@ public class PublicPlanDataSeederTest {
         this.planRepositoryMock,
         this.placeRepositoryMock,
         this.placeDataSeederMock,
-        this.planRatingRepositoryMock
+        this.planRatingRepositoryMock,
+        this.followRepositoryMock
       );
     // El seeder usa el Plan devuelto por save (con el id asignado) para colgarle calificaciones:
     // el mock recicla el argumento, como hace Spring Data con una entidad nueva.
@@ -142,7 +147,8 @@ public class PublicPlanDataSeederTest {
       this.planRepositoryMock,
       this.placeRepositoryMock,
       this.placeDataSeederMock,
-      this.planRatingRepositoryMock
+      this.planRatingRepositoryMock,
+      this.followRepositoryMock
     );
   }
 
@@ -198,6 +204,9 @@ public class PublicPlanDataSeederTest {
         assertThat(rating.getScore(), is(equalTo(Integer.parseInt(expected.substring(split + 1)))));
       }
     }
+
+    // [FOLLOW] las relaciones demo entre fantasmas salen de la misma corrida (AC-14)
+    verify(this.followRepositoryMock, times(4)).save(any(Follow.class));
   }
 
   @Test
@@ -234,6 +243,8 @@ public class PublicPlanDataSeederTest {
 
     // then: la guarda por par (plan, rater) manda: ni una sola fila nueva ni updates
     verify(this.planRatingRepositoryMock, never()).save(any(PlanRating.class));
+    // [FOLLOW] las relaciones ya sembradas tampoco se duplican (AC-14)
+    verify(this.followRepositoryMock, never()).save(any(Follow.class));
   }
 
   @Test
@@ -296,6 +307,7 @@ public class PublicPlanDataSeederTest {
     givenAllGhostPlansExist();
     when(this.planRatingRepositoryMock.findByPlanIdAndUserEmail(any(UUID.class), anyString()))
       .thenAnswer(invocation -> Optional.of(new PlanRating()));
+    when(this.followRepositoryMock.existsByFollowerIdAndFollowedId(any(), any())).thenReturn(true);
   }
 
   private static List<Place> placesNamed(String... names) {

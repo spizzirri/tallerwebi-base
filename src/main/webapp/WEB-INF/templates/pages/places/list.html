@@ -1,5 +1,6 @@
 <!DOCTYPE HTML>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head th:replace="~{layouts/base :: head('Places')}"></head>
 
@@ -192,9 +193,30 @@
           </button>
           <h3 class="text-sm font-semibold uppercase tracking-wide text-gray-500">Upcoming public plans</h3>
           <ul class="flex flex-col gap-3">
-            <li v-for="plan in filteredPlans" :key="plan.id">
+            <li v-for="plan in filteredPlans" :key="plan.id" class="relative">
+              <!-- [MARK] Toggle de Guardados del sidebar. Vue renderiza las cards, asi que el
+                   estado viene de GET /api/plans/public y el click pega contra
+                   POST/DELETE /api/plans/{id}/bookmarks sin recargar. Sin sesion el boton no se
+                   renderiza (sec:authorize, mismo criterio que el resto de CTAs). -->
+              <button type="button" sec:authorize="isAuthenticated()"
+                @click.stop.prevent="toggleBookmark(plan)"
+                :aria-pressed="plan.bookmarked ? 'true' : 'false'"
+                :aria-label="plan.bookmarked ? 'Quitar de Guardados' : 'Guardar en Guardados'"
+                :title="plan.bookmarked ? 'Quitar de Guardados' : 'Guardar en Guardados'"
+                :class="plan.bookmarked ? 'text-primary' : 'text-gray-600 hover:text-primary'"
+                class="absolute right-2 top-2 z-10 inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/90 shadow ring-1 ring-black/10 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
+                data-bookmark-toggle="true" :data-bookmarked="plan.bookmarked ? 'true' : 'false'">
+                <svg v-if="plan.bookmarked" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"
+                  aria-hidden="true">
+                  <path d="M6.5 3.5h11a1 1 0 0 1 1 1v16l-6.5-3.8L5.5 20.5v-16a1 1 0 0 1 1-1z"></path>
+                </svg>
+                <svg v-else class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M6.5 3.5h11a1 1 0 0 1 1 1v16l-6.5-3.8L5.5 20.5v-16a1 1 0 0 1 1-1z"></path>
+                </svg>
+              </button>
               <a :href="'/plans/' + plan.id + '/public'"
-                class="block rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition hover:bg-gray-50">
+                class="block rounded-lg border border-gray-200 bg-white p-4 pr-12 shadow-sm transition hover:bg-gray-50">
                 <h4 class="text-base font-medium text-gray-900">{{ plan.name }}</h4>
                 <p class="text-xs text-gray-500">{{ plan.eventDate || 'No date' }} &middot; {{ plan.placeCount }} places</p>
                 <!-- [CAL] Indicador read-only del agregado (16-CAL.md, AC-10): la version Vue
@@ -666,6 +688,27 @@
             }
           };
 
+          /* [MARK] Guardar/quitar desde el sidebar. Vue repinta la card en el lugar: el estado lo
+             confirma el servidor (si el fetch falla, el icono no cambia). El confirm se pregunta
+             solo al quitar, igual que en el fragment server-rendered. */
+          const toggleBookmark = async (plan) => {
+            const removing = plan.bookmarked === true;
+            if (removing && !window.confirm('¿Quitar este plan de Guardados?')) return;
+            const csrfToken = document.querySelector('meta[name="_csrf"]')?.content || '';
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content || 'X-CSRF-TOKEN';
+            try {
+              const response = await fetch('/api/plans/' + plan.id + '/bookmarks', {
+                method: removing ? 'DELETE' : 'POST',
+                headers: { [csrfHeader]: csrfToken }
+              });
+              if (!response.ok) throw new Error('bookmarks ' + response.status);
+              plan.bookmarked = !removing;
+            } catch (error) {
+              console.error(error);
+              alert('Error al actualizar Guardados');
+            }
+          };
+
           document.addEventListener('click', (event) => {
             const link = event.target.closest('[data-open-plan]');
             if (!link) return;
@@ -921,6 +964,7 @@
             closeDetails,
             plansQuery,
             filteredPlans,
+            toggleBookmark,
             showCreatePlan,
             planNameInput,
             openCreatePlan,

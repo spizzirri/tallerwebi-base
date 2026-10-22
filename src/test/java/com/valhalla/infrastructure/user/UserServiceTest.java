@@ -13,6 +13,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.valhalla.domain.bookmark.PlanBookmarkRepository;
 import com.valhalla.domain.exception.UserAlreadyExists;
 import com.valhalla.domain.exception.UserNotFoundException;
 import com.valhalla.domain.plan.Plan;
@@ -38,15 +39,22 @@ public class UserServiceTest {
   private UserService userService;
   private UserRepository userRepositoryMock;
   private PlanRepository planRepositoryMock;
+  private PlanBookmarkRepository planBookmarkRepositoryMock;
   private PasswordEncoder passwordEncoder;
 
   @BeforeEach
   public void init() {
     this.userRepositoryMock = mock(UserRepository.class);
     this.planRepositoryMock = mock(PlanRepository.class);
+    this.planBookmarkRepositoryMock = mock(PlanBookmarkRepository.class);
     this.passwordEncoder = new BCryptPasswordEncoder();
     this.userService =
-      new UserServiceImpl(this.userRepositoryMock, this.planRepositoryMock, this.passwordEncoder);
+      new UserServiceImpl(
+        this.userRepositoryMock,
+        this.planRepositoryMock,
+        this.planBookmarkRepositoryMock,
+        this.passwordEncoder
+      );
   }
 
   @Test
@@ -232,6 +240,26 @@ public class UserServiceTest {
     InOrder inOrder = inOrder(this.planRepositoryMock, this.userRepositoryMock);
     inOrder.verify(this.planRepositoryMock).deleteById(PLAN_ID_A);
     inOrder.verify(this.planRepositoryMock).deleteById(PLAN_ID_B);
+    inOrder.verify(this.userRepositoryMock).deleteById(id);
+  }
+
+  /**
+   * [MARK] Los guardados cuelgan de {@code users.id}: si el usuario se borra con guardados encima
+   * la FK revienta. Se borran antes del usuario, igual que sus planes.
+   */
+  @Test
+  public void shouldDeleteTheBookmarksOfTheUserBeforeDeletingTheUser() {
+    // given
+    Long id = 1L;
+    when(this.userRepositoryMock.existsById(id)).thenReturn(true);
+    when(this.planRepositoryMock.findByAdministratorId(id)).thenReturn(List.of());
+
+    // when
+    this.userService.delete(id);
+
+    // then
+    InOrder inOrder = inOrder(this.planBookmarkRepositoryMock, this.userRepositoryMock);
+    inOrder.verify(this.planBookmarkRepositoryMock).deleteAllByUserId(id);
     inOrder.verify(this.userRepositoryMock).deleteById(id);
   }
 

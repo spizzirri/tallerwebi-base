@@ -11,6 +11,10 @@
 > cualquiera. `GET /profile` sin sesión sigue redirigiendo a login (es el atajo "mi perfil").
 > **v2.4:** la vista del perfil deja de alojar la sección placeholder Tema (`#theme`): la única
 > entrada de tema es el modal del navbar (PROF-010/011, que pasan a la card `[PROF+THEME]`).
+> **v2.5:** `[FOLLOW]` (`19-FOLLOW.md`) activa lo que esta spec dejaba preparado: la sección
+> `#follow` y los contadores de seguidores/seguidos son reales en `view.html` y `edit.html`, y la
+> entrada "Siguiendo" del modal navega a `/profile#follow`. Los AC de esta spec no cambian; donde
+> decían "placeholder" ahora aplica lo que provee `[FOLLOW]`.
 
 ## Objetivo
 
@@ -56,7 +60,10 @@ futuro.
   bloque del navbar (autenticado y anónimo). No bloquea el modal (PROF-009), pero sí la entrada
   "Tema" del modal y la persistencia server-side (PROF-010/011), que entran una vez mergeado.
 - `[MARK]` y `[FOLLOW]` no son bloqueantes: sus secciones entran como placeholders no
-  interactivos y se activan en las cards de cada feature.
+  interactivos y se activan en las cards de cada feature. **Actualizado en v2.5:** `[FOLLOW]` ya
+  los activó — `#follow`, sus dos listas y los contadores de seguidores/seguidos son reales, y la
+  entrada "Siguiendo" del modal es un link a `/profile#follow`. Guardados (`#bookmarks`) sigue
+  siendo el placeholder de `[MARK]`.
 
 ## Criterios de Aceptacion
 
@@ -189,9 +196,11 @@ infra de upload).
   URL lleva el id; (3) una sola route con branch `isSelf` (sesión vs path) evita duplicar
   `/my-profile` + URL pública. La sesión decide: id propio → superficie de edición (+ datos
   privados), id ajeno → vista pública read-only.
-- **Qué expone la vista pública:** nombre, avatar/iniciales, contador de seguidores placeholder
-  (0 — llega con [FOLLOW]) y los planes **públicos** del dueño. Email, rol y edición son de la
-  superficie propia; nunca aparecen para un visitante — y el visitante puede ser anónimo: el link
+- **Qué expone la vista pública:** nombre, avatar/iniciales, contadores **reales** de
+  seguidores/seguidos y la sección `#follow` con sus dos listas (`[FOLLOW]`, v2.5 — el
+  `followerCount = 0` de v2 era el placeholder) y los planes **públicos** del dueño. Email, rol y
+  edición son de la superficie propia; nunca aparecen para un visitante — y el visitante puede ser
+  anónimo: el link
   compartido abre la vista pública sin sesión (AC-05/AC-13; el `isSelf` solo puede ser cierto con
   sesión autenticada). La diferencia entre perfil y CRUD de
   administración sigue en pie: `UserController` resuelve el caso admin con `/admin/users/{id}` y
@@ -223,17 +232,20 @@ infra de upload).
 - **El modal es el menú global del sitio, no solo la caja del perfil.** Click en el avatar
   (autenticado) o en el botón de menú (anónimo) abre un panel con entradas según sesión. El
   autenticado ve: header (iniciales + nombre), Ver perfil, Cambiar contraseña, Guardados
-  (pronto), Siguiendo (pronto), Tema y Cerrar sesión (roja). El anónimo ve: Iniciar sesión,
-  Registrarse, Tema. Las entradas pronto son deshabilitadas visibles — "no interactivo hasta que
-  la feature existe", no ocultas: anuncian el roadmap y mantienen el layout estable. Los anchors
-  `#bookmarks` / `#follow` ya existen en la vista propia desde v2, de modo que activar MARK/FOLLOW
-  es un cambio de una línea en el href. Implementación mínima (JS vanilla embebido o `<details>`),
+  (pronto), Siguiendo (navegable desde v2.5), Tema y Cerrar sesión (roja). El anónimo ve: Iniciar
+  sesión, Registrarse, Tema. Las entradas pronto son deshabilitadas visibles — "no interactivo hasta
+  que la feature existe", no ocultas: anuncian el roadmap y mantienen el layout estable. Los anchors
+  `#bookmarks` / `#follow` ya existen en la vista propia desde v2: `[MARK]` sigue siendo un cambio
+  de una línea en el href cuando aterrice, y `[FOLLOW]` ya lo hizo (v2.5: "Siguiendo" linkea a
+  `/profile#follow`). Implementación mínima (JS vanilla embebido o `<details>`),
   accesible: `aria-expanded`, cierre con Esc y click-afuera.
 - **Secciones placeholder en el perfil propio:** Guardados (`#bookmarks`) y Seguidores/Siguiendo
   (`#follow`) con copy "a futuro"; los placeholders son la casa de estos settings, y el modal es el
   acceso rápido a cada uno. Los placeholders distribuyen quién es OWNER final de cada archivo: PROF
-  no compite con THEME/MARK/FOLLOW por los mismos archivos más adelante. La sección Tema (`#theme`)
-  se retiró de la vista en v2.4 (vive solo en el modal).
+  no compite con THEME/MARK/FOLLOW por los mismos archivos más adelante. **v2.5:** `#follow` dejó
+  de ser placeholder — `[FOLLOW]` lo provee con contadores y las dos listas (seguidores/seguidos)
+  en `edit.html` y `view.html`; Guardados (`#bookmarks`) sigue siendo el placeholder de `[MARK]`.
+  La sección Tema (`#theme`) se retiró de la vista en v2.4 (vive solo en el modal).
 - **El toggle de tema entra al modal escalonado y persiste por sesión.** Etapa 1 (PROF-009): el
   modal sin entrada de tema, el toggle provisorio de [THEME] sigue de pie. Etapa 2 (PROF-010, tras
   el merge de [THEME]): la entrada "Tema" entra al modal para las dos sesiones, y el toggle
@@ -352,8 +364,10 @@ public class ProfileController {
 - `ProfileForm` (nombres + `avatarUrl` opcional), `ChangePasswordForm` — DTOs en
   `presentation/profile/`, excluidos de JaCoCo. El usuario de la **escritura** sale SIEMPRE de la
   sesión; el path solo alimenta la vista.
-- DTO de vista pública `PublicProfileView` (nombre, iniciales/avatar, contador placeholder,
-  lista de planes públicos) en el mismo paquete.
+- Sin DTO de vista: `ProfileController#publicModel` arma un `Map` con `owner`, `ownerInitial`,
+  `profileName`, `profileAvatarUrl`, `followerCount`, `followingCount`, `followers`, `following`,
+  `isFollowing` y `profilePlans`. **v2.5:** `[FOLLOW]` reemplazó el contador placeholder por los
+  conteos reales de seguidores/seguidos y agregó las dos listas de `#follow`.
 - El mapeo `/{id:\\d+}` evita colisiones con los sub-paths existentes (`/profile/change-password`,
   `/profile/theme`).
 
@@ -361,9 +375,9 @@ public class ProfileController {
 
 | Archivo | Contenido |
 |---------|-----------|
-| `templates/pages/profile/edit.html` | Superficie propia: form de `firstName`/`lastName`/`avatarUrl` con `th:action="@{/profile}"` + CSRF, email read-only, rol, link a `/profile/change-password`, aviso `?updated=true`, `th:errors`. Debajo, secciones placeholder con anclas y copy "a futuro": Guardados (`id="bookmarks"`), Seguidores (`id="follow"`) — la sección Tema (`id="theme"`) se retiró en v2.4 |
-| `templates/pages/profile/view.html` | Vista pública: header (avatar/iniciales + nombre + contador placeholder), grilla/lista de `PublicProfileView.plans` reutilizando los patrones de `plans/public-list.html` |
-| `templates/components/navbar.html` | El avatar pasa de `<span>` a `<button>` que abre el modal (autenticado); el anónimo gana un `<button>` de menú como trigger. El botón renderiza el `avatarUrl` vigente (`userAvatarUrl`, resuelto en cada request por `CurrentUserControllerAdvice`) o cae a la inicial: guardar el perfil actualiza el navbar en el render del redirect. Modal con dos variantes: autenticado — header (avatar/iniciales + nombre), Ver perfil → `/profile/{id}`, Cambiar contraseña, Guardados y Siguiendo **deshabilitados con badge "Pronto"**, Tema (PROF-010, tras merge de [THEME]), Cerrar sesión (roja) con ruta por rol + CSRF; anónimo — Iniciar sesión, Registrarse, Tema. El toggle standalone de [THEME] desaparece de ambos bloques cuando la entrada "Tema" entra (PROF-010). Cierre con Esc/click afuera, `aria-expanded` |
+| `templates/pages/profile/edit.html` | Superficie propia: form de `firstName`/`lastName`/`avatarUrl` con `th:action="@{/profile}"` + CSRF, email read-only, rol, link a `/profile/change-password`, aviso `?updated=true`, `th:errors`. Debajo, secciones con anclas: Guardados (`id="bookmarks"`, placeholder de `[MARK]`) y Seguidores/Seguidos (`id="follow"`, real desde v2.5 con `[FOLLOW]`: contadores y las dos listas) — la sección Tema (`id="theme"`) se retiró en v2.4 |
+| `templates/pages/profile/view.html` | Vista pública: header (avatar/iniciales + nombre + contadores reales de seguidores/seguidos desde v2.5), sección `#follow` con las dos listas, grilla/lista de `profilePlans` reutilizando los patrones de `plans/public-list.html` |
+| `templates/components/navbar.html` | El avatar pasa de `<span>` a `<button>` que abre el modal (autenticado); el anónimo gana un `<button>` de menú como trigger. El botón renderiza el `avatarUrl` vigente (`userAvatarUrl`, resuelto en cada request por `CurrentUserControllerAdvice`) o cae a la inicial: guardar el perfil actualiza el navbar en el render del redirect. Modal con dos variantes: autenticado — header (avatar/iniciales + nombre), Ver perfil → `/profile/{id}`, Cambiar contraseña, Guardados **deshabilitado con badge "Pronto"**, Siguiendo como link a `/profile#follow` (v2.5, `[FOLLOW]`), Tema (PROF-010, tras merge de [THEME]), Cerrar sesión (roja) con ruta por rol + CSRF; anónimo — Iniciar sesión, Registrarse, Tema. El toggle standalone de [THEME] desaparece de ambos bloques cuando la entrada "Tema" entra (PROF-010). Cierre con Esc/click afuera, `aria-expanded` |
 | `templates/layouts/base.html` | PROF-011: `data-theme` server-side para autenticados (la `themePreference` del usuario gana sobre `localStorage["planit-theme"]`; null → localStorage/sistema como hoy). Sin flash de tema incorrecto |
 | `templates/components/avatar-picker.html` | Partial compartido del picker: el avatar actual (o iniciales), botón "editar" que abre la grilla de los 3 defaults + campo "URL propia". Reusado en `register.html` y `profile/edit.html` |
 | `templates/pages/auth/user/register.html` | Agrega el partial del picker (campo opcional) — el form ya colecta nombre/apellido, no re-diseña el alta |
@@ -391,7 +405,7 @@ salir en null (I-10).
 | `domain/user/UserService.java` | Actualizar (interface: `updateProfile` con avatar, `updateThemePreference`) |
 | `infrastructure/user/UserServiceImpl.java` | Actualizar (persistencia de `avatarUrl` y `themePreference`) |
 | `presentation/profile/ProfileController.java` | Crear (`/profile` redirect, `/{id}` dual, `POST /profile`, change-password) |
-| `presentation/profile/ProfileForm.java`, `ChangePasswordForm.java`, `PublicProfileView.java` | Crear (DTOs) |
+| `presentation/profile/ProfileForm.java`, `ChangePasswordForm.java` | Crear (DTOs) |
 | `presentation/shared/` o `domain/plan/` | Consulta de planes públicos por owner (según dónde viva hoy la query de planes) |
 | `templates/pages/profile/edit.html` | Crear (superficie propia + placeholders) |
 | `templates/pages/profile/view.html` | Crear (vista pública + planes públicos) |
