@@ -9,7 +9,7 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-public interface JpaPlanRatingRepository extends JpaRepository<PlanRating, Long> {
+public interface JpaPlanRatingRepository extends JpaRepository<PlanRating, UUID> {
   /** Autoria interna: busca la calificacion de un usuario sobre un plan para el upsert. */
   @Query(
     "select rating from PlanRating rating where rating.plan.id = :planId and rating.user.email = :email"

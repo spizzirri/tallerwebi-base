@@ -18,10 +18,20 @@ import com.valhalla.infrastructure.place.PlaceServiceImpl;
 import com.valhalla.presentation.place.EditPlaceRequest;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class PlaceServiceImplTest {
+
+  private static final UUID PLACE_ID = UUID.fromString("0192f0a1-0000-7000-8000-000000000001");
+  private static final UUID OTHER_PLACE_ID = UUID.fromString(
+    "0192f0a1-0000-7000-8000-000000000007"
+  );
+  private static final UUID MISSING_ID = UUID.fromString("0192f0a1-0000-7000-8000-000000000099");
+  private static final UUID PLACE_TO_DELETE = UUID.fromString(
+    "0192f0a1-0000-7000-8000-000000000005"
+  );
 
   private PlaceRepository placeRepositoryMock;
   private PlanPlaceRepository planPlaceRepositoryMock;
@@ -85,23 +95,23 @@ public class PlaceServiceImplTest {
   @Test
   public void shouldReturnPlaceWhenIdExists() {
     Place expectedPlace = place("MALBA", PlaceCategory.MUSEUM);
-    expectedPlace.setId(1L);
-    when(placeRepositoryMock.findById(1L)).thenReturn(Optional.of(expectedPlace));
+    expectedPlace.setId(PLACE_ID);
+    when(placeRepositoryMock.findById(PLACE_ID)).thenReturn(Optional.of(expectedPlace));
 
-    Optional<Place> result = placeService.getPlaceById(1L);
+    Optional<Place> result = placeService.getPlaceById(PLACE_ID);
 
     assertThat(result.orElseThrow(), is(equalTo(expectedPlace)));
-    verify(placeRepositoryMock).findById(1L);
+    verify(placeRepositoryMock).findById(PLACE_ID);
   }
 
   @Test
   public void shouldReturnEmptyWhenIdDoesNotExist() {
-    when(placeRepositoryMock.findById(99L)).thenReturn(Optional.empty());
+    when(placeRepositoryMock.findById(MISSING_ID)).thenReturn(Optional.empty());
 
-    Optional<Place> result = placeService.getPlaceById(99L);
+    Optional<Place> result = placeService.getPlaceById(MISSING_ID);
 
     assertThat(result.isEmpty(), is(true));
-    verify(placeRepositoryMock).findById(99L);
+    verify(placeRepositoryMock).findById(MISSING_ID);
   }
 
   @Test
@@ -137,8 +147,8 @@ public class PlaceServiceImplTest {
   @Test
   public void shouldUpdateAnExistingPlaceApplyingTheSameMapping() {
     Place existing = place("Old Name", PlaceCategory.OTHER);
-    existing.setId(7L);
-    when(placeRepositoryMock.findById(7L)).thenReturn(Optional.of(existing));
+    existing.setId(OTHER_PLACE_ID);
+    when(placeRepositoryMock.findById(OTHER_PLACE_ID)).thenReturn(Optional.of(existing));
     EditPlaceRequest request = new EditPlaceRequest(
       "New Name",
       PlaceCategory.MUSEUM,
@@ -152,7 +162,7 @@ public class PlaceServiceImplTest {
       -58.397
     );
 
-    Place result = placeService.update(7L, request);
+    Place result = placeService.update(OTHER_PLACE_ID, request);
 
     assertThat(result, is(sameInstance(existing)));
     assertThat(result.getName(), is(equalTo("New Name")));
@@ -170,7 +180,7 @@ public class PlaceServiceImplTest {
 
   @Test
   public void shouldThrowPlaceNotFoundWhenUpdatingAMissingId() {
-    when(placeRepositoryMock.findById(99L)).thenReturn(Optional.empty());
+    when(placeRepositoryMock.findById(MISSING_ID)).thenReturn(Optional.empty());
     EditPlaceRequest request = new EditPlaceRequest(
       "Any",
       PlaceCategory.BAR,
@@ -184,27 +194,27 @@ public class PlaceServiceImplTest {
       null
     );
 
-    assertThrows(PlaceNotFoundException.class, () -> placeService.update(99L, request));
+    assertThrows(PlaceNotFoundException.class, () -> placeService.update(MISSING_ID, request));
   }
 
   @Test
   public void shouldDeleteAPlaceThatIsNotReferencedByAnyPlan() {
-    when(planPlaceRepositoryMock.existsByPlaceId(5L)).thenReturn(false);
+    when(planPlaceRepositoryMock.existsByPlaceId(PLACE_TO_DELETE)).thenReturn(false);
 
-    placeService.delete(5L);
+    placeService.delete(PLACE_TO_DELETE);
 
-    verify(planPlaceRepositoryMock).existsByPlaceId(5L);
-    verify(placeRepositoryMock).deleteById(5L);
+    verify(planPlaceRepositoryMock).existsByPlaceId(PLACE_TO_DELETE);
+    verify(placeRepositoryMock).deleteById(PLACE_TO_DELETE);
   }
 
   @Test
   public void shouldRefuseToDeleteAPlaceReferencedByAPlanWithoutTouchingTheRow() {
-    when(planPlaceRepositoryMock.existsByPlaceId(5L)).thenReturn(true);
+    when(planPlaceRepositoryMock.existsByPlaceId(PLACE_TO_DELETE)).thenReturn(true);
 
-    assertThrows(PlaceInUseException.class, () -> placeService.delete(5L));
+    assertThrows(PlaceInUseException.class, () -> placeService.delete(PLACE_TO_DELETE));
 
-    verify(planPlaceRepositoryMock).existsByPlaceId(5L);
-    verify(placeRepositoryMock, never()).deleteById(5L);
+    verify(planPlaceRepositoryMock).existsByPlaceId(PLACE_TO_DELETE);
+    verify(placeRepositoryMock, never()).deleteById(PLACE_TO_DELETE);
   }
 
   private Place place(String name, PlaceCategory category) {

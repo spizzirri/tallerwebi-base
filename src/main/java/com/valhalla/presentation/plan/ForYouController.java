@@ -87,7 +87,7 @@ public class ForYouController {
     @RequestParam(required = false) String scope
   ) {
     boolean followingScope = SCOPE_FOLLOWING.equalsIgnoreCase(scope == null ? "" : scope.trim());
-    Long viewerId = followingScope ? viewerId(authentication) : null;
+    UUID viewerId = followingScope ? viewerId(authentication) : null;
     if (followingScope && viewerId == null) {
       return new ModelAndView(REDIRECT_LOGIN_FOLLOWING);
     }
@@ -96,7 +96,7 @@ public class ForYouController {
     // propios deja pasar todo igual. El corte por null cubre el caso sin anonymous habilitado.
     String currentEmail = authentication == null ? null : authentication.getName();
     PlanDiscoveryQuery query = PlanDiscoveryQuery.parse(queryText, category, when, sort);
-    List<Long> followedIds = followingScope ? followService.followedIds(viewerId) : List.of();
+    List<UUID> followedIds = followingScope ? followService.followedIds(viewerId) : List.of();
     List<Plan> source = followingScope
       ? planService.getPublicPlansByAdministrators(followedIds)
       : planService.getPublicPlans();
@@ -139,7 +139,7 @@ public class ForYouController {
   }
 
   /** Id del visitante con sesion; en anonimo el principal es el String "anonymousUser". */
-  private Long viewerId(Authentication authentication) {
+  private UUID viewerId(Authentication authentication) {
     if (authentication == null || !(authentication.getPrincipal() instanceof UserDetails)) {
       return null;
     }

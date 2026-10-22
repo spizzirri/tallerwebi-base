@@ -18,6 +18,7 @@ import com.valhalla.domain.plan.PlanRepository;
 import com.valhalla.domain.user.User;
 import com.valhalla.domain.user.UserRepository;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,9 +59,9 @@ public class FollowSecurityTest {
 
   private MockMvc mockMvc;
 
-  private Long viewerId;
-  private Long otherId;
-  private Long authorId;
+  private UUID viewerId;
+  private UUID otherId;
+  private UUID authorId;
 
   @BeforeEach
   public void setUp() {
@@ -133,7 +134,7 @@ public class FollowSecurityTest {
     // preexistente): el eje de esta asercion son las identidades de los autores del feed.
   }
 
-  private Long givenUser(String email, String firstName, String lastName) {
+  private UUID givenUser(String email, String firstName, String lastName) {
     User user = new User();
     user.setEmail(email);
     user.setPassword("password123");
@@ -145,7 +146,7 @@ public class FollowSecurityTest {
     return this.userRepository.findByEmail(email).orElseThrow().getId();
   }
 
-  private void givenPlan(Long administratorId, String name, boolean isPublic) {
+  private void givenPlan(UUID administratorId, String name, boolean isPublic) {
     Plan plan = new Plan();
     plan.setName(name);
     plan.setIsPublic(isPublic);

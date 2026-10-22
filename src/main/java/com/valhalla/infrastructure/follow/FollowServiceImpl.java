@@ -7,6 +7,7 @@ import com.valhalla.domain.user.User;
 import com.valhalla.domain.user.UserService;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
  * servicio es la primera: seguir dos veces es un no-op y dejar de seguir a quien no se sigue no
  * escribe nada (AC-02).
  *
- * <p>Los dos usuarios se resuelven con {@link UserService#findById(Long)} para que un id
+ * <p>Los dos usuarios se resuelven con {@link UserService#findById(UUID)} para que un id
  * inexistente salga como {@code UserNotFoundException} y el perfil responda 404 (AC-01).
  */
 @Service
@@ -33,7 +34,7 @@ public class FollowServiceImpl implements FollowService {
 
   @Override
   @Transactional
-  public void follow(Long followerId, Long followedId) {
+  public void follow(UUID followerId, UUID followedId) {
     if (Objects.equals(followerId, followedId)) {
       throw new IllegalArgumentException("No podes seguirte a vos mismo");
     }
@@ -47,7 +48,7 @@ public class FollowServiceImpl implements FollowService {
 
   @Override
   @Transactional
-  public void unfollow(Long followerId, Long followedId) {
+  public void unfollow(UUID followerId, UUID followedId) {
     if (!followRepository.existsByFollowerIdAndFollowedId(followerId, followedId)) {
       return;
     }
@@ -56,37 +57,37 @@ public class FollowServiceImpl implements FollowService {
 
   @Override
   @Transactional(readOnly = true)
-  public boolean isFollowing(Long followerId, Long followedId) {
+  public boolean isFollowing(UUID followerId, UUID followedId) {
     return followRepository.existsByFollowerIdAndFollowedId(followerId, followedId);
   }
 
   @Override
   @Transactional(readOnly = true)
-  public long countFollowers(Long userId) {
+  public long countFollowers(UUID userId) {
     return followRepository.countByFollowedId(userId);
   }
 
   @Override
   @Transactional(readOnly = true)
-  public long countFollowing(Long userId) {
+  public long countFollowing(UUID userId) {
     return followRepository.countByFollowerId(userId);
   }
 
   @Override
   @Transactional(readOnly = true)
-  public List<User> followers(Long userId) {
+  public List<User> followers(UUID userId) {
     return followRepository.findFollowers(userId);
   }
 
   @Override
   @Transactional(readOnly = true)
-  public List<User> following(Long userId) {
+  public List<User> following(UUID userId) {
     return followRepository.findFollowing(userId);
   }
 
   @Override
   @Transactional(readOnly = true)
-  public List<Long> followedIds(Long followerId) {
+  public List<UUID> followedIds(UUID followerId) {
     return followRepository.findFollowedIds(followerId);
   }
 }

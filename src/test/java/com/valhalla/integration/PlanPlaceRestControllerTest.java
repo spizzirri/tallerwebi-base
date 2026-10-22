@@ -10,6 +10,7 @@ import com.valhalla.domain.place.*;
 import com.valhalla.domain.plan.*;
 import com.valhalla.domain.planplace.*;
 import com.valhalla.domain.user.*;
+import java.util.UUID;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
@@ -57,7 +58,7 @@ class PlanPlaceRestControllerTest extends PlanPlaceWebFixture {
 
   @Test
   void detailIncludesPersistedVisitAndPlaceDataForParticipants() throws Exception {
-    Long id = add(first);
+    UUID id = add(first);
     PlanPlace entry = entries.findById(id).orElseThrow();
     entry.setDescription("Visita guiada");
     entry.setVisitDate(java.time.LocalDate.of(2026, 12, 1));
@@ -130,7 +131,7 @@ class PlanPlaceRestControllerTest extends PlanPlaceWebFixture {
 
   @Test
   void I04_updatesScheduleAndClearsIt() throws Exception {
-    Long id = add(first);
+    UUID id = add(first);
     mvc
       .perform(
         put(url + "/" + id)
@@ -156,7 +157,7 @@ class PlanPlaceRestControllerTest extends PlanPlaceWebFixture {
 
   @Test
   void I05_deletesEntry() throws Exception {
-    Long id = add(first);
+    UUID id = add(first);
     mvc
       .perform(delete(url + "/" + id).with(user("apl@test.com")).with(csrf()))
       .andExpect(status().isOk());
@@ -165,15 +166,15 @@ class PlanPlaceRestControllerTest extends PlanPlaceWebFixture {
 
   @Test
   void I06_reorders() throws Exception {
-    Long firstEntry = add(first);
-    Long secondEntry = add(second);
+    UUID firstEntry = add(first);
+    UUID secondEntry = add(second);
     mvc
       .perform(
         post(url + "/reorder")
           .with(user("apl@test.com"))
           .with(csrf())
           .contentType("application/json")
-          .content("[" + secondEntry + "," + firstEntry + "]")
+          .content("[\"" + secondEntry + "\",\"" + firstEntry + "\"]")
       )
       .andExpect(status().isOk());
     assertEquals(second, entries.findByPlanId(plan.getId()).get(0).getPlace().getId());
@@ -181,7 +182,7 @@ class PlanPlaceRestControllerTest extends PlanPlaceWebFixture {
 
   @Test
   void invalidDateReturns400AndDoesNotModify() throws Exception {
-    Long id = add(first);
+    UUID id = add(first);
     mvc
       .perform(
         put(url + "/" + id)

@@ -127,7 +127,7 @@ public class UserViewABME2E extends E2eBase {
   private void thenShouldSeeHeading(String expected) throws MalformedURLException {
     String heading;
     String path = usersPage.getCurrentUrl().getPath();
-    boolean onFormPage = path.contains("/users/new") || path.matches(".*/users/\\d+/edit");
+    boolean onFormPage = path.contains("/users/new") || path.matches(".*/users/[0-9a-f-]{36}/edit");
     if (onFormPage) {
       heading = new UserFormPage(context.pages().get(0)).getHeading();
     } else {

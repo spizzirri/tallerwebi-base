@@ -5,6 +5,7 @@ import com.valhalla.domain.place.PlaceCategory;
 import com.valhalla.domain.place.PlaceRepository;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -24,7 +25,7 @@ public class PlaceRepositoryImpl implements PlaceRepository {
   }
 
   @Override
-  public Optional<Place> findById(Long id) {
+  public Optional<Place> findById(UUID id) {
     return jpaPlaceRepository.findById(id);
   }
 
@@ -52,7 +53,7 @@ public class PlaceRepositoryImpl implements PlaceRepository {
   }
 
   @Override
-  public void deleteById(Long id) {
+  public void deleteById(UUID id) {
     jpaPlaceRepository.deleteById(id);
   }
 

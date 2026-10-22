@@ -2,11 +2,12 @@ package com.valhalla.domain.place;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface PlaceRepository {
   List<Place> findAll();
 
-  Optional<Place> findById(Long id);
+  Optional<Place> findById(UUID id);
 
   List<Place> findByCategory(PlaceCategory category);
 
@@ -16,7 +17,7 @@ public interface PlaceRepository {
 
   void save(Place place);
 
-  void deleteById(Long id);
+  void deleteById(UUID id);
 
   long count();
 }

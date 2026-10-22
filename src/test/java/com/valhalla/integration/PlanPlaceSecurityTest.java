@@ -5,6 +5,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 // Inherits the real database and filter-chain fixture, as well as the endpoint contract tests.
@@ -22,7 +23,7 @@ class PlanPlaceSecurityTest extends PlanPlaceWebFixture {
 
   @Test
   void S02_anonymousPutRedirectsWithoutWriting() throws Exception {
-    Long id = add(first);
+    UUID id = add(first);
     mvc
       .perform(
         put(url + "/" + id)
@@ -36,7 +37,7 @@ class PlanPlaceSecurityTest extends PlanPlaceWebFixture {
 
   @Test
   void S03_anonymousDeleteRedirectsWithoutDeleting() throws Exception {
-    Long id = add(first);
+    UUID id = add(first);
     mvc.perform(delete(url + "/" + id).with(csrf())).andExpect(status().isFound());
     assertTrue(entries.findById(id).isPresent());
   }
@@ -79,7 +80,7 @@ class PlanPlaceSecurityTest extends PlanPlaceWebFixture {
 
   @Test
   void otherOwnerCannotUpdateDeleteOrReorder() throws Exception {
-    Long id = add(first);
+    UUID id = add(first);
     mvc
       .perform(
         put(url + "/" + id)
@@ -98,7 +99,7 @@ class PlanPlaceSecurityTest extends PlanPlaceWebFixture {
           .with(user("other@test.com"))
           .with(csrf())
           .contentType("application/json")
-          .content("[" + first + "]")
+          .content("[\"" + id + "\"]")
       )
       .andExpect(status().isNotFound());
     assertTrue(entries.findById(id).isPresent());
@@ -106,7 +107,7 @@ class PlanPlaceSecurityTest extends PlanPlaceWebFixture {
 
   @Test
   void entryFromAnotherPlanIsNotFound() throws Exception {
-    Long id = add(first);
+    UUID id = add(first);
     com.valhalla.domain.plan.Plan other = new com.valhalla.domain.plan.Plan();
     other.setName("Other");
     other.setAdministrator(plan.getAdministrator());

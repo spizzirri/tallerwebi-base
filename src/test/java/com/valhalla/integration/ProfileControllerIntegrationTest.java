@@ -23,6 +23,7 @@ import com.valhalla.domain.user.User;
 import com.valhalla.domain.user.UserRepository;
 import com.valhalla.domain.user.UserService;
 import jakarta.servlet.Filter;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,8 +70,8 @@ public class ProfileControllerIntegrationTest {
 
   private MockMvc mockMvc;
 
-  private Long selfId;
-  private Long otherId;
+  private UUID selfId;
+  private UUID otherId;
 
   @BeforeEach
   public void setUp() {
@@ -440,7 +441,8 @@ public class ProfileControllerIntegrationTest {
 
   @Test
   public void unknownProfileReturnsNotFoundJsonSchema() throws Exception {
-    this.mockMvc.perform(get("/profile/424242")).andExpect(status().isNotFound());
+    this.mockMvc.perform(get("/profile/0192f0a1-0000-7000-8000-0000000003e7"))
+      .andExpect(status().isNotFound());
   }
 
   // --- S-06: no hay POST sobre /profile/{id}: las escrituras viven en la sesion (AC-04) ---

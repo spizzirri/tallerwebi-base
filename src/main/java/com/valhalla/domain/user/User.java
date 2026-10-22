@@ -1,11 +1,12 @@
 package com.valhalla.domain.user;
 
+import com.valhalla.domain.plan.UuidVersion7Generator;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.util.UUID;
+import org.hibernate.annotations.UuidGenerator;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Entity
@@ -13,8 +14,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class User {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  @UuidGenerator(algorithm = UuidVersion7Generator.class)
+  private UUID id;
 
   @Column(unique = true)
   private String email;
@@ -31,11 +32,11 @@ public class User {
   private String role;
   private Boolean active = false;
 
-  public Long getId() {
+  public UUID getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(UUID id) {
     this.id = id;
   }
 

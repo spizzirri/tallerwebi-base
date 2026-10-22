@@ -7,16 +7,16 @@ import java.util.UUID;
 
 /** [MARK] Acceso a los planes guardados por cada usuario. */
 public interface PlanBookmarkRepository {
-  Optional<PlanBookmark> findByUserIdAndPlanId(Long userId, UUID planId);
+  Optional<PlanBookmark> findByUserIdAndPlanId(UUID userId, UUID planId);
 
   /** Mas recientes primero; el id desempata dos guardados en el mismo milisegundo. */
-  List<PlanBookmark> findByUserId(Long userId);
+  List<PlanBookmark> findByUserId(UUID userId);
 
-  Set<UUID> findPlanIdsByUserId(Long userId);
+  Set<UUID> findPlanIdsByUserId(UUID userId);
 
   PlanBookmark save(PlanBookmark bookmark);
 
-  void deleteByUserIdAndPlanId(Long userId, UUID planId);
+  void deleteByUserIdAndPlanId(UUID userId, UUID planId);
 
-  void deleteAllByUserId(Long userId);
+  void deleteAllByUserId(UUID userId);
 }

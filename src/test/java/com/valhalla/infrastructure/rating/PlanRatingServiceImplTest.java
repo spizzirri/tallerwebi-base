@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
 public class PlanRatingServiceImplTest {
 
   private static final String EMAIL = "votante@test.com";
-  private static final Long USER_ID = 11L;
+  private static final UUID USER_ID = UUID.fromString("0192f0a1-0000-7000-8000-00000000000b");
   private static final UUID PLAN_ID = UUID.fromString("0192f0a1-0000-7000-8000-0000000000ca");
 
   private PlanRatingServiceImpl ratingService;
@@ -195,7 +195,7 @@ public class PlanRatingServiceImplTest {
     return plan;
   }
 
-  private static User user(Long id, String email) {
+  private static User user(UUID id, String email) {
     User user = new User();
     user.setId(id);
     user.setEmail(email);

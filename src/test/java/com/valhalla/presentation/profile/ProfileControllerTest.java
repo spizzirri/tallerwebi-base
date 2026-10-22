@@ -3,7 +3,7 @@ package com.valhalla.presentation.profile;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -18,6 +18,7 @@ import com.valhalla.domain.plan.PlanService;
 import com.valhalla.domain.user.User;
 import com.valhalla.domain.user.UserService;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -35,9 +36,11 @@ import org.springframework.web.servlet.ModelAndView;
  */
 public class ProfileControllerTest {
 
-  private static final Long VIEWER_ID = 1L;
-  private static final Long OWNER_ID = 2L;
-  private static final Long MISSING_ID = 99L;
+  private static final UUID VIEWER_ID = UUID.fromString("0192f0a1-0000-7000-8000-000000000001");
+  private static final UUID OWNER_ID = UUID.fromString("0192f0a1-0000-7000-8000-000000000002");
+  private static final UUID FAN_ID = UUID.fromString("0192f0a1-0000-7000-8000-000000000007");
+  private static final UUID IDOL_ID = UUID.fromString("0192f0a1-0000-7000-8000-000000000008");
+  private static final UUID MISSING_ID = UUID.fromString("0192f0a1-0000-7000-8000-0000000003e7");
   private static final String VIEWER_EMAIL = "viewer@test.com";
   private static final String OWNER_EMAIL = "owner@test.com";
   private static final String VIEW_PUBLIC = "pages/profile/view";
@@ -77,8 +80,8 @@ public class ProfileControllerTest {
   public void U09_view_publicaExponeConteosRealesIsFollowingYLasDosListas() {
     // given: el dueno del perfil tiene 3 seguidores y sigue a 4, y el visitante ya lo sigue
     User owner = user(OWNER_ID, OWNER_EMAIL, "Grace", "Hopper");
-    User follower = user(7L, "fan@test.com", "Fan", "Uno");
-    User followed = user(8L, "idol@test.com", "Idolo", "Dos");
+    User follower = user(FAN_ID, "fan@test.com", "Fan", "Uno");
+    User followed = user(IDOL_ID, "idol@test.com", "Idolo", "Dos");
     when(this.userServiceMock.findById(OWNER_ID)).thenReturn(owner);
     when(this.followServiceMock.countFollowers(OWNER_ID)).thenReturn(3L);
     when(this.followServiceMock.countFollowing(OWNER_ID)).thenReturn(4L);
@@ -119,7 +122,7 @@ public class ProfileControllerTest {
     assertThat(view.getViewName(), is(VIEW_PUBLIC));
     assertThat(view.getModel().get("followerCount"), is(equalTo(3L)));
     assertThat(view.getModel().get("isFollowing"), is(false));
-    verify(this.followServiceMock, never()).isFollowing(anyLong(), anyLong());
+    verify(this.followServiceMock, never()).isFollowing(any(UUID.class), any(UUID.class));
   }
 
   // --- U-09 (sin Authentication): la cadena sin anonymous deja el principal en null ---
@@ -134,7 +137,7 @@ public class ProfileControllerTest {
 
     // then: sin principal no hay relacion que consultar
     assertThat(view.getModel().get("isFollowing"), is(false));
-    verify(this.followServiceMock, never()).isFollowing(anyLong(), anyLong());
+    verify(this.followServiceMock, never()).isFollowing(any(UUID.class), any(UUID.class));
   }
 
   // --- U-09 (con sesion pero sin relacion): el boton dice "Seguir" ---
@@ -160,8 +163,8 @@ public class ProfileControllerTest {
   public void U10_view_propiaMuestraElEditorSinBotonDeSeguirConLasListas() {
     // given: el dueno es el usuario de la sesion
     User me = user(VIEWER_ID, VIEWER_EMAIL, "Ana", "Perez");
-    User follower = user(7L, "fan@test.com", "Fan", "Uno");
-    User followed = user(8L, "idol@test.com", "Idolo", "Dos");
+    User follower = user(FAN_ID, "fan@test.com", "Fan", "Uno");
+    User followed = user(IDOL_ID, "idol@test.com", "Idolo", "Dos");
     when(this.userServiceMock.findById(VIEWER_ID)).thenReturn(me);
     when(this.followServiceMock.countFollowers(VIEWER_ID)).thenReturn(2L);
     when(this.followServiceMock.countFollowing(VIEWER_ID)).thenReturn(1L);
@@ -178,7 +181,7 @@ public class ProfileControllerTest {
     assertThat(view.getModel().get("followingCount"), is(equalTo(1L)));
     assertThat(view.getModel().get("followers"), is(equalTo(List.of(follower))));
     assertThat(view.getModel().get("following"), is(equalTo(List.of(followed))));
-    verify(this.followServiceMock, never()).isFollowing(anyLong(), anyLong());
+    verify(this.followServiceMock, never()).isFollowing(any(UUID.class), any(UUID.class));
   }
 
   // --- POST /profile/{id}/follow ---
@@ -190,7 +193,7 @@ public class ProfileControllerTest {
 
     // then (AC-03): ni excepcion ni relacion, el UI no ofrece el boton en el perfil propio
     assertThat(view.getViewName(), is(equalTo("redirect:/profile/" + VIEWER_ID)));
-    verify(this.followServiceMock, never()).follow(anyLong(), anyLong());
+    verify(this.followServiceMock, never()).follow(any(UUID.class), any(UUID.class));
   }
 
   @Test
@@ -229,7 +232,7 @@ public class ProfileControllerTest {
     verify(this.followServiceMock, times(1)).unfollow(VIEWER_ID, OWNER_ID);
   }
 
-  private static User user(Long id, String email, String firstName, String lastName) {
+  private static User user(UUID id, String email, String firstName, String lastName) {
     User user = new User();
     user.setId(id);
     user.setEmail(email);

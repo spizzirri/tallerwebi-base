@@ -38,7 +38,7 @@ public final class PlanFeedCards {
     String eventDate,
     int placeCount,
     String administratorName,
-    Long administratorId,
+    UUID administratorId,
     String cover,
     Double ratingAverage,
     Long ratingCount,

@@ -6,11 +6,11 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface JpaPlanPlaceRepository extends JpaRepository<PlanPlace, Long> {
+public interface JpaPlanPlaceRepository extends JpaRepository<PlanPlace, UUID> {
   @EntityGraph(attributePaths = { "place" })
   List<PlanPlace> findByPlanIdOrderBySortOrder(UUID planId);
 
-  boolean existsByPlanIdAndPlaceId(UUID planId, Long placeId);
+  boolean existsByPlanIdAndPlaceId(UUID planId, UUID placeId);
 
-  boolean existsByPlaceId(Long placeId);
+  boolean existsByPlaceId(UUID placeId);
 }

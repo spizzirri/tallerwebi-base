@@ -18,6 +18,7 @@ import com.valhalla.domain.plan.PlanService;
 import com.valhalla.domain.user.UserRepository;
 import com.valhalla.domain.user.UserService;
 import java.time.LocalDate;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -139,7 +140,7 @@ public class UserControllerTest {
   @WithMockUser(username = "admin@unlam.edu.ar", roles = { "ADMIN" })
   public void shouldShowEditUserForm() throws Exception {
     userService.create("editable@unlam.edu.ar", TEST_PASSWORD, TEST_ROLE, "Editable", "User");
-    Long userId = userRepository.findByEmail("editable@unlam.edu.ar").get().getId();
+    UUID userId = userRepository.findByEmail("editable@unlam.edu.ar").get().getId();
 
     this.mockMvc.perform(get("/admin/users/" + userId + "/edit"))
       .andExpect(status().isOk())
@@ -153,7 +154,7 @@ public class UserControllerTest {
   @WithMockUser(username = "admin@unlam.edu.ar", roles = { "ADMIN" })
   public void shouldUpdateUserAndRedirectToList() throws Exception {
     userService.create("updatable@unlam.edu.ar", TEST_PASSWORD, TEST_ROLE, "Updatable", "User");
-    Long userId = userRepository.findByEmail("updatable@unlam.edu.ar").get().getId();
+    UUID userId = userRepository.findByEmail("updatable@unlam.edu.ar").get().getId();
 
     this.mockMvc.perform(
         post("/admin/users/" + userId)
@@ -178,7 +179,7 @@ public class UserControllerTest {
       "Deactivatable",
       "User"
     );
-    Long userId = userRepository.findByEmail("deactivatable@unlam.edu.ar").get().getId();
+    UUID userId = userRepository.findByEmail("deactivatable@unlam.edu.ar").get().getId();
 
     this.mockMvc.perform(
         post("/admin/users/" + userId + "/deactivate").with(csrf()).param("_method", "PUT")
@@ -191,7 +192,7 @@ public class UserControllerTest {
   @WithMockUser(username = "admin@unlam.edu.ar", roles = { "ADMIN" })
   public void shouldDeleteUserAndRedirectToList() throws Exception {
     userService.create("deletable@unlam.edu.ar", TEST_PASSWORD, TEST_ROLE, "Deletable", "User");
-    Long userId = userRepository.findByEmail("deletable@unlam.edu.ar").get().getId();
+    UUID userId = userRepository.findByEmail("deletable@unlam.edu.ar").get().getId();
 
     this.mockMvc.perform(
         post("/admin/users/" + userId + "/delete").with(csrf()).param("_method", "DELETE")
@@ -213,7 +214,7 @@ public class UserControllerTest {
   public void shouldDeleteAUserThatOwnsPlansWithoutFailing() throws Exception {
     String ownerEmail = "owner@unlam.edu.ar";
     userService.create(ownerEmail, TEST_PASSWORD, TEST_ROLE, "Owner", "OfPlans");
-    Long userId = userRepository.findByEmail(ownerEmail).get().getId();
+    UUID userId = userRepository.findByEmail(ownerEmail).get().getId();
 
     Plan plan = new Plan();
     plan.setName("A plan that blocks the delete");
@@ -252,7 +253,7 @@ public class UserControllerTest {
       "Updatable",
       "Invalid"
     );
-    Long userId = userRepository.findByEmail("updatable-invalid@unlam.edu.ar").get().getId();
+    UUID userId = userRepository.findByEmail("updatable-invalid@unlam.edu.ar").get().getId();
 
     this.mockMvc.perform(
         post("/admin/users/" + userId)
@@ -273,7 +274,7 @@ public class UserControllerTest {
   @WithMockUser(username = "admin@unlam.edu.ar", roles = { "ADMIN" })
   public void shouldActivateUserAndRedirectToList() throws Exception {
     userService.create("activatable@unlam.edu.ar", TEST_PASSWORD, TEST_ROLE, "Activatable", "User");
-    Long userId = userRepository.findByEmail("activatable@unlam.edu.ar").get().getId();
+    UUID userId = userRepository.findByEmail("activatable@unlam.edu.ar").get().getId();
     userService.deactivate(userId);
 
     this.mockMvc.perform(
@@ -287,7 +288,7 @@ public class UserControllerTest {
   @WithMockUser(username = "admin@unlam.edu.ar", roles = { "ADMIN" })
   public void shouldRotatePasswordAndRedirectToList() throws Exception {
     userService.create("rotatable@unlam.edu.ar", TEST_PASSWORD, TEST_ROLE, "Rotatable", "User");
-    Long userId = userRepository.findByEmail("rotatable@unlam.edu.ar").get().getId();
+    UUID userId = userRepository.findByEmail("rotatable@unlam.edu.ar").get().getId();
 
     this.mockMvc.perform(
         post("/admin/users/" + userId + "/rotate-password").with(csrf()).param("_method", "PUT")

@@ -10,6 +10,7 @@ import com.valhalla.domain.planplace.PlanPlaceRepository;
 import com.valhalla.presentation.place.EditPlaceRequest;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,7 +39,7 @@ public class PlaceServiceImpl implements PlaceService {
 
   @Override
   @Transactional(readOnly = true)
-  public Optional<Place> getPlaceById(Long id) {
+  public Optional<Place> getPlaceById(UUID id) {
     return placeRepository.findById(id);
   }
 
@@ -69,7 +70,7 @@ public class PlaceServiceImpl implements PlaceService {
   }
 
   @Override
-  public Place update(Long id, EditPlaceRequest request) {
+  public Place update(UUID id, EditPlaceRequest request) {
     Place place = placeRepository.findById(id).orElseThrow(PlaceNotFoundException::new);
     applyRequest(place, request);
     placeRepository.save(place);
@@ -83,7 +84,7 @@ public class PlaceServiceImpl implements PlaceService {
    * {@code deleteById} de Spring Data es un no-op silencioso sobre una fila ausente.
    */
   @Override
-  public void delete(Long id) {
+  public void delete(UUID id) {
     if (planPlaceRepository.existsByPlaceId(id)) {
       throw new PlaceInUseException();
     }

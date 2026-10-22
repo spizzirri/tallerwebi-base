@@ -1,23 +1,24 @@
 package com.valhalla.domain.place;
 
+import com.valhalla.domain.plan.UuidVersion7Generator;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.util.UUID;
+import org.hibernate.annotations.UuidGenerator;
 
 @Entity
 @Table(name = "places")
 public class Place { // NOPMD — intentional: 11 fields vs maxfields=10; the 3 extra (openingHours, phone, website) are optional OSM-imported columns, one getter/setter pair each, no behaviour.
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  @UuidGenerator(algorithm = UuidVersion7Generator.class)
+  private UUID id;
 
   @NotBlank(message = "Name is required")
   @Column(nullable = false)
@@ -52,11 +53,11 @@ public class Place { // NOPMD — intentional: 11 fields vs maxfields=10; the 3 
 
   private String website;
 
-  public Long getId() {
+  public UUID getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(UUID id) {
     this.id = id;
   }
 

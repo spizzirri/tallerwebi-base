@@ -213,7 +213,7 @@ public class PlanController {
   @PostMapping("/{id}/join-requests/{requestId}/respond")
   public ModelAndView respondToJoinRequest(
     @PathVariable UUID id,
-    @PathVariable Long requestId,
+    @PathVariable UUID requestId,
     @RequestParam String action,
     Authentication authentication
   ) {
@@ -454,7 +454,7 @@ public class PlanController {
   @PostMapping("/{id}/invitations/{invitationId}/respond")
   public ModelAndView respondToInvitation(
     @PathVariable UUID id,
-    @PathVariable Long invitationId,
+    @PathVariable UUID invitationId,
     @RequestParam boolean accept,
     Authentication authentication,
     org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes
@@ -534,8 +534,8 @@ public class PlanController {
   private static Map<String, Object> placeView(PlanPlace entry) {
     Place place = entry.getPlace();
     Map<String, Object> view = new LinkedHashMap<>();
-    view.put("id", place.getId());
-    view.put("entryId", entry.getId());
+    view.put("id", String.valueOf(place.getId()));
+    view.put("entryId", String.valueOf(entry.getId()));
     view.put("description", entry.getDescription());
     view.put("visitDate", entry.getVisitDate() == null ? null : entry.getVisitDate().toString());
     view.put("visitTime", entry.getVisitTime() == null ? null : entry.getVisitTime().toString());

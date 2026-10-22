@@ -39,7 +39,7 @@ public class PlanPlaceServiceImpl implements PlanPlaceService {
   }
 
   @Override
-  public PlanPlace addPlaceToPlan(UUID planId, Long placeId, String ownerEmail) {
+  public PlanPlace addPlaceToPlan(UUID planId, UUID placeId, String ownerEmail) {
     Plan plan = planService.getEditablePlan(planId, ownerEmail);
     PlanPlace entry = new PlanPlace();
     plan.addPlanPlace(entry);
@@ -70,7 +70,7 @@ public class PlanPlaceServiceImpl implements PlanPlaceService {
   @Override
   public PlanPlace updatePlanPlace(
     UUID planId,
-    Long id,
+    UUID id,
     LocalDate date,
     LocalTime time,
     String ownerEmail
@@ -83,14 +83,14 @@ public class PlanPlaceServiceImpl implements PlanPlaceService {
   }
 
   @Override
-  public void removePlaceFromPlan(UUID planId, Long id, String ownerEmail) {
+  public void removePlaceFromPlan(UUID planId, UUID id, String ownerEmail) {
     PlanPlace entry = ownedEntry(planId, id, ownerEmail);
     entry.getPlan().getPlanPlaces().remove(entry);
     repository.deleteById(id);
   }
 
   @Override
-  public void reorderPlaces(UUID planId, List<Long> entryIds, String ownerEmail) {
+  public void reorderPlaces(UUID planId, List<UUID> entryIds, String ownerEmail) {
     planService.getEditablePlan(planId, ownerEmail);
     List<PlanPlace> entries = repository.findByPlanId(planId);
     // The same place can appear several times, so entries are identified by their own id.
@@ -110,11 +110,11 @@ public class PlanPlaceServiceImpl implements PlanPlaceService {
 
   @Transactional(readOnly = true)
   @Override
-  public boolean isPlaceInPlan(UUID planId, Long placeId) {
+  public boolean isPlaceInPlan(UUID planId, UUID placeId) {
     return repository.existsByPlanIdAndPlaceId(planId, placeId);
   }
 
-  private PlanPlace ownedEntry(UUID planId, Long id, String ownerEmail) {
+  private PlanPlace ownedEntry(UUID planId, UUID id, String ownerEmail) {
     planService.getEditablePlan(planId, ownerEmail);
     PlanPlace entry = repository.findById(id).orElseThrow(PlanNotFoundException::new);
     if (!planId.equals(entry.getPlan().getId())) {

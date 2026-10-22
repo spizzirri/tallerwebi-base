@@ -2,6 +2,7 @@ package com.valhalla.domain.follow;
 
 import com.valhalla.domain.user.User;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * [FOLLOW] Seguir y dejar de seguir usuarios, y las lecturas que alimentan el perfil y el feed.
@@ -10,20 +11,20 @@ import java.util.List;
  * es un no-op. Ninguna de las dos operaciones rompe la vista (AC-01..AC-03).
  */
 public interface FollowService {
-  void follow(Long followerId, Long followedId);
+  void follow(UUID followerId, UUID followedId);
 
-  void unfollow(Long followerId, Long followedId);
+  void unfollow(UUID followerId, UUID followedId);
 
-  boolean isFollowing(Long followerId, Long followedId);
+  boolean isFollowing(UUID followerId, UUID followedId);
 
-  long countFollowers(Long userId);
+  long countFollowers(UUID userId);
 
-  long countFollowing(Long userId);
+  long countFollowing(UUID userId);
 
-  List<User> followers(Long userId);
+  List<User> followers(UUID userId);
 
-  List<User> following(Long userId);
+  List<User> following(UUID userId);
 
   /** [FOLLOW] Autores seguidos, para el scope Siguiendo del feed: una sola consulta (AC-15). */
-  List<Long> followedIds(Long followerId);
+  List<UUID> followedIds(UUID followerId);
 }

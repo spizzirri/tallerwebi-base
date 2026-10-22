@@ -77,8 +77,8 @@ public class BookmarkSecurityTest {
 
   private MockMvc mockMvc;
 
-  private Long ownerId;
-  private Long saverId;
+  private UUID ownerId;
+  private UUID saverId;
 
   @BeforeEach
   public void setUp() {

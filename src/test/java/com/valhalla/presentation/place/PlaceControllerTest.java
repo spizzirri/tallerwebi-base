@@ -13,11 +13,14 @@ import com.valhalla.domain.place.Place;
 import com.valhalla.domain.place.PlaceCategory;
 import com.valhalla.domain.place.PlaceService;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.servlet.ModelAndView;
 
 public class PlaceControllerTest {
+
+  private static final UUID PLACE_ID = UUID.fromString("0192f0a1-0000-7000-8000-000000000001");
 
   private PlaceController controller;
   private PlaceService placeServiceMock;
@@ -30,7 +33,7 @@ public class PlaceControllerTest {
 
   @Test
   public void shouldReturnAllPlacesWhenListHasNoFilters() {
-    List<Place> places = List.of(place(1L, "MALBA", PlaceCategory.MUSEUM));
+    List<Place> places = List.of(place(PLACE_ID, "MALBA", PlaceCategory.MUSEUM));
     when(placeServiceMock.getAllPlaces()).thenReturn(places);
 
     ModelAndView result = controller.listPlaces(null, null);
@@ -42,7 +45,7 @@ public class PlaceControllerTest {
 
   @Test
   public void shouldReturnCategoryFilteredPlaces() {
-    List<Place> places = List.of(place(1L, "Cafe Tortoni", PlaceCategory.CAFE));
+    List<Place> places = List.of(place(PLACE_ID, "Cafe Tortoni", PlaceCategory.CAFE));
     when(placeServiceMock.getPlacesByCategory(PlaceCategory.CAFE)).thenReturn(places);
 
     ModelAndView result = controller.listPlaces("CAFE", null);
@@ -53,7 +56,7 @@ public class PlaceControllerTest {
 
   @Test
   public void shouldApplySearchWithinSelectedCategory() {
-    List<Place> places = List.of(place(1L, "Parrilla Don Julio", PlaceCategory.RESTAURANT));
+    List<Place> places = List.of(place(PLACE_ID, "Parrilla Don Julio", PlaceCategory.RESTAURANT));
     when(placeServiceMock.searchPlaces("Don", PlaceCategory.RESTAURANT)).thenReturn(places);
 
     ModelAndView result = controller.listPlaces("RESTAURANT", "Don");
@@ -64,7 +67,7 @@ public class PlaceControllerTest {
 
   @Test
   public void shouldReturnNameFilteredPlaces() {
-    List<Place> places = List.of(place(1L, "Parrilla Don Julio", PlaceCategory.RESTAURANT));
+    List<Place> places = List.of(place(PLACE_ID, "Parrilla Don Julio", PlaceCategory.RESTAURANT));
     when(placeServiceMock.searchPlaces("Don")).thenReturn(places);
 
     ModelAndView result = controller.listPlaces(null, "Don");
@@ -81,7 +84,7 @@ public class PlaceControllerTest {
     verifyNoInteractions(placeServiceMock);
   }
 
-  private Place place(Long id, String name, PlaceCategory category) {
+  private Place place(UUID id, String name, PlaceCategory category) {
     Place place = new Place();
     place.setId(id);
     place.setName(name);

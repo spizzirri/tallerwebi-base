@@ -1,17 +1,18 @@
 package com.valhalla.domain.rating;
 
 import com.valhalla.domain.plan.Plan;
+import com.valhalla.domain.plan.UuidVersion7Generator;
 import com.valhalla.domain.user.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import java.util.UUID;
+import org.hibernate.annotations.UuidGenerator;
 
 /**
  * [CAL] Calificacion de 1 a 5 estrellas que un usuario logueado le da a un plan publico.
@@ -31,8 +32,8 @@ import jakarta.persistence.UniqueConstraint;
 public class PlanRating {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  @UuidGenerator(algorithm = UuidVersion7Generator.class)
+  private UUID id;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "plan_id", nullable = false)

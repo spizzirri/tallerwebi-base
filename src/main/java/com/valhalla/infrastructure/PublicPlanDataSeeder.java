@@ -207,6 +207,15 @@ public class PublicPlanDataSeeder implements ApplicationListener<ContextRefreshe
 
   @Override
   public synchronized void onApplicationEvent(ContextRefreshedEvent event) {
+    ensureSeeded();
+  }
+
+  /**
+   * Idempotente: siembra fantasmas, planes publicos, calificaciones y follows. Es publico porque
+   * {@link DemoInteractionSeeder} cuelga de este feed (le pone guardados, permisos e invitaciones
+   * encima) y el orden de los listeners no esta garantizado.
+   */
+  public synchronized void ensureSeeded() {
     if (seeded || !enabled()) {
       return;
     }
@@ -244,6 +253,11 @@ public class PublicPlanDataSeeder implements ApplicationListener<ContextRefreshe
     if (added > 0 && LOGGER.isLoggable(Level.INFO)) {
       LOGGER.info("Public demo ratings topped up: " + added);
     }
+  }
+
+  /** Encendido solo donde se pide: {@code -Dseed.demoPlans=true} o la variable de entorno. */
+  boolean isEnabled() {
+    return enabled();
   }
 
   /** Encendido solo donde se pide: {@code -Dseed.demoPlans=true} o la variable de entorno. */

@@ -312,10 +312,9 @@ public class PublicPlanDataSeederTest {
 
   private static List<Place> placesNamed(String... names) {
     List<Place> places = new ArrayList<>();
-    long id = 1;
     for (String name : names) {
       Place place = new Place();
-      place.setId(id++);
+      place.setId(UUID.randomUUID());
       place.setName(name);
       places.add(place);
     }
