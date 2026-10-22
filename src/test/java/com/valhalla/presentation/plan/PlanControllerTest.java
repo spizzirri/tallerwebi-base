@@ -294,7 +294,7 @@ public class PlanControllerTest {
   public void T_MARK_007d_showPublicPlan_marcaElGuardadoDelVisitante() {
     Plan plan = plan(PLAN_ID, "Publico");
     plan.setIsPublic(true);
-    when(this.planServiceMock.getPublicPlan(PLAN_ID)).thenReturn(plan);
+    when(this.planServiceMock.getSharedPlan(PLAN_ID)).thenReturn(plan);
     when(this.planBookmarkServiceMock.isBookmarked(PLAN_ID, OWNER_EMAIL)).thenReturn(true);
     Authentication visitor = new UsernamePasswordAuthenticationToken(
       new org.springframework.security.core.userdetails.User(
@@ -320,7 +320,7 @@ public class PlanControllerTest {
       "anonymousUser",
       AuthorityUtils.createAuthorityList("ROLE_ANONYMOUS")
     );
-    when(this.planServiceMock.getPublicPlan(PLAN_ID)).thenReturn(plan);
+    when(this.planServiceMock.getSharedPlan(PLAN_ID)).thenReturn(plan);
 
     ModelAndView view = this.controller.showPublicPlan(PLAN_ID, anonymous);
 
