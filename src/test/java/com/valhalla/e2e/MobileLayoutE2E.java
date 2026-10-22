@@ -89,7 +89,7 @@ public class MobileLayoutE2E extends E2eBase {
   }
 
   @Test
-  void T_MOB_004_exploradorFiltrosArribaMapaAbajoEnPhone() {
+  void T_MOB_004_exploradorMapaArribaYTabsPlacesPlans() {
     signInAsAdmin();
     page.setViewportSize(PHONE_W, PHONE_H);
     WebPage web = new WebPage(page);
@@ -97,53 +97,113 @@ public class MobileLayoutE2E extends E2eBase {
     page.waitForSelector("#map");
     awaitStyles();
 
-    // AC-01/AC-06: la pagina no se desborda, los filtros viven arriba y el mapa abajo
+    // AC-01: la pagina no scrollea de lado con el explorador cargado
     assertNoSideScroll("/explore");
     Locator map = page.locator("#map");
-    assertThat(
-      "el mapa tiene alto visible debajo de los filtros",
-      map.boundingBox().height,
-      is(greaterThan(150.0))
-    );
-    Locator sidebar = page.locator("#app > aside").first();
-    assertThat(
-      "el panel de filtros no puede exceder la pantalla",
-      sidebar.boundingBox().width,
-      is(greaterThan(0.0))
-    );
-    assertThat(
-      "el panel de filtros entra en la pantalla",
-      sidebar.boundingBox().width <= PHONE_W,
-      is(true)
-    );
-    assertThat(
-      "el panel de filtros esta capado a 40vh (sino tapa el mapa)",
-      sidebar.boundingBox().height,
-      is(lessThanOrEqualTo(PHONE_H * 0.40 + 1))
-    );
-    // El descubrimiento de planes es un bottom-sheet sobre el mapa, no un overlay a altura
-    // completa: si no, en mobile tapaba el mapa entero. Tiene que verse una franja de mapa
-    // arriba del sheet.
+    Locator placesSheet = page.locator("#app > aside").first();
     Locator plansSheet = page.locator("#plans-aside");
+    Locator tabPlaces = page.locator("label[for='tab-places']");
+    Locator tabPlans = page.locator("label[for='tab-plans']");
+
+    // Estado inicial: el mapa ocupa toda el area (arriba de todo) y los dos paneles esperan
+    // detras de su tab. invisible (visibility:hidden) los deja fuera de isVisible() pero con
+    // caja medida, y pointer-events-none evita que escondidos tapen markers del mapa.
+    assertThat("la tab Places esta en la barra", tabPlaces.isVisible(), is(true));
+    assertThat("la tab Plans esta en la barra", tabPlans.isVisible(), is(true));
+    assertThat("el panel Places esta oculto al cargar", placesSheet.isVisible(), is(false));
+    assertThat("el panel Plans esta oculto al cargar", plansSheet.isVisible(), is(false));
     assertThat(
-      "el sheet de planes esta capado a 35vh",
-      plansSheet.boundingBox().height,
-      is(lessThanOrEqualTo(PHONE_H * 0.35 + 1))
+      "el mapa llena casi toda la altura de la pantalla",
+      map.boundingBox().height,
+      is(greaterThan(PHONE_H * 0.70))
     );
-    double mapStrip = plansSheet.boundingBox().y - map.boundingBox().y;
-    assertThat(
-      "queda una franja de mapa visible arriba del sheet",
-      mapStrip,
-      is(greaterThan(100.0))
+
+    // El estado de datos llega asincronico (Vue pega /api/places al montar): sin esperarlo la
+    // captura sale con "0 place(s)" y el mapa sin tiles, que no es como se ve el explorador.
+    page.waitForFunction(
+      "() => document.querySelectorAll('#app > aside article').length > 0" +
+      " && document.querySelectorAll('#map .leaflet-marker-icon').length > 0" +
+      " && document.querySelectorAll('#map .leaflet-tile-loaded').length > 0",
+      null,
+      new com.microsoft.playwright.Page.WaitForFunctionOptions().setTimeout(15000)
     );
     page.screenshot(new Page.ScreenshotOptions().setPath(Path.of("target/explore-mobile.png")));
 
-    // AC-07: en desktop vuelve al layout de dos paneles (sidebar de 320px)
-    page.setViewportSize(DESKTOP_W, DESKTOP_H);
-    double desktopSidebar = sidebar.boundingBox().width;
-    assertThat("sidebar de escritorio w-80", Math.round(desktopSidebar), is(320L));
+    // Tab Places: despliega filtros + listado sentado sobre la barra de tabs (tope 40vh) y,
+    // como son pestañas excluyentes, Plans sigue escondido.
+    tabPlaces.click();
+    assertThat("Places se despliega al elegir la tab", placesSheet.isVisible(), is(true));
     assertThat(
-      "en desktop el sheet de planes vuelve a overlay lateral de altura completa",
+      "el panel Places respeta el tope de 40vh",
+      placesSheet.boundingBox().height,
+      is(lessThanOrEqualTo(PHONE_H * 0.40 + 1))
+    );
+    assertThat("Places y Plans son excluyentes", plansSheet.isVisible(), is(false));
+    double placesBottom = placesSheet.boundingBox().y + placesSheet.boundingBox().height;
+    assertThat(
+      "el panel Places queda sentado sobre la barra de tabs (48px)",
+      Math.abs(placesBottom - (PHONE_H - 48)),
+      is(lessThan(6.0))
+    );
+
+    // La cruz del panel oculta el desplegable y devuelve el mapa a pantalla completa: apunta a
+    // tab-none, un tercer radio del mismo grupo (un radio no se destilda con su propio label).
+    page.locator("label[for='tab-none']:visible").click();
+    assertThat("la cruz cierra Places", placesSheet.isVisible(), is(false));
+    assertThat("y no abre el otro panel por accidente", plansSheet.isVisible(), is(false));
+
+    // Tab Plans: intercambia el panel (Plans entra, Places sale) con su tope de 35vh.
+    tabPlans.click();
+    assertThat("al elegir Plans se cierra Places", placesSheet.isVisible(), is(false));
+    assertThat("Plans se despliega", plansSheet.isVisible(), is(true));
+    assertThat(
+      "el panel Plans respeta el tope de 35vh",
+      plansSheet.boundingBox().height,
+      is(lessThanOrEqualTo(PHONE_H * 0.35 + 1))
+    );
+    page.locator("label[for='tab-none']:visible").click();
+    assertThat("la cruz cierra Plans", plansSheet.isVisible(), is(false));
+    assertThat("ningun panel queda colgando", placesSheet.isVisible(), is(false));
+
+    // El detalle de un place es una card superpuesta centrada sobre el mapa (con margenes a los
+    // costados), no un sheet edge-to-edge. Abro un place desde su card en el panel de la tab.
+    tabPlaces.click();
+    page.locator("#app > aside article").first().click();
+    Locator details = page.locator("#place-details-aside");
+    details.waitFor();
+    assertThat("el detalle de place es visible", details.isVisible(), is(true));
+    double cardLeft = details.boundingBox().x;
+    double cardRight = PHONE_W - (details.boundingBox().x + details.boundingBox().width);
+    assertThat(
+      "la card deja margen a los costados (no pega los bordes)",
+      cardLeft >= 10.0,
+      is(true)
+    );
+    assertThat(
+      "la card esta centrada horizontalmente (margenes iguales)",
+      Math.abs(cardLeft - cardRight) <= 4.0,
+      is(true)
+    );
+    assertThat(
+      "la card tiene la altura acotada (scroll interno, no tapa toda la pantalla)",
+      details.boundingBox().height <= PHONE_H * 0.60 + 1,
+      is(true)
+    );
+    page.screenshot(
+      new Page.ScreenshotOptions().setPath(Path.of("target/explore-detail-card.png"))
+    );
+
+    // Desktop: sin tabs, los paneles vuelven al layout de dos columnas aunque los radios
+    // conserven la ultima tab elegida (md:visible/md:* mandan sobre group-has).
+    page.setViewportSize(DESKTOP_W, DESKTOP_H);
+    assertThat("sidebar de escritorio w-80", Math.round(placesSheet.boundingBox().width), is(320L));
+    assertThat(
+      "en desktop el sidebar de lugares esta visible sin tocar ninguna tab",
+      placesSheet.isVisible(),
+      is(true)
+    );
+    assertThat(
+      "en desktop el panel de planes vuelve a overlay lateral de altura completa",
       plansSheet.boundingBox().height > PHONE_H * 0.5,
       is(true)
     );
