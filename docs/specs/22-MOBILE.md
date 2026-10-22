@@ -89,6 +89,10 @@ carreras al medir boxes.
   `md:ml-auto` del bloque de links lo devuelve al cluster derecho.
 - **Touch targets:** ≥44 px solo en la hamburguesa (AC-06 literal de la card); el resto de los
   controles quedó en el estándar actual (~36 px) — desviación asumida.
+- **Padding inferior de la fila de links en mobile.** El nav no declara padding vertical: con
+  `flex-wrap`, la última fila (links anónimos, `w-full`) tocaba el canto inferior y los pills
+  azules quedaban pegados al borde con la sección siguiente, en todas las vistas. La fila gana
+  `pb-3` solo en mobile (`md:pb-0` conserva el desktop pixel-idéntico).
 - **Explorador: mapa arriba + pestañas Places/Plans (AC-03/05/07).** Evolución de las dos
   primeras propuestas (columna apilada; después sheet colapsado con barra de peek): el mapa
   pasa a ocupar toda el área y los paneles se despliegan desde una barra de tabs. Implementado
