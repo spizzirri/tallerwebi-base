@@ -8,6 +8,7 @@ import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.S3Configuration;
 
 /**
  * Configuración para la integración con Cloudflare R2 utilizando AWS S3 SDK.
@@ -32,11 +33,19 @@ public class R2Config {
   @Bean
   public S3Client s3Client() {
     AwsBasicCredentials credentials = AwsBasicCredentials.create(this.accessKey, this.secretKey);
+    // R2 rechaza con 403 (firma inválida) las subidas con chunked encoding
+    S3Configuration configuracionR2 = S3Configuration
+      .builder()
+      .pathStyleAccessEnabled(true)
+      .chunkedEncodingEnabled(false)
+      .build();
     return S3Client
       .builder()
       .endpointOverride(URI.create(this.endpoint))
-      .region(Region.US_EAST_1)
+      // R2 ignora la región, pero el SDK exige una; Cloudflare indica "auto"
+      .region(Region.of("auto"))
       .credentialsProvider(StaticCredentialsProvider.create(credentials))
+      .serviceConfiguration(configuracionR2)
       .build();
   }
 }
