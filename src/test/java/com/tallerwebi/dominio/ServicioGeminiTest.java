@@ -8,7 +8,8 @@ import static org.mockito.Mockito.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpEntity;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 public class ServicioGeminiTest {
@@ -93,8 +94,8 @@ public class ServicioGeminiTest {
   }
 
   private void dadoQueLaApiResponde(String json) {
-    when(this.restTemplateMock.postForObject(anyString(), any(HttpEntity.class), eq(String.class)))
-      .thenReturn(json);
+    when(this.restTemplateMock.exchange(any(RequestEntity.class), eq(String.class)))
+      .thenReturn(ResponseEntity.ok(json));
   }
 
   private String cuandoPregunto(String mensaje, String contexto, boolean persistir)
@@ -108,9 +109,8 @@ public class ServicioGeminiTest {
 
   private void entoncesLaPeticionContieneElContexto(String contexto) {
     verify(restTemplateMock)
-      .postForObject(
-        anyString(),
-        argThat((HttpEntity<String> entity) -> {
+      .exchange(
+        argThat((RequestEntity<String> entity) -> {
           String body = entity.getBody();
           return body != null && body.contains("system_instruction") && body.contains(contexto);
         }),

@@ -3,14 +3,14 @@ package com.tallerwebi.dominio;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -97,12 +97,6 @@ public class ServicioGeminiImpl implements ServicioGemini {
 
   private String ejecutarConContexto(String mensaje, String contexto)
     throws JsonProcessingException {
-    // HttpHeaders implementa MultiValueMap, pero se necesita su API tipada (setContentType)
-    @SuppressWarnings("PMD.LooseCoupling")
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_JSON);
-    headers.set("X-goog-api-key", this.apiKey);
-
     Map<String, Object> body = new HashMap<>();
 
     if (contexto != null && !contexto.isEmpty()) {
@@ -120,9 +114,13 @@ public class ServicioGeminiImpl implements ServicioGemini {
     ObjectMapper mapper = new ObjectMapper();
     String requestBody = mapper.writeValueAsString(body);
 
-    HttpEntity<String> request = new HttpEntity<>(requestBody, headers);
+    RequestEntity<String> request = RequestEntity
+      .post(URI.create(URL))
+      .contentType(MediaType.APPLICATION_JSON)
+      .header("X-goog-api-key", this.apiKey)
+      .body(requestBody);
 
-    String response = restTemplate.postForObject(URL, request, String.class);
+    String response = restTemplate.exchange(request, String.class).getBody();
 
     return extraerRespuesta(response);
   }
