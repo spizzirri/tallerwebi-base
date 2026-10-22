@@ -5,6 +5,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -75,7 +76,7 @@ public class SpringWebTestConfig implements WebMvcConfigurer {
   }
 
   @Bean
-  public org.springframework.web.client.RestTemplate restTemplate() {
-    return new org.springframework.web.client.RestTemplate();
+  public RestClient restClient() {
+    return RestClient.create();
   }
 }

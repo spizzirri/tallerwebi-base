@@ -3,16 +3,14 @@ package com.tallerwebi.dominio;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
-import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClient;
 
 @Service
 public class ServicioGeminiImpl implements ServicioGemini {
@@ -20,7 +18,7 @@ public class ServicioGeminiImpl implements ServicioGemini {
   @Value("${GEMINI_API_KEY:default}")
   private String apiKey;
 
-  private final RestTemplate restTemplate;
+  private final RestClient restClient;
 
   private String systemInstructions = "";
 
@@ -44,8 +42,8 @@ public class ServicioGeminiImpl implements ServicioGemini {
     "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent";
 
   @Autowired
-  public ServicioGeminiImpl(RestTemplate restTemplate) {
-    this.restTemplate = restTemplate;
+  public ServicioGeminiImpl(RestClient restClient) {
+    this.restClient = restClient;
   }
 
   @Override
@@ -114,13 +112,14 @@ public class ServicioGeminiImpl implements ServicioGemini {
     ObjectMapper mapper = new ObjectMapper();
     String requestBody = mapper.writeValueAsString(body);
 
-    RequestEntity<String> request = RequestEntity
-      .post(URI.create(URL))
+    String response = restClient
+      .post()
+      .uri(URL)
       .contentType(MediaType.APPLICATION_JSON)
       .header("X-goog-api-key", this.apiKey)
-      .body(requestBody);
-
-    String response = restTemplate.exchange(request, String.class).getBody();
+      .body(requestBody)
+      .retrieve()
+      .body(String.class);
 
     return extraerRespuesta(response);
   }

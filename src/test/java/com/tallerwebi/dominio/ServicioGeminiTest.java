@@ -1,21 +1,26 @@
 package com.tallerwebi.dominio;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.startsWith;
-import static org.mockito.Mockito.*;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.RequestEntity;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.web.client.RestClient;
 
 public class ServicioGeminiTest {
 
   private ServicioGeminiImpl servicioGemini;
-  private RestTemplate restTemplateMock;
+  private MockRestServiceServer servidorGemini;
   private static final String PREGUNTA = "¿Hola?";
   private static final String RESPUESTA_ESPERADA = "Respuesta Gemini";
   private static final String JSON_RESPONSE =
@@ -23,8 +28,9 @@ public class ServicioGeminiTest {
 
   @BeforeEach
   public void init() {
-    this.restTemplateMock = mock(RestTemplate.class);
-    this.servicioGemini = new ServicioGeminiImpl(restTemplateMock);
+    RestClient.Builder restClientBuilder = RestClient.builder();
+    this.servidorGemini = MockRestServiceServer.bindTo(restClientBuilder).build();
+    this.servicioGemini = new ServicioGeminiImpl(restClientBuilder.build());
   }
 
   @Test
@@ -52,24 +58,24 @@ public class ServicioGeminiTest {
     throws JsonProcessingException {
     String contexto = "Eres un experto en Java";
     servicioGemini.configurar(contexto);
-    this.dadoQueLaApiResponde(JSON_RESPONSE);
+    this.dadoQueLaApiRespondeSiLaPeticionContieneElContexto(contexto, JSON_RESPONSE);
 
     String respuesta = this.cuandoPregunto(PREGUNTA, null, false);
 
     this.entoncesLaRespuestaEs(respuesta, RESPUESTA_ESPERADA);
-    this.entoncesLaPeticionContieneElContexto(contexto);
+    this.entoncesSeEnvioLaPeticionEsperada();
   }
 
   @Test
   public void preguntarConContextoAdicionalDeberiaCombinarContextos()
     throws JsonProcessingException {
     servicioGemini.setSystemInstruction("Base");
-    this.dadoQueLaApiResponde(JSON_RESPONSE);
+    this.dadoQueLaApiRespondeSiLaPeticionContieneElContexto("Base. Adicional", JSON_RESPONSE);
 
     String respuesta = this.cuandoPregunto(PREGUNTA, "Adicional", true);
 
     this.entoncesLaRespuestaEs(respuesta, RESPUESTA_ESPERADA);
-    this.entoncesLaPeticionContieneElContexto("Base. Adicional");
+    this.entoncesSeEnvioLaPeticionEsperada();
   }
 
   @Test
@@ -94,8 +100,16 @@ public class ServicioGeminiTest {
   }
 
   private void dadoQueLaApiResponde(String json) {
-    when(this.restTemplateMock.exchange(any(RequestEntity.class), eq(String.class)))
-      .thenReturn(ResponseEntity.ok(json));
+    this.servidorGemini.expect(method(HttpMethod.POST))
+      .andRespond(withSuccess(json, MediaType.APPLICATION_JSON));
+  }
+
+  private void dadoQueLaApiRespondeSiLaPeticionContieneElContexto(String contexto, String json) {
+    this.servidorGemini.expect(method(HttpMethod.POST))
+      .andExpect(
+        content().string(allOf(containsString("system_instruction"), containsString(contexto)))
+      )
+      .andRespond(withSuccess(json, MediaType.APPLICATION_JSON));
   }
 
   private String cuandoPregunto(String mensaje, String contexto, boolean persistir)
@@ -107,14 +121,7 @@ public class ServicioGeminiTest {
     assertThat(respuestaActual, equalTo(respuestaEsperada));
   }
 
-  private void entoncesLaPeticionContieneElContexto(String contexto) {
-    verify(restTemplateMock)
-      .exchange(
-        argThat((RequestEntity<String> entity) -> {
-          String body = entity.getBody();
-          return body != null && body.contains("system_instruction") && body.contains(contexto);
-        }),
-        eq(String.class)
-      );
+  private void entoncesSeEnvioLaPeticionEsperada() {
+    this.servidorGemini.verify();
   }
 }
