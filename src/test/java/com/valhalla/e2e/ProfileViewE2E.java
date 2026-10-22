@@ -17,9 +17,10 @@ import org.junit.jupiter.api.Test;
 /**
  * [PROF] Browser coverage del perfil (docs/specs/11-PROF.md, E-01..E-04): el menú del navbar abre
  * el modal, "Ver perfil" llega a la URL con id, el editor persiste visible con el aviso, la vista
- * pública funciona con y sin sesión, y la única entrada "Pronto" que queda (Guardados) no navega.
- * Extra de esta ronda: la guardia de z-order del modal en /explore, cuya barra sticky tapaba el
- * panel.
+ * pública funciona con y sin sesión. Extra de esta ronda: la guardia de z-order del modal en
+ * /explore, cuya barra sticky tapaba el panel.
+ *
+ * <p>[MARK] "Guardados" ya no es un "Pronto": es un link activo al ancla del perfil propio.
  *
  * <p>[FOLLOW] E-02 (docs/specs/19-FOLLOW.md): "Siguiendo" ya es un link a `/profile#follow`, y la
  * vista pública muestra los contadores reales con las dos listas de `#follow`.
@@ -55,26 +56,21 @@ public class ProfileViewE2E extends E2eBase {
     assertTrue(page.textContent("main h1").contains("Mi perfil"));
   }
 
-  // --- E-03: las entradas "Pronto" están deshabilitadas y NO navegan ---
+  // --- E-03: no quedan entradas "Pronto": cada ancla del modal es un link real ---
 
   @Test
-  void soonEntriesAreDisabledAndDoNotNavigate() {
+  void noSoonEntriesRemainInTheMenuAndTheAnchorsAreLinks() {
     page.locator("#navbar-avatar").click();
     page.waitForSelector("#navbar-menu:not([hidden])");
 
-    // AC-18: "Pronto" no es <a> ni <button> navegable: un span aria-disabled. El E2E no lo
-    // clica (Playwright se niega sobre elementos deshabilitados y ahi esta el punto): fija en
-    // el DOM que la entrada no linkea a nada. [FOLLOW] activo "Siguiendo" (AC-06 de 19-FOLLOW),
-    // asi que "Guardados" quedo como la unica entrada inerte del modal.
+    // [MARK] activo "Guardados" y [FOLLOW] activo "Siguiendo": el modal ya no tiene placeholders.
     var disabledEntries = page.locator("#navbar-menu [role='menuitem'][aria-disabled='true']");
-    assertEquals(1, disabledEntries.count());
-    String remaining = disabledEntries.first().innerText();
-    assertTrue(remaining.contains("Guardados"));
-    assertTrue(remaining.contains("Pronto"));
-    assertEquals(
-      0,
-      page.locator("#navbar-menu a", new Page.LocatorOptions().setHasText("Guardados")).count()
-    );
+    assertEquals(0, disabledEntries.count());
+
+    // [MARK] AC-17: Guardados es un link al ancla de la seccion en el perfil propio.
+    var bookmarksLink = page.locator("#navbar-menu a#menu-bookmarks");
+    assertEquals(1, bookmarksLink.count());
+    assertTrue(bookmarksLink.getAttribute("href").endsWith("/profile#bookmarks"));
 
     // El menú sigue abierto y la URL intacta: nada navegó.
     assertTrue(page.locator("#navbar-menu:not([hidden])").count() == 1);

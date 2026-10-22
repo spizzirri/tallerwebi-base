@@ -4,8 +4,8 @@
 
   <!-- [PROF] Menú modal del navbar (AC-17/AC-18). Renderizado como hermano del <nav> en
        base.html: los helpers E2E cuentan "body > nav a, body > nav button", y este panel no
-       pertenece ahí. Las entradas "Pronto" son spans con aria-disabled y siguen inertes; [FOLLOW]
-       ya activo "Siguiendo" como link a #follow del perfil. -->
+       pertenece ahí. Ya no quedan entradas "Pronto": [MARK] activó "Guardados" y [FOLLOW]
+       "Siguiendo", ambas links a su ancla del perfil propio. -->
 
   <!-- z 1100 y no 50: /explore (places/list.html) deja el <nav> sticky con z-index 1000 para
        ganarle a las capas del mapa Leaflet (~800 max), y con el z-50 original el panel quedaba
@@ -50,15 +50,17 @@
         Cambiar contrasena
       </a>
 
-      <span role="menuitem" aria-disabled="true" data-soon="true"
-        class="flex items-center gap-2 px-4 py-2 text-gray-400">
+      <!-- [MARK] AC-17: Guardados ya esta activo: link al ancla de la seccion en el perfil propio.
+           Comparte el patron de los demas items del menu (role, data-menu-item) para que el modal
+           cierre al navegar. -->
+      <a role="menuitem" th:href="@{/profile#bookmarks}" id="menu-bookmarks"
+        class="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100" data-menu-item>
         <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M6 3h12l2 6-8 12L4 9l2-6z"></path>
         </svg>
         Guardados
-        <span class="ml-auto rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-semibold text-gray-500">Pronto</span>
-      </span>
+      </a>
 
       <!-- [FOLLOW] AC-06: "Siguiendo" ya es navegable y lleva a la seccion #follow del perfil
            propio (el atajo /profile resuelve el id y el fragmento sobrevive al 302). -->

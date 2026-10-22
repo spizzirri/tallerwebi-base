@@ -11,6 +11,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.valhalla.domain.bookmark.PlanBookmarkService;
 import com.valhalla.domain.exception.UserNotFoundException;
 import com.valhalla.domain.follow.FollowService;
 import com.valhalla.domain.plan.PlanService;
@@ -47,6 +48,7 @@ public class ProfileControllerTest {
   private ProfileController controller;
   private UserService userServiceMock;
   private PlanService planServiceMock;
+  private PlanBookmarkService planBookmarkServiceMock;
   private FollowService followServiceMock;
   private Authentication viewer;
 
@@ -54,9 +56,15 @@ public class ProfileControllerTest {
   public void init() {
     this.userServiceMock = mock(UserService.class);
     this.planServiceMock = mock(PlanService.class);
+    this.planBookmarkServiceMock = mock(PlanBookmarkService.class);
     this.followServiceMock = mock(FollowService.class);
     this.controller =
-      new ProfileController(this.userServiceMock, this.planServiceMock, this.followServiceMock);
+      new ProfileController(
+        this.userServiceMock,
+        this.planServiceMock,
+        this.planBookmarkServiceMock,
+        this.followServiceMock
+      );
     when(this.planServiceMock.getPublicPlans()).thenReturn(List.of());
     this.viewer = authenticated(VIEWER_EMAIL);
     when(this.userServiceMock.getByEmail(VIEWER_EMAIL))

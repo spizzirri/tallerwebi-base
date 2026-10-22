@@ -99,6 +99,27 @@ public class CurrentUserControllerAdvice {
    */
   @ModelAttribute("currentPath")
   public String currentPath(HttpServletRequest request) {
+    return visiblePath(request);
+  }
+
+  /**
+   * [MARK] La ruta con su query string, para que los forms de Guardados vuelvan a la misma pantalla
+   * con los filtros del feed intactos (el feed lleva {@code q}/{@code category}/{@code when}/
+   * {@code sort} en la URL). Mismas exclusiones que {@link #currentPath}: las paginas de auth y
+   * admin no ofrecen el toggle.
+   */
+  @ModelAttribute("currentUrl")
+  public String currentUrl(HttpServletRequest request) {
+    String path = visiblePath(request);
+    if (path == null) {
+      return null;
+    }
+    String query = request.getQueryString();
+    return query == null || query.isBlank() ? path : path + "?" + query;
+  }
+
+  /** Path de la request sin context path, o null donde el navbar no tiene que hablar. */
+  private static String visiblePath(HttpServletRequest request) {
     String path = request.getRequestURI().substring(request.getContextPath().length());
     if ("/auth".equals(path) || path.startsWith("/auth/") || isInAdminArea(request)) {
       return null;

@@ -46,6 +46,19 @@ Whether a plan can be read through its shared link. A boolean on the Plan, not a
 | **Public plan** | `isPublic` is true: the plan is accessible via shared URL without login |
 | **Private plan** | `isPublic` is false: the plan is visible only to its owner and its participants |
 
+## Bookmarks
+
+A **Bookmark** (UI: "Guardados") is a private save of a public Plan that a registered User keeps
+to clone later. It belongs to the saver, never to the Plan's owner, and it is not a way to access
+a plan: removing it changes nothing about the Plan.
+
+| Term | Definition |
+|------|------------|
+| **Bookmark** | A User's private save of a public Plan. Only public plans can be bookmarked; only the owner of the bookmark lists it, from the "Guardados" section of their own profile. |
+| **Bookmark snapshot** | Copy of the plan's display data (name, description, date, place count, author, place references) taken when the bookmark is created. It is the fallback the card and the clone use once the live plan is no longer accessible. |
+| **Bookmark status** | Computed per viewer on each read: `AVAILABLE` (the live plan is still reachable, with the live data), `PRIVATE` (the plan became private and the viewer is neither owner nor participant) or `DELETED` (the plan no longer exists). Unavailable states keep the card visible with a badge and a tooltip, and can still be cloned. |
+| **Clone from bookmark** | Creates a private plan owned by the bookmark's user. With a live plan it reuses the clone flow; otherwise it rebuilds the plan from the snapshot, skipping places that no longer exist. When the live plan is reachable, its current data wins over the snapshot. |
+
 ## Key Concepts
 
 **Plan invitation**: A pending invitation sent by a registered User to another registered

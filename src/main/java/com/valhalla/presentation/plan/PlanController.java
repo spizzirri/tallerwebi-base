@@ -1,5 +1,6 @@
 package com.valhalla.presentation.plan;
 
+import com.valhalla.domain.bookmark.PlanBookmarkService;
 import com.valhalla.domain.place.Place;
 import com.valhalla.domain.plan.Plan;
 import com.valhalla.domain.plan.PlanService;
@@ -45,16 +46,19 @@ public class PlanController {
   private final PlanService planService;
   private final PlanPlaceService planPlaceService;
   private final PlanRatingService planRatingService;
+  private final PlanBookmarkService planBookmarkService;
 
   @Autowired
   public PlanController(
     PlanService planService,
     PlanPlaceService planPlaceService,
-    PlanRatingService planRatingService
+    PlanRatingService planRatingService,
+    PlanBookmarkService planBookmarkService
   ) {
     this.planService = planService;
     this.planPlaceService = planPlaceService;
     this.planRatingService = planRatingService;
+    this.planBookmarkService = planBookmarkService;
   }
 
   @GetMapping
@@ -108,6 +112,7 @@ public class PlanController {
       "itineraryPlaces",
       plan.getPlanPlaces().stream().map(PlanController::placeView).toList()
     );
+    addBookmarkFlags(model, plan, userEmail);
     return new ModelAndView(VIEW_PLAN_DETAIL, model);
   }
 
@@ -150,7 +155,22 @@ public class PlanController {
     model.put("ratingCount", summary.count());
     // Sin sesion no hay puntaje propio que buscar (AC-05): el anonimo nunca tiene widget de voto.
     model.put("myRating", email == null ? null : this.planRatingService.getMyRating(id, email));
+    addBookmarkFlags(model, plan, email);
     return new ModelAndView(VIEW_PUBLIC_PLAN, model);
+  }
+
+  /**
+   * [MARK] Estado del toggle para el usuario de la sesion. Solo los planes publicos se guardan, y
+   * sin sesion no se renderiza el control: {@code canBookmark} es la unica condicion que mira el
+   * template, {@code isBookmarked} solo importa cuando hay sesion.
+   */
+  private void addBookmarkFlags(Map<String, Object> model, Plan plan, String userEmail) {
+    boolean canBookmark = userEmail != null && plan.getIsPublic();
+    model.put("canBookmark", canBookmark);
+    model.put(
+      "isBookmarked",
+      canBookmark && this.planBookmarkService.isBookmarked(plan.getId(), userEmail)
+    );
   }
 
   /** [CAL] "Calificar": upsert del puntaje del usuario logueado sobre el plan publico. Sin matcher

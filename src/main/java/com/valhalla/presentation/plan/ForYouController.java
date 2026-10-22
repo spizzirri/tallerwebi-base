@@ -1,5 +1,6 @@
 package com.valhalla.presentation.plan;
 
+import com.valhalla.domain.bookmark.PlanBookmarkService;
 import com.valhalla.domain.follow.FollowService;
 import com.valhalla.domain.place.PlaceCategory;
 import com.valhalla.domain.plan.Plan;
@@ -13,6 +14,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -47,6 +49,7 @@ public class ForYouController {
 
   private final PlanService planService;
   private final PlanRatingService planRatingService;
+  private final PlanBookmarkService planBookmarkService;
   private final FollowService followService;
   private final UserService userService;
 
@@ -54,11 +57,13 @@ public class ForYouController {
   public ForYouController(
     PlanService planService,
     PlanRatingService planRatingService,
+    PlanBookmarkService planBookmarkService,
     FollowService followService,
     UserService userService
   ) {
     this.planService = planService;
     this.planRatingService = planRatingService;
+    this.planBookmarkService = planBookmarkService;
     this.followService = followService;
     this.userService = userService;
   }
@@ -105,15 +110,22 @@ public class ForYouController {
     // eso va por query, mientras los lugares ya vienen con el plan.
     Map<UUID, Long> participantCounts =
       this.planService.getParticipantCounts(publicPlans.stream().map(Plan::getId).toList());
+    // [MARK] Un solo lookup alimenta el icono de todas las cards. Sin sesion no hay nada que
+    // preguntar y el toggle no se renderiza (AC-05): no es un soft gate, es ausencia de control.
+    boolean signedIn = signedIn(authentication);
+    Set<UUID> bookmarkedPlanIds = bookmarkedPlanIds(authentication);
     Map<String, Object> model = new ModelMap();
     model.put(
       ATTR_PUBLIC_PLANS,
       PlanDiscovery
         .discover(publicPlans, summaries, participantCounts, query, LocalDate.now())
         .stream()
-        .map(plan -> PlanFeedCards.planCard(plan, summaries))
+        .map(plan ->
+          PlanFeedCards.planCard(plan, summaries, bookmarkedPlanIds.contains(plan.getId()))
+        )
         .toList()
     );
+    model.put("canBookmark", signedIn);
     model.put("q", query.text());
     model.put("selectedCategory", query.category() == null ? "" : query.category().name());
     model.put("selectedWhen", query.when().name().toLowerCase(Locale.ROOT));
@@ -132,5 +144,20 @@ public class ForYouController {
       return null;
     }
     return userService.getByEmail(authentication.getName()).getId();
+  }
+
+  /** Visitante autenticado real: el principal anonimo es un String, no un {@link UserDetails}. */
+  private static boolean signedIn(Authentication authentication) {
+    return authentication != null && authentication.getPrincipal() instanceof UserDetails;
+  }
+
+  /**
+   * [MARK] Planes guardados del visitante. Sin sesion no hay nada que preguntar y el toggle no se
+   * renderiza (AC-05): el conjunto vacio no es un soft gate, es ausencia de control.
+   */
+  private Set<UUID> bookmarkedPlanIds(Authentication authentication) {
+    return signedIn(authentication)
+      ? this.planBookmarkService.getBookmarkedPlanIds(authentication.getName())
+      : Set.of();
   }
 }

@@ -1,0 +1,39 @@
+<!-- [MARK] Toggle de "Guardados": un unico boton que guarda o quita un plan publico.
+     El estado lo resuelve el controller por request (bookmarked), no JavaScript: sin JS el form
+     POST sigue funcionando. El icono cambia de contorno a relleno y el aria-pressed lo anuncia.
+
+     Parametros: toggle(planId, bookmarked, returnTo)
+       - planId:    UUID del plan.
+       - bookmarked: boolean, estado para el usuario de la sesion.
+       - returnTo:  ruta interna a la que volver despues del POST. El controller la valida y, si no
+                    es segura, cae a la vista publica del plan.
+
+     Sin sesion este fragmento no se monta en ninguna vista (AC-05): no hay soft gate ni boton que
+     rebote al login. -->
+<div th:fragment="toggle(planId, bookmarked, returnTo)" xmlns:th="http://www.thymeleaf.org"
+  class="inline-flex">
+  <form method="post"
+    th:action="${bookmarked} ? @{'/bookmarks/{id}/remove'(id=${planId})} : @{'/bookmarks/{id}'(id=${planId})}"
+    th:attr="data-bookmark-remove=${bookmarked} ? 'true' : null" class="inline-flex">
+    <input type="hidden" name="returnTo" th:value="${returnTo}" />
+    <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}"
+      th:value="${_csrf.token}" />
+    <button type="submit" data-bookmark-toggle="true"
+      th:attr="data-bookmarked=${bookmarked}, aria-pressed=${bookmarked}, aria-label=${bookmarked ? 'Quitar de Guardados' : 'Guardar en Guardados'}, title=${bookmarked ? 'Quitar de Guardados' : 'Guardar en Guardados'}"
+      th:classappend="${bookmarked} ? 'text-primary' : 'text-gray-600 hover:text-primary'"
+      class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow ring-1 ring-black/10 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary">
+      <!-- Relleno: ya esta guardado. -->
+      <svg th:if="${bookmarked}" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"
+        aria-hidden="true">
+        <path d="M6.5 3.5h11a1 1 0 0 1 1 1v16l-6.5-3.8L5.5 20.5v-16a1 1 0 0 1 1-1z"></path>
+      </svg>
+      <!-- Contorno: todavia no esta guardado. -->
+      <svg th:unless="${bookmarked}" class="h-5 w-5" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true">
+        <path d="M6.5 3.5h11a1 1 0 0 1 1 1v16l-6.5-3.8L5.5 20.5v-16a1 1 0 0 1 1-1z"></path>
+      </svg>
+      <span class="sr-only"
+        th:text="${bookmarked ? 'Quitar de Guardados' : 'Guardar en Guardados'}">Guardar en Guardados</span>
+    </button>
+  </form>
+</div>

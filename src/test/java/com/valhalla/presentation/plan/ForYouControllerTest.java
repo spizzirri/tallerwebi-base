@@ -15,8 +15,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.valhalla.domain.bookmark.PlanBookmarkService;
 import com.valhalla.domain.follow.FollowService;
 import com.valhalla.domain.place.Place;
 import com.valhalla.domain.place.PlaceCategory;
@@ -30,6 +32,7 @@ import com.valhalla.domain.user.UserService;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,7 +41,7 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -59,6 +62,7 @@ public class ForYouControllerTest {
   private ForYouController controller;
   private PlanService planServiceMock;
   private PlanRatingService planRatingServiceMock;
+  private PlanBookmarkService planBookmarkServiceMock;
   private FollowService followServiceMock;
   private UserService userServiceMock;
   private Authentication authentication;
@@ -67,12 +71,14 @@ public class ForYouControllerTest {
   public void init() {
     this.planServiceMock = mock(PlanService.class);
     this.planRatingServiceMock = mock(PlanRatingService.class);
+    this.planBookmarkServiceMock = mock(PlanBookmarkService.class);
     this.followServiceMock = mock(FollowService.class);
     this.userServiceMock = mock(UserService.class);
     this.controller =
       new ForYouController(
         this.planServiceMock,
         this.planRatingServiceMock,
+        this.planBookmarkServiceMock,
         this.followServiceMock,
         this.userServiceMock
       );
@@ -252,7 +258,8 @@ public class ForYouControllerTest {
             "administratorId",
             "cover",
             "ratingAverage",
-            "ratingCount"
+            "ratingCount",
+            "bookmarked"
           )
         )
       )
@@ -280,6 +287,57 @@ public class ForYouControllerTest {
 
     // then (AC-09): el nombre de administrador queda vacio, nunca el email
     assertThat(card.get("administratorName"), is(equalTo("")));
+  }
+
+  // --- [MARK] estado de Guardados en las cards del feed ---
+
+  @Test
+  public void T_MARK_003a_forYou_marcaConBookmarkedLosPlanesQueElUsuarioGuardo() {
+    // given
+    Plan saved = plan(PLAN_ID, "Guardado");
+    Plan other = plan(OTHER_PLAN_ID, "No guardado");
+    when(this.planServiceMock.getPublicPlans()).thenReturn(List.of(saved, other));
+    when(this.planBookmarkServiceMock.getBookmarkedPlanIds(OWNER_EMAIL))
+      .thenReturn(Set.of(PLAN_ID));
+
+    // when
+    ModelAndView view =
+      this.controller.forYou(signedInAuthentication(), null, null, null, null, null);
+
+    // then
+    assertThat(view.getModel().get("canBookmark"), is(true));
+    assertThat(cardAt(view, 0).get("bookmarked"), is(true));
+    assertThat(cardAt(view, 1).get("bookmarked"), is(false));
+  }
+
+  @Test
+  public void T_MARK_003b_forYou_anonimoNoOfreceGuardarNiConsultaGuardados() {
+    // given
+    when(this.planServiceMock.getPublicPlans()).thenReturn(List.of(plan(PLAN_ID, "Publico")));
+    Authentication anonymous = new AnonymousAuthenticationToken(
+      "key",
+      "anonymousUser",
+      AuthorityUtils.createAuthorityList("ROLE_ANONYMOUS")
+    );
+
+    // when
+    ModelAndView view = this.controller.forYou(anonymous, null, null, null, null, null);
+
+    // then (AC-05): sin sesion no hay control, no un control que rebote al login
+    assertThat(view.getModel().get("canBookmark"), is(false));
+    assertThat(cardAt(view, 0).get("bookmarked"), is(false));
+    verifyNoInteractions(this.planBookmarkServiceMock);
+  }
+
+  private static Authentication signedInAuthentication() {
+    return new UsernamePasswordAuthenticationToken(
+      new org.springframework.security.core.userdetails.User(
+        OWNER_EMAIL,
+        "n/a",
+        AuthorityUtils.createAuthorityList("ROLE_USER")
+      ),
+      "n/a"
+    );
   }
 
   // --- GET /for-you con busqueda, filtros y orden [SEARCH] ---
