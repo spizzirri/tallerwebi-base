@@ -165,6 +165,7 @@
     </div>
 
     <div class="d-flex justify-content-end mb-4">
+        <a th:if="${isPlanAdministrator}" th:href="@{/plans/{id}/settings(id=${plan.id})}" class="btn btn-outline-secondary">Configuración del plan</a>
         <form th:if="${isPlanAdministrator}" th:action="@{/plans/{id}/delete(id=${plan.id})}" method="POST">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
             <button type="submit" class="btn btn-danger">Eliminar plan</button>
@@ -180,6 +181,32 @@
     </div>
 
     <div class="row g-4">
+        <section th:if="${canShareLink}" class="col-12" aria-labelledby="share-link-heading">
+            <div class="card border-0 shadow-sm p-4">
+                <h5 id="share-link-heading" class="fw-bold">Compartir link</h5>
+                <div class="d-flex gap-2">
+                    <input id="plan-share-link" type="text" readonly th:value="@{/plans/{id}/public(id=${plan.id})}" class="form-control" aria-label="Link del plan" />
+                    <button id="copy-plan-share-link" type="button" class="btn btn-outline-primary">Copiar link</button>
+                </div>
+                <p id="plan-share-status" role="status" class="small text-muted mt-2 mb-0"></p>
+            </div>
+        </section>
+        <section th:if="${canHandleRequests}" class="col-12" aria-labelledby="join-requests-heading">
+            <div class="card border-0 shadow-sm p-4">
+                <h5 id="join-requests-heading" class="fw-bold">Solicitudes</h5>
+                <p th:if="${#lists.isEmpty(joinRequests)}" class="text-muted mb-0">No hay solicitudes pendientes.</p>
+                <ul th:unless="${#lists.isEmpty(joinRequests)}" class="list-group list-group-flush">
+                    <li th:each="request : ${joinRequests}" class="list-group-item d-flex flex-wrap align-items-center justify-content-between gap-3">
+                        <a th:href="@{/profile/{id}(id=${request.requesterId})}" th:text="${request.requesterName}">Ver perfil</a>
+                        <form th:action="@{/plans/{id}/join-requests/{rid}/respond(id=${plan.id},rid=${request.id})}" method="post" class="d-flex gap-2 mb-0">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                            <button type="submit" name="action" value="accept" class="btn btn-primary btn-sm">Aceptar</button>
+                            <button type="submit" name="action" value="reject" class="btn btn-outline-danger btn-sm">Rechazar</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </section>
         <div class="col-md-7">
             <div class="card border-0 shadow-sm p-3 mb-4">
                 <div id="map"></div>
@@ -310,6 +337,11 @@
                         </select>
                     </div>
                     <input th:unless="${canEditPlan}" type="hidden" name="role" value="guest" />
+                    <label for="invitation-channel" class="form-label">Enviar invitación</label>
+                    <select id="invitation-channel" name="channel" class="form-select mb-3">
+                        <option th:if="${canInviteInternal}" value="app">Dentro de la app</option>
+                        <option th:if="${canInviteByEmail}" value="email">Por email y en Mis planes</option>
+                    </select>
                     <button type="submit" class="btn btn-primary">Invitar</button>
                 </form>
                 <h5 id="participants-heading" class="fw-bold mb-3">
@@ -440,6 +472,7 @@
     </dialog>
     </div>
 
+    <script th:if="${canShareLink}" th:src="@{/js/plan-share.js}" defer></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script th:inline="javascript">

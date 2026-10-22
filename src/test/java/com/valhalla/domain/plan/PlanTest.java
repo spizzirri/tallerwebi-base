@@ -144,4 +144,101 @@ public class PlanTest {
     field.setAccessible(true);
     field.set(plan, null);
   }
+
+  @Test
+  public void PET_U01_permissionsDefaultAndRecoverLegacyNulls() throws Exception {
+    Field embedded = Plan.class.getDeclaredField("settings");
+    embedded.setAccessible(true);
+    embedded.set(plan, null);
+    PlanSettings settings = plan.getSettings();
+    assertThat(settings.getShareLink(), is(PlanPermission.OWNER));
+    assertThat(settings.getHandleRequests(), is(PlanPermission.OWNER));
+    assertThat(settings.getInviteInternal(), is(PlanPermission.EDITORS));
+    assertThat(settings.getInviteByEmail(), is(PlanPermission.OWNER));
+    for (String name : new String[] {
+      "shareLink",
+      "handleRequests",
+      "inviteInternal",
+      "inviteByEmail",
+    }) {
+      Field field = PlanSettings.class.getDeclaredField(name);
+      field.setAccessible(true);
+      field.set(settings, null);
+    }
+    assertThat(settings.getShareLink(), is(PlanPermission.OWNER));
+    assertThat(settings.getHandleRequests(), is(PlanPermission.OWNER));
+    assertThat(settings.getInviteInternal(), is(PlanPermission.EDITORS));
+    assertThat(settings.getInviteByEmail(), is(PlanPermission.OWNER));
+    assertThat(settings.isSharingEnabled(), is(false));
+  }
+
+  @Test
+  public void PET_U02_requestPermissionRejectsParticipantsAndNulls() {
+    PlanSettings settings = plan.getSettings();
+    org.junit.jupiter.api.Assertions.assertThrows(
+      IllegalArgumentException.class,
+      () -> settings.setHandleRequests(PlanPermission.PARTICIPANTS)
+    );
+    org.junit.jupiter.api.Assertions.assertThrows(
+      NullPointerException.class,
+      () -> settings.setShareLink(null)
+    );
+    org.junit.jupiter.api.Assertions.assertThrows(
+      NullPointerException.class,
+      () -> settings.setInviteInternal(null)
+    );
+    org.junit.jupiter.api.Assertions.assertThrows(
+      NullPointerException.class,
+      () -> settings.setInviteByEmail(null)
+    );
+    org.junit.jupiter.api.Assertions.assertThrows(
+      NullPointerException.class,
+      () -> settings.setHandleRequests(null)
+    );
+    assertThat(settings.getHandleRequests(), is(PlanPermission.OWNER));
+  }
+
+  @Test
+  public void PET_U03_capabilitiesFollowEachPermissionAndMembership() {
+    User editor = new User();
+    editor.setEmail("editor@test.com");
+    User participant = new User();
+    participant.setEmail("participant@test.com");
+    plan.getParticipants().add(editor);
+    plan.getParticipants().add(participant);
+    plan.getEditors().add(editor);
+    for (PlanPermission permission : PlanPermission.values()) {
+      plan.getSettings().setShareLink(permission);
+      plan.getSettings().setInviteInternal(permission);
+      plan.getSettings().setInviteByEmail(permission);
+      assertThat(plan.canShareLink(administrator.getEmail()), is(true));
+      assertThat(plan.canInviteInternal(editor.getEmail()), is(permission != PlanPermission.OWNER));
+      assertThat(
+        plan.canInviteByEmail(participant.getEmail()),
+        is(permission == PlanPermission.PARTICIPANTS)
+      );
+      assertThat(plan.canShareLink("visitor@test.com"), is(false));
+      assertThat(plan.canInviteInternal(null), is(false));
+    }
+    plan.getSettings().setHandleRequests(PlanPermission.EDITORS);
+    assertThat(plan.canHandleRequests(editor.getEmail()), is(true));
+    assertThat(plan.canHandleRequests(participant.getEmail()), is(false));
+    plan.getParticipants().remove(editor);
+    assertThat(plan.canHandleRequests(editor.getEmail()), is(false));
+  }
+
+  @Test
+  public void PET_U04_ordinaryEditPreservesPermissions() {
+    plan.getSettings().setShareLink(PlanPermission.PARTICIPANTS);
+    plan.getSettings().setInviteInternal(PlanPermission.OWNER);
+    plan.getSettings().setInviteByEmail(PlanPermission.EDITORS);
+    plan.getSettings().setHandleRequests(PlanPermission.EDITORS);
+    plan.updateFrom(new Plan());
+    assertThat(plan.getSettings().getShareLink(), is(PlanPermission.PARTICIPANTS));
+    assertThat(plan.getSettings().getInviteInternal(), is(PlanPermission.OWNER));
+    assertThat(plan.getSettings().getInviteByEmail(), is(PlanPermission.EDITORS));
+    assertThat(plan.getSettings().getHandleRequests(), is(PlanPermission.EDITORS));
+    assertThat(plan.hasPendingJoinRequest(null), is(false));
+    assertThat(plan.hasPendingJoinRequest("visitor@test.com"), is(false));
+  }
 }

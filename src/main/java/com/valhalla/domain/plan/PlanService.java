@@ -6,6 +6,21 @@ import java.util.Map;
 import java.util.UUID;
 
 public interface PlanService {
+  Plan getSharedPlan(UUID id);
+  void requestToJoin(UUID id, String userEmail);
+  void respondToJoinRequest(UUID id, Long requestId, String action, String userEmail);
+  List<PendingJoinRequest> getPendingJoinRequests(UUID id, String userEmail);
+  void updateSettings(
+    UUID id,
+    PlanPermission shareLink,
+    PlanPermission handleRequests,
+    PlanPermission inviteInternal,
+    PlanPermission inviteByEmail,
+    String userEmail
+  );
+
+  record PendingJoinRequest(Long id, Long requesterId, String requesterName) {}
+
   Plan createPlan(Plan plan, String ownerEmail);
   List<Plan> getPlansByUserEmail(String ownerEmail);
   List<Plan> getPublicPlans();
@@ -19,6 +34,14 @@ public interface PlanService {
   void changeParticipantRole(UUID id, String participantEmail, String role, String userEmail);
   void removeParticipant(UUID id, String participantEmail, String userEmail);
   void inviteParticipant(UUID id, String participantEmail, String role, String userEmail);
+  void inviteParticipant(
+    UUID id,
+    String participantEmail,
+    String role,
+    String channel,
+    String userEmail
+  );
+  void acceptInvitationToken(UUID id, String token, String userEmail);
   List<PendingInvitation> getPendingInvitations(String userEmail);
   void respondToInvitation(UUID planId, Long invitationId, boolean accept, String userEmail);
 

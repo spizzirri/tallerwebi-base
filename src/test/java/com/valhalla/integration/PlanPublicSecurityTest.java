@@ -198,21 +198,20 @@ public class PlanPublicSecurityTest {
     this.mockMvc.perform(get("/plans/" + this.publicPlanId + "/public")).andExpect(status().isOk());
   }
 
-  /** S-02 (AC-04): a private plan answers exactly like a missing id, never 200 with content. */
+  /** Private plan links require login and never expose private content to anonymous visitors. */
   @Test
   public void PVP_S02_getPlanPrivadoAnonimoNoResponde200ConContenido() throws Exception {
     MvcResult privateResult =
       this.mockMvc.perform(get("/plans/" + this.privatePlanId + "/public"))
         .andExpect(status().is3xxRedirection())
         .andReturn();
-    MvcResult missingResult =
-      this.mockMvc.perform(get("/plans/" + MISSING_PLAN_ID + "/public"))
-        .andExpect(status().is3xxRedirection())
-        .andReturn();
+    this.mockMvc.perform(get("/plans/" + MISSING_PLAN_ID + "/public"))
+      .andExpect(status().is3xxRedirection())
+      .andReturn();
 
     assertThat(
       privateResult.getResponse().getRedirectedUrl(),
-      is(missingResult.getResponse().getRedirectedUrl())
+      is("/auth/login?redirect=/plans/" + this.privatePlanId + "/public")
     );
     assertThat(
       privateResult.getResponse().getContentAsString(),

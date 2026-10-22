@@ -22,6 +22,18 @@ public class PlanRequest {
 
   private Boolean isPublic;
 
+  @jakarta.validation.Valid
+  private com.valhalla.domain.plan.PlanSettings settings =
+    new com.valhalla.domain.plan.PlanSettings();
+
+  public com.valhalla.domain.plan.PlanSettings getSettings() {
+    return settings;
+  }
+
+  public void setSettings(com.valhalla.domain.plan.PlanSettings settings) {
+    this.settings = settings;
+  }
+
   private List<PlanPlaceRequest> places = new ArrayList<>();
 
   public PlanRequest() {}

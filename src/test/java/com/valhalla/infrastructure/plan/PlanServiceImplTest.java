@@ -191,14 +191,225 @@ public class PlanServiceImplTest {
     verify(planRepositoryMock, never()).save(any());
   }
 
+  @Test
+  public void invitationChannelsEnforceIndependentPermissions() {
+    Plan plan = invitationPlan(false);
+    User editor = owner(9L, OTHER_EMAIL);
+    plan.getParticipants().add(editor);
+    plan.getEditors().add(editor);
+    User recipient = owner(10L, UNKNOWN_EMAIL);
+    when(userRepositoryMock.findByEmail(UNKNOWN_EMAIL)).thenReturn(Optional.of(recipient));
+    when(userRepositoryMock.findByEmail(OTHER_EMAIL)).thenReturn(Optional.of(editor));
+    assertThrows(
+      PlanNotFoundException.class,
+      () -> planService.inviteParticipant(PLAN_ID, UNKNOWN_EMAIL, "guest", "email", OTHER_EMAIL)
+    );
+    plan.getSettings().setInviteInternal(com.valhalla.domain.plan.PlanPermission.OWNER);
+    assertThrows(
+      PlanNotFoundException.class,
+      () -> planService.inviteParticipant(PLAN_ID, UNKNOWN_EMAIL, "guest", "app", OTHER_EMAIL)
+    );
+    plan.getSettings().setInviteInternal(com.valhalla.domain.plan.PlanPermission.PARTICIPANTS);
+    plan.getEditors().clear();
+    assertThrows(
+      PlanNotFoundException.class,
+      () -> planService.inviteParticipant(PLAN_ID, UNKNOWN_EMAIL, "editor", "app", OTHER_EMAIL)
+    );
+    planService.inviteParticipant(PLAN_ID, UNKNOWN_EMAIL, "guest", "app", OTHER_EMAIL);
+    assertThat(plan.getInvitations(), hasSize(1));
+  }
+
+  @Test
+  public void emailInvitationSendsTokenAndOnlyRecipientCanUseItOnce() {
+    Plan plan = invitationPlan(false);
+    User recipient = owner(9L, OTHER_EMAIL);
+    when(userRepositoryMock.findByEmail(OTHER_EMAIL)).thenReturn(Optional.of(recipient));
+    when(userRepositoryMock.findByEmail(OWNER_EMAIL))
+      .thenReturn(Optional.of(plan.getAdministrator()));
+    com.valhalla.domain.plan.EmailNotifier notifier = mock(
+      com.valhalla.domain.plan.EmailNotifier.class
+    );
+    org.springframework.test.util.ReflectionTestUtils.setField(
+      planService,
+      "emailNotifier",
+      notifier
+    );
+    planService.inviteParticipant(PLAN_ID, OTHER_EMAIL, "editor", "email", OWNER_EMAIL);
+    PlanInvitation invitation = plan.getInvitations().getFirst();
+    org.springframework.test.util.ReflectionTestUtils.setField(invitation, "id", 123L);
+    String token = invitation.getToken();
+    assertThat(token.length(), is(64));
+    verify(notifier).sendInvitation(OTHER_EMAIL, PLAN_ID, token);
+    assertThrows(
+      PlanNotFoundException.class,
+      () -> planService.acceptInvitationToken(PLAN_ID, token, UNKNOWN_EMAIL)
+    );
+    assertThrows(
+      PlanNotFoundException.class,
+      () -> planService.acceptInvitationToken(PLAN_ID, "invalid", OTHER_EMAIL)
+    );
+    planService.acceptInvitationToken(PLAN_ID, token, OTHER_EMAIL);
+    assertThat(plan.isParticipant(OTHER_EMAIL), is(true));
+    assertThat(plan.isEditor(OTHER_EMAIL), is(true));
+    assertThat(plan.getInvitations(), is(empty()));
+    assertThrows(
+      PlanNotFoundException.class,
+      () -> planService.acceptInvitationToken(PLAN_ID, token, OTHER_EMAIL)
+    );
+  }
+
+  @Test
+  public void invalidInvitationChannelDoesNotCreateInvitation() {
+    Plan plan = invitationPlan(false);
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> planService.inviteParticipant(PLAN_ID, OTHER_EMAIL, "guest", "unknown", OWNER_EMAIL)
+    );
+    assertThat(plan.getInvitations(), is(empty()));
+  }
+
   private Plan invitationPlan(boolean isPublic) {
     Plan plan = new Plan();
+    plan.setId(PLAN_ID);
     plan.setAdministrator(owner(OWNER_ID, OWNER_EMAIL));
     plan.setIsPublic(isPublic);
     when(planRepositoryMock.findById(PLAN_ID)).thenReturn(Optional.of(plan));
     when(userRepositoryMock.findByEmail(OWNER_EMAIL))
       .thenReturn(Optional.of(plan.getAdministrator()));
     return plan;
+  }
+
+  @Test
+  public void PET_requestIsIdempotentAndDoesNotGrantAccess() {
+    Plan plan = invitationPlan(false);
+    plan.getSettings().setShareLink(com.valhalla.domain.plan.PlanPermission.PARTICIPANTS);
+    User requester = owner(9L, OTHER_EMAIL);
+    when(userRepositoryMock.findByEmail(OTHER_EMAIL)).thenReturn(Optional.of(requester));
+    planService.requestToJoin(PLAN_ID, OTHER_EMAIL);
+    planService.requestToJoin(PLAN_ID, OTHER_EMAIL);
+    assertThat(plan.getJoinRequests(), hasSize(1));
+    assertThat(plan.isParticipant(OTHER_EMAIL), is(false));
+    verify(planRepositoryMock, times(1)).save(plan);
+  }
+
+  @Test
+  public void PET_disabledSharingAndPublicPlansRejectRequests() {
+    Plan plan = invitationPlan(false);
+    when(userRepositoryMock.findByEmail(OTHER_EMAIL))
+      .thenReturn(Optional.of(owner(9L, OTHER_EMAIL)));
+    assertThrows(
+      PlanNotFoundException.class,
+      () -> planService.requestToJoin(PLAN_ID, OTHER_EMAIL)
+    );
+    plan.setIsPublic(true);
+    plan.getSettings().setShareLink(com.valhalla.domain.plan.PlanPermission.PARTICIPANTS);
+    assertThrows(
+      PlanNotFoundException.class,
+      () -> planService.requestToJoin(PLAN_ID, OTHER_EMAIL)
+    );
+    assertThat(plan.getJoinRequests(), is(empty()));
+    verify(planRepositoryMock, never()).save(any());
+  }
+
+  @Test
+  public void PET_existingMembersDoNotCreateRequests() {
+    Plan plan = invitationPlan(false);
+    User participant = owner(9L, OTHER_EMAIL);
+    when(userRepositoryMock.findByEmail(OTHER_EMAIL)).thenReturn(Optional.of(participant));
+    plan.getParticipants().add(participant);
+    planService.requestToJoin(PLAN_ID, OWNER_EMAIL);
+    planService.requestToJoin(PLAN_ID, OTHER_EMAIL);
+    assertThat(plan.getJoinRequests(), is(empty()));
+    verify(planRepositoryMock, never()).save(any());
+  }
+
+  @Test
+  public void PET_acceptGrantsParticipationAndRemovesPendingInvitation() {
+    Plan plan = invitationPlan(false);
+    User requester = owner(9L, OTHER_EMAIL);
+    com.valhalla.domain.plan.PlanJoinRequest request = pendingRequest(plan, requester);
+    plan
+      .getInvitations()
+      .add(new PlanInvitation(plan, requester, plan.getAdministrator(), "editor"));
+    planService.respondToJoinRequest(PLAN_ID, request.getId(), "accept", OWNER_EMAIL);
+    assertThat(plan.isParticipant(OTHER_EMAIL), is(true));
+    assertThat(plan.isEditor(OTHER_EMAIL), is(false));
+    assertThat(plan.getJoinRequests(), is(empty()));
+    assertThat(plan.getInvitations(), is(empty()));
+    verify(planRepositoryMock).save(plan);
+  }
+
+  @Test
+  public void PET_onlyAuthorizedManagerCanListAndRespond() {
+    Plan plan = invitationPlan(false);
+    User editor = owner(8L, OTHER_EMAIL);
+    plan.getParticipants().add(editor);
+    plan.getEditors().add(editor);
+    com.valhalla.domain.plan.PlanJoinRequest request = pendingRequest(
+      plan,
+      owner(9L, UNKNOWN_EMAIL)
+    );
+    assertThrows(
+      PlanNotFoundException.class,
+      () -> planService.getPendingJoinRequests(PLAN_ID, OTHER_EMAIL)
+    );
+    assertThrows(
+      PlanNotFoundException.class,
+      () -> planService.respondToJoinRequest(PLAN_ID, request.getId(), "accept", OTHER_EMAIL)
+    );
+    plan.getSettings().setHandleRequests(com.valhalla.domain.plan.PlanPermission.EDITORS);
+    assertThat(planService.getPendingJoinRequests(PLAN_ID, OTHER_EMAIL), hasSize(1));
+    planService.respondToJoinRequest(PLAN_ID, request.getId(), "reject", OTHER_EMAIL);
+    assertThat(plan.isParticipant(UNKNOWN_EMAIL), is(false));
+    assertThat(plan.getJoinRequests(), is(empty()));
+    verify(planRepositoryMock).save(plan);
+  }
+
+  @Test
+  public void PET_invalidOrMissingResponsePreservesRequest() {
+    Plan plan = invitationPlan(false);
+    pendingRequest(plan, owner(9L, OTHER_EMAIL));
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> planService.respondToJoinRequest(PLAN_ID, 123L, "invalid", OWNER_EMAIL)
+    );
+    assertThrows(
+      PlanNotFoundException.class,
+      () -> planService.respondToJoinRequest(PLAN_ID, 999L, "accept", OWNER_EMAIL)
+    );
+    assertThat(plan.getJoinRequests(), hasSize(1));
+    assertThat(plan.getParticipants(), is(empty()));
+    verify(planRepositoryMock, never()).save(any());
+  }
+
+  @Test
+  public void PET_settingsAreOwnerOnlyAndPersistAllPermissions() {
+    Plan plan = invitationPlan(false);
+    com.valhalla.domain.plan.PlanPermission ownerOnly =
+      com.valhalla.domain.plan.PlanPermission.OWNER;
+    com.valhalla.domain.plan.PlanPermission editors =
+      com.valhalla.domain.plan.PlanPermission.EDITORS;
+    assertThrows(
+      PlanNotFoundException.class,
+      () -> planService.updateSettings(PLAN_ID, editors, editors, ownerOnly, editors, OTHER_EMAIL)
+    );
+    verify(planRepositoryMock, never()).save(any());
+    planService.updateSettings(PLAN_ID, editors, editors, ownerOnly, editors, OWNER_EMAIL);
+    assertThat(plan.getSettings().getShareLink(), is(editors));
+    assertThat(plan.getSettings().getHandleRequests(), is(editors));
+    assertThat(plan.getSettings().getInviteInternal(), is(ownerOnly));
+    assertThat(plan.getSettings().getInviteByEmail(), is(editors));
+    verify(planRepositoryMock).save(plan);
+  }
+
+  private com.valhalla.domain.plan.PlanJoinRequest pendingRequest(Plan plan, User requester) {
+    com.valhalla.domain.plan.PlanJoinRequest request = new com.valhalla.domain.plan.PlanJoinRequest(
+      plan,
+      requester
+    );
+    org.springframework.test.util.ReflectionTestUtils.setField(request, "id", 123L);
+    plan.getJoinRequests().add(request);
+    return request;
   }
 
   // --- getPendingInvitations ---

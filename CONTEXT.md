@@ -8,7 +8,7 @@
 | **Place** | A location in Buenos Aires. Has name, description, category, address, coordinates, image. |
 | **Plan** | A curated collection of places with schedule. Owned by a User. Is public or private. |
 | **PlanPlace** | A place within a plan, with visit date, time, and order in the itinerary. |
-| **Plan participant** | Registered User who joins a Plan using its Short Code. Can read its detail and leave it; cannot edit or delete it unless assigned the Editor role. The administrator owns the Plan and can delete it. |
+| **Plan participant** | Registered User who joins a public Plan using its Short Code, or a private Plan after an accepted join request or invitation. Can read its detail and leave it; cannot edit or delete it unless assigned the Editor role. The administrator owns the Plan and can delete it. |
 | **Rating** | A 1–5 star score a logged-in User gives to a public Plan. One per User per Plan (updatable). Authorship is stored but never shown: only the average and count are public. |
 | **Seguidor / Seguido** | Directed follow relation between two Users: one `follows` row per (follower, followed) pair. It grants no extra visibility — only the followed user's public plans reach the "Siguiendo" feed scope — and it sends no notifications. |
 
@@ -19,8 +19,20 @@ Editors. The owner cannot be removed. Removal revokes participation and the Edit
 role for that Plan without deleting the User's account.
 
 **PlanManager**: Embedded component of a Plan that groups its Participants, Editors
-and pending Invitations. It preserves the existing persistence tables and the Plan's
+and pending Invitations and Join Requests. It preserves the existing persistence tables and the Plan's
 public methods for accessing these collections.
+
+**Plan join request**: A registered User's pending request to participate in a private
+Plan through its shared link or Short Code. It grants no access until the owner, or an Editor when
+authorized, accepts it. Rejection removes the request without granting participation.
+The visitor sees only the name, description, date, place count and generic cover.
+
+**Plan settings**: Owner-managed permissions for sharing links, inviting internally,
+inviting by email and handling join requests. Internal invitations default to Editors;
+other capabilities default to Owner. Sharing and inviting can extend to all Participants;
+handling requests can extend only to Editors. Owner-only sharing disables the private
+landing summary and request form. Only owners and Editors can propose the Editor role.
+Bans are deferred to their separate branch.
 
 ## Categories
 
@@ -63,7 +75,8 @@ a plan: removing it changes nothing about the Plan.
 
 **Plan invitation**: A pending invitation sent by a registered User to another registered
 User for a Plan, with the proposed Participant or Editor role and the inviter's identity.
-Only the recipient can accept or reject it from My Plans. Sending an invitation does not
+Only the recipient can accept or reject it from My Plans. Email invitations also carry
+a single-use link: GET opens confirmation after login, POST accepts with CSRF protection. Sending an invitation does not
 grant participation or access to a private Plan. Acceptance grants the proposed role;
 rejection leaves participation unchanged. Both responses remove the pending invitation.
 

@@ -45,7 +45,7 @@ public class PlansPage extends WebPage {
     this.typeIntoElement("#plan-date", isoDate);
   }
 
-  /** Paso 1 -> paso 2 (selección de lugares): el formulario se envía al avanzar. */
+  /** Avanza al siguiente paso del wizard. */
   public void clickNextStep() {
     this.clickElement("button:has-text('Siguiente')");
   }
@@ -59,7 +59,7 @@ public class PlansPage extends WebPage {
     this.page.locator("#app > aside article button[aria-label^='Add ']").first().click();
   }
 
-  /** Paso 2: envía el formulario del modal (POST /plans). */
+  /** Paso 3: envía el formulario del modal (POST /plans). */
   public void clickCreate() {
     this.clickElement("button:has-text('Crear plan')");
   }
@@ -72,12 +72,13 @@ public class PlansPage extends WebPage {
     typeEventDate(isoDate);
     clickNextStep();
     addFirstDraftPlace();
+    clickNextStep();
     clickCreate();
     waitForDetailPath();
   }
 
   /**
-   * [PPV] Mismo flujo pero marcando "Hacer público este plan" (checkbox del paso 1), para que el
+   * [PPV] Mismo flujo pero marcando "Hacer público este plan" (checkbox del paso 3), para que el
    * listado público tenga una tarjeta que mostrar.
    */
   public void createPublicPlanViaExplore(String name, String description, String isoDate) {
@@ -85,9 +86,10 @@ public class PlansPage extends WebPage {
     typeName(name);
     typeDescription(description);
     typeEventDate(isoDate);
-    this.page.locator("#plan-public").check();
     clickNextStep();
     addFirstDraftPlace();
+    clickNextStep();
+    this.page.locator("#plan-public").check();
     clickCreate();
     waitForDetailPath();
   }

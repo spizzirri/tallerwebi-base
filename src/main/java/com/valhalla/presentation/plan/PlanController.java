@@ -3,6 +3,7 @@ package com.valhalla.presentation.plan;
 import com.valhalla.domain.bookmark.PlanBookmarkService;
 import com.valhalla.domain.place.Place;
 import com.valhalla.domain.plan.Plan;
+import com.valhalla.domain.plan.PlanPermission;
 import com.valhalla.domain.plan.PlanService;
 import com.valhalla.domain.planplace.PlanPlace;
 import com.valhalla.domain.planplace.PlanPlaceService;
@@ -37,6 +38,7 @@ public class PlanController {
   private static final String VIEW_PLANS_LIST = "pages/plans/list";
   private static final String VIEW_PLAN_DETAIL = "pages/plans/detail";
   private static final String VIEW_PUBLIC_PLAN = "pages/plans/public";
+  private static final String PUBLIC_SUFFIX = "/public";
   private static final String REDIRECT_PLANS = "redirect:/plans";
   private static final String REDIRECT_PLAN_DETAIL = "redirect:/plans/";
   private static final String REDIRECT_EXPLORE = "redirect:/explore";
@@ -84,7 +86,17 @@ public class PlanController {
     model.put("canEditPlan", plan.canEdit(userEmail));
     model.put("isPlanAdministrator", plan.isAdministrator(userEmail));
     model.put("isPlanParticipant", plan.isParticipant(userEmail));
-    model.put("canInvite", userEmail != null && plan.canEdit(userEmail));
+    model.put("canInviteInternal", plan.canInviteInternal(userEmail));
+    model.put("canInviteByEmail", plan.canInviteByEmail(userEmail));
+    model.put("canInvite", plan.canInviteInternal(userEmail) || plan.canInviteByEmail(userEmail));
+    model.put(
+      "canShareLink",
+      plan.canShareLink(userEmail) && (plan.getIsPublic() || plan.getSettings().isSharingEnabled())
+    );
+    model.put("canHandleRequests", plan.canHandleRequests(userEmail));
+    if (plan.canHandleRequests(userEmail)) {
+      model.put("joinRequests", planService.getPendingJoinRequests(id, userEmail));
+    }
     model.put(
       "participants",
       Stream
@@ -116,15 +128,12 @@ public class PlanController {
     return new ModelAndView(VIEW_PLAN_DETAIL, model);
   }
 
-  /**
-   * Vista publica read-only de un plan compartido. La visibilidad la decide el servicio: un plan
-   * privado responde igual que un id inexistente. Los CTAs se deciden por el estado real de la
-   * sesion (isLogged, isParticipant, isPlanAdministrator) y no por {@code authentication != null}:
-   * con anonimo ese objeto existe como AnonymousAuthenticationToken y seria siempre true.
-   */
   @GetMapping("/{id}/public")
   public ModelAndView showPublicPlan(@PathVariable UUID id, Authentication authentication) {
-    Plan plan = planService.getPublicPlan(id);
+    Plan plan = planService.getSharedPlan(id);
+    if (!plan.getIsPublic()) {
+      return showJoinLanding(plan, currentEmail(authentication));
+    }
     Map<String, Object> model = new ModelMap();
     model.put(ATTR_PLAN, plan);
     model.put(
@@ -159,6 +168,88 @@ public class PlanController {
     return new ModelAndView(VIEW_PUBLIC_PLAN, model);
   }
 
+  private ModelAndView showJoinLanding(Plan plan, String email) {
+    UUID id = plan.getId();
+    if (email == null) {
+      return new ModelAndView("redirect:/auth/login?redirect=/plans/" + id + PUBLIC_SUFFIX);
+    }
+    if (plan.isAdministrator(email) || plan.isParticipant(email)) {
+      return new ModelAndView(REDIRECT_PLAN_DETAIL + id);
+    }
+    Map<String, Object> model = new ModelMap();
+    boolean sharingEnabled = plan.getSettings().isSharingEnabled();
+    model.put("planId", id);
+    model.put("sharingEnabled", sharingEnabled);
+    model.put("requestPending", plan.hasPendingJoinRequest(email));
+    if (sharingEnabled) {
+      model.put(
+        "summary",
+        new JoinPlanSummary(
+          plan.getName(),
+          plan.getDescription(),
+          plan.getEventDate(),
+          plan.getPlanPlaces().size(),
+          "/images/plans/cover-" + (Math.floorMod(id.hashCode(), 6) + 1) + ".svg"
+        )
+      );
+    }
+    return new ModelAndView("pages/plans/request", model);
+  }
+
+  public record JoinPlanSummary(
+    String name,
+    String description,
+    java.time.LocalDate eventDate,
+    int placeCount,
+    String cover
+  ) {}
+
+  @PostMapping("/{id}/join-requests")
+  public ModelAndView requestToJoin(@PathVariable UUID id, Authentication authentication) {
+    planService.requestToJoin(id, authentication.getName());
+    return new ModelAndView(REDIRECT_PLAN_DETAIL + id + PUBLIC_SUFFIX);
+  }
+
+  @PostMapping("/{id}/join-requests/{requestId}/respond")
+  public ModelAndView respondToJoinRequest(
+    @PathVariable UUID id,
+    @PathVariable Long requestId,
+    @RequestParam String action,
+    Authentication authentication
+  ) {
+    planService.respondToJoinRequest(id, requestId, action, authentication.getName());
+    return new ModelAndView(REDIRECT_PLAN_DETAIL + id);
+  }
+
+  @GetMapping("/{id}/settings")
+  public ModelAndView showSettings(@PathVariable UUID id, Authentication authentication) {
+    return new ModelAndView(
+      "pages/plans/settings",
+      ATTR_PLAN,
+      planService.getOwnedPlan(id, authentication.getName())
+    );
+  }
+
+  @PostMapping("/{id}/settings")
+  public ModelAndView updateSettings(
+    @PathVariable UUID id,
+    @RequestParam PlanPermission shareLink,
+    @RequestParam PlanPermission handleRequests,
+    @RequestParam PlanPermission inviteInternal,
+    @RequestParam PlanPermission inviteByEmail,
+    Authentication authentication
+  ) {
+    planService.updateSettings(
+      id,
+      shareLink,
+      handleRequests,
+      inviteInternal,
+      inviteByEmail,
+      authentication.getName()
+    );
+    return new ModelAndView(REDIRECT_PLAN_DETAIL + id + "/settings?saved=true");
+  }
+
   /**
    * [MARK] Estado del toggle para el usuario de la sesion. Solo los planes publicos se guardan, y
    * sin sesion no se renderiza el control: {@code canBookmark} es la unica condicion que mira el
@@ -186,10 +277,10 @@ public class PlanController {
   ) {
     if (bindingResult.hasErrors()) {
       // Tampering con el form (score inválido): de vuelta a la vista publica sin calificar.
-      return new ModelAndView(REDIRECT_PLAN_DETAIL + id + "/public");
+      return new ModelAndView(REDIRECT_PLAN_DETAIL + id + PUBLIC_SUFFIX);
     }
     this.planRatingService.rate(id, authentication.getName(), ratingData.getScore());
-    return new ModelAndView(REDIRECT_PLAN_DETAIL + id + "/public");
+    return new ModelAndView(REDIRECT_PLAN_DETAIL + id + PUBLIC_SUFFIX);
   }
 
   /** En anonimo el principal es el String "anonymousUser", no un UserDetails. */
@@ -225,10 +316,12 @@ public class PlanController {
       // un POST inválido vuelve a esa vista en vez de re-renderizar pages/plans/new.
       return new ModelAndView(REDIRECT_EXPLORE);
     }
-    Plan created = planService.createPlan(
-      toPlanOrderedByVisitTime(planForm),
-      authentication.getName()
-    );
+    Plan draft = toPlanOrderedByVisitTime(planForm);
+    draft.getSettings().setShareLink(planForm.getSettings().getShareLink());
+    draft.getSettings().setHandleRequests(planForm.getSettings().getHandleRequests());
+    draft.getSettings().setInviteInternal(planForm.getSettings().getInviteInternal());
+    draft.getSettings().setInviteByEmail(planForm.getSettings().getInviteByEmail());
+    Plan created = planService.createPlan(draft, authentication.getName());
     return new ModelAndView(REDIRECT_PLAN_DETAIL + created.getId());
   }
 
@@ -285,11 +378,37 @@ public class PlanController {
     return new ModelAndView(REDIRECT_PLAN_DETAIL + id);
   }
 
+  @GetMapping("/{id}/invitations/{token}/accept")
+  public ModelAndView acceptInvitationLink(
+    @PathVariable UUID id,
+    @PathVariable String token,
+    Authentication authentication
+  ) {
+    String email = currentEmail(authentication);
+    if (email == null) {
+      return new ModelAndView(
+        "redirect:/auth/login?redirect=/plans/" + id + "/invitations/" + token + "/accept"
+      );
+    }
+    return new ModelAndView("pages/plans/accept-invitation", Map.of("planId", id, "token", token));
+  }
+
+  @PostMapping("/{id}/invitations/{token}/accept")
+  public ModelAndView acceptInvitationLinkPost(
+    @PathVariable UUID id,
+    @PathVariable String token,
+    Authentication authentication
+  ) {
+    planService.acceptInvitationToken(id, token, authentication.getName());
+    return new ModelAndView(REDIRECT_PLAN_DETAIL + id);
+  }
+
   @PostMapping("/{id}/participants/invite")
   public ModelAndView inviteParticipant(
     @PathVariable UUID id,
     @RequestParam String participantEmail,
     @RequestParam(defaultValue = "guest") String role,
+    @RequestParam(defaultValue = "app") String channel,
     Authentication authentication,
     org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes
   ) {
@@ -298,11 +417,17 @@ public class PlanController {
         id,
         participantEmail,
         role,
+        channel,
         authentication == null ? null : authentication.getName()
       );
       redirectAttributes.addFlashAttribute(
         "invitationSuccess",
         "Invitación enviada. La persona podrá aceptarla o rechazarla en Mis planes."
+      );
+    } catch (org.springframework.mail.MailException exception) {
+      redirectAttributes.addFlashAttribute(
+        "invitationError",
+        "No se pudo enviar el email. Revisá la configuración SMTP o usá la invitación dentro de la app."
       );
     } catch (IllegalArgumentException exception) {
       redirectAttributes.addFlashAttribute("invitationError", exception.getMessage());
@@ -344,8 +469,13 @@ public class PlanController {
 
   @PostMapping("/join")
   public ModelAndView joinPlan(@RequestParam String shortCode, Authentication authentication) {
-    Plan plan = planService.joinPlan(shortCode, authentication.getName());
-    return new ModelAndView(REDIRECT_PLAN_DETAIL + plan.getId());
+    String email = authentication.getName();
+    Plan plan = planService.joinPlan(shortCode, email);
+    boolean awaitingApproval =
+      !plan.getIsPublic() && !plan.isAdministrator(email) && !plan.isParticipant(email);
+    return new ModelAndView(
+      REDIRECT_PLAN_DETAIL + plan.getId() + (awaitingApproval ? PUBLIC_SUFFIX : "")
+    );
   }
 
   /**

@@ -39,6 +39,13 @@ public class PlanManager {
   @OneToMany(mappedBy = "plan", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<PlanInvitation> invitations = new ArrayList<>();
 
+  @OneToMany(mappedBy = "plan", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<PlanJoinRequest> joinRequests = new ArrayList<>();
+
+  public List<PlanJoinRequest> getJoinRequests() {
+    return joinRequests;
+  }
+
   public List<User> getParticipants() {
     return participants;
   }
