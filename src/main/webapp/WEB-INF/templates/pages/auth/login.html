@@ -6,7 +6,8 @@
 <body th:replace="~{layouts/base :: layout(~{::main})}">
 
   <main class="flex-1 flex items-center justify-center p-4">
-    <div id="login-app" class="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
+    <div id="login-app" class="w-full max-w-md rounded-lg bg-white p-8 shadow-md"
+      th:attr="data-error=${error}">
       <form ref="form" @submit.prevent="submit" action="#" th:action="@{/admin/validate-login}" method="POST">
         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
         <h3 class="mb-2 text-2xl font-semibold text-gray-900">Taller Web I</h3>
@@ -33,27 +34,23 @@
       </form>
     </div>
     <script>
-      const app = Vue.createApp({
-        data() {
-          return {
-            email: '',
-            password: '',
-            error: '[[${error}]]',
-            // Spring Security redirects here with ?logout=true after a successful logout. Read
-            // client-side because it is a boolean flag with fixed copy, and mixing a Thymeleaf
-            // th:if into this Vue-mounted template would put two template engines in one subtree.
-            logout: new URLSearchParams(window.location.search).has('logout'),
-            loading: false
-          }
-        },
-        methods: {
-          submit() {
-            this.loading = true;
-            this.$refs.form.submit();
-          }
+      const { createApp, ref } = Vue;
+
+      createApp({
+        setup() {
+          const data = document.getElementById('login-app').dataset;
+          const email = ref('');
+          const password = ref('');
+          const error = ref(data.error || '');
+          const loading = ref(false);
+          const form = ref(null);
+          // Spring Security redirects here with ?logout=true: read it client-side so this
+          // subtree keeps one template engine instead of mixing a th:if into it.
+          const logout = new URLSearchParams(window.location.search).has('logout');
+          const submit = () => { loading.value = true; form.value.submit(); };
+          return { email, password, error, logout, loading, form, submit };
         }
-      });
-      app.mount('#login-app');
+      }).mount('#login-app');
     </script>
   </main>
 

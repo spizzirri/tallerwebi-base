@@ -20,6 +20,7 @@
       .\scripts\gate.ps1 all=UserServiceTest+LoginViewE2E
       .\scripts\gate.ps1 reset-db                 throws the local database away and rebuilds it
       .\scripts\gate.ps1 check                    Checkstyle, PMD, CPD, Prettier
+      .\scripts\gate.ps1 js                       the frontend JS contract
       .\scripts\gate.ps1 coverage                 runs the suite, prints the coverage matrix
 
     Bare `.\scripts\gate.ps1` prints this help rather than starting a build.
@@ -30,6 +31,7 @@
     .\scripts\gate.ps1 e2e LoginViewE2E -Headed -SlowMo 300
     .\scripts\gate.ps1 all -Port 9090
     .\scripts\gate.ps1 check -Fix
+    .\scripts\gate.ps1 js -Strict
     .\scripts\gate.ps1 list
 
 .NOTES
@@ -71,6 +73,7 @@ Commands
   all                   unit + integration + e2e    one `mvn verify`, stack included
   all=<a>+<b>           a mix; + separates, e2e names go to failsafe, the rest to surefire
   check                 Checkstyle, PMD, CPD, Prettier. Changes nothing
+  js                    the frontend JS contract, docs/guide-js.md. Changes nothing
   coverage              runs the whole suite, prints the coverage matrix
   reset-db              DESTROYS every local database and rebuilds it. See below
 
@@ -85,6 +88,7 @@ Targets
 Options
   -Fast          skip Checkstyle/PMD/CPD/Prettier/JaCoCo (the -Pdev profile)
   -Fix           with `check`: let Prettier rewrite the files (check alone never does)
+  -Strict        with `js`: fail on a contract violation (default only reports)
   -Headed        show the browser (e2e only)
   -SlowMo <ms>   per-action delay in the browser (e2e only)
   -Port <n>      moves Jetty and e2e.baseUrl together
@@ -100,6 +104,8 @@ Examples
   .\scripts\gate.ps1 all=UserServiceTest+LoginViewE2E
   .\scripts\gate.ps1 check
   .\scripts\gate.ps1 check -Fix
+  .\scripts\gate.ps1 js
+  .\scripts\gate.ps1 js -Strict
   .\scripts\gate.ps1 coverage
   .\scripts\gate.ps1 list=e2e
   .\scripts\gate.ps1 reset-db
@@ -152,7 +158,7 @@ $unitPatterns = "!**/e2e/**,!**/integration/**"
 # disarm it, letting a bogus -Dit.test name report a green build over zero tests.
 $surefireNone = '__NoUnitGate__'
 
-$commands = 'help', 'list', 'unit', 'integration', 'e2e', 'all', 'check', 'coverage', 'reset-db'
+$commands = 'help', 'list', 'unit', 'integration', 'e2e', 'all', 'check', 'js', 'coverage', 'reset-db'
 
 # Resolve before listing: Get-ChildItem echoes back the path it was given, and the package
 # is computed by cutting a fixed prefix off it, so the prefix has to be the same string
@@ -178,6 +184,7 @@ $command = $null
 $targets = @()
 $fast = $false
 $fix = $false
+$strict = $false
 $headed = $false
 $slowmo = 0
 $port = 0
@@ -310,6 +317,9 @@ while ($args.Count -gt 0) {
     elseif ($arg -match '^-(Fix)$') {
         $fix = $true
     }
+    elseif ($arg -match '^-(Strict)$') {
+        $strict = $true
+    }
     elseif ($arg -match '^-(Keep|k)$') {
         $keep = $true
     }
@@ -382,8 +392,13 @@ if ($command -eq 'help') {
 if ($fix -and $command -ne 'check') {
     Stop-With "-Fix only applies to 'check'."
 }
+# CI runs `js` with -Strict (docs/guide-js.md); locally it stays a report by default, and a
+# report has nothing to fail.
+if ($strict -and $command -ne 'js') {
+    Stop-With "-Strict only applies to 'js'."
+}
 # list is absent on purpose: `list=e2e` is a scope, and the block below validates it.
-if ($targets.Count -gt 0 -and $command -in 'help', 'check', 'coverage', 'reset-db') {
+if ($targets.Count -gt 0 -and $command -in 'help', 'check', 'js', 'coverage', 'reset-db') {
     Stop-With "'$command' does not take a target. Targets apply to unit, integration, e2e and all."
 }
 if ($targets -match 'E2E' -and $command -in 'unit', 'integration') {
@@ -504,6 +519,24 @@ if ($command -eq 'list') {
     Write-Host '         .\scripts\gate.ps1 e2e=<Class>'
     Set-Location $originalLocation
     exit 0
+}
+
+# ---- js ------------------------------------------------------------------------------
+if ($command -eq 'js') {
+    if ($fast) {
+        Write-Host '[js] -Fast ignored: nothing here runs Maven.'
+    }
+
+    # Invoked with `&`, inside the engine that is already running this script. A child
+    # `powershell` process would hardcode one engine (Windows PowerShell or pwsh) regardless
+    # of which one the developer used, and its path needs quoting to survive the `cmd /c`
+    # wrapper in Invoke-Native. Called this way, `exit` inside the check ends the check and
+    # leaves its code in $LASTEXITCODE without taking this script down.
+    $jsCheck = Join-Path $PSScriptRoot 'js-check.ps1'
+    if ($strict) { & $jsCheck -Strict } else { & $jsCheck }
+    $exitCode = $LASTEXITCODE
+    Set-Location $originalLocation
+    exit $exitCode
 }
 
 # ---- check ---------------------------------------------------------------------------

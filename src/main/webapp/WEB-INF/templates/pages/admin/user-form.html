@@ -6,7 +6,8 @@
 <body th:replace="~{layouts/base :: layout(~{::main})}">
 
   <main class="flex-1 flex items-center justify-center p-4">
-    <div id="user-form-app" class="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
+    <div id="user-form-app" class="w-full max-w-md rounded-lg bg-white p-8 shadow-md"
+      th:attr="data-first-name=${userForm.firstName},data-last-name=${userForm.lastName},data-email=${userForm.email},data-role=${userForm.role},data-error=${error}">
       <h3 class="mb-2 text-2xl font-semibold text-gray-900"
         th:text="${isEdit} ? 'Edit User' : 'New User'">Form Title</h3>
       <hr class="mb-6 border-gray-200">
@@ -61,22 +62,19 @@
     </div>
 
     <script>
-      Vue.createApp({
-        data() {
+      const { createApp, ref } = Vue;
+
+      createApp({
+        setup() {
+          const data = document.getElementById('user-form-app').dataset;
+          const field = (key) => ref(data[key] || '');
+          const loading = ref(false);
+          const form = ref(null);
+          const submit = () => { loading.value = true; form.value.submit(); };
           return {
-            firstName: '[[${userForm.firstName}]]',
-            lastName: '[[${userForm.lastName}]]',
-            email: '[[${userForm.email}]]',
-            role: '[[${userForm.role}]]',
-            error: '[[${error}]]',
-            loading: false
-          }
-        },
-        methods: {
-          submit() {
-            this.loading = true;
-            this.$refs.form.submit();
-          }
+            firstName: field('firstName'), lastName: field('lastName'), email: field('email'),
+            role: field('role'), error: field('error'), loading, form, submit
+          };
         }
       }).mount('#user-form-app');
     </script>

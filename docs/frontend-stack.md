@@ -64,38 +64,46 @@ so they work without JavaScript. Vue enhances them with loading states and
 reactive UI. The server handles all business logic:
 
 ```html
-<form ref="form" @submit.prevent="submit" action="#"
-  th:action="@{/admin/validate-login}" method="POST">
-  <input v-model="email" name="email" type="email" />
-  <button :disabled="loading">Sign in</button>
-</form>
+<div id="login-app" th:attr="data-error=${error}">
+  <form @submit.prevent="submit" action="#" th:action="@{/admin/validate-login}" method="POST">
+    <input v-model="email" name="email" type="email" />
+    <button :disabled="loading">Sign in</button>
+  </form>
+</div>
 
 <script>
-  Vue.createApp({
-    data() {
-      return { email: '', loading: false, error: '[[${error}]]' }
-    },
-    methods: {
-      submit() {
-        this.loading = true;
-        this.$refs.form.submit();  // POST nativo del browser
-      }
+  const { createApp, ref } = Vue;
+
+  createApp({
+    setup() {
+      const data = document.getElementById('login-app').dataset;
+      const email = ref('');
+      const error = ref(data.error || '');
+      const loading = ref(false);
+      const form = ref(null);
+      const submit = () => {
+        if (loading.value) return;   // guards Enter as well as a second click
+        loading.value = true;
+        form.value.submit();         // POST nativo del browser
+      };
+      return { email, error, loading, form, submit };
     }
   }).mount('#login-app');
 </script>
 ```
 
-**Server data enters via Thymeleaf.** The server renders initial values with
-`[[${variable}]]` syntax (Thymeleaf expressions inside Vue data blocks) or
-via `data-*` attributes for non-string values. Vue reads these on mount and
-takes over from there.
+**Server data enters through `data-*` on the root.** Thymeleaf writes the attribute, the
+browser decodes it, and `setup()` reads `dataset`. Never `[[${...}]]` inside `<script>`: that
+is HTML-escaped text, so `&` arrives as `&amp;` and a newline ends the string literal. See
+[guide-js.md](guide-js.md) R3.
 
-**Error handling.** The server returns the page with error in the model.
-Thymeleaf renders `error: '[[${error}]]'` into Vue's data. Vue displays it
-with `v-if="error"`. No client-side HTML parsing needed.
+**Error handling.** The server returns the page with `error` in the model, the template puts
+it on the root as `data-error`, and Vue renders it with `v-if="error"`. No client-side HTML
+parsing needed.
 
 **Loading states.** Vue's reactive `loading` property disables buttons and shows
-feedback during submission , no round-trip flicker.
+feedback during submission , no round-trip flicker. The handler checks the flag too, because
+`:disabled` alone does not stop a submit fired by Enter.
 
 **Each page is independent.** Every template mounts its own Vue app. Pages
 without interactivity don't mount Vue at all. Vue is optional per page.
@@ -108,7 +116,7 @@ without interactivity don't mount Vue at all. Vue is optional per page.
 | Style with utility classes | Tailwind (in templates) |
 | Simple form with no errors/loading | Plain HTML (no JS needed) |
 | Form with loading state / inline errors | Vue (`v-model`, `@submit`, `ref`) |
-| Timer / clock / reactive updates | Vue (`data()`, `setInterval`) |
+| Timer / clock / reactive updates | Vue (`ref()`, `setInterval`) |
 | Complex multi-step form | Vue component with multiple `ref()` |
 | Shared state across components | Add Pinia (when needed) |
 
@@ -141,5 +149,14 @@ Docker WAR (it detects it is not running from a source checkout).
 | :------------------------------------------ | :--------------------------------------- | :-------- |
 | `resources/core/js/tailwind-browser.js`     | `@tailwindcss/browser` 4.3.3 (jsdelivr)  | ~282 KB   |
 | `resources/core/js/vue.global.prod.js`      | Vue.js 3.5.13 (jsdelivr)                 | ~158 KB   |
+| `resources/core/js/leaflet.js`              | Leaflet 1.9.4 (unpkg)                    | ~147 KB   |
+| `resources/css/leaflet.css`                 | Leaflet 1.9.4 (unpkg)                    | ~15 KB, plus `resources/css/images/` for its relative `url()` targets |
+| `resources/css/bootstrap.min.css`           | Bootstrap 5.3.0 (jsdelivr)               | ~228 KB   |
+
+Font Awesome was dropped in favour of the vendored Lucide
+(`resources/core/js/lucide.min.js`): a whole webfont for 16 glyphs, when the icon
+set for the map and the category markers was Lucide already. Two icon languages in
+one `<head>` is what the "Bootstrap / Font Awesome conflict" in
+[guide-js.md](guide-js.md) referred to.
 
 Pin upgrades: change one at a time, re-run the E2E suite, and update this table.

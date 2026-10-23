@@ -196,8 +196,13 @@ public class PlanPlaceDetailE2E extends E2eBase {
         const planId = location.pathname.split('/').pop();
         const url = '/api/plans/' + planId + '/places';
         const entries = await (await fetch(url)).json();
-        const header = document.querySelector('meta[name="csrf-header"]').content;
-        const token = document.querySelector('meta[name="csrf-token"]').content;
+        const headerMeta = document.querySelector('meta[name="_csrf_header"]');
+        const tokenMeta = document.querySelector('meta[name="_csrf"]');
+        if (!headerMeta || !tokenMeta) {
+          throw new Error('the plan detail page must carry the _csrf metas');
+        }
+        const header = headerMeta.content;
+        const token = tokenMeta.content;
         const response = await fetch(url + '/' + entries[0].id, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json', [header]: token },

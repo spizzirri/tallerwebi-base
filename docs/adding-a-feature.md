@@ -260,7 +260,8 @@ Create `src/main/webapp/WEB-INF/templates/pages/products/new.html`:
 <body th:replace="~{layouts/base :: layout(~{::main})}">
 
   <main class="flex-1 flex items-center justify-center p-4">
-    <div id="product-app" class="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
+    <div id="product-app" class="w-full max-w-md rounded-lg bg-white p-8 shadow-md"
+      th:attr="data-error=${error}">
 
       <form ref="form" @submit.prevent="submit" action="#" th:action="@{/products}" method="POST">
         <h3 class="mb-2 text-2xl font-semibold text-gray-900">New Product</h3>
@@ -270,14 +271,12 @@ Create `src/main/webapp/WEB-INF/templates/pages/products/new.html`:
           <label for="name" class="mb-1 block text-sm font-medium text-gray-700">Name</label>
           <input v-model="name" id="name" name="name" type="text"
             class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none" />
-          <p v-if="errors.name" class="mt-1 text-sm text-red-600">{{ errors.name }}</p>
         </div>
 
         <div class="mb-4">
           <label for="price" class="mb-1 block text-sm font-medium text-gray-700">Price</label>
           <input v-model="price" id="price" name="price" type="number" step="0.01"
             class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none" />
-          <p v-if="errors.price" class="mt-1 text-sm text-red-600">{{ errors.price }}</p>
         </div>
 
         <button type="submit" :disabled="loading"
@@ -293,15 +292,22 @@ Create `src/main/webapp/WEB-INF/templates/pages/products/new.html`:
   </main>
 
   <script>
-    Vue.createApp({
-      data() {
-        return { name: '', price: '', error: '[[${error}]]', loading: false }
-      },
-      methods: {
-        submit() {
-          this.loading = true;
-          this.$refs.form.submit();
-        }
+    const { createApp, ref } = Vue;
+
+    createApp({
+      setup() {
+        const data = document.getElementById('product-app').dataset;
+        const name = ref('');
+        const price = ref('');
+        const error = ref(data.error || '');
+        const loading = ref(false);
+        const form = ref(null);
+        const submit = () => {
+          if (loading.value) return;
+          loading.value = true;
+          form.value.submit();
+        };
+        return { name, price, error, loading, form, submit };
       }
     }).mount('#product-app');
   </script>

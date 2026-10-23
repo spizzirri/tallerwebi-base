@@ -32,6 +32,8 @@ import com.valhalla.domain.place.PlaceCategory;
 import com.valhalla.domain.place.PlaceRepository;
 import com.valhalla.presentation.shared.LoginRedirects;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -101,12 +103,18 @@ public class PlaceImportControllerTest {
       .andExpect(view().name("pages/admin/place-import"))
       // La attribution ODbL es obligatoria en cualquier mapa que muestre datos OSM.
       .andExpect(content().string(containsString("OpenStreetMap")))
-      .andExpect(content().string(containsString("/admin/places/import/pois")))
+      // El endpoint y la attribution del tile viven en pages/place-import.js desde la fase 3.
+      .andExpect(content().string(containsString("/js/pages/place-import.js")))
       // El boton reemplaza a la carga automatica: sin click no hay consulta.
       .andExpect(content().string(containsString("id=\"load-pois\"")))
       // La caja de CABA viaja en el modelo hacia la vista, que decide si el boton se habilita.
       .andExpect(model().attribute("cabaBounds", hasEntry("south", -34.7058)))
       .andExpect(content().string(containsString("-34.7058")));
+
+    String module = Files.readString(
+      Paths.get("src", "main", "webapp", "resources", "core", "js", "pages", "place-import.js")
+    );
+    assertThat(module, containsString("/admin/places/import/pois"));
 
     verifyNoInteractions(this.overpassClient);
   }

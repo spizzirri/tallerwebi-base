@@ -157,15 +157,15 @@
        Vanilla y embebido: el fragment viaja con la página y no depende de bundles. -->
   <script>
     (function () {
-      var menu = document.getElementById("navbar-menu");
+      const menu = document.getElementById("navbar-menu");
       if (!menu) return;
-      var openers = document.querySelectorAll("[data-menu-toggle]");
-      var syncOpeners = function (open) {
-        for (var i = 0; i < openers.length; i++) {
+      const openers = document.querySelectorAll("[data-menu-toggle]");
+      const syncOpeners = function (open) {
+        for (let i = 0; i < openers.length; i++) {
           openers[i].setAttribute("aria-expanded", open ? "true" : "false");
         }
       };
-      var setIsOpen = function (open) {
+      const setIsOpen = function (open) {
         if (open) {
           menu.removeAttribute("hidden");
           syncOpeners(true);
@@ -174,7 +174,7 @@
           syncOpeners(false);
         }
       };
-      for (var i = 0; i < openers.length; i++) {
+      for (let i = 0; i < openers.length; i++) {
         openers[i].addEventListener("click", function () {
           if (menu.hasAttribute("hidden")) {
             setIsOpen(true);
@@ -189,8 +189,8 @@
       document.addEventListener("click", function (e) {
         if (menu.hasAttribute("hidden")) return;
         if (menu.contains(e.target)) return;
-        var inOpener = false;
-        for (var j = 0; j < openers.length; j++) {
+        let inOpener = false;
+        for (let j = 0; j < openers.length; j++) {
           if (openers[j].contains(e.target)) inOpener = true;
         }
         if (!inOpener) setIsOpen(false);

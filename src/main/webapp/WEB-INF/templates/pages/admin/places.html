@@ -6,7 +6,7 @@
 <body th:replace="~{layouts/base :: layout(~{::main})}">
 
   <main class="flex-1 p-4">
-    <div id="places-app" class="mx-auto max-w-4xl">
+    <div id="places-app" class="mx-auto max-w-4xl" th:attr="data-error=${error}">
       <div class="mb-6 flex items-center justify-between">
         <h2 class="text-2xl font-semibold text-gray-900">Places</h2>
         <div class="flex items-center gap-2">
@@ -67,11 +67,13 @@
     </div>
 
     <script>
-      Vue.createApp({
-        data() {
-          return {
-            error: '[[${error}]]'
-          }
+      const { createApp, ref } = Vue;
+
+      createApp({
+        setup() {
+          const data = document.getElementById('places-app').dataset;
+          const error = ref(data.error || '');
+          return { error };
         }
       }).mount('#places-app');
     </script>

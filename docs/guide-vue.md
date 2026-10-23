@@ -2,6 +2,9 @@
 
 Step-by-step guide for creating an interactive view using the full stack.
 
+> How that page's JavaScript is written — API style, where server data enters, DOM vs
+> markup, errors — is the [JavaScript contract](guide-js.md). Read it alongside this guide.
+
 ## Base Structure
 
 Every view follows this structure:
@@ -19,12 +22,12 @@ Every view follows this structure:
   </main>
 
   <script>
-    Vue.createApp({
-      data() {
-        return { /* reactive state */ }
-      },
-      methods: {
-        /* functions */
+    const { createApp, ref } = Vue;
+
+    createApp({
+      setup() {
+        const message = ref('');
+        return { message };
       }
     }).mount('#my-app');
   </script>
@@ -48,7 +51,11 @@ Create `src/main/webapp/WEB-INF/templates/pages/contact.html`:
 <body th:replace="~{layouts/base :: layout(~{::main})}">
 
   <main class="flex-1 flex items-center justify-center p-4">
-    <div id="contact-app" class="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
+    <div id="contact-app" class="w-full max-w-md rounded-lg bg-white p-8 shadow-md"
+         th:attr="data-error=${error},
+                  data-name=${contactData.name},
+                  data-email=${contactData.email},
+                  data-message=${contactData.message}">
 
       <form ref="form" @submit.prevent="submit" action="#" th:action="@{/contact}" method="POST">
         <h3 class="mb-2 text-2xl font-semibold text-gray-900">Contact</h3>
@@ -82,7 +89,7 @@ Create `src/main/webapp/WEB-INF/templates/pages/contact.html`:
           <span v-else>Send</span>
         </button>
 
-        <!-- General error (Thymeleaf -> Vue via [[${...}]]) -->
+        <!-- General error, seeded from data-error on the root element -->
         <p v-if="error" class="mt-4 rounded-md bg-red-100 px-4 py-3 text-sm text-red-700">{{ error }}</p>
       </form>
 
@@ -90,21 +97,23 @@ Create `src/main/webapp/WEB-INF/templates/pages/contact.html`:
   </main>
 
   <script>
+    const { ref } = Vue;
+    const root = document.getElementById('contact-app');
+
     Vue.createApp({
-      data() {
-        return {
-          name: '',
-          email: '',
-          message: '',
-          error: '[[${error}]]',
-          loading: false
-        }
-      },
-      methods: {
-        submit() {
-          this.loading = true;
-          this.$refs.form.submit();
-        }
+      setup() {
+        const data = root.dataset;
+        const name = ref(data.name || '');
+        const email = ref(data.email || '');
+        const message = ref(data.message || '');
+        const error = ref(data.error || '');
+        const loading = ref(false);
+        const submit = () => {
+          if (loading.value) return;
+          loading.value = true;
+          root.querySelector('form').submit();
+        };
+        return { name, email, message, error, loading, submit };
       }
     }).mount('#contact-app');
   </script>
@@ -166,29 +175,35 @@ public class ContactData {
 </button>
 ```
 
-### Server errors to Vue
+### Server errors and values to Vue
+
+Server data reaches the app through `data-*` on its root, never as an inline expression
+inside `<script>`: `[[${...}]]` there is HTML-escaped text, so `&` arrives as `&amp;` and a
+newline ends the string literal. See [guide-js.md](guide-js.md) R3.
 
 ```html
+<div id="contact-app" th:attr="data-error=${error},data-name=${contactData.name}"></div>
 <script>
+  const data = document.getElementById('contact-app').dataset;
+
   Vue.createApp({
-    data() {
-      return {
-        error: '[[${error}]]'  // Thymeleaf passes error to Vue
-      }
+    setup() {
+      const error = ref(data.error || '');
+      const name = ref(data.name || '');
+      return { error, name };
     }
-  }).mount('#app');
+  }).mount('#contact-app');
 </script>
 ```
 
 ### Native submit with loading
 
 ```javascript
-methods: {
-  submit() {
-    this.loading = true;
-    this.$refs.form.submit();  // Native browser POST
-  }
-}
+const submit = () => {
+  if (loading.value) return;   // guards Enter as well as a second click
+  loading.value = true;
+  form.submit();               // Native browser POST
+};
 ```
 
 ### Confirmation before action
@@ -221,11 +236,18 @@ methods: {
 
 ## Rules
 
-1. **Each page mounts its own Vue app** , do not share between pages
+1. **Each page mounts its own Vue app** , do not share between pages; the root is
+   `#<view>-app` (`#contact-app`, `#explore-app`), never a generic `#app`
 2. **Thymeleaf renders initial data** , Vue takes over after
-3. **Always `th:action` + `method="POST"`** , works without JS (progressive enhancement)
+3. **Always `th:action` + `method="POST"`** , the form still posts when the script fails to
+   load (see the visibility-shield caveat in [guide-js.md](guide-js.md))
 4. **`v-model` on all inputs** , reactive binding
-5. **`@submit.prevent` + `this.$refs.form.submit()`** , submit with loading state
-6. **`[[${variable}]]` to pass server data to Vue** , Thymeleaf -> Vue
+5. **Native submit with an in-flight guard** , `form.submit()` behind a `loading` flag that
+   the handler checks, so Enter and a second click cannot post twice
+6. **Server data enters through `data-*` on the root** , read it with `dataset`, never as
+   `[[${variable}]]` inside `<script>`
 7. **`:disabled="loading"`** , user feedback
-8. **`v-if="error"`** , inline error display
+8. **`v-if="error"`** , inline error display; never `alert()`
+
+How that JavaScript is written — Composition API, request helper, DOM over markup — is the
+[JavaScript contract](guide-js.md). This guide covers the view structure only.

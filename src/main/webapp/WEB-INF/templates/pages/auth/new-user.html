@@ -6,7 +6,8 @@
 <body th:replace="~{layouts/base :: layout(~{::main})}">
 
   <main class="flex-1 flex items-center justify-center p-4">
-    <div id="register-app" class="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
+    <div id="register-app" class="w-full max-w-md rounded-lg bg-white p-8 shadow-md"
+      th:attr="data-error=${error}">
       <form ref="form" @submit.prevent="submit" action="#" th:action="@{/admin/register}" method="POST">
         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
         <h3 class="mb-2 text-2xl font-semibold text-gray-900">New User</h3>
@@ -42,25 +43,22 @@
       </form>
     </div>
     <script>
-      const app = Vue.createApp({
-        data() {
-          return {
-            firstName: '',
-            lastName: '',
-            email: '',
-            password: '',
-            error: '[[${error}]]',
-            loading: false
-          }
-        },
-        methods: {
-          submit() {
-            this.loading = true;
-            this.$refs.form.submit();
-          }
+      const { createApp, ref } = Vue;
+
+      createApp({
+        setup() {
+          const data = document.getElementById('register-app').dataset;
+          const firstName = ref('');
+          const lastName = ref('');
+          const email = ref('');
+          const password = ref('');
+          const error = ref(data.error || '');
+          const loading = ref(false);
+          const form = ref(null);
+          const submit = () => { loading.value = true; form.value.submit(); };
+          return { firstName, lastName, email, password, error, loading, form, submit };
         }
-      });
-      app.mount('#register-app');
+      }).mount('#register-app');
     </script>
   </main>
 

@@ -100,7 +100,7 @@ public class MobileLayoutE2E extends E2eBase {
     // AC-01: la pagina no scrollea de lado con el explorador cargado
     assertNoSideScroll("/explore");
     Locator map = page.locator("#map");
-    Locator placesSheet = page.locator("#app > aside").first();
+    Locator placesSheet = page.locator("#explore-app > aside").first();
     Locator plansSheet = page.locator("#plans-aside");
     Locator tabPlaces = page.locator("label[for='tab-places']");
     Locator tabPlans = page.locator("label[for='tab-plans']");
@@ -121,7 +121,7 @@ public class MobileLayoutE2E extends E2eBase {
     // El estado de datos llega asincronico (Vue pega /api/places al montar): sin esperarlo la
     // captura sale con "0 place(s)" y el mapa sin tiles, que no es como se ve el explorador.
     page.waitForFunction(
-      "() => document.querySelectorAll('#app > aside article').length > 0" +
+      "() => document.querySelectorAll('#explore-app > aside article').length > 0" +
       " && document.querySelectorAll('#map .leaflet-marker-icon').length > 0" +
       " && document.querySelectorAll('#map .leaflet-tile-loaded').length > 0",
       null,
@@ -168,7 +168,7 @@ public class MobileLayoutE2E extends E2eBase {
     // El detalle de un place es una card superpuesta centrada sobre el mapa (con margenes a los
     // costados), no un sheet edge-to-edge. Abro un place desde su card en el panel de la tab.
     tabPlaces.click();
-    page.locator("#app > aside article").first().click();
+    page.locator("#explore-app > aside article").first().click();
     Locator details = page.locator("#place-details-aside");
     details.waitFor();
     assertThat("el detalle de place es visible", details.isVisible(), is(true));

@@ -209,25 +209,47 @@ El frontend no tiene bundles compilados. Lo propio es solo esto:
 src/main/webapp/resources/
 ├── core/js/
 │   ├── tailwind-browser.js      (@tailwindcss/browser vendorizado: compila Tailwind en el browser)
-│   └── vue.global.prod.js
+│   ├── vue.global.prod.js
+│   ├── lucide.min.js
+│   ├── add-to-plan.js           agrega un lugar a un plan (módulo)
+│   ├── plan-share.js            comparte un plan (script clásico, defer)
+│   ├── lib/
+│   │   ├── api.js                   csrfToken(), apiFetch(), ApiError
+│   │   └── dom.js                   el(): el único constructor de nodos
+│   └── pages/
+│       ├── places-list.js           mapa, filtros y panel de plan
+│       ├── plans-detail.js          mapa, itinerario y catálogo
+│       ├── place-import.js          importador OSM
+│       └── plans-public.js          mapa público de solo lectura
+├── css/
+    └── brand.css
 └── images/
     └── place-placeholder.svg
 ```
 
+`lib/` y `pages/` son módulos ES nativos: el browser resuelve `import` sin bundler, y
+`BaseWebConfig` mapea `/js/**` a `core/js/`. El contrato que los gobierna es
+[guide-js.md](guide-js.md).
+
 **Tailwind es local y vendorizado**: `layouts/base.html` lo carga con
 `<script th:src="@{/js/tailwind-browser.js}" defer>`. No hay paso de build de CSS.
 
-**Leaflet sí viene de CDN**, y solo en `pages/places/list.html`:
-`https://unpkg.com/leaflet@1.9.4/dist/leaflet.{css,js}`. No existe `lib/leaflet/` en el repo.
+**Leaflet es local y vendorizado**, igual que Tailwind, Vue y Lucide: las cuatro vistas con
+mapa —`places/list`, `plans/detail`, `admin/place-import` y `plans/public`— cargan
+`@{/js/leaflet.js}` y `@{/css/leaflet.css}`, con la 1.9.4 fija en el repo. La versión no queda
+en manos de un origen remoto porque `divIcon({ html: elemento })` depende del contrato de 1.9,
+y un CDN caído dejaba el mapa muerto. El CSS arrastra `resources/css/images/` por sus `url()`
+relativos.
 
 No existe `js/map.js`, `js/places.js`, `js/plan-builder.js` ni `js/share-view.js`: la lógica de
-Leaflet vive **inline** dentro de los templates Thymeleaf.
+Leaflet vive en los módulos de `resources/core/js/pages/` (`places-list.js`,
+`plans-detail.js`, `place-import.js`, `plans-public.js`), no inline en los templates.
 
 ### Map Integration (Leaflet + OSM)
 
 | Feature | Implementation |
 |---------|----------------|
-| Base map | OpenStreetMap tiles (free, no API key), Leaflet 1.9.4 desde unpkg |
+| Base map | OpenStreetMap tiles (free, no API key), Leaflet 1.9.4 vendorizado (unpkg) |
 | Markers | Custom markers by category (color/icon) |
 | Popups | Place name y categoría **sin link** — los detalles van al panel lateral de `/places`, sin navegar |
 | Responsive | Fullscreen on mobile, sidebar on desktop |
@@ -308,7 +330,7 @@ Leaflet vive **inline** dentro de los templates Thymeleaf.
 | Session auth | Spring Security | SecurityFilterChain: form login, CSRF, session management (1 per user) |
 | DB for places | PostgreSQL (prod) | Already configured, supports PostGIS if needed later |
 | Seed data | ApplicationListener | ContextRefreshedEvent seeder, migrate to Flyway later |
-| Frontend | Tailwind CSS (vendorizado, compila en el browser) + Vue.js | No build step, fast development. Leaflet sí viene de CDN |
+| Frontend | Tailwind CSS (vendorizado, compila en el browser) + Vue.js | No build step, fast development. Leaflet también vendorizado |
 
 ## 7. Implementation Order
 

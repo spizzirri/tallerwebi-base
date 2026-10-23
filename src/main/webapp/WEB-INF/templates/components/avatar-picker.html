@@ -58,12 +58,12 @@
 
   <script>
     (function () {
-      var picker = document.getElementById("avatar-picker");
+      const picker = document.getElementById("avatar-picker");
       if (!picker) return;
-      var hidden = document.getElementById("avatarUrl");
-      var text = document.getElementById("avatarUrlText");
-      var choices = picker.querySelectorAll(".avatar-choice");
-      var renderable = function (value) {
+      const hidden = document.getElementById("avatarUrl");
+      const text = document.getElementById("avatarUrlText");
+      const choices = picker.querySelectorAll(".avatar-choice");
+      const renderable = function (value) {
         if (!value) return false;
         return value.indexOf("https://") === 0 || value.indexOf("/images/avatars/") === 0;
       };
@@ -72,9 +72,9 @@
       // Se alterna con el atributo `hidden` y no con la clase `.hidden`: el circulo de iniciales
       // lleva `inline-flex` y esa utilidad le gana a `.hidden` en la cascada del Tailwind del
       // browser (mismo layer, declarada despues). Preflight fuerza `[hidden]` con !important.
-      var updatePreview = function (value) {
-        var image = document.getElementById("avatar-preview-img");
-        var initial = document.getElementById("avatar-preview-initial");
+      const updatePreview = function (value) {
+        const image = document.getElementById("avatar-preview-img");
+        const initial = document.getElementById("avatar-preview-initial");
         if (!image || !initial) return;
         if (!renderable(value)) {
           image.setAttribute("hidden", "");
@@ -85,14 +85,14 @@
         image.removeAttribute("hidden");
         initial.setAttribute("hidden", "");
       };
-      var clearSelection = function () {
-        for (var j = 0; j < choices.length; j++) {
+      const clearSelection = function () {
+        for (let j = 0; j < choices.length; j++) {
           choices[j].classList.remove("avatar-selected", "ring-2", "ring-blue-500", "border-blue-500");
         }
       };
-      for (var i = 0; i < choices.length; i++) {
+      for (let i = 0; i < choices.length; i++) {
         choices[i].addEventListener("click", function () {
-          var value = this.getAttribute("data-avatar-value") || "";
+          const value = this.getAttribute("data-avatar-value") || "";
           // La galeria manda al campo oculto; el visible solo se llena con URLs https propias.
           hidden.value = value;
           text.value = value.indexOf("https://") === 0 ? value : "";

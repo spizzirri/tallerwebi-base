@@ -11,7 +11,7 @@
      tokens and scripts. head(pageTitle) delegates to it. -->
 
 <head th:fragment="head(pageTitle)">
-  <!-- CSRF para el JS de fetch: add-to-plan.js y el Vue de pages/places/list.html leen estos
+  <!-- CSRF para el JS de fetch: add-to-plan.js y pages/places-list.js leen estos
        metas para el POST a /api/plans/{id}/places. Van acá, en el head completo de la app, y
        no en headContent: la vista pública read-only (pages/plans/public.html, que hereda
        headContent) no debe exponer el token. [_csrf] puede ser null en páginas públicas. -->
@@ -35,19 +35,19 @@
        body. Claves de icono y overrides viven en brand.css y components/navbar.html. -->
   <script>
     (function () {
-      var stored = null;
+      let stored = null;
       try { stored = localStorage.getItem("planit-theme"); } catch (e) { /* sin storage */ }
-      var dark = stored === "dark" ||
+      const dark = stored === "dark" ||
         (stored !== "light" && window.matchMedia("(prefers-color-scheme: dark)").matches);
-      var apply = function (mode) {
+      const apply = function (mode) {
         document.documentElement.setAttribute("data-theme", mode);
         document.documentElement.setAttribute("data-bs-theme", mode);
       };
       apply(dark ? "dark" : "light");
       document.addEventListener("click", function (event) {
-        var toggle = event.target.closest && event.target.closest("[data-theme-toggle]");
+        const toggle = event.target.closest && event.target.closest("[data-theme-toggle]");
         if (!toggle) return;
-        var next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+        const next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
         apply(next);
         try { localStorage.setItem("planit-theme", next); } catch (e) { /* sin storage */ }
       });
@@ -227,9 +227,9 @@
   <script th:src="@{/js/vue.global.prod.js}"></script>
   <script defer>
     (function () {
-      var reveal = function () {
-        var styles = document.querySelectorAll("head style");
-        for (var i = 0; i < styles.length; i++) {
+      const reveal = function () {
+        const styles = document.querySelectorAll("head style");
+        for (let i = 0; i < styles.length; i++) {
           if (styles[i].textContent.length > 2000) {
             document.documentElement.style.visibility = "visible";
             return;
@@ -243,10 +243,10 @@
   </script>
   <script th:if="${devReloadToken != null}" th:inline="javascript" defer>
     (function () {
-      var endpoint = /*[[@{/reload/version}]]*/ "";
-      var expected = /*[[${devReloadToken}]]*/ "";
+      const endpoint = /*[[@{/reload/version}]]*/ "";
+      const expected = /*[[${devReloadToken}]]*/ "";
       if (!endpoint || !expected) return;
-      var poll = function () {
+      const poll = function () {
         fetch(endpoint, { cache: "no-store" })
           .then(function (r) {
             if (r.ok) return r.text();
@@ -282,7 +282,7 @@
       if (window.__markRemoveConfirmBound) return;
       window.__markRemoveConfirmBound = true;
       document.addEventListener("submit", function (event) {
-        var form = event.target;
+        const form = event.target;
         if (!form || !form.getAttribute) return;
         if (form.getAttribute("data-bookmark-remove") !== "true") return;
         if (!window.confirm("¿Quitar este plan de Guardados?")) {

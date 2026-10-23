@@ -33,6 +33,12 @@ jobs:
           java-version: "25"
           cache: maven
 
+      # The view layer's contract (docs/guide-js.md) is a PowerShell grep gate, so it runs on
+      # the runner's preinstalled pwsh. Before the Maven build: it takes seconds and it is the
+      # cheapest thing that can fail.
+      - name: Frontend JS contract
+        run: pwsh -File scripts/gate.ps1 js -Strict
+
       - name: Build, test, and quality gates
         run: mvn clean verify --fail-at-end -DskipITs
 

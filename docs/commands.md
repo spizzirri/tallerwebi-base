@@ -119,6 +119,8 @@ mvn test -Pdev
 .\scripts\gate.ps1 e2e=LoginViewE2E         # run only what you name
 .\scripts\gate.ps1 all                      # unit + integration + E2E in one `mvn verify`
 .\scripts\gate.ps1 check                    # Checkstyle, PMD, CPD, Prettier; changes no files
+.\scripts\gate.ps1 js                       # the frontend JS contract (docs/guide-js.md)
+.\scripts\gate.ps1 js -Strict               # same, but fail on a violation instead of reporting
 .\scripts\gate.ps1 coverage                 # the whole suite, then the line coverage table
 .\scripts\gate.ps1 unit -Fast               # skip the static-analysis gates
 ```

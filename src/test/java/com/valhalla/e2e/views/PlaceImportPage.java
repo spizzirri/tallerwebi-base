@@ -21,7 +21,7 @@ public class PlaceImportPage extends WebPage {
   /** Espera a que la lista tenga exactamente {@code count} POIs: el fetch resuelve despues del load. */
   public void waitForPois(int count) {
     page.waitForFunction(
-      "(n) => document.querySelectorAll('#app > aside ul li').length === n",
+      "(n) => document.querySelectorAll('#place-import-app > aside ul li').length === n",
       count
     );
   }
@@ -57,15 +57,15 @@ public class PlaceImportPage extends WebPage {
   }
 
   public void waitForError() {
-    page.waitForSelector("#app > aside p[role='alert']");
+    page.waitForSelector("#place-import-app > aside p[role='alert']");
   }
 
   public int poiCount() {
-    return page.locator("#app > aside ul li").count();
+    return page.locator("#place-import-app > aside ul li").count();
   }
 
   public String statusText() {
-    return this.getElementText("#app > aside p[aria-live='polite']").trim();
+    return this.getElementText("#place-import-app > aside p[aria-live='polite']").trim();
   }
 
   /** Un POI sin coordenadas no se dibuja, asi que el total puede ser menor que el de la lista. */
@@ -74,16 +74,16 @@ public class PlaceImportPage extends WebPage {
   }
 
   public boolean hasError() {
-    return page.locator("#app > aside p[role='alert']").count() > 0;
+    return page.locator("#place-import-app > aside p[role='alert']").count() > 0;
   }
 
   public String errorText() {
-    return this.getElementText("#app > aside p[role='alert']").trim();
+    return this.getElementText("#place-import-app > aside p[role='alert']").trim();
   }
 
   public void selectPoi(String name) {
     page
-      .locator("#app > aside ul li a")
+      .locator("#place-import-app > aside ul li a")
       .filter(new Locator.FilterOptions().setHasText(name))
       .click();
   }

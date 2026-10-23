@@ -33,6 +33,8 @@ import com.valhalla.domain.user.UserRepository;
 import com.valhalla.presentation.place.EditPlaceRequest;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +46,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.HiddenHttpMethodFilter;
+import org.springframework.web.util.HtmlUtils;
 
 @WebIntegrationTest
 @Transactional
@@ -52,6 +55,8 @@ public class PlaceAdminControllerTest {
   private static final String ADMIN_EMAIL = "admin@unlam.edu.ar";
   private static final int SEEDED_TOTAL = 12;
   private static final String SEEDED_PLACE = "Parrilla Don Julio";
+  /** Both characters the R3 bridge exists for: HTML escaping and a line break. */
+  private static final String DESCRIPTION_WITH_ESCAPES = "Linea1 & Linea2\nLinea3";
 
   @Autowired
   private WebApplicationContext wac;
@@ -118,6 +123,30 @@ public class PlaceAdminControllerTest {
       .andExpect(model().attribute("isEdit", true))
       .andExpect(model().attribute("placeId", place.getId()))
       .andExpect(model().attribute("placeForm", hasProperty("name", is("Para Editar"))));
+  }
+
+  /**
+   * guide-js.md R3: the form state travels in {@code data-*}, so an ampersand and a newline in
+   * the description survive the trip. An inline {@code [[${...}]]} literal would emit
+   * {@code &amp;} into the JavaScript and break the line -- the page's Vue app would not mount.
+   */
+  @Test
+  @WithMockUser(username = ADMIN_EMAIL, roles = { "ADMIN" })
+  public void shouldBridgeTheDescriptionThroughTheDataAttribute() throws Exception {
+    EditPlaceRequest request = new EditPlaceRequest();
+    request.setName("Con Descripcion");
+    request.setCategory(PlaceCategory.CAFE);
+    request.setDescription(DESCRIPTION_WITH_ESCAPES);
+    Place place = placeService.create(request);
+
+    String html =
+      this.mockMvc.perform(get("/admin/places/" + place.getId() + "/edit"))
+        .andExpect(status().isOk())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+
+    assertThat(attributeValue(html, "data-description"), is(DESCRIPTION_WITH_ESCAPES));
   }
 
   // --- I-07 ---
@@ -326,6 +355,13 @@ public class PlaceAdminControllerTest {
 
   private List<String> namesOf(List<Place> places) {
     return places.stream().map(Place::getName).toList();
+  }
+
+  /** Raw attribute value, decoded: what the browser's parser hands to {@code dataset}. */
+  private String attributeValue(String html, String name) {
+    Matcher matcher = Pattern.compile(name + "=\"([^\"]*)\"").matcher(html);
+    assertThat("attribute " + name + " is rendered", matcher.find(), is(true));
+    return HtmlUtils.htmlUnescape(matcher.group(1));
   }
 
   /** GET a la API y parsea el array de lugares con Jackson (mismo seam que PlaceRestControllerTest). */

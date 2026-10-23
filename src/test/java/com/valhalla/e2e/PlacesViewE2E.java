@@ -60,20 +60,20 @@ public class PlacesViewE2E extends E2eBase {
       is(equalTo(2))
     );
 
-    page.locator("#app > aside select").selectOption("RESTAURANT");
+    page.locator("#explore-app > aside select").selectOption("RESTAURANT");
     waitForPlaceCount(2);
     assertThat(
       placeCards().allTextContents().stream().allMatch(cardText -> cardText.contains("RESTAURANT")),
       is(true)
     );
 
-    page.locator("#app > aside select").selectOption("");
-    page.locator("#app > aside input[type='text']").fill("Don");
+    page.locator("#explore-app > aside select").selectOption("");
+    page.locator("#explore-app > aside input[type='text']").fill("Don");
     waitForPlaceCount(1);
     assertThat(placeCards().first().textContent(), containsString("Don"));
 
     page
-      .locator("#app > aside button")
+      .locator("#explore-app > aside button")
       .filter(new Locator.FilterOptions().setHasText("Clear Filters"))
       .click();
     waitForPlaceCount(TOTAL_PLACES);
@@ -162,7 +162,7 @@ public class PlacesViewE2E extends E2eBase {
 
   @Test
   void shouldKeepPageFixedWhilePlacesSidebarScrolls() {
-    Locator sidebar = page.locator("#app > aside");
+    Locator sidebar = page.locator("#explore-app > aside");
     assertThat(
       (Boolean) sidebar.evaluate("element => element.scrollHeight > element.clientHeight"),
       is(true)
@@ -174,7 +174,7 @@ public class PlacesViewE2E extends E2eBase {
 
     sidebar.hover();
     page.mouse().wheel(0, 500);
-    page.waitForFunction("() => document.querySelector('#app > aside').scrollTop > 0");
+    page.waitForFunction("() => document.querySelector('#explore-app > aside').scrollTop > 0");
 
     assertThat(
       (Boolean) page.evaluate(
@@ -219,7 +219,7 @@ public class PlacesViewE2E extends E2eBase {
   }
 
   private Locator placeCards() {
-    return page.locator("#app > aside article");
+    return page.locator("#explore-app > aside article");
   }
 
   private void waitForMarkerCentered(int markerIndex) {
@@ -241,7 +241,7 @@ public class PlacesViewE2E extends E2eBase {
 
   private void waitForPlaceCount(int expectedCount) {
     page.waitForFunction(
-      "() => document.querySelectorAll('#app > aside article').length === " +
+      "() => document.querySelectorAll('#explore-app > aside article').length === " +
       expectedCount +
       " && document.querySelectorAll('#map .leaflet-marker-icon').length === " +
       expectedCount

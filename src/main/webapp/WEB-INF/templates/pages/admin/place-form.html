@@ -6,7 +6,8 @@
 <body th:replace="~{layouts/base :: layout(~{::main})}">
 
   <main class="flex-1 flex items-center justify-center p-4">
-    <div id="place-form-app" class="w-full max-w-2xl rounded-lg bg-white p-8 shadow-md">
+    <div id="place-form-app" class="w-full max-w-2xl rounded-lg bg-white p-8 shadow-md"
+      th:attr="data-name=${placeForm.name},data-category=${placeForm.category},data-description=${placeForm.description},data-address=${placeForm.address},data-image-url=${placeForm.imageUrl},data-latitude=${placeForm.latitude},data-longitude=${placeForm.longitude},data-opening-hours=${placeForm.openingHours},data-phone=${placeForm.phone},data-website=${placeForm.website},data-error=${error}">
       <h3 class="mb-2 text-2xl font-semibold text-gray-900"
         th:text="${isEdit} ? 'Edit Place' : 'New Place'">Form Title</h3>
       <hr class="mb-6 border-gray-200">
@@ -101,28 +102,22 @@
     </div>
 
     <script>
-      Vue.createApp({
-        data() {
+      const { createApp, ref } = Vue;
+
+      createApp({
+        setup() {
+          const data = document.getElementById('place-form-app').dataset;
+          const field = (key) => ref(data[key] || '');
+          const loading = ref(false);
+          const form = ref(null);
+          const submit = () => { loading.value = true; form.value.submit(); };
           return {
-            name: '[[${placeForm.name}]]',
-            category: '[[${placeForm.category}]]',
-            description: '[[${placeForm.description}]]',
-            address: '[[${placeForm.address}]]',
-            imageUrl: '[[${placeForm.imageUrl}]]',
-            latitude: '[[${placeForm.latitude}]]',
-            longitude: '[[${placeForm.longitude}]]',
-            openingHours: '[[${placeForm.openingHours}]]',
-            phone: '[[${placeForm.phone}]]',
-            website: '[[${placeForm.website}]]',
-            error: '[[${error}]]',
-            loading: false
-          }
-        },
-        methods: {
-          submit() {
-            this.loading = true;
-            this.$refs.form.submit();
-          }
+            name: field('name'), category: field('category'), description: field('description'),
+            address: field('address'), imageUrl: field('imageUrl'), latitude: field('latitude'),
+            longitude: field('longitude'), openingHours: field('openingHours'),
+            phone: field('phone'), website: field('website'), error: field('error'),
+            loading, form, submit
+          };
         }
       }).mount('#place-form-app');
     </script>

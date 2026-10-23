@@ -56,7 +56,7 @@ public class PlansPage extends WebPage {
    * panel de creación está abierto.
    */
   public void addFirstDraftPlace() {
-    this.page.locator("#app > aside article button[aria-label^='Add ']").first().click();
+    this.page.locator("#explore-app > aside article button[aria-label^='Add ']").first().click();
   }
 
   /** Paso 3: envía el formulario del modal (POST /plans). */

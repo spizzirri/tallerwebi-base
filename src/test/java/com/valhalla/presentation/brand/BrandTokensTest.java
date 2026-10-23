@@ -40,6 +40,28 @@ public class BrandTokensTest {
   );
   private static final Path NAVBAR = TEMPLATES.resolve("components/navbar.html");
   private static final Path PLACES = TEMPLATES.resolve("pages/places/list.html");
+  /** The same view's JavaScript, extracted in phase 3 of docs/guide-js.md. */
+  private static final Path PLACES_JS = Paths.get(
+    "src",
+    "main",
+    "webapp",
+    "resources",
+    "core",
+    "js",
+    "pages",
+    "places-list.js"
+  );
+  /** The shared map helpers, extracted in phase 5: the category table lives here now. */
+  private static final Path PLACES_MAP_JS = Paths.get(
+    "src",
+    "main",
+    "webapp",
+    "resources",
+    "core",
+    "js",
+    "lib",
+    "places-map.js"
+  );
 
   private static final List<String> CATEGORY_TOKENS = List.of(
     "--category-restaurant",
@@ -183,6 +205,7 @@ public class BrandTokensTest {
   void categoryColorsLiveInOneTokenPerCategory() throws IOException {
     String tokens = read(TOKENS);
     String places = read(PLACES);
+    String placesJs = read(PLACES_JS);
 
     for (String token : CATEGORY_TOKENS) {
       assertThat(
@@ -193,14 +216,14 @@ public class BrandTokensTest {
     }
 
     // El mapa del marker y el del panel eran dos copias del mismo objeto. Una sola ahora.
-    assertThat(places, not(containsString("categoryColors")));
+    assertThat(placesJs, not(containsString("categoryColors")));
 
     // Ningun hex de categoria literal en el JS: se lee del :root computado.
-    assertThat(places, containsString("getPropertyValue"));
+    assertThat(placesJs, containsString("getPropertyValue"));
     for (String hex : categoryHexes()) {
       assertThat(
-        "ningun hex de categoria literal en list.html: " + hex,
-        places,
+        "ningun hex de categoria literal en places-list.js: " + hex,
+        placesJs,
         not(containsString(hex))
       );
     }
@@ -213,6 +236,8 @@ public class BrandTokensTest {
   @Test
   void categoryIconsComeFromTheVendoredLibrary() throws IOException {
     String places = read(PLACES);
+    String placesJs = read(PLACES_JS);
+    String placesMapJs = read(PLACES_MAP_JS);
     Path library = Paths.get("src", "main", "webapp", "resources", "core", "js", "lucide.min.js");
 
     org.junit.jupiter.api.Assertions.assertTrue(
@@ -231,10 +256,21 @@ public class BrandTokensTest {
     // de cerrar del panel, que es markup y además ya usaba currentColor.
     assertThat(places, not(containsString("'<svg")));
     assertThat(places, not(containsString("stroke=\"white\"")));
-    assertThat(places, containsString("lucide.createElement(lucide.icons[name]"));
+    assertThat(placesJs, not(containsString("'<svg")));
+    assertThat(placesJs, not(containsString("stroke=\"white\"")));
+    assertThat(placesJs, containsString("lucide.createElement(lucide.icons[name]"));
+    // La tabla de categorias es una sola desde la fase 5: vive en lib/places-map.js y las
+    // tres vistas la comparten, en vez de tener una copia con nombres de Font Awesome y otra
+    // con nombres de Lucide.
+    assertThat(
+      "places-list.js consume la tabla compartida",
+      placesJs,
+      containsString("from '../lib/places-map.js'")
+    );
+    assertThat(placesMapJs, containsString("lucide.createElement(lucide.icons[categoryIconName"));
 
     for (String icon : LUCIDE_ICONS) {
-      assertThat("el mapa nombra el icono: " + icon, places, containsString("'" + icon + "'"));
+      assertThat("el mapa nombra el icono: " + icon, placesMapJs, containsString("'" + icon + "'"));
     }
   }
 

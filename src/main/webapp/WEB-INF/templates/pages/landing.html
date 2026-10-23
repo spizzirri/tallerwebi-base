@@ -545,11 +545,11 @@
        apagadas) solo se activan cuando esta clase está en <html>. prefers-reduced-motion
        desactiva el efecto y muestra todo. */
     (function () {
-      var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      var revealAll = function () {
-        var nodes = document.querySelectorAll('[data-reveal], .tagline-word');
-        for (var i = 0; i < nodes.length; i++) {
+      const revealAll = function () {
+        const nodes = document.querySelectorAll('[data-reveal], .tagline-word');
+        for (let i = 0; i < nodes.length; i++) {
           nodes[i].classList.add('is-revealed', 'is-lit');
         }
       };
@@ -562,8 +562,8 @@
       document.documentElement.classList.add('reveal-ready');
 
       /* Bloques: entran una vez cuando aparecen. */
-      var blocks = document.querySelectorAll('[data-reveal]');
-      var blockObserver = new IntersectionObserver(
+      const blocks = document.querySelectorAll('[data-reveal]');
+      const blockObserver = new IntersectionObserver(
         function (entries) {
           entries.forEach(function (entry) {
             if (!entry.isIntersecting) return;
@@ -573,17 +573,17 @@
         },
         { threshold: 0.15 }
       );
-      for (var i = 0; i < blocks.length; i++) {
+      for (let i = 0; i < blocks.length; i++) {
         blockObserver.observe(blocks[i]);
       }
 
       /* Tagline: las palabras se encienden una por una, en orden de lectura, con un delay
          proporcional a su posición. Cada palabra tiene su propio observer para que se activen
          al cruzar la línea de lectura, no todas de un tirón. */
-      var words = document.querySelectorAll('.tagline-word');
-      for (var w = 0; w < words.length; w++) {
+      const words = document.querySelectorAll('.tagline-word');
+      for (let w = 0; w < words.length; w++) {
         (function (word, index) {
-          var wordObserver = new IntersectionObserver(
+          const wordObserver = new IntersectionObserver(
             function (entries) {
               entries.forEach(function (entry) {
                 if (!entry.isIntersecting) return;

@@ -84,7 +84,7 @@ public class PlaceViewABME2E extends E2eBase {
   private int openExploreAndCountPlaces() {
     navigateToExplore();
     page.waitForFunction(
-      "() => { const cards = document.querySelectorAll('#app > aside article').length; " +
+      "() => { const cards = document.querySelectorAll('#explore-app > aside article').length; " +
       "return cards > 0 && cards === document.querySelectorAll('#map .leaflet-marker-icon').length; }"
     );
     return placeCards().count();
@@ -137,7 +137,7 @@ public class PlaceViewABME2E extends E2eBase {
   private void openExploreAndWaitForCount(int expectedCount) {
     navigateToExplore();
     page.waitForFunction(
-      "() => document.querySelectorAll('#app > aside article').length === " +
+      "() => document.querySelectorAll('#explore-app > aside article').length === " +
       expectedCount +
       " && document.querySelectorAll('#map .leaflet-marker-icon').length === " +
       expectedCount
@@ -161,6 +161,6 @@ public class PlaceViewABME2E extends E2eBase {
   }
 
   private Locator placeCards() {
-    return page.locator("#app > aside article");
+    return page.locator("#explore-app > aside article");
   }
 }

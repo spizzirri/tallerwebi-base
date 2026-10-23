@@ -11,6 +11,7 @@ The project integrates several tools to ensure the code is clean, maintainable a
 | **PMD** | **Logic and Best Practices** | Detects potential errors, unused variables and optimizations. | `.code-quality/pmd/` |
 | **CPD** | **Duplicate Detection** | Finds copied and pasted code blocks (Copy-Paste). | `.code-quality/cpd/` |
 | **JaCoCo** | **Test Coverage** | Measures what percentage of the code is covered by tests (>80%). | `.code-quality/jacoco/` |
+| **js-check** | **Frontend Contract** | Checks the JavaScript rules in `docs/guide-js.md` across templates and `resources/core/js`. Reports only until the debt is paid. | N/A (console) |
 
 ## PMD (Static Code Analyzer)
 
@@ -129,11 +130,19 @@ rd /s /q .code-quality\jacoco & mvn clean test
 ```powershell
 .\scripts\gate.ps1 check       # Checkstyle + PMD + CPD + Prettier, changes no files
 .\scripts\gate.ps1 check -Fix  # same, but Prettier is allowed to rewrite the files
+.\scripts\gate.ps1 js          # the frontend JavaScript contract, changes no files
 .\scripts\gate.ps1 coverage    # run the whole suite, print line coverage per package
 ```
 
 `check` invokes `prettier:check`, so it never reformats your tree — `-Fix` is the explicit
 opt-in for that.
+
+`js` is the one gate that covers the view layer: the JavaScript rules in
+[guide-js.md](guide-js.md), read out of the templates and `resources/core/js`. CI runs it
+strict — `pwsh -File scripts/gate.ps1 js -Strict`, in the `backend` job's `Frontend JS
+contract` step, before the Maven build — and the tree is at 0 FAIL. On its own,
+`.\scripts\gate.ps1 js` reports and exits 0, and that stays the shape of a local run. INFO
+findings never fail, with or without `-Strict`.
 
 Maven builds (`mvn test`, `mvn package`, `mvn verify`) run `prettier:check` at
 `process-sources` and fail on badly formatted code, but they never rewrite your files. Run

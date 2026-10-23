@@ -61,13 +61,17 @@ src/main/webapp/
 │       ├── places/list.html # places map + sidebar (details render in the sidebar)
 │       └── plans/          # list, new, detail (itinerary + map)
 └── resources/
-    ├── core/js/            # vendored, no build step: tailwind-browser.js, vue.global.prod.js
+    ├── core/js/            # vendored, no build step: tailwind-browser.js, vue.global.prod.js,
+    │                       # lucide.min.js, leaflet.js
+    ├── css/                # vendored stylesheets: bootstrap.min.css, leaflet.css
+    │                       # (+ css/images/ for leaflet's relative url() targets)
     └── images/             # place-placeholder.svg
 ```
 
 El frontend no tiene paso de build: Tailwind corre en el browser (`tailwind-browser.js`, vendored),
-Vue igual (`vue.global.prod.js`), Leaflet entra por CDN de unpkg y su logica de mapa vive inline
-en los templates Thymeleaf.
+Vue igual (`vue.global.prod.js`) y Leaflet tambien (`leaflet.js` + `leaflet.css`, version fija en
+el repo), y su logica de mapa vive en modulos de `resources/core/js/pages/`, no inline en los
+templates Thymeleaf.
 
 ## Documentation
 

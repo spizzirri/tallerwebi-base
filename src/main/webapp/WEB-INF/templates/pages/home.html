@@ -21,26 +21,24 @@
     <a th:href="@{/admin/home}" class="text-blue-600 hover:underline">Reload</a>
 
     <script>
-      Vue.createApp({
-        data() {
-          return {
-            elapsed: '0:00'
-          }
-        },
-        mounted() {
-          const loginTime = Number(document.getElementById('session-clock-app').dataset.loginTime);
-          const pad = (n) => n < 10 ? '0' + n : '' + n;
-          const update = () => {
-            const total = Math.max(0, Date.now() - loginTime);
-            let seconds = Math.floor(total / 1000);
-            const hours = Math.floor(seconds / 3600);
-            seconds %= 3600;
-            const minutes = Math.floor(seconds / 60);
-            seconds %= 60;
-            this.elapsed = (hours > 0 ? pad(hours) + ':' : '') + pad(minutes) + ':' + pad(seconds);
-          };
-          setInterval(update, 1000);
-          update();
+      const { createApp, ref, onMounted } = Vue;
+
+      createApp({
+        setup() {
+          const elapsed = ref('0:00');
+          const pad = (n) => String(n).padStart(2, '0');
+          onMounted(() => {
+            const loginTime = Number(document.getElementById('session-clock-app').dataset.loginTime);
+            const update = () => {
+              const total = Math.floor(Math.max(0, Date.now() - loginTime) / 1000);
+              const hours = Math.floor(total / 3600);
+              const minutes = Math.floor((total % 3600) / 60);
+              elapsed.value = (hours ? pad(hours) + ':' : '') + pad(minutes) + ':' + pad(total % 60);
+            };
+            setInterval(update, 1000);
+            update();
+          });
+          return { elapsed };
         }
       }).mount('#session-clock-app');
     </script>
