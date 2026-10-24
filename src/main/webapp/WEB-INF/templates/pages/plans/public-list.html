@@ -119,7 +119,15 @@
             <div th:if="${canBookmark}" class="absolute right-3 top-3 z-10">
               <div th:replace="~{components/bookmark-button :: toggle(${plan.id}, ${plan.bookmarked}, ${currentUrl})}"></div>
             </div>
-            <a th:href="@{/plans/{id}/public(id=${plan.id})}" class="flex flex-1 flex-col">
+            <!-- [DIS] 23-DIS: el link de la card es un overlay. HTML no admite <a> dentro de <a>
+                 y el nombre del autor linkeaba a su perfil ADENTRO del link de la card: el parser
+                 la partia en fragmentos. Ahora el destino es un <a> absoluto que cubre la card
+                 (mismo href, nombre accesible sr-only con el nombre del plan) y lo que es
+                 interactivo de verdad (Guardar, autor) queda por encima con z-10. -->
+            <a th:href="@{/plans/{id}/public(id=${plan.id})}" class="absolute inset-0 z-0">
+              <span class="sr-only" th:text="${plan.name}">Ver plan</span>
+            </a>
+            <div class="flex flex-1 flex-col">
               <!-- Cover generico del plan (id -> /images/plans/cover-N.svg). A futuro, si Plan
                    trae imageUrl propia, th:src cambia a ${plan.imageUrl} sin tocar el resto. -->
               <img th:src="${plan.cover}" th:alt="${plan.name}" loading="lazy"
@@ -147,7 +155,7 @@
                     <!-- [PROF] AC-22: el nombre del autor linkea a su perfil publico (siempre
                          tiene id: la tarjeta publica sale de un plan real con dueno). -->
                     <a th:href="@{/profile/{id}(id=${plan.administratorId})}"
-                      class="truncate text-blue-600 hover:underline"
+                      class="relative z-10 truncate text-blue-600 hover:underline"
                       th:title="${plan.administratorName}"
                       th:text="${plan.administratorName}">Administrador</a>
                   </p>
@@ -159,7 +167,7 @@
                   </p>
                 </div>
               </div>
-            </a>
+            </div>
 
             <!-- Acciones de la tarjeta: clonar como base propia (los planes propios no llegan
                  aca, asi que no hay CTA de edicion en el feed). El mismo CTA con y sin sesion

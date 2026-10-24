@@ -154,8 +154,20 @@ public class ActionIconsTest {
     String feed = read(FEED);
     assertThat(feed, containsString("data-testid=\"plan-card-author\""));
     assertThat(feed, containsString("class=\"flex min-w-0 items-baseline gap-1\""));
-    assertThat(feed, containsString("class=\"truncate text-blue-600 hover:underline\""));
+    assertThat(
+      feed,
+      containsString("class=\"relative z-10 truncate text-blue-600 hover:underline\"")
+    );
     assertThat(feed, containsString("th:title=\"${plan.administratorName}\""));
+    // El link de la card es un overlay: el link del autor no queda anidado dentro de otro <a>
+    // (HTML invalido que el parser partia en fragmentos).
+    assertThat(
+      feed,
+      containsString(
+        "<a th:href=\"@{/plans/{id}/public(id=${plan.id})}\" class=\"absolute inset-0 z-0\">"
+      )
+    );
+    assertThat(feed, containsString("<span class=\"sr-only\" th:text=\"${plan.name}\">"));
 
     String profile = read(PROFILE_EDIT);
     assertThat(profile, containsString("data-testid=\"bookmark-card-author\""));

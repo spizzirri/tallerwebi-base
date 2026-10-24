@@ -35,7 +35,7 @@ Sin backend, sin DB y sin JavaScript nuevo: los iconos se dibujan server-side.
 | AC-01 | Cada acción del inventario (Crear, Buscar, Unirse, Clonar, Abrir/Ver, Quitar/Eliminar, Configuración, Copiar link, Aceptar/Rechazar, Guardar) lleva un icono SVG inline del set Lucide, con `stroke="currentColor"`, `aria-hidden="true"` y tamaño fijo (`h-4 w-4`) |
 | AC-02 | El set es outline por defecto y filled solo para estado activo (el toggle de Guardados, que ya existía): un solo glyph por acción, `stroke-width="2"` en todo el set |
 | AC-03 | Los botones con texto conservan el texto como nombre accesible (el icono va `aria-hidden`); los botones de solo icono mantienen `aria-label` + `title` + `sr-only` (Guardados, hamburguesa, tema) |
-| AC-04 | "Por {autor}" del feed `/for-you` renderiza en una sola línea, con el nombre truncado accesiblemente (`title` con el nombre completo y elipsis visual); el mismo fix aplica al bloque de Guardados del perfil, que comparte payload |
+| AC-04 | "Por {autor}" del feed `/for-you` renderiza en una sola línea, con el nombre truncado accesiblemente (`title` con el nombre completo); para que el link del autor pueda existir, el link de la card pasa a ser un overlay (HTML inválido: `<a>` anidado dentro de `<a>`); el mismo fix de una línea aplica al bloque de Guardados del perfil, que comparte payload |
 | AC-05 | Cero JS nuevo: ningún archivo de la card agrega runtime de Lucide; los iconos viajan en el HTML server-side |
 | AC-06 | La puerta completa queda verde (`pwsh -File scripts/gate.ps1 all`) |
 
@@ -103,6 +103,14 @@ El cierre de la card es el gate completo en verde con los counts escritos en el 
   link lleva el nombre completo: hover para mouse y texto completo en el DOM (la elipsis es
   visual; lector de pantalla lee el nombre entero). El bloque de Guardados del perfil comparte
   payload con el feed y el mismo defecto: se arregla en la misma pasada.
+- **La card se linkea con overlay, no con `<a>` anidado.** El feed envolvía la card entera en
+  `<a href=".../public">` y el link del autor vivía adentro: `<a>` dentro de `<a>` es HTML
+  inválido y el parser lo resolvía partiendo el link de la card en fragmentos y metiendo un clon
+  dentro del párrafo del autor (el E2E lo delató como locador ambiguo de 2 elementos). Ahora el
+  destino es un `<a class="absolute inset-0 z-0">` hermano —mismo href, nombre accesible
+  `sr-only` con el nombre del plan— y lo que es interactivo de verdad (Guardados y el autor)
+  queda por encima con `z-10`. Card entera clicable, HTML válido, y los tests previos no cambian:
+  el primer `<a>` de la card sigue siendo el de la vista pública.
 - **No choca con 17-DIS (estandarizar diseños).** Esa spec propone `.btn-cta` para unificar los
   CTAs: cuando se implemente, los iconos quedan dentro de la misma clase (`inline-flex` ya es
   parte del diseño de `.btn-cta`) y no hay retoque posterior.
@@ -158,10 +166,22 @@ En `detail.html` (stack Bootstrap) la misma pieza con las utilidades del stack:
   class="flex min-w-0 items-baseline gap-1">
   <span class="shrink-0">Por</span>
   <a th:href="@{/profile/{id}(id=${plan.administratorId})}"
-    class="truncate text-blue-600 hover:underline"
+    class="relative z-10 truncate text-blue-600 hover:underline"
     th:title="${plan.administratorName}"
     th:text="${plan.administratorName}">Administrador</a>
 </p>
+```
+
+### 4. Link de la card como overlay (AC-04)
+
+```html
+<a th:href="@{/plans/{id}/public(id=${plan.id})}" class="absolute inset-0 z-0">
+  <span class="sr-only" th:text="${plan.name}">Ver plan</span>
+</a>
+<div class="flex flex-1 flex-col">
+  <img ... />
+  <div class="flex flex-1 flex-col p-5">… meta con el link del autor (relative z-10) …</div>
+</div>
 ```
 
 ## Archivos
