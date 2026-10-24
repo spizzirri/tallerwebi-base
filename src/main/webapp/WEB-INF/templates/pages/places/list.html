@@ -229,7 +229,11 @@
             aria-label="Search public plans"
             class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm" />
           <button type="button" @click="openCreatePlan"
-            class="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700">
+            class="inline-flex items-center gap-2 rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M5 12h14" />
+              <path d="M12 5v14" />
+            </svg>
             Create plan
           </button>
           <h3 class="text-sm font-semibold uppercase tracking-wide text-gray-500">Upcoming public plans</h3>
@@ -484,7 +488,11 @@
                   </button>
                   <button v-if="planStep === 2" type="button" @click="nextPlanStep" :disabled="draftPlaces.length === 0" class="rounded-md bg-blue-600 px-4 py-2 font-medium text-white disabled:opacity-50">Siguiente</button>
                   <button v-if="planStep === 3" type="submit" :disabled="draftPlaces.length === 0"
-                    class="rounded-md bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">
+                    class="inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M5 12h14" />
+                      <path d="M12 5v14" />
+                    </svg>
                     Crear plan
                   </button>
                 </template>

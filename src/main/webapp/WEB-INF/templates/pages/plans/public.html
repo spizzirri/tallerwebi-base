@@ -82,26 +82,60 @@
         <input type="hidden" name="shortCode" th:value="${shortCode}">
         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
         <button type="submit"
-          class="rounded-md bg-primary px-4 py-2 font-medium text-white">Unirme al plan</button>
+          class="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 font-medium text-white">
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <line x1="19" x2="19" y1="8" y2="14" />
+            <line x1="22" x2="16" y1="11" y2="11" />
+          </svg>
+          Unirme al plan
+        </button>
       </form>
 
       <form th:if="${isLogged and !isParticipant and !isPlanAdministrator}" method="post"
         th:action="@{/plans/{id}/clone(id=${plan.id})}" class="inline">
         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
         <button type="submit"
-          class="rounded-md bg-primary px-4 py-2 font-medium text-white">Clonar plan</button>
+          class="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 font-medium text-white">
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+            <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+          </svg>
+          Clonar plan
+        </button>
       </form>
 
       <a th:if="${!isLogged}"
         th:href="${#strings.isEmpty(currentPath)} ? @{/auth/login} : @{/auth/login(redirect=${currentPath})}"
-        class="rounded-md bg-primary px-4 py-2 font-medium text-white">Unirme al plan</a>
+        class="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 font-medium text-white">
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <line x1="19" x2="19" y1="8" y2="14" />
+          <line x1="22" x2="16" y1="11" y2="11" />
+        </svg>
+        Unirme al plan
+      </a>
 
       <a th:if="${!isLogged}"
         th:href="${#strings.isEmpty(currentPath)} ? @{/auth/login} : @{/auth/login(redirect=${currentPath})}"
-        class="rounded-md bg-primary px-4 py-2 font-medium text-white">Clonar plan</a>
+        class="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 font-medium text-white">
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+          <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+        </svg>
+        Clonar plan
+      </a>
 
       <a th:if="${isParticipant or isPlanAdministrator}" th:href="@{/plans/{id}(id=${plan.id})}"
-        class="rounded-md bg-gray-800 px-4 py-2 font-medium text-white">Ver mi plan</a>
+        class="inline-flex items-center gap-2 rounded-md bg-gray-800 px-4 py-2 font-medium text-white">
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
+          <circle cx="12" cy="12" r="3" />
+        </svg>
+        Ver mi plan
+      </a>
     </div>
 
     <section class="mt-6 rounded-lg bg-white p-6 shadow">

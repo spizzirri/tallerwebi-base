@@ -21,8 +21,12 @@
           <!-- Como en un muro: si nada de lo que hay te interesa, armás el tuyo desde cero.
                La creacion vive en el modal de /explore. -->
           <a th:href="@{/explore}"
-            class="rounded-md bg-primary px-4 py-2 font-medium text-white transition hover:bg-secondary">
-            + Crear plan
+            class="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 font-medium text-white transition hover:bg-secondary">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M5 12h14" />
+              <path d="M12 5v14" />
+            </svg>
+            Crear plan
           </a>
         </div>
 
@@ -83,7 +87,12 @@
               </select>
             </label>
 
-            <button type="submit" class="rounded-md bg-primary px-4 py-2 font-medium text-white">
+            <button type="submit"
+              class="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 font-medium text-white">
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.3-4.3" />
+              </svg>
               Buscar
             </button>
 
@@ -129,12 +138,17 @@
                     <span th:text="${plan.placeCount}">0</span>
                     lugar(es) en el itinerario
                   </p>
-                  <p th:if="${!#strings.isEmpty(plan.administratorName)}">
-                    Por
+                  <!-- [DIS] AC-04 (23-DIS): "Por {autor}" en una sola linea. El <p> es fila:
+                       "Por" no encoge, el link trunca con elipsis y el title lleva el nombre
+                       completo (hover y lectura de pantalla leen el nombre entero). -->
+                  <p th:if="${!#strings.isEmpty(plan.administratorName)}" data-testid="plan-card-author"
+                    class="flex min-w-0 items-baseline gap-1">
+                    <span class="shrink-0">Por</span>
                     <!-- [PROF] AC-22: el nombre del autor linkea a su perfil publico (siempre
                          tiene id: la tarjeta publica sale de un plan real con dueno). -->
                     <a th:href="@{/profile/{id}(id=${plan.administratorId})}"
-                      class="text-blue-600 hover:underline"
+                      class="truncate text-blue-600 hover:underline"
+                      th:title="${plan.administratorName}"
                       th:text="${plan.administratorName}">Administrador</a>
                   </p>
                   <!-- [CAL] Indicador de calificaciones de la tarjeta (16-CAL.md, AC-10): el mismo
@@ -158,14 +172,22 @@
                 th:action="@{/plans/{id}/clone(id=${plan.id})}" method="POST" class="flex-1">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                 <button type="submit"
-                  class="w-full cursor-pointer rounded-md bg-primary px-4 py-2 font-medium text-white transition hover:bg-secondary">
+                  class="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 font-medium text-white transition hover:bg-secondary">
+                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+                    <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+                  </svg>
                   Clonar Plan
                 </button>
               </form>
 
               <a sec:authorize="!isAuthenticated()"
                 th:href="${#strings.isEmpty(currentPath)} ? @{/auth/login} : @{/auth/login(redirect=${currentPath})}"
-                class="flex-1 rounded-md bg-primary px-4 py-2 text-center font-medium text-white transition hover:bg-secondary">
+                class="inline-flex flex-1 items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 font-medium text-white transition hover:bg-secondary">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+                  <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+                </svg>
                 Clonar Plan
               </a>
             </div>
@@ -181,7 +203,11 @@
             Seguí a otros usuarios desde su perfil y sus planes públicos aparecen acá.
           </p>
           <a th:href="@{/for-you}"
-            class="inline-block rounded-md bg-primary px-6 py-3 font-medium text-white transition hover:bg-secondary">
+            class="inline-flex items-center gap-2 rounded-md bg-primary px-6 py-3 font-medium text-white transition hover:bg-secondary">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
             Ver todos los planes
           </a>
           <a th:href="@{/explore}"

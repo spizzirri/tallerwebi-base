@@ -11,8 +11,12 @@
       <div class="mb-6 flex items-center justify-between">
         <h2 class="text-2xl font-semibold text-gray-900">Mis planes</h2>
         <a th:href="@{/explore}"
-          class="rounded-md bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700">
-          + Crear plan
+          class="inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700">
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 12h14" />
+            <path d="M12 5v14" />
+          </svg>
+          Crear plan
         </a>
       </div>
 
@@ -30,7 +34,13 @@
           <input id="shortCode" name="shortCode" type="text" required maxlength="8" aria-describedby="join-code-help"
             placeholder="ABC12345" class="rounded-md border border-gray-300 px-3 py-2" />
         </div>
-        <button type="submit" class="rounded-md bg-blue-600 px-4 py-2 font-medium text-white">
+        <button type="submit" class="inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 font-medium text-white">
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <line x1="19" x2="19" y1="8" y2="14" />
+            <line x1="22" x2="16" y1="11" y2="11" />
+          </svg>
           Unirme al plan
         </button>
       </form>
@@ -66,14 +76,25 @@
             </td>
             <td class="flex justify-end gap-2 px-4 py-3">
               <a th:href="@{/plans/{id}(id=${plan.id})}"
-                class="rounded bg-gray-200 px-3 py-1 text-sm font-medium text-gray-700 transition hover:bg-gray-300">
+                class="inline-flex items-center gap-1.5 rounded bg-gray-200 px-3 py-1 text-sm font-medium text-gray-700 transition hover:bg-gray-300">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
                 Ver detalle
               </a>
               <form th:action="@{/plans/{id}/delete(id=${plan.id})}" method="POST">
                 <input type="hidden" name="_method" value="DELETE" />
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                 <button type="submit"
-                  class="rounded bg-red-100 px-3 py-1 text-sm font-medium text-red-700 transition hover:bg-red-200">
+                  class="inline-flex items-center gap-1.5 rounded bg-red-100 px-3 py-1 text-sm font-medium text-red-700 transition hover:bg-red-200">
+                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M3 6h18" />
+                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                    <line x1="10" x2="10" y1="11" y2="17" />
+                    <line x1="14" x2="14" y1="11" y2="17" />
+                  </svg>
                   Eliminar
                 </button>
               </form>
@@ -88,7 +109,11 @@
         <ul class="divide-y divide-gray-200 rounded-md bg-white shadow-md">
           <li th:each="plan : ${participantPlans}" class="flex items-center justify-between px-4 py-3">
             <span th:text="${plan.name}">Nombre del plan</span>
-            <a th:href="@{/plans/{id}(id=${plan.id})}" class="rounded bg-gray-200 px-3 py-1 text-sm">
+            <a th:href="@{/plans/{id}(id=${plan.id})}" class="inline-flex items-center gap-1.5 rounded bg-gray-200 px-3 py-1 text-sm">
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
               Ver detalle
             </a>
           </li>
@@ -110,14 +135,29 @@
             <p class="text-sm font-medium break-words" th:text="${invitation.inviterName}">Nombre completo</p>
             <p class="text-sm text-gray-600 break-words" th:text="${invitation.inviterEmail}">correo@ejemplo.com</p>
             <p class="mt-2 text-sm">Rol: <strong th:text="${invitation.role == 'editor' ? 'Editor' : 'Participante'}">Participante</strong></p>
-            <a th:if="${invitation.isPublic}" th:href="@{/plans/{id}(id=${invitation.planId})}" class="mt-4 inline-block rounded bg-gray-200 px-3 py-1 text-sm font-medium text-gray-700 transition hover:bg-gray-300">
+            <a th:if="${invitation.isPublic}" th:href="@{/plans/{id}(id=${invitation.planId})}" class="mt-4 inline-flex items-center gap-1.5 rounded bg-gray-200 px-3 py-1 text-sm font-medium text-gray-700 transition hover:bg-gray-300">
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
               Ver detalle
             </a>
             <p th:unless="${invitation.isPublic}" class="mt-4 text-xs text-gray-500">Acept&aacute; la invitaci&oacute;n para ver el plan.</p>
             <form th:action="@{/plans/{id}/invitations/{invitationId}/respond(id=${invitation.planId},invitationId=${invitation.id})}" method="POST" class="mt-4 flex flex-wrap gap-2">
               <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-              <button type="submit" name="accept" value="true" class="rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700">Aceptar</button>
-              <button type="submit" name="accept" value="false" class="rounded-md bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200">Rechazar</button>
+              <button type="submit" name="accept" value="true" class="inline-flex items-center gap-1.5 rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M20 6 9 17l-5-5" />
+                </svg>
+                Aceptar
+              </button>
+              <button type="submit" name="accept" value="false" class="inline-flex items-center gap-1.5 rounded-md bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M18 6 6 18" />
+                  <path d="m6 6 12 12" />
+                </svg>
+                Rechazar
+              </button>
             </form>
           </li>
         </ul>

@@ -63,7 +63,12 @@
           </div>
 
           <button type="submit"
-            class="w-full rounded-md bg-blue-600 py-2 font-medium text-white transition hover:bg-blue-700">
+            class="inline-flex w-full items-center justify-center gap-2 rounded-md bg-blue-600 py-2 font-medium text-white transition hover:bg-blue-700">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" />
+              <path d="M17 21v-8H7v8" />
+              <path d="M7 3v5h8" />
+            </svg>
             Guardar perfil
           </button>
         </form>
@@ -111,13 +116,18 @@
                   Fecha: <span th:text="${bookmark.eventDate}"></span>
                 </p>
                 <p><span th:text="${bookmark.placeCount}"></span> lugares en el itinerario</p>
-                <p th:if="${!#strings.isEmpty(bookmark.administratorName)}">
-                  Por
+                <!-- [DIS] AC-04 (23-DIS): mismo fix del feed: "Por {autor}" en una sola linea,
+                     con elipsis visual y el nombre completo en el title. -->
+                <p th:if="${!#strings.isEmpty(bookmark.administratorName)}" data-testid="bookmark-card-author"
+                  class="flex min-w-0 items-baseline gap-1">
+                  <span class="shrink-0">Por</span>
                   <a th:if="${bookmark.administratorId != null}"
                     th:href="@{/profile/{id}(id=${bookmark.administratorId})}"
-                    class="text-primary hover:underline"
+                    class="truncate text-primary hover:underline"
+                    th:title="${bookmark.administratorName}"
                     th:text="${bookmark.administratorName}">Autor</a>
-                  <span th:unless="${bookmark.administratorId != null}"
+                  <span th:unless="${bookmark.administratorId != null}" class="truncate"
+                    th:title="${bookmark.administratorName}"
                     th:text="${bookmark.administratorName}">Autor</span>
                 </p>
               </div>
@@ -127,13 +137,21 @@
               <div class="mt-3 flex flex-wrap gap-2 border-t border-gray-100 pt-3">
                 <a th:if="${bookmark.openable}"
                   th:href="${bookmark.publicPlan} ? @{/plans/{id}/public(id=${bookmark.planId})} : @{/plans/{id}(id=${bookmark.planId})}"
-                  class="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50">
+                  class="inline-flex items-center gap-1.5 rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50">
+                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
                   Abrir
                 </a>
                 <form th:action="@{/bookmarks/{id}/clone(id=${bookmark.planId})}" method="POST">
                   <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                   <button type="submit"
-                    class="cursor-pointer rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-white transition hover:bg-secondary">
+                    class="inline-flex cursor-pointer items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-white transition hover:bg-secondary">
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+                      <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+                    </svg>
                     Clonar plan
                   </button>
                 </form>
@@ -142,7 +160,14 @@
                   <input type="hidden" name="returnTo" value="/profile#bookmarks" />
                   <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                   <button type="submit"
-                    class="cursor-pointer rounded-md border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 transition hover:bg-red-50">
+                    class="inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 transition hover:bg-red-50">
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M3 6h18" />
+                      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                      <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                      <line x1="10" x2="10" y1="11" y2="17" />
+                      <line x1="14" x2="14" y1="11" y2="17" />
+                    </svg>
                     Quitar
                   </button>
                 </form>
