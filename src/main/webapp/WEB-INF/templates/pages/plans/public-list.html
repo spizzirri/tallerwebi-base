@@ -175,7 +175,9 @@
                  [PPV]: logueado ejecuta el clone via form, anonimo va al login con la vuelta
                  al feed (?redirect=, el mismo mecanismo que el navbar) y clona al volver.
                  relative z-10: queda por encima del overlay de la card, si no el <a> absoluto
-                 le roba el click (lo descubrio el E2E de Clonar Plan). -->
+                 le roba el click (lo descubrio el E2E de clonacion del feed).
+                 El literal del CTA no se repite aca: los tests de integracion cuentan esa
+                 cadena por plan listado y un comentario la duplicaria. -->
             <div class="relative z-10 flex gap-2 border-t border-gray-100 p-3">
               <!-- El CTA de clonar = [CLO] POST /plans/{id}/clone: copia el plan como tuyo y caes en
                    tu copia editable. Con CSRF via form nativo, como /plans/join. -->
