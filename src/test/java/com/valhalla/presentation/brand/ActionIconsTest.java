@@ -168,6 +168,12 @@ public class ActionIconsTest {
       )
     );
     assertThat(feed, containsString("<span class=\"sr-only\" th:text=\"${plan.name}\">"));
+    // La fila de acciones tambien va por encima del overlay: si no, el <a> absoluto le roba
+    // el click al boton Clonar (lo cubrio el E2E de clonar del feed).
+    assertThat(
+      feed,
+      containsString("<div class=\"relative z-10 flex gap-2 border-t border-gray-100 p-3\">")
+    );
 
     String profile = read(PROFILE_EDIT);
     assertThat(profile, containsString("data-testid=\"bookmark-card-author\""));

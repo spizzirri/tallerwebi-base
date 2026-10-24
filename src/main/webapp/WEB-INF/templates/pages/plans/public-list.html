@@ -123,7 +123,8 @@
                  y el nombre del autor linkeaba a su perfil ADENTRO del link de la card: el parser
                  la partia en fragmentos. Ahora el destino es un <a> absoluto que cubre la card
                  (mismo href, nombre accesible sr-only con el nombre del plan) y lo que es
-                 interactivo de verdad (Guardar, autor) queda por encima con z-10. -->
+                 interactivo de verdad (Guardar, autor, fila de acciones) queda por encima
+                 con z-10. -->
             <a th:href="@{/plans/{id}/public(id=${plan.id})}" class="absolute inset-0 z-0">
               <span class="sr-only" th:text="${plan.name}">Ver plan</span>
             </a>
@@ -172,8 +173,10 @@
             <!-- Acciones de la tarjeta: clonar como base propia (los planes propios no llegan
                  aca, asi que no hay CTA de edicion en el feed). El mismo CTA con y sin sesion
                  [PPV]: logueado ejecuta el clone via form, anonimo va al login con la vuelta
-                 al feed (?redirect=, el mismo mecanismo que el navbar) y clona al volver. -->
-            <div class="flex gap-2 border-t border-gray-100 p-3">
+                 al feed (?redirect=, el mismo mecanismo que el navbar) y clona al volver.
+                 relative z-10: queda por encima del overlay de la card, si no el <a> absoluto
+                 le roba el click (lo descubrio el E2E de Clonar Plan). -->
+            <div class="relative z-10 flex gap-2 border-t border-gray-100 p-3">
               <!-- El CTA de clonar = [CLO] POST /plans/{id}/clone: copia el plan como tuyo y caes en
                    tu copia editable. Con CSRF via form nativo, como /plans/join. -->
               <form sec:authorize="isAuthenticated()"

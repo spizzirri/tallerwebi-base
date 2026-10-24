@@ -108,9 +108,11 @@ El cierre de la card es el gate completo en verde con los counts escritos en el 
   inválido y el parser lo resolvía partiendo el link de la card en fragmentos y metiendo un clon
   dentro del párrafo del autor (el E2E lo delató como locador ambiguo de 2 elementos). Ahora el
   destino es un `<a class="absolute inset-0 z-0">` hermano —mismo href, nombre accesible
-  `sr-only` con el nombre del plan— y lo que es interactivo de verdad (Guardados y el autor)
-  queda por encima con `z-10`. Card entera clicable, HTML válido, y los tests previos no cambian:
-  el primer `<a>` de la card sigue siendo el de la vista pública.
+  `sr-only` con el nombre del plan— y lo que es interactivo de verdad —Guardados, el autor y la
+  fila de acciones Clonar— queda por encima con `z-10` (la fila de acciones también: sin eso el
+  overlay le roba el click y el E2E de clonar del feed lo detecta). Card entera clicable, HTML
+  válido, y los tests previos no cambian: el primer `<a>` de la card sigue siendo el de la vista
+  pública.
 - **No choca con 17-DIS (estandarizar diseños).** Esa spec propone `.btn-cta` para unificar los
   CTAs: cuando se implemente, los iconos quedan dentro de la misma clase (`inline-flex` ya es
   parte del diseño de `.btn-cta`) y no hay retoque posterior.
