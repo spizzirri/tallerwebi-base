@@ -29,14 +29,17 @@ Se eligen en el panel del agente.
 - Claude Sonnet 4.6, Claude Opus 4.6 y GPT-OSS 120B se retiran el 2/11/2026.
 
 ## 4. Revisión y permisos
-- **Política de revisión de artefactos**: Always Proceed, Agent Decides o **Request Review**.
-- **Preset de permisos de comandos**: **Request Review**, Default, Auto o Turbo, más listas de comandos permitidos y bloqueados.
-- Recomendado: **Request Review** en ambos, para revisar cada plan y cada comando antes de que se ejecute.
+Se configuran en **Open Antigravity Settings** (paleta de comandos, `Ctrl+Shift+P`), pantalla **General**:
+- **Plan Review Policy** (sección *Agent Behavior*): **Always Ask** o Always Proceed.
+- **Permission Preset** (sección *Permission Settings*): **Request Review**, Default, Auto (Preview) o Turbo,
+  más listas de comandos permitidos y bloqueados.
+- Recomendado: **Always Ask** para los planes y **Request Review** para los comandos, para revisar cada plan y
+  cada comando antes de que se ejecute.
 
 ## 5. Navegador integrado
 - El agente usa el Google Chrome instalado, con un perfil separado del personal.
 - Puede abrir la app, interactuar con la página y guardar capturas y grabaciones como evidencia.
-- Se activa o desactiva en los ajustes, sección **Browser** (**Browser Tools**).
+- Se activa o desactiva con **Enable Browser Tools**, en **Open Antigravity Settings** → **General**.
 
 ## 6. Cómo desarrollar una spec
 Requisito: la spec `specs/<funcionalidad>.md` está redactada a partir de [specs/plantilla.md](specs/plantilla.md)

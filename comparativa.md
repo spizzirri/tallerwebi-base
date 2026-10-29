@@ -58,7 +58,7 @@ Detalle: [vscode-copilot.md](vscode-copilot.md) §1, [antigravity.md](antigravit
 | Aspecto | VS Code + Copilot | Antigravity |
 | :--- | :--- | :--- |
 | Comandos de terminal | Confirmación antes de ejecutar herramientas y comandos | Preset **Request Review**, Default, Auto o Turbo, con listas de comandos permitidos y bloqueados |
-| Revisión de planes | Manual en el chat | Política de artefactos: Always Proceed, Agent Decides o **Request Review** |
+| Revisión de planes | Manual en el chat | **Plan Review Policy**: **Always Ask** o Always Proceed |
 
 Detalle: [vscode-copilot.md](vscode-copilot.md) §4, [antigravity.md](antigravity.md) §4.
 
