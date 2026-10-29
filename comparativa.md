@@ -6,10 +6,10 @@ Datos verificados en la documentación oficial al 29/10/2026. El detalle de uso 
 ## 1. Modos de trabajo
 | Necesidad | VS Code + Copilot | Antigravity |
 | :--- | :--- | :--- |
-| Consultar sin modificar archivos | Agente **Ask** | Modo **Fast**, pidiendo solo análisis (no tiene modo de solo lectura) |
-| Planificar antes de implementar | Agente **Plan** o `/plan` | Modo **Planning** o `/plan` |
-| Implementar con autonomía | Agente **Agent** | Ejecución del plan aprobado (**Proceed**) o modo **Fast** |
-| Edición puntual en el archivo abierto | Chat en línea (`Ctrl+I`) | Modo **Fast** |
+| Consultar sin modificar archivos | Agente **Ask** | Conversación del agente, pidiendo "sin modificar archivos" (no hay modo de solo lectura) |
+| Planificar antes de implementar | Agente **Plan** o `/plan` | Pedir un plan en la conversación; **Plan Review Policy: Always Ask** lo detiene para revisión |
+| Implementar con autonomía | Agente **Agent** | Ejecución del plan aprobado, o pedido directo |
+| Edición puntual en el archivo abierto | Chat en línea (`Ctrl+I`) | Pedido directo en la conversación |
 | Modo Edit | Eliminado en VS Code 1.126 | No existe |
 
 Detalle: [vscode-copilot.md](vscode-copilot.md) §2, [antigravity.md](antigravity.md) §2.
@@ -17,10 +17,10 @@ Detalle: [vscode-copilot.md](vscode-copilot.md) §2, [antigravity.md](antigravit
 ## 2. Planificación
 | Aspecto | VS Code + Copilot | Antigravity |
 | :--- | :--- | :--- |
-| Resultado | Plan en la memoria de la sesión | Artefactos: **Implementation Plan** y lista de tareas |
+| Resultado | Plan en la memoria de la sesión | Plan como artefacto de la conversación |
 | Revisión | Se corrige conversando en el chat | Comentarios en línea sobre el texto o los pasos del plan |
-| Aprobación | **Start Implementation** pasa el plan a Agent | **Proceed** |
-| Cierre | Resumen en el chat | Artefacto **Walkthrough** con lo hecho y su verificación |
+| Aprobación | **Start Implementation** pasa el plan a Agent | Aprobación del plan revisado |
+| Cierre | Resumen en el chat | Resumen en la conversación y grabaciones del navegador como artefactos |
 
 ## 3. Modelos
 | Aspecto | VS Code + Copilot | Antigravity |

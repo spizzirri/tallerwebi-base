@@ -31,6 +31,6 @@ Vista (Thymeleaf) → Integración (MockMvc) → E2E (Playwright).
 ## 4. Qué modo usar según la tarea
 | Tarea | VS Code + Copilot | Antigravity |
 | :--- | :--- | :--- |
-| Entender la spec o el código, sin cambios | Agente **Ask** | Modo **Fast**, pidiendo solo análisis |
-| Funcionalidad nueva o cambio en varios archivos | Agente **Plan** → **Start Implementation** (Agent) | Modo **Planning** (Implementation Plan → **Proceed**) |
-| Cambio puntual en un archivo | Chat en línea (`Ctrl+I`) | Modo **Fast** |
+| Entender la spec o el código, sin cambios | Agente **Ask** | Conversación del agente, pidiendo "sin modificar archivos" |
+| Funcionalidad nueva o cambio en varios archivos | Agente **Plan** → **Start Implementation** (Agent) | Pedir un plan y aprobarlo (**Plan Review Policy: Always Ask**) |
+| Cambio puntual en un archivo | Chat en línea (`Ctrl+I`) | Pedido directo en la conversación |

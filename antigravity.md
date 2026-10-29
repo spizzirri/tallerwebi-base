@@ -11,17 +11,18 @@ Cómo desarrollar una spec de `specs/` con Antigravity en este proyecto. El fluj
   - `.agents/skills/<nombre>/SKILL.md`: procedimientos reutilizables. Los workflows (`.agents/workflows/`)
     dejaron de funcionar el 19/10/2026 y se migran a skills con `/migrate-workflows`.
 
-## 2. Modos del agente
-Se eligen en el panel del agente.
+## 2. Cómo se trabaja con el agente
+En Antigravity IDE 2.6 todo se pide en la conversación del panel del agente; lo que cambia según la tarea es la
+instrucción y la política de revisión del plan.
 
-| Modo | Qué hace | Cuándo |
-| :--- | :--- | :--- |
-| **Planning** | Analiza, genera un **Implementation Plan** y una lista de tareas, y espera revisión antes de ejecutar | Funcionalidades nuevas o cambios en varios archivos |
-| **Fast** | Ejecuta directamente, sin plan previo | Consultas y cambios puntuales |
+| Necesidad | Cómo se pide |
+| :--- | :--- |
+| Consultar sin cambios | Empezar el mensaje con "Sin modificar archivos: …" |
+| Planificar antes de implementar | Pedir un plan y que espere aprobación; con **Plan Review Policy: Always Ask** el agente se detiene para revisarlo |
+| Implementar | Aprobar el plan revisado |
+| Cambio puntual | Pedirlo directamente |
 
-- También se puede pedir un plan con `/plan`.
-- El Implementation Plan se comenta en línea (seleccionando texto o pasos). **Proceed** lo aprueba y el agente lo ejecuta.
-- Al terminar, el agente entrega un **Walkthrough** con lo que hizo y cómo lo verificó.
+- En tareas complejas el agente genera el plan como artefacto, que se revisa y se comenta antes de aprobarlo.
 
 ## 3. Modelos
 - Se eligen en el selector de modelos del panel del agente: Gemini (Pro y Flash), Claude (Sonnet y Opus) y GPT-OSS.
@@ -45,20 +46,21 @@ Se configuran en **Open Antigravity Settings** (paleta de comandos, `Ctrl+Shift+
 Requisito: la spec `specs/<funcionalidad>.md` está redactada a partir de [specs/plantilla.md](specs/plantilla.md)
 y aprobada. Si depende de otra spec, esa tiene que estar implementada antes.
 
-### Paso 1 — Fast: entender la spec
+### Paso 1 — Entender la spec
 > Sin modificar archivos: leé `specs/<funcionalidad>.md`. ¿Qué clases nuevas hacen falta, en qué paquetes, y qué
 > casos de prueba hay que escribir en cada capa?
 
-### Paso 2 — Planning: armar el plan
-> Implementá `specs/<funcionalidad>.md` siguiendo `AGENTS.md`. El plan tiene que recorrer los casos de prueba de la
+### Paso 2 — Armar el plan
+> Antes de modificar archivos, generá un plan para implementar `specs/<funcionalidad>.md` siguiendo `AGENTS.md`
+> y esperá mi aprobación. El plan tiene que recorrer los casos de prueba de la
 > sección 6 en el orden de capas de `.ai-guidelines/workflow.md`, con un ciclo Red-Green-Refactor por caso, y
 > terminar con `mvn verify`.
 
-Revisar el Implementation Plan contra la spec: que no falten casos, que no agregue nada fuera de alcance y que no use
-Spring Boot. Comentarlo en línea hasta aprobarlo.
+Revisar el plan contra la spec: que no falten casos, que no agregue nada fuera de alcance y que no use
+Spring Boot. Pedir correcciones hasta aprobarlo.
 
 ### Paso 3 — Implementar
-Hacer clic en **Proceed**. Durante la ejecución, verificar que cada test se ejecute y falle antes de escribir el
+Aprobar el plan. Durante la ejecución, verificar que cada test se ejecute y falle antes de escribir el
 código que lo hace pasar.
 
 ### Paso 4 — Verificar
