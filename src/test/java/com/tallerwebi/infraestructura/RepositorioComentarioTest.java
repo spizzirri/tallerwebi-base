@@ -2,11 +2,13 @@ package com.tallerwebi.infraestructura;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 
 import com.tallerwebi.dominio.Comentario;
 import com.tallerwebi.dominio.RepositorioComentario;
 import com.tallerwebi.infraestructura.config.HibernateInfraestructuraTestConfig;
 import jakarta.transaction.Transactional;
+import java.util.List;
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -67,5 +69,39 @@ public class RepositorioComentarioTest {
       this.sessionFactory.getCurrentSession().get(Comentario.class, comentario.getId());
     assertThat(persistido.getContenido(), equalTo(comentario.getContenido()));
     assertThat(persistido.getContenido().length(), equalTo(2000));
+  }
+
+  @Test
+  @Transactional
+  @Rollback
+  public void listarTodosDeberiaDevolverlosDelMasNuevoAlMasViejo() {
+    // preparacion
+    Comentario primero = new Comentario();
+    primero.setContenido("Primer comentario");
+    Comentario segundo = new Comentario();
+    segundo.setContenido("Segundo comentario");
+    this.sessionFactory.getCurrentSession().persist(primero);
+    this.sessionFactory.getCurrentSession().persist(segundo);
+    this.sessionFactory.getCurrentSession().flush();
+    this.sessionFactory.getCurrentSession().clear();
+
+    // ejecucion
+    List<Comentario> resultado = this.repositorioComentario.listarTodos();
+
+    // validacion
+    assertThat(resultado, hasSize(2));
+    assertThat(resultado.get(0).getId(), equalTo(segundo.getId()));
+    assertThat(resultado.get(1).getId(), equalTo(primero.getId()));
+  }
+
+  @Test
+  @Transactional
+  @Rollback
+  public void listarTodosSinComentariosDeberiaDevolverListaVacia() {
+    // ejecucion
+    List<Comentario> resultado = this.repositorioComentario.listarTodos();
+
+    // validacion
+    assertThat(resultado, equalTo(List.of()));
   }
 }

@@ -24,4 +24,8 @@ public class VistaComentarios extends VistaWeb {
   public String obtenerMensajeDeError() {
     return this.obtenerTextoDelElemento("p.alert-danger");
   }
+
+  public String obtenerPrimerComentarioDelListado() {
+    return this.obtenerTextoDelElemento("#tabla-comentarios tbody tr:first-child td");
+  }
 }

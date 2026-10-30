@@ -75,6 +75,35 @@ public class VistaComentariosE2E {
     this.entoncesVeElMensajeDeExito();
   }
 
+  @Test
+  void deberiaPublicarUnComentarioYVerloPrimeroEnElListado() {
+    // preparacion
+    this.dadoQueExisteUnComentarioPublicado("Comentario inicial");
+    this.dadoQueElUsuarioEscribeUnComentario("Comentario mas reciente");
+
+    // ejecucion
+    this.cuandoPublicaElComentario();
+
+    // validacion
+    this.entoncesElPrimerComentarioEnElListadoEs("Comentario mas reciente");
+  }
+
+  private void dadoQueExisteUnComentarioPublicado(String contenido) {
+    this.vistaComentarios.escribirComentario(contenido);
+    this.vistaComentarios.publicarComentario();
+  }
+
+  private void dadoQueElUsuarioEscribeUnComentario(String contenido) {
+    this.vistaComentarios.escribirComentario(contenido);
+  }
+
+  private void entoncesElPrimerComentarioEnElListadoEs(String contenidoEsperado) {
+    assertThat(
+      this.vistaComentarios.obtenerPrimerComentarioDelListado(),
+      equalToIgnoringCase(contenidoEsperado)
+    );
+  }
+
   private void dadoQueElUsuarioEscribeUnComentarioValido() {
     this.vistaComentarios.escribirComentario("Comentario publicado desde el navegador");
   }

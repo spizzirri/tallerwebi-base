@@ -1,6 +1,9 @@
 package com.tallerwebi.dominio;
 
-@FunctionalInterface
+import java.util.List;
+
 public interface RepositorioComentario {
   void guardar(Comentario comentario);
+
+  List<Comentario> listarTodos();
 }

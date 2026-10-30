@@ -14,6 +14,19 @@
         <textarea id="contenido" name="contenido" data-max-code-points="2000"></textarea>
         <button type="submit">Publicar comentario</button>
       </form>
+      <p id="sin-comentarios" th:if="${comentarios != null and #lists.isEmpty(comentarios)}">No hay comentarios disponibles</p>
+      <table id="tabla-comentarios" th:if="${comentarios != null and not #lists.isEmpty(comentarios)}">
+        <thead>
+          <tr>
+            <th>Comentario</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="comentario : ${comentarios}">
+            <td th:text="${comentario.contenido}"></td>
+          </tr>
+        </tbody>
+      </table>
     </main>
     <script type="module" th:src="@{/js/comentarios.js}"></script>
   </body>

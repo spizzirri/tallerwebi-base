@@ -5,8 +5,10 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
 import static org.mockito.Mockito.*;
 
+import com.tallerwebi.dominio.Comentario;
 import com.tallerwebi.dominio.ServicioComentario;
 import com.tallerwebi.dominio.excepcion.ComentarioInvalido;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.servlet.ModelAndView;
@@ -59,5 +61,50 @@ public class ControladorComentarioTest {
     // validacion
     assertThat(modelAndView.getViewName(), equalToIgnoringCase("comentarios"));
     assertThat(modelAndView.getModel().get("error"), equalTo("El comentario no puede estar vacío"));
+  }
+
+  @Test
+  public void irAComentariosDeberiaIncluirElListadoEnElModelo() {
+    // preparacion
+    List<Comentario> comentarios = List.of(new Comentario(), new Comentario());
+    when(this.servicioComentarioMock.listar()).thenReturn(comentarios);
+
+    // ejecucion
+    ModelAndView modelAndView = this.controladorComentario.irAComentarios();
+
+    // validacion
+    assertThat(modelAndView.getViewName(), equalToIgnoringCase("comentarios"));
+    assertThat(modelAndView.getModel().get("comentarios"), equalTo(comentarios));
+  }
+
+  @Test
+  public void irAComentariosSiElServicioFallaDeberiaMostrarMensajeDeError() {
+    // preparacion
+    when(this.servicioComentarioMock.listar()).thenThrow(new RuntimeException("Error al listar"));
+
+    // ejecucion
+    ModelAndView modelAndView = this.controladorComentario.irAComentarios();
+
+    // validacion
+    assertThat(modelAndView.getViewName(), equalToIgnoringCase("comentarios"));
+    assertThat(
+      modelAndView.getModel().get("error"),
+      equalTo("No se pudieron cargar los comentarios")
+    );
+  }
+
+  @Test
+  public void publicarComentarioValidoDeberiaIncluirElListadoEnElModelo() {
+    // preparacion
+    String contenido = "Comentario valido";
+    List<Comentario> comentarios = List.of(new Comentario(), new Comentario());
+    when(this.servicioComentarioMock.listar()).thenReturn(comentarios);
+
+    // ejecucion
+    ModelAndView modelAndView = this.controladorComentario.publicarComentario(contenido);
+
+    // validacion
+    assertThat(modelAndView.getViewName(), equalToIgnoringCase("comentarios"));
+    assertThat(modelAndView.getModel().get("comentarios"), equalTo(comentarios));
   }
 }

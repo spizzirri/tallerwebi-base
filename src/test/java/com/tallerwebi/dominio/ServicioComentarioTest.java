@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.excepcion.ComentarioInvalido;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -156,5 +157,30 @@ public class ServicioComentarioTest {
     ArgumentCaptor<Comentario> comentarioCaptor = ArgumentCaptor.forClass(Comentario.class);
     verify(this.repositorioComentarioMock).guardar(comentarioCaptor.capture());
     assertThat(comentarioCaptor.getValue().getContenido(), equalTo(contenido));
+  }
+
+  @Test
+  public void listarComentariosDeberiaDevolverLosDelRepositorio() {
+    // preparacion
+    List<Comentario> comentariosEsperados = List.of(new Comentario(), new Comentario());
+    when(this.repositorioComentarioMock.listarTodos()).thenReturn(comentariosEsperados);
+
+    // ejecucion
+    List<Comentario> resultado = this.servicioComentario.listar();
+
+    // validacion
+    assertThat(resultado, equalTo(comentariosEsperados));
+  }
+
+  @Test
+  public void listarComentariosSinDatosDeberiaDevolverListaVacia() {
+    // preparacion
+    when(this.repositorioComentarioMock.listarTodos()).thenReturn(List.of());
+
+    // ejecucion
+    List<Comentario> resultado = this.servicioComentario.listar();
+
+    // validacion
+    assertThat(resultado, equalTo(List.of()));
   }
 }

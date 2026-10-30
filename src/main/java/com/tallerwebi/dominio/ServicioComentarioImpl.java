@@ -2,6 +2,7 @@ package com.tallerwebi.dominio;
 
 import com.tallerwebi.dominio.excepcion.ComentarioInvalido;
 import jakarta.transaction.Transactional;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,5 +30,10 @@ public class ServicioComentarioImpl implements ServicioComentario {
     Comentario comentario = new Comentario();
     comentario.setContenido(contenido);
     this.repositorioComentario.guardar(comentario);
+  }
+
+  @Override
+  public List<Comentario> listar() {
+    return this.repositorioComentario.listarTodos();
   }
 }

@@ -21,7 +21,9 @@ public class ControladorComentario {
 
   @RequestMapping(path = "/comentarios", method = RequestMethod.GET)
   public ModelAndView irAComentarios() {
-    return new ModelAndView("comentarios");
+    ModelAndView modelAndView = new ModelAndView("comentarios");
+    this.agregarComentariosAlModelo(modelAndView);
+    return modelAndView;
   }
 
   @RequestMapping(path = "/publicar-comentario", method = RequestMethod.POST)
@@ -35,6 +37,15 @@ public class ControladorComentario {
     } catch (ComentarioInvalido excepcion) {
       modelAndView.addObject("error", excepcion.getMessage());
     }
+    this.agregarComentariosAlModelo(modelAndView);
     return modelAndView;
+  }
+
+  private void agregarComentariosAlModelo(ModelAndView modelAndView) {
+    try {
+      modelAndView.addObject("comentarios", this.servicioComentario.listar());
+    } catch (Exception excepcion) {
+      modelAndView.addObject("error", "No se pudieron cargar los comentarios");
+    }
   }
 }
