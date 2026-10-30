@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Comentarios</title>
+  </head>
+  <body>
+    <main>
+      <h1>Comentarios</h1>
+      <p class="alert alert-success" th:if="${mensaje}" th:text="${mensaje}"></p>
+      <p class="alert alert-danger" th:if="${error}" th:text="${error}"></p>
+      <form method="post" accept-charset="UTF-8" th:action="@{/publicar-comentario}">
+        <label for="contenido">Comentario</label>
+        <textarea id="contenido" name="contenido" data-max-code-points="2000"></textarea>
+        <button type="submit">Publicar comentario</button>
+      </form>
+    </main>
+    <script type="module" th:src="@{/js/comentarios.js}"></script>
+  </body>
+</html>
