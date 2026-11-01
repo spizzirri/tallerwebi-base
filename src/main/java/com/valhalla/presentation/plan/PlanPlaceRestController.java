@@ -72,7 +72,8 @@ public class PlanPlaceRestController {
           // abajo traduce a 400 como el resto del cuerpo invalido.
           request.transportModeToNext() == null
             ? null
-            : TransportMode.valueOf(request.transportModeToNext())
+            : TransportMode.valueOf(request.transportModeToNext()),
+          request.travelMinutesToNext()
         ),
         principal.getName()
       )
@@ -126,6 +127,7 @@ public class PlanPlaceRestController {
     Double longitude,
     Integer durationMinutes,
     String transportModeToNext,
+    Integer travelMinutesToNext,
     boolean timePinned
   ) {
     static ItineraryEntry from(PlanPlace entry) {
@@ -144,6 +146,7 @@ public class PlanPlaceRestController {
         entry.getPlace().getLongitude(),
         entry.getDurationMinutes(),
         entry.getTransportModeToNext() == null ? null : entry.getTransportModeToNext().name(),
+        entry.getTravelMinutesToNext(),
         entry.isTimePinned()
       );
     }

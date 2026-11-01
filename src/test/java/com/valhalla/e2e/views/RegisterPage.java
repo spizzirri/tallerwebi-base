@@ -6,8 +6,7 @@ import com.microsoft.playwright.Page;
 public class RegisterPage extends WebPage {
 
   public RegisterPage(Page page) {
-    super(page);
-    page.navigate(baseUrl() + "/auth/register");
+    super(page, "/auth/register");
   }
 
   public String getErrorMessage() {

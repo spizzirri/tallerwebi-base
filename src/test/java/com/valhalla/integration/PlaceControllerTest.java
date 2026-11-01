@@ -95,7 +95,7 @@ public class PlaceControllerTest {
 
   /**
    * [FLASH] El template de Vue viaja crudo en el HTML: sin v-cloak el navegador pinta el banner de
-   * error, los {{selectedPlace.*}} y el modal hasta que places-list.js monta. El atributo no sirve
+   * error y los {{selectedPlace.*}} hasta que places-list.js monta. El atributo no sirve
    * sin la regla del layout, y el logo necesita sus dimensiones para no pintarse a 1366 px cuando
    * el CSS compilado todavia no llego.
    */

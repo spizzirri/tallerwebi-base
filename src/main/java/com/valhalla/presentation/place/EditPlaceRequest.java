@@ -40,30 +40,6 @@ public class EditPlaceRequest { // NOPMD — intencional: 12 campos vs maxfields
 
   public EditPlaceRequest() {}
 
-  public EditPlaceRequest(
-    String name,
-    PlaceCategory category,
-    String description,
-    String address,
-    String openingHours,
-    String phone,
-    String website,
-    String imageUrl,
-    Double latitude,
-    Double longitude
-  ) {
-    this.name = name;
-    this.category = category;
-    this.description = description;
-    this.address = address;
-    this.openingHours = openingHours;
-    this.phone = phone;
-    this.website = website;
-    this.imageUrl = imageUrl;
-    this.latitude = latitude;
-    this.longitude = longitude;
-  }
-
   public String getName() {
     return name;
   }

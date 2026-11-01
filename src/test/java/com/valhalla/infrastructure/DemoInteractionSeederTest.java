@@ -27,7 +27,6 @@ import com.valhalla.domain.plan.PlanPermission;
 import com.valhalla.domain.plan.PlanRepository;
 import com.valhalla.domain.plan.PlanService;
 import com.valhalla.domain.user.User;
-import com.valhalla.domain.user.UserRepository;
 import com.valhalla.domain.user.UserService;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -62,7 +61,6 @@ public class DemoInteractionSeederTest {
 
   private PublicPlanDataSeeder publicPlanSeederMock;
   private UserService userServiceMock;
-  private UserRepository userRepositoryMock;
   private PlanRepository planRepositoryMock;
   private PlaceRepository placeRepositoryMock;
   private PlanService planServiceMock;
@@ -75,7 +73,6 @@ public class DemoInteractionSeederTest {
   public void init() {
     this.publicPlanSeederMock = mock(PublicPlanDataSeeder.class);
     this.userServiceMock = mock(UserService.class);
-    this.userRepositoryMock = mock(UserRepository.class);
     this.planRepositoryMock = mock(PlanRepository.class);
     this.placeRepositoryMock = mock(PlaceRepository.class);
     this.planServiceMock = mock(PlanService.class);
@@ -86,7 +83,6 @@ public class DemoInteractionSeederTest {
       new DemoInteractionSeeder(
         this.publicPlanSeederMock,
         this.userServiceMock,
-        this.userRepositoryMock,
         this.planRepositoryMock,
         this.placeRepositoryMock,
         this.planServiceMock,
@@ -117,7 +113,6 @@ public class DemoInteractionSeederTest {
     verify(this.publicPlanSeederMock, never()).ensureSeeded();
     verifyNoInteractions(
       this.userServiceMock,
-      this.userRepositoryMock,
       this.planRepositoryMock,
       this.placeRepositoryMock,
       this.planServiceMock,
@@ -130,7 +125,7 @@ public class DemoInteractionSeederTest {
   public void conElMarcadorSembradoNoSiembraNada() {
     // given: el flag prendido y una base que ya paso por este seeder
     when(this.publicPlanSeederMock.isEnabled()).thenReturn(true);
-    when(this.userRepositoryMock.findByEmail(LUCIA_EMAIL))
+    when(this.userServiceMock.findOptionalByEmail(LUCIA_EMAIL))
       .thenReturn(Optional.of(userWith(LUCIA_EMAIL)));
     when(this.planRepositoryMock.existsByShortCode(MARKER)).thenReturn(true);
 
@@ -139,11 +134,10 @@ public class DemoInteractionSeederTest {
 
     // then: se pide el feed base y se lee el marcador, nada mas
     verify(this.publicPlanSeederMock).ensureSeeded();
-    verify(this.userRepositoryMock).findByEmail(LUCIA_EMAIL);
+    verify(this.userServiceMock).findOptionalByEmail(LUCIA_EMAIL);
     verify(this.planRepositoryMock).existsByShortCode(MARKER);
     verify(this.planRepositoryMock, never()).save(any(Plan.class));
     verifyNoInteractions(
-      this.userServiceMock,
       this.placeRepositoryMock,
       this.planServiceMock,
       this.planBookmarkServiceMock,
@@ -155,14 +149,13 @@ public class DemoInteractionSeederTest {
   public void sinFantasmasNoSiembraNada() {
     // given: el flag prendido pero el feed base no dejo fantasmas (catalogo vacio, por ejemplo)
     when(this.publicPlanSeederMock.isEnabled()).thenReturn(true);
-    when(this.userRepositoryMock.findByEmail(LUCIA_EMAIL)).thenReturn(Optional.empty());
+    when(this.userServiceMock.findOptionalByEmail(LUCIA_EMAIL)).thenReturn(Optional.empty());
 
     // when
     this.seeder.onApplicationEvent(null);
 
     // then
     verifyNoInteractions(
-      this.userServiceMock,
       this.placeRepositoryMock,
       this.planServiceMock,
       this.planBookmarkServiceMock,
@@ -287,7 +280,7 @@ public class DemoInteractionSeederTest {
 
   private void givenEnabledSeederWithGhosts() {
     when(this.publicPlanSeederMock.isEnabled()).thenReturn(true);
-    when(this.userRepositoryMock.findByEmail(anyString()))
+    when(this.userServiceMock.findOptionalByEmail(anyString()))
       .thenAnswer(invocation -> Optional.of(userWith(invocation.getArgument(0, String.class))));
     when(this.planRepositoryMock.findByShortCode(anyString()))
       .thenAnswer(invocation -> {

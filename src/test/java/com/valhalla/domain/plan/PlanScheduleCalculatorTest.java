@@ -428,6 +428,54 @@ public class PlanScheduleCalculatorTest {
     assertEquals(60, PlanScheduleCalculator.effectiveDuration(null, null, null));
   }
 
+  @Test
+  public void U23_elTrasladoFijoGanaSobreLaDistanciaYNoSeConeaEnNoventaMinutos() {
+    // given: dos paradas tan lejos que el calculado quedaria en el techo de 90 minutos, pero el
+    // tramo de la primera esta fijado a mano en 200
+    List<PlanScheduleCalculator.Slot> slots = PlanScheduleCalculator.schedule(
+      PLAN_DATE,
+      DAY_START,
+      DAY_END,
+      TransportMode.WALK,
+      List.of(
+        stop(60, null, PlaceCategory.OTHER, LATITUDE, LONGITUDE, null, 200),
+        stop(60, null, PlaceCategory.OTHER, 40.4, -3.7, null)
+      )
+    );
+
+    // then: manda el valor manual sin el techo del calculado
+    assertEquals(LocalTime.of(13, 20), slots.get(1).start());
+  }
+
+  @Test
+  public void U24_elTrasladoFijoTienePisoDeUnMinutoYNoNecesitaCoordenadas() {
+    // given/then: un override no positivo cae al piso de 1 minuto
+    List<PlanScheduleCalculator.Slot> clamped = PlanScheduleCalculator.schedule(
+      PLAN_DATE,
+      DAY_START,
+      DAY_END,
+      TransportMode.WALK,
+      List.of(
+        stop(60, null, PlaceCategory.OTHER, null, null, null, 0),
+        stop(60, null, PlaceCategory.OTHER, null, null, null)
+      )
+    );
+    assertEquals(LocalTime.of(10, 1), clamped.get(1).start());
+
+    // given/then: sin coordenadas el override manda sobre el fallback de 15 minutos
+    List<PlanScheduleCalculator.Slot> withoutCoordinates = PlanScheduleCalculator.schedule(
+      PLAN_DATE,
+      DAY_START,
+      DAY_END,
+      TransportMode.WALK,
+      List.of(
+        stop(60, null, PlaceCategory.OTHER, null, null, null, 20),
+        stop(60, null, PlaceCategory.OTHER, null, null, null)
+      )
+    );
+    assertEquals(LocalTime.of(10, 20), withoutCoordinates.get(1).start());
+  }
+
   private static PlanScheduleCalculator.Stop stop(
     Integer duration,
     Integer placeDuration,
@@ -435,6 +483,18 @@ public class PlanScheduleCalculatorTest {
     Double latitude,
     Double longitude,
     TransportMode transportModeToNext
+  ) {
+    return stop(duration, placeDuration, category, latitude, longitude, transportModeToNext, null);
+  }
+
+  private static PlanScheduleCalculator.Stop stop(
+    Integer duration,
+    Integer placeDuration,
+    PlaceCategory category,
+    Double latitude,
+    Double longitude,
+    TransportMode transportModeToNext,
+    Integer travelMinutesToNext
   ) {
     return new PlanScheduleCalculator.Stop(
       null,
@@ -444,7 +504,8 @@ public class PlanScheduleCalculatorTest {
       category,
       latitude,
       longitude,
-      transportModeToNext
+      transportModeToNext,
+      travelMinutesToNext
     );
   }
 
@@ -459,6 +520,7 @@ public class PlanScheduleCalculatorTest {
       duration,
       null,
       PlaceCategory.OTHER,
+      null,
       null,
       null,
       null

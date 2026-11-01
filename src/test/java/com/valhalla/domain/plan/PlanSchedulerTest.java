@@ -149,6 +149,23 @@ public class PlanSchedulerTest {
     assertThat(stop.getVisitTime(), is(equalTo(DAY_START)));
   }
 
+  @Test
+  public void respetaElTrasladoFijoDeLaPrimeraParada() {
+    // given: dos museos pegados (el calculado seria el piso de 5 minutos) pero el tramo de la
+    // primera esta fijado a mano en 45
+    Plan plan = plan(PLAN_DATE, DAY_START);
+    PlanPlace first = addStop(plan, museum(MUSEUM_DURATION_MINUTES));
+    first.setTravelMinutesToNext(45);
+    addStop(plan, museum(MUSEUM_DURATION_MINUTES));
+
+    // when
+    PlanScheduler.apply(plan);
+
+    // then: 90 de visita + 45 del tramo fijo, no los 5 del calculo
+    assertThat(first.getTravelMinutesToNext(), is(equalTo(45)));
+    assertThat(plan.getPlanPlaces().get(1).getVisitTime(), is(equalTo(LocalTime.of(12, 15))));
+  }
+
   private static Plan plan(LocalDate eventDate, LocalTime eventTime) {
     Plan plan = new Plan();
     plan.setName("Itinerario");

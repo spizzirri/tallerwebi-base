@@ -10,5 +10,8 @@ import java.util.List;
  *
  * <p>{@code fetchedAt} en {@code null} no significa "no hay puntos": significa que esa zona nunca se
  * cargo, que es distinto de haberse cargado y no haber traido nada.
+ *
+ * @param pois filas guardadas del area visible
+ * @param fetchedAt cuando se cargo la zona, o {@code null} si nunca se cargo
  */
 public record ZonePois(List<MapPoi> pois, Instant fetchedAt) {}

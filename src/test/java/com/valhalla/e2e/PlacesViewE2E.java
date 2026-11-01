@@ -148,16 +148,14 @@ public class PlacesViewE2E extends E2eBase {
       equalTo("rgb(231, 76, 60)")
     );
 
-    panel.locator("button").filter(new Locator.FilterOptions().setHasText("Add to plan")).click();
-    assertThat(detailsPanel().count(), is(equalTo(1)));
-    assertThat(page.url(), equalTo(placesUrl()));
-    // El modal "Add to plan" recién se abre cuando resuelve el fetch('/api/plans') que le
-    // alimenta el select, así que hay que esperarlo y cerrarlo: montado sobre la página
-    // (backdrop z-2000) bloquearía cada click siguiente con un intercept de puntero.
-    Locator addToPlanDialog = page.locator("div[role='dialog']");
-    addToPlanDialog.waitFor();
-    addToPlanDialog.locator("button:has-text('Cancelar')").click();
-    page.waitForFunction("() => document.querySelector(\"div[role='dialog']\") === null");
+    // [APL] Sin sesión no hay planes propios, así que el picker inline del panel no se
+    // pinta y tampoco hay diálogo: la ficha sigue siendo solo informativa para anónimos.
+    assertThat(
+      panel.locator("button").filter(new Locator.FilterOptions().setHasText("Add to plan")).count(),
+      is(equalTo(0))
+    );
+    assertThat(panel.locator("#plan-picker").count(), is(equalTo(0)));
+    assertThat(page.locator("div[role='dialog']").count(), is(equalTo(0)));
 
     panel.locator("button[aria-label='Close place details']").click();
     page.waitForFunction(
@@ -170,6 +168,25 @@ public class PlacesViewE2E extends E2eBase {
     cardNamed("MALBA").locator("span:text-is('View details →')").click();
     waitForSelectedPlace("MALBA");
     assertThat(page.url(), equalTo(placesUrl()));
+  }
+
+  /**
+   * [T12] Sin sesión el "+" "Create plan" del panel de planes manda al login conservando el
+   * retorno: abrir el wizard para un anónimo solo lo mandaría a fallar en el submit (POST
+   * /plans exige sesión).
+   */
+  @Test
+  void createPlanButtonSendsAnonymousUsersToLogin() {
+    newContext();
+    page.navigate(placesUrl());
+    // Sin sesión el "+" es un <a> al login, no un <button> que abre el wizard.
+    String createPlan = "aside[aria-label='Plans'] a:has-text('Create plan')";
+    page.waitForSelector(createPlan);
+
+    page.locator(createPlan).click();
+
+    page.waitForSelector("input[type='email']");
+    assertThat(page.url(), containsString("/auth/login?redirect="));
   }
 
   @Test
@@ -205,7 +222,7 @@ public class PlacesViewE2E extends E2eBase {
   /**
    * [FLASH] Regresion del primer paint de /explore. El template de Vue viaja en el HTML del
    * servidor: hasta que places-list.js monta, los v-if y los {{ }} son HTML inerte. Antes del fix
-   * se veian el banner de error, el aside con "{{selectedPlace.name}}", el modal "Agregar a plan"
+   * se veian el banner de error y el aside con "{{selectedPlace.name}}"
    * y el logo a su tamano intrínseco (1366 px).
    *
    * <p>Se retrasa el modulo que monta Vue 1,5 s (con un scheduler aparte: dormir dentro del
@@ -260,7 +277,7 @@ public class PlacesViewE2E extends E2eBase {
               if (!root.hasAttribute("data-v-app")) flag("root visible before Vue mounted");
               if (root.textContent.indexOf("{{") !== -1) flag("raw Vue template visible");
               if (visible(root.querySelector("[role='alert']"))) flag("error banner visible");
-              if (visible(root.querySelector("[role='dialog']"))) flag("add-to-plan modal visible");
+              if (visible(root.querySelector("[role='dialog']"))) flag("dialog visible");
             }
           }
           var logo = document.querySelector("nav img[alt='Logo']");
@@ -342,7 +359,9 @@ public class PlacesViewE2E extends E2eBase {
   }
 
   private Locator markers() {
-    return page.locator("#map .leaflet-marker-icon");
+    // [ITI] El badge con data-category es un DIV HIJO del marcador (divIcon html), no el
+    // root: este helper mide pines de lugares; los del borrador no llevan data-category.
+    return page.locator("#map .leaflet-marker-icon div[data-category]");
   }
 
   private String placesUrl() {
@@ -356,7 +375,7 @@ public class PlacesViewE2E extends E2eBase {
   private void waitForMarkerCentered(int markerIndex) {
     page.waitForFunction(
       "() => { const map = document.querySelector('#map'); " +
-      "const marker = map.querySelectorAll('.leaflet-marker-icon')[" +
+      "const marker = map.querySelectorAll('.leaflet-marker-icon div[data-category]')[" +
       markerIndex +
       "]; " +
       "if (!marker) return false; " +
@@ -371,10 +390,12 @@ public class PlacesViewE2E extends E2eBase {
   }
 
   private void waitForPlaceCount(int expectedCount) {
+    // [ITI] data-category en el conteo de marcadores: los del borrador no se cuentan como
+    // lugares (AC-14), así la igualdad exacta tarjeta↔marcador sobrevive al overlay.
     page.waitForFunction(
       "() => document.querySelectorAll('#explore-app > aside article').length === " +
       expectedCount +
-      " && document.querySelectorAll('#map .leaflet-marker-icon').length === " +
+      " && document.querySelectorAll('#map .leaflet-marker-icon div[data-category]').length === " +
       expectedCount
     );
   }

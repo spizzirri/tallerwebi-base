@@ -9,6 +9,11 @@ import java.util.Locale;
  *
  * <p>Valida en el constructor porque el bbox llega por query string: una caja invertida o fuera de
  * rango tiene que morir en un 400 del proxy y no en una consulta rara a Overpass.
+ *
+ * @param south borde sur (latitud minima)
+ * @param west borde oeste (longitud minima)
+ * @param north borde norte (latitud maxima)
+ * @param east borde este (longitud maxima)
  */
 public record BoundingBox(double south, double west, double north, double east) {
   /**

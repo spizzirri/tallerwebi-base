@@ -1,7 +1,8 @@
 /**
  * Add to Plan functionality for the Places view.
  * Emits a custom event when the "+" button is clicked on a place card; the Vue app in
- * pages/places/list.html listens for it and handles the modal. It answers back with
+ * pages/places/list.js listens for it and routes the place to the open wizard draft or the
+ * active plan. It answers back with
  * `plan-error`, because this module has no error surface of its own.
  */
 import { apiFetch } from './lib/api.js';

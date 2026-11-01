@@ -12,7 +12,6 @@ import com.valhalla.domain.plan.PlanRepository;
 import com.valhalla.domain.plan.PlanService;
 import com.valhalla.domain.planplace.PlanPlace;
 import com.valhalla.domain.user.User;
-import com.valhalla.domain.user.UserRepository;
 import com.valhalla.domain.user.UserService;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -135,7 +134,6 @@ public class DemoInteractionSeeder implements ApplicationListener<ContextRefresh
 
   private final PublicPlanDataSeeder publicPlanSeeder;
   private final UserService userService;
-  private final UserRepository userRepository;
   private final PlanRepository planRepository;
   private final PlaceRepository placeRepository;
   private final PlanService planService;
@@ -147,7 +145,6 @@ public class DemoInteractionSeeder implements ApplicationListener<ContextRefresh
   public DemoInteractionSeeder(
     PublicPlanDataSeeder publicPlanSeeder,
     UserService userService,
-    UserRepository userRepository,
     PlanRepository planRepository,
     PlaceRepository placeRepository,
     PlanService planService,
@@ -156,7 +153,6 @@ public class DemoInteractionSeeder implements ApplicationListener<ContextRefresh
   ) {
     this.publicPlanSeeder = publicPlanSeeder;
     this.userService = userService;
-    this.userRepository = userRepository;
     this.planRepository = planRepository;
     this.placeRepository = placeRepository;
     this.planService = planService;
@@ -195,13 +191,13 @@ public class DemoInteractionSeeder implements ApplicationListener<ContextRefresh
   }
 
   private boolean ghostsPresent() {
-    return userRepository.findByEmail(LUCIA).isPresent();
+    return userService.findOptionalByEmail(LUCIA).isPresent();
   }
 
   private Map<String, User> ghostsByEmail() {
     Map<String, User> ghosts = new LinkedHashMap<>();
     for (String email : GHOST_EMAILS) {
-      ghosts.put(email, userRepository.findByEmail(email).orElseThrow());
+      ghosts.put(email, userService.findOptionalByEmail(email).orElseThrow());
     }
     return ghosts;
   }
@@ -339,7 +335,7 @@ public class DemoInteractionSeeder implements ApplicationListener<ContextRefresh
         INACTIVE_FIRST_NAME,
         INACTIVE_LAST_NAME
       );
-    User inactive = this.userRepository.findByEmail(INACTIVE_EMAIL).orElseThrow();
+    User inactive = this.userService.findOptionalByEmail(INACTIVE_EMAIL).orElseThrow();
     this.userService.deactivate(inactive.getId());
 
     User camila = ghosts.get(CAMILA);

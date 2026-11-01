@@ -81,7 +81,8 @@ public final class PlanScheduler {
       place.getCategory(),
       place.getLatitude(),
       place.getLongitude(),
-      stop.getTransportModeToNext()
+      stop.getTransportModeToNext(),
+      stop.getTravelMinutesToNext()
     );
   }
 }

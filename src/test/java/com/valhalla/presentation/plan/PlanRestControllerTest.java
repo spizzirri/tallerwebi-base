@@ -36,8 +36,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 
 /**
  * Unit tests of {@link PlanRestController}. The service is mocked, so what is under test is the
- * mapping of {@code GET /api/plans} (its two branches on {@code Principal}, the endpoint the
- * "Add to plan" modal calls) and of {@code GET /api/plans/public} (the feed the sidebar of
+ * mapping of {@code GET /api/plans} (its two branches on {@code Principal}) and of
+ * {@code GET /api/plans/public} (the feed the sidebar of
  * /explore consumes: visibility, own-plan exclusion, ordering, window and payload shape).
  */
 public class PlanRestControllerTest {

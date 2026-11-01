@@ -193,7 +193,7 @@ public class PlanPlaceDetailE2E extends E2eBase {
   void keepsTheSharedNavbarOnThePlanDetailPage() {
     createPlanWithAVisit();
 
-    Map<String, Object> nav = (Map<String, Object>) page.evaluate(
+    Map<?, ?> nav = (Map<?, ?>) page.evaluate(
       """
       () => {
         const avatarStyle = getComputedStyle(document.querySelector('#navbar-avatar'));

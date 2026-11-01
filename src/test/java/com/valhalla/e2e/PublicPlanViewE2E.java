@@ -140,9 +140,10 @@ public class PublicPlanViewE2E extends E2eBase {
   }
 
   /**
-   * Adds a second stop through the API while the admin session is still open (05-APL-FE owns the
-   * add-to-plan UI, so the backend is exercised via fetch — same pattern as AddPlaceToPlanE2E).
-   * Picks a place the itinerary does not have yet, since the create modal already added the first
+   * Adds a second stop through the API while the admin session is still open (the add-place UI
+   * lives in the plan detail and the create wizard, so the backend is exercised via fetch — same
+   * pattern as AddPlaceToPlanE2E).
+   * Picks a place the itinerary does not have yet, since the create flow already added the first
    * catalog place. The whole seeded catalog has coordinates, so the polyline test gets two stops
    * that qualify.
    */

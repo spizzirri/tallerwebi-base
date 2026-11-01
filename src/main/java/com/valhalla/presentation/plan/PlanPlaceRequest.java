@@ -18,6 +18,9 @@ public class PlanPlaceRequest {
 
   private TransportMode transportModeToNext;
 
+  // [SCH] Traslado hacia la parada siguiente fijado a mano; vacio en el form = null = calculado.
+  private Integer travelMinutesToNext;
+
   public PlanPlaceRequest() {}
 
   public PlanPlaceRequest(UUID placeId, String description, TransportMode transportModeToNext) {
@@ -48,5 +51,13 @@ public class PlanPlaceRequest {
 
   public void setTransportModeToNext(TransportMode transportModeToNext) {
     this.transportModeToNext = transportModeToNext;
+  }
+
+  public Integer getTravelMinutesToNext() {
+    return travelMinutesToNext;
+  }
+
+  public void setTravelMinutesToNext(Integer travelMinutesToNext) {
+    this.travelMinutesToNext = travelMinutesToNext;
   }
 }

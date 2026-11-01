@@ -121,7 +121,7 @@ public class MapPoi { // NOPMD — intentional: 15 fields vs maxfields=10; the e
    *
    * @return {@code true} solo si algun valor mostrado difiere y hubo que escribir
    */
-  public boolean apply(OsmPoi poi, PlaceCategory category) {
+  public boolean apply(OsmPoi poi, PlaceCategory newCategory) {
     OsmPoi incoming = new OsmPoi(
       poi.name(),
       poi.address(),
@@ -135,14 +135,14 @@ public class MapPoi { // NOPMD — intentional: 15 fields vs maxfields=10; the e
       osmType,
       osmId
     );
-    if (incoming.equals(toOsmPoi()) && this.category == category) {
+    if (incoming.equals(toOsmPoi()) && this.category == newCategory) {
       return false;
     }
     this.name = incoming.name();
     this.address = incoming.address();
     this.latitude = incoming.latitude();
     this.longitude = incoming.longitude();
-    this.category = category;
+    this.category = newCategory;
     this.openingHours = incoming.openingHours();
     this.phone = incoming.phone();
     this.website = incoming.website();

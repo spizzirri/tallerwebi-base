@@ -9,6 +9,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
@@ -997,6 +998,39 @@ public class PlanControllerIntegrationTest {
     }
     assertThat(saved.getPlanPlaces().get(0).getVisitTime(), is(equalTo(EVENT_TIME)));
     assertThat(saved.getPlanPlaces().get(1).getVisitTime(), is(equalTo(SECOND_STOP_START)));
+  }
+
+  @Test
+  @WithMockUser(username = OWNER_EMAIL)
+  public void T_PLN_089_postPlans_aceptaElTrasladoFijoPorTramo() throws Exception {
+    // given: el form manda minutos fijos en la primera fila y nada en la segunda (input vacio)
+    UUID first = givenMuseum();
+    UUID second = givenMuseum();
+
+    // when
+    MvcResult result =
+      this.mockMvc.perform(
+          post("/plans")
+            .with(csrf())
+            .param("name", PLAN_NAME)
+            .param("eventDate", EVENT_DATE.toString())
+            .param("eventTime", "10:00")
+            .param("transportMode", "WALK")
+            .param("places[0].placeId", first.toString())
+            .param("places[0].travelMinutesToNext", "20")
+            .param("places[1].placeId", second.toString())
+        )
+        .andExpect(status().is3xxRedirection())
+        .andReturn();
+
+    // then: el override persiste y el tramo lo usa tal cual: 10:00 + 90 de visita + 20
+    this.entityManager.flush();
+    this.entityManager.clear();
+    Plan saved =
+      this.planRepository.findById(planIdOf(result.getResponse().getRedirectedUrl())).orElseThrow();
+    assertThat(saved.getPlanPlaces().get(0).getTravelMinutesToNext(), is(20));
+    assertThat(saved.getPlanPlaces().get(1).getTravelMinutesToNext(), is(nullValue()));
+    assertThat(saved.getPlanPlaces().get(1).getVisitTime(), is(equalTo(LocalTime.of(11, 50))));
   }
 
   @Test
@@ -2384,14 +2418,14 @@ public class PlanControllerIntegrationTest {
     return place.getId();
   }
 
-  /** [SCH] Crea un plan por el endpoint con las paradas dadas, en ese orden. */
+  /** [SCH] Crea un plan por el endpoint con las paradas dadas, en ese orden. Sin dayEndTime:
+   *  el form ya no lo manda y el default del servidor (23:00) es el que tiene que quedar. */
   private MvcResult createPlanWith(UUID... placeIds) throws Exception {
     MockHttpServletRequestBuilder request = post("/plans")
       .with(csrf())
       .param("name", PLAN_NAME)
       .param("eventDate", EVENT_DATE.toString())
       .param("eventTime", "10:00")
-      .param("dayEndTime", "23:00")
       .param("transportMode", "WALK");
     for (int index = 0; index < placeIds.length; index++) {
       request.param("places[" + index + "].placeId", placeIds[index].toString());

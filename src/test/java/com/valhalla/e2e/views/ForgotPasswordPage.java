@@ -6,8 +6,7 @@ import com.microsoft.playwright.Page;
 public class ForgotPasswordPage extends WebPage {
 
   public ForgotPasswordPage(Page page) {
-    super(page);
-    page.navigate(baseUrl() + "/auth/forgot-password");
+    super(page, "/auth/forgot-password");
   }
 
   public String getErrorMessage() {

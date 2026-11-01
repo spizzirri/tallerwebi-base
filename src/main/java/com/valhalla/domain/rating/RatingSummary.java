@@ -6,5 +6,9 @@ import java.util.UUID;
  * [CAL] Agregado publico de calificaciones de un plan: promedio y cantidad. Es lo unico que sale al
  * HTML (exhibicion privada, ver 16-CAL.md). Top-level para poder usarlo como constructor
  * expression en JPQL.
+ *
+ * @param planId plan calificado
+ * @param average promedio de los puntajes
+ * @param count cantidad de puntajes
  */
 public record RatingSummary(UUID planId, Double average, Long count) {}

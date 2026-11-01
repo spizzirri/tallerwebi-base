@@ -119,18 +119,17 @@ public class PlaceServiceImplTest {
 
   @Test
   public void shouldCreateAPlaceMappingEveryFieldAndSavingBlankImageAsNull() {
-    EditPlaceRequest request = new EditPlaceRequest(
-      "El Banco Rojo",
-      PlaceCategory.RESTAURANT,
-      "Cafe de especialidad",
-      "Av. Rivadavia 456",
-      "Mo-Su 08:00-20:00",
-      "+54 11 5555-0001",
-      "https://elbankrojo.test",
-      "   ",
-      -34.6091,
-      -58.3917
-    );
+    EditPlaceRequest request = new EditPlaceRequest();
+    request.setName("El Banco Rojo");
+    request.setCategory(PlaceCategory.RESTAURANT);
+    request.setDescription("Cafe de especialidad");
+    request.setAddress("Av. Rivadavia 456");
+    request.setOpeningHours("Mo-Su 08:00-20:00");
+    request.setPhone("+54 11 5555-0001");
+    request.setWebsite("https://elbankrojo.test");
+    request.setImageUrl("   ");
+    request.setLatitude(-34.6091);
+    request.setLongitude(-58.3917);
     request.setDefaultDurationMinutes(45);
 
     Place result = placeService.create(request);
@@ -155,18 +154,17 @@ public class PlaceServiceImplTest {
     existing.setId(OTHER_PLACE_ID);
     existing.setDefaultDurationMinutes(120);
     when(placeRepositoryMock.findById(OTHER_PLACE_ID)).thenReturn(Optional.of(existing));
-    EditPlaceRequest request = new EditPlaceRequest(
-      "New Name",
-      PlaceCategory.MUSEUM,
-      "Updated description",
-      "Cerrito 123",
-      "Tu-Su 10:00-18:00",
-      "+54 11 5555-0002",
-      "https://museo.test",
-      "https://example.test/img.png",
-      -34.589,
-      -58.397
-    );
+    EditPlaceRequest request = new EditPlaceRequest();
+    request.setName("New Name");
+    request.setCategory(PlaceCategory.MUSEUM);
+    request.setDescription("Updated description");
+    request.setAddress("Cerrito 123");
+    request.setOpeningHours("Tu-Su 10:00-18:00");
+    request.setPhone("+54 11 5555-0002");
+    request.setWebsite("https://museo.test");
+    request.setImageUrl("https://example.test/img.png");
+    request.setLatitude(-34.589);
+    request.setLongitude(-58.397);
 
     Place result = placeService.update(OTHER_PLACE_ID, request);
 
@@ -244,18 +242,9 @@ public class PlaceServiceImplTest {
   @Test
   public void shouldThrowPlaceNotFoundWhenUpdatingAMissingId() {
     when(placeRepositoryMock.findById(MISSING_ID)).thenReturn(Optional.empty());
-    EditPlaceRequest request = new EditPlaceRequest(
-      "Any",
-      PlaceCategory.BAR,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
-    );
+    EditPlaceRequest request = new EditPlaceRequest();
+    request.setName("Any");
+    request.setCategory(PlaceCategory.BAR);
 
     assertThrows(PlaceNotFoundException.class, () -> placeService.update(MISSING_ID, request));
   }

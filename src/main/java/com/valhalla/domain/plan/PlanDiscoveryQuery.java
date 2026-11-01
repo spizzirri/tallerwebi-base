@@ -3,7 +3,14 @@ package com.valhalla.domain.plan;
 import com.valhalla.domain.place.PlaceCategory;
 import java.util.Locale;
 
-/** [SEARCH] Filtros y orden del feed, ya normalizados. Los parametros crudos no llegan al dominio. */
+/**
+ * [SEARCH] Filtros y orden del feed, ya normalizados. Los parametros crudos no llegan al dominio.
+ *
+ * @param text texto libre de busqueda
+ * @param category categoria a filtrar, o {@code null} sin filtro
+ * @param when ventana temporal (todas, proximas, pasadas)
+ * @param sort orden del resultado
+ */
 public record PlanDiscoveryQuery(String text, PlaceCategory category, When when, Sort sort) {
   public enum When {
     ALL,

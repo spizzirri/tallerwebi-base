@@ -1,6 +1,7 @@
 package com.valhalla.domain.user;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface UserService {
@@ -8,6 +9,8 @@ public interface UserService {
   User findById(UUID id);
   /** [PROF] El principal del principal de sesión lleva el email, no el id: este método lo cruza. */
   User getByEmail(String email);
+  /** Igual que {@link #getByEmail} pero sin excepción: para cuando el usuario puede no existir. */
+  Optional<User> findOptionalByEmail(String email);
   void create(String email, String password, String role, String firstName, String lastName);
   void update(UUID id, String email, String role, String firstName, String lastName);
   void activate(UUID id);

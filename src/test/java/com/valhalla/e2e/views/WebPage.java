@@ -16,6 +16,17 @@ public class WebPage {
     this.page = page;
   }
 
+  /**
+   * Navega al abrir el page object. La llamada vive en el constructor de WebPage, no en el de la
+   * subclase: ahi {@link #baseUrl()} (final) se declara en la propia clase en construccion, asi
+   * que javac no ve un escape de {@code this} a una subclase a medio inicializar (lint
+   * this-escape).
+   */
+  protected WebPage(Page page, String path) {
+    this(page);
+    page.navigate(baseUrl() + path);
+  }
+
   public URL getCurrentUrl() throws MalformedURLException {
     return URI.create(page.url()).toURL();
   }
@@ -47,8 +58,12 @@ public class WebPage {
    * Base URL for E2E navigation. Failsafe derives this from ${jetty.port} (see pom.xml), so
    * there is no local default: one that silently said 8080 would let the tests keep hitting
    * the old port after the server moved.
+   *
+   * <p>Final: los page objects navegan desde el constructor de WebPage (no desde el de la
+   * subclase) y un método sobreescribible ahi seria un escape de {@code this} a mitad de
+   * construir (lint this-escape de javac).
    */
-  public String baseUrl() {
+  public final String baseUrl() {
     String baseUrl = System.getProperty("e2e.baseUrl");
     if (baseUrl == null) {
       throw new IllegalStateException(

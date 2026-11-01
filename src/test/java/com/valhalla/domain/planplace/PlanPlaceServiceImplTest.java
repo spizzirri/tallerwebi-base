@@ -83,7 +83,7 @@ class PlanPlaceServiceImplTest {
   void U04_updatesSchedule() {
     LocalDate date = LocalDate.of(2026, 12, 1);
     LocalTime time = LocalTime.of(10, 30);
-    PlanPlaceUpdate changes = new PlanPlaceUpdate(null, date, time, null);
+    PlanPlaceUpdate changes = new PlanPlaceUpdate(null, date, time, null, null);
     assertSame(entry, service.updatePlanPlace(PLAN_ID, ENTRY_ID, changes, "owner"));
     assertEquals(date, entry.getVisitDate());
     assertEquals(time, entry.getVisitTime());
@@ -96,7 +96,8 @@ class PlanPlaceServiceImplTest {
       45,
       LocalDate.of(2026, 12, 1),
       LocalTime.of(10, 30),
-      TransportMode.CAR
+      TransportMode.CAR,
+      null
     );
 
     service.updatePlanPlace(PLAN_ID, ENTRY_ID, changes, "owner");
@@ -110,7 +111,7 @@ class PlanPlaceServiceImplTest {
     service.updatePlanPlace(
       PLAN_ID,
       ENTRY_ID,
-      new PlanPlaceUpdate(null, null, LocalTime.of(14, 0), null),
+      new PlanPlaceUpdate(null, null, LocalTime.of(14, 0), null, null),
       "owner"
     );
 
@@ -127,7 +128,7 @@ class PlanPlaceServiceImplTest {
     service.updatePlanPlace(
       PLAN_ID,
       ENTRY_ID,
-      new PlanPlaceUpdate(null, null, null, null),
+      new PlanPlaceUpdate(null, null, null, null, null),
       "owner"
     );
 
@@ -135,6 +136,28 @@ class PlanPlaceServiceImplTest {
     assertEquals(LocalDate.of(2026, 12, 1), entry.getVisitDate());
     assertEquals(LocalTime.of(9, 0), entry.getVisitTime());
     assertEquals(60, entry.getDurationMinutes());
+  }
+
+  @Test
+  void updateGuardaElTrasladoFijoYLoLimpiaConNulo() {
+    service.updatePlanPlace(
+      PLAN_ID,
+      ENTRY_ID,
+      new PlanPlaceUpdate(null, null, null, null, 30),
+      "owner"
+    );
+
+    assertEquals(30, entry.getTravelMinutesToNext());
+
+    // El form vacio el input: null no es "conserva", es volver al calculo por distancia y modo.
+    service.updatePlanPlace(
+      PLAN_ID,
+      ENTRY_ID,
+      new PlanPlaceUpdate(null, null, null, null, null),
+      "owner"
+    );
+
+    assertNull(entry.getTravelMinutesToNext());
   }
 
   @Test

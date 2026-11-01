@@ -20,6 +20,24 @@
         z-index: 1000;
         flex-shrink: 0;
       }
+
+      /* [ITI] Marcador numerado del borrador sobre el mapa: círculo oscuro, a diferencia
+         de los pines de categoría (badge lleva su color). Sin data-category: el E2E de
+         conteo de lugares se ata a ese atributo y el overlay queda fuera. */
+      .draft-marker .draft-step {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background-color: #111827;
+        color: #fff;
+        border: 2px solid #fff;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        font-weight: 600;
+      }
     </style>
 
     <!-- Leaflet CSS, vendorizado con la version fija (1.9.4) en el repo. Ya no viene de CDN:
@@ -34,10 +52,13 @@
          layout de escritorio (mapa a la izquierda, sidebar junto al borde, paneles siempre
          visibles via md:visible). -->
     <!-- [FLASH] v-cloak: el template es HTML de servidor y Vue lo pinta recien en mount().
-         Sin el atributo se ven crudos el banner de error, el aside de detalle con sus
-         {{selectedPlace.*}} y el modal "Agregar a plan". La regla y el fallback de 3 s viven
+         Sin el atributo se ven crudos el banner de error y el aside de detalle con sus
+         {{selectedPlace.*}}. La regla y el fallback de 3 s viven
          en layouts/base.html :: headContent. -->
-    <div id="explore-app" v-cloak
+    <!-- [APL] isLogged via data-* (guide-js R3): el picker del panel de detalle se pinta
+         solo con sesión; sin ella el fetch de /api/plans devuelve [] igual que en un
+         usuario sin planes y el frontend no podría distinguirlos. -->
+    <div id="explore-app" v-cloak th:attr="data-is-logged=${isLogged}"
       class="group flex-1 min-h-0 min-w-0 flex flex-col md:flex-row-reverse overflow-hidden">
       <!-- Error surface for the whole view: the 5 request paths below and the add-to-plan
            module all report here instead of opening a browser alert box. role="alert"
@@ -205,14 +226,54 @@
             <p v-if="selectedPlace.description" class="whitespace-pre-line text-sm leading-6 text-gray-700">
               {{ selectedPlace.description }}
             </p>
-            <div class="mt-auto flex justify-end pt-4">
-              <button type="button" :data-add-to-plan="selectedPlace.id" :data-place-name="selectedPlace.name"
-                :data-place-category="selectedPlace.category" :data-place-latitude="selectedPlace.latitude"
-                :data-place-longitude="selectedPlace.longitude"
-                :aria-label="'Add ' + selectedPlace.name + ' to a plan'"
-                class="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700">
-                Add to plan
-              </button>
+            <!-- [APL] Picker de plan inline en el panel de detalle: select + boton, sin
+                 modal (AC3). El boton vive fuera del <article> de la tarjeta para no
+                 chocar con el selector de e2e de addDraftPlace
+                 (aside > article > button[aria-label^='Add ']).
+                 [T7] Se listan todos los planes propios: el que ya contiene el lugar
+                 queda deshabilitado y marcado, en vez de esconder el picker entero.
+                 [T9] El gate es la sesión (isLogged), no la cantidad de planes: logueado
+                 sin planes ofrece crear el primero con el wizard de la misma página en
+                 vez de no pintar nada.
+                 [T10] Con el wizard de creación abierto el botón agrega al plan EN
+                 PROCESO (mismo destino que el "+" de las tarjetas), no a uno guardado. -->
+            <div v-if="isLogged" class="flex flex-col gap-2 border-t border-gray-100 pt-4">
+              <template v-if="showCreatePlan">
+                <p class="text-sm text-gray-600">Se agregará al plan que estás creando.</p>
+                <button type="button" @click="addSelectedToDraft"
+                  aria-label="Agregar al plan"
+                  class="h-10 rounded-md bg-blue-600 px-3 text-sm font-semibold text-white hover:bg-blue-700">
+                  Agregar al plan
+                </button>
+              </template>
+              <template v-else-if="availablePlans.length">
+                <label for="plan-picker" class="text-sm font-medium text-gray-700">Plan</label>
+                <select id="plan-picker" v-model="planPickId" :disabled="planBusy"
+                  class="h-10 rounded-md border border-gray-300 bg-white px-2 text-sm text-gray-900 disabled:opacity-60">
+                  <option v-for="plan in availablePlans" :key="plan.id" :value="plan.id"
+                    :disabled="planContainsPlace(plan)">
+                    {{ planContainsPlace(plan) ? plan.name + ' (ya contiene el lugar)' : plan.name }}
+                  </option>
+                </select>
+                <button type="button" @click="addSelectedToPlan" :disabled="planBusy || !planPickId"
+                  aria-label="Agregar al plan"
+                  class="h-10 rounded-md bg-blue-600 px-3 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60">
+                  <span v-if="!planBusy">Agregar al plan</span>
+                  <span v-else>Agregando…</span>
+                </button>
+              </template>
+              <template v-else>
+                <p class="text-sm text-gray-600">Todavía no tenés planes. Creá uno para agregar este lugar.</p>
+                <!-- "Crear un plan", no "Crear plan": este texto vive dentro del panel de
+                     detalle y un has-text('Crear plan') genérico lo matchearía junto al
+                     botón del sidebar y el submit del wizard (strict mode en los e2e). -->
+                <button type="button" @click="openCreatePlan"
+                  class="h-10 rounded-md bg-blue-600 px-3 text-sm font-semibold text-white hover:bg-blue-700">
+                  Crear un plan
+                </button>
+              </template>
+              <p v-if="planMessage" role="status"
+                class="text-sm" :class="planError ? 'text-red-600' : 'text-green-700'">{{ planMessage }}</p>
             </div>
           </div>
         </aside>
@@ -234,7 +295,18 @@
           <input v-model="plansQuery" type="search" placeholder="Search public plans..."
             aria-label="Search public plans"
             class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm" />
-          <button type="button" @click="openCreatePlan"
+          <!-- [APL/T12] Sin sesión el "+" no abre el wizard: manda al login conservando a
+               dónde volver (mismo patrón que el CTA anónimo de la vista pública, T_PVP_007).
+               Con sesión sigue abriendo la creación. th:if es server-side (guide-js R3). -->
+          <a th:if="${!isLogged}" th:href="@{/auth/login?redirect=/explore}"
+            class="inline-flex items-center gap-2 rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M5 12h14" />
+              <path d="M12 5v14" />
+            </svg>
+            Create plan
+          </a>
+          <button th:if="${isLogged}" type="button" @click="openCreatePlan"
             class="inline-flex items-center gap-2 rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700">
             <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M5 12h14" />
@@ -337,44 +409,6 @@
           </a>
         </aside>
 
-        <!-- Add to plan modal -->
-        <div v-if="showAddToPlan" @click.self="closeAddToPlan" @keydown.esc="closeAddToPlan"
-          class="fixed inset-0 z-[2000] flex items-center justify-center bg-black/50 p-4">
-          <div role="dialog" aria-modal="true" aria-labelledby="add-to-plan-title"
-            class="flex max-h-[90vh] w-full max-w-md flex-col rounded-lg bg-white p-6 shadow-md">
-            <h2 id="add-to-plan-title" class="text-2xl font-semibold text-gray-900">Agregar a plan</h2>
-            <p class="mt-2 text-sm text-gray-600">Selecciona un plan para agregar <strong>{{ placeToAdd?.name }}</strong></p>
-            <div class="mt-4 flex flex-col gap-3">
-              <select v-model="selectedPlanId" aria-label="Seleccionar plan"
-                class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm">
-                <option value="" disabled>Selecciona un plan...</option>
-                <option v-for="plan in availablePlans" :key="plan.id" :value="plan.id">
-                  {{ plan.name }} ({{ formatDate(plan.eventDate) || 'Sin fecha' }})
-                </option>
-              </select>
-              <p v-if="availablePlans.length === 0" class="text-sm text-gray-500">
-                No hay planes disponibles para agregar este lugar.
-              </p>
-            </div>
-            <div class="mt-4 flex justify-end gap-2">
-              <button type="button" @click="closeAddToPlan"
-                class="rounded-md bg-gray-200 px-4 py-2 font-medium text-gray-700 hover:bg-gray-300">
-                Cancelar
-              </button>
-              <button type="button" @click="confirmAddToPlan" :disabled="!selectedPlanId"
-                class="rounded-md bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">
-                Agregar
-              </button>
-            </div>
-            <div class="mt-3 border-t border-gray-200 pt-3">
-              <button type="button" @click="createNewPlan"
-                class="w-full rounded-md border border-dashed border-gray-300 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900">
-                + Crear nuevo plan
-              </button>
-            </div>
-          </div>
-        </div>
-
         <!-- Create plan: replaces the Plans aside in place, leaving the map interactive -->
         <aside v-if="showCreatePlan" id="plans-aside" role="complementary" aria-labelledby="create-plan-title"
           class="invisible pointer-events-none translate-y-4 opacity-0 transition-[opacity,transform] duration-200 group-has-[#tab-plans:checked]:visible group-has-[#tab-plans:checked]:pointer-events-auto group-has-[#tab-plans:checked]:translate-y-0 group-has-[#tab-plans:checked]:opacity-100 md:visible md:pointer-events-auto md:translate-y-0 md:opacity-100 absolute inset-x-0 bottom-12 md:top-0 md:right-auto md:bottom-0 z-[1040] max-h-[70vh] md:max-h-none flex w-auto md:w-80 max-w-full flex-col overflow-y-auto md:overflow-hidden bg-white p-5 shadow-xl">
@@ -432,13 +466,6 @@
                           v-model="planStartTime"
                           class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none" />
                       </div>
-                      <div class="min-w-0 flex-1">
-                        <label for="plan-day-end" class="mb-1 block text-sm font-medium text-gray-700">Fin del
-                          día</label>
-                        <input type="time" id="plan-day-end" name="dayEndTime" step="300"
-                          v-model="planDayEnd"
-                          class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none" />
-                      </div>
                     </div>
                     <div class="mt-4">
                       <label for="plan-transport"
@@ -489,8 +516,10 @@
                               aria-label="Nota"
                               class="mt-2 w-full rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm" />
                           </div>
+                          <!-- [SCH] El tramo es UNA linea: selector de modo + input de minutos,
+                               con el default calculado en el placeholder. Sin rotulo propio ni
+                               hint "≈ N min calculado": los inputs ya dicen lo mismo. -->
                           <div v-if="stop.leg" class="mt-1 flex items-center gap-2 pl-8 text-xs text-gray-500">
-                            <span class="min-w-0 flex-1 truncate">{{ stop.leg.label }}</span>
                             <select v-model="stop.item.transportModeToNext"
                               :name="'places[' + stop.index + '].transportModeToNext'"
                               aria-label="Traslado hacia la parada siguiente"
@@ -498,6 +527,14 @@
                               <option value="">Según el plan</option>
                               <option v-for="(label, mode) in transportLabels" :key="mode" :value="mode">{{ label }}</option>
                             </select>
+                            <!-- [SCH] Minutos del tramo a mano: vacío = calculado por
+                                 distancia y modo. El placeholder pone a la vista ese
+                                 default calculado en lugar del "auto". -->
+                            <input type="number" min="1" v-model="stop.item.travelMinutesToNext"
+                              :name="'places[' + stop.index + '].travelMinutesToNext'"
+                              :placeholder="stop.leg.minutes + ' min'"
+                              aria-label="Minutos de traslado a la parada siguiente"
+                              class="w-24 rounded-md border border-gray-300 bg-white px-2 py-1.5 text-xs" />
                           </div>
                         </li>
                       </ol>

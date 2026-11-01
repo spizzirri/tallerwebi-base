@@ -36,6 +36,7 @@ const parsePlace = (p) => {
         // quedan neutros para que una parada del catálogo no herede un horario que no tiene.
         durationMinutes: p.durationMinutes ?? null,
         transportModeToNext: p.transportModeToNext || '',
+        travelMinutesToNext: p.travelMinutesToNext ?? null,
         timePinned: p.timePinned === true,
         id: target.id,
         name: target.name || 'Sin nombre',
@@ -318,11 +319,12 @@ createApp({
             } catch (error) { requestError.value = error.message; }
         };
 
-        /* El PUT reemplaza los cuatro campos del horario, así que el payload viaja completo: el
-           campo editado y los otros tres tal como están. Los dos de fecha y hora solo se repiten
+        /* El PUT reemplaza los campos del horario, así que el payload viaja completo: el
+           campo editado y los otros tal como están. Los dos de fecha y hora solo se repiten
            si la parada está fijada a mano o si se está editando justamente uno de ellos; si no,
            van en null para que cambiar solo la duración no convierta una parada derivada en una
-           fijada. */
+           fijada. El traslado fijo no tiene pin: viaja como está, y vaciarlo lo devuelve al
+           cálculo (null en el servidor). */
         const updateEntry = async (entry, field, value) => {
             if (saving.value || !entry) return;
             saving.value = true;
@@ -334,6 +336,9 @@ createApp({
                     ? (value === '' ? null : Number(value))
                     : (entry.durationMinutes ?? null),
                 transportModeToNext: entry.transportModeToNext || null,
+                travelMinutesToNext: field === 'travelMinutesToNext'
+                    ? (value === '' ? null : Number(value))
+                    : (entry.travelMinutesToNext ?? null),
                 visitDate: field === 'visitDate'
                     ? (value || null)
                     : (keepsSchedule ? (entry.visitDate || null) : null),
@@ -373,7 +378,8 @@ createApp({
                         visitTime: entry.visitTime,
                         durationMinutes: entry.durationMinutes,
                         timePinned: entry.timePinned,
-                        transportModeToNext: entry.transportModeToNext || ''
+                        transportModeToNext: entry.transportModeToNext || '',
+                        travelMinutesToNext: entry.travelMinutesToNext ?? null
                     });
                     selectedPlaceId.value = null;
                     renderMarkers(addedId);

@@ -81,8 +81,14 @@ const haversineKm = (from, to) => {
   return 2 * EARTH_RADIUS_KM * Math.asin(Math.sqrt(haversine));
 };
 
-/** Traslado hacia la parada siguiente: sin coordenadas 15, si no distancia con rodeo y redondeo. */
+/**
+ * Traslado hacia la parada siguiente. Con minutos fijados a mano en la parada de origen manda el
+ * override (piso 1, sin el techo del cálculo); sin override, sin coordenadas 15, si no distancia
+ * con rodeo y redondeo. Espeja el `gap()` de la calculadora del servidor.
+ */
 export function travelMinutes(from, to, mode) {
+  const override = parseInt(from?.travelMinutesToNext, 10);
+  if (Number.isFinite(override)) return Math.max(1, override);
   if (!hasCoordinates(from) || !hasCoordinates(to)) return DEFAULT_GAP_MINUTES;
   const speed = TRANSPORT_SPEEDS[mode] || TRANSPORT_SPEEDS[DEFAULT_MODE];
   const distanceKm = haversineKm(from, to) * ROAD_FACTOR;

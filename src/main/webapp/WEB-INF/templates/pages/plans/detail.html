@@ -617,14 +617,9 @@
                         </div>
                     </div>
 
-                    <!-- [SCH] La ventana del día y el modo del plan son los que usa el planificador
-                         para derivar el horario: sin ellos acá, el dueño no puede corregir por qué
-                         una parada se fue al día siguiente o cuánto tarda cada tramo. -->
-                    <div class="mb-3">
-                        <label for="dayEndTime" class="form-label text-muted small">Fin del día</label>
-                        <input type="time" th:field="*{dayEndTime}" class="form-control" step="300" />
-                    </div>
-
+                    <!-- [SCH] El modo del plan es uno de los datos que usa el planificador para
+                         derivar el horario. El cierre de la jornada es el default fijo 23:00:
+                         ya no se expone como campo editable. -->
                     <div class="mb-3">
                         <label for="transportMode" class="form-label text-muted small">Cómo se trasladan</label>
                         <select th:field="*{transportMode}" class="form-select">
@@ -776,6 +771,16 @@
                         <input type="time" class="form-control form-control-sm" :id="'visit-time-' + selectedEntry.id"
                             :value="selectedEntry.visitTime || ''"
                             @change="updateEntry(selectedEntry, 'visitTime', $event.target.value)">
+                    </div>
+                </div>
+                <!-- [SCH] Minutos del tramo a la parada siguiente; vacío = calculado por
+                     distancia y modo. El servidor lo aplica con piso de 1 al rederivar. -->
+                <div class="row g-2 mt-1">
+                    <div class="col-md-4">
+                        <label class="form-label small text-muted mb-1" :for="'travel-minutes-' + selectedEntry.id">Traslado a la siguiente (min)</label>
+                        <input type="number" min="1" class="form-control form-control-sm" :id="'travel-minutes-' + selectedEntry.id"
+                            :value="selectedEntry.travelMinutesToNext ?? ''" placeholder="Según el cálculo"
+                            @change="updateEntry(selectedEntry, 'travelMinutesToNext', $event.target.value)">
                     </div>
                 </div>
                 <!-- AC-06/AC-07 sin botones nuevos: el texto explica que fijar corre la cadena y

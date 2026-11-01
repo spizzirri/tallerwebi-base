@@ -12,7 +12,6 @@ import com.valhalla.domain.planplace.PlanPlaceRepository;
 import com.valhalla.domain.planplace.PlanPlaceService;
 import com.valhalla.domain.planplace.PlanPlaceUpdate;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
@@ -85,6 +84,8 @@ public class PlanPlaceServiceImpl implements PlanPlaceService {
     PlanPlace entry = ownedEntry(planId, id, ownerEmail);
     entry.setDurationMinutes(changes.durationMinutes());
     entry.setTransportModeToNext(changes.transportModeToNext());
+    // [SCH] Nulo no es "dejar como esta": es volver al calculo por distancia y modo.
+    entry.setTravelMinutesToNext(changes.travelMinutesToNext());
     entry.setVisitDate(changes.visitDate());
     entry.setVisitTime(changes.visitTime());
     // [SCH] Una fecha u hora enviada es un pin aunque llegue una sola de las dos: el usuario eligio

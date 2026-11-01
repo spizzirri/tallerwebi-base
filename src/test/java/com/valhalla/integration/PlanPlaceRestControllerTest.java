@@ -55,6 +55,7 @@ class PlanPlaceRestControllerTest extends PlanPlaceWebFixture {
         null,
         java.time.LocalDate.of(2026, 12, 1),
         java.time.LocalTime.of(10, 30),
+        null,
         null
       ),
       email
@@ -269,7 +270,8 @@ class PlanPlaceRestControllerTest extends PlanPlaceWebFixture {
           .contentType("application/json")
           .content(
             "{\"visitDate\":\"2026-12-02\",\"visitTime\":\"09:30\"," +
-            "\"durationMinutes\":45,\"transportModeToNext\":\"BIKE\"}"
+            "\"durationMinutes\":45,\"transportModeToNext\":\"BIKE\"," +
+            "\"travelMinutesToNext\":30}"
           )
       )
       .andExpect(status().isOk())
@@ -277,6 +279,7 @@ class PlanPlaceRestControllerTest extends PlanPlaceWebFixture {
       .andExpect(jsonValue("/visitTime", "09:30"))
       .andExpect(jsonValue("/durationMinutes", 45))
       .andExpect(jsonValue("/transportModeToNext", "BIKE"))
+      .andExpect(jsonValue("/travelMinutesToNext", 30))
       .andExpect(jsonValue("/timePinned", true));
 
     PlanPlace saved = entries.findById(id).orElseThrow();
@@ -284,6 +287,24 @@ class PlanPlaceRestControllerTest extends PlanPlaceWebFixture {
     assertEquals(java.time.LocalTime.of(9, 30), saved.getVisitTime());
     assertEquals(45, saved.getDurationMinutes());
     assertEquals(TransportMode.BIKE, saved.getTransportModeToNext());
+    assertEquals(30, saved.getTravelMinutesToNext());
+  }
+
+  @Test
+  void unTrasladoFijoNoNumericoDevuelve400YNoEscribe() throws Exception {
+    UUID id = add(first);
+
+    mvc
+      .perform(
+        put(url + "/" + id)
+          .with(user("apl@test.com"))
+          .with(csrf())
+          .contentType("application/json")
+          .content("{\"travelMinutesToNext\":\"treinta\"}")
+      )
+      .andExpect(status().isBadRequest());
+
+    assertNull(entries.findById(id).orElseThrow().getTravelMinutesToNext());
   }
 
   @Test

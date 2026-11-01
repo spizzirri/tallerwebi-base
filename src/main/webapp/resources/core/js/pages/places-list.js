@@ -28,6 +28,11 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
 
 createApp({
   setup() {
+    // [APL] Sesión server-side vía data-* (guide-js R3): /api/plans devuelve [] igual para
+    // anónimo y para un usuario sin planes, así que el gate del picker no puede salir del
+    // fetch. Sin el atributo (render fuera del controller) se asume anónimo.
+    const isLogged =
+      document.getElementById('explore-app')?.dataset.isLogged === 'true';
     const places = ref([]);
     const selectedPlace = ref(null);
     const selectedCategory = ref('');
@@ -39,16 +44,12 @@ createApp({
     const planDateInput = ref(null);
     const planStep = ref(1);
     const draftPlaces = ref([]);
-    /* Los cuatro datos de los que sale el horario. La fecha vive en el input nativo, así que su
-       ref es solo el espejo que necesita el preview. */
+    /* Los tres datos de los que sale el horario. La fecha vive en el input nativo, así que su
+       ref es solo el espejo que necesita el preview. El fin del día no se expone: el preview (y
+       el servidor) cierran siempre a las 23:00. */
     const planDate = ref('');
     const planStartTime = ref('10:00');
-    const planDayEnd = ref('23:00');
     const planTransportMode = ref('WALK');
-    const showAddToPlan = ref(false);
-    const placeToAdd = ref(null);
-    const availablePlans = ref([]);
-    const selectedPlanId = ref('');
     const publicPlans = ref([]);
     const error = ref('');
     const setError = (message) => {
@@ -65,6 +66,9 @@ createApp({
     let mapResizeObserver = null;
     let markers = [];
     const markersByPlaceId = new Map();
+    // [ITI] Capas del borrador sobre el mapa: handles propias, nunca las de los lugares.
+    let draftMarkers = [];
+    let draftRouteLine = null;
 
     const filteredPlaces = computed(() => {
       return places.value.filter(place => {
@@ -156,7 +160,6 @@ createApp({
       draftPlaces.value = [];
       planDate.value = '';
       planStartTime.value = '10:00';
-      planDayEnd.value = '23:00';
       planTransportMode.value = 'WALK';
     };
 
@@ -191,6 +194,73 @@ createApp({
         setError(error.status === 409
           ? 'El destino ya se encuentra en el plan.'
           : failure(error, 'Error al agregar el lugar al plan.'));
+      }
+    };
+
+    /* [APL] Panel de detalle: agregar a plan inline, sin modal (AC-03). Los planes propios se
+       piden una sola vez al montar. Se listan TODOS, aunque el plan ya contenga el lugar (T7):
+       filtrarlo afuera escondia el picker entero para ese lugar, y tras un alta tambien se
+       desmontaba el mensaje de exito. El plan contenedor queda deshabilitado y marcado; el
+       backend no rechaza duplicados (no hay 409), asi que la UI es la unica guarda. */
+    const planOptions = ref([]);
+    const planPickId = ref('');
+    const planBusy = ref(false);
+    const planMessage = ref('');
+    const planError = ref(false);
+
+    const loadPlanOptions = async () => {
+      const response = await apiFetch('/api/plans');
+      const plans = await response.json();
+      // Un payload no-array no debe romper el picker: se trata como "sin planes".
+      planOptions.value = Array.isArray(plans) ? plans : [];
+    };
+
+    const availablePlans = computed(() => planOptions.value);
+
+    const planContainsPlace = (plan) => {
+      const place = selectedPlace.value;
+      return (
+        !!place &&
+        (plan.planPlaces || []).some(entry => String(entry.placeId) === String(place.id))
+      );
+    };
+
+    const firstAddablePlan = (plans) =>
+      plans.find(plan => !planContainsPlace(plan))?.id || '';
+
+    watch(selectedPlace, () => {
+      planPickId.value = firstAddablePlan(availablePlans.value);
+      planMessage.value = '';
+      planError.value = false;
+    });
+
+    // Tras una alta el plan sigue listado pero ya contiene el lugar: si el select quedó
+    // apuntando a él, vuelve al primero todavía agregable.
+    watch(availablePlans, (plans) => {
+      const current = plans.find(plan => plan.id === planPickId.value);
+      if (!current || planContainsPlace(current)) {
+        planPickId.value = firstAddablePlan(plans);
+      }
+    });
+
+    const addSelectedToPlan = async () => {
+      const plan = availablePlans.value.find(candidate => candidate.id === planPickId.value);
+      if (planBusy.value || !plan || planContainsPlace(plan)) return;
+      planBusy.value = true;
+      planMessage.value = '';
+      planError.value = false;
+      try {
+        await apiFetch('/api/plans/' + plan.id + '/places?placeId=' + selectedPlace.value.id,
+          { method: 'POST' });
+        await loadPlanOptions();
+        planMessage.value = 'Agregado a ' + plan.name + '.';
+      } catch (error) {
+        planError.value = error.status === 409;
+        planMessage.value = error.status === 409
+          ? 'El destino ya se encuentra en el plan.'
+          : failure(error, 'Error al agregar el lugar al plan.');
+      } finally {
+        planBusy.value = false;
       }
     };
 
@@ -243,7 +313,21 @@ createApp({
 
     // The same place may be added repeatedly, so rows are keyed by their own counter.
     const addToDraft = (place) => {
-      draftPlaces.value.push({ key: nextDraftKey++, place, description: '', transportModeToNext: '' });
+      draftPlaces.value.push({
+        key: nextDraftKey++,
+        place,
+        description: '',
+        transportModeToNext: '',
+        travelMinutesToNext: ''
+      });
+    };
+
+    // [T10] El panel de detalle con el wizard abierto agrega al plan EN PROCESO, igual que
+    // el "+" de las tarjetas (listener add-to-plan), en vez de ofrecer crear otro plan.
+    const addSelectedToDraft = () => {
+      addToDraft(selectedPlace.value);
+      planError.value = false;
+      planMessage.value = 'Agregado al plan en proceso.';
     };
 
     const removeDraft = (index) => {
@@ -262,22 +346,14 @@ createApp({
     const schedule = computed(() => scheduleStops({
       planDate: planDate.value,
       startTime: planStartTime.value,
-      dayEnd: planDayEnd.value,
       mode: planTransportMode.value,
       stops: draftPlaces.value
     }));
 
     const shortDate = (isoDate) => isoDate.slice(8, 10) + '/' + isoDate.slice(5, 7);
 
-    /* El tramo pertenece a la parada que lo origina: usa el modo propio de la parada y, si no
-       fija uno, el del plan. */
-    const legLabel = (item, minutes) => {
-      const mode = item.transportModeToNext || planTransportMode.value;
-      return (TRANSPORT_LABELS[mode] || TRANSPORT_LABELS.WALK) + ' · ' + minutes + ' min';
-    };
-
-    /* Las paradas agrupadas por la jornada que les tocó, con el chip ya resuelto. El último tramo
-       de cada día se omite: cruza a la jornada siguiente, no es un traslado del itinerario. */
+    /* Las paradas agrupadas por la jornada que les tocó. El último tramo de cada día se omite:
+       cruza a la jornada siguiente, no es un traslado del itinerario. */
     const dayGroups = computed(() => {
       const groups = [];
       schedule.value.forEach((slot, index) => {
@@ -301,7 +377,7 @@ createApp({
           order: index + 1,
           timeRange: formatClock(slot.startMinutes) + ' – ' + formatClock(slot.endMinutes),
           duration: formatDuration(slot.minutes),
-          leg: isLastOfDay ? null : { label: legLabel(item, slot.legMinutes) }
+          leg: isLastOfDay ? null : { minutes: slot.legMinutes }
         });
       });
       return groups;
@@ -380,35 +456,62 @@ createApp({
       });
     };
 
-    const closeAddToPlan = () => {
-      showAddToPlan.value = false;
-      placeToAdd.value = null;
-      availablePlans.value = [];
-    };
+    /* [ITI] Borrador sobre el mapa (AC-13): al agregar lugares al wizard se dibujan
+       marcadores numerados y una polyline punteada en el orden del itinerario, sin
+       fitBounds (la vista la elige quien mira el mapa). Los popups se construyen con
+       nodos: el nombre viene del ABM/importador, sin sanitizar (guide-js R7). El badge
+       NO lleva data-category: el conteo E2E de lugares sigue atado solo a los pines. */
+    const draftPopupContent = (place, slot, index, legMinutes) => el('div', {}, [
+      el('strong', { text: (index + 1) + '. ' + place.name }),
+      el('br'),
+      'Llegada ' + formatClock(slot.startMinutes),
+      el('br'),
+      'Permanencia ' + formatDuration(slot.minutes),
+      legMinutes === null ? null : el('br'),
+      legMinutes === null ? null : 'Traslado ' + legMinutes + ' min'
+    ]);
 
-    const confirmAddToPlan = async () => {
-      if (!placeToAdd.value || !selectedPlanId.value) return;
-      // Emit event for the external JS module to handle the API call
-      const event = new CustomEvent('confirm-add-to-plan', {
-        detail: {
-          planId: selectedPlanId.value,
-          placeId: placeToAdd.value.id
-        }
-      });
-      document.dispatchEvent(event);
-      closeAddToPlan();
-    };
-
-    const createNewPlan = () => {
-      // La creación ya no vive en /plans/new: se abre el panel de creación de /explore con el
-      // lugar pendiente ya cargado en el borrador. El modal "Agregar a plan" se cierra
-      // después de copiar el lugar, porque tapa el panel (overlay z-2000 sobre aside z-1000).
-      const pendingPlace = placeToAdd.value;
-      closeAddToPlan();
-      if (pendingPlace) {
-        addToDraft(pendingPlace);
+    const drawDraftOverlay = () => {
+      if (!map) return;
+      draftMarkers.forEach(m => map.removeLayer(m));
+      draftMarkers = [];
+      if (draftRouteLine) {
+        map.removeLayer(draftRouteLine);
+        draftRouteLine = null;
       }
-      openCreatePlan();
+
+      const coordinates = [];
+      schedule.value.forEach((slot, index) => {
+        const place = draftPlaces.value[index].place;
+        if (!place.latitude || !place.longitude) return;
+        coordinates.push([place.latitude, place.longitude]);
+
+        const isLast = index === schedule.value.length - 1;
+        const legMinutes = isLast ? null : slot.legMinutes;
+        const badge = el('div', {
+          class: 'draft-step',
+          dataset: { draftStep: String(index + 1) },
+          'aria-hidden': 'true'
+        }, [String(index + 1)]);
+        const marker = buildMarker(place, {
+          badge,
+          className: 'draft-marker',
+          size: 26,
+          popupAnchor: [0, -13]
+        }).addTo(map);
+        marker.bindPopup(draftPopupContent(place, slot, index, legMinutes), { autoPan: false });
+        draftMarkers.push(marker);
+      });
+
+      if (coordinates.length > 1) {
+        // Mismas opciones de la polyline punteada del detalle del plan (plans-detail.js).
+        draftRouteLine = L.polyline(coordinates, {
+          color: '#0d6efd',
+          weight: 3,
+          opacity: 0.8,
+          dashArray: '6, 6'
+        }).addTo(map);
+      }
     };
 
     // Listen for add-to-plan events from the external JavaScript module
@@ -421,28 +524,6 @@ createApp({
       }
       if (activePlan.value) {
         await addToActivePlan(place);
-        return;
-      }
-
-      placeToAdd.value = place;
-
-      try {
-        const response = await apiFetch('/api/plans');
-        const userPlans = await response.json();
-
-        const plansWithoutPlace = userPlans.filter(plan =>
-          !plan.planPlaces.some(pp => pp.placeId === place.id)
-        );
-
-        // La modal se abre siempre (tengas 0, algunos o todos los
-        // planes ocupados por este lugar): desde ahí siempre se puede
-        // crear un plan nuevo, y si hay planes disponibles también se
-        // puede elegir uno existente.
-        availablePlans.value = plansWithoutPlace;
-        selectedPlanId.value = '';
-        showAddToPlan.value = true;
-      } catch (error) {
-        setError(failure(error, 'Error al cargar los planes.'));
       }
     });
 
@@ -462,6 +543,15 @@ createApp({
       } catch (error) {
         // A failed feed leaves the list empty, exactly like having no plans.
         console.error('Error fetching public plans:', error);
+      }
+
+      // [APL] Planes propios para el picker del panel de detalle. El gate de visibilidad
+      // es isLogged (server-side), no este fetch: sin sesión o sin planes la lista queda
+      // vacía y el panel ofrece crear el primer plan; un fallo la deja igual.
+      try {
+        await loadPlanOptions();
+      } catch (error) {
+        console.error('Error fetching plan options:', error);
       }
 
       // The vendored Tailwind compiler runs deferred, so this can execute before any
@@ -510,6 +600,8 @@ createApp({
 
       // Add markers
       updateMarkers();
+      // [ITI] Dibujo inicial del overlay del borrador (vacío al arrancar: es un no-op).
+      drawDraftOverlay();
 
     });
 
@@ -517,7 +609,15 @@ createApp({
       updateMarkers();
     });
 
+    // [ITI] El overlay sigue al borrador: schedule se recalcula con cada cambio de
+    // paradas, fecha, hora de inicio, modo o minutos fijos, así que un solo watch
+    // cubre los cinco (y repinta los horarios de los popups al arrancar el día más tarde).
+    watch(schedule, () => {
+      drawDraftOverlay();
+    });
+
     return {
+      isLogged,
       places,
       error,
       selectedPlace,
@@ -551,7 +651,6 @@ createApp({
       draftPlaces,
       planDate,
       planStartTime,
-      planDayEnd,
       planTransportMode,
       transportLabels: TRANSPORT_LABELS,
       schedule,
@@ -565,13 +664,14 @@ createApp({
       moveDraft,
       nextPlanStep,
       onPlanSubmit,
-      showAddToPlan,
-      placeToAdd,
       availablePlans,
-      selectedPlanId,
-      closeAddToPlan,
-      confirmAddToPlan,
-      createNewPlan
+      planContainsPlace,
+      planPickId,
+      planBusy,
+      planMessage,
+      planError,
+      addSelectedToPlan,
+      addSelectedToDraft
     };
   }
 }).mount('#explore-app');

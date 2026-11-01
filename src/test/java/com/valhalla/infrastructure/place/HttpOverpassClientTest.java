@@ -32,11 +32,11 @@ import org.junit.jupiter.api.Test;
  */
 public class HttpOverpassClientTest {
 
-  /** Tres elementos: un way con center y todos los tags, un node con lat/lon y solo contact:*, y
-   * uno sin name. */
   /** Caja concreta y distinta de CABA: prueba que la query usa la que recibe, no una constante. */
   private static final BoundingBox BOX = new BoundingBox(-34.62, -58.45, -34.58, -58.37);
 
+  /** Tres elementos: un way con center y todos los tags, un node con lat/lon y solo contact:*,
+   * uno sin name. */
   private static final String FIXTURE =
     """
     {
@@ -283,7 +283,7 @@ public class HttpOverpassClientTest {
     List<OsmPoi> pois = overpass.findPois("amenity", "restaurant", BOX);
 
     assertThat(pois, hasSize(2));
-    verify(httpClient, times(2)).send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class));
+    verify(httpClient, times(2)).send(any(HttpRequest.class), any());
   }
 
   @Test
@@ -295,7 +295,7 @@ public class HttpOverpassClientTest {
     List<OsmPoi> pois = overpass.findPois("amenity", "restaurant", BOX);
 
     assertThat(pois, hasSize(2));
-    verify(httpClient, times(2)).send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class));
+    verify(httpClient, times(2)).send(any(HttpRequest.class), any());
   }
 
   /** Tope de reintentos: dos, ni uno mas; si el endpoint sigue saturado se propaga el status. */
@@ -311,7 +311,7 @@ public class HttpOverpassClientTest {
     );
 
     assertThat(error.getMessage(), containsString("503"));
-    verify(httpClient, times(3)).send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class));
+    verify(httpClient, times(3)).send(any(HttpRequest.class), any());
   }
 
   /** El gateway timeout tambien es transitorio: Overpass lo usa cuando se le pasa su presupuesto. */
@@ -322,7 +322,7 @@ public class HttpOverpassClientTest {
     HttpOverpassClient overpass = new HttpOverpassClient(ENDPOINT, httpClient, 0L, 0L);
 
     assertThat(overpass.findPois("amenity", "restaurant", BOX), hasSize(2));
-    verify(httpClient, times(2)).send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class));
+    verify(httpClient, times(2)).send(any(HttpRequest.class), any());
   }
 
   @Test
@@ -337,7 +337,7 @@ public class HttpOverpassClientTest {
     );
 
     assertThat(error.getMessage(), containsString("500"));
-    verify(httpClient, times(1)).send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class));
+    verify(httpClient, times(1)).send(any(HttpRequest.class), any());
   }
 
   @Test
@@ -404,14 +404,11 @@ public class HttpOverpassClientTest {
     return response;
   }
 
-  @SuppressWarnings("unchecked")
   private static void stubSend(
     HttpClient httpClient,
     HttpResponse<String> first,
-    HttpResponse<String>... rest
+    HttpResponse<?>... rest
   ) throws IOException, InterruptedException {
-    doReturn(first, (Object[]) rest)
-      .when(httpClient)
-      .send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class));
+    doReturn(first, (Object[]) rest).when(httpClient).send(any(HttpRequest.class), any());
   }
 }

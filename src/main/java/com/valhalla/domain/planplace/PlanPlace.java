@@ -20,6 +20,8 @@ import org.hibernate.annotations.UuidGenerator;
 
 @Entity
 @Table(name = "plan_places")
+// [APL] Once columnas: la entidad mapea la tabla completa; bajar de 10 exigiria partir la entidad.
+@SuppressWarnings("PMD.TooManyFields")
 public class PlanPlace {
 
   @Id
@@ -51,6 +53,12 @@ public class PlanPlace {
   @Enumerated(EnumType.STRING)
   @Column(name = "transport_mode_to_next")
   private TransportMode transportModeToNext;
+
+  // [SCH] Minutos de traslado hacia la parada siguiente, a mano. Nulo = el planificador estima el
+  // tramo por distancia y modo. Un valor fijado se respeta tal cual (piso 1 minuto, sin el techo
+  // de 90 del calculado): el usuario conocio el trayecto mejor que la estimacion.
+  @Column(name = "travel_minutes_to_next")
+  private Integer travelMinutesToNext;
 
   // [SCH] El usuario fijo esta hora a mano: la derivacion arranca de aca y recalcula las
   // siguientes, en vez de pisarla. La columna no figuraba en la tabla de la spec (que solo
@@ -125,6 +133,14 @@ public class PlanPlace {
 
   public void setTransportModeToNext(TransportMode transportModeToNext) {
     this.transportModeToNext = transportModeToNext;
+  }
+
+  public Integer getTravelMinutesToNext() {
+    return travelMinutesToNext;
+  }
+
+  public void setTravelMinutesToNext(Integer travelMinutesToNext) {
+    this.travelMinutesToNext = travelMinutesToNext;
   }
 
   /**

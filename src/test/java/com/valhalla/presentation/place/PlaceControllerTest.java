@@ -7,9 +7,14 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 
 import com.valhalla.domain.plan.PlanSettings;
+import java.security.Principal;
 import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.web.servlet.ModelAndView;
 
 public class PlaceControllerTest {
@@ -23,7 +28,7 @@ public class PlaceControllerTest {
 
   @Test
   public void shouldReturnTheExploreView() {
-    ModelAndView result = controller.listPlaces();
+    ModelAndView result = controller.listPlaces(null);
 
     assertThat(result.getViewName(), is(equalTo("pages/places/list")));
   }
@@ -34,7 +39,7 @@ public class PlaceControllerTest {
    */
   @Test
   public void shouldNotPutTheCatalogueInTheModel() {
-    ModelAndView result = controller.listPlaces();
+    ModelAndView result = controller.listPlaces(null);
 
     assertThat(result.getModel().get("places"), is(nullValue()));
     assertThat(result.getModel().get("categories"), is(nullValue()));
@@ -42,9 +47,38 @@ public class PlaceControllerTest {
 
   @Test
   public void shouldBuildTheCreatePlanPanelForTheView() {
-    ModelAndView result = controller.listPlaces();
+    ModelAndView result = controller.listPlaces(null);
 
     assertThat(result.getModel().get("defaultPlanSettings"), is(instanceOf(PlanSettings.class)));
     assertThat(result.getModel().get("today"), is(equalTo(LocalDate.now().toString())));
+    assertThat(result.getModel().get("isLogged"), is(equalTo(false)));
+  }
+
+  /** [APL/T9] La sesion es el gate del picker del panel de detalle: sin ella no se pinta. */
+  @Test
+  public void shouldMarkTheExploreViewAsLoggedForARealSession() {
+    Principal user = new UsernamePasswordAuthenticationToken(
+      "someone@unlam.edu.ar",
+      "secret",
+      AuthorityUtils.NO_AUTHORITIES
+    );
+
+    ModelAndView result = controller.listPlaces(user);
+
+    assertThat(result.getModel().get("isLogged"), is(equalTo(true)));
+  }
+
+  /** [APL/T9] El token anonimo de Spring Security tambien cuenta como sin sesion. */
+  @Test
+  public void shouldTreatTheAnonymousTokenAsLoggedOut() {
+    Authentication anonymous = new AnonymousAuthenticationToken(
+      "key",
+      "anonymousUser",
+      AuthorityUtils.createAuthorityList("ROLE_ANONYMOUS")
+    );
+
+    ModelAndView result = controller.listPlaces(anonymous);
+
+    assertThat(result.getModel().get("isLogged"), is(equalTo(false)));
   }
 }

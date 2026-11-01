@@ -13,7 +13,7 @@ public class AddPlaceToPlanE2E extends E2eBase {
     PlansPage plans = new PlansPage(page);
     plans.createPlanViaExplore("APL E2E", "Itinerario de prueba", "2026-12-31");
     String planId = page.url().substring(page.url().lastIndexOf('/') + 1);
-    // 05-APL-FE owns the Add to plan UI; exercise the backend via fetch in the authenticated browser.
+    // /places no renderiza agregado (05-APL-FE): exercise the backend via fetch in the authenticated browser.
     Object result = page.evaluate(
       """
       async planId => {

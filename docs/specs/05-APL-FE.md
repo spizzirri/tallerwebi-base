@@ -8,29 +8,30 @@
 
 ## Objetivo
 
-Frontend para agregar lugares a planes: boton "Add to plan" en el panel lateral de `/places`, itinerario con Vue.js, mapa con rutas y marcadores numerados en el detalle del plan.
+Frontend para agregar lugares a planes: ficha de lugar de solo lectura en `/places`, itinerario con Vue.js, mapa con rutas y marcadores numerados en el detalle del plan. El agregado vive en el wizard de creación y en el detalle del plan.
 
 ## Pre-requisitos
 
-- [APL-BE] completed (PlanPlace entity, REST endpoints, `userPlans` en el model de `GET /places`)
+- [APL-BE] completed (PlanPlace entity, REST endpoints)
 - [PLC] completed (panel lateral de detalles del lugar dentro de `/places`)
 
 ## Criterios de Aceptacion
 
 | # | Criterio |
 |---|----------|
-| AC-01 | El panel lateral de `/places` muestra un dropdown con los planes del usuario logueado para el lugar seleccionado |
-| AC-02 | Se puede agregar el lugar seleccionado a un plan desde el panel lateral, sin salir de `/places` |
-| AC-03 | Al agregar un lugar se muestra feedback visual (redirect o mensaje) |
+| AC-01 | El panel lateral de `/places` ofrece un picker de plan inline (select de TODOS los planes propios; los que ya contienen el lugar salen deshabilitados y marcados "(ya contiene el lugar)" + botón "Agregar al plan"), sin modal; el bloque se pinta con sesión (gate `isLogged`), y un usuario logueado sin planes ve un CTA "Crear un plan" que abre el wizard de la misma página en vez de nada; con el wizard de creación abierto el botón agrega el lugar al plan EN PROCESO (borrador, mismo destino que el "+" de las tarjetas) en lugar de ofrecer crear otro plan o listar planes guardados |
+| AC-02 | Al hacer click en un lugar de `/explore` nunca se abre un modal de "agregar a plan": el agregado desde la ficha es inline, con feedback en el mismo panel (éxito o error); un plan que ya contiene el lugar no se puede re-agregar (opción deshabilitada, guard en el cliente porque el backend no rechaza duplicados) |
+| AC-03 | Al agregar un lugar desde el wizard o desde el detalle del plan se muestra feedback visual (redirect o mensaje) |
 | AC-04 | El detalle del plan (/plans/{id}) muestra el itinerario con los lugares en orden |
 | AC-05 | El itinerario agrupa las paradas por día y cada una muestra numero de orden, nombre, categoria y su horario como chip con rango `HH:mm – HH:mm`, duración y fecha (la fecha solo aparece cuando difiere del Día 1) |
-| AC-06 | Se puede editar duración, día y hora de visita desde el diálogo de la parada; fijar el día o la hora recalcula las paradas siguientes y las marca como fijadas a mano |
+| AC-06 | Se puede editar duración, día y hora de visita desde el diálogo de la parada, y los minutos de traslado del tramo anterior desde ahí o desde el paso 2; fijar el día o la hora recalcula las paradas siguientes y las marca como fijadas a mano |
 | AC-07 | Se puede eliminar un lugar del itinerario con boton X |
 | AC-08 | El mapa muestra markers numerados por cada lugar del itinerario |
 | AC-09 | El mapa dibuja una linea de ruta entre los lugares en orden |
 | AC-10 | El mapa hace fitBounds para mostrar todos los markers |
 | AC-11 | Los forms usan CSRF token para proteger POST/PUT/DELETE |
-| AC-12 | El form de creación de plan pide fecha (Día 1), hora de inicio, fin de día y modo de traslado; no pide hora por parada, el paso de lugares muestra el rango derivado de cada parada |
+| AC-12 | El form de creación de plan pide fecha (Día 1), hora de inicio y modo de traslado (el fin de día es el default fijo 23:00, sin input); no pide hora por parada, el paso de lugares muestra el rango derivado de cada parada y permite fijar los minutos de traslado por tramo; la fila del tramo es una sola línea con el selector de modo y el input de minutos (sin rótulo propio ni hint), y el input muestra el default calculado como placeholder |
+| AC-13 | Mientras el wizard de `/explore` tiene paradas en el borrador, el mapa dibuja el itinerario como overlay: marcadores numerados (círculo oscuro, estilo propio) con popup de paso, nombre, llegada, permanencia y traslado, más una polyline punteada entre ellas en orden; se repinta con cada cambio del borrador y no hace fitBounds |
 
 ## Escenarios de Test
 
@@ -38,7 +39,7 @@ Frontend para agregar lugares a planes: boton "Add to plan" en el panel lateral 
 
 | # | Test | AC que cubre |
 |---|------|-------------|
-| U-01 | El panel lateral de `/places` muestra el select con los planes del usuario y el boton "Add to plan" | AC-01, AC-02 |
+| U-01 | El panel lateral de `/places` no contiene el botón "Add to plan" ni el modal; el picker inline existe con `id="plan-picker"` y `aria-label="Agregar al plan"`, tras `v-if="isLogged"` (flag server-side por `data-is-logged` en `#explore-app`); con el wizard abierto (`v-if="showCreatePlan"`) el mismo bloque expone un botón "Agregar al plan" que llama a `addSelectedToDraft` (lugar al borrador, sin select ni CTA), y logueado sin planes renderiza el CTA "Crear un plan"; las opciones deshabilitadas llevan el sufijo "(ya contiene el lugar)" | AC-01, AC-02 |
 
 ### Tests de Integracion (`presentation/plan/PlanControllerTest.java`)
 
@@ -51,32 +52,67 @@ Frontend para agregar lugares a planes: boton "Add to plan" en el panel lateral 
 
 | # | Test | Flujo | AC que cubre |
 |---|------|-------|-------------|
-| E-01 | `AddToPlanE2E` | Ir a /places, seleccionar un lugar, agregar a plan desde el panel, verificar en /plans/{id} | AC-01, AC-02, AC-04, AC-05 |
+| E-01 | `AddPlaceToPlanE2E` | Crear plan desde /explore, agregar un lugar vía API en la sesión del navegador y verificar el itinerario | AC-04, AC-05 |
+| E-02 | `PlanPickerE2E` | Con sesión y un plan propio: el picker se pinta para un lugar que el plan ya contiene (opción deshabilitada y marcada), y para otro lugar el agregado inline funciona y la API confirma el itinerario | AC-01, AC-02 |
 
 ## Notas / decisiones de diseño
 
-- **El "Add to plan" vive en el panel lateral, no en una ficha aparte** (D1). No existe
-  `pages/places/detail.html` ni ruta `/places/{id}`: la ficha se rediseñó en Sprint 1 (PR #6) como
-  `<aside aria-label="Details for ...">` dentro de `/places`. El panel ya tiene nombre, categoría,
-  dirección, descripción e imagen del lugar, así que el dropdown de planes se agrega ahí y el
-  usuario no pierde el mapa, el filtro aplicado ni la posición del scroll.
-- **El panel ya existe en `places/list.html`** y su botón "Add to plan" hoy es un no-op
-  (`PlacesViewE2E` solo verifica que no navegue y que el panel siga montado). Esta spec lo
-  conecta al endpoint real de APL-BE.
-- **CSRF (AC-11)**: APL-BE reduce el ignore list a las lecturas, así que el `POST` desde `/places`
+- **El "Add to plan" y su modal se quitaron de `/places`; el picker volvió inline**. No existe
+  `pages/places/detail.html` ni ruta `/places/{id}`: la ficha vive como
+  `<aside aria-label="Details for ...">` dentro de `/places` (nombre, categoría,
+  dirección, descripción e imagen) y ahora cierra con un picker de plan: select de TODOS los
+  planes propios (`availablePlans`, UUIDs comparados como string); el plan que ya contiene el
+  lugar sale deshabilitado y marcado "(ya contiene el lugar)", porque el backend no rechaza
+  duplicados (no hay 409) y la UI es la única guarda; el botón "Agregar al plan" hace
+  `apiFetch` POST, sin modal y sin salir de la página. El gate del bloque es la sesión
+  (`v-if="isLogged"`, flag server-side que viaja como `data-is-logged` en `#explore-app`):
+  `/api/plans` devuelve `[]` tanto sin sesión como en un usuario sin planes, así que por el
+  fetch solo no se distinguían y el usuario logueado sin planes no veía nada. Con sesión y
+  cero planes el panel ofrece un CTA "Crear un plan" que abre el wizard de la misma página; con
+  el wizard de creación ya abierto el botón agrega el lugar al plan en proceso (`addToDraft`,
+  el mismo destino que el "+" de las tarjetas) en vez de ofrecer crear otro; sin sesión la
+  ficha queda informativa. El agregado también sigue vivo en el wizard de creación de `/explore` (tarjeta
+  "+" → borrador) y en el detalle del plan; el usuario no pierde el mapa, el filtro aplicado
+  ni la posición del scroll.
+- **El "+" "Create plan" del panel de planes manda al login sin sesión** (`th:if` server-side
+  con `isLogged`): `/explore` es `permitAll` pero `POST /plans` exige sesión, así que abrir el
+  wizard a un anónimo solo lo mandaría a chocar en el submit. El `<a>` lleva
+  `@{/auth/login?redirect=/explore}` para volver al explorador tras autenticarse, el mismo
+  patrón del CTA anónimo de la vista pública (T_PVP_007); con sesión sigue siendo el `<button>`
+  que abre la creación.
+- **`add-to-plan.js` queda como puente de eventos**: el click en la tarjeta "+" emite
+  `add-to-plan` y `places-list.js` lo enruta al borrador del wizard o al plan activo. El camino
+  que abría el modal (fetch de `/api/plans` + select) se reemplazó por el picker inline del
+  panel de detalle.
+- **CSRF (AC-11)**: APL-BE reduce el ignore list a las lecturas, así que el `POST` de agregado
   necesita el token. Un form de Thymeleaf lo trae con `th:name="${_csrf.parameterName}"`; si la
   llamada se hace con `fetch`, el token va en el header que indique `${_csrf.parameterName}`.
 - **El horario no se tipea al crear** (24-SCH): el paso 1 del wizard pide fecha (Día 1), hora de
-  inicio, fin de día y modo de traslado (`WALK`/`BIKE`/`BUS`/`CAR`); el paso 2 muestra por parada
-  el rango derivado y el tramo al siguiente con su selector de modo (opción "Según el plan"). El
+  inicio y modo de traslado (`WALK`/`BIKE`/`BUS`/`CAR`) —el fin de día es el default fijo 23:00,
+  sin input—; el paso 2 muestra por parada
+  el rango derivado y el tramo al siguiente con su selector de modo (opción "Según el plan") y un
+  input de minutos de traslado (vacío = calculado, mínimo 1). La fila del tramo es una sola
+  línea —selector de modo + input de minutos, sin rótulo propio ni hint— y el default calculado
+  queda a la vista como placeholder del input. El diálogo "Ver más" del detalle no lo muestra porque
+  `plans-detail.js` no tiene los minutos del tramo (no están en el itinerario del servidor): ahí
+  el input sigue con placeholder "auto". El
   detalle de la programación vive en la spec 24-SCH (PR #42), no acá.
 - **El itinerario agrupa por día y edita por diálogo**: los chips son de solo lectura (rango,
   duración, fecha solo si difiere del Día 1 y badge "Fijado" cuando el usuario fijó el horario).
   La edición de duración/día/hora está en el diálogo de la parada y manda un
   `PlanPlaceUpdateRequest` completo a `PUT /api/plans/{id}/places/{entryId}`, que recalcula la
-  cadena de horarios.
-- **El form "Editar plan" expone la ventana del día**: además de fecha y hora de inicio tiene
-  `dayEndTime` y `transportMode`, los mismos campos que usa el planificador para derivar el horario.
+  cadena de horarios. El diálogo también edita los minutos de traslado del tramo: vacío vuelve al
+  cálculo, un valor se persiste como override.
+- **El form "Editar plan" expone el modo del plan**: además de fecha y hora de inicio tiene
+  `transportMode`, uno de los campos que usa el planificador para derivar el horario. El cierre
+  de la ventana (`dayEndTime`) es el default fijo 23:00 y ya no tiene input.
+- **El overlay del borrador vive solo en `/explore`** (AC-13): `places-list.js` dibuja
+  marcadores numerados (círculo oscuro vía CSS propio en el style block, badge sin
+  `data-category`) y una polyline punteada con las mismas opciones que la del detalle del plan
+  (`#0d6efd`, `dashArray '6, 6'`), en `let` planos aparte de los marcadores de lugares. Un
+  `watch(schedule)` las repinta ante cualquier cambio del borrador (paradas, fecha, hora, modo,
+  minutos fijos) y no hay fitBounds. Los popups se construyen con nodos (guide-js R7). El E2E
+  de conteo tarjeta↔marcador se ata a `[data-category]`, así el overlay no lo rompe.
 - **El ABM de lugares expone la duración típica** (`defaultDurationMinutes`, campo
   "Duración típica (min)"): es el segundo eslabón de la cascada de duraciones, entre la parada
   y el default por categoría.
@@ -85,11 +121,13 @@ Frontend para agregar lugares a planes: boton "Add to plan" en el panel lateral 
 
 > Los pasos a continuación son guía de implementación, no reemplazan los acceptance criteria de arriba.
 >
-> **El código de ejemplo es anterior a la implementación actual**: el "Add to plan" hoy abre un
-> modal, y desde 24-SCH el itinerario agrupa por día y renderiza chips de solo lectura, con la
-> edición del horario en el diálogo de la parada (`plans-detail.js` → `updateEntry`, que manda los
-> cuatro campos del horario de una vez). El detalle usa Bootstrap con el módulo JS, no el CDN de
-> Vue de abajo.
+> **El código de ejemplo es anterior a la implementación actual**: el "Add to plan" con su modal
+> se eliminó de `/places` —el picker de planes que se ve abajo volvió, pero inline en el panel de
+> detalle, sin form server-side ni `sec:authorize`—, y desde 24-SCH el itinerario agrupa por día y
+> renderiza chips de solo
+> lectura, con la edición del horario en el diálogo de la parada (`plans-detail.js` →
+> `updateEntry`, que manda los cuatro campos del horario de una vez). El detalle usa Bootstrap con
+> el módulo JS, no el CDN de Vue de abajo.
 
 ### 1. Update the places panel (add "Add to plan" form)
 
@@ -318,7 +356,7 @@ File: `src/main/webapp/WEB-INF/templates/pages/plans/detail.html`
 
 | File | Action |
 |------|--------|
-| `templates/pages/places/list.html` | Update (add "Add to plan" form al panel lateral, con CSRF) |
+| `templates/pages/places/list.html` | Update (ficha de lugar con picker de plan inline, sin modal) |
 | `templates/pages/plans/detail.html` | Update (add Vue.js itinerary with CSRF helpers) |
-| `resources/core/js/pages/places-list.js` | Update (wizard: ventana del día y rango derivado por parada, AC-12) |
+| `resources/core/js/pages/places-list.js` | Update (wizard: ventana del día y rango derivado por parada, AC-12; picker del panel de detalle, AC-01/02; overlay del borrador en el mapa, AC-13) |
 | `resources/core/js/pages/plans-detail.js` | Update (itinerario agrupado por día, chips y PUT completo del horario, AC-05/AC-06) |

@@ -50,11 +50,6 @@ public class PlansPage extends WebPage {
     this.typeIntoElement("#plan-start-time", time);
   }
 
-  /** Paso 1 del modal: hora en que cierra la jornada; lo que no entra rueda al día siguiente. */
-  public void typeDayEndTime(String time) {
-    this.typeIntoElement("#plan-day-end", time);
-  }
-
   /** Paso 1 del modal: modo de traslado por defecto, por su {@code value} (WALK, BIKE, BUS, CAR). */
   public void selectTransportMode(String mode) {
     this.page.selectOption("#plan-transport", mode);

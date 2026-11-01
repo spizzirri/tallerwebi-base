@@ -17,6 +17,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -109,29 +110,8 @@ public class PlanController {
     if (plan.canHandleRequests(userEmail)) {
       model.put("joinRequests", planService.getPendingJoinRequests(id, userEmail));
     }
-    model.put(
-      "participants",
-      Stream
-        .concat(Stream.ofNullable(plan.getAdministrator()), plan.getParticipants().stream())
-        .collect(
-          java.util.stream.Collectors.toMap(User::getEmail, user -> user, (first, second) -> first)
-        )
-        .values()
-        .stream()
-        .sorted(Comparator.comparing(User::getEmail, String.CASE_INSENSITIVE_ORDER))
-        .toList()
-    );
-    model.put(
-      "participantEmails",
-      Stream
-        .concat(
-          Stream.ofNullable(plan.getAdministrator()).map(User::getEmail),
-          plan.getParticipants().stream().map(User::getEmail)
-        )
-        .distinct()
-        .sorted(String.CASE_INSENSITIVE_ORDER.thenComparing(Comparator.naturalOrder()))
-        .toList()
-    );
+    model.put("participants", participantViews(plan));
+    model.put("participantEmails", participantEmails(plan));
     model.put(
       "itineraryPlaces",
       plan.getPlanPlaces().stream().map(PlanController::placeView).toList()
@@ -141,6 +121,29 @@ public class PlanController {
     model.put("planDateIso", plan.getEventDate() == null ? null : plan.getEventDate().toString());
     addBookmarkFlags(model, plan, userEmail);
     return new ModelAndView(VIEW_PLAN_DETAIL, model);
+  }
+
+  /** Autor + participantes sin duplicados, ordenados por email (la vista pinta el rol). */
+  private static List<User> participantViews(Plan plan) {
+    return Stream
+      .concat(Stream.ofNullable(plan.getAdministrator()), plan.getParticipants().stream())
+      .collect(java.util.stream.Collectors.toMap(User::getEmail, user -> user, (a, b) -> a))
+      .values()
+      .stream()
+      .sorted(Comparator.comparing(User::getEmail, String.CASE_INSENSITIVE_ORDER))
+      .toList();
+  }
+
+  /** Emails de autor + participantes, unicos y ordenados: con esto se arma la lista de @mention. */
+  private static List<String> participantEmails(Plan plan) {
+    return Stream
+      .concat(
+        Stream.ofNullable(plan.getAdministrator()).map(User::getEmail),
+        plan.getParticipants().stream().map(User::getEmail)
+      )
+      .distinct()
+      .sorted(String.CASE_INSENSITIVE_ORDER.thenComparing(Comparator.naturalOrder()))
+      .toList();
   }
 
   @GetMapping("/{id}/public")
@@ -577,6 +580,7 @@ public class PlanController {
       entry.setPlace(place);
       entry.setDescription(row.getDescription());
       entry.setTransportModeToNext(row.getTransportModeToNext());
+      entry.setTravelMinutesToNext(row.getTravelMinutesToNext());
       entry.setSortOrder(order);
       order++;
       plan.addPlanPlace(entry);

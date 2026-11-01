@@ -1,7 +1,6 @@
 package com.valhalla.infrastructure.rating;
 
 import com.valhalla.domain.rating.PlanRating;
-import com.valhalla.domain.rating.PlanRatingRepository;
 import com.valhalla.domain.rating.RatingSummary;
 import java.util.List;
 import java.util.Optional;

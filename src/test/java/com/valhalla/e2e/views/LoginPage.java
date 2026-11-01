@@ -13,8 +13,7 @@ public class LoginPage extends WebPage {
    *             [AUT-01].
    */
   public LoginPage(Page page, String path) {
-    super(page);
-    page.navigate(baseUrl() + path);
+    super(page, path);
   }
 
   public String getErrorMessage() {

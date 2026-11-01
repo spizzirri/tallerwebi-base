@@ -30,6 +30,18 @@ public final class PlanFeedCards {
    *
    * <p>[MARK] {@code bookmarked} es el estado del usuario de la sesion sobre este plan. No es un
    * dato del plan: viaja en la tarjeta para que el icono se pinte sin un pedido extra por card.
+   *
+   * @param id id del plan
+   * @param name nombre del plan
+   * @param description descripcion del plan
+   * @param eventDate fecha del evento en ISO, o {@code null}
+   * @param placeCount cantidad de lugares del itinerario
+   * @param administratorName nombre visible del autor
+   * @param administratorId id del autor, para linkear a su perfil
+   * @param cover imagen generica de la tarjeta
+   * @param ratingAverage promedio de calificaciones, o {@code null} sin puntajes
+   * @param ratingCount cantidad de calificaciones
+   * @param bookmarked si el usuario de la sesion lo tiene guardado
    */
   public record Card(
     UUID id,

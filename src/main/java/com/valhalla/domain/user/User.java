@@ -143,10 +143,10 @@ public class User {
    * compilador lo obliga. Un avatar en blanco queda en null para que la vista caiga al fallback
    * de iniciales.
    */
-  public void updateProfile(String firstName, String lastName, String avatarUrl) {
-    this.firstName = firstName;
-    this.lastName = lastName;
-    this.avatarUrl = normalize(avatarUrl);
+  public void updateProfile(String newFirstName, String newLastName, String newAvatarUrl) {
+    this.firstName = newFirstName;
+    this.lastName = newLastName;
+    this.avatarUrl = normalize(newAvatarUrl);
   }
 
   /**

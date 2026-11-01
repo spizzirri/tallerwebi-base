@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -130,49 +131,7 @@ public class SecurityConfig {
   public SecurityFilterChain defaultFilterChain(HttpSecurity http, SessionRegistry sessionRegistry)
     throws Exception {
     http
-      .authorizeHttpRequests(auth ->
-        auth
-          .requestMatchers(
-            org.springframework.http.HttpMethod.GET,
-            "/api/**",
-            "/explore",
-            "/for-you"
-          )
-          .permitAll()
-          // [PPV] El feed /for-you es visible con y sin sesion (decision de producto posterior al
-          // arranque, cuando era /plans/public y exigia sesion). El GET es permitAll; el resto de
-          // verbos sobre esa ruta cae en anyRequest().authenticated() de abajo.
-          // [PVP] La vista publica de un plan compartido tambien es visible sin sesion. La
-          // allowlist de ambas es solo para GET: el POST de /plans/{id}/clone [CLO] sigue
-          // exigiendo estar autenticado.
-          .requestMatchers(
-            org.springframework.http.HttpMethod.GET,
-            "/plans/*/public",
-            "/plans/*/invitations/*/accept"
-          )
-          .permitAll()
-          // [PROF] La vista publica del perfil es abierta (11-PROF v2.3: el link compartido
-          // funciona sin sesion). Solo el GET con id UUID; GET /profile (atajo "mi perfil")
-          // y el POST quedan en anyRequest().authenticated() de abajo.
-          .requestMatchers(
-            org.springframework.http.HttpMethod.GET,
-            "/profile/{id:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}"
-          )
-          .permitAll()
-          .requestMatchers("/api/**")
-          .authenticated()
-          .requestMatchers(
-            org.springframework.http.HttpMethod.GET,
-            "/plans/{id:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}"
-          )
-          .permitAll()
-          .requestMatchers("/", "/share/**", "/reload/**")
-          .permitAll()
-          .requestMatchers("/css/**", "/js/**", "/images/**", "/manifest.json")
-          .permitAll()
-          .anyRequest()
-          .authenticated()
-      )
+      .authorizeHttpRequests(this::defaultAuthorizationRules)
       .formLogin(form ->
         form
           .loginPage("/auth/login")
@@ -191,6 +150,49 @@ public class SecurityConfig {
       );
 
     return http.build();
+  }
+
+  /**
+   * Superficie publica de la cadena default: solo GETs abiertos; cualquier otro verbo de esas rutas
+   * y el resto del sitio cae en anyRequest().authenticated().
+   *
+   * <p>[PPV] El feed /for-you es visible con y sin sesion (decision de producto posterior al
+   * arranque, cuando era /plans/public y exigia sesion); [PVP] la vista publica de un plan
+   * compartido tambien. La allowlist de ambas es solo para GET: el POST de /plans/{id}/clone [CLO]
+   * sigue exigiendo estar autenticado. [PROF] La vista publica del perfil es abierta (11-PROF v2.3:
+   * el link compartido funciona sin sesion), pero solo el GET con id UUID: GET /profile (atajo "mi
+   * perfil") y el POST quedan autenticados.
+   */
+  private void defaultAuthorizationRules(
+    AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auth
+  ) {
+    auth
+      .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/**", "/explore", "/for-you")
+      .permitAll()
+      .requestMatchers(
+        org.springframework.http.HttpMethod.GET,
+        "/plans/*/public",
+        "/plans/*/invitations/*/accept"
+      )
+      .permitAll()
+      .requestMatchers(
+        org.springframework.http.HttpMethod.GET,
+        "/profile/{id:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}"
+      )
+      .permitAll()
+      .requestMatchers("/api/**")
+      .authenticated()
+      .requestMatchers(
+        org.springframework.http.HttpMethod.GET,
+        "/plans/{id:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}"
+      )
+      .permitAll()
+      .requestMatchers("/", "/share/**", "/reload/**")
+      .permitAll()
+      .requestMatchers("/css/**", "/js/**", "/images/**", "/manifest.json")
+      .permitAll()
+      .anyRequest()
+      .authenticated();
   }
 
   @Bean

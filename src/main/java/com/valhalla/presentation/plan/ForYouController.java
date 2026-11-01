@@ -117,14 +117,7 @@ public class ForYouController {
     Map<String, Object> model = new ModelMap();
     model.put(
       ATTR_PUBLIC_PLANS,
-      PlanDiscovery
-        .discover(publicPlans, summaries, participantCounts, query, LocalDate.now())
-        .stream()
-        .filter(plan -> !plan.isBanned(currentEmail))
-        .map(plan ->
-          PlanFeedCards.planCard(plan, summaries, bookmarkedPlanIds.contains(plan.getId()))
-        )
-        .toList()
+      feedCards(publicPlans, summaries, participantCounts, query, currentEmail, bookmarkedPlanIds)
     );
     model.put("canBookmark", signedIn);
     model.put("q", query.text());
@@ -137,6 +130,24 @@ public class ForYouController {
     model.put("followingScope", followingScope);
     model.put("followsNobody", followingScope && followedIds.isEmpty());
     return new ModelAndView(VIEW_PUBLIC_LIST, model);
+  }
+
+  /** Tarjetas del feed: descubrimiento + filtro de baneados + flag de guardado por card. */
+  private static List<Map<String, Object>> feedCards(
+    List<Plan> publicPlans,
+    Map<UUID, RatingSummary> summaries,
+    Map<UUID, Long> participantCounts,
+    PlanDiscoveryQuery query,
+    String currentEmail,
+    Set<UUID> bookmarkedPlanIds
+  ) {
+    return PlanDiscovery
+      .discover(publicPlans, summaries, participantCounts, query, LocalDate.now())
+      .stream()
+      .filter(plan -> !plan.isBanned(currentEmail))
+      .map(plan -> PlanFeedCards.planCard(plan, summaries, bookmarkedPlanIds.contains(plan.getId()))
+      )
+      .toList();
   }
 
   /** Id del visitante con sesion; en anonimo el principal es el String "anonymousUser". */

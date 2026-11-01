@@ -8,6 +8,7 @@ import com.valhalla.domain.user.User;
 import com.valhalla.domain.user.UserRepository;
 import com.valhalla.domain.user.UserService;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -53,6 +54,12 @@ public class UserServiceImpl implements UserService {
   @Transactional(readOnly = true)
   public User getByEmail(String email) {
     return userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public Optional<User> findOptionalByEmail(String email) {
+    return userRepository.findByEmail(email);
   }
 
   @Override

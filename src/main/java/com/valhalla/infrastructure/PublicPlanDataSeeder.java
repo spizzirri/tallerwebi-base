@@ -372,7 +372,8 @@ public class PublicPlanDataSeeder implements ApplicationListener<ContextRefreshe
           stop.getPlace().getCategory(),
           stop.getPlace().getLatitude(),
           stop.getPlace().getLongitude(),
-          stop.getTransportModeToNext()
+          stop.getTransportModeToNext(),
+          stop.getTravelMinutesToNext()
         )
       )
       .toList();
