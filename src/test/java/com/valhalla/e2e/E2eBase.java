@@ -9,6 +9,7 @@ import com.microsoft.playwright.Tracing;
 import com.valhalla.e2e.views.LoginPage;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
+import java.util.List;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -45,10 +46,20 @@ abstract class E2eBase {
   @BeforeAll
   static void openBrowser() {
     playwright = Playwright.create();
+    // --hide-scrollbars: los viewports del suite (320x568, 390x844) emulan telefonos, cuyos
+    // scrollbars son overlay y no ocupan layout. Sin este flag Chromium de escritorio reserva
+    // 15px de scrollbar vertical y el ancho util queda en 305px, lo que hace medir celdas del
+    // calendario 1px por debajo del target tactil en CalendarE2E por un artefacto del
+    // entorno, no del producto.
     browser =
       playwright
         .chromium()
-        .launch(new BrowserType.LaunchOptions().setHeadless(!HEADED).setSlowMo(SLOW_MO));
+        .launch(
+          new BrowserType.LaunchOptions()
+            .setHeadless(!HEADED)
+            .setSlowMo(SLOW_MO)
+            .setArgs(List.of("--hide-scrollbars"))
+        );
   }
 
   @AfterAll
