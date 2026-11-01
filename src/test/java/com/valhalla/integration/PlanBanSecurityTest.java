@@ -185,7 +185,7 @@ public class PlanBanSecurityTest {
   }
 
   @Test
-  public void bannedParticipantsDialogIsOnlyVisibleToOwnerAndEditors() throws Exception {
+  public void bannedParticipantsSectionIsOnlyVisibleToOwnerAndEditors() throws Exception {
     User member = users.findByEmail(MEMBER).orElseThrow();
     member.setFirstName("Persona");
     member.setLastName("Baneada");

@@ -5,7 +5,7 @@ No incorpora la rama `task-19-BAN`. Spec: `docs/specs/21-PET.md`.
 
 > Actualización card #49: se eliminó la configuración de "Compartir link"; la
 > visibilidad del plan gobierna el acceso. Tampoco hay un botón para copiar el link
-> desde el detalle. Ver `docs/specs/21-PET.md`.
+> desde la configuración del plan. Ver `docs/specs/21-PET.md`.
 
 ## Cómo probar el flujo manualmente
 
@@ -18,9 +18,10 @@ No incorpora la rama `task-19-BAN`. Spec: `docs/specs/21-PET.md`.
    genérico. No muestra dueño, participantes, emails, short code ni itinerario.
 5. Pulsar **Solicitar participación**. La misma pantalla informa que el pedido está
    pendiente; volver a enviarlo no crea otra solicitud.
-6. Desde el detalle, el dueño ve **Solicitudes**, con enlace al perfil y acciones
-   **Aceptar** y **Rechazar**. Puede habilitar esta gestión para editores en la
-   configuración. Los participantes comunes no pueden gestionar solicitudes.
+6. Desde el detalle, el dueño ve el bloque **Solicitudes** entre el resumen del
+   plan y el formulario de invitación, con enlace al perfil y acciones **Aceptar** y
+   **Rechazar**. Puede habilitar esta gestión para editores en la configuración.
+   Los participantes comunes no pueden gestionar solicitudes.
 7. Al aceptar, la persona pasa a participante. Al abrir nuevamente el link, accede
    directamente al detalle. Rechazar elimina el pedido y permite solicitar de nuevo.
 
@@ -34,8 +35,11 @@ Los permisos de invitación y de gestión de solicitudes tienen sus defaults
 (**Solo dueño** para gestionar solicitudes e invitar por email; **Dueño y editores**
 para invitar dentro de la app). Un plan privado siempre muestra el resumen y el
 formulario de solicitud en la landing; un plan público conserva su vista pública.
-Solo el dueño puede modificar la configuración; los endpoints también verifican
-los permisos y los formularios conservan la protección CSRF existente.
+Solo el dueño puede cambiar los permisos de roles; dueño y editores administran
+datos, solicitudes y bans. La configuración `#configuracion` conserva datos, roles y
+baneados; las solicitudes viven junto a participantes.
+Los endpoints también verifican los permisos y los formularios conservan la
+protección CSRF existente.
 
 ## Persistencia
 
@@ -52,7 +56,7 @@ respondiéndose desde el detalle.
 
 ## Permisos e invitaciones por canal
 
-Configuración del plan y el paso 3 de `/explore` incluyen tres permisos:
+La sección **Roles y permisos** del detalle y el paso 3 de `/explore` incluyen tres permisos:
 invitación interna (Dueño y editores), invitación por email (Solo dueño) y
 gestionar solicitudes (Solo dueño). Los dos primeros admiten Todos los
 participantes; gestionar solicitudes solo admite dueño o editores. El permiso de

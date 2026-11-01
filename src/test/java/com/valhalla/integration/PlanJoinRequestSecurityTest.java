@@ -210,7 +210,7 @@ public class PlanJoinRequestSecurityTest {
           .param("inviteInternal", "PARTICIPANTS")
           .param("inviteByEmail", "PARTICIPANTS")
       )
-      .andExpect(redirectedUrl("/plans/" + plan.getId() + "/settings?saved=true"));
+      .andExpect(redirectedUrl("/plans/" + plan.getId() + "#config-roles"));
     entityManager.flush();
     entityManager.clear();
     plan = plans.findById(plan.getId()).orElseThrow();

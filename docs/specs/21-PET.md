@@ -8,7 +8,9 @@
 > **Cambio (2026-10-25, card #49):** se elimino la configuracion de compartir por link. La
 > visibilidad del plan gobierna el acceso y la landing privada siempre ofrece resumen + solicitud.
 > **Cambio (2026-10-28):** se elimino el boton "Compartir link" del detalle. La configuracion
-> conserva los permisos y bans; el acceso por URL sigue dependiendo de la visibilidad.
+> conserva datos, roles y bans; las solicitudes se muestran junto a participantes, entre el
+> resumen del plan y el formulario de invitacion. El acceso por URL sigue dependiendo de la
+> visibilidad.
 
 ## Objetivo
 
@@ -47,9 +49,12 @@ Decisiones (2026-10-17, con equipo):
    editores incluyen al dueño).
 3. **Defaults**: `handleRequests = OWNER`, `inviteInternal = EDITORS` (comportamiento
    actual), `inviteByEmail = OWNER`.
-4. **Configuracion post-creacion**: solo el dueño, en la pagina dedicada
-   "Configuracion del plan". En creacion se configuran desde el **paso 3** del wizard de
-   `/explore` (mismo aside de siempre, sin pagina de creacion standalone).
+4. **Configuracion post-creacion**: una sola seccion `#configuracion` dentro del detalle.
+   El dueño ve `#config-roles` con los 3 selectores; dueño y editores comparten los bloques de
+   datos basicos, roles y baneados. Las solicitudes viven junto a participantes, entre el
+   resumen y el formulario de invitacion. En creacion se configuran desde el **paso 3**
+   del wizard de `/explore` con los mismos selectores y defaults (sin pagina de configuracion
+   standalone).
 5. **Invitacion por email**: email **real** (SMTP) solo a usuarios **ya registrados**, con link
    de aceptacion por token. Sin SMTP configurado, el envio cae a un logger de consola
    (dev/tests).
@@ -64,8 +69,8 @@ Decisiones (2026-10-17, con equipo):
 | AC-01 | `Plan` tiene 3 selectores de roles embebidos en `PlanSettings` (`handleRequests`, `inviteInternal`, `inviteByEmail`); los valores fuera de `OWNER/EDITORS/PARTICIPANTS` (y de `OWNER/EDITORS` para solicitudes) se rechazan. El acceso por link lo define `isPublic`, no un permiso de sharing |
 | AC-02 | Los planes nuevos nacen con los defaults: solicitudes `OWNER`, invitar interno `EDITORS`, invitar por email `OWNER` |
 | AC-03 | En la creacion (wizard de `/explore`, paso 3) el dueño elige los 3 selectores y los valores nacen aplicados al plan |
-| AC-04 | `GET/POST /plans/{id}/settings` (pagina "Configuracion del plan") es **owner-only**: para cualquier otro usuario responde igual que un id inexistente |
-| AC-05 | La pagina de configuracion muestra las 3 dropdowns y la lista de **bans** (con quitar-ban por usuario) |
+| AC-04 | La configuracion del plan vive en una unica seccion `#configuracion` del detalle `GET /plans/{id}`: datos basicos, roles y baneados, sin navegacion por anclas. Las solicitudes se muestran entre el resumen del plan y el formulario de invitacion. Solo el dueño ve y puede enviar los 3 selectores de permisos (`POST /plans/{id}/settings`); para cualquier otro usuario ese POST responde igual que un id inexistente. `GET /plans/{id}/settings` redirige al detalle (`#config-roles`) y conserva el control owner-only |
+| AC-05 | La seccion `#config-roles` muestra las 3 dropdowns y la seccion `#banned-participants` del mismo detalle muestra la lista de **bans** con quitar-ban por usuario. No existe una pagina separada de configuracion |
 | AC-06 | Plan privado + no participante + con sesion: `GET /plans/{id}/public` muestra la landing de solicitud con el resumen sanitizado (nombre, descripcion, fecha, placeCount, cover) y **sin** datos privados (dueño, participantes, itinerario, emails) |
 | AC-07 | Plan privado + sin sesion: la landing redirige a `/auth/login?redirect=/plans/{id}/public`; al volver del login cae en la landing |
 | AC-08 | Plan privado: la landing **siempre** muestra el resumen y el formulario de solicitud; no existe un modo configurable de "sin acceso". La visibilidad del plan es la unica regla de acceso por link (card #49) |
@@ -76,7 +81,7 @@ Decisiones (2026-10-17, con equipo):
 | AC-13 | Seccion "Solicitudes" en el detalle: visible para el dueño, y para los editores solo si `handleRequests = EDITORS`; cada solicitud muestra el usuario con link a su perfil y las tres acciones (aceptar/rechazar/banear) |
 | AC-14 | `POST /plans/{id}/join-requests/{requestId}/respond?action=accept|reject|ban`: **accept** agrega al requester como participant y elimina la solicitud; **reject** la elimina sin mas; **ban** la elimina, lo agrega a `bannedUsers` y, si ya participaba o era editor, lo remueve y pierde el rol |
 | AC-15 | Un usuario banneado no puede solicitar de nuevo ni entrar via short code; para quien responde sin permiso (participant ajeno, otro usuario) la respuesta de respond es identica a un id inexistente |
-| AC-16 | La configuracion del plan no incluye un boton ni un campo "Compartir link": el detalle no renderiza `#plan-share-link`. En un plan publico la URL es abierta a cualquiera; en uno privado lleva a la landing de solicitud |
+| AC-16 | La configuracion del plan no incluye un boton ni un campo "Compartir link": el detalle no renderiza `#plan-share-link`. Tampoco muestra la leyenda "Datos, solicitudes, roles y baneos en un solo lugar" ni los botones de ancla de la configuracion. En un plan publico la URL es abierta a cualquiera; en uno privado lleva a la landing de solicitud |
 | AC-17 | `inviteParticipant`: el canal **app** valida `inviteInternal` y el canal **email** valida `inviteByEmail`; ademas del front (form habilitado o no), el service responde como inexistente a quien no cumple |
 | AC-18 | Invitacion con canal email: se genera `token` en la `PlanInvitation` y se envia **email real** al usuario registrado con el link de aceptacion; si no hay SMTP configurado el envio cae a un logger y la invitacion queda igualmente pendiente en la app |
 | AC-19 | `GET /plans/{id}/invitations/{token}/accept` (permitAll, el token es la credencial): sin sesion redirige a login con `redirect` de vuelta; con sesion muestra la confirmacion y el POST (con CSRF) acepta si el logueado es el destinatario y cae en `/plans/{id}`; si el logueado no es el destinatario, error amigable sin aceptar nada |
@@ -131,14 +136,14 @@ Decisiones (2026-10-17, con equipo):
 | # | Test | AC que cubre |
 |---|------|-------------|
 | I-01 | `POST /plans` con los 3 selectores del paso 3 crea el plan con esos valores | AC-03 |
-| I-02 | `GET /plans/{id}/settings` como dueño renderiza las 3 dropdowns + bans; para editor/participante/extraño → redirect "Plan not found" | AC-04 |
-| I-03 | `POST /plans/{id}/settings` del dueño cambia los 3 selectores y persisten tras reload | AC-04, AC-05 |
+| I-02 | `GET /plans/{id}` como dueño renderiza `#configuracion` con las 3 dropdowns, datos y bans, sin `#plan-share-link` ni botones de ancla; las solicitudes aparecen fuera de la configuracion, entre el resumen y la invitacion. Editor/participante/extraño no ven los selectores de permisos. `GET /plans/{id}/settings` redirige al detalle (dueño) o responde "Plan not found" | AC-04 |
+| I-03 | `POST /plans/{id}/settings` del dueño cambia los 3 selectores, redirige a `#config-roles` y persisten tras recargar el detalle | AC-04, AC-05 |
 | I-04 | `GET /plans/{id}/public` (privado, sesion de extraño) renderiza la landing con resumen y sin datos privados en el HTML | AC-06 |
 | I-05 | La landing sin sesion es 302 a `/auth/login?redirect=...`; despues del login cae en la landing | AC-07 |
 | I-06 | `POST /plans/{id}/join-requests` crea la pendiente; segundo POST no duplica | AC-10, AC-11 |
 | I-07 | Aceptar la solicitud aparece como participant en el detalle; rechazar y banear dejan `plan_banned_users` con el usuario | AC-14 |
 | I-08 | `GET /plans/{id}/invitations/{token}/accept` con sesion del destinatario lo deja como participant y el token queda invalido (segunda vez error) | AC-19, AC-20 |
-| I-09 | Ni el paso 3 de `/explore`, ni `GET /plans/{id}/settings`, ni el detalle renderizan `shareLink`, "Compartir link" o `#plan-share-link` | AC-01, AC-16 |
+| I-09 | Ni el paso 3 de `/explore` ni el detalle renderizan `shareLink` o "Compartir link"; la configuracion del detalle no expone `#plan-share-link` | AC-01, AC-16 |
 | I-10 | `GET /plans/{id}/public` de un plan publico sigue renderizando la vista publica sin landing | AC-12 |
 
 ### Tests de Seguridad (`integration/PlanJoinRequestSecurityTest.java`)
@@ -157,6 +162,7 @@ Decisiones (2026-10-17, con equipo):
 | # | Test | Flujo | AC que cubre |
 |---|------|-------|-------------|
 | E-01 | `PublicPlanJoinRequestE2E` | Dueño crea un plan privado en `/explore` → comparte `/plans/{id}/public` → extraño registrado la abre: ve resumen sanitizado → "Solicitar participacion" → dueño acepta en la seccion Solicitudes del detalle → el solicitante aparece en los participantes del detalle y su solicitud desaparece | AC-06, AC-11, AC-13, AC-14 |
+| E-02 | `PlanDetailConfigurationE2E` | Dueño crea un plan en `/explore` → desde `#configuracion` del detalle cambia datos basicos y permisos → sigue en `/plans/{id}` y ve "Configuración guardada" | AC-03, AC-04, AC-05 |
 
 ## Notas / decisiones de diseño
 
@@ -407,20 +413,15 @@ public record JoinPlanSummary(
 El template nunca recibe el `Plan` completo: sin dueño, sin participantes, sin emails ni
 itinerario (U-15, S-01).
 
-### 6. Pagina "Configuracion del plan" (owner-only)
+### 6. Configuracion unificada en el detalle (owner-only para permisos)
 
 File: `src/main/java/com/valhalla/presentation/plan/PlanController.java`
 
 ```java
-private static final String VIEW_SETTINGS = "pages/plans/settings";
-
 @GetMapping("/{id}/settings")
 public ModelAndView showSettings(@PathVariable UUID id, Authentication authentication) {
-  return new ModelAndView(
-    "pages/plans/settings",
-    ATTR_PLAN,
-    planService.getOwnedPlan(id, authentication.getName()) // owner-only, sino not-found
-  );
+  planService.getOwnedPlan(id, authentication.getName()); // owner-only, sino not-found
+  return new ModelAndView("redirect:/plans/" + id + "#config-roles");
 }
 
 @PostMapping("/{id}/settings")
@@ -429,30 +430,37 @@ public ModelAndView updateSettings(
     @RequestParam PlanPermission handleRequests,
     @RequestParam PlanPermission inviteInternal,
     @RequestParam PlanPermission inviteByEmail,
-    Authentication authentication) {
+    Authentication authentication,
+    RedirectAttributes redirectAttributes) {
   planService.updateSettings(
     id, handleRequests, inviteInternal, inviteByEmail, authentication.getName()
   );
-  return new ModelAndView("redirect:/plans/" + id + "/settings?saved=true");
+  redirectAttributes.addFlashAttribute("settingsSaved", "Configuración guardada");
+  return new ModelAndView("redirect:/plans/" + id + "#config-roles");
 }
 ```
 
-`pages/plans/settings.html` (nueva) reusa el fragmento `components/plan-permissions.html`: 3
-`<select>` con las opciones "Solo el dueño / Dueño y editores / Dueño, editores y participantes"
-(solicitudes solo con las dos primeras). La lista de bans con quitar-ban llega con `task-19-BAN`
-(AC-05).
+`pages/plans/detail.html` concentra la configuracion en `#configuracion` con tres bloques:
+`#config-datos`, `#config-roles` y `#banned-participants`, sin leyenda ni navegacion por anclas.
+El bloque `#config-solicitudes` vive fuera de la configuracion, en la columna de participantes,
+entre `#plan-summary` y el formulario de invitacion. Solo el dueño
+renderiza el formulario de `#config-roles`; ese formulario y el paso 3 de `/explore` reusan
+`components/plan-permissions.html` con las mismas opciones y defaults. No existe
+`pages/plans/settings.html`: la ruta vieja solo redirige al detalle.
 
 ### 7. Secciones y CTAs en el detalle (`detail.html`)
 
-- **Seccion Solicitudes** (AC-13): solo si `model["canHandleRequests"]`; cada card del
-  requester con `th:href="@{/users/{id}(...)}"` al perfil y dos forms POST a
-  `/plans/{id}/join-requests/{rid}/respond?action=accept|reject` (la accion `ban` llega con
-  `task-19-BAN`).
+- **Seccion "Solicitudes"** (AC-13) en la columna de participantes, debajo del resumen del plan
+  y arriba de "Invitar a alguien": el bloque `#config-solicitudes` solo aparece si
+  `model["canHandleRequests"]`; cada card del requester linkea a su perfil y ofrece
+  aceptar/rechazar.
+- **Seccion "Baneados"** (AC-05): `#banned-participants` lista los usuarios baneados con su
+  accion de quitar-ban. Ya no es un dialog: vive en la misma configuracion del detalle.
 - **Form de invitacion** (AC-17): el input de email y el boton de canal app/email habilitados
   segun `model["canInviteInternal"]` / `model["canInviteByEmail"]`.
 
-Los flags los computa `Plan` (`canInviteInternal`, `canInviteByEmail`, `canHandleRequests`);
-el template nunca decide permisos por su cuenta.
+Los flags los computa `Plan` (`canInviteInternal`, `canInviteByEmail`,
+`canHandleRequests`); el template nunca decide permisos por su cuenta.
 
 ### 8. Aceptacion por token + envio por email
 
@@ -532,15 +540,14 @@ File: `src/main/webapp/WEB-INF/templates/pages/places/list.html`
 | `infrastructure/plan/PlanServiceImpl.java` | Actualizar (toda la logica PET) |
 | `infrastructure/email/EmailConfiguration.java` | Crear (SMTP o fallback, AC-18) |
 | `infrastructure/email/LoggingEmailNotifier.java` | Crear (fallback sin SMTP, AC-18) |
-| `presentation/plan/PlanController.java` | Actualizar (landing, settings, join-requests, accept-by-token) |
+| `presentation/plan/PlanController.java` | Actualizar (landing, settings como redirect, join-requests, accept-by-token) |
 | `presentation/plan/PlanRequest.java` | Actualizar (3 selectores del paso 3) |
 | `config/SecurityConfig.java` | Actualizar (permitAll del GET accept-by-token) |
 | `config/BaseJpaConfig.java` | Actualizar (paquete de entidades de email/plan) |
-| `components/plan-permissions.html` | Crear (3 selectores reusables) |
-| `pages/plans/settings.html` | Crear (AC-04) |
+| `components/plan-permissions.html` | Crear (3 selectores reusables en wizard y detalle) |
 | `pages/plans/request.html` | Crear (AC-06/08/10) |
 | `pages/plans/accept-invitation.html` | Crear (confirmacion del token) |
-| `pages/plans/detail.html` | Actualizar (Solicitudes y gating de invitaciones) |
+| `pages/plans/detail.html` | Actualizar (configuracion: datos, roles y bans; solicitudes junto a participantes) |
 | `pages/places/list.html` | Actualizar (paso 3 del wizard, AC-03) |
 | `.env.example` | Actualizar (SMTP_* y APP_BASE_URL) |
 | `docker-compose.yml` | Actualizar (pasa las variables SMTP al proceso) |

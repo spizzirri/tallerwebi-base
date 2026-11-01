@@ -34,6 +34,16 @@ sanitizado y la opción de solicitar participación (ver la spec `21-PET`). No h
 configuración de "compartir por link" ni un botón de copia en el detalle; la URL se
 comparte fuera de la aplicación y su acceso lo define la visibilidad del plan.
 
+La configuración del plan vive en una única sección `#configuracion` del detalle, sin
+navegación por anclas, con tres bloques: **Datos básicos** (`#config-datos`),
+**Roles y permisos** (`#config-roles`) y **Baneados** (`#banned-participants`). El bloque
+de **Solicitudes** (`#config-solicitudes`) vive junto a los participantes, entre el
+resumen del plan y el formulario de invitación. El dueño y los editores administran
+datos, solicitudes y bans; solo el dueño ve y envía los selectores de permisos. No hay
+página separada de configuración: `GET /plans/{id}/settings` redirige al detalle y
+`POST /plans/{id}/settings` sigue siendo owner-only. El paso 3 del wizard de `/explore`
+usa el mismo fragmento de permisos y los mismos defaults que `#config-roles`.
+
 Si el detalle falla al evaluar `isPlanParticipant` con un valor nulo, comprobar que
 el controlador y la plantilla correspondan a la misma versión. En desarrollo con
 Docker, `docker compose restart app` recompila y carga las clases actualizadas.
@@ -128,6 +138,7 @@ persona, duplicados, respuestas repetidas y eliminación de invitaciones con el 
 | AC-13 | DELETE /plans/{id} elimina un plan |
 | AC-14 | Solo el dueño cambia el rol de participantes existentes. Editores, participantes y terceros reciben la misma respuesta que un plan inexistente, y el rol no se modifica |
 | AC-15 | El detalle del plan nunca muestra el correo de los participantes como texto: muestra nombre completo, rol y link al perfil. El correo solo aparece en campos ocultos de acciones autorizadas |
+| AC-16 | La configuración del plan se administra desde la sección única `#configuracion` del detalle (datos básicos, roles y baneados), sin navegación por anclas ni un control para compartir el link. El bloque de solicitudes vive entre el resumen del plan y el formulario de invitación. El dueño ve los permisos, los editores no, y el wizard de `/explore` usa los mismos selectores y defaults |
 
 ## Escenarios de Test
 
@@ -171,6 +182,7 @@ persona, duplicados, respuestas repetidas y eliminación de invitaciones con el 
 | I-12 | El dueño ve el formulario de rol y su POST persiste el cambio | AC-14 |
 | I-13 | Un editor ve la insignia de rol pero no el formulario; su POST redirige al plan inexistente y el rol no cambia | AC-14 |
 | I-14 | El detalle muestra nombre y rol de los participantes sin el correo como texto visible | AC-15 |
+| I-15 | El detalle del dueño renderiza `#configuracion` con datos, permisos y bans, sin navegación por anclas ni `#plan-share-link`; el editor no ve los selectores de permisos. Las solicitudes aparecen entre el resumen y la invitación. `/plans/{id}/settings` redirige al detalle | AC-16 |
 
 ### Tests de Integracion (`infrastructure/PlanRepositoryTest.java`)
 
@@ -187,6 +199,7 @@ persona, duplicados, respuestas repetidas y eliminación de invitaciones con el 
 |---|------|-------|-------------|
 | E-01 | `PlansViewE2E` | Crear plan, ver en lista, ver detalle, eliminar | AC-02, AC-06, AC-07, AC-08 |
 | E-02 | `PlanParticipantsE2E` | El dueño cambia el rol; el editor no ve el control ni el correo y el rol se mantiene | AC-14, AC-15 |
+| E-03 | `PlanDetailConfigurationE2E` | El dueño cambia datos y permisos desde `#configuracion` sin salir del detalle | AC-16 |
 
 ## Referencia de Implementacion
 

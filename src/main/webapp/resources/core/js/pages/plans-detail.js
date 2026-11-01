@@ -64,7 +64,6 @@ createApp({
         const placeDialog = ref(null);
         const planOptionsOpen = ref(false);
         const planOptionsButton = ref(null);
-        const bannedParticipantsDialog = ref(null);
         const closePlanOptions = (event) => {
             if (!event.currentTarget.contains(event.relatedTarget)) {
                 planOptionsOpen.value = false;
@@ -445,9 +444,8 @@ createApp({
 
         return {
             allPlaces, planPlaces, selectedPlaceId, selectedEntry, requestError, saving,
-            // [MERGE] Sin estos cuatro en el retorno, el menú "Más opciones" no abre: el handler
-            // escribe sobre una propiedad inexistente y Vue la descarta en silencio.
-            planOptionsOpen, planOptionsButton, bannedParticipantsDialog, closePlanOptions,
+            // El menú "Más opciones" usa estos controles desde la plantilla.
+            planOptionsOpen, planOptionsButton, closePlanOptions,
             placeDialog, availablePlaces, dayGroups, dayCount, directionsUrl,
             getCategoryLabel, iconHtml, categoryIconHtml, showPlace, updateEntry, addPlace,
             removePlace, onDragStart, onDrop

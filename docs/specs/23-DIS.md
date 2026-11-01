@@ -156,7 +156,7 @@ En `detail.html` (stack Bootstrap) la misma pieza con las utilidades del stack:
 | Quitar / Eliminar | trash-2 | detalle ("Eliminar plan"), Mis planes, perfil ("Quitar") |
 | Configuración | settings | detalle |
 | Aceptar / Rechazar | check / x | Mis planes (invitaciones pendientes) |
-| Guardar | save | detalle ("Guardar cambios"), perfil, contraseña, configuración del plan |
+| Guardar | save | detalle ("Guardar cambios", "Guardar permisos"), perfil, contraseña |
 | Salir | log-out | menú del navbar (ya existía) |
 | Guardar en Guardados | bookmark outline/filled | ya existía (bookmark-button, explorador) |
 
@@ -193,7 +193,6 @@ En `detail.html` (stack Bootstrap) la misma pieza con las utilidades del stack:
 | `templates/pages/plans/public.html` | Actualizar (iconos) |
 | `templates/pages/plans/detail.html` | Actualizar (iconos, stack Bootstrap) |
 | `templates/pages/plans/list.html` | Actualizar (iconos) |
-| `templates/pages/plans/settings.html` | Actualizar (icono save) |
 | `templates/pages/profile/edit.html` | Actualizar (iconos; autor de Guardados en una línea) |
 | `templates/pages/profile/change-password.html` | Actualizar (icono save) |
 | `templates/pages/places/list.html` | Actualizar (plus en "Create plan") |

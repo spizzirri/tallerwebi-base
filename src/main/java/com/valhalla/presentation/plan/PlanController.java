@@ -256,11 +256,11 @@ public class PlanController {
 
   @GetMapping("/{id}/settings")
   public ModelAndView showSettings(@PathVariable UUID id, Authentication authentication) {
-    return new ModelAndView(
-      "pages/plans/settings",
-      ATTR_PLAN,
-      planService.getOwnedPlan(id, authentication.getName())
-    );
+    // La configuracion vive en el detalle. Se conserva la ruta como redireccion para
+    // enlaces viejos, pero sigue pasando por getOwnedPlan: el dueño es el unico que puede
+    // ver y cambiar los selectores de permisos.
+    planService.getOwnedPlan(id, authentication.getName());
+    return new ModelAndView(REDIRECT_PLAN_DETAIL + id + "#config-roles");
   }
 
   @PostMapping("/{id}/settings")
@@ -269,7 +269,8 @@ public class PlanController {
     @RequestParam PlanPermission handleRequests,
     @RequestParam PlanPermission inviteInternal,
     @RequestParam PlanPermission inviteByEmail,
-    Authentication authentication
+    Authentication authentication,
+    org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes
   ) {
     planService.updateSettings(
       id,
@@ -278,7 +279,8 @@ public class PlanController {
       inviteByEmail,
       authentication.getName()
     );
-    return new ModelAndView(REDIRECT_PLAN_DETAIL + id + "/settings?saved=true");
+    redirectAttributes.addFlashAttribute("settingsSaved", "Configuración guardada");
+    return new ModelAndView(REDIRECT_PLAN_DETAIL + id + "#config-roles");
   }
 
   /**

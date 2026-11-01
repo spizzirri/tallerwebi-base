@@ -265,8 +265,7 @@ public class PlanPlaceDetailE2E extends E2eBase {
     assertThat(dialog.locator(".visit-editor input[type='time']")).isVisible();
 
     // [DIS-B04] aria-labelledby y foco dentro del diálogo al abrir. El selector se ancla al
-    // dialog de este detalle: desde el merge de main hay otro <dialog> (banned-participants)
-    // antes en el DOM y document.querySelector('dialog') lo agarra a él.
+    // diálogo de este detalle para no depender del orden de los <dialog> del DOM.
     assertThat(dialog).hasAttribute("aria-labelledby", "place-detail-title");
     boolean focusInside = Boolean.TRUE.equals(
       page.evaluate(

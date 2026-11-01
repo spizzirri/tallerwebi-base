@@ -130,4 +130,19 @@ class PlanPlaceRepositoryTest {
     assertTrue(entries.findById(lateId).isEmpty());
     assertTrue(places.findById(first.getId()).isPresent());
   }
+
+  @Test
+  void I11_legacyNullTimePinnedLoadsAsNotPinned() {
+    PlanPlace entry = save(first, 1);
+    em.flush();
+
+    em
+      .createNativeQuery("UPDATE plan_places SET time_pinned = NULL WHERE id = ?")
+      .setParameter(1, entry.getId())
+      .executeUpdate();
+    em.clear();
+
+    PlanPlace loaded = entries.findById(entry.getId()).orElseThrow();
+    assertFalse(loaded.isTimePinned());
+  }
 }

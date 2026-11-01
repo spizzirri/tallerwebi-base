@@ -28,7 +28,6 @@ public class ActionIconsTest {
   private static final Path PUBLIC_PLAN = TEMPLATES.resolve("pages/plans/public.html");
   private static final Path DETAIL = TEMPLATES.resolve("pages/plans/detail.html");
   private static final Path MY_PLANS = TEMPLATES.resolve("pages/plans/list.html");
-  private static final Path SETTINGS = TEMPLATES.resolve("pages/plans/settings.html");
   private static final Path PROFILE_EDIT = TEMPLATES.resolve("pages/profile/edit.html");
   private static final Path CHANGE_PASSWORD = TEMPLATES.resolve(
     "pages/profile/change-password.html"
@@ -60,11 +59,9 @@ public class ActionIconsTest {
     PUBLIC_PLAN,
     5, // Unirme (form + link), Clonar (form + link), Ver mi plan
     DETAIL,
-    5, // Configuración, Eliminar, Salir, Clonar, Guardar cambios
+    6, // Configuración, Eliminar, Salir, Clonar, Guardar cambios, Guardar permisos
     MY_PLANS,
     8, // Crear plan, Unirme, Ver detalle x3, Eliminar, Aceptar, Rechazar
-    SETTINGS,
-    1,
     PROFILE_EDIT,
     4, // Guardar perfil, Abrir, Clonar, Quitar
     CHANGE_PASSWORD,
@@ -102,7 +99,6 @@ public class ActionIconsTest {
     assertThat(read(MY_PLANS), containsString(CHECK));
     assertThat(read(MY_PLANS), containsString(CLOSE));
 
-    assertThat(read(SETTINGS), containsString(SAVE));
     assertThat(read(PROFILE_EDIT), containsString(SAVE));
     assertThat(read(PROFILE_EDIT), containsString(EYE));
     assertThat(read(PROFILE_EDIT), containsString(COPY));

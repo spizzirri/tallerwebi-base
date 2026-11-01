@@ -130,7 +130,7 @@ public class PlansPage extends WebPage {
       Pattern.compile(
         "[a-zA-Z][a-zA-Z0-9+.-]*://[^/]*" +
         Pattern.quote(LIST_PATH) +
-        "/[0-9a-f-]{36}(?:[?;][^#]*)?$"
+        "/[0-9a-f-]{36}(?:[?;][^#]*)?(?:#.*)?$"
       )
     );
   }
