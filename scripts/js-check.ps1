@@ -119,8 +119,9 @@ function Test-JsLine {
 # which a line scan reads as two harmless lines and passes.
 #
 # Google Fonts is the one deliberate exception: brand.css declares a local fallback family,
-# so an unreachable fonts.googleapis.com changes the typeface and nothing else, while an
-# unreachable Leaflet or Bootstrap leaves a dead map or an unstyled page.
+# and the link loads non-blocking (media="print" + onload swap), so a slow or unreachable
+# fonts.googleapis.com changes the typeface and nothing else, while an unreachable Leaflet
+# or Bootstrap leaves a dead map or an unstyled page.
 function Add-RemoteAssetFindings {
     param($File, $Raw)
 

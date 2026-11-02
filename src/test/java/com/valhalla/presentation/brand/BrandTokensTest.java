@@ -164,7 +164,9 @@ public class BrandTokensTest {
 
   // Las webfonts entran por <link> en el head, con display=swap. El parámetro no es
   // cosmético: sin él el texto queda invisible hasta que la fuente llega, y encima
-  // el reveal shield de base.html ya espera hasta 3 segundos.
+  // el reveal shield de base.html ya espera hasta 3 segundos. El link es no bloqueante
+  // (media="print" + onload): una respuesta lenta de fonts.googleapis.com cambia la
+  // tipografía pero nunca pospone los scripts del head.
   @Test
   void theWebfontsLoadWithSwapAndPreconnect() throws IOException {
     String base = read(BASE);
@@ -177,6 +179,16 @@ public class BrandTokensTest {
     assertThat("Josefin Sans y Bree Serif", base, containsString("family=Josefin+Sans"));
     assertThat("Josefin Sans y Bree Serif", base, containsString("family=Bree+Serif"));
     assertThat("display=swap evita el texto invisible", base, containsString("display=swap"));
+    assertThat(
+      "el link de las webfonts carga no bloqueante (media=print)",
+      base,
+      containsString("media=\"print\"")
+    );
+    assertThat(
+      "onload cambia media=print a all al terminar de cargar",
+      base,
+      containsString("onload=\"this.media='all'\"")
+    );
     assertThat(
       "preconnect a fonts.googleapis.com",
       base,

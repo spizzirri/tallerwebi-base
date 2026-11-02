@@ -271,7 +271,9 @@ Every one of them is local now: Leaflet's script and stylesheet, Bootstrap 5.3 f
 `plans/detail` draws its 16 glyphs with the Lucide library every other page already uses.
 
 The one accepted exception is Google Fonts, because `brand.css` declares a local fallback
-family: if `fonts.googleapis.com` is unreachable the typeface changes and nothing else.
+family and the link loads non-blocking (`media="print"` swapped to `all` by `onload`): a slow
+or unreachable `fonts.googleapis.com` changes the typeface and never postpones the scripts.
+The E2E suite stubs the request and does not depend on the network.
 
 Gate: **JS07**.
 
