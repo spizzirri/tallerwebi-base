@@ -27,7 +27,6 @@ public class FollowE2E extends E2eBase {
 
   private static final String PLAN_NAME = "Plan del autor seguido";
   private static final String PLAN_DESCRIPTION = "Un plan publico para el scope Siguiendo";
-  private static final String PLAN_DATE = "2026-12-31";
 
   private static final String FOLLOWER_FIRST_NAME = "Rosa";
   private static final String FOLLOWER_LAST_NAME = "Seguidora";
@@ -38,7 +37,8 @@ public class FollowE2E extends E2eBase {
   void E01_seguirYDejarDeSeguirCambiaElScopeSiguiendo() {
     // --- arrange: el admin publica un plan publico y el seguidor se registra por UI ---
     signInAsAdmin();
-    new PlansPage(page).createPublicPlanViaExplore(PLAN_NAME, PLAN_DESCRIPTION, PLAN_DATE);
+    // Fecha dinámica: el #plan-date del wizard lleva min=${today}, un literal duro vence.
+    new PlansPage(page).createPublicPlanViaExplore(PLAN_NAME, PLAN_DESCRIPTION, isoDateIn(30));
 
     newContext();
     WebPage web = new WebPage(page);

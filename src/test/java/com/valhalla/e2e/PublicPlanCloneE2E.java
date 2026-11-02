@@ -26,7 +26,6 @@ public class PublicPlanCloneE2E extends E2eBase {
 
   private static final String PLAN_NAME = "Plan publico a clonar E2E";
   private static final String PLAN_DESCRIPTION = "Un plan publico que cualquiera puede clonar";
-  private static final String PLAN_DATE = "2026-12-31";
   private static final String EMAIL = "visitante.clo@unlam.edu.ar";
   private static final String PASSWORD = "secret123";
 
@@ -58,7 +57,8 @@ public class PublicPlanCloneE2E extends E2eBase {
   private String givenAPublicPlanUrl() {
     signInAsAdmin();
     PlansPage plans = new PlansPage(page);
-    plans.createPlanViaExplore(PLAN_NAME, PLAN_DESCRIPTION, PLAN_DATE);
+    // Fecha dinámica: el #plan-date del wizard lleva min=${today}, un literal duro vence.
+    plans.createPlanViaExplore(PLAN_NAME, PLAN_DESCRIPTION, isoDateIn(30));
     plans.waitForDetailPath();
 
     String planId = currentPlanId();

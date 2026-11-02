@@ -16,7 +16,7 @@ public class PlanBanE2E extends E2eBase {
   void banAndUnbanInlineSectionPreservesPrivatePlanApproval() {
     signInAsAdmin();
     PlansPage plans = new PlansPage(page);
-    plans.createPlanViaExplore("Plan BAN", "Recorrido privado", "2026-12-31");
+    plans.createPlanViaExplore("Plan BAN", "Recorrido privado", isoDateIn(30));
     String detailUrl = page.url();
     try (BrowserContext visitor = browser.newContext()) {
       Page guest = visitor.newPage();

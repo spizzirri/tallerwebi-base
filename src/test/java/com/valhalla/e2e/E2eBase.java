@@ -5,10 +5,13 @@ import com.microsoft.playwright.BrowserContext;
 import com.microsoft.playwright.BrowserType;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
+import com.microsoft.playwright.Route;
 import com.microsoft.playwright.Tracing;
 import com.valhalla.e2e.views.LoginPage;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -108,6 +111,12 @@ abstract class E2eBase {
   /** Starts a fresh context and page, for a test that has to switch session mid-test. */
   void newContext() {
     context = browser.newContext();
+    // Hermetic suite: a slow or unreachable fonts.googleapis.com must not postpone the
+    // head scripts. Empty CSS also means fonts.gstatic.com is never requested.
+    context.route(
+      "https://fonts.googleapis.com/**",
+      route -> route.fulfill(new Route.FulfillOptions().setContentType("text/css").setBody(""))
+    );
     context.tracing().start(new Tracing.StartOptions().setScreenshots(true).setSnapshots(true));
     page = context.newPage();
   }
@@ -125,6 +134,21 @@ abstract class E2eBase {
     login.clickSignIn();
     login.waitForPath("/admin/home");
     return login;
+  }
+
+  /**
+   * ISO date {@code days} from now, computed at call time: the create wizard's date input renders
+   * {@code min=${today}} from the server's own {@code LocalDate.now()}, so a hardcoded literal
+   * eventually falls below the min and {@code nextPlanStep()} silently refuses to advance past
+   * step 1 (the carousel track then covers the later steps and Playwright times out).
+   */
+  protected static String isoDateIn(int days) {
+    return LocalDate.now().plusDays(days).toString();
+  }
+
+  /** The {@code dd/MM/yyyy} label the app renders for an ISO date, to keep assertions in sync. */
+  protected static String dateLabel(String isoDate) {
+    return LocalDate.parse(isoDate).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
   }
 
   private void saveFailureArtifacts(ExtensionContext test) {

@@ -20,7 +20,7 @@ public class PlanPickerE2E extends E2eBase {
   void E01_pickerStaysVisibleForPlaceAlreadyInPlan() {
     signInAsAdmin();
     PlansPage plans = new PlansPage(page);
-    plans.createPlanViaExplore("Plan APL T7", "Reproduccion picker", "2026-12-31");
+    plans.createPlanViaExplore("Plan APL T7", "Reproduccion picker", isoDateIn(30));
     String planId = detailPlanId();
 
     // El wizard agrega la primera tarjeta del catálogo: ese lugar ya está en el plan.
@@ -47,7 +47,7 @@ public class PlanPickerE2E extends E2eBase {
   void E02_addsSelectedPlaceToOwnPlanFromDetailPanel() {
     signInAsAdmin();
     PlansPage plans = new PlansPage(page);
-    plans.createPlanViaExplore("Plan APL T7b", "Agregado desde detalle", "2026-12-31");
+    plans.createPlanViaExplore("Plan APL T7b", "Agregado desde detalle", isoDateIn(30));
     String planId = detailPlanId();
 
     plans.navigateToExplore();
@@ -124,7 +124,8 @@ public class PlanPickerE2E extends E2eBase {
     PlansPage plans = new PlansPage(page);
     plans.navigateToExplore();
     plans.navigateToCreatePlanModal();
-    plans.typeEventDate("2027-03-20");
+    // La fecha del borrador queda por delante de la de los planes creados en otros tests (+90).
+    plans.typeEventDate(isoDateIn(90));
     plans.clickNextStep();
 
     page

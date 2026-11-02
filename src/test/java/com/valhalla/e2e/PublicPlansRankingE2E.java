@@ -34,10 +34,8 @@ public class PublicPlansRankingE2E extends E2eBase {
 
   private static final String UNRATED_PLAN = "Asado sin votos E2E";
   private static final String UNRATED_DESCRIPTION = "Un plan que nadie califico todavia";
-  private static final String UNRATED_DATE = "2026-11-01";
   private static final String RATED_PLAN = "Milonga calificada E2E";
   private static final String RATED_DESCRIPTION = "Un plan con una calificacion real";
-  private static final String RATED_DATE = "2026-12-31";
   private static final String VISITOR_EMAIL = "visitante.top@unlam.edu.ar";
   private static final String VISITOR_PASSWORD = "secret123";
 
@@ -46,8 +44,8 @@ public class PublicPlansRankingE2E extends E2eBase {
     // --- arrange: both public plans come from the admin's session, through the create modal.
     signInAsAdmin();
     PlansPage plans = new PlansPage(page);
-    plans.createPublicPlanViaExplore(UNRATED_PLAN, UNRATED_DESCRIPTION, UNRATED_DATE);
-    plans.createPublicPlanViaExplore(RATED_PLAN, RATED_DESCRIPTION, RATED_DATE);
+    plans.createPublicPlanViaExplore(UNRATED_PLAN, UNRATED_DESCRIPTION, isoDateIn(1));
+    plans.createPublicPlanViaExplore(RATED_PLAN, RATED_DESCRIPTION, isoDateIn(30));
     // The public URL is captured while the detail page is open: the admin session navigates away
     // afterwards and the id is only there.
     String ratedPlanUrl = publicUrlOf(plans);

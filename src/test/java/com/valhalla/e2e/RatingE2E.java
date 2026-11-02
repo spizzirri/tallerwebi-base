@@ -30,7 +30,6 @@ public class RatingE2E extends E2eBase {
 
   private static final String PLAN_NAME = "Plan calificable E2E";
   private static final String PLAN_DESCRIPTION = "Un plan para calificar por link";
-  private static final String PLAN_DATE = "2026-12-31";
   private static final String VOTER_EMAIL = "votante@unlam.edu.ar";
 
   @Test
@@ -107,7 +106,8 @@ public class RatingE2E extends E2eBase {
   private Fixture givenPublicPlanAndUser() {
     signInAsAdmin();
     PlansPage plans = new PlansPage(page);
-    plans.createPublicPlanViaExplore(PLAN_NAME, PLAN_DESCRIPTION, PLAN_DATE);
+    // Fecha dinámica: el #plan-date del wizard lleva min=${today}, un literal duro vence.
+    plans.createPublicPlanViaExplore(PLAN_NAME, PLAN_DESCRIPTION, isoDateIn(30));
     plans.waitForDetailPath();
     String planPublicUrl = publicPlanUrl();
 

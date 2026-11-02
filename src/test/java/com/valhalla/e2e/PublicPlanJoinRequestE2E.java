@@ -16,7 +16,7 @@ public class PublicPlanJoinRequestE2E extends E2eBase {
   void E01_publicUrlRequestAndAcceptanceGrantPrivatePlanAccess() {
     signInAsAdmin();
     PlansPage plans = new PlansPage(page);
-    plans.createPlanViaExplore("Encuentro privado PET", "Resumen del encuentro", "2026-12-31");
+    plans.createPlanViaExplore("Encuentro privado PET", "Resumen del encuentro", isoDateIn(30));
     String publicUrl = page.url() + "/public";
 
     try (BrowserContext visitor = browser.newContext()) {

@@ -28,7 +28,6 @@ import org.junit.jupiter.api.Test;
  */
 public class PlanScheduleE2E extends E2eBase {
 
-  private static final String PLAN_DATE = "2026-12-05";
   private static final String START_TIME = "09:00";
   private static final String TRANSPORT_MODE = "BIKE";
   private static final int STOP_COUNT = 3;
@@ -109,7 +108,8 @@ public class PlanScheduleE2E extends E2eBase {
     plans.navigateToCreatePlanModal();
     plans.typeName(planName);
     plans.typeDescription("Tres paradas con horario derivado");
-    plans.typeEventDate(PLAN_DATE);
+    // Fecha dinámica: el #plan-date del wizard lleva min=${today} y un literal duro vence.
+    plans.typeEventDate(isoDateIn(30));
     plans.typeStartTime(START_TIME);
     plans.selectTransportMode(TRANSPORT_MODE);
     plans.clickNextStep();

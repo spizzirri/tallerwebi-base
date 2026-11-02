@@ -17,7 +17,7 @@ public class PlanDetailConfigurationE2E extends E2eBase {
   void ownerConfiguresThePlanFromTheDetailWithoutLeavingThePage() {
     signInAsAdmin();
     PlansPage plans = new PlansPage(page);
-    plans.createPlanViaExplore("Plan configurable", "Configuración inicial", "2026-12-31");
+    plans.createPlanViaExplore("Plan configurable", "Configuración inicial", isoDateIn(30));
     String detailUrl = page.url();
 
     assertThat(page.locator("#plan-app")).isVisible();
@@ -60,7 +60,8 @@ public class PlanDetailConfigurationE2E extends E2eBase {
     page
       .locator("#config-datos textarea[name='description']")
       .fill("Configuración actualizada desde el detalle");
-    page.locator("#config-datos input[name='eventDate']").fill("2027-01-15");
+    // Fecha dinámica: el input del wizard lleva min=${today}, un literal duro vence contra el reloj.
+    page.locator("#config-datos input[name='eventDate']").fill(isoDateIn(45));
     page.locator("#config-datos input[name='eventTime']").fill("19:30");
     page.locator("#config-datos button[type='submit']").click();
     plans.waitForDetailPath();

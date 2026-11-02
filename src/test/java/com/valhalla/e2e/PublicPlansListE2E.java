@@ -155,7 +155,7 @@ public class PublicPlansListE2E extends E2eBase {
     register.typeConfirmPassword(PASSWORD);
     register.clickRegister();
     web.waitForPath(LoginRedirects.USER_LANDING);
-    new PlansPage(page).createPublicPlanViaExplore(PLAN_NAME, PLAN_DESCRIPTION, "2026-12-31");
+    new PlansPage(page).createPublicPlanViaExplore(PLAN_NAME, PLAN_DESCRIPTION, isoDateIn(30));
 
     // --- Act: OTRA sesion mira el feed y encuentra la tarjeta con su autora ---
     newContext();
@@ -195,7 +195,7 @@ public class PublicPlansListE2E extends E2eBase {
   /** Crea el plan publico con la sesion admin y la deja abierta sobre su detalle. */
   private void givenAPublicPlanExists() {
     signInAsAdmin();
-    new PlansPage(page).createPublicPlanViaExplore(PLAN_NAME, PLAN_DESCRIPTION, "2026-12-31");
+    new PlansPage(page).createPublicPlanViaExplore(PLAN_NAME, PLAN_DESCRIPTION, isoDateIn(30));
   }
 
   /** Registra un usuario limpio en el contexto nuevo: la registration abre la sesion y aterriza en el feed. */

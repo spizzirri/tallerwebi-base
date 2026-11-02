@@ -65,6 +65,6 @@ public class PlansViewE2E extends E2eBase {
   }
 
   private void givenAPlanExists() {
-    this.plans.createPlanViaExplore(PLAN_NAME, "Un viaje de prueba", "2026-12-31");
+    this.plans.createPlanViaExplore(PLAN_NAME, "Un viaje de prueba", isoDateIn(30));
   }
 }

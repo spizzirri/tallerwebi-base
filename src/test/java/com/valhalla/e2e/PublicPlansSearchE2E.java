@@ -31,13 +31,10 @@ public class PublicPlansSearchE2E extends E2eBase {
 
   private static final String FIRST_PLAN = "Alfa Noche E2E";
   private static final String FIRST_DESCRIPTION = "Propuesta uno";
-  private static final String FIRST_DATE = "2027-03-01";
   private static final String SECOND_PLAN = "Zeta Noche E2E";
   private static final String SECOND_DESCRIPTION = "Propuesta dos";
-  private static final String SECOND_DATE = "2026-11-20";
   private static final String OTHER_PLAN = "Parrilla del barrio E2E";
   private static final String OTHER_DESCRIPTION = "Asado con amigos";
-  private static final String OTHER_DATE = "2027-01-15";
 
   @Test
   void T_SEARCH_001_buscarOrdenarYLimpiarLosFiltrosVuelveAlFeedCompleto() {
@@ -88,9 +85,11 @@ public class PublicPlansSearchE2E extends E2eBase {
   private void givenThreePublicPlans() {
     signInAsAdmin();
     PlansPage plans = new PlansPage(page);
-    plans.createPublicPlanViaExplore(FIRST_PLAN, FIRST_DESCRIPTION, FIRST_DATE);
-    plans.createPublicPlanViaExplore(SECOND_PLAN, SECOND_DESCRIPTION, SECOND_DATE);
-    plans.createPublicPlanViaExplore(OTHER_PLAN, OTHER_DESCRIPTION, OTHER_DATE);
+    // Dates computed at use time (the wizard's min=${today} expires hardcoded literals).
+    // Relative order is the feed's tie-break: SECOND (+1) < OTHER (+30) < FIRST (+90).
+    plans.createPublicPlanViaExplore(FIRST_PLAN, FIRST_DESCRIPTION, isoDateIn(90));
+    plans.createPublicPlanViaExplore(SECOND_PLAN, SECOND_DESCRIPTION, isoDateIn(1));
+    plans.createPublicPlanViaExplore(OTHER_PLAN, OTHER_DESCRIPTION, isoDateIn(30));
   }
 
   /**

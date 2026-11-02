@@ -56,7 +56,7 @@ public class MobileLayoutE2E extends E2eBase {
   void T_MOB_002_feedUnaColumnaEnPhoneYTresEnDesktop() {
     // arrange: un plan publico visible para cualquiera (el del admin no le llega al admin)
     signInAsAdmin();
-    new PlansPage(page).createPublicPlanViaExplore(PLAN_NAME, "Para el feed", "2026-12-31");
+    new PlansPage(page).createPublicPlanViaExplore(PLAN_NAME, "Para el feed", isoDateIn(30));
     newContext();
 
     // --- phone: sin scroll lateral y grilla en una columna (AC-01, AC-03) ---
@@ -303,7 +303,7 @@ public class MobileLayoutE2E extends E2eBase {
     plans.navigateToCreatePlanModal();
     plans.typeName("Detalle chico 320");
     plans.typeDescription("Para ver el itinerario en una pantalla angosta");
-    plans.typeEventDate("2026-12-05");
+    plans.typeEventDate(isoDateIn(30));
     plans.clickNextStep();
     plans.addFirstDraftPlace();
     plans.clickNextStep();

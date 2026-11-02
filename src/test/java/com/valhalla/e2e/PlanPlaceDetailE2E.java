@@ -30,15 +30,14 @@ import org.junit.jupiter.api.Test;
  */
 public class PlanPlaceDetailE2E extends E2eBase {
 
-  private static final String EVENT_DATE = "2026-12-01";
   // [SCH] El tile FECHA del resumen se unificó a dd/mm/yyyy con el resto de la feature; el
-  // input del form de edición sigue value ISO (EVENT_DATE de arriba).
-  private static final String EVENT_DATE_LABEL = "01/12/2026";
+  // input del form de edición sigue value ISO. Ambas fechas se computan en el @BeforeEach:
+  // el #plan-date del wizard lleva min=${today}, así que un literal duro vence contra el reloj.
   private static final String PLAN_TIME = "20:00";
   private static final String START_TIME = "18:30";
-  private static final String PINNED_DATE = "2026-12-02";
-  private static final String PINNED_DATE_LABEL = "02/12/2026";
   private static final String PINNED_TIME = "10:30";
+  private String eventDate;
+  private String pinnedDate;
   // Playwright manda el Pattern de Java tal cual a una regex de JavaScript, donde no existen
   // (?s) ni \Q...\E: por eso el "any" explícito es [\s\S]* en lugar de (?s).*.
   private static final Pattern RANGE = Pattern.compile(
@@ -61,6 +60,9 @@ public class PlanPlaceDetailE2E extends E2eBase {
     signInAsAdmin();
     this.plans = new PlansPage(page);
     this.planName = "Detalle E2E " + System.nanoTime();
+    // Relative order matters: the pinned day (+2) must differ from the plan's own day (+1).
+    this.eventDate = isoDateIn(1);
+    this.pinnedDate = isoDateIn(2);
   }
 
   @Test
@@ -74,9 +76,9 @@ public class PlanPlaceDetailE2E extends E2eBase {
     assertThat(page.locator(".stop-details")).hasCount(1);
     assertThat(page.locator(".stop-schedule").first()).hasText(rangeFrom(START_TIME));
     assertThat(page.locator(".stop-pinned")).hasCount(0);
-    assertThat(page.locator("#plan-summary")).containsText(EVENT_DATE_LABEL);
+    assertThat(page.locator("#plan-summary")).containsText(dateLabel(eventDate));
     assertThat(page.locator("#plan-summary")).containsText(START_TIME);
-    assertThat(page.locator("input[name='eventDate']")).hasValue(EVENT_DATE);
+    assertThat(page.locator("input[name='eventDate']")).hasValue(eventDate);
     assertThat(page.locator("input[name='eventTime']")).hasValue(START_TIME);
 
     // The start time belongs to the edit form: changing it re-derives the whole chain, so the
@@ -104,14 +106,14 @@ public class PlanPlaceDetailE2E extends E2eBase {
     // app calls. Pinning the stop onto another day moves it out of the plan's own day: the
     // dialog and the itinerary both pick up the new time and the dd/mm/yyyy day, and the stop is
     // now marked as pinned instead of derived.
-    updateVisitDetails(PINNED_DATE, PINNED_TIME);
+    updateVisitDetails(pinnedDate, PINNED_TIME);
     dialog = openStopDetails(0);
     assertThat(dialog).containsText(PINNED_TIME);
-    assertThat(dialog).containsText(PINNED_DATE_LABEL);
+    assertThat(dialog).containsText(dateLabel(pinnedDate));
     closeStopDetails();
     page.reload();
     assertThat(page.locator(".stop-schedule").first()).containsText(PINNED_TIME);
-    assertThat(page.locator(".stop-schedule").first()).containsText(PINNED_DATE_LABEL);
+    assertThat(page.locator(".stop-schedule").first()).containsText(dateLabel(pinnedDate));
     assertThat(page.locator(".stop-pinned")).hasCount(1);
 
     // A second stop added from the page's own form carries no schedule of its own: the server
@@ -121,7 +123,7 @@ public class PlanPlaceDetailE2E extends E2eBase {
     dialog = openStopDetails(1);
     assertThat(dialog).containsText("Horario de visita");
     assertThat(dialog).containsText(RANGE);
-    assertThat(dialog).containsText(PINNED_DATE_LABEL);
+    assertThat(dialog).containsText(dateLabel(pinnedDate));
     assertThat(dialog.locator("dd").last()).hasText("2");
     closeStopDetails();
 
@@ -293,7 +295,7 @@ public class PlanPlaceDetailE2E extends E2eBase {
     plans.navigateToCreatePlanModal();
     plans.typeName(planName);
     plans.typeDescription("Itinerario con horarios de visita");
-    plans.typeEventDate(EVENT_DATE);
+    plans.typeEventDate(eventDate);
     plans.typeStartTime(START_TIME);
     plans.clickNextStep();
     plans.addFirstDraftPlace();

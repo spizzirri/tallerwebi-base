@@ -29,7 +29,6 @@ public class BookmarkE2E extends E2eBase {
 
   private static final String PLAN_NAME = "Plan guardable E2E";
   private static final String PLAN_DESCRIPTION = "Un plan para guardar desde el feed";
-  private static final String PLAN_DATE = "2026-12-31";
   private static final String EMAIL = "guardador@unlam.edu.ar";
   private static final String PASSWORD = "secret123";
 
@@ -260,7 +259,8 @@ public class BookmarkE2E extends E2eBase {
   private String givenAnAdminOwnsAPublicPlan() {
     signInAsAdmin();
     PlansPage plans = new PlansPage(page);
-    plans.createPublicPlanViaExplore(PLAN_NAME, PLAN_DESCRIPTION, PLAN_DATE);
+    // Fecha dinámica: el #plan-date del wizard lleva min=${today}, un literal duro vence.
+    plans.createPublicPlanViaExplore(PLAN_NAME, PLAN_DESCRIPTION, isoDateIn(30));
     return currentPlanId();
   }
 
