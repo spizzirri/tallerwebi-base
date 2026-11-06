@@ -325,3 +325,11 @@ details[open] > summary::after {
 html[data-theme="dark"] details > summary:hover {
   background-color: rgb(255 255 255 / 0.06);
 }
+.planit-toasts { position: fixed; right: 1.5rem; bottom: 1.5rem; z-index: 10000; display: grid; gap: .75rem; width: min(26rem, calc(100vw - 3rem)); pointer-events: none; }
+.planit-toast { display: flex; align-items: center; gap: 1rem; padding: 1rem; border: 1px solid var(--primary); border-left-width: 4px; border-radius: .75rem; background: var(--white); color: var(--black); box-shadow: 0 8px 30px #0003; pointer-events: auto; overflow-wrap: anywhere; }
+.planit-toast span { flex: 1; }
+.planit-toast { position: relative; overflow: hidden; }
+.planit-toast-progress { position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background: var(--primary); transform: scaleX(0); transform-origin: left; }
+.planit-toast button { flex-shrink: 0; cursor: pointer; font-size: 1.5rem; line-height: 1; color: inherit; background: transparent; border: 0; padding: .25rem; }
+.planit-toast button:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+html[data-theme="dark"] .planit-toast { background: var(--black); color: var(--white); }

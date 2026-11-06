@@ -1520,9 +1520,9 @@ public class PlanControllerIntegrationTest {
     this.planRepository.save(plan);
 
     this.mockMvc.perform(post("/plans/join").with(csrf()).param("shortCode", " join1234 "))
-      .andExpect(redirectedUrl("/plans/" + planId + "/public"));
+      .andExpect(redirectedUrl("/plans"));
     this.mockMvc.perform(post("/plans/join").with(csrf()).param("shortCode", "JOIN1234"))
-      .andExpect(redirectedUrl("/plans/" + planId + "/public"));
+      .andExpect(redirectedUrl("/plans"));
     assertThat(plan.getJoinRequests(), hasSize(1));
     assertThat(plan.isParticipant(OTHER_EMAIL), is(false));
     this.mockMvc.perform(

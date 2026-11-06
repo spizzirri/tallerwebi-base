@@ -1,5 +1,7 @@
 package com.valhalla.presentation.user;
 
+import static com.valhalla.presentation.shared.SuccessRedirects.confirmed;
+
 import com.valhalla.domain.user.User;
 import com.valhalla.domain.user.UserService;
 import jakarta.validation.Valid;
@@ -134,7 +136,7 @@ public class UserController {
   @RequestMapping(value = "/{id}/delete", method = { RequestMethod.POST, RequestMethod.DELETE })
   public ModelAndView deleteUser(@PathVariable UUID id) {
     userService.delete(id);
-    return new ModelAndView(REDIRECT_USERS);
+    return confirmed(REDIRECT_USERS, "Usuario eliminado.");
   }
 
   private ModelAndView renderFormWithError(EditUserRequest form, boolean isEdit) {

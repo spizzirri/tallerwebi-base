@@ -250,7 +250,7 @@ public class PlanBanSecurityTest {
         .perform(
           post("/plans/join").with(user(MEMBER)).with(csrf()).param("shortCode", " ban12345 ")
         )
-        .andExpect(redirectedUrl("/plans/" + planId + "/public"));
+        .andExpect(redirectedUrl("/plans"));
       plan = plans.findById(planId).orElseThrow();
       assertThat(plan.isParticipant(MEMBER), is(false));
       service.respondToJoinRequest(

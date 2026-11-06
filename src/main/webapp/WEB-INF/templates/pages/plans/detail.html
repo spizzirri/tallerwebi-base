@@ -515,8 +515,8 @@
             </section>
 
             <section class="card border-0 shadow-sm p-4 mb-4" aria-labelledby="participants-heading">
-                <div th:if="${participantSuccess}" class="alert alert-success" role="status" th:text="${participantSuccess}"></div>
-                <div th:if="${invitationSuccess}" class="alert alert-success" role="status" th:text="${invitationSuccess}"></div>
+                <span hidden data-toast th:if="${participantSuccess}" th:text="${participantSuccess}"></span>
+                <span hidden data-toast th:if="${invitationSuccess}" th:text="${invitationSuccess}"></span>
                 <div th:if="${invitationError}" class="alert alert-danger" role="alert" th:text="${invitationError}"></div>
                 <form th:if="${canInvite}" th:action="@{/plans/{id}/participants/invite(id=${plan.id})}" method="POST" class="mb-4">
                     <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />

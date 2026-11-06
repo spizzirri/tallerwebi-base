@@ -33,6 +33,11 @@ public class PublicPlanJoinRequestE2E extends E2eBase {
       assertThat(visitorPage.locator("main h1")).hasText("Encuentro privado PET");
       assertThat(visitorPage.locator(".stop-details")).hasCount(0);
       visitorPage.locator("button:has-text('Solicitar participación')").click();
+      new WebPage(visitorPage).waitForPath("/plans");
+      assertThat(visitorPage.locator(".planit-toast[role='status']"))
+        .containsText("Solicitud enviada");
+
+      visitorPage.navigate(publicUrl);
       assertThat(visitorPage.locator("main [role='status']"))
         .containsText("Ya enviaste tu solicitud");
 

@@ -126,6 +126,7 @@ public class PlaceAdminController {
   public ModelAndView deletePlace(@PathVariable UUID id, RedirectAttributes redirectAttributes) {
     try {
       placeService.delete(id);
+      redirectAttributes.addFlashAttribute("successToast", "Lugar eliminado.");
     } catch (PlaceInUseException exception) {
       // AC-11: no se borra nada y el motivo viaja al listado por flash attribute.
       redirectAttributes.addFlashAttribute(ATTR_ERROR, ERROR_PLACE_IN_USE);

@@ -121,7 +121,12 @@ public class PlanJoinRequestSecurityTest {
   public void PET_S05_requestIdentityComesFromSessionAndVisitorCannotRespond() throws Exception {
     mvc
       .perform(post(requests()).with(user(REQUESTER)).with(csrf()).param("userEmail", OWNER))
-      .andExpect(redirectedUrl(landing()));
+      .andExpect(redirectedUrl("/plans"))
+      .andExpect(
+        org.springframework.test.web.servlet.result.MockMvcResultMatchers
+          .flash()
+          .attributeExists("successToast")
+      );
     assertThat(plan.getJoinRequests().getFirst().getRequester().getEmail(), is(REQUESTER));
     mvc
       .perform(post(response()).with(user(REQUESTER)).with(csrf()).param("action", "accept"))
@@ -227,7 +232,12 @@ public class PlanJoinRequestSecurityTest {
   private void submitRequest() throws Exception {
     mvc
       .perform(post(requests()).with(user(REQUESTER)).with(csrf()))
-      .andExpect(redirectedUrl(landing()));
+      .andExpect(redirectedUrl("/plans"))
+      .andExpect(
+        org.springframework.test.web.servlet.result.MockMvcResultMatchers
+          .flash()
+          .attributeExists("successToast")
+      );
     entityManager.flush();
   }
 

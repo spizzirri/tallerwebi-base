@@ -1,5 +1,7 @@
 package com.valhalla.presentation.plan;
 
+import static com.valhalla.presentation.shared.SuccessRedirects.confirmed;
+
 import com.valhalla.domain.bookmark.PlanBookmarkService;
 import com.valhalla.domain.exception.PlanBannedException;
 import com.valhalla.domain.place.Place;
@@ -243,7 +245,10 @@ public class PlanController {
   @PostMapping("/{id}/join-requests")
   public ModelAndView requestToJoin(@PathVariable UUID id, Authentication authentication) {
     planService.requestToJoin(id, authentication.getName());
-    return new ModelAndView(REDIRECT_PLAN_DETAIL + id + PUBLIC_SUFFIX);
+    return confirmed(
+      REDIRECT_PLANS,
+      "Solicitud enviada. Esperá la aprobación para acceder al plan."
+    );
   }
 
   @PostMapping("/{id}/join-requests/{requestId}/respond")
@@ -384,7 +389,7 @@ public class PlanController {
   @RequestMapping(value = "/{id}/delete", method = { RequestMethod.POST, RequestMethod.DELETE })
   public ModelAndView deletePlan(@PathVariable UUID id, Authentication authentication) {
     planService.deleteOwnedPlan(id, authentication.getName());
-    return new ModelAndView(REDIRECT_PLANS);
+    return confirmed(REDIRECT_PLANS, "Plan eliminado.");
   }
 
   @PostMapping("/{id}/participants/role")
@@ -513,7 +518,7 @@ public class PlanController {
   @PostMapping("/{id}/leave")
   public ModelAndView leavePlan(@PathVariable UUID id, Authentication authentication) {
     planService.leavePlan(id, authentication.getName());
-    return new ModelAndView(REDIRECT_PLANS);
+    return confirmed(REDIRECT_PLANS, "Saliste del plan.");
   }
 
   @PostMapping("/{id}/invitations/{invitationId}/respond")
@@ -538,9 +543,10 @@ public class PlanController {
     Plan plan = planService.joinPlan(shortCode, email);
     boolean awaitingApproval =
       !plan.getIsPublic() && !plan.isAdministrator(email) && !plan.isParticipant(email);
-    return new ModelAndView(
-      REDIRECT_PLAN_DETAIL + plan.getId() + (awaitingApproval ? PUBLIC_SUFFIX : "")
-    );
+    if (awaitingApproval) {
+      return confirmed(REDIRECT_PLANS, "Solicitud enviada.");
+    }
+    return confirmed(REDIRECT_PLAN_DETAIL + plan.getId(), "Ya participás del plan.");
   }
 
   /**

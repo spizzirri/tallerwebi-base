@@ -81,6 +81,38 @@ public class PlanControllerTest {
   private static final Validator VALIDATOR = localValidator();
 
   @Test
+  public void visibleChangesStaySilentAndJoiningConfirmsParticipation() {
+    var request = new org.springframework.mock.web.MockHttpServletRequest();
+    var flash = new org.springframework.web.servlet.FlashMap();
+    request.setAttribute(
+      org.springframework.web.servlet.DispatcherServlet.OUTPUT_FLASH_MAP_ATTRIBUTE,
+      flash
+    );
+    org.springframework.web.context.request.RequestContextHolder.setRequestAttributes(
+      new org.springframework.web.context.request.ServletRequestAttributes(request)
+    );
+    try {
+      when(planServiceMock.clonePlan(PLAN_ID, OWNER_EMAIL))
+        .thenReturn(plan(OTHER_PLAN_ID, "Copia"));
+      Plan shared = plan(PLAN_ID, "Publico");
+      shared.setIsPublic(true);
+      when(planServiceMock.joinPlan("PUBLIC01", OWNER_EMAIL)).thenReturn(shared);
+
+      controller.clonePlan(PLAN_ID, authentication);
+      controller.changeParticipantRole(PLAN_ID, "participant@test.com", "editor", authentication);
+      controller.respondToJoinRequest(PLAN_ID, JOIN_REQUEST_ID, "accept", authentication);
+      assertThat(flash.isEmpty(), is(true));
+
+      ModelAndView joined = controller.joinPlan("PUBLIC01", authentication);
+
+      assertThat(joined.getViewName(), is("redirect:/plans/" + PLAN_ID));
+      assertThat(flash.get("successToast"), is("Ya participás del plan."));
+    } finally {
+      org.springframework.web.context.request.RequestContextHolder.resetRequestAttributes();
+    }
+  }
+
+  @Test
   public void PET_privateLandingRedirectsAnonymousAndMembers() {
     Plan shared = plan(PLAN_ID, "Privado");
     shared.setIsPublic(false);
@@ -126,7 +158,7 @@ public class PlanControllerTest {
   public void PET_requestAndResponseUseAuthenticatedIdentity() {
     ModelAndView request = controller.requestToJoin(PLAN_ID, authentication);
     verify(planServiceMock).requestToJoin(PLAN_ID, OWNER_EMAIL);
-    assertThat(request.getViewName(), is("redirect:/plans/" + PLAN_ID + "/public"));
+    assertThat(request.getViewName(), is("redirect:/plans"));
     ModelAndView response = controller.respondToJoinRequest(
       PLAN_ID,
       JOIN_REQUEST_ID,
