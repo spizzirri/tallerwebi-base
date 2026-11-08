@@ -75,6 +75,13 @@
               </span>
             </td>
             <td class="flex justify-end gap-2 px-4 py-3">
+              <!-- "Mis planes" solo lista planes propios: el dueno comparte tambien los privados. -->
+              <button type="button" data-share-plan
+                th:attr="data-share-url=@{/plans/{id}/public(id=${plan.id})}"
+                class="inline-flex items-center gap-1.5 rounded bg-blue-100 px-3 py-1 text-sm font-medium text-blue-700 transition hover:bg-blue-200">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" /><polyline points="16 6 12 2 8 6" /><line x1="12" x2="12" y1="2" y2="15" /></svg>
+                Compartir
+              </button>
               <a th:href="@{/plans/{id}(id=${plan.id})}"
                 class="inline-flex items-center gap-1.5 rounded bg-gray-200 px-3 py-1 text-sm font-medium text-gray-700 transition hover:bg-gray-300">
                 <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -180,6 +187,7 @@
       </aside>
       </div>
     </div>
+  <script th:src="@{/js/share-plan.js}"></script>
   </main>
 
 </body>

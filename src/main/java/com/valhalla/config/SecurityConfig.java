@@ -172,7 +172,20 @@ public class SecurityConfig {
       .requestMatchers(
         org.springframework.http.HttpMethod.GET,
         "/plans/*/public",
+        // [OG-JPG] La portada de preview para los scrapers: la pide el bot sin sesion. El
+        // servicio resuelve foto-del-plan → portada generica → marca; con foto real el JPG
+        // recorta un dato del plan (la foto del lugar, publica de todos modos).
+        "/plans/*/og-image",
         "/plans/*/invitations/*/accept"
+      )
+      .permitAll()
+      // [OG-JPG] HEAD tambien, sobre la imagen y sobre la pagina: curl -I (y algunos bots
+      // que inspeccionan antes de bajar) golpea con HEAD, y un matcher GET-only no cubre
+      // ese verbo: responderia 302 al login y el bot descartaria el preview.
+      .requestMatchers(
+        org.springframework.http.HttpMethod.HEAD,
+        "/plans/*/public",
+        "/plans/*/og-image"
       )
       .permitAll()
       .requestMatchers(

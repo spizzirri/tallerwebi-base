@@ -321,28 +321,39 @@
                    estado viene de GET /api/plans/public y el click pega contra
                    POST/DELETE /api/plans/{id}/bookmarks sin recargar. Sin sesion el boton no se
                    renderiza (sec:authorize, mismo criterio que el resto de CTAs). -->
-              <button type="button" sec:authorize="isAuthenticated()"
-                @click.stop.prevent="toggleBookmark(plan)"
-                :disabled="plan.bookmarking === true"
-                :aria-busy="plan.bookmarking ? 'true' : 'false'"
-                :aria-pressed="plan.bookmarked ? 'true' : 'false'"
-                :aria-label="plan.bookmarked ? 'Quitar de Guardados' : 'Guardar en Guardados'"
-                :title="plan.bookmarked ? 'Quitar de Guardados' : 'Guardar en Guardados'"
-                :class="plan.bookmarked ? 'text-primary' : 'text-gray-600 hover:text-primary'"
-                class="absolute right-2 top-2 z-10 inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/90 shadow ring-1 ring-black/10 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary disabled:cursor-not-allowed disabled:opacity-50"
-                data-bookmark-toggle="true" :data-bookmarked="plan.bookmarked ? 'true' : 'false'">
-                <svg v-if="plan.bookmarked" data-bookmark-icon="filled" class="h-4 w-4"
-                  viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                  <path d="M6.5 3.5h11a1 1 0 0 1 1 1v16l-6.5-3.8L5.5 20.5v-16a1 1 0 0 1 1-1z"></path>
-                </svg>
-                <svg v-else data-bookmark-icon="outline" class="h-4 w-4" viewBox="0 0 24 24"
-                  fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"
-                  aria-hidden="true">
-                  <path d="M6.5 3.5h11a1 1 0 0 1 1 1v16l-6.5-3.8L5.5 20.5v-16a1 1 0 0 1 1-1z"></path>
-                </svg>
-              </button>
+              <div class="absolute right-2 top-2 z-10 flex items-center gap-2">
+                <button type="button" sec:authorize="isAuthenticated()"
+                  @click.stop.prevent="toggleBookmark(plan)"
+                  :disabled="plan.bookmarking === true"
+                  :aria-busy="plan.bookmarking ? 'true' : 'false'"
+                  :aria-pressed="plan.bookmarked ? 'true' : 'false'"
+                  :aria-label="plan.bookmarked ? 'Quitar de Guardados' : 'Guardar en Guardados'"
+                  :title="plan.bookmarked ? 'Quitar de Guardados' : 'Guardar en Guardados'"
+                  :class="plan.bookmarked ? 'text-primary' : 'text-gray-600 hover:text-primary'"
+                  class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/90 shadow ring-1 ring-black/10 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary disabled:cursor-not-allowed disabled:opacity-50"
+                  data-bookmark-toggle="true" :data-bookmarked="plan.bookmarked ? 'true' : 'false'">
+                  <svg v-if="plan.bookmarked" data-bookmark-icon="filled" class="h-4 w-4"
+                    viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M6.5 3.5h11a1 1 0 0 1 1 1v16l-6.5-3.8L5.5 20.5v-16a1 1 0 0 1 1-1z"></path>
+                  </svg>
+                  <svg v-else data-bookmark-icon="outline" class="h-4 w-4" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"
+                    aria-hidden="true">
+                    <path d="M6.5 3.5h11a1 1 0 0 1 1 1v16l-6.5-3.8L5.5 20.5v-16a1 1 0 0 1 1-1z"></path>
+                  </svg>
+                </button>
+                <!-- El listener es delegado en document (share-plan.js), asi que este boton
+                     montado por Vue comparte igual que los server-rendered. -->
+                <button type="button" data-share-plan
+                  :data-share-url="'/plans/' + plan.id + '/public'"
+                  aria-label="Compartir plan" title="Compartir plan"
+                  class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-gray-600 shadow ring-1 ring-black/10 transition hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary">
+                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" /><polyline points="16 6 12 2 8 6" /><line x1="12" x2="12" y1="2" y2="15" /></svg>
+                  <span class="sr-only">Compartir plan</span>
+                </button>
+              </div>
               <a :href="'/plans/' + plan.id + '/public'"
-                class="block rounded-lg border border-gray-200 bg-white p-4 pr-12 shadow-sm transition hover:bg-gray-50">
+                class="block rounded-lg border border-gray-200 bg-white p-4 pr-20 shadow-sm transition hover:bg-gray-50">
                 <h4 class="text-base font-medium text-gray-900">{{ plan.name }}</h4>
                 <p class="text-xs text-gray-500">{{ formatDate(plan.eventDate) || 'No date' }} &middot; {{ plan.placeCount }} places</p>
                 <!-- [CAL] Indicador read-only del agregado (16-CAL.md, AC-10): la version Vue
@@ -628,6 +639,9 @@
          mapa de iconos se construye al montar la app, y un script clásico se ejecuta en
          orden: cuando corra createElement, window.lucide ya existe. -->
     <script th:src="@{/js/lucide.min.js}"></script>
+
+    <!-- Compartir: las cards del sidebar las monta Vue, el script observa altas del DOM. -->
+    <script th:src="@{/js/share-plan.js}" defer></script>
 
     <!-- Vue.js app (Vue is already loaded by the layout) -->
     <script type="module" th:src="@{/js/pages/places-list.js}"></script>

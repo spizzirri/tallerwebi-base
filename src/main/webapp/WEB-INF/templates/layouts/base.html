@@ -21,9 +21,57 @@
 </head>
 
 <th:block th:fragment="headContent(pageTitle)">
+  <th:block th:replace="~{layouts/base :: previewMeta(${pageTitle})}"></th:block>
+  <th:block th:replace="~{layouts/base :: headTail(${pageTitle})}"></th:block>
+</th:block>
+
+<!-- El preview vive aparte del resto del head: las páginas con <head> propio
+     (pages/plans/public.html) lo insertan antes de sus stylesheets, para que los og* queden
+     al principio del head (los scrapers no ejecutan CSS ni JS y algunos cortan la lectura
+     si el head es largo), sin duplicar el resto del headContent. -->
+<th:block th:fragment="previewMeta(pageTitle)">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
+  <!-- Vista previa al compartir el link. Los scrapers de WhatsApp, Discord y Teams leen Open
+       Graph; Twitter/X leen la tarjeta propia. Van todos en el HTML que responde el servidor:
+       estos bots no ejecutan JS. Van primero en el head, antes del script de tema y de los
+       stylesheets, porque algunos bots cortan la lectura de metas si el head es muy largo. Las
+       URLs salen absolutas desde el bean siteOrigin, que arma la base con PUBLIC_BASE_URL si
+       está configurada (túnel/producción) o con la request si no (ver BaseWebConfig). -->
+  <meta property="og:type" th:content="${ogType != null ? ogType : 'website'}">
+  <meta property="og:site_name" content="PlanIt">
+  <meta property="og:title" th:content="${ogTitle != null} ? ${ogTitle} : (${pageTitle != null} ? ${pageTitle} : 'PlanIt')">
+  <meta property="og:description" th:content="${ogDescription != null}
+    ? ${ogDescription}
+    : (${pageDescription != null}
+      ? ${pageDescription}
+      : 'Discover and plan your perfect day in Buenos Aires')">
+  <meta property="og:url" th:if="${ogUrl != null}" th:content="${@siteOrigin.absolute(ogUrl)}">
+  <meta property="og:image" th:content="${@siteOrigin.absolute(ogImage != null ? ogImage : '/images/og-image.png')}">
+  <meta property="og:image:secure_url" th:content="${@siteOrigin.absolute(ogImage != null ? ogImage : '/images/og-image.png')}">
+  <!-- Alt de la imagen: WhatsApp lo pide para accesibilidad y suma a la tarjeta grande. El
+       preview del plan es su portada, asi que se describe con el mismo titulo (plan · creador). -->
+  <meta property="og:image:alt" th:content="${ogTitle != null} ? ${ogTitle} : (${pageTitle != null} ? ${pageTitle} : 'PlanIt')">
+  <!-- Dimensiones y tipo: el endpoint de preview del plan garantiza JPG 1200x630; la imagen de
+       marca es PNG del mismo tamaño; sin ogImageType (páginas que no definen preview) se declaran
+       igual los valores de la marca. -->
+  <th:block th:if="${ogImage == null || ogImageType != null}">
+    <meta property="og:image:type" th:content="${ogImageType != null ? ogImageType : 'image/png'}">
+    <meta property="og:image:width" th:content="${ogImageWidth != null ? ogImageWidth : 1200}">
+    <meta property="og:image:height" th:content="${ogImageHeight != null ? ogImageHeight : 630}">
+  </th:block>
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" th:content="${ogTitle != null} ? ${ogTitle} : (${pageTitle != null} ? ${pageTitle} : 'PlanIt')">
+  <meta name="twitter:description" th:content="${ogDescription != null}
+    ? ${ogDescription}
+    : (${pageDescription != null}
+      ? ${pageDescription}
+      : 'Discover and plan your perfect day in Buenos Aires')">
+  <meta name="twitter:image" th:content="${@siteOrigin.absolute(ogImage != null ? ogImage : '/images/og-image.png')}">
+</th:block>
+
+<th:block th:fragment="headTail(pageTitle)">
   <!-- Modo oscuro: el tema se resuelve acá, en línea y antes de cualquier stylesheet, para que
        la primera pintura ya salga con el modo elegido y no haya destello claro. La precedencia
        es preferencia del usuario > localStorage > sistema:
@@ -85,31 +133,10 @@
     ? ${pageDescription}
     : 'Discover and plan your perfect day in Buenos Aires'">
 
-  <!-- Vista previa al compartir el link. Los scrapers de WhatsApp, Slack y LinkedIn leen
-       Open Graph; Twitter/X leen la tarjeta propia. El @{} de Thymeleaf devuelve una URL
-       relativa en un GET directo, y og:image relativa no se descarga: el prefijo sale del
-       bean siteOrigin, que lo arma con la request real (ver BaseWebConfig). -->
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="PlanIt">
-  <meta property="og:title" th:content="${ogTitle != null} ? ${ogTitle} : (${pageTitle != null} ? ${pageTitle} : 'PlanIt')">
-  <meta property="og:description" th:content="${ogDescription != null}
-    ? ${ogDescription}
-    : (${pageDescription != null}
-      ? ${pageDescription}
-      : 'Discover and plan your perfect day in Buenos Aires')">
-  <meta property="og:url" th:if="${ogUrl != null}" th:content="${ogUrl}">
-  <meta property="og:image" th:content="|${@siteOrigin.base()}@{/images/og-image.png}|">
-  <meta property="og:image:type" content="image/png">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" th:content="${ogTitle != null} ? ${ogTitle} : (${pageTitle != null} ? ${pageTitle} : 'PlanIt')">
-  <meta name="twitter:description" th:content="${ogDescription != null}
-    ? ${ogDescription}
-    : (${pageDescription != null}
-      ? ${pageDescription}
-      : 'Discover and plan your perfect day in Buenos Aires')">
-  <meta name="twitter:image" th:content="|${@siteOrigin.base()}@{/images/og-image.png}|">
+  <!-- El botón de compartir resuelve la URL del plan contra este origen en vez de
+       window.location.origin: detrás de ngrok el link público no es el host que ve el
+       navegador. Con PUBLIC_BASE_URL sin configurar, es el origen de la página (localhost). -->
+  <meta name="public-base-url" th:content="${@siteOrigin.base()}">
 
   <!-- Barra del navegador en mobile, del color del navbar. El manifest da nombre e ícono
        al "agregar a pantalla de inicio"; apple-touch-icon es aparte porque iOS no acepta

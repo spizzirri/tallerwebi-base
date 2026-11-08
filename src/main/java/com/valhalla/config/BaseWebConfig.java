@@ -10,6 +10,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Scope;
+import org.springframework.core.env.Environment;
 import org.springframework.http.CacheControl;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -77,27 +78,61 @@ public abstract class BaseWebConfig implements WebMvcConfigurer {
   }
 
   /**
-   * Origen absoluto de la request actual, para las etiquetas de compartir. El
-   * <code>@{...}</code> de Thymeleaf devuelve una URL relativa en un GET directo, y una
-   * <code>og:image</code> relativa no la baja ningún scraper. Thymeleaf 3.1 ya no expone
-   * <code>#request</code> en las expresiones, así que el prefijo se arma acá y el template
-   * lo lee como <code>${@siteOrigin.base()}</code>. Sale de la request y no de una
-   * constante: detrás de un proxy el host público no es adivinable desde el código.
+   * Origen absoluto para las etiquetas de compartir. El <code>@{...}</code> de Thymeleaf
+   * devuelve una URL relativa en un GET directo, y una <code>og:image</code> relativa no la
+   * baja ningún scraper. Thymeleaf 3.1 ya no expone <code>#request</code> en las expresiones,
+   * así que el prefijo se arma acá y el template lo lee como <code>${@siteOrigin.base()}</code>.
+   *
+   * <p>La base pública es configurable con <code>PUBLIC_BASE_URL</code> (variable de entorno o
+   * property de Spring, ej. <code>https://abc123.ngrok-free.app</code>); como segundo origen se
+   * lee <code>APP_BASE_URL</code>, la misma variable que ya usa el email de invitaciones y el
+   * docker-compose. Es el origen que reciben los bots de WhatsApp/Discord, y detrás de un túnel
+   * o un despliegue la request llega con el host interno, no con el dominio público. Sin ninguna
+   * de las dos puesta, se cae al origen de la request (incluido el puerto), que es lo correcto
+   * en desarrollo local.
    */
   @Bean
   @Scope(WebApplicationContext.SCOPE_REQUEST)
-  public SiteOrigin siteOrigin(HttpServletRequest request) {
+  public SiteOrigin siteOrigin(HttpServletRequest request, Environment environment) {
+    String configured = environment.getProperty("PUBLIC_BASE_URL");
+    if (configured == null || configured.isBlank()) {
+      configured = environment.getProperty("APP_BASE_URL");
+    }
+    if (configured != null && !configured.isBlank()) {
+      String base = configured.trim();
+      while (base.endsWith("/")) {
+        base = base.substring(0, base.length() - 1);
+      }
+      return new SiteOrigin(base);
+    }
+    // Detras de ForwardedHeaderFilter (SecurityInitializer) con un tunel https, getServerPort()
+    // devuelve 443: los puertos default de cada scheme no se pegan en la URL.
+    String scheme = request.getScheme();
+    int port = request.getServerPort();
+    boolean defaultPort =
+      ("http".equals(scheme) && port == 80) || ("https".equals(scheme) && port == 443);
     return new SiteOrigin(
-      request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
+      scheme + "://" + request.getServerName() + (defaultPort ? "" : ":" + port)
     );
   }
 
   /**
-   * Origen absoluto de una request. Sin proxy de scope: solo lo lee el template.
+   * Origen absoluto para las URLs de compartir. Sin proxy de scope: solo lo lee el template.
    *
-   * @param base scheme, host y puerto de la request, con el separador {@code ://} ya puesto
+   * @param base scheme, host y puerto, con el separador {@code ://} ya puesto y sin slash final
    */
-  public record SiteOrigin(String base) {}
+  public record SiteOrigin(String base) {
+    /** Absolutiza una ruta local; una URL que ya viene absoluta (la foto de un lugar) pasa tal cual. */
+    public String absolute(String url) {
+      if (url == null || url.isBlank()) {
+        return url;
+      }
+      if (url.startsWith("http://") || url.startsWith("https://")) {
+        return url;
+      }
+      return base + (url.startsWith("/") ? url : "/" + url);
+    }
+  }
 
   @Override
   public void addInterceptors(InterceptorRegistry registry) {

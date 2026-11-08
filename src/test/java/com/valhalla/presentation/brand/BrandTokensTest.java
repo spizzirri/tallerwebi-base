@@ -481,15 +481,26 @@ public class BrandTokensTest {
     String base = read(BASE);
 
     for (String[] tag : new String[][] {
-      { "og:type", "content=\"website\"" },
+      { "og:type", "th:content=\"${ogType != null ? ogType : 'website'}\"" },
       { "og:site_name", "content=\"PlanIt\"" },
       { "og:title", null },
       { "og:description", null },
-      { "og:image", "th:content=\"|${@siteOrigin.base()}@{/images/og-image.png}|\"" },
-      { "og:image:width", "content=\"1200\"" },
-      { "og:image:height", "content=\"630\"" },
+      {
+        "og:image",
+        "th:content=\"${@siteOrigin.absolute(ogImage != null ? ogImage : '/images/og-image.png')}\"",
+      },
+      {
+        "og:image:secure_url",
+        "th:content=\"${@siteOrigin.absolute(ogImage != null ? ogImage : '/images/og-image.png')}\"",
+      },
+      { "og:image:alt", null },
+      { "og:image:width", "th:content=\"${ogImageWidth != null ? ogImageWidth : 1200}\"" },
+      { "og:image:height", "th:content=\"${ogImageHeight != null ? ogImageHeight : 630}\"" },
       { "twitter:card", "content=\"summary_large_image\"" },
-      { "twitter:image", "th:content=\"|${@siteOrigin.base()}@{/images/og-image.png}|\"" },
+      {
+        "twitter:image",
+        "th:content=\"${@siteOrigin.absolute(ogImage != null ? ogImage : '/images/og-image.png')}\"",
+      },
     }) {
       String element = metaElement(base, tag[0]);
       if (tag[1] != null) {

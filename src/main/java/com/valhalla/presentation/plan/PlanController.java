@@ -108,6 +108,9 @@ public class PlanController {
     model.put("canInviteInternal", plan.canInviteInternal(userEmail));
     model.put("canInviteByEmail", plan.canInviteByEmail(userEmail));
     model.put("canInvite", plan.canInviteInternal(userEmail) || plan.canInviteByEmail(userEmail));
+    // El dueno y los editores comparten un plan privado; el resto de participantes no. Un plan
+    // publico lo comparte cualquiera (21-PET: la visibilidad gobierna el acceso).
+    model.put("canShare", plan.getIsPublic() || plan.canEdit(userEmail));
     model.put("canHandleRequests", plan.canHandleRequests(userEmail));
     if (plan.canHandleRequests(userEmail)) {
       model.put("joinRequests", planService.getPendingJoinRequests(id, userEmail));
@@ -196,16 +199,38 @@ public class PlanController {
     return new ModelAndView(VIEW_PUBLIC_PLAN, model);
   }
 
+  /**
+   * Meta tags Open Graph/Twitter de la vista pública: los lee el scraper de WhatsApp/Discord/
+   * Teams sin ejecutar JS, así que todo sale del HTML ya renderizado (base.html los dibuja con
+   * el prefijo absoluto de siteOrigin, que respeta PUBLIC_BASE_URL).
+   */
   private void addPublicMeta(Map<String, Object> model, Plan plan) {
+    String creator = displayName(plan.getAdministrator());
     model.put("pageTitle", plan.getName());
-    if (plan.getDescription() != null && !plan.getDescription().isBlank()) {
-      model.put("pageDescription", plan.getDescription());
-    }
-    model.put("ogTitle", plan.getName());
-    if (plan.getDescription() != null && !plan.getDescription().isBlank()) {
-      model.put("ogDescription", plan.getDescription());
-    }
+    model.put("ogTitle", creator.isBlank() ? plan.getName() : plan.getName() + " · por " + creator);
     model.put("ogType", "website");
+    model.put("ogUrl", "/plans/" + plan.getId() + PUBLIC_SUFFIX);
+    String description = plan.getDescription() == null ? "" : plan.getDescription().trim();
+    if (description.isBlank()) {
+      description =
+        creator.isBlank()
+          ? "Un plan para descubrir en PlanIt."
+          : "Plan de " + creator + " en PlanIt.";
+    }
+    // Los scrapers cortan la descripción igual: se recorta acá para que el texto visto sea el enviado.
+    String ogDescription = description.length() <= 200
+      ? description
+      : description.substring(0, 199).stripTrailing() + "…";
+    model.put("pageDescription", ogDescription);
+    model.put("ogDescription", ogDescription);
+    // La og-image siempre sale de nuestro propio dominio por el endpoint dedicado
+    // (/plans/{id}/og-image): los scrapers no leen SVG, así que la misma portada que pinta la
+    // card se rasteriza y codifica a JPEG aca (ver PlanOgImageService) y el bot nunca sigue
+    // redirecciones. Acá solo se anuncian el formato fijo que el endpoint garantiza.
+    model.put("ogImage", "/plans/" + plan.getId() + "/og-image");
+    model.put("ogImageType", "image/jpeg");
+    model.put("ogImageWidth", 1200);
+    model.put("ogImageHeight", 630);
   }
 
   private ModelAndView showJoinLanding(Plan plan, String email) {

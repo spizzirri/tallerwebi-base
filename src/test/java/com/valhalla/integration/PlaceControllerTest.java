@@ -113,4 +113,57 @@ public class PlaceControllerTest {
       // de que Tailwind compilara.
       .andExpect(content().string(not(containsString("textContent.length > 2000"))));
   }
+
+  // [SHARE] El sidebar de /explore lo pinta Vue despues del load: el boton viaja solo con el
+  // link (share-plan.js comparte unicamente la URL; el mensaje no lleva titulo ni descripcion),
+  // y el listener delegado cubre el alta tardia.
+  @Test
+  @WithMockUser
+  public void shouldShipTheShareButtonOnTheExplorePlanCards() throws Exception {
+    mockMvc
+      .perform(get("/explore"))
+      .andExpect(status().isOk())
+      .andExpect(content().string(containsString("data-share-plan")))
+      .andExpect(
+        content().string(containsString(":data-share-url=\"'/plans/' + plan.id + '/public'\""))
+      )
+      .andExpect(content().string(not(containsString(":data-share-title"))))
+      .andExpect(content().string(not(containsString(":data-share-text"))))
+      .andExpect(content().string(not(containsString(":data-share-cover"))))
+      .andExpect(content().string(containsString("/js/share-plan.js")));
+  }
+
+  // [META] El catalogo tambien se comparte por link: mismo par OG/Twitter del layout con URL
+  // absoluta y la portada de marca.
+  @Test
+  @WithMockUser
+  public void shouldDeclareTheSharePreviewForTheExploreCatalogue() throws Exception {
+    mockMvc
+      .perform(get("/explore"))
+      .andExpect(status().isOk())
+      .andExpect(
+        content()
+          .string(
+            containsString("property=\"og:title\" content=\"Explorar lugares en Buenos Aires\"")
+          )
+      )
+      .andExpect(
+        content()
+          .string(
+            containsString(
+              "property=\"og:description\" content=\"Descubrí lugares y armá tu plan perfecto " +
+              "con PlanIt.\""
+            )
+          )
+      )
+      .andExpect(
+        content().string(containsString("property=\"og:url\" content=\"http://localhost/explore\""))
+      )
+      .andExpect(
+        content()
+          .string(
+            containsString("property=\"og:image\" content=\"http://localhost/images/og-image.png\"")
+          )
+      );
+  }
 }

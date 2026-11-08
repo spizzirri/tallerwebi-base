@@ -101,6 +101,20 @@
             <version>${thymeleaf.spring.version}</version>
         </dependency>
 
+        <!-- SVG -> PNG para la og:image de compartir: los scrapers (WhatsApp, Discord, Teams,
+             X) no renderizan SVG. batik-codec aporta el encoder que usa PNGTranscoder. -->
+        <dependency>
+            <groupId>org.apache.xmlgraphics</groupId>
+            <artifactId>batik-transcoder</artifactId>
+            <version>1.18</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.xmlgraphics</groupId>
+            <artifactId>batik-codec</artifactId>
+            <version>1.18</version>
+            <scope>runtime</scope>
+        </dependency>
+
         <dependency>
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>

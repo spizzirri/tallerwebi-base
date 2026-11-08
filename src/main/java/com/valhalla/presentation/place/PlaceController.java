@@ -26,6 +26,9 @@ public class PlaceController {
     model.put("defaultPlanSettings", new com.valhalla.domain.plan.PlanSettings());
     // [WEA] El selector de fecha del plan no acepta días ya pasados.
     model.put("today", LocalDate.now().toString());
+    model.put("ogTitle", "Explorar lugares en Buenos Aires");
+    model.put("ogDescription", "Descubrí lugares y armá tu plan perfecto con PlanIt.");
+    model.put("ogUrl", "/explore");
     // [APL] Sesión para el picker del panel de detalle: /api/plans devuelve [] tanto en
     // anónimo como en un usuario sin planes, así que por el fetch solo el frontend no sabe
     // si debe ocultar el bloque o ofrecer crear un primer plan. Defensivo como el

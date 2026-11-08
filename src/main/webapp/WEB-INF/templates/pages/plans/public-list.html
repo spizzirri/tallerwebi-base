@@ -116,8 +116,16 @@
             <!-- [MARK] Guardar para clonar despues. Va fuera del <a> porque un form adentro de un
                  anchor es HTML invalido; absoluto arriba a la derecha del cover. Sin sesion no se
                  renderiza (AC-05) y el returnTo conserva los filtros del feed. -->
-            <div th:if="${canBookmark}" class="absolute right-3 top-3 z-10">
-              <div th:replace="~{components/bookmark-button :: toggle(${plan.id}, ${plan.bookmarked}, ${currentUrl})}"></div>
+            <div class="absolute right-3 top-3 z-10 flex items-center gap-2">
+              <button type="button" data-share-plan
+                th:attr="data-share-url=@{/plans/{id}/public(id=${plan.id})}"
+                aria-label="Compartir plan" title="Compartir plan"
+                class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-gray-600 shadow ring-1 ring-black/10 transition hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary">
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" /><polyline points="16 6 12 2 8 6" /><line x1="12" x2="12" y1="2" y2="15" /></svg>
+              </button>
+              <div th:if="${canBookmark}">
+                <div th:replace="~{components/bookmark-button :: toggle(${plan.id}, ${plan.bookmarked}, ${currentUrl})}"></div>
+              </div>
             </div>
             <!-- [DIS] 23-DIS: el link de la card es un overlay. HTML no admite <a> dentro de <a>
                  y el nombre del autor linkeaba a su perfil ADENTRO del link de la card: el parser
@@ -258,6 +266,7 @@
           </a>
         </div>
       </div>
+      <script th:src="@{/js/share-plan.js}"></script>
     </main>
   </body>
 </html>

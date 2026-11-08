@@ -12,4 +12,5 @@ import org.springframework.security.web.context.AbstractSecurityWebApplicationIn
 public class SecurityInitializer extends AbstractSecurityWebApplicationInitializer {
   // No constructor args: the proxy finds springSecurityFilterChain in the
   // servlet WebApplicationContext (registered via SecurityConfig there).
+  // onStartup es final aca: el ForwardedHeaderFilter se registra en MyServletInitializer.
 }

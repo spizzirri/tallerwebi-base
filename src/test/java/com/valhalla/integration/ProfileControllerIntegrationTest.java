@@ -199,6 +199,75 @@ public class ProfileControllerIntegrationTest {
     assertThat(html, not(containsString("Plan privado de Ada")));
   }
 
+  // --- [META/SHARE] preview del perfil y boton en sus cards ---
+
+  @Test
+  public void profileWithAvatarPreviewsWithTheAvatarNotTheBrandImage() throws Exception {
+    User owner = userRepository.findById(selfId).orElseThrow();
+    owner.setAvatarUrl("/images/avatars/avatar-1.svg");
+    userRepository.save(owner);
+
+    String html =
+      this.mockMvc.perform(get("/profile/" + selfId))
+        .andExpect(status().isOk())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+
+    // Con avatar cargado, la tarjeta del perfil usa la foto real del usuario, absoluta igual
+    // que og:image:secure_url (mismo valor, solo cambia el nombre de la propiedad).
+    assertThat(
+      html,
+      containsString(
+        "property=\"og:image\" content=\"http://localhost/images/avatars/avatar-1.svg\""
+      )
+    );
+    assertThat(
+      html,
+      containsString(
+        "property=\"og:image:secure_url\" content=\"http://localhost/images/avatars/avatar-1.svg\""
+      )
+    );
+  }
+
+  @Test
+  public void publicProfileDeclaresItsSharePreviewAndShipsTheShareButton() throws Exception {
+    Plan plan = new Plan();
+    plan.setName("Plan publico de Ada");
+    plan.setIsPublic(true);
+    plan.setAdministrator(userRepository.findById(selfId).orElseThrow());
+    Plan created = planService.createPlan(plan, SELF_EMAIL);
+
+    String html =
+      this.mockMvc.perform(get("/profile/" + selfId))
+        .andExpect(status().isOk())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+
+    // El perfil no tiene portada propia: el preview cae en la imagen de marca, siempre absoluta.
+    assertThat(html, containsString("property=\"og:title\" content=\"Ada Lovelace\""));
+    assertThat(
+      html,
+      containsString(
+        "property=\"og:description\" content=\"Perfil de Ada Lovelace en PlanIt. " +
+        "Descubrí sus planes públicos.\""
+      )
+    );
+    assertThat(
+      html,
+      containsString("property=\"og:url\" content=\"http://localhost/profile/" + selfId + "\"")
+    );
+    assertThat(
+      html,
+      containsString("property=\"og:image\" content=\"http://localhost/images/og-image.png\"")
+    );
+    assertThat(html, containsString("name=\"twitter:card\" content=\"summary_large_image\""));
+    // La card del plan publico comparte el link; la tarjeta la arma la plataforma con la OG.
+    assertThat(html, containsString("data-share-url=\"/plans/" + created.getId() + "/public\""));
+    assertThat(html, containsString("/js/share-plan.js"));
+  }
+
   // --- [MARK] toggle de Guardados en las cards del perfil publico ---
 
   @Test

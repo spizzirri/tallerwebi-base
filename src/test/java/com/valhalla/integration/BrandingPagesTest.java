@@ -232,7 +232,7 @@ public class BrandingPagesTest {
     assertThat(head, not(containsString("@siteOrigin")));
 
     java.util.regex.Pattern absoluteImage = java.util.regex.Pattern.compile(
-      "https?://[^/]+:\\d+/images/og-image\\.png"
+      "https?://[^/]+(:\\d+)?/images/og-image\\.png"
     );
     // Open Graph se declara con property= y Twitter con name=: el patrón acepta ambos.
     for (String property : new String[] { "og:image", "twitter:image" }) {

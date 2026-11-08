@@ -7,8 +7,11 @@
      mapa) + administratorName + participantCount + los flags de sesion de los CTAs.
 
      Como en detail.html, Leaflet va antes del stack Tailwind, asi el head propio la carga
-     primero y despues hereda las metas compartidas via headContent. -->
+     primero y despues hereda el resto del head compartido via headTail. El preview para los
+     scrapers (previewMeta) va primero en el head, antes de cualquier stylesheet: es la pagina
+     que leen los bots. -->
 <head>
+  <th:block th:replace="~{layouts/base :: previewMeta(${plan.name})}"></th:block>
   <!-- Leaflet CSS, vendorizado con la version fija (1.9.4) en el repo. Ya no viene de CDN: un
        CDN caido dejaba el mapa muerto, y divIcon({ html: elemento }) depende del contrato de
        1.9, asi que la version no puede quedar en manos de un origen remoto. -->
@@ -20,7 +23,7 @@
       border-radius: 0.5rem;
     }
   </style>
-  <th:block th:replace="~{layouts/base :: headContent(${plan.name})}"></th:block>
+  <th:block th:replace="~{layouts/base :: headTail(${plan.name})}"></th:block>
 </head>
 
 <body th:replace="~{layouts/base :: layout(~{::main})}">
@@ -30,8 +33,19 @@
     <div class="mt-1 flex items-start justify-between gap-3">
       <h1 class="text-3xl font-bold text-black" th:text="${plan.name}">Plan</h1>
       <!-- [MARK] Toggle de Guardados: con sesion se puede guardar para clonar despues. -->
-      <div th:if="${canBookmark}" class="shrink-0 pt-1">
-        <div th:replace="~{components/bookmark-button :: toggle(${plan.id}, ${isBookmarked}, ${currentPath})}"></div>
+      <div class="flex shrink-0 items-center gap-2 pt-1">
+        <button
+          type="button"
+          data-share-plan
+          th:attr="data-share-url=@{/plans/{id}/public(id=${plan.id})}"
+          class="inline-flex items-center gap-2 rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
+        >
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" /><polyline points="16 6 12 2 8 6" /><line x1="12" x2="12" y1="2" y2="15" /></svg>
+          Compartir
+        </button>
+        <div th:if="${canBookmark}">
+          <div th:replace="~{components/bookmark-button :: toggle(${plan.id}, ${isBookmarked}, ${currentPath})}"></div>
+        </div>
       </div>
     </div>
 
@@ -202,6 +216,7 @@
       window.PUBLIC_PLAN_SEED = { stops: /*[[${itineraryPlaces}]]*/ [] };
     </script>
     <script type="module" th:src="@{/js/pages/plans-public.js}"></script>
+    <script th:src="@{/js/share-plan.js}"></script>
 
     <style>
       /* Mismo estilo de marcadores que pages/plans/detail.html (13-PVP: esa vista es la

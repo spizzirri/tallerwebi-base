@@ -42,6 +42,9 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       SECURITY_SECRET: ${SECURITY_SECRET}
       APP_BASE_URL: ${APP_BASE_URL:-http://localhost:8080}
+      # Base publica para los meta tags OG (link previews). Si no se pone, el app cae a
+      # APP_BASE_URL y, sin ninguna de las dos, al origen de la request.
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-}
       SMTP_HOST: ${SMTP_HOST:-}
       SMTP_PORT: ${SMTP_PORT:-587}
       SMTP_USERNAME: ${SMTP_USERNAME:-}
