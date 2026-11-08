@@ -12,6 +12,7 @@ import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -91,6 +92,7 @@ public class PlanServiceImplTest {
   private UserRepository userRepositoryMock;
   private PlaceRepository placeRepositoryMock;
   private PlanRatingRepository planRatingRepositoryMock;
+  private com.valhalla.domain.notification.NotificationService notificationServiceMock;
 
   @BeforeEach
   public void init() {
@@ -98,12 +100,14 @@ public class PlanServiceImplTest {
     this.userRepositoryMock = mock(UserRepository.class);
     this.placeRepositoryMock = mock(PlaceRepository.class);
     this.planRatingRepositoryMock = mock(PlanRatingRepository.class);
+    this.notificationServiceMock = mock(com.valhalla.domain.notification.NotificationService.class);
     this.planService =
       new PlanServiceImpl(
         this.planRepositoryMock,
         this.userRepositoryMock,
         this.placeRepositoryMock,
-        this.planRatingRepositoryMock
+        this.planRatingRepositoryMock,
+        this.notificationServiceMock
       );
   }
 
@@ -1348,6 +1352,237 @@ public class PlanServiceImplTest {
       () -> this.planService.clonePlan(PLAN_ID, UNKNOWN_EMAIL)
     );
     verifyNoInteractions(this.planRepositoryMock);
+  }
+
+  // --- [NOTIF] hooks de notificacion ---
+
+  @Test
+  public void NOTIF_createPlanPublico_notificaUnPlanNuevo() {
+    // given
+    User owner = owner(OWNER_ID, OWNER_EMAIL);
+    when(this.userRepositoryMock.findByEmail(OWNER_EMAIL)).thenReturn(Optional.of(owner));
+    Plan plan = new Plan();
+    plan.setId(PLAN_ID);
+    plan.setName("Escapada");
+    plan.setIsPublic(true);
+    when(this.planRepositoryMock.save(plan)).thenReturn(plan);
+
+    // when
+    this.planService.createPlan(plan, OWNER_EMAIL);
+
+    // then: AC-03, los seguidores del autor se enteran
+    verify(this.notificationServiceMock, times(1)).notifyNewPlan(owner, PLAN_ID, "Escapada");
+  }
+
+  @Test
+  public void NOTIF_createPlanPrivado_noNotificaNadie() {
+    // given
+    when(this.userRepositoryMock.findByEmail(OWNER_EMAIL))
+      .thenReturn(Optional.of(owner(OWNER_ID, OWNER_EMAIL)));
+    Plan plan = new Plan();
+    plan.setName("Escapada");
+    when(this.planRepositoryMock.save(plan)).thenReturn(plan);
+
+    // when
+    this.planService.createPlan(plan, OWNER_EMAIL);
+
+    // then
+    verifyNoInteractions(this.notificationServiceMock);
+  }
+
+  @Test
+  public void NOTIF_updatePlan_alPasarDePrivadoAPublico_notificaUnaVez() {
+    // given
+    User owner = owner(OWNER_ID, OWNER_EMAIL);
+    Plan existing = ownedPlan(PLAN_ID, owner);
+    existing.setName("Nombre viejo");
+    existing.setIsPublic(false);
+    when(this.planRepositoryMock.findById(PLAN_ID)).thenReturn(Optional.of(existing));
+    when(this.planRepositoryMock.save(existing)).thenReturn(existing);
+    Plan changes = new Plan();
+    changes.setName("Nombre viejo");
+    changes.setIsPublic(true);
+
+    // when: publicar
+    this.planService.updatePlan(PLAN_ID, changes, OWNER_EMAIL);
+
+    // then: AC-03
+    verify(this.notificationServiceMock, times(1)).notifyNewPlan(owner, PLAN_ID, "Nombre viejo");
+
+    // when: editar otra vez sobre un plan ya publico
+    this.planService.updatePlan(PLAN_ID, changes, OWNER_EMAIL);
+
+    // then: no hay re-notificacion, el evento es la publicacion (AC-03)
+    verify(this.notificationServiceMock, times(1)).notifyNewPlan(any(), any(), any());
+  }
+
+  @Test
+  public void NOTIF_joinPlanPublico_notificaAlDuenoDelParticipante() {
+    // given
+    Plan plan = invitationPlan(true);
+    plan.setName("Viaje a Bariloche");
+    plan.setShortCode("ABCDEFGH");
+    User participant = owner(INVITED_ID, OTHER_EMAIL);
+    when(this.planRepositoryMock.findByShortCode("ABCDEFGH")).thenReturn(Optional.of(plan));
+    when(this.userRepositoryMock.findByEmail(OTHER_EMAIL)).thenReturn(Optional.of(participant));
+
+    // when
+    this.planService.joinPlan("ABCDEFGH", OTHER_EMAIL);
+
+    // then: AC-02, el dueno se entera del participante nuevo
+    verify(this.notificationServiceMock, times(1))
+      .notifyNewParticipant(participant, plan.getAdministrator(), PLAN_ID, "Viaje a Bariloche");
+  }
+
+  @Test
+  public void NOTIF_joinPlanDeQuienYaParticipa_noNotifica() {
+    // given: el usuario ya es participante, el join es no-op
+    Plan plan = invitationPlan(true);
+    User participant = owner(INVITED_ID, OTHER_EMAIL);
+    plan.getParticipants().add(participant);
+    plan.setShortCode("ABCDEFGH");
+    when(this.planRepositoryMock.findByShortCode("ABCDEFGH")).thenReturn(Optional.of(plan));
+    when(this.userRepositoryMock.findByEmail(OTHER_EMAIL)).thenReturn(Optional.of(participant));
+
+    // when
+    this.planService.joinPlan("ABCDEFGH", OTHER_EMAIL);
+
+    // then
+    verifyNoInteractions(this.notificationServiceMock);
+  }
+
+  @Test
+  public void NOTIF_acceptJoinRequest_notificaAlDueno() {
+    // given
+    Plan plan = invitationPlan(false);
+    plan.setName("Viaje a Bariloche");
+    User requester = owner(INVITED_ID, OTHER_EMAIL);
+    com.valhalla.domain.plan.PlanJoinRequest request = pendingRequest(plan, requester);
+
+    // when
+    planService.respondToJoinRequest(PLAN_ID, request.getId(), "accept", OWNER_EMAIL);
+
+    // then: AC-02
+    verify(this.notificationServiceMock, times(1))
+      .notifyNewParticipant(requester, plan.getAdministrator(), PLAN_ID, "Viaje a Bariloche");
+    // AC-16: el solicitante tambien cierra su pendiente
+    verify(this.notificationServiceMock, times(1))
+      .notifyJoinRequestResponse(
+        plan.getAdministrator(),
+        requester,
+        PLAN_ID,
+        "Viaje a Bariloche",
+        true
+      );
+  }
+
+  @Test
+  public void NOTIF_requestToJoin_notificaAlDueno() {
+    // given
+    Plan plan = invitationPlan(false);
+    plan.setName("Viaje a Jujuy");
+    User requester = owner(INVITED_ID, OTHER_EMAIL);
+    when(userRepositoryMock.findByEmail(OTHER_EMAIL)).thenReturn(Optional.of(requester));
+
+    // when
+    planService.requestToJoin(PLAN_ID, OTHER_EMAIL);
+
+    // then: AC-15
+    verify(this.notificationServiceMock, times(1))
+      .notifyJoinRequest(requester, plan.getAdministrator(), PLAN_ID, "Viaje a Jujuy");
+  }
+
+  @Test
+  public void NOTIF_solicitudRepetida_noNotificaDeNuevo() {
+    // given
+    Plan plan = invitationPlan(false);
+    User requester = owner(INVITED_ID, OTHER_EMAIL);
+    when(userRepositoryMock.findByEmail(OTHER_EMAIL)).thenReturn(Optional.of(requester));
+
+    // when: la segunda requestToJoin encuentra la pendiente y corta antes de guardar
+    planService.requestToJoin(PLAN_ID, OTHER_EMAIL);
+    planService.requestToJoin(PLAN_ID, OTHER_EMAIL);
+
+    // then: AC-15, una sola fila por solicitud abierta
+    verify(this.notificationServiceMock, times(1))
+      .notifyJoinRequest(eq(requester), eq(plan.getAdministrator()), eq(PLAN_ID), any());
+  }
+
+  @Test
+  public void NOTIF_rejectJoinRequest_notificaAlSolicitante() {
+    // given
+    Plan plan = invitationPlan(false);
+    plan.setName("Viaje a Mendoza");
+    User requester = owner(INVITED_ID, OTHER_EMAIL);
+    com.valhalla.domain.plan.PlanJoinRequest request = pendingRequest(plan, requester);
+
+    // when
+    planService.respondToJoinRequest(PLAN_ID, request.getId(), "reject", OWNER_EMAIL);
+
+    // then: AC-16, el rechazo tambien es una respuesta; AC-02, nadie se sumo
+    verify(this.notificationServiceMock, never()).notifyNewParticipant(any(), any(), any(), any());
+    verify(this.notificationServiceMock, times(1))
+      .notifyJoinRequestResponse(
+        plan.getAdministrator(),
+        requester,
+        PLAN_ID,
+        "Viaje a Mendoza",
+        false
+      );
+  }
+
+  @Test
+  public void NOTIF_acceptInvitation_notificaAlDueno() {
+    // given
+    Plan plan = invitationPlan(false);
+    plan.setName("Viaje a Bariloche");
+    User recipient = owner(INVITED_ID, OTHER_EMAIL);
+    PlanInvitation invitation = new PlanInvitation(
+      plan,
+      recipient,
+      plan.getAdministrator(),
+      "guest"
+    );
+    org.springframework.test.util.ReflectionTestUtils.setField(invitation, "id", INVITATION_ID);
+    plan.getInvitations().add(invitation);
+
+    // when
+    planService.respondToInvitation(PLAN_ID, INVITATION_ID, true, OTHER_EMAIL);
+
+    // then: AC-02, por invitacion aceptada tambien se notifica
+    verify(this.notificationServiceMock, times(1))
+      .notifyNewParticipant(recipient, plan.getAdministrator(), PLAN_ID, "Viaje a Bariloche");
+  }
+
+  @Test
+  public void NOTIF_inviteParticipant_notificaAlInvitado() {
+    // given
+    Plan plan = invitationPlan(false);
+    plan.setName("Cena secreta");
+    User invited = owner(INVITED_ID, OTHER_EMAIL);
+    when(userRepositoryMock.findByEmail(OTHER_EMAIL)).thenReturn(Optional.of(invited));
+
+    // when
+    planService.inviteParticipant(PLAN_ID, OTHER_EMAIL, "guest", OWNER_EMAIL);
+
+    // then: AC-03 (extension), el invitado recibe la notificacion con el plan congelado
+    verify(this.notificationServiceMock, times(1))
+      .notifyInvitation(plan.getAdministrator(), invited, PLAN_ID, "Cena secreta");
+  }
+
+  @Test
+  public void NOTIF_inviteFallida_noNotifica() {
+    // given: un visitante sin permisos intenta invitar
+    invitationPlan(false);
+
+    // when
+    assertThrows(
+      PlanNotFoundException.class,
+      () -> planService.inviteParticipant(PLAN_ID, OTHER_EMAIL, "guest", UNKNOWN_EMAIL)
+    );
+
+    // then: la invitacion no existe, la notificacion tampoco
+    verifyNoInteractions(this.notificationServiceMock);
   }
 
   // --- fixtures ---

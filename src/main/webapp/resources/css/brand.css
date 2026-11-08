@@ -140,6 +140,7 @@ html[data-theme="dark"] .text-gray-300 { color: var(--dark-text-decor); }
 html[data-theme="dark"] .hover\:text-gray-900:hover { color: var(--dark-text); }
 html[data-theme="dark"] .text-blue-600 { color: var(--dark-link); }
 html[data-theme="dark"] .text-red-600 { color: var(--dark-danger); }
+html[data-theme="dark"] .hover\:text-red-600:hover { color: var(--dark-danger); }
 /* text-black solo donde cae el contenido principal: en el navbar es el avatar
    sobre --secondary, que no cambia de modo, y detail.html además lo re-pinnea
    con !important dentro de nav. */
@@ -324,6 +325,73 @@ details[open] > summary::after {
 
 html[data-theme="dark"] details > summary:hover {
   background-color: rgb(255 255 255 / 0.06);
+}
+/* --- [NOTIF] Badge de no-leidas en la campana del navbar -------------------
+ * El numero sale de data-notifications-count (lo pinta el advice global por request) y se
+ * dibuja con content: attr(): un pseudo-elemento no es texto del DOM, asi los E2E que pinnean
+ * WebPage.getNavbarItems por allTextContents siguen viendo el mismo set de siempre. En 0 el
+ * selector :not() ya apaga el badge; arriba 99 el digito se corta, no desborda la campana. */
+.navbar-notifications[data-notifications-count]:not([data-notifications-count="0"])::after {
+  content: attr(data-notifications-count);
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: 1rem;
+  height: 1rem;
+  padding: 0 0.1875rem;
+  border-radius: 9999px;
+  background: rgb(220 38 38);
+  color: #fff;
+  font-size: 0.625rem;
+  font-weight: 700;
+  line-height: 1rem;
+  text-align: center;
+}
+
+/* --- [NOTIF] Tiles del centro de notificaciones ----------------------------
+ * El estado del pendiente vive aca y no como utilidad suelta en el template: bg-blue-50 no
+ * tiene complemento oscuro, asi que en modo oscuro la fila no leida quedaba con slab celeste
+ * brilloso y el texto casi blanco de --dark-text encima. Acada tile le da su pareja oscura:
+ * la misma --dark-link de los links al 12% sobre la tarjeta, celeste pero traslucido. El punto
+ * de pendiente usa --primary: es identidad y, como el resto de la marca, no cambia de modo. */
+.notification-row {
+  transition: background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.notification-row--read {
+  background-color: #f9fafb;
+  border-color: #f3f4f6;
+}
+
+.notification-row--unread {
+  background-color: #eff6ff;
+  border-color: #dbeafe;
+}
+
+.notification-row:hover {
+  box-shadow: 0 1px 3px rgb(17 24 39 / 0.1);
+}
+
+.notification-dot {
+  flex-shrink: 0;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  background-color: var(--primary);
+}
+
+html[data-theme="dark"] .notification-row--read {
+  background-color: var(--dark-surface);
+  border-color: var(--dark-border);
+}
+
+html[data-theme="dark"] .notification-row--unread {
+  background-color: rgb(96 165 250 / 0.12);
+  border-color: rgb(96 165 250 / 0.32);
+}
+
+html[data-theme="dark"] .notification-row:hover {
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.5);
 }
 .planit-toasts { position: fixed; right: 1.5rem; bottom: 1.5rem; z-index: 10000; display: grid; gap: .75rem; width: min(26rem, calc(100vw - 3rem)); pointer-events: none; }
 .planit-toast { display: flex; align-items: center; gap: 1rem; padding: 1rem; border: 1px solid var(--primary); border-left-width: 4px; border-radius: .75rem; background: var(--white); color: var(--black); box-shadow: 0 8px 30px #0003; pointer-events: auto; overflow-wrap: anywhere; }

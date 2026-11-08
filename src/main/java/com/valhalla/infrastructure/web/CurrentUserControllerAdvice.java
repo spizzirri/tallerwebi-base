@@ -1,6 +1,7 @@
 package com.valhalla.infrastructure.web;
 
 import com.valhalla.domain.exception.UserNotFoundException;
+import com.valhalla.domain.notification.NotificationService;
 import com.valhalla.domain.user.User;
 import com.valhalla.domain.user.UserService;
 import com.valhalla.infrastructure.security.AppUserDetails;
@@ -32,9 +33,14 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 public class CurrentUserControllerAdvice {
 
   private final UserService userService;
+  private final NotificationService notificationService;
 
-  public CurrentUserControllerAdvice(UserService userService) {
+  public CurrentUserControllerAdvice(
+    UserService userService,
+    NotificationService notificationService
+  ) {
     this.userService = userService;
+    this.notificationService = notificationService;
   }
 
   @ModelAttribute("userInitial")
@@ -73,6 +79,25 @@ public class CurrentUserControllerAdvice {
       return avatarUrl == null || avatarUrl.isBlank() ? null : avatarUrl.trim();
     } catch (UserNotFoundException syntheticPrincipal) {
       return null;
+    }
+  }
+
+  /**
+   * [NOTIF] AC-05: cantidad de notificaciones leidas-por-el-usuario para el badge de la campana.
+   * Cero en las mismas tres defensas que {@link #userAvatarUrl} (anonimo, principal sintetico o
+   * sin sesion), para que el navbar renda sin badge en vez de romper la pagina. La cuenta corre
+   * por request, server-rendered: sin JS el badge del render siguiente ya descuenta lo marcado.
+   */
+  @ModelAttribute("unreadNotificationCount")
+  public long unreadNotificationCount(Principal principal) {
+    if (principal == null || principal instanceof AnonymousAuthenticationToken) {
+      return 0;
+    }
+    try {
+      User user = userService.getByEmail(principal.getName());
+      return notificationService.unreadCount(user.getId());
+    } catch (UserNotFoundException syntheticPrincipal) {
+      return 0;
     }
   }
 

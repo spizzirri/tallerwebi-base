@@ -191,12 +191,13 @@
               <li th:each="follower : ${followers}">
                 <a th:href="@{/profile/{id}(id=${follower.id})}"
                   class="flex items-center gap-2 text-sm text-blue-600 hover:underline">
-                  <img th:if="${follower.avatarUrl != null}" th:src="${follower.avatarUrl}" alt=""
-                    class="h-8 w-8 rounded-full object-cover" />
-                  <span th:unless="${follower.avatarUrl != null}"
-                    class="navbar-avatar inline-flex h-8 w-8 items-center justify-center rounded-full bg-secondary font-serif text-sm font-bold text-black"
-                    th:text="${#strings.isEmpty(follower.firstName)} ? 'U' : ${#strings.substring(follower.firstName, 0, 1)}"
-                    aria-hidden="true">U</span>
+                  <span class="navbar-avatar relative inline-flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-secondary font-serif text-sm font-bold text-black"
+                    aria-hidden="true">
+                    <span
+                      th:text="${#strings.isEmpty(follower.firstName)} ? 'U' : ${#strings.substring(follower.firstName, 0, 1)}">U</span>
+                    <img th:if="${follower.avatarUrl != null}" th:src="${follower.avatarUrl}" alt=""
+                      onerror="this.remove()" class="absolute inset-0 h-full w-full object-cover" />
+                  </span>
                   <span
                     th:text="${((follower.firstName == null ? '' : follower.firstName) + ' ' + (follower.lastName == null ? '' : follower.lastName)).trim()}">Nombre</span>
                 </a>
@@ -213,12 +214,13 @@
               <li th:each="seguido : ${following}">
                 <a th:href="@{/profile/{id}(id=${seguido.id})}"
                   class="flex items-center gap-2 text-sm text-blue-600 hover:underline">
-                  <img th:if="${seguido.avatarUrl != null}" th:src="${seguido.avatarUrl}" alt=""
-                    class="h-8 w-8 rounded-full object-cover" />
-                  <span th:unless="${seguido.avatarUrl != null}"
-                    class="navbar-avatar inline-flex h-8 w-8 items-center justify-center rounded-full bg-secondary font-serif text-sm font-bold text-black"
-                    th:text="${#strings.isEmpty(seguido.firstName)} ? 'U' : ${#strings.substring(seguido.firstName, 0, 1)}"
-                    aria-hidden="true">U</span>
+                  <span class="navbar-avatar relative inline-flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-secondary font-serif text-sm font-bold text-black"
+                    aria-hidden="true">
+                    <span
+                      th:text="${#strings.isEmpty(seguido.firstName)} ? 'U' : ${#strings.substring(seguido.firstName, 0, 1)}">U</span>
+                    <img th:if="${seguido.avatarUrl != null}" th:src="${seguido.avatarUrl}" alt=""
+                      onerror="this.remove()" class="absolute inset-0 h-full w-full object-cover" />
+                  </span>
                   <span
                     th:text="${((seguido.firstName == null ? '' : seguido.firstName) + ' ' + (seguido.lastName == null ? '' : seguido.lastName)).trim()}">Nombre</span>
                 </a>

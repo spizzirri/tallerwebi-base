@@ -1,0 +1,311 @@
+<!DOCTYPE HTML>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{layouts/base :: head('Notificaciones - PlanIt')}"></head>
+
+<body th:replace="~{layouts/base :: layout(~{::main})}">
+
+  <!-- [NOTIF] AC-04/AC-07/AC-08: centro de notificaciones. Lista mas nueva primero, paginada de
+       a 10, con estado visual de no-leida y accion de marcar. La identidad del destinatario sale
+       de la sesion en el controller; el template solo pinta lo que le llega.
+       Cada fila es un tile: el color del estado (leida/pendiente) vive en brand.css como
+       .notification-row*, porque el celeste de pendiente necesita su complemento oscuro y una
+       utilidad suelta de Tailwind no lo tiene. Cada texto y su destino dependen del tipo (AC-10),
+       y el destino siempre es el lugar donde la notificacion se resuelve: el ancla del plan
+       aterriza sobre el boton Aceptar, no arriba de la pagina. -->
+  <main class="flex-1 p-4">
+    <div class="mx-auto max-w-3xl space-y-6">
+
+      <div class="flex flex-wrap items-center justify-between gap-4 rounded-xl bg-white px-6 py-5 shadow-md">
+        <div>
+          <h1 class="text-2xl font-semibold text-gray-900">Notificaciones</h1>
+          <p th:if="${unreadNotificationCount > 0}"
+            class="mt-1 text-sm font-medium text-blue-600"
+            th:text="${unreadNotificationCount} + ' sin leer'">2 sin leer</p>
+          <p th:unless="${unreadNotificationCount > 0}" class="mt-1 text-sm text-gray-500">
+            Todo al día
+          </p>
+        </div>
+        <!-- [NOTIF] AC-06: vaciar el badge de una accion; el boton solo existe si hay pendientes. -->
+        <form th:if="${unreadNotificationCount > 0}" method="post" th:action="@{/notifications/read-all}">
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+          <button type="submit" id="btn-mark-all-read"
+            class="rounded-full bg-primary px-4 py-2 text-sm font-medium text-white transition hover:bg-secondary">
+            Marcar todas como leídas
+          </button>
+        </form>
+      </div>
+
+      <section id="notifications-section" class="rounded-xl bg-white p-4 shadow-md sm:p-6">
+        <!-- [NOTIF] AC-07 + pedido del usuario: el cambio de pagina no navega, se resuelve aca
+             mismo. Este div es el fragmento "feed" que responde el endpoint partial; el script
+             lo reemplaza entero al tocar Anteriores/Siguientes. Las mas nuevas van en la pagina 1
+             y el paginador solo existe si hay mas notificaciones que las que entran. -->
+        <div id="notifications-feed" data-testid="notifications-feed" th:fragment="feed">
+        <div th:if="${notifications.isEmpty()}" id="notifications-empty" data-testid="notifications-empty"
+          class="rounded-xl border border-dashed border-gray-300 px-6 py-14 text-center">
+          <p class="text-sm font-medium text-gray-900">Todavía no tenés notificaciones.</p>
+          <p class="mt-1 text-sm text-gray-500">
+            Acá aparecen novedades sobre tus seguidores, tus planes y los cambios de acceso.
+          </p>
+        </div>
+
+        <ul th:unless="${notifications.isEmpty()}" id="notifications-list" data-testid="notifications-list"
+          class="space-y-2">
+          <li th:each="n : ${notifications}" data-testid="notification"
+            th:attr="data-read=${n.read}"
+            th:with="actorName=${((n.actor.firstName == null ? '' : n.actor.firstName) + ' ' + (n.actor.lastName == null ? '' : n.actor.lastName)).trim()}"
+            class="notification-row flex items-start gap-3 rounded-xl border px-4 py-3.5"
+            th:classappend="${not n.read} ? 'notification-row--unread' : 'notification-row--read'">
+            <!-- Avatar del actor: el mismo patron de la lista de seguidores del perfil (imagen si
+                 tiene, inicial sobre --secondary si no). Decorativo: el nombre, debajo, es el link. -->
+            <a th:href="@{/profile/{id}(id=${n.actor.id})}" class="shrink-0" tabindex="-1"
+              aria-hidden="true">
+              <!-- El disco con la inicial va siempre y la foto encima, absoluta: si la URL del
+                   avatar no responde (la galeria fuera del contexto, un https caido) el onerror se
+                   borra a si mismo y queda la inicial, nunca el icono roto de arriba. -->
+              <span
+                class="navbar-avatar relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-secondary font-serif text-base font-bold text-black">
+                <span
+                  th:text="${#strings.isEmpty(actorName)} ? 'U' : ${#strings.substring(actorName, 0, 1)}">U</span>
+                <img th:if="${n.actor.avatarUrl != null}" th:src="${n.actor.avatarUrl}" alt=""
+                  onerror="this.remove()" class="absolute inset-0 h-full w-full object-cover" />
+              </span>
+            </a>
+
+            <div class="min-w-0 flex-1">
+              <p class="text-sm leading-snug text-gray-800">
+                <!-- th:switch sobre el nombre del enum: el texto y el destino dependen del tipo (AC-10). -->
+                <th:block th:switch="${n.type.name()}">
+                  <th:block th:case="'NEW_FOLLOWER'">
+                    <a th:href="@{/profile/{id}(id=${n.actor.id})}"
+                      class="font-semibold text-gray-900 hover:underline"
+                      th:text="${#strings.isEmpty(actorName)} ? 'Alguien' : ${actorName}">Nombre</a>
+                    <span class="text-gray-600">te empezó a seguir</span>
+                  </th:block>
+                  <th:block th:case="'NEW_PARTICIPANT'">
+                    <a th:href="@{/profile/{id}(id=${n.actor.id})}"
+                      class="font-semibold text-gray-900 hover:underline"
+                      th:text="${#strings.isEmpty(actorName)} ? 'Alguien' : ${actorName}">Nombre</a>
+                    <span class="text-gray-600">se unió a tu plan</span>
+                    <a th:if="${n.relatedPlanId != null}" th:href="@{/plans/{id}(id=${n.relatedPlanId})}"
+                      class="font-semibold text-blue-600 hover:underline" th:text="${n.relatedPlanName}">Plan</a>
+                    <span th:unless="${n.relatedPlanId != null}" class="font-semibold text-gray-700"
+                      th:text="${n.relatedPlanName}">Plan</span>
+                  </th:block>
+                  <th:block th:case="'NEW_PLAN'">
+                    <a th:href="@{/profile/{id}(id=${n.actor.id})}"
+                      class="font-semibold text-gray-900 hover:underline"
+                      th:text="${#strings.isEmpty(actorName)} ? 'Alguien' : ${actorName}">Nombre</a>
+                    <span class="text-gray-600">publicó</span>
+                    <!-- Solo se notifica el plan publicado: el landing publico siempre abre. -->
+                    <a th:if="${n.relatedPlanId != null}"
+                      th:href="@{/plans/{id}/public(id=${n.relatedPlanId})}"
+                      class="font-semibold text-blue-600 hover:underline" th:text="${n.relatedPlanName}">Plan</a>
+                    <span th:unless="${n.relatedPlanId != null}" class="font-semibold text-gray-700"
+                      th:text="${n.relatedPlanName}">Plan</span>
+                  </th:block>
+                  <th:block th:case="'PLAN_INVITATION'">
+                    <a th:href="@{/profile/{id}(id=${n.actor.id})}"
+                      class="font-semibold text-gray-900 hover:underline"
+                      th:text="${#strings.isEmpty(actorName)} ? 'Alguien' : ${actorName}">Nombre</a>
+                    <span class="text-gray-600">te invitó al plan</span>
+                    <!-- El invitado todavia no participa: /plans/{id} lo cortaria. La invitacion se
+                         resuelve en /plans, que lista las pendientes con Aceptar/Rechazar; el ancla
+                         cae en ese aside y no arriba de la pagina. -->
+                    <a th:href="@{/plans} + '#pending-invitations-heading'"
+                      class="font-semibold text-blue-600 hover:underline"
+                      th:text="${n.relatedPlanName}">Plan</a>
+                  </th:block>
+                  <th:block th:case="'JOIN_REQUESTED'">
+                    <a th:href="@{/profile/{id}(id=${n.actor.id})}"
+                      class="font-semibold text-gray-900 hover:underline"
+                      th:text="${#strings.isEmpty(actorName)} ? 'Alguien' : ${actorName}">Nombre</a>
+                    <span class="text-gray-600">solicitó unirse a tu plan</span>
+                    <!-- AC-15: el destino es la seccion Solicitudes del plan, donde esta el Aceptar. -->
+                    <a th:if="${n.relatedPlanId != null}"
+                      th:href="@{/plans/{id}(id=${n.relatedPlanId})} + '#join-requests-heading'"
+                      class="font-semibold text-blue-600 hover:underline" th:text="${n.relatedPlanName}">Plan</a>
+                    <span th:unless="${n.relatedPlanId != null}" class="font-semibold text-gray-700"
+                      th:text="${n.relatedPlanName}">Plan</span>
+                  </th:block>
+                  <th:block th:case="'JOIN_REQUEST_ACCEPTED'">
+                    <a th:href="@{/profile/{id}(id=${n.actor.id})}"
+                      class="font-semibold text-gray-900 hover:underline"
+                      th:text="${#strings.isEmpty(actorName)} ? 'Alguien' : ${actorName}">Nombre</a>
+                    <span class="text-gray-600">aprobó tu solicitud para el plan</span>
+                    <!-- Ya participa: el plan se abre. -->
+                    <a th:if="${n.relatedPlanId != null}" th:href="@{/plans/{id}(id=${n.relatedPlanId})}"
+                      class="font-semibold text-blue-600 hover:underline" th:text="${n.relatedPlanName}">Plan</a>
+                    <span th:unless="${n.relatedPlanId != null}" class="font-semibold text-gray-700"
+                      th:text="${n.relatedPlanName}">Plan</span>
+                  </th:block>
+                  <th:block th:case="'JOIN_REQUEST_REJECTED'">
+                    <a th:href="@{/profile/{id}(id=${n.actor.id})}"
+                      class="font-semibold text-gray-900 hover:underline"
+                      th:text="${#strings.isEmpty(actorName)} ? 'Alguien' : ${actorName}">Nombre</a>
+                    <span class="text-gray-600">rechazó tu solicitud para el plan</span>
+                    <!-- Sin acceso al plan, pero el landing siempre muestra el resumen y permite
+                         volver a solicitar: ahi queda la unica accion posible. -->
+                    <a th:if="${n.relatedPlanId != null}"
+                      th:href="@{/plans/{id}/public(id=${n.relatedPlanId})}"
+                      class="font-semibold text-blue-600 hover:underline" th:text="${n.relatedPlanName}">Plan</a>
+                    <span th:unless="${n.relatedPlanId != null}" class="font-semibold text-gray-700"
+                      th:text="${n.relatedPlanName}">Plan</span>
+                  </th:block>
+                  <th:block th:case="'PARTICIPANT_REMOVED'">
+                    <a th:href="@{/profile/{id}(id=${n.actor.id})}"
+                      class="font-semibold text-gray-900 hover:underline"
+                      th:text="${#strings.isEmpty(actorName)} ? 'Alguien' : ${actorName}">Nombre</a>
+                    <span class="text-gray-600">te expulsó del plan</span>
+                    <span class="font-semibold text-gray-700" th:text="${n.relatedPlanName}">Plan</span>
+                  </th:block>
+                  <th:block th:case="'PARTICIPANT_BANNED'">
+                    <a th:href="@{/profile/{id}(id=${n.actor.id})}"
+                      class="font-semibold text-gray-900 hover:underline"
+                      th:text="${#strings.isEmpty(actorName)} ? 'Alguien' : ${actorName}">Nombre</a>
+                    <span class="text-gray-600">te bloqueó el acceso al plan</span>
+                    <span class="font-semibold text-gray-700" th:text="${n.relatedPlanName}">Plan</span>
+                  </th:block>
+                  <th:block th:case="'EDITOR_ROLE_GRANTED'">
+                    <a th:href="@{/profile/{id}(id=${n.actor.id})}"
+                      class="font-semibold text-gray-900 hover:underline"
+                      th:text="${#strings.isEmpty(actorName)} ? 'Alguien' : ${actorName}">Nombre</a>
+                    <span class="text-gray-600">te asignó el rol de Editor en el plan</span>
+                    <a th:if="${n.relatedPlanId != null}" th:href="@{/plans/{id}(id=${n.relatedPlanId})}"
+                      class="font-semibold text-blue-600 hover:underline" th:text="${n.relatedPlanName}">Plan</a>
+                    <span th:unless="${n.relatedPlanId != null}" class="font-semibold text-gray-700"
+                      th:text="${n.relatedPlanName}">Plan</span>
+                  </th:block>
+                  <th:block th:case="'EDITOR_ROLE_REVOKED'">
+                    <a th:href="@{/profile/{id}(id=${n.actor.id})}"
+                      class="font-semibold text-gray-900 hover:underline"
+                      th:text="${#strings.isEmpty(actorName)} ? 'Alguien' : ${actorName}">Nombre</a>
+                    <span class="text-gray-600">te quitó el rol de Editor del plan</span>
+                    <a th:if="${n.relatedPlanId != null}" th:href="@{/plans/{id}(id=${n.relatedPlanId})}"
+                      class="font-semibold text-blue-600 hover:underline" th:text="${n.relatedPlanName}">Plan</a>
+                    <span th:unless="${n.relatedPlanId != null}" class="font-semibold text-gray-700"
+                      th:text="${n.relatedPlanName}">Plan</span>
+                  </th:block>
+                </th:block>
+              </p>
+              <p class="mt-1.5 flex items-center gap-2 text-xs text-gray-500">
+                <span th:unless="${n.read}" class="notification-dot" aria-hidden="true"></span>
+                <!-- createdAt es un Instant: el texto sale en la zona del servidor y el script del
+                     pie lo pasa a la zona del browser, que es la unica que le interesa al lector. -->
+                <time class="notif-time" th:attr="datetime=${n.createdAt}"
+                  th:text="${#temporals.format(n.createdAt.atZone(T(java.time.ZoneId).systemDefault()), 'dd/MM/yyyy HH:mm')}">01/01/2026 12:00</time>
+              </p>
+            </div>
+
+            <!-- [NOTIF] AC-06/AC-18: dos acciones por fila: marcar (solo si esta pendiente) y
+                 tirar. El E2E apunta por fila con el atributo data-read de arriba y la clase
+                 .btn-mark-read, no con un id unico. -->
+            <div class="flex shrink-0 items-center gap-1 self-center">
+              <form th:unless="${n.read}" method="post"
+                th:action="@{/notifications/{id}/read(id=${n.id})}">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <input type="hidden" name="page" th:value="${page}">
+                <button type="submit"
+                  class="btn-mark-read rounded-full border border-gray-300 px-3 py-1.5 text-xs font-medium text-blue-600 transition hover:bg-gray-100">
+                  Marcar leída
+                </button>
+              </form>
+              <form method="post" th:action="@{/notifications/{id}/delete(id=${n.id})}">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <input type="hidden" name="page" th:value="${page}">
+                <button type="submit"
+                  class="btn-delete-notification rounded-full p-2 text-gray-500 transition hover:bg-gray-100 hover:text-red-600"
+                  th:attr="aria-label='Eliminar esta notificación', title='Eliminar esta notificación'">
+                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M3 6h18" />
+                    <path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2" />
+                    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                    <line x1="10" x2="10" y1="11" y2="17" />
+                    <line x1="14" x2="14" y1="11" y2="17" />
+                  </svg>
+                </button>
+              </form>
+            </div>
+          </li>
+        </ul>
+
+        <!-- [NOTIF] AC-07: paginacion previa/siguiente; el numero de pagina viaja en la URL.
+             Con JS el click no recarga la pagina: el script pide el fragmento y lo reemplaza. -->
+        <nav th:if="${hasPrev or hasNext}" class="flex items-center justify-between gap-4 pt-5"
+          aria-label="Paginación de notificaciones">
+          <a th:if="${hasPrev}" id="notifications-prev" data-testid="notifications-prev"
+            th:href="@{/notifications(page=${page - 1})}"
+            class="rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-blue-600 transition hover:border-primary hover:bg-primary hover:text-white">
+            Anteriores
+          </a>
+          <span id="notifications-page-label" class="text-sm text-gray-500"
+            th:text="'Página ' + ${page + 1} + ' de ' + ${totalPages}">Página 1 de 2</span>
+          <a th:if="${hasNext}" id="notifications-next" data-testid="notifications-next"
+            th:href="@{/notifications(page=${page + 1})}"
+            class="rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-blue-600 transition hover:border-primary hover:bg-primary hover:text-white">
+            Siguientes
+          </a>
+        </nav>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      (function () {
+        // [NOTIF] El servidor no conoce la zona horaria de quien lee (y en Docker la suya es UTC),
+        // asi que la marca temporal viaja en datetime y se reescribe a la hora local del browser.
+        // Sin JS queda la del servidor: texto de fallback, no pagina rota.
+        function formatTimes(root) {
+          root.querySelectorAll("time[datetime]").forEach(function (el) {
+            const at = new Date(el.getAttribute("datetime"));
+            if (isNaN(at.getTime())) return;
+            el.textContent = at.toLocaleString("es-AR", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            });
+          });
+        }
+
+        // [NOTIF] Cambio de pagina SIN recargar la pagina entera: Anteriores/Siguientes piden el
+        // fragmento "feed" (?partial=1) y reemplazan la bandeja ahi mismo; la URL se actualiza con
+        // replaceState para que un F5 caiga en la pagina que se esta viendo. Sin JS los links
+        // siguen siendo navegacion normal, y el paginador no existe si las notificaciones entran
+        // todas en la pagina 1.
+        const section = document.getElementById("notifications-section");
+        let feed = document.getElementById("notifications-feed");
+        formatTimes(feed);
+
+        let loading = false;
+        section.addEventListener("click", function (e) {
+          const link = e.target.closest("#notifications-prev, #notifications-next");
+          if (!link || loading) return;
+          e.preventDefault();
+          loading = true;
+          const url = new URL(link.href);
+          url.searchParams.set("partial", "1");
+          fetch(url)
+            .then(function (r) { return r.text(); })
+            .then(function (html) {
+              const next = new DOMParser().parseFromString(html, "text/html")
+                .getElementById("notifications-feed");
+              if (!next) return;
+              feed.replaceWith(next);
+              feed = next;
+              formatTimes(feed);
+              history.replaceState(null, "", link.href);
+              feed.scrollIntoView({ behavior: "smooth", block: "start" });
+            })
+            .catch(function () { window.location.href = link.href; })
+            .finally(function () { loading = false; });
+        });
+      })();
+    </script>
+  </main>
+</body>
+
+</html>

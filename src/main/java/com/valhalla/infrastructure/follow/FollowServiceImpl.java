@@ -3,6 +3,7 @@ package com.valhalla.infrastructure.follow;
 import com.valhalla.domain.follow.Follow;
 import com.valhalla.domain.follow.FollowRepository;
 import com.valhalla.domain.follow.FollowService;
+import com.valhalla.domain.notification.NotificationService;
 import com.valhalla.domain.user.User;
 import com.valhalla.domain.user.UserService;
 import java.util.List;
@@ -25,11 +26,17 @@ public class FollowServiceImpl implements FollowService {
 
   private final FollowRepository followRepository;
   private final UserService userService;
+  private final NotificationService notificationService;
 
   @Autowired
-  public FollowServiceImpl(FollowRepository followRepository, UserService userService) {
+  public FollowServiceImpl(
+    FollowRepository followRepository,
+    UserService userService,
+    NotificationService notificationService
+  ) {
     this.followRepository = followRepository;
     this.userService = userService;
+    this.notificationService = notificationService;
   }
 
   @Override
@@ -44,6 +51,9 @@ public class FollowServiceImpl implements FollowService {
       return;
     }
     followRepository.save(new Follow(follower, followed));
+    // [NOTIF] AC-01: el alta de la arista y la notificacion comparten transaccion; el repeat
+    // follow sale antes por el early-return de arriba, asi no hay duplicados.
+    notificationService.notifyNewFollower(follower, followed);
   }
 
   @Override

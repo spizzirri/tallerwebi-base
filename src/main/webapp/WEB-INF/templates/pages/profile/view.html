@@ -13,11 +13,15 @@
 
       <div class="rounded-lg bg-white p-8 shadow-md">
         <div class="flex flex-wrap items-center gap-4">
-          <img th:if="${profileAvatarUrl != null}" th:src="${profileAvatarUrl}" alt="Avatar"
-            class="h-16 w-16 rounded-full object-cover" />
-          <span th:unless="${profileAvatarUrl != null}"
-            class="navbar-avatar inline-flex h-16 w-16 items-center justify-center rounded-full bg-secondary font-serif text-2xl font-bold text-black"
-            th:text="${ownerInitial}" role="img" th:attr="aria-label=${profileName}">U</span>
+          <!-- [PROF] Avatar: la inicial va siempre en el disco y la foto encima, absoluta. Si la
+               URL persistida no responde (una galeria fuera del contexto, un https caido) el
+               onerror se borra a si mismo y queda la inicial: nunca el icono roto. -->
+          <span role="img" th:attr="aria-label=${profileName}"
+            class="navbar-avatar relative inline-flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-secondary font-serif text-2xl font-bold text-black">
+            <span th:text="${ownerInitial}">U</span>
+            <img th:if="${profileAvatarUrl != null}" th:src="${profileAvatarUrl}" alt=""
+              onerror="this.remove()" class="absolute inset-0 h-full w-full object-cover" />
+          </span>
           <div class="flex-1">
             <h1 class="text-2xl font-semibold text-gray-900" th:text="${profileName}">Nombre</h1>
             <!-- [FOLLOW] AC-04: los dos contadores son los reales, no el placeholder de [PROF]. -->
@@ -104,12 +108,13 @@
               <li th:each="follower : ${followers}">
                 <a th:href="@{/profile/{id}(id=${follower.id})}"
                   class="flex items-center gap-2 text-sm text-blue-600 hover:underline">
-                  <img th:if="${follower.avatarUrl != null}" th:src="${follower.avatarUrl}" alt=""
-                    class="h-8 w-8 rounded-full object-cover" />
-                  <span th:unless="${follower.avatarUrl != null}"
-                    class="navbar-avatar inline-flex h-8 w-8 items-center justify-center rounded-full bg-secondary font-serif text-sm font-bold text-black"
-                    th:text="${#strings.isEmpty(follower.firstName)} ? 'U' : ${#strings.substring(follower.firstName, 0, 1)}"
-                    aria-hidden="true">U</span>
+                  <span class="navbar-avatar relative inline-flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-secondary font-serif text-sm font-bold text-black"
+                    aria-hidden="true">
+                    <span
+                      th:text="${#strings.isEmpty(follower.firstName)} ? 'U' : ${#strings.substring(follower.firstName, 0, 1)}">U</span>
+                    <img th:if="${follower.avatarUrl != null}" th:src="${follower.avatarUrl}" alt=""
+                      onerror="this.remove()" class="absolute inset-0 h-full w-full object-cover" />
+                  </span>
                   <span
                     th:text="${((follower.firstName == null ? '' : follower.firstName) + ' ' + (follower.lastName == null ? '' : follower.lastName)).trim()}">Nombre</span>
                 </a>
@@ -126,12 +131,13 @@
               <li th:each="seguido : ${following}">
                 <a th:href="@{/profile/{id}(id=${seguido.id})}"
                   class="flex items-center gap-2 text-sm text-blue-600 hover:underline">
-                  <img th:if="${seguido.avatarUrl != null}" th:src="${seguido.avatarUrl}" alt=""
-                    class="h-8 w-8 rounded-full object-cover" />
-                  <span th:unless="${seguido.avatarUrl != null}"
-                    class="navbar-avatar inline-flex h-8 w-8 items-center justify-center rounded-full bg-secondary font-serif text-sm font-bold text-black"
-                    th:text="${#strings.isEmpty(seguido.firstName)} ? 'U' : ${#strings.substring(seguido.firstName, 0, 1)}"
-                    aria-hidden="true">U</span>
+                  <span class="navbar-avatar relative inline-flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-secondary font-serif text-sm font-bold text-black"
+                    aria-hidden="true">
+                    <span
+                      th:text="${#strings.isEmpty(seguido.firstName)} ? 'U' : ${#strings.substring(seguido.firstName, 0, 1)}">U</span>
+                    <img th:if="${seguido.avatarUrl != null}" th:src="${seguido.avatarUrl}" alt=""
+                      onerror="this.remove()" class="absolute inset-0 h-full w-full object-cover" />
+                  </span>
                   <span
                     th:text="${((seguido.firstName == null ? '' : seguido.firstName) + ' ' + (seguido.lastName == null ? '' : seguido.lastName)).trim()}">Nombre</span>
                 </a>

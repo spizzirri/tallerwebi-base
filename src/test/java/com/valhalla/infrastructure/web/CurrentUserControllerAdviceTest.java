@@ -31,11 +31,13 @@ public class CurrentUserControllerAdviceTest {
 
   private CurrentUserControllerAdvice advice;
   private UserService userService;
+  private com.valhalla.domain.notification.NotificationService notificationService;
 
   @BeforeEach
   public void init() {
     userService = Mockito.mock(UserService.class);
-    advice = new CurrentUserControllerAdvice(userService);
+    notificationService = Mockito.mock(com.valhalla.domain.notification.NotificationService.class);
+    advice = new CurrentUserControllerAdvice(userService, notificationService);
   }
 
   // --- userInitial / userDisplayName ---
@@ -171,6 +173,38 @@ public class CurrentUserControllerAdviceTest {
       is(false)
     );
     assertThat(advice.showAdminNav(null, requestFor("/admin/home")), is(false));
+  }
+
+  // --- [NOTIF] unreadNotificationCount: el badge de la campana ---
+
+  @Test
+  public void NOTIF_shouldExposeTheUnreadCountOfTheSignedInUser() {
+    java.util.UUID id = java.util.UUID.randomUUID();
+    User user = Mockito.mock(User.class);
+    when(user.getId()).thenReturn(id);
+    when(userService.getByEmail(EMAIL)).thenReturn(user);
+    when(notificationService.unreadCount(id)).thenReturn(3L);
+
+    assertThat(advice.unreadNotificationCount(appUser("Ana", "Perez")), is(3L));
+  }
+
+  @Test
+  public void NOTIF_shouldBadgeZeroWhenThePrincipalIsSynthetic() {
+    when(userService.getByEmail(EMAIL)).thenThrow(new UserNotFoundException());
+
+    assertThat(advice.unreadNotificationCount(appUser("Ana", "Perez")), is(0L));
+  }
+
+  @Test
+  public void NOTIF_shouldNotConsultNotificationsWithoutASession() {
+    assertThat(advice.unreadNotificationCount(null), is(0L));
+    assertThat(
+      advice.unreadNotificationCount(
+        new AnonymousAuthenticationToken("key", "anonymousUser", roles("ROLE_ANONYMOUS"))
+      ),
+      is(0L)
+    );
+    Mockito.verifyNoInteractions(notificationService);
   }
 
   // --- helpers ---

@@ -78,6 +78,23 @@
       Plans
     </a>
 
+    <!-- [NOTIF] AC-05: campana con badge de no-leidas. El numero viaja en data-notifications-count
+         y se pinta por CSS (::after con attr(), brand.css), no como nodo de texto: el pinneo de
+         WebPage.getNavbarItems toma allTextContents y un "3" suelto cambiaria el set esperado de
+         todos los E2E del navbar; el pseudo-elemento es texto generado y no entra ahi. El advice
+         global (CurrentUserControllerAdvice.unreadNotificationCount) resuelve la cuenta por
+         request: marcar desde la pagina descuenta en el render del redirect, sin JS. -->
+    <a th:href="@{/notifications}" id="navbar-notifications" data-testid="navbar-notifications"
+      aria-label="Notificaciones"
+      class="navbar-notifications relative inline-flex h-9 w-9 items-center justify-center rounded-md hover:bg-white/10"
+      th:attr="data-notifications-count=${unreadNotificationCount}">
+      <svg class="h-5 w-5" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+      </svg>
+    </a>
+
     <!-- [PROF] El avatar pasa de <span> a <button>: abre el menú modal del navbar
          (components/navbar-menu.html, renderizado fuera del <nav> en base.html). Muestra el
          avatarUrl vigente del usuario (userAvatarUrl, resuelto por CurrentUserControllerAdvice)
@@ -94,9 +111,13 @@
       th:if="${userInitial != null}"
       th:attr="aria-label=${userDisplayName}, title=${userDisplayName}"
       aria-haspopup="true" aria-expanded="false" aria-controls="navbar-menu">
-      <span th:unless="${userAvatarUrl != null}" th:text="${userInitial}">U</span>
-      <img th:if="${userAvatarUrl != null}" th:src="${userAvatarUrl}" alt=""
-        class="h-full w-full object-cover" />
+      <span class="relative inline-flex h-full w-full items-center justify-center">
+        <!-- La inicial va siempre: si la foto no responde, el onerror se borra a si mismo y el
+             disco ya tiene su pareja dibujada underneath. Evita el icono roto en el navbar. -->
+        <span th:text="${userInitial}">U</span>
+        <img th:if="${userAvatarUrl != null}" th:src="${userAvatarUrl}" alt=""
+          onerror="this.remove()" class="absolute inset-0 h-full w-full object-cover" />
+      </span>
     </button>
 
     <!-- [PROF+THEME] El toggle standalone ya no vive en la rama autenticada: el control de

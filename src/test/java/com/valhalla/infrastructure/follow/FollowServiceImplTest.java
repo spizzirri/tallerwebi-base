@@ -35,12 +35,19 @@ public class FollowServiceImplTest {
   private FollowServiceImpl followService;
   private FollowRepository followRepositoryMock;
   private UserService userServiceMock;
+  private com.valhalla.domain.notification.NotificationService notificationServiceMock;
 
   @BeforeEach
   public void init() {
     this.followRepositoryMock = mock(FollowRepository.class);
     this.userServiceMock = mock(UserService.class);
-    this.followService = new FollowServiceImpl(this.followRepositoryMock, this.userServiceMock);
+    this.notificationServiceMock = mock(com.valhalla.domain.notification.NotificationService.class);
+    this.followService =
+      new FollowServiceImpl(
+        this.followRepositoryMock,
+        this.userServiceMock,
+        this.notificationServiceMock
+      );
   }
 
   // --- follow: camino feliz ---
@@ -68,6 +75,9 @@ public class FollowServiceImplTest {
     assertThat(this.followService.isFollowing(FOLLOWER_ID, FOLLOWED_ID), is(true));
     // El constructor vacio existe para JPA: por si solo no arma ninguna arista.
     assertThat(new Follow().getFollowed(), is(nullValue()));
+    // [NOTIF] AC-01: el alta de la arista dispara la notificacion al seguido.
+    verify(this.notificationServiceMock, times(1))
+      .notifyNewFollower(any(User.class), any(User.class));
   }
 
   @Test
@@ -83,6 +93,8 @@ public class FollowServiceImplTest {
 
     // then
     verify(this.followRepositoryMock, never()).save(any(Follow.class));
+    // [NOTIF] el repeat no notifica de nuevo (AC-01: una notificacion por relacion nueva)
+    verifyNoInteractions(this.notificationServiceMock);
   }
 
   // --- unfollow ---
