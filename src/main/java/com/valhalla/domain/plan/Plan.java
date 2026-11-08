@@ -23,6 +23,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 @Entity
 @Table(name = "plans")
+// [PABM] Once columnas tras sumar `active`: la entidad mapea la tabla completa, igual que
+// PlanPlace, y bajar de 10 exigiria partir el plan en dos entidades.
+@SuppressWarnings("PMD.TooManyFields")
 public class Plan {
 
   @Id
@@ -42,6 +45,11 @@ public class Plan {
   private PlanSchedule schedule = new PlanSchedule();
 
   private Boolean isPublic = false;
+
+  // [PABM] Visibilidad en los listados publicos: con active=false el plan no aparece en /for-you,
+  // /explore ni en los feeds, pero los participantes conservan el acceso al detalle (AC-12 a
+  // AC-14). Default true para que las filas existentes sigan visibles sin migracion (AC-16).
+  private Boolean active = true;
 
   @Column(unique = true)
   private String shortCode;
@@ -217,6 +225,14 @@ public class Plan {
     this.isPublic = isPublic;
   }
 
+  public Boolean getActive() {
+    return active != null ? active : true;
+  }
+
+  public void setActive(Boolean active) {
+    this.active = active;
+  }
+
   public String getShortCode() {
     return shortCode;
   }
@@ -246,5 +262,8 @@ public class Plan {
     setDayEndTime(changes.getDayEndTime());
     setTransportMode(changes.getTransportMode());
     this.isPublic = changes.getIsPublic();
+    // [PABM] El form de admin es quien controla active; un form sin el campo (el del dueño) trae
+    // el default true del objeto cambios.
+    this.active = changes.getActive();
   }
 }

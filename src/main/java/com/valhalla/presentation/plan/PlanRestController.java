@@ -2,12 +2,12 @@ package com.valhalla.presentation.plan;
 
 import com.valhalla.domain.bookmark.PlanBookmarkService;
 import com.valhalla.domain.plan.Plan;
+import com.valhalla.domain.plan.PlanDiscovery;
 import com.valhalla.domain.plan.PlanService;
 import com.valhalla.domain.planplace.PlanPlace;
 import com.valhalla.domain.rating.PlanRatingService;
 import com.valhalla.domain.rating.RatingSummary;
 import java.security.Principal;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -76,9 +76,8 @@ public class PlanRestController {
       .filter(plan -> Boolean.TRUE.equals(plan.getIsPublic()))
       .filter(plan -> !plan.isBanned(currentEmail))
       .filter(plan -> currentEmail == null || !plan.isAdministrator(currentEmail))
-      .sorted(
-        Comparator.comparing(Plan::getEventDate, Comparator.nullsLast(Comparator.naturalOrder()))
-      )
+      // [PABM] PlanIt primero y, dentro de cada grupo, la misma fecha ascendente de antes.
+      .sorted(PlanDiscovery.publicDateOrder())
       .limit(PUBLIC_PLANS_LIMIT)
       .map(plan ->
         PlanFeedCards.card(

@@ -41,6 +41,10 @@
           class="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100">
           Places
         </a>
+        <a role="menuitem" th:if="${showAdminNav}" th:href="@{/admin/plans}" data-menu-item
+          class="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100">
+          Plans
+        </a>
         <a role="menuitem" th:unless="${showAdminNav}" th:href="@{/for-you}" data-menu-item
           class="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100">
           Para vos
@@ -128,35 +132,6 @@
         Siguiendo
       </a>
 
-      <!-- [PROF+THEME] AC-17/AC-21: "Tema" es una accion, no un link: un form POST a
-           /profile/theme (CSRF incluido) que persiste la preferencia en el usuario. El
-           indicador dice el modo vigente (Claro/Oscuro) y los dos textos viajan: el modo
-           decide cual se ve, igual que los iconos. El hidden arranca en el opuesto del modo
-           preferido para que el form funcione sin JS; el script del fragment lo recalcula
-           al enviar a partir de data-theme, que es el modo real ya aplicado. El redirect
-           vuelve a la pagina de origen (currentUrl) y el controller lo valida. -->
-      <form th:action="@{/profile/theme}" method="POST" id="menu-theme-form">
-        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-        <input type="hidden" name="theme" id="menu-theme-value"
-          th:value="${userThemePreference == 'dark'} ? 'light' : 'dark'">
-        <input type="hidden" name="redirect" th:value="${currentUrl}">
-        <button type="submit" role="menuitem" id="menu-theme"
-          class="flex w-full items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100">
-          <svg class="theme-icon-moon h-4 w-4" aria-hidden="true" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
-          </svg>
-          <svg class="theme-icon-sun h-4 w-4" aria-hidden="true" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="4" />
-            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
-          </svg>
-          Tema
-          <span class="theme-label-light ml-auto rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600">Claro</span>
-          <span class="theme-label-dark ml-auto rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600">Oscuro</span>
-        </button>
-      </form>
-
       <div class="border-t border-gray-100 my-1"></div>
 
       <!-- AC-17: logout rojo y destacado; la ruta es por rol, NO por área (mismo comentario del
@@ -235,20 +210,6 @@
         }
         if (!inOpener) setIsOpen(false);
       });
-
-      // [PROF+THEME] El hidden del form de Tema arranca con el opuesto del modo preferido
-      // (asi el POST funciona sin JS). Al enviar se recalcula desde data-theme, que es el
-      // modo que el usuario esta viendo, y se copia a localStorage: el anonimo que herede
-      // este browser despues del logout arranca en el mismo modo ([THEME]).
-      const themeForm = document.getElementById("menu-theme-form");
-      const themeValue = document.getElementById("menu-theme-value");
-      if (themeForm && themeValue) {
-        themeForm.addEventListener("submit", function () {
-          const next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
-          themeValue.value = next;
-          try { localStorage.setItem("planit-theme", next); } catch (e) { /* sin storage */ }
-        });
-      }
     })();
   </script>
 </div>

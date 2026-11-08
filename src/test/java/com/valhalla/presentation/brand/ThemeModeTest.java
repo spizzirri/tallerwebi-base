@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.matchesPattern;
+import static org.hamcrest.Matchers.not;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -17,10 +18,10 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Modo oscuro, por archivo. El comportamiento en browser —repintado, persistencia en
- * localStorage, ícono que cambia— lo cubre ThemeModeE2E; esto clava las piezas estructurales
+ * localStorage y en el usuario— lo cubre ThemeModeE2E; esto clava las piezas estructurales
  * que ese E2E solo ve funcionando: el script temprano del head (con la precedencia
- * preferencia > localStorage > sistema de [PROF+THEME]), el toggle standalone que sobrevive
- * solo en la rama anónima del navbar, la entrada "Tema" del modal autenticado y la capa oscura
+ * preferencia > localStorage > sistema de [PROF+THEME]), el toggle standalone que solo
+ * declara la rama autenticada del navbar —como form POST a /profile/theme— y la capa oscura
  * en el stylesheet de tokens. Lee los templates porque la garantía es sobre lo que el markup
  * declara, igual que en BrandTokensTest.
  */
@@ -72,17 +73,16 @@ public class ThemeModeTest {
     );
   }
 
-  // [PROF+THEME] La sesión autenticada movió el control al modal, así que el toggle standalone
-  // sobrevive solo en la rama anónima. El E2E pinnea el conjunto visible de items de cada rama;
-  // esto clava que la rama anónima no se quede sin botón ni sin su label accesible y que la
-  // autenticada no lo duplique.
+  // [PROF+THEME] El toggle standalone existe solo para la sesión autenticada, y como form POST
+  // a /profile/theme: la preferencia del servidor manda sobre localStorage, así que un botón
+  // client-only se revertiría en la carga siguiente. El anónimo no tiene ningún control de tema.
   @Test
-  void theNavbarKeepsTheStandaloneToggleOnlyForAnonymousVisitors() throws IOException {
+  void theNavbarKeepsTheStandaloneToggleOnlyForAuthenticatedVisitors() throws IOException {
     String navbar = read(NAVBAR);
 
     assertThat(
-      "solo la rama anónima declara el botón",
-      occurrences(navbar, "type=\"button\" data-theme-toggle"),
+      "solo hay un toggle en todo el navbar",
+      occurrences(navbar, "data-theme-toggle"),
       is(1)
     );
     assertThat(
@@ -92,34 +92,43 @@ public class ThemeModeTest {
     );
     assertThat("los dos íconos viajan siempre", occurrences(navbar, "theme-icon-moon"), is(1));
     assertThat(occurrences(navbar, "theme-icon-sun"), is(1));
-    // La primera (y única) rama anónima abre antes del botón que queda: el toggle está dentro
-    // de su markup y no en el de la autenticada.
+
+    int formStart = navbar.indexOf("<form th:action=\"@{/profile/theme}\"");
+    assertThat("el toggle vive en un form POST", formStart, greaterThan(0));
+    String form = navbar.substring(
+      formStart,
+      navbar.indexOf("</form>", formStart) + "</form>".length()
+    );
+
     assertThat(
-      "y el botón que queda es el de la rama anónima",
-      navbar.substring(navbar.indexOf("sec:authorize=\"!isAuthenticated()\"")),
-      containsString("class=\"theme-toggle")
+      "el form está guardado por isAuthenticated()",
+      form,
+      containsString("sec:authorize=\"isAuthenticated()\"")
+    );
+    assertThat("y no por la negación anónima", form, not(containsString("!isAuthenticated()")));
+    assertThat("apunta a /profile/theme", form, containsString("th:action=\"@{/profile/theme}\""));
+    assertThat("es un POST", form, containsString("method=\"POST\""));
+    assertThat("con CSRF", form, containsString("th:name=\"${_csrf.parameterName}\""));
+    assertThat("el valor del tema viaja en el form", form, containsString("name=\"theme\""));
+    assertThat("y el redirect de vuelta al origen", form, containsString("name=\"redirect\""));
+    assertThat(
+      "el submit es el que dispara el POST",
+      form,
+      containsString("type=\"submit\" data-theme-toggle")
     );
   }
 
-  // [PROF+THEME] El item "Tema" del modal autenticado es una acción (form POST), no un link:
-  // el navegador la ejecuta sin JS y el controller valida el valor y el redirect.
+  // [PROF+THEME] El item "Tema" del modal se retiró: el único control es el toggle del navbar.
   @Test
-  void theAuthenticatedMenuCarriesTheActiveThemeEntry() throws IOException {
+  void theAuthenticatedMenuCarriesNoThemeEntry() throws IOException {
     String menu = read(MENU);
 
-    assertThat(occurrences(menu, "id=\"menu-theme\""), is(1));
-    assertThat(menu, containsString("th:action=\"@{/profile/theme}\""));
-    assertThat(menu, containsString("method=\"POST\""));
-    assertThat("el valor del tema viaja en el form", menu, containsString("name=\"theme\""));
-    assertThat("y el redirect de vuelta al origen", menu, containsString("name=\"redirect\""));
-    assertThat("con CSRF", menu, containsString("th:name=\"${_csrf.parameterName}\""));
-    assertThat("el indicador dice el modo vigente", menu, containsString("theme-label-light"));
-    assertThat(menu, containsString("theme-label-dark"));
-    assertThat(
-      "el toggle mobile duplicado ya no está en el modal",
-      occurrences(menu, "data-theme-toggle"),
-      is(0)
-    );
+    assertThat("el modal ya no ofrece Tema", occurrences(menu, "id=\"menu-theme\""), is(0));
+    assertThat(menu, not(containsString("th:action=\"@{/profile/theme}\"")));
+    assertThat(menu, not(containsString("menu-theme-value")));
+    assertThat(menu, not(containsString("theme-label-light")));
+    assertThat(menu, not(containsString("theme-label-dark")));
+    assertThat("el toggle mobile duplicado tampoco", occurrences(menu, "data-theme-toggle"), is(0));
   }
 
   // [PROF+THEME] La preferencia del usuario viaja en un meta que el script temprano lee antes
@@ -189,16 +198,9 @@ public class ThemeModeTest {
     );
     // El toggle no sincroniza íconos desde JS: los dos viajan en el botón y los muestra el modo.
     assertThat(tokens, containsString(".theme-icon-sun { display: none; }"));
-    // [PROF+THEME] Mismo patrón para el indicador Claro/Oscuro del modal: el badge vigente lo
-    // decide el modo, no JS.
-    assertThat(tokens, containsString(".theme-label-dark { display: none; }"));
     assertThat(
       tokens,
-      containsString("html[data-theme=\"dark\"] .theme-label-light { display: none; }")
-    );
-    assertThat(
-      tokens,
-      containsString("html[data-theme=\"dark\"] .theme-label-dark { display: inline; }")
+      containsString("html[data-theme=\"dark\"] .theme-icon-sun { display: block; }")
     );
     // El color por defecto del texto: el preflight de Tailwind no declara ninguno, así que lo
     // sin clase text-* hereda el negro del navegador. Tiene que vivir en el bloque de tokens

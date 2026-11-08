@@ -50,6 +50,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -63,6 +64,7 @@ import org.springframework.web.context.WebApplicationContext;
  */
 @WebIntegrationTest
 @Transactional
+@TestPropertySource(properties = "place.import.freshness-minutes=0")
 public class PlaceImportControllerTest {
 
   private static final String ADMIN_EMAIL = "admin@unlam.edu.ar";

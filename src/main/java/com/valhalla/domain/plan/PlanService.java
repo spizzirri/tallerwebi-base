@@ -75,4 +75,27 @@ public interface PlanService {
   Plan clonePlan(UUID id, String clonerEmail);
   /** [TOP] Participantes por plan, para el ranking del feed. Vacio si no hay ids. */
   Map<UUID, Long> getParticipantCounts(Collection<UUID> planIds);
+
+  // [PABM] Operaciones del ABM de admin (AC-01 a AC-11): sin chequeo de ownership, el admin de
+  // la plataforma gestiona cualquier plan, incluidos participantes y settings.
+  List<Plan> getAllPlans();
+  Plan getAnyPlan(UUID id);
+  Plan createAdminPlan(Plan plan);
+  Plan updateAnyPlan(UUID id, Plan changes);
+  void deleteAnyPlan(UUID id);
+  void togglePlanActive(UUID id, boolean active);
+  void changeParticipantRoleAny(UUID id, String participantEmail, String role);
+  void removeParticipantAny(UUID id, String participantEmail, String adminEmail);
+  /**
+   * [PABM] AC-20: invitación desde el admin. Actúa con la autoridad del dueño del plan, así que
+   * las reglas de {@link #inviteParticipant(UUID, String, String, String, String)} no cambian.
+   */
+  void inviteParticipantAny(UUID id, String participantEmail, String role);
+  void updateAnySettings(
+    UUID id,
+    PlanPermission handleRequests,
+    PlanPermission inviteInternal,
+    PlanPermission inviteByEmail,
+    boolean autoSchedule
+  );
 }

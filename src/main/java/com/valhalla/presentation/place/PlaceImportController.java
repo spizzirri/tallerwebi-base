@@ -7,6 +7,8 @@ import com.valhalla.domain.place.OverpassClient;
 import com.valhalla.domain.place.PlaceService;
 import com.valhalla.domain.place.ZonePois;
 import com.valhalla.infrastructure.place.PoiIngestService;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +18,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -30,15 +33,22 @@ import org.springframework.web.servlet.ModelAndView;
  * a traves de {@link OverpassClient}: el navegador nunca habla con Overpass y ningun test depende de
  * la red (AC-10).
  *
- * <p>El flujo tiene tres pasos y solo uno cuesta medio minuto:
+ * <p>El flujo tiene tres pasos y solo uno puede costar medio minuto, y solo la primera vez que
+ * se mira una zona:
  *
  * <table>
  *   <caption>Endpoints</caption>
  *   <tr><th>Paso</th><th>Endpoint</th><th>Red</th></tr>
  *   <tr><td>Entrar o mover el mapa</td><td>{@code GET /pois}</td><td>ninguna: lee de la base</td></tr>
- *   <tr><td>"Cargar puntos de esta zona"</td><td>{@code GET /refresh}</td><td>Overpass + diff</td></tr>
+ *   <tr><td>"Cargar puntos de esta zona"</td><td>{@code GET /refresh}</td><td>Overpass + diff, o solo la base si la zona esta fresca</td></tr>
  *   <tr><td>Elegir un punto</td><td>{@code /admin/places/new?…}</td><td>ninguna</td></tr>
  * </table>
+ *
+ * <p>La ventana de frescura es lo que evita pagar los 25-45 s dos veces por la misma zona: una
+ * caja traida hace menos de {@code place.import.freshness-minutes} minutos se responde con lo
+ * guardado. El elemento que se trae no se puede recortar para ganar tiempo: Overpass evalua la
+ * consulta completa antes de aplicar el limite de {@code out}, y recortar la respuesta marcaria
+ * como dados de baja puntos que siguen existiendo.
  *
  * <p>La consulta llega con el area visible del mapa ({@code south}, {@code west}, {@code north},
  * {@code east}) y se recorta a {@link BoundingBox#CABA}: el importador carga la zona que el usuario
@@ -62,6 +72,9 @@ public class PlaceImportController {
   /** Campos del sobre: los mismos para los dos endpoints, para que la vista no distinga. */
   private static final String FIELD_POIS = "pois";
   private static final String FIELD_FETCHED_AT = "fetchedAt";
+
+  /** {@code true} solo si esta misma request fue a Overpass; {@code false} si salio de la base. */
+  private static final String FIELD_REFRESHED = "refreshed";
 
   /** La vista no tiene como distinguir un timeout de un 502: el log es la unica pista. */
   private static final Logger LOGGER = Logger.getLogger(PlaceImportController.class.getName());
@@ -91,15 +104,20 @@ public class PlaceImportController {
   private final PoiIngestService poiIngestService;
   private final PlaceService placeService;
 
+  /** Cuanto vale lo guardado de una zona antes de volver a pedirla. */
+  private final Duration freshness;
+
   @Autowired
   public PlaceImportController(
     OverpassClient overpassClient,
     PoiIngestService poiIngestService,
-    PlaceService placeService
+    PlaceService placeService,
+    @Value("${place.import.freshness-minutes:15}") long freshnessMinutes
   ) {
     this.overpassClient = overpassClient;
     this.poiIngestService = poiIngestService;
     this.placeService = placeService;
+    this.freshness = Duration.ofMinutes(freshnessMinutes);
   }
 
   /** El modelo lleva la caja de CABA: la vista decide con ella si el boton de cargar esta activo. */
@@ -138,8 +156,9 @@ public class PlaceImportController {
    * Consulta Overpass, aplica el diff contra lo guardado (crear lo nuevo, actualizar lo que cambio,
    * dar de baja lo que ya no viene) y responde lo mismo que {@code /pois}.
    *
-   * <p>Es el unico camino que toca la red, y por eso el unico que puede tardar: el admin lo dispara
-   * a mano con el boton.
+   * <p>Es el unico camino que puede tocar la red. Solo la toca si la zona+tag se trajo hace mas de
+   * {@code place.import.freshness-minutes}: una zona recien cargada se responde con lo guardado y
+   * el sobre lo dice en {@code refreshed}.
    */
   @GetMapping("/refresh")
   @ResponseBody
@@ -169,10 +188,22 @@ public class PlaceImportController {
     if (visible == null) {
       return badRequest(ERROR_BOX);
     }
-    if (refresh && !ingest(tag, visible)) {
+    ZonePois stored = poiIngestService.read(tag.key(), tag.value(), visible);
+    boolean queried = refresh && !isFresh(stored.fetchedAt());
+    if (queried && !ingest(tag, visible)) {
       return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(Map.of(ERROR_KEY, ERROR_OVERPASS));
     }
-    return ResponseEntity.ok(envelope(poiIngestService.read(tag.key(), tag.value(), visible)));
+    ZonePois answer = queried ? poiIngestService.read(tag.key(), tag.value(), visible) : stored;
+    return ResponseEntity.ok(envelope(answer, queried));
+  }
+
+  /**
+   * Una zona traida dentro de la ventana no se vuelve a pedir: Overpass tarda 25-45 s y recargar la
+   * misma caja con los mismos datos no cambia nada. {@code null} es "nunca se cargo", que nunca es
+   * fresco.
+   */
+  private boolean isFresh(Instant fetchedAt) {
+    return fetchedAt != null && fetchedAt.plus(freshness).isAfter(Instant.now());
   }
 
   /**
@@ -203,6 +234,10 @@ public class PlaceImportController {
    * Mismo sobre para los dos endpoints: {@code fetchedAt} en {@code null} es "zona nunca cargada",
    * que es distinto de "cargada sin resultados".
    *
+   * <p>{@code refreshed} dice si esta misma request pago Overpass. Es la unica forma que tiene la
+   * vista de distinguir "se actualizo y no cambio nada" de "no se consulto porque lo guardado
+   * todavia vale", que desde el boton se ven iguales.
+   *
    * <p>Cada punto viaja como {@link PoiView}, con su categoria (el color del marcador) y el id del
    * lugar que ya lo representa. Los ids guardados se piden una sola vez para toda la pantalla: la
    * vista puede traer hasta 300 puntos y una consulta por punto no escala.
@@ -210,7 +245,7 @@ public class PlaceImportController {
    * <p>{@code fetchedAt} va como ISO-8601 ya formateado, no como {@code Instant}: asi el navegador
    * lo parsea con zona horaria en vez de depender de como serialice fechas el ObjectMapper.
    */
-  private Map<String, Object> envelope(ZonePois zonePois) {
+  private Map<String, Object> envelope(ZonePois zonePois, boolean refreshed) {
     Map<String, UUID> savedPlaceIds = placeService.savedPlaceIds(osmKeysOf(zonePois.pois()));
     Map<String, Object> body = new LinkedHashMap<>();
     body.put(FIELD_POIS, viewsOf(zonePois.pois(), savedPlaceIds));
@@ -218,6 +253,7 @@ public class PlaceImportController {
       FIELD_FETCHED_AT,
       zonePois.fetchedAt() == null ? null : zonePois.fetchedAt().toString()
     );
+    body.put(FIELD_REFRESHED, refreshed);
     return body;
   }
 

@@ -31,7 +31,7 @@ sin dependencias de red en ningun test.
 | AC-01 | `/admin/places` lista, crea, edita y da de baja places; los cambios persisten en la base y son visibles en `/explore` y `GET /api/places` |
 | AC-02 | `imageUrl` es opcional en el form: vacio guarda `null` y la vista cae al default `/images/place-placeholder.svg`; con una URL cargada, `/explore` muestra esa imagen |
 | AC-03 | Un usuario con rol USER no accede a `/admin/places*`: la cadena `/admin/**` lo redirige a su home sin renderizar el ABM; un anonimo queda redirigido sin renderizarlo tampoco |
-| AC-04 | La vista "Importar del mapa" muestra POIs reales de CABA (amenities/comercios) en un mapa Leaflet; al entrar y al mover el mapa los pinta **desde la base**, sin consultar Overpass. El admin elige el tipo de lugar y presiona "Cargar puntos de esta zona": recién ahí el backend consulta Overpass (a través de `OverpassClient`, sin API key, acotado al área visible del mapa y recortado a CABA) y guarda lo traído |
+| AC-04 | La vista "Importar del mapa" muestra POIs reales de CABA (amenities/comercios) en un mapa Leaflet; al entrar y al mover el mapa los pinta **desde la base**, sin consultar Overpass. El admin elige el tipo de lugar y presiona "Cargar puntos de esta zona": recién ahí el backend consulta Overpass (a través de `OverpassClient`, sin API key, acotado al área visible del mapa y recortado a CABA) y guarda lo traído. Si esa zona+tag ya se trajo dentro de la ventana de frescura, el botón responde con lo guardado sin consultar Overpass (AC-15) |
 | AC-05 | Al elegir un POI en el importador (la vista previa y despues "Crear lugar"), el form del ABM queda pre-lleno con nombre, direccion, coordenadas, horarios, telefono, web y categoria OSM mapeada; el admin puede revisar y cambiar cualquier campo antes de guardar, y guardar crea el place con esos datos |
 | AC-05b | El panel de detalle de `/explore` muestra horarios, telefono y web de un place cuando existen (el telefono como `tel:`, la web como enlace `https`), y no muestra filas vacias para los que no los tienen |
 | AC-06 | Tags OSM sin mapping explicito caen en `OTHER` y el admin siempre puede cambiar la categoria antes de guardar |
@@ -40,9 +40,10 @@ sin dependencias de red en ningun test.
 | AC-09 | `PlacesViewE2E` queda recalibrado contra el dataset nuevo y deja de atar el test al hex de color: el marker se identifica por su categoria (`data-category`), no por `background-color:#e74c3c` |
 | AC-10 | Ningun test de integracion ni E2E depende de red: `OverpassClient` se mockea en los tests; ninguna suite golpea Overpass ni Nominatim |
 | AC-11 | No se puede dar de baja un lugar que forma parte de planes: el ABM informa el motivo, no borra, y el place sigue en la base (la FK `plan_places.place_id` no se rompe) |
-| AC-12 | Lo traído queda en la base: una fila por POI en `poi` (identidad natural `osm:<type>/<id>` en `source_key`, unique) y una de cobertura por zona y tag en `poi_zone(zone_key, tag_key, tag_value, fetched_at)`. Volver a cargar la misma zona aplica **sólo el diff**: inserta lo nuevo, actualiza únicamente lo que cambió, marca `REMOVED` lo que Overpass dejó de devolver (baja lógica) y reactiva lo que reaparece; recargar con datos idénticos no escribe ninguna fila. Un fallo de Overpass no toca lo guardado, y la vista muestra la antigüedad de la última carga o que la zona nunca se cargó |
+| AC-12 | Lo traído queda en la base: una fila por POI en `poi` (identidad natural `osm:<type>/<id>` en `source_key`, unique) y una de cobertura por zona y tag en `poi_zone(zone_key, tag_key, tag_value, fetched_at)`. Cuando la zona se vuelve a pedir (vencida la ventana de frescura), aplica **sólo el diff**: inserta lo nuevo, actualiza únicamente lo que cambió, marca `REMOVED` lo que Overpass dejó de devolver (baja lógica) y reactiva lo que reaparece; recargar con datos idénticos no escribe ninguna fila. Un fallo de Overpass no toca lo guardado, y la vista muestra la antigüedad de la última carga o que la zona nunca se cargó |
 | AC-13 | Elegir el mismo POI del importador dos veces **no duplica el lugar**: el link del ABM lleva `externalId=osm:<type>/<id>`, el form lo postea como hidden y el alta reusa la fila de ese `places.external_id` (nullable, unique), quedándose con los datos de la última importación. Un lugar creado a mano queda sin identidad y editar un lugar importado no la pierde |
 | AC-14 | El importador pinta cada punto con **el color de su categoría**, el mismo token que usa `/explore` (sin hex nuevos), y el click en un punto —marker o fila de la lista— abre una **vista previa** sobre el mapa con nombre, categoría, dirección, horarios, teléfono, web y coordenadas, sin navegar; desde ahí se abre el alta pre-llenada. Un punto que ya es un lugar del catálogo (`places.external_id` igual a su `source_key`) se marca como **guardado** en la vista previa y en la lista, ofrece "Ver el lugar guardado" (link al ABM de ese lugar) en vez de crear, y el alta abierta con ese `externalId` muestra el mismo aviso |
+| AC-15 | Repetir "Cargar puntos de esta zona" sobre una zona+tag traída dentro de `place.import.freshness-minutes` (default 15) **no consulta Overpass**: responde con lo guardado en milisegundos y el sobre lo declara con `refreshed: false`. Una zona vencida o nunca traída sí consulta y responde `refreshed: true`. `/pois` nunca consulta y siempre responde `refreshed: false`. Con `place.import.freshness-minutes=0` la ventana queda deshabilitada |
 
 ## Escenarios de Test
 
@@ -175,6 +176,18 @@ sin dependencias de red en ningun test.
 | I-34 | El sobre de `/pois` trae la `category` y el `externalId` de cada punto; un POI sin identidad de OSM responde `externalId: null` | AC-14 |
 | I-35 | Con un lugar guardado que tiene `external_id` igual al `source_key` de un POI, ese punto responde con su `savedPlaceId` y los demás con `null`, con una sola consulta al catálogo | AC-14 |
 
+### Tests de Integración (`integration/PlaceImportFreshnessTest.java`)
+
+La clase corre con `place.import.freshness-minutes=15`; `PlaceImportControllerTest` declara la misma
+propiedad en `0` para seguir probando el diff en cada carga.
+
+| # | Test | AC que cubre |
+|---|------|-------------|
+| I-36 | Dos `/refresh` seguidos sobre la misma zona+tag: el primero responde `refreshed: true`, el segundo `refreshed: false`, el `fetchedAt` no se mueve y `OverpassClient` se llamó una sola vez | AC-15 |
+| I-37 | Un `/refresh` sobre una zona cuyo `fetched_at` se envejeció fuera de la ventana vuelve a consultar Overpass y responde `refreshed: true` | AC-12, AC-15 |
+| I-38 | Un `/refresh` sobre una zona nunca traída consulta Overpass y responde `refreshed: true` | AC-15 |
+| I-39 | `/pois` responde `refreshed: false` siempre, aunque la zona se haya traído hace un instante | AC-04, AC-15 |
+
 ### Tests de Seguridad (`integration/PlaceAdminSecurityTest.java`)
 
 | # | Test | AC que cubre |
@@ -266,6 +279,16 @@ dominio / fila sembrada), nunca dentro de la lógica de la vista.
     transitorios: **429** (limite por IP: esperar 30 s) y **502/503/504** (cola llena: esperar
     1 s). Se reintenta hasta dos veces en total; si sigue fallando, `refresh` responde 502 y la
     vista invita a probar de nuevo.
+- **Ventana de frescura: lo único barato es no llamar.** Cada `refresh` es **una sola** consulta
+  a Overpass, así que el tiempo lo domina la latencia del servidor escaneando el bbox (25–47 s),
+  no el volumen de la respuesta. `poi_zone.fetched_at` ya sellaba la cobertura por zona+tag, y
+  ahora también decide: si la zona se trajo dentro de `place.import.freshness-minutes` (default
+  15), `refresh` responde con lo guardado y no toca la red. El sobre declara `refreshed` para que
+  la vista pueda decir "se usaron los puntos guardados" en vez de parecer que el botón no hizo
+  nada. **No se baja el tope de `out ... 300`**: Overpass evalúa la consulta completa y recorta
+  al final, así que traer menos elementos no acelera la respuesta, y como el diff marca `REMOVED`
+  todo lo guardado que no vuelve en la respuesta, un tope más chico daría de baja puntos válidos.
+  Un `0` en la propiedad deshabilita la ventana (los tests del diff la usan así).
 - **Nominatim — hechos.** `https://nominatim.openstreetmap.org/search` (o Photon) hace
   geocoding por nombre; sin key, requiere un `User-Agent` identificable, 1 req/s. No es
   necesario en el flujo principal del importador (Overpass ya devuelve coordenadas del POI
@@ -597,11 +620,13 @@ Los dos endpoints del importador comparten forma y sobre, y solo uno toca la red
 
 - `GET /admin/places/import/pois?amenity=...&south=..&west=..&north=..&east=..`: valida la forma
   (un tag del allowlist, los cuatro bordes y ningun parametro de mas) y el recorte a CABA, y
-  devuelve `{"pois":[…],"fetchedAt":"…"|null}` leyendo `poi` y `poi_zone`. Cero red.
-- `GET /admin/places/import/refresh` con la misma forma: consulta `OverpassClient.findPois` con la
-  zona sellada, llama a `PoiIngestService.ingest` (el único `@Transactional`) y responde el mismo
-  sobre ya actualizado. Si el cliente lanza (red / 429 agotado), responde 502 con mensaje y **no
-  toca ninguna fila**; la vista lo muestra sin romperse.
+  devuelve `{"pois":[…],"fetchedAt":"…"|null,"refreshed":false}` leyendo `poi` y `poi_zone`. Cero red.
+- `GET /admin/places/import/refresh` con la misma forma: si la zona+tag se trajo dentro de
+  `place.import.freshness-minutes` (default 15) **no consulta Overpass** y responde el mismo sobre
+  con `refreshed: false`. Si esta vencida o nunca se trajo, consulta `OverpassClient.findPois` con
+  la zona sellada, llama a `PoiIngestService.ingest` (el único `@Transactional`) y responde el
+  sobre con `refreshed: true`. Si el cliente lanza (red / 429 agotado), responde 502 con mensaje y
+  **no toca ninguna fila**; la vista lo muestra sin romperse.
 
 Cada elemento de `pois` es un `PoiView` (no un `OsmPoi`): `name`, `address`, `latitude`,
 `longitude`, `openingHours`, `phone`, `website`, `category` (nombre del enum, lo que pinta el
@@ -610,7 +635,8 @@ identidad, o `null`). `ZonePois` lleva `MapPoi` justamente para no perder catego
 el catálogo se consulta una sola vez por request con `PlaceService.savedPlaceIds(...)`.
 
 `fetchedAt` en `null` significa "esta zona y este tag nunca se cargaron", que es distinto de
-"cargada sin resultados".
+"cargada sin resultados". `refreshed` dice si esa misma request pagó Overpass: es lo que permite
+distinguir "se actualizó y no cambió nada" de "no se consultó porque lo guardado todavía vale".
 
 ### 7. Vistas del ABM
 
@@ -711,6 +737,7 @@ Los archivos de test nuevos siguen los nombres y paquetes existentes:
 `infrastructure/PublicPlanDataSeederTest.java`),
 `integration/PlaceAdminControllerTest.java`,
 `integration/PlaceImportControllerTest.java`,
+`integration/PlaceImportFreshnessTest.java`,
 `integration/PlaceAdminSecurityTest.java`, `integration/PlaceImageTest.java`,
 `infrastructure/place/HttpOverpassClientTest.java`,
 `domain/place/MapPoiTest.java` (U-19..U-22),
@@ -766,7 +793,8 @@ siembra la fila por JDBC). Los mock de `OverpassClient` en integracion son `@Moc
 | `domain/place/PlaceServiceImplTest.java` | Actualizar (U-28..U-34, upsert por identidad y `savedPlaceIds`) |
 | `infrastructure/place/PlaceRepositoryTest.java` | Actualizar (I-28, I-29, I-32, I-33, `findByExternalId`/`findByExternalIdIn`) |
 | `integration/PlaceImageTest.java` | Crear (I-13, I-14) |
-| `integration/PlaceImportControllerTest.java` | Crear (I-15..I-25, I-34, I-35) |
+| `integration/PlaceImportControllerTest.java` | Crear (I-15..I-25, I-34, I-35; ventana de frescura en `0`) |
+| `integration/PlaceImportFreshnessTest.java` | Crear (I-36..I-39, ventana de frescura en 15) |
 | `integration/PlaceAdminSecurityTest.java` | Crear (S-01..S-04) |
 | `e2e/PlacesViewE2E.java` | Actualizar (E-01..E-03, recalibrado sin hex) |
 | `e2e/PlaceViewABME2E.java` | Crear (E-04..E-06) |

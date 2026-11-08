@@ -300,4 +300,14 @@ public class PlanTest {
     // then: sin dato, reordenar recalcula
     assertThat(settings.getAutoSchedule(), is(true));
   }
+
+  /** [PABM] Una fila anterior a la columna active la hidrata en null: el plan sigue activo. */
+  @Test
+  public void activeDefaultsToTrueWhenTheColumnIsNull() {
+    Plan plan = new Plan();
+
+    plan.setActive(null);
+
+    assertThat(plan.getActive(), is(true));
+  }
 }

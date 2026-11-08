@@ -194,8 +194,11 @@ public class PoiIngestService {
   /**
    * Clave de la zona: los cuatro bordes a dos decimales. Se arma con {@code Locale.ROOT} porque un
    * default {@code es-AR} escribiria comas y la clave se partiria en cuatro.
+   *
+   * <p>Es la identidad de la cobertura ({@code poi_zone.zone_key}); publica para que los tests
+   * puedan leer y envejecer una zona sin rearmar el formato a mano.
    */
-  static String zoneKey(BoundingBox zone) {
+  public static String zoneKey(BoundingBox zone) {
     return String.format(
       Locale.ROOT,
       "%.2f,%.2f,%.2f,%.2f",

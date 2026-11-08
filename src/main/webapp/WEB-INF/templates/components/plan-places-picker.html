@@ -1,0 +1,96 @@
+<!DOCTYPE HTML>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+  Picker de lugares del ABM de planes (pages/plan-places-picker.js). Mismo mapa, filtros y vista
+  previa que el importador del catalogo: lee los lugares guardados de la zona visible y deja afuera
+  los que el plan ya tiene.
+  planId != null: edicion. "Agregar al plan" postea el form oculto a /admin/plans/{id}/places/add.
+  planId == null: alta. El wizard recibe el lugar elegido por evento (no hay form).
+  excludedIds: ids separados por coma de los lugares ya en el plan (vacio en el alta).
+-->
+<div th:fragment="picker(planId, excludedIds)" id="plan-places-picker" class="flex flex-col gap-3"
+  th:attr="data-mode=${planId != null ? 'edit' : 'create'}, data-excluded=${excludedIds}">
+
+  <p class="text-sm text-gray-600">
+    Busque lugares del catálogo en la zona visible del mapa. Puede filtrar por categoría o por nombre,
+    y agregar un lugar desde su vista previa.
+  </p>
+
+  <div class="flex flex-wrap gap-2" role="group" aria-label="Filtrar por categoría">
+    <button v-for="category in categories" :key="category" type="button" @click="toggleCategory(category)"
+      :aria-pressed="isChosen(category) ? 'true' : 'false'" :style="chipStyle(category)"
+      class="rounded-full border px-3 py-1 text-xs font-medium transition">
+      {{ categoryLabel(category) }}
+    </button>
+  </div>
+
+  <!-- Enter no envia el form del alta: el submit implicito usaria el boton submit oculto del paso 3. -->
+  <input v-model="search" type="search" autocomplete="off" placeholder="Buscar por nombre"
+    @keydown.enter.prevent
+    aria-label="Buscar lugar por nombre"
+    class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" />
+
+  <p class="text-xs text-gray-500" aria-live="polite">{{ statusText }}</p>
+  <p v-if="error" role="alert" class="rounded-md bg-red-100 px-3 py-2 text-sm text-red-700">{{ error }}</p>
+
+  <div class="relative h-72 w-full overflow-hidden rounded-md border border-gray-200">
+    <div id="plan-places-map" class="absolute inset-0 h-full w-full"></div>
+
+    <div v-if="selected" id="plan-places-preview" role="region" aria-label="Vista previa del lugar"
+      class="absolute bottom-3 left-3 right-3 z-[1100] max-h-[70%] overflow-y-auto rounded-lg border border-gray-200 bg-white p-3 shadow-lg md:left-auto md:right-3 md:top-3 md:bottom-auto md:w-72">
+      <div class="flex items-start justify-between gap-2">
+        <h4 class="text-sm font-semibold text-gray-900">{{ selected.name }}</h4>
+        <button type="button" @click="closePreview"
+          class="rounded px-2 py-1 text-xs font-medium text-gray-500 transition hover:bg-gray-100 hover:text-gray-700">
+          Cerrar
+        </button>
+      </div>
+      <p class="mt-1 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-gray-600">
+        <span class="inline-block h-3 w-3 rounded-full" :style="{ backgroundColor: categoryColor(selected.category) }"></span>
+        {{ categoryLabel(selected.category) }}
+      </p>
+      <dl class="mt-2 flex flex-col gap-1 text-xs text-gray-700">
+        <div class="flex gap-2">
+          <dt class="w-20 shrink-0 font-medium text-gray-500">Dirección</dt>
+          <dd class="break-words">{{ orDash(selected.address) }}</dd>
+        </div>
+        <div class="flex gap-2">
+          <dt class="w-20 shrink-0 font-medium text-gray-500">Horarios</dt>
+          <dd class="break-words">{{ orDash(selected.openingHours) }}</dd>
+        </div>
+        <div class="flex gap-2">
+          <dt class="w-20 shrink-0 font-medium text-gray-500">Coordenadas</dt>
+          <dd>{{ coordinatesOf(selected) }}</dd>
+        </div>
+      </dl>
+      <button type="button" id="plan-places-add" @click="addPlace(selected)"
+        class="mt-3 w-full rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white transition hover:bg-gray-800">
+        Agregar al plan
+      </button>
+    </div>
+  </div>
+
+  <ul class="flex max-h-56 flex-col gap-2 overflow-y-auto" aria-label="Lugares de la zona visible">
+    <li v-for="place in results" :key="place.id">
+      <button type="button" @click="selectPlace(place)"
+        :aria-pressed="selected && selected.id === place.id ? 'true' : 'false'"
+        class="block w-full rounded-md border border-gray-200 bg-white p-2 text-left text-sm transition hover:bg-gray-50">
+        <span class="block font-medium text-gray-900">{{ place.name }}</span>
+        <span class="block text-xs text-gray-500">
+          {{ categoryLabel(place.category) }}<template v-if="place.address"> · {{ place.address }}</template>
+        </span>
+      </button>
+    </li>
+  </ul>
+
+  <form th:if="${planId != null}" ref="addForm" th:action="@{/admin/plans/{id}/places/add(id=${planId})}"
+    method="POST" class="hidden">
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+    <input type="hidden" name="placeId" :value="addPlaceId" />
+  </form>
+</div>
+
+</body>
+</html>

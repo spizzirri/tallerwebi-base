@@ -239,24 +239,19 @@ public class MobileLayoutE2E extends E2eBase {
 
   @Test
   void T_MOB_006_hamburguesaEnPhoneYNavbarDeDesktopIntacto() {
-    // sin sesion: el navbar anonimo nunca ofrece hamburguesa (decision fijada en PPV)
+    // sin sesion: el navbar anonimo nunca ofrece hamburguesa (decision fijada en PPV) ni
+    // control de tema: el anonimo sigue al sistema.
     page.setViewportSize(PHONE_W, PHONE_H);
     WebPage web = new WebPage(page);
     web.navigate(web.baseUrl() + "/");
     awaitStyles();
     assertThat("anonimo no tiene hamburguesa", page.locator("#navbar-menu-btn").count(), is(0));
-    // [MOBILE] El toggle de tema es hijo directo del nav con order-last: en mobile comparte
-    // fila con el logo en vez de quedar huerfano en una tercera fila debajo de los links.
-    Locator anonTheme = page.locator("nav > button[data-theme-toggle]");
-    assertThat("el toggle de tema esta en el navbar anonimo", anonTheme.isVisible(), is(true));
-    double rowDelta = Math.abs(
-      anonTheme.boundingBox().y - page.locator(".navbar-brand").first().boundingBox().y
-    );
     assertThat(
-      "el toggle comparte fila con el logo (<40px de diferencia)",
-      rowDelta,
-      is(lessThan(40.0))
+      "anonimo tampoco tiene toggle de tema",
+      page.locator("nav > button[data-theme-toggle]").count(),
+      is(0)
     );
+    assertThat("ni el form del toggle", page.locator("#navbar-theme-form").count(), is(0));
     page.screenshot(new Page.ScreenshotOptions().setPath(Path.of("target/navbar-anon-mobile.png")));
 
     // con sesion: la hamburguesa esta, mide 44px y abre el menu con los destinos del nav
@@ -269,6 +264,18 @@ public class MobileLayoutE2E extends E2eBase {
       "target tactil >= 44px (AC-02)",
       burger.boundingBox().height,
       is(greaterThanOrEqualTo(44.0))
+    );
+    // [MOBILE] El toggle de tema es hijo directo del nav con order-last y la hamburguesa gana
+    // ml-auto: en mobile el par queda en la fila del logo, pegado al canto derecho.
+    Locator authTheme = page.locator("#navbar-theme-form button[data-theme-toggle]");
+    assertThat("el toggle de tema esta en el navbar con sesion", authTheme.isVisible(), is(true));
+    double rowDelta = Math.abs(
+      authTheme.boundingBox().y - page.locator(".navbar-brand").first().boundingBox().y
+    );
+    assertThat(
+      "el toggle comparte fila con el logo (<40px de diferencia)",
+      rowDelta,
+      is(lessThan(40.0))
     );
     burger.click();
     page.waitForSelector("#navbar-menu:not([hidden])");
@@ -285,7 +292,7 @@ public class MobileLayoutE2E extends E2eBase {
     assertThat(
       "items del navbar de escritorio",
       web.getNavbarItems(),
-      contains("PlanIt", "Para vos", "Explore", "Plans", "A")
+      contains("PlanIt", "Para vos", "Explore", "Plans", "A", "Cambiar tema")
     );
   }
 

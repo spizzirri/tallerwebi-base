@@ -1,0 +1,206 @@
+<!DOCTYPE HTML>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{layouts/base :: head('Plan Detail')}"></head>
+
+<body th:replace="~{layouts/base :: layout(~{::main})}">
+
+  <main class="flex-1 p-4">
+    <div class="mx-auto max-w-4xl space-y-6">
+      <!-- Vista 100% de solo lectura: la unica accion es entrar al form de edicion. -->
+      <div class="flex items-center justify-between">
+        <h2 class="text-2xl font-semibold text-gray-900" th:text="${plan.name}">Plan</h2>
+        <div class="flex items-center gap-2">
+          <a th:href="@{/admin/plans}"
+            class="rounded-md bg-gray-200 px-4 py-2 font-medium text-gray-700 transition hover:bg-gray-300">
+            Back to Plans
+          </a>
+          <a th:href="@{/admin/plans/{id}/edit(id=${plan.id})}"
+            class="rounded-md bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700">
+            Edit
+          </a>
+        </div>
+      </div>
+
+      <!-- 1. Datos basicos -->
+      <section class="rounded-lg bg-white p-6 shadow-md">
+        <h3 class="mb-4 text-lg font-semibold text-gray-900">Basic Data</h3>
+        <dl class="grid grid-cols-1 gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
+          <div>
+            <dt class="font-medium text-gray-500">Name</dt>
+            <dd class="text-gray-900" th:text="${plan.name}">name</dd>
+          </div>
+          <div>
+            <dt class="font-medium text-gray-500">Date</dt>
+            <dd class="text-gray-900" th:text="${plan.eventDate ?: '—'}">date</dd>
+          </div>
+          <div>
+            <dt class="font-medium text-gray-500">Start time</dt>
+            <dd class="text-gray-900" th:text="${plan.eventTime ?: '—'}">time</dd>
+          </div>
+          <div>
+            <dt class="font-medium text-gray-500">Transport mode</dt>
+            <dd class="text-gray-900" th:text="${plan.transportMode ?: '—'}">mode</dd>
+          </div>
+          <div>
+            <dt class="font-medium text-gray-500">Short code</dt>
+            <dd class="text-gray-900" th:text="${plan.shortCode ?: '—'}">code</dd>
+          </div>
+          <div>
+            <dt class="font-medium text-gray-500">Visibility</dt>
+            <dd>
+              <span th:if="${plan.isPublic}"
+                class="inline-block rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">PUBLIC</span>
+              <span th:unless="${plan.isPublic}"
+                class="inline-block rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">PRIVATE</span>
+            </dd>
+          </div>
+          <div>
+            <dt class="font-medium text-gray-500">Status</dt>
+            <dd>
+              <span th:if="${plan.active}"
+                class="inline-block rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">Active</span>
+              <span th:unless="${plan.active}"
+                class="inline-block rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">Inactive</span>
+            </dd>
+          </div>
+          <div class="sm:col-span-2">
+            <dt class="font-medium text-gray-500">Description</dt>
+            <dd class="whitespace-pre-wrap text-gray-900" th:text="${plan.description ?: '—'}">description</dd>
+          </div>
+          <div class="sm:col-span-2">
+            <dt class="font-medium text-gray-500">Administrator</dt>
+            <dd class="text-gray-900"
+              th:with="admin=${plan.administrator}, adminName=${admin == null ? '' : #strings.trim((admin.firstName == null ? '' : admin.firstName) + ' ' + (admin.lastName == null ? '' : admin.lastName))}"
+              th:text="${admin == null ? '—' : (adminName == '' ? admin.email : adminName)}">admin</dd>
+          </div>
+        </dl>
+      </section>
+
+      <!-- 2. Participantes: solo lectura (rol y baja viven en el form de edicion) -->
+      <section class="rounded-lg bg-white p-6 shadow-md">
+        <h3 class="mb-4 text-lg font-semibold text-gray-900">Participants</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full border-collapse text-sm">
+            <thead>
+              <tr class="border-b border-gray-200 text-left text-gray-500">
+                <th class="py-2 pr-4">Name</th>
+                <th class="py-2 pr-4">Email</th>
+                <th class="py-2 pr-4">Role</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:if="${plan.administrator != null}" class="border-b border-gray-100"
+                th:with="owner=${plan.administrator}">
+                <td class="py-2 pr-4 text-gray-900"
+                  th:with="ownerName=${#strings.trim((owner.firstName == null ? '' : owner.firstName) + ' ' + (owner.lastName == null ? '' : owner.lastName))}"
+                  th:text="${ownerName == '' ? owner.email : ownerName}">owner</td>
+                <td class="py-2 pr-4 text-gray-700" th:text="${owner.email}">email</td>
+                <td class="py-2 pr-4">
+                  <span class="inline-block rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">Owner</span>
+                </td>
+              </tr>
+              <tr th:each="participant : ${plan.participants}" class="border-b border-gray-100"
+                th:with="fullName=${#strings.trim((participant.firstName == null ? '' : participant.firstName) + ' ' + (participant.lastName == null ? '' : participant.lastName))}">
+                <td class="py-2 pr-4 text-gray-900"
+                  th:text="${fullName == '' ? participant.email : fullName}">name</td>
+                <td class="py-2 pr-4 text-gray-700" th:text="${participant.email}">email</td>
+                <td class="py-2 pr-4">
+                  <span th:if="${plan.isEditor(participant.email)}"
+                    class="inline-block rounded-full bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-700">Editor</span>
+                  <span th:unless="${plan.isEditor(participant.email)}"
+                    class="inline-block rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">Guest</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p th:if="${#lists.isEmpty(plan.participants)}" class="mt-4 text-sm text-gray-500">
+          No participants yet.
+        </p>
+      </section>
+
+      <!-- 3. Lugares del plan, con todos los datos de la parada -->
+      <section class="rounded-lg bg-white p-6 shadow-md">
+        <h3 class="mb-4 text-lg font-semibold text-gray-900">Places</h3>
+        <p th:if="${#lists.isEmpty(plan.planPlaces)}" class="text-sm text-gray-500">
+          This plan has no places yet.
+        </p>
+        <ul th:unless="${#lists.isEmpty(plan.planPlaces)}" class="divide-y divide-gray-100">
+          <li th:each="entry : ${plan.planPlaces}" class="py-3">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <p class="text-sm font-medium text-gray-900" th:text="${entry.place.name}">place</p>
+                <p class="text-xs text-gray-500" th:text="${entry.place.category}">category</p>
+              </div>
+              <span class="shrink-0 rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600"
+                th:text="'#' + ${entry.sortOrder}">order</span>
+            </div>
+            <dl class="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-xs sm:grid-cols-5">
+              <div>
+                <dt class="font-medium text-gray-500">Visit date</dt>
+                <dd class="text-gray-900" th:text="${entry.visitDate ?: '—'}">date</dd>
+              </div>
+              <div>
+                <dt class="font-medium text-gray-500">Visit time</dt>
+                <dd class="text-gray-900" th:text="${entry.visitTime ?: '—'}">time</dd>
+              </div>
+              <div>
+                <dt class="font-medium text-gray-500">Duration (min)</dt>
+                <dd class="text-gray-900" th:text="${entry.durationMinutes ?: '—'}">duration</dd>
+              </div>
+              <div>
+                <dt class="font-medium text-gray-500">Mode to next</dt>
+                <dd class="text-gray-900" th:text="${entry.transportModeToNext ?: '—'}">mode</dd>
+              </div>
+              <div>
+                <dt class="font-medium text-gray-500">Travel to next (min)</dt>
+                <dd class="text-gray-900" th:text="${entry.travelMinutesToNext ?: '—'}">travel</dd>
+              </div>
+            </dl>
+          </li>
+        </ul>
+      </section>
+
+      <!-- 4. Settings: badges de solo lectura -->
+      <section class="rounded-lg bg-white p-6 shadow-md">
+        <h3 class="mb-4 text-lg font-semibold text-gray-900">Settings</h3>
+        <dl class="grid grid-cols-1 gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
+          <div>
+            <dt class="font-medium text-gray-500">Handle requests</dt>
+            <dd>
+              <span class="inline-block rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-700"
+                th:text="${plan.settings.handleRequests}">OWNER</span>
+            </dd>
+          </div>
+          <div>
+            <dt class="font-medium text-gray-500">Invite internal</dt>
+            <dd>
+              <span class="inline-block rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-700"
+                th:text="${plan.settings.inviteInternal}">EDITORS</span>
+            </dd>
+          </div>
+          <div>
+            <dt class="font-medium text-gray-500">Invite by email</dt>
+            <dd>
+              <span class="inline-block rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-700"
+                th:text="${plan.settings.inviteByEmail}">OWNER</span>
+            </dd>
+          </div>
+          <div>
+            <dt class="font-medium text-gray-500">Auto schedule</dt>
+            <dd>
+              <span th:if="${plan.settings.autoSchedule}"
+                class="inline-block rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">ON</span>
+              <span th:unless="${plan.settings.autoSchedule}"
+                class="inline-block rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">OFF</span>
+            </dd>
+          </div>
+        </dl>
+      </section>
+    </div>
+  </main>
+
+</body>
+
+</html>

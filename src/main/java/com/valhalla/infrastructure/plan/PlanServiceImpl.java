@@ -6,6 +6,7 @@ import com.valhalla.domain.exception.UserNotFoundException;
 import com.valhalla.domain.notification.NotificationService;
 import com.valhalla.domain.place.PlaceRepository;
 import com.valhalla.domain.plan.Plan;
+import com.valhalla.domain.plan.PlanDiscovery;
 import com.valhalla.domain.plan.PlanInvitation;
 import com.valhalla.domain.plan.PlanJoinRequest;
 import com.valhalla.domain.plan.PlanParticipantCount;
@@ -17,6 +18,7 @@ import com.valhalla.domain.planplace.PlanPlace;
 import com.valhalla.domain.rating.PlanRatingRepository;
 import com.valhalla.domain.user.User;
 import com.valhalla.domain.user.UserRepository;
+import java.time.LocalTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -36,7 +38,12 @@ public class PlanServiceImpl implements PlanService { // NOPMD — intentional: 
   private static final int SHORT_CODE_MAX_ATTEMPTS = 10;
   private static final String PARTICIPANT_ROLE = "guest";
   private static final String EMAIL_CHANNEL = "email";
+  // [PABM] Canal de la invitacion que hace el admin: dentro de la app, como el default del usuario.
+  private static final String INTERNAL_CHANNEL = "app";
   private static final String EDITOR_ROLE = "editor";
+  // [PABM] Usuario sistema dueño de los planes que se crean desde el admin (AC-03). El email vive
+  // en el dominio porque el ranking tambien lo necesita para priorizar esos planes.
+  private static final String APP_USER_EMAIL = PlanDiscovery.PLANIT_EMAIL;
 
   @Autowired
   private com.valhalla.domain.plan.EmailNotifier emailNotifier;
@@ -206,6 +213,14 @@ public class PlanServiceImpl implements PlanService { // NOPMD — intentional: 
   @Override
   public Plan createPlan(Plan plan, String ownerEmail) {
     User owner = userRepository.findByEmail(ownerEmail).orElseThrow(UserNotFoundException::new);
+    return persistNewPlan(plan, owner);
+  }
+
+  /**
+   * [PABM] Alta compartida por el usuario y el admin: los lugares se resuelven y el horario se
+   * deriva igual en los dos caminos, sea cual sea el dueño.
+   */
+  private Plan persistNewPlan(Plan plan, User owner) {
     for (PlanPlace entry : plan.getPlanPlaces()) {
       entry.setPlace(
         placeRepository
@@ -240,11 +255,17 @@ public class PlanServiceImpl implements PlanService { // NOPMD — intentional: 
   /**
    * [PPV] Listado publico: solo {@code isPublic = true}, sin orden garantizado y sin escribir nada.
    * El filtro vive en la query del repositorio, no aca — la vista nunca ve un plan privado.
+   *
+   * <p>[PABM] AC-12: los planes desactivados tampoco entran al feed ni a /explore.
    */
   @Override
   @Transactional(readOnly = true)
   public List<Plan> getPublicPlans() {
-    List<Plan> plans = planRepository.findByIsPublicTrue();
+    List<Plan> plans = planRepository
+      .findByIsPublicTrue()
+      .stream()
+      .filter(Plan::getActive)
+      .toList();
     plans.forEach(plan -> plan.getBannedUsers().forEach(user -> user.getEmail()));
     return plans;
   }
@@ -252,6 +273,8 @@ public class PlanServiceImpl implements PlanService { // NOPMD — intentional: 
   /**
    * [FOLLOW] Planes publicos de los autores seguidos: el conjunto lo elige el follow, el orden y
    * los filtros siguen siendo de {@code PlanDiscovery}, asi que la query no ordena (AC-08, AC-15).
+   *
+   * <p>[PABM] AC-12: el scope Siguiendo tampoco muestra planes desactivados.
    */
   @Override
   @Transactional(readOnly = true)
@@ -260,7 +283,11 @@ public class PlanServiceImpl implements PlanService { // NOPMD — intentional: 
     if (administratorIds == null || administratorIds.isEmpty()) {
       return List.of();
     }
-    List<Plan> plans = planRepository.findByIsPublicTrueAndAdministratorIdIn(administratorIds);
+    List<Plan> plans = planRepository
+      .findByIsPublicTrueAndAdministratorIdIn(administratorIds)
+      .stream()
+      .filter(Plan::getActive)
+      .toList();
     plans.forEach(plan -> plan.getBannedUsers().forEach(user -> user.getEmail()));
     return plans;
   }
@@ -299,7 +326,16 @@ public class PlanServiceImpl implements PlanService { // NOPMD — intentional: 
     // Solo el dueño cambia roles existentes: los editores conservan la invitación, no la
     // reasignación. getOwnedPlan responde como inexistente para el resto (misma política que
     // deleteOwnedPlan), así que un editor no puede distinguir un plan ajeno de uno inexistente.
-    Plan plan = getOwnedPlan(id, userEmail);
+    applyParticipantRole(getOwnedPlan(id, userEmail), participantEmail, role);
+  }
+
+  /** [PABM] AC-09: el admin reasigna roles de cualquier plan sin ser el dueño. */
+  @Override
+  public void changeParticipantRoleAny(UUID id, String participantEmail, String role) {
+    applyParticipantRole(getAnyPlan(id), participantEmail, role);
+  }
+
+  private void applyParticipantRole(Plan plan, String participantEmail, String role) {
     if (plan.isAdministrator(participantEmail)) {
       throw new PlanNotFoundException();
     }
@@ -335,6 +371,36 @@ public class PlanServiceImpl implements PlanService { // NOPMD — intentional: 
     moderateParticipant(id, participantEmail, userEmail, false);
   }
 
+  /**
+   * [PABM] AC-10: el admin saca participantes de cualquier plan, guest o editor.
+   *
+   * <p>[NOTIF] La notificación se firma con el admin real, no con el dueño: el aviso le dice al
+   * expulsado quién lo sacó. Por eso el email llega como parámetro y no se infiere del plan.
+   */
+  @Override
+  public void removeParticipantAny(UUID id, String participantEmail, String adminEmail) {
+    Plan plan = getAnyPlan(id);
+    requireRemovableParticipant(plan, participantEmail);
+    User admin = userRepository.findByEmail(adminEmail).orElseThrow(UserNotFoundException::new);
+    ejectParticipant(plan, admin, participantEmail, false);
+  }
+
+  /** [PABM] AC-20: el admin invita con la autoridad del dueño; el resto de las reglas son las mismas. */
+  @Override
+  public void inviteParticipantAny(UUID id, String participantEmail, String role) {
+    Plan plan = getAnyPlan(id);
+    if (plan.getAdministrator() == null) {
+      throw new PlanNotFoundException();
+    }
+    inviteParticipant(
+      id,
+      participantEmail,
+      role,
+      INTERNAL_CHANNEL,
+      plan.getAdministrator().getEmail()
+    );
+  }
+
   @Override
   public void banParticipant(UUID id, String participantEmail, String userEmail) {
     moderateParticipant(id, participantEmail, userEmail, true);
@@ -367,20 +433,33 @@ public class PlanServiceImpl implements PlanService { // NOPMD — intentional: 
     boolean ban
   ) {
     Plan plan = getEditablePlan(id, userEmail);
-    if (
-      plan.isAdministrator(participantEmail) ||
-      !plan.isParticipant(participantEmail) ||
-      (plan.isEditor(participantEmail) && !plan.isAdministrator(userEmail))
-    ) {
+    // Solo el dueño expulsa a un editor: un editor no saca a otro editor.
+    if (plan.isEditor(participantEmail) && !plan.isAdministrator(userEmail)) {
       throw new PlanNotFoundException();
     }
+    requireRemovableParticipant(plan, participantEmail);
+    ejectParticipant(plan, findPlanActor(plan, userEmail), participantEmail, ban);
+  }
+
+  /** [PABM] Ni al dueño ni a un ajeno al plan: los guardas de la expulsión, ahora compartidos. */
+  private void requireRemovableParticipant(Plan plan, String participantEmail) {
+    if (plan.isAdministrator(participantEmail) || !plan.isParticipant(participantEmail)) {
+      throw new PlanNotFoundException();
+    }
+  }
+
+  /**
+   * [NOTIF] Saca al participante y avisa al afectado. El {@code actor} es quien ejecuta la
+   * expulsión —el dueño/editor para {@code removeParticipant}, el admin para
+   * {@code removeParticipantAny}—, no el dueño del plan: la notificación dice quién lo hizo.
+   */
+  private void ejectParticipant(Plan plan, User actor, String participantEmail, boolean ban) {
     User participant = plan
       .getParticipants()
       .stream()
       .filter(user -> user.getEmail().equals(participantEmail))
       .findFirst()
       .orElseThrow(PlanNotFoundException::new);
-    User actor = findPlanActor(plan, userEmail);
     if (ban) {
       plan.getBannedUsers().add(participant);
     }
@@ -411,7 +490,7 @@ public class PlanServiceImpl implements PlanService { // NOPMD — intentional: 
 
   @Override
   public void inviteParticipant(UUID id, String participantEmail, String role, String userEmail) {
-    inviteParticipant(id, participantEmail, role, "app", userEmail);
+    inviteParticipant(id, participantEmail, role, INTERNAL_CHANNEL, userEmail);
   }
 
   @Override
@@ -440,10 +519,10 @@ public class PlanServiceImpl implements PlanService { // NOPMD — intentional: 
   }
 
   private void validateInvitationChannel(Plan plan, String channel, String role, String userEmail) {
-    if (!"app".equals(channel) && !EMAIL_CHANNEL.equals(channel)) {
+    if (!INTERNAL_CHANNEL.equals(channel) && !EMAIL_CHANNEL.equals(channel)) {
       throw new IllegalArgumentException("Canal de invitación inválido.");
     }
-    boolean allowed = "app".equals(channel)
+    boolean allowed = INTERNAL_CHANNEL.equals(channel)
       ? plan.canInviteInternal(userEmail)
       : plan.canInviteByEmail(userEmail);
     if (!allowed || (EDITOR_ROLE.equals(role) && !plan.canEdit(userEmail))) {
@@ -588,7 +667,10 @@ public class PlanServiceImpl implements PlanService { // NOPMD — intentional: 
     if (plan.isBanned(userEmail)) {
       throw new PlanBannedException();
     }
-    if (!plan.getIsPublic() && !plan.isAdministrator(userEmail) && !plan.isParticipant(userEmail)) {
+    // [PABM] AC-13/AC-14: un plan desactivado sigue abierto solo para su dueño y sus
+    // participantes, igual que los privados; para un extraño respondemos como si no existiera.
+    boolean member = plan.isAdministrator(userEmail) || plan.isParticipant(userEmail);
+    if (!member && (!plan.getActive() || !plan.getIsPublic())) {
       throw new PlanNotFoundException();
     }
     // The detail view renders participants and places after this transaction has ended.
@@ -738,6 +820,108 @@ public class PlanServiceImpl implements PlanService { // NOPMD — intentional: 
       .countParticipantsByPlanIds(planIds)
       .stream()
       .collect(Collectors.toMap(PlanParticipantCount::planId, PlanParticipantCount::count));
+  }
+
+  /** [PABM] Listado completo del ABM: todos los planes, sin filtros de acceso (AC-01). */
+  @Override
+  @Transactional(readOnly = true)
+  public List<Plan> getAllPlans() {
+    List<Plan> plans = planRepository.findAll();
+    // El listado pinta la cantidad de participantes despues de cerrar la transaccion.
+    plans.forEach(plan -> plan.getParticipants().forEach(user -> user.getEmail()));
+    return plans;
+  }
+
+  /**
+   * [PABM] Cualquier plan para el admin: sin chequeo de ownership (AC-04, AC-08). Calienta las
+   * colecciones lazy que la vista de detalle lee despues de cerrar la transaccion, igual que
+   * {@link #getSharedPlan(UUID)}.
+   */
+  @Override
+  @Transactional(readOnly = true)
+  public Plan getAnyPlan(UUID id) {
+    Plan plan = planRepository.findById(id).orElseThrow(PlanNotFoundException::new);
+    plan.getParticipants().forEach(user -> user.getEmail());
+    plan.getEditors().forEach(user -> user.getEmail());
+    // Las invitaciones pendientes se listan en el edit, fuera de la transaccion.
+    plan.getInvitations().forEach(invitation -> invitation.getRecipient().getEmail());
+    plan.getPlanPlaces().forEach(entry -> entry.getPlace().getName());
+    if (plan.getAdministrator() != null) {
+      plan.getAdministrator().getEmail();
+    }
+    return plan;
+  }
+
+  /** [PABM] El alta admin siempre nace a nombre del usuario sistema y activa (AC-03, AC-16). */
+  @Override
+  public Plan createAdminPlan(Plan plan) {
+    plan.setActive(true);
+    return persistNewPlan(plan, getOrCreateAppUser());
+  }
+
+  @Override
+  public Plan updateAnyPlan(UUID id, Plan changes) {
+    Plan plan = getAnyPlan(id);
+    // [PABM] El admin no edita la ventana del dia: el valor guardado (23:00 por defecto) se conserva
+    // aunque el objeto cambios no lo traiga.
+    LocalTime dayEnd = plan.getDayEndTime();
+    plan.updateFrom(changes);
+    plan.setDayEndTime(dayEnd);
+    // [SCH] Mismo motivo que updatePlan: cambiar fecha u horario recalcula el itinerario.
+    PlanScheduler.apply(plan);
+    return planRepository.save(plan);
+  }
+
+  /** [PABM] Baja admin: ratings primero (FK owner), el resto viaja con las cascadas (AC-07). */
+  @Override
+  public void deleteAnyPlan(UUID id) {
+    Plan plan = getAnyPlan(id);
+    planRatingRepository.deleteAllByPlanId(plan.getId());
+    planRepository.deleteById(plan.getId());
+  }
+
+  @Override
+  public void togglePlanActive(UUID id, boolean active) {
+    Plan plan = getAnyPlan(id);
+    plan.setActive(active);
+    planRepository.save(plan);
+  }
+
+  /** [PABM] AC-11: settings completos desde el admin, autoSchedule incluido. */
+  @Override
+  public void updateAnySettings(
+    UUID id,
+    PlanPermission handleRequests,
+    PlanPermission inviteInternal,
+    PlanPermission inviteByEmail,
+    boolean autoSchedule
+  ) {
+    Plan plan = getAnyPlan(id);
+    plan.getSettings().setHandleRequests(handleRequests);
+    plan.getSettings().setInviteInternal(inviteInternal);
+    plan.getSettings().setInviteByEmail(inviteByEmail);
+    plan.getSettings().setAutoSchedule(autoSchedule);
+    planRepository.save(plan);
+  }
+
+  /**
+   * [PABM] Usuario sistema dueño de los planes creados desde el admin (AC-03): si no existe se
+   * crea aca. Rol ADMIN y contraseña no loginable porque no tiene cuenta de acceso (AC-18).
+   */
+  private User getOrCreateAppUser() {
+    return userRepository
+      .findByEmail(APP_USER_EMAIL)
+      .orElseGet(() -> {
+        User appUser = new User();
+        appUser.setEmail(APP_USER_EMAIL);
+        appUser.setPassword("N/A");
+        appUser.setFirstName("PlanIt");
+        appUser.setLastName("App");
+        appUser.setRole("ADMIN");
+        appUser.setActive(true);
+        userRepository.save(appUser);
+        return appUser;
+      });
   }
 
   /**

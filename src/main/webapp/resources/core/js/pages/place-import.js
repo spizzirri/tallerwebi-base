@@ -12,7 +12,14 @@
  */
 import { apiFetch } from '../lib/api.js';
 import { categoryColor } from '../lib/category-colors.js';
-import { el } from '../lib/dom.js';
+import {
+  coordinatesOf,
+  createMap,
+  drawPoiMarkers,
+  intersects,
+  normalizeName,
+  orDash
+} from '../lib/map-picker.js';
 
 const CABA = (window.PLACE_IMPORT_SEED || {}).cabaBounds ?? null;
 const { createApp, ref, computed, watch, onMounted } = Vue;
@@ -48,6 +55,9 @@ createApp({
     const pois = ref([]);
     const search = ref('');
     const error = ref('');
+    /* Aviso de un refresh que no consulto Overpass porque la zona todavia valia: sin esto el
+       boton "Actualizar" parece no hacer nada. */
+    const note = ref('');
     const loading = ref(false);
     /* Ingesta en curso: el boton no puede disparar dos y una lectura no la cancela. */
     const refreshing = ref(false);
@@ -98,15 +108,6 @@ createApp({
       };
     };
 
-    /* Sin acentos ni mayusculas: "cafe" tiene que encontrar "Café". El filtro es local a
-       proposito: la lista ya esta en memoria, no hay motivo para volver a pedirla. */
-    const normalizeName = (text) => (text || '').normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase();
-
-    const intersects = (a, b) => a.south < b.north && a.north > b.south &&
-      a.west < b.east && a.east > b.west;
-
     /* Cargar solo tiene sentido si la zona visible toca CABA: el backend recorta a la ciudad. */
     const canLoad = computed(() => !!area.value && intersects(area.value, CABA));
     /* La zona (y el tipo) que se esta mirando ya se cargo alguna vez. */
@@ -123,6 +124,7 @@ createApp({
     const statusText = computed(() => {
       if (refreshing.value) return 'Consultando OpenStreetMap: puede tardar hasta 30 s...';
       if (!loaded.value) return loading.value ? 'Leyendo los puntos guardados...' : '';
+      if (note.value) return note.value;
       return filtered.value.length < pois.value.length
         ? filtered.value.length + ' de ' + pois.value.length + ' punto(s)'
         : pois.value.length + ' punto(s) encontrados';
@@ -187,39 +189,9 @@ createApp({
       selectedPoi.value = null;
     };
 
-    /* El panel muestra todo lo que el alta va a recibir, con un guion donde OSM no trajo nada. */
-    const orDash = (value) =>
-      value === null || value === undefined || value === '' ? '—' : value;
-
-    const coordinatesOf = (poi) =>
-      poi.latitude === null || poi.latitude === undefined ||
-        poi.longitude === null || poi.longitude === undefined
-        ? '—'
-        : poi.latitude + ', ' + poi.longitude;
-
+    /* Los markers del mapa (color por categoria, popup y click) viven en lib/map-picker.js. */
     const drawMarkers = () => {
-      markers.forEach((marker) => map.removeLayer(marker));
-      markers = filtered.value
-        .filter((poi) => poi.latitude !== null && poi.longitude !== null)
-        .map((poi) => {
-          /* El mismo token por categoria que usa /explore: un punto del importador se lee igual
-             que el del mapa publico. */
-          const color = categoryColor(poi.category);
-          const marker = L.circleMarker([poi.latitude, poi.longitude], {
-            radius: 9,
-            color: color,
-            weight: 3,
-            fillColor: color,
-            fillOpacity: 0.9
-          }).addTo(map);
-          /* Leaflet parses a String popup as HTML and the OSM name is unsanitized:
-             the label is a node, not markup. */
-          marker.bindPopup(el('strong', { text: poi.name }));
-          marker.on('click', () => {
-            selectPoi(poi);
-          });
-          return marker;
-        });
+      markers = drawPoiMarkers(map, markers, filtered.value, selectPoi);
     };
 
     /* Los markers se redibujan solos cuando cambia la lista filtrada. */
@@ -260,10 +232,14 @@ createApp({
         if (current !== pending) return;
         pois.value = data.pois || [];
         fetchedAt.value = data.fetchedAt || null;
+        note.value = isRefresh && data.refreshed === false
+          ? 'Esta zona se actualizó hace instantes: se usaron los puntos guardados.'
+          : '';
         loaded.value = true;
       } catch (loadError) {
         if (current !== pending || loadError.name === 'AbortError') return;
         console.error(loadError);
+        note.value = '';
         error.value = loadError.status === 401 ? loadError.message : failure;
       } finally {
         if (current === pending) {
@@ -292,16 +268,7 @@ createApp({
     });
 
     onMounted(() => {
-      map = L.map('map', { center: [-34.6037, -58.3816], zoom: 13 });
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      }).addTo(map);
-      /* El compilador de Tailwind corre diferido: sin esto el mapa se crea midiendo 0 y queda
-         centrado fuera de lugar (la misma razon que en /explore). El invalidateSize va con
-         pan por defecto: conserva el centro geografico; con pan:false el paso de 0 al tamaño
-         real desplazaba la vista varios kilometros. */
-      new ResizeObserver(() => map.invalidateSize()).observe(map.getContainer());
-      requestAnimationFrame(() => map.invalidateSize());
+      map = createMap('map', { center: [-34.6037, -58.3816], zoom: 13 });
       map.on('moveend zoomend', onMapMoved);
       /* Mismo camino que un movimiento: si el mapa todavia mide 0 no hay area y no se pide
          nada; el invalidateSize de arriba dispara el moveend que sí la tiene. */

@@ -54,7 +54,7 @@ public class PlanController {
 
   // [SCH] Defaults del planificador cuando el form no manda la ventana del dia ni el modo: los
   // mismos que asume un plan viejo sin esas columnas.
-  private static final LocalTime DEFAULT_DAY_END = LocalTime.of(23, 0);
+  static final LocalTime DEFAULT_DAY_END = LocalTime.of(23, 0);
 
   // [SCH] El fin de la visita viaja ya formateado: la vista publica no calcula nada y el formato
   // es el mismo HH:mm (24 h, cero a la izquierda) que dibuja el detalle del plan.
@@ -560,8 +560,10 @@ public class PlanController {
    *
    * <p>The form owns these fields and its itinerary rows only: id, shortCode and administrator
    * never come from a post.
+   *
+   * <p>[PABM] Package-private: el admin arma el alta con este mismo camino (lugares y horario).
    */
-  private Plan toPlan(PlanRequest planForm) {
+  static Plan toPlan(PlanRequest planForm) {
     Plan plan = new Plan();
     plan.setName(planForm.getName());
     plan.setDescription(planForm.getDescription());

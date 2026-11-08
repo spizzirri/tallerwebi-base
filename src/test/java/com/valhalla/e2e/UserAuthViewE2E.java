@@ -57,12 +57,12 @@ public class UserAuthViewE2E extends E2eBase {
     // The Explore link arrived with the map feature in 03-PLC and resolves to /explore, so it
     // belongs in the set too. "Para vos" resuelve a /for-you, el feed que es home del usuario
     // (visible con y sin sesión); el label cambió de "Planes públicos" cuando el feed pasó a
-    // mostrar solo planes ajenos. [PROF+THEME] El toggle "Cambiar tema" ya no vive en el
-    // navbar autenticado: el control es el item "Tema" del modal, así que no integra este set.
+    // mostrar solo planes ajenos. [PROF+THEME] El toggle "Cambiar tema" vive en el navbar con
+    // sesión iniciada (form POST a /profile/theme): su sr-only lo hace el último item del set.
     assertThat(
       "the authenticated navbar offers only items that resolve",
       landing.getNavbarItems(),
-      contains("PlanIt", "Para vos", "Explore", "Plans", "A")
+      contains("PlanIt", "Para vos", "Explore", "Plans", "A", "Cambiar tema")
     );
   }
 

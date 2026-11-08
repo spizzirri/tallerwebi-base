@@ -151,7 +151,7 @@ public class CurrentUserControllerAdvice {
    * [MARK] La ruta con su query string, para que los forms de Guardados vuelvan a la misma pantalla
    * con los filtros del feed intactos (el feed lleva {@code q}/{@code category}/{@code when}/
    * {@code sort} en la URL). Mismas exclusiones que {@link #currentPath}: las paginas de auth y
-   * admin no ofrecen el toggle.
+   * admin no ofrecen Guardados.
    */
   @ModelAttribute("currentUrl")
   public String currentUrl(HttpServletRequest request) {
@@ -159,13 +159,23 @@ public class CurrentUserControllerAdvice {
     if (path == null) {
       return null;
     }
-    String query = request.getQueryString();
-    return query == null || query.isBlank() ? path : path + "?" + query;
+    return withQuery(path, request);
+  }
+
+  /**
+   * [PROF+THEME] A donde vuelve el POST del toggle de tema: la pagina actual con su query string,
+   * admin incluido. {@link #currentUrl} no sirve para esto: devuelve null en {@code /admin/**} porque
+   * existe para el redirect del login, y un admin que cambia de tema no puede perder el area donde
+   * estaba trabajando.
+   */
+  @ModelAttribute("themeRedirectUrl")
+  public String themeRedirectUrl(HttpServletRequest request) {
+    return withQuery(requestPath(request), request);
   }
 
   /** Path de la request sin context path, o null donde el navbar no tiene que hablar. */
   private static String visiblePath(HttpServletRequest request) {
-    String path = request.getRequestURI().substring(request.getContextPath().length());
+    String path = requestPath(request);
     if ("/auth".equals(path) || path.startsWith("/auth/") || isInAdminArea(request)) {
       return null;
     }
@@ -177,8 +187,19 @@ public class CurrentUserControllerAdvice {
    * {@code /admin/...}. Un prefijo suelto alcanzaría a un hipotético {@code /administrator}.
    */
   private static boolean isInAdminArea(HttpServletRequest request) {
-    String path = request.getRequestURI().substring(request.getContextPath().length());
+    String path = requestPath(request);
     return "/admin".equals(path) || path.startsWith("/admin/");
+  }
+
+  /** Path de la request sin context path, sin exclusiones. */
+  private static String requestPath(HttpServletRequest request) {
+    return request.getRequestURI().substring(request.getContextPath().length());
+  }
+
+  /** El path con su query string, o el path solo cuando la request no trae query. */
+  private static String withQuery(String path, HttpServletRequest request) {
+    String query = request.getQueryString();
+    return query == null || query.isBlank() ? path : path + "?" + query;
   }
 
   /**

@@ -1,0 +1,452 @@
+<!DOCTYPE HTML>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{layouts/base :: head(${isEdit} ? 'Editar plan' : 'Nuevo plan')}"></head>
+
+<body th:replace="~{layouts/base :: layout(~{::main})}">
+
+  <main class="flex-1 p-4">
+    <div class="mx-auto max-w-4xl space-y-6">
+
+      <!-- ALTA: los tres pasos del alta de usuario (datos, paradas, privacidad y permisos).
+           El wizard lo maneja pages/plan-create.js; sin JS el form queda sin pasos visibles. -->
+      <section th:unless="${isEdit}" class="rounded-lg bg-white p-6 shadow-md sm:p-8">
+        <h2 class="mb-2 text-2xl font-semibold text-gray-900">Nuevo plan</h2>
+        <hr class="mb-6 border-gray-200">
+
+        <!-- AC-02: el alta siempre es a nombre del usuario sistema, no del admin logueado. -->
+        <p class="mb-6 rounded-md border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
+          Este plan va a ser de PlanIt (app@planit.com).
+        </p>
+
+        <p th:if="${error}" class="mb-4 rounded-md bg-red-100 px-4 py-3 text-sm text-red-700"
+          th:text="${error}">error</p>
+
+        <div class="mb-4 mt-2" aria-live="polite">
+          <p id="plan-step-label" class="mb-1 text-sm text-gray-500">Paso 1 de 3: Datos del plan</p>
+          <div class="flex gap-2">
+            <span data-progress="1" class="h-1.5 flex-1 rounded-full bg-blue-600"></span>
+            <span data-progress="2" class="h-1.5 flex-1 rounded-full bg-gray-200"></span>
+            <span data-progress="3" class="h-1.5 flex-1 rounded-full bg-gray-200"></span>
+          </div>
+        </div>
+
+        <form id="plan-create-form" th:object="${planForm}" th:action="@{/admin/plans}" method="POST">
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+          <!-- Paso 1: datos basicos -->
+          <div data-step="1" class="space-y-4">
+            <div>
+              <label for="name" class="mb-1 block text-sm font-medium text-gray-700">Nombre del plan</label>
+              <input id="name" th:field="*{name}" type="text" required placeholder="Ej: Salida por Buenos Aires"
+                class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none" />
+            </div>
+            <div>
+              <label for="description" class="mb-1 block text-sm font-medium text-gray-700">Descripción</label>
+              <textarea id="description" th:field="*{description}" rows="4"
+                class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"></textarea>
+            </div>
+            <div class="flex gap-3">
+              <div class="min-w-0 flex-1">
+                <label for="eventDate" class="mb-1 block text-sm font-medium text-gray-700">Fecha</label>
+                <input id="eventDate" th:field="*{eventDate}" type="date" required th:attr="min=${today}"
+                  class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none" />
+              </div>
+              <div class="min-w-0 flex-1">
+                <label for="eventTime" class="mb-1 block text-sm font-medium text-gray-700">Hora de inicio</label>
+                <input id="eventTime" th:field="*{eventTime}" type="time" step="300"
+                  class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none" />
+              </div>
+            </div>
+            <div>
+              <label for="transportMode" class="mb-1 block text-sm font-medium text-gray-700">Cómo se trasladan</label>
+              <select id="transportMode" th:field="*{transportMode}"
+                class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 focus:border-blue-500 focus:outline-none">
+                <option th:each="entry : ${transportLabels}" th:value="${entry.key}" th:text="${entry.value}">A pie</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Paso 2: paradas. El picker agrega lugares; aca se ordenan y se anotan. -->
+          <div data-step="2" hidden class="space-y-4">
+            <p class="rounded-md bg-blue-50 px-3 py-2 text-xs text-blue-800">
+              Agregue lugares desde el mapa. El horario de cada parada se calcula solo a partir de la fecha,
+              la hora de inicio y el modo de traslado.
+            </p>
+
+            <div th:replace="~{components/plan-places-picker :: picker(null, '')}"></div>
+
+            <h3 class="text-sm font-semibold uppercase tracking-wide text-gray-500">Paradas del plan</h3>
+            <p id="plan-draft-empty" class="text-sm text-gray-500">Todavía no hay paradas.</p>
+            <p id="plan-draft-count" hidden class="text-xs text-gray-500"></p>
+            <ol id="plan-draft-list" class="flex flex-col gap-2"></ol>
+            <p id="plan-draft-hint" role="alert" hidden class="rounded-md bg-red-100 px-3 py-2 text-sm text-red-700"></p>
+          </div>
+
+          <!-- Paso 3: privacidad y permisos, con los mismos selectores que el usuario -->
+          <div data-step="3" hidden class="space-y-4">
+            <h3 class="text-lg font-semibold text-gray-900">Privacidad y permisos</h3>
+            <div class="flex items-center gap-2">
+              <input type="checkbox" id="plan-public" name="isPublic" value="true"
+                class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+              <input type="hidden" name="_isPublic" value="on" />
+              <label for="plan-public" class="text-sm font-medium text-gray-700">Hacer público este plan</label>
+            </div>
+            <div th:replace="~{components/plan-permissions :: selectors(${defaultPlanSettings}, 'settings.')}"></div>
+            <div class="flex items-center gap-2">
+              <input id="autoSchedule" name="autoSchedule" type="checkbox" value="true" checked
+                class="h-4 w-4 rounded border-gray-300" />
+              <label for="autoSchedule" class="text-sm font-medium text-gray-700">
+                Horario automático (reordenar recalcula las horas de cada parada)
+              </label>
+            </div>
+          </div>
+
+          <!-- Opciones del traslado hacia la parada siguiente: las clona el wizard por cada fila. -->
+          <template id="plan-transport-options">
+            <option value="">Según el plan</option>
+            <option th:each="entry : ${transportLabels}" th:value="${entry.key}" th:text="${entry.value}">A pie</option>
+          </template>
+
+          <div class="mt-6 flex items-center justify-between gap-3">
+            <a th:href="@{/admin/plans}"
+              class="rounded-md bg-gray-200 px-4 py-2 font-medium text-gray-700 transition hover:bg-gray-300">
+              Cancelar
+            </a>
+            <div class="flex gap-2">
+              <button id="plan-prev" type="button" hidden
+                class="rounded-md bg-gray-200 px-4 py-2 font-medium text-gray-700 transition hover:bg-gray-300">
+                Atrás
+              </button>
+              <button id="plan-next" type="button"
+                class="rounded-md bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700">
+                Siguiente
+              </button>
+              <button id="plan-submit" type="submit" hidden disabled
+                class="rounded-md bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">
+                Crear plan
+              </button>
+            </div>
+          </div>
+        </form>
+      </section>
+
+      <!-- EDICION: una sola pagina. Datos, participantes, lugares y settings. -->
+      <th:block th:if="${isEdit}">
+
+        <!-- A. Datos basicos -->
+        <section class="rounded-lg bg-white p-6 shadow-md sm:p-8">
+          <h2 class="mb-2 text-2xl font-semibold text-gray-900">Editar plan</h2>
+          <hr class="mb-6 border-gray-200">
+
+          <p th:if="${error}" class="mb-4 rounded-md bg-red-100 px-4 py-3 text-sm text-red-700"
+            th:text="${error}">error</p>
+
+          <form th:object="${planForm}" th:action="@{/admin/plans/{id}(id=${planId})}" method="POST">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+            <div>
+              <label for="name" class="mb-1 block text-sm font-medium text-gray-700">Nombre del plan</label>
+              <input id="name" th:field="*{name}" type="text" required
+                class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none" />
+            </div>
+            <div class="mt-4">
+              <label for="description" class="mb-1 block text-sm font-medium text-gray-700">Descripción</label>
+              <textarea id="description" th:field="*{description}" rows="3"
+                class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"></textarea>
+            </div>
+            <div class="mt-4 flex gap-4">
+              <div class="flex-1">
+                <label for="eventDate" class="mb-1 block text-sm font-medium text-gray-700">Fecha</label>
+                <input id="eventDate" th:field="*{eventDate}" type="date" required
+                  class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none" />
+              </div>
+              <div class="flex-1">
+                <label for="eventTime" class="mb-1 block text-sm font-medium text-gray-700">Hora de inicio</label>
+                <input id="eventTime" th:field="*{eventTime}" type="time" step="300"
+                  class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none" />
+              </div>
+            </div>
+            <div class="mt-4">
+              <label for="transportMode" class="mb-1 block text-sm font-medium text-gray-700">Cómo se trasladan</label>
+              <select id="transportMode" th:field="*{transportMode}"
+                class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 focus:border-blue-500 focus:outline-none">
+                <option th:each="entry : ${transportLabels}" th:value="${entry.key}" th:text="${entry.value}">A pie</option>
+              </select>
+            </div>
+            <div class="mt-4">
+              <label for="isPublic" class="mb-1 block text-sm font-medium text-gray-700">Visibilidad</label>
+              <select id="isPublic" th:field="*{isPublic}"
+                class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 focus:border-blue-500 focus:outline-none">
+                <option value="false">Privado</option>
+                <option value="true">Público</option>
+              </select>
+            </div>
+            <!-- Sin th:field: el formobj sin el campo tiene que renderizar tildado por defecto. -->
+            <div class="mt-4 flex items-center gap-2">
+              <input id="active" name="active" type="checkbox" value="true"
+                th:checked="${planForm.active != false}" class="h-4 w-4 rounded border-gray-300" />
+              <label for="active" class="text-sm font-medium text-gray-700">
+                Activo (visible en los listados públicos)
+              </label>
+            </div>
+
+            <div class="mt-6 flex gap-3">
+              <button type="submit"
+                class="flex-1 rounded-md bg-blue-600 py-2 font-medium text-white transition hover:bg-blue-700">
+                Guardar datos
+              </button>
+              <a th:href="@{/admin/plans}"
+                class="flex-1 rounded-md bg-gray-200 py-2 text-center font-medium text-gray-700 transition hover:bg-gray-300">
+                Volver al listado
+              </a>
+            </div>
+          </form>
+        </section>
+
+        <!-- B. Participantes: rol, baja e invitaciones (AC-09, AC-10, AC-20) -->
+        <section class="rounded-lg bg-white p-6 shadow-md">
+          <h3 class="mb-4 text-lg font-semibold text-gray-900">Participantes</h3>
+
+          <p th:if="${invitationError}" role="alert" class="mb-4 rounded-md bg-red-100 px-3 py-2 text-sm text-red-700"
+            th:text="${invitationError}">error</p>
+
+          <div class="overflow-x-auto">
+            <table class="w-full border-collapse text-sm">
+              <thead>
+                <tr class="border-b border-gray-200 text-left text-gray-500">
+                  <th class="py-2 pr-4">Nombre</th>
+                  <th class="py-2 pr-4">Correo</th>
+                  <th class="py-2 pr-4">Rol</th>
+                  <th class="py-2 text-right">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:if="${plan.administrator != null}" class="border-b border-gray-100"
+                  th:with="owner=${plan.administrator}">
+                  <td class="py-2 pr-4 text-gray-900"
+                    th:with="ownerName=${#strings.trim((owner.firstName == null ? '' : owner.firstName) + ' ' + (owner.lastName == null ? '' : owner.lastName))}"
+                    th:text="${ownerName == '' ? owner.email : ownerName}">dueño</td>
+                  <td class="py-2 pr-4 text-gray-700" th:text="${owner.email}">correo</td>
+                  <td class="py-2 pr-4">
+                    <span class="inline-block rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">Dueño</span>
+                  </td>
+                  <td class="py-2 text-right text-gray-400">-</td>
+                </tr>
+                <tr th:each="participant : ${plan.participants}" class="border-b border-gray-100"
+                  th:with="fullName=${#strings.trim((participant.firstName == null ? '' : participant.firstName) + ' ' + (participant.lastName == null ? '' : participant.lastName))}">
+                  <td class="py-2 pr-4 text-gray-900"
+                    th:text="${fullName == '' ? participant.email : fullName}">nombre</td>
+                  <td class="py-2 pr-4 text-gray-700" th:text="${participant.email}">correo</td>
+                  <td class="py-2 pr-4">
+                    <span th:if="${plan.isEditor(participant.email)}"
+                      class="inline-block rounded-full bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-700">Editor</span>
+                    <span th:unless="${plan.isEditor(participant.email)}"
+                      class="inline-block rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">Invitado</span>
+                  </td>
+                  <td class="py-2">
+                    <div class="flex items-center justify-end gap-2">
+                      <form th:action="@{/admin/plans/{id}/participants/role(id=${plan.id})}" method="POST"
+                        class="flex items-center gap-2">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <input type="hidden" name="participantEmail" th:value="${participant.email}" />
+                        <select name="role" aria-label="Rol del participante"
+                          class="rounded border border-gray-300 px-2 py-1 text-sm">
+                          <option value="guest" th:selected="${!plan.isEditor(participant.email)}">Invitado</option>
+                          <option value="editor" th:selected="${plan.isEditor(participant.email)}">Editor</option>
+                        </select>
+                        <button type="submit"
+                          class="rounded bg-blue-100 px-3 py-1 text-sm font-medium text-blue-700 transition hover:bg-blue-200">
+                          Guardar rol
+                        </button>
+                      </form>
+                      <form th:action="@{/admin/plans/{id}/participants/remove(id=${plan.id})}" method="POST">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <input type="hidden" name="participantEmail" th:value="${participant.email}" />
+                        <button type="submit"
+                          class="rounded bg-red-100 px-3 py-1 text-sm font-medium text-red-700 transition hover:bg-red-200">
+                          Quitar
+                        </button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p th:if="${#lists.isEmpty(plan.participants)}" class="mt-4 text-sm text-gray-500">
+            Todavía no hay participantes.
+          </p>
+
+          <!-- Invitacion con la autoridad del dueño del plan (AC-20). -->
+          <form th:action="@{/admin/plans/{id}/participants/invite(id=${plan.id})}" method="POST"
+            class="mt-6 flex flex-wrap items-end gap-2 border-t border-gray-100 pt-4">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            <div class="min-w-[12rem] flex-1">
+              <label for="invite-email" class="mb-1 block text-sm font-medium text-gray-700">Correo de la persona</label>
+              <input id="invite-email" name="participantEmail" type="email" required
+                class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" />
+            </div>
+            <div>
+              <label for="invite-role" class="mb-1 block text-sm font-medium text-gray-700">Rol</label>
+              <select id="invite-role" name="role"
+                class="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm">
+                <option value="guest" selected>Invitado</option>
+                <option value="editor">Editor</option>
+              </select>
+            </div>
+            <button type="submit"
+              class="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700">
+              Invitar
+            </button>
+          </form>
+
+          <div th:unless="${#lists.isEmpty(plan.invitations)}" class="mt-6">
+            <h4 class="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">Invitaciones pendientes</h4>
+            <ul class="divide-y divide-gray-100 text-sm">
+              <li th:each="invitation : ${plan.invitations}" class="flex items-center justify-between py-2">
+                <span class="text-gray-900" th:text="${invitation.recipient.email}">correo</span>
+                <span class="text-xs text-gray-500" th:text="${invitation.role == 'editor' ? 'Editor' : 'Invitado'}">rol</span>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- C. Lugares: mapa del catalogo (AC-19), alta, baja, reorden y edicion de cada parada -->
+        <section class="rounded-lg bg-white p-6 shadow-md">
+          <h3 class="mb-4 text-lg font-semibold text-gray-900">Lugares</h3>
+
+          <div th:replace="~{components/plan-places-picker :: picker(${planId}, ${#strings.listJoin(planPlaceIds, ',')})}"></div>
+
+          <p th:if="${#lists.isEmpty(plan.planPlaces)}" class="mt-6 text-sm text-gray-500">
+            Este plan todavía no tiene lugares.
+          </p>
+
+          <ul th:unless="${#lists.isEmpty(plan.planPlaces)}" class="mt-6 divide-y divide-gray-100">
+            <li th:each="entry, stat : ${plan.planPlaces}" class="py-4">
+              <div class="flex items-start justify-between gap-4">
+                <div>
+                  <p class="text-sm font-medium text-gray-900" th:text="${entry.place.name}">lugar</p>
+                  <p class="text-xs text-gray-500" th:text="${entry.place.category}">categoría</p>
+                </div>
+                <div class="flex shrink-0 items-center gap-1">
+                  <!-- Orden: primera/ultima fila deshabilitada -->
+                  <form th:action="@{/admin/plans/{id}/places/{placeId}/move-up(id=${plan.id}, placeId=${entry.id})}"
+                    method="POST">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <button type="submit" th:disabled="${stat.first}" aria-label="Subir"
+                      class="rounded border border-gray-300 px-2 py-1 text-sm text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40">
+                      &#9650;
+                    </button>
+                  </form>
+                  <form
+                    th:action="@{/admin/plans/{id}/places/{placeId}/move-down(id=${plan.id}, placeId=${entry.id})}"
+                    method="POST">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <button type="submit" th:disabled="${stat.last}" aria-label="Bajar"
+                      class="rounded border border-gray-300 px-2 py-1 text-sm text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40">
+                      &#9660;
+                    </button>
+                  </form>
+                  <form th:action="@{/admin/plans/{id}/places/{placeId}/delete(id=${plan.id}, placeId=${entry.id})}"
+                    method="POST">
+                    <input type="hidden" name="_method" value="DELETE" />
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <button type="submit"
+                      class="rounded bg-red-100 px-3 py-1 text-sm font-medium text-red-700 transition hover:bg-red-200">
+                      Quitar
+                    </button>
+                  </form>
+                </div>
+              </div>
+
+              <!-- Guardado por fila: cada parada manda sus propios campos -->
+              <form
+                th:action="@{/admin/plans/{id}/places/{placeId}/update(id=${plan.id}, placeId=${entry.id})}"
+                method="POST" class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-5">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <div>
+                  <label th:for="${'visitDate-' + stat.index}" class="mb-1 block text-xs font-medium text-gray-500">Fecha de visita</label>
+                  <input th:id="${'visitDate-' + stat.index}" name="visitDate" type="date"
+                    th:value="${entry.visitDate}"
+                    class="w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm focus:border-blue-500 focus:outline-none" />
+                </div>
+                <div>
+                  <label th:for="${'visitTime-' + stat.index}" class="mb-1 block text-xs font-medium text-gray-500">Hora de visita</label>
+                  <input th:id="${'visitTime-' + stat.index}" name="visitTime" type="time"
+                    th:value="${entry.visitTime == null ? '' : #strings.substring(entry.visitTime.toString(), 0, 5)}"
+                    class="w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm focus:border-blue-500 focus:outline-none" />
+                </div>
+                <div>
+                  <label th:for="${'duration-' + stat.index}" class="mb-1 block text-xs font-medium text-gray-500">Duración (min)</label>
+                  <input th:id="${'duration-' + stat.index}" name="durationMinutes" type="number" min="1"
+                    th:value="${entry.durationMinutes}"
+                    class="w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm focus:border-blue-500 focus:outline-none" />
+                </div>
+                <div>
+                  <label th:for="${'mode-' + stat.index}" class="mb-1 block text-xs font-medium text-gray-500">Traslado a la siguiente</label>
+                  <select th:id="${'mode-' + stat.index}" name="transportModeToNext"
+                    class="w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm focus:border-blue-500 focus:outline-none">
+                    <option value="">Según el plan</option>
+                    <option th:each="mode : ${transportLabels}" th:value="${mode.key}" th:text="${mode.value}"
+                      th:selected="${mode.key == entry.transportModeToNext}">A pie</option>
+                  </select>
+                </div>
+                <div>
+                  <label th:for="${'travel-' + stat.index}" class="mb-1 block text-xs font-medium text-gray-500">Minutos de traslado</label>
+                  <input th:id="${'travel-' + stat.index}" name="travelMinutesToNext" type="number" min="0"
+                    th:value="${entry.travelMinutesToNext}"
+                    class="w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm focus:border-blue-500 focus:outline-none" />
+                </div>
+                <div class="flex justify-end sm:col-span-5">
+                  <button type="submit"
+                    class="rounded-md bg-blue-600 px-4 py-1.5 text-sm font-medium text-white transition hover:bg-blue-700">
+                    Guardar parada
+                  </button>
+                </div>
+              </form>
+            </li>
+          </ul>
+        </section>
+
+        <!-- D. Configuracion: mismos selectores que el usuario (AC-11) -->
+        <section class="rounded-lg bg-white p-6 shadow-md">
+          <h3 class="mb-4 text-lg font-semibold text-gray-900">Configuración</h3>
+          <form th:action="@{/admin/plans/{id}/settings(id=${plan.id})}" method="POST">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            <div th:replace="~{components/plan-permissions :: selectors(${plan.settings}, '')}"></div>
+
+            <div class="mt-4 flex items-center gap-2">
+              <input id="autoSchedule" name="autoSchedule" type="checkbox" value="true"
+                th:checked="${plan.settings.autoSchedule}" class="h-4 w-4 rounded border-gray-300" />
+              <label for="autoSchedule" class="text-sm font-medium text-gray-700">
+                Horario automático (reordenar recalcula las horas de cada parada)
+              </label>
+            </div>
+
+            <div class="mt-4 flex justify-end">
+              <button type="submit"
+                class="rounded-md bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700">
+                Guardar configuración
+              </button>
+            </div>
+          </form>
+        </section>
+      </th:block>
+    </div>
+
+    <!-- Leaflet vendorizado (1.9.4) para el picker de lugares, igual que el importador y el form
+         de lugares. Va dentro de <main>: layouts/base solo incluye ese elemento, y un script fuera
+         de el se descarta sin error. -->
+    <link rel="stylesheet" th:href="@{/css/leaflet.css}" />
+    <script th:src="@{/js/leaflet.js}"></script>
+
+    <!-- Wizard del alta y picker de lugares. Dentro de <main> por la misma razon que Leaflet: el
+         layout no los copia. El wizard solo existe en el alta; en edicion no hace nada. -->
+    <script type="module" th:src="@{/js/pages/plan-create.js}"></script>
+    <script type="module" th:src="@{/js/pages/plan-places-picker.js}"></script>
+  </main>
+
+</body>
+
+</html>

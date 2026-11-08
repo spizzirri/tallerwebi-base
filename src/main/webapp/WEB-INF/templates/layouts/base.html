@@ -31,13 +31,16 @@
          themePreference (CurrentUserControllerAdvice.userThemePreference), así la elección
          viaja entre dispositivos sin depender del storage del browser.
        - [THEME] anónimo (sin meta): la decisión vive en localStorage bajo la clave
-         "planit-theme"; si nunca eligió, sigue al sistema.
+         "planit-theme"; si nunca eligió, sigue al sistema. El anónimo no tiene control de
+         tema: no hay botón en el navbar.
        Escribe dos atributos con el mismo valor: data-theme es el que encienden los overrides
        de brand.css, y data-bs-theme es la misma llave en la sintaxis que lee Bootstrap (solo
-       pages/plans/detail.html carga Bootstrap). El click del toggle del navbar anónimo se
-       atiende por delegación de eventos: el botón se renderiza después y así el script no se
-       repite en el body. Claves de icono y overrides viven en brand.css y
-       components/navbar.html. -->
+       pages/plans/detail.html carga Bootstrap). El click del toggle del navbar (solo sesión
+       iniciada) se atiende por delegación de eventos: el botón se renderiza después y así el
+       script no se repite en el body. Ese toggle no persiste acá: su form hace un POST a
+       /profile/theme, porque la preferencia del servidor manda sobre localStorage. El handler
+       solo aplica el modo y deja el valor en el hidden del form antes del submit. Claves de
+       icono y overrides viven en brand.css y components/navbar.html. -->
   <meta name="theme-preference" th:if="${userThemePreference != null}"
     th:content="${userThemePreference}">
   <script>
@@ -65,6 +68,11 @@
         const next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
         apply(next);
         try { localStorage.setItem("planit-theme", next); } catch (e) { /* sin storage */ }
+        // [PROF+THEME] El toggle del navbar es type=submit dentro de #navbar-theme-form: el
+        // submit nativo sigue despues de este handler y serializa sus hidden. Poner el valor
+        // aca hace que el POST lleve el modo que el usuario acaba de ver aplicado.
+        const field = document.getElementById("navbar-theme-value");
+        if (field) field.value = next;
       });
     })();
   </script>

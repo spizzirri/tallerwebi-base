@@ -17,7 +17,36 @@ public final class PlanDiscovery {
   /** Promedio del prior: un plan sin votos arranca aca. */
   static final double PRIOR_MEAN = 3.7;
 
+  /** [PABM] Email del usuario sistema dueno de los planes que se crean desde el admin. */
+  public static final String PLANIT_EMAIL = "app@planit.com";
+
   private PlanDiscovery() {}
+
+  /**
+   * [PABM] Regla de producto: los planes de PlanIt van siempre primero, en todos los ordenes y con
+   * cualquier filtro. Dentro de cada grupo se conserva el orden propio de la lista. Un plan sin
+   * administrador no es de PlanIt y nunca rompe la comparacion.
+   */
+  public static Comparator<Plan> planItFirst() {
+    return Comparator.comparingInt((Plan plan) -> isPlanIt(plan) ? 0 : 1);
+  }
+
+  /** [PABM] Plan creado por el usuario sistema del admin, reconocido por el email del dueno. */
+  public static boolean isPlanIt(Plan plan) {
+    return (
+      plan != null &&
+      plan.getAdministrator() != null &&
+      PLANIT_EMAIL.equalsIgnoreCase(plan.getAdministrator().getEmail())
+    );
+  }
+
+  /**
+   * [PPV] Orden por fecha del sidebar publico: PlanIt primero y, dentro de cada grupo, la misma
+   * fecha ascendente con nulos al final que ya usaba el endpoint.
+   */
+  public static Comparator<Plan> publicDateOrder() {
+    return planItFirst().thenComparing(eventDateOrder());
+  }
 
   /** [TOP] Promedio bayesiano: el prior pesa menos a medida que el plan junta votos. */
   public static double popularityScore(Double average, Long count) {
@@ -27,15 +56,16 @@ public final class PlanDiscovery {
   }
 
   /**
-   * Orden de popularidad: calificados antes que sin calificar, despues score descendente,
-   * participantes descendentes, fecha ascendente (nulos al final), nombre y id.
+   * Orden de popularidad: PlanIt primero y, dentro de cada grupo, calificados antes que sin
+   * calificar, despues score descendente, participantes descendentes, fecha ascendente (nulos al
+   * final), nombre y id.
    */
   public static Comparator<Plan> popularityOrder(
     Map<UUID, RatingSummary> summaries,
     Map<UUID, Long> participantCounts
   ) {
-    return Comparator
-      .comparingInt((Plan plan) -> hasRatings(plan, summaries) ? 0 : 1)
+    return planItFirst()
+      .thenComparingInt(plan -> hasRatings(plan, summaries) ? 0 : 1)
       .thenComparing(
         Comparator.comparingDouble((Plan plan) ->
           -popularityScore(average(plan, summaries), votes(plan, summaries))
@@ -88,22 +118,30 @@ public final class PlanDiscovery {
     Map<UUID, Long> participantCounts
   ) {
     return switch (sort) {
-      case DATE -> Comparator
-        .comparing(
-          (Plan plan) -> plan.getEventDate(),
-          Comparator.nullsLast(Comparator.naturalOrder())
-        )
-        .thenComparing(plan -> normalize(plan.getName()))
-        .thenComparing(Plan::getId);
-      case NAME -> Comparator
-        .comparing((Plan plan) -> normalize(plan.getName()))
-        .thenComparing(
-          (Plan plan) -> plan.getEventDate(),
-          Comparator.nullsLast(Comparator.naturalOrder())
-        )
-        .thenComparing(Plan::getId);
+      case DATE -> planItFirst().thenComparing(eventDateOrder());
+      case NAME -> planItFirst().thenComparing(nameOrder());
       case POPULAR -> popularityOrder(summaries, participantCounts);
     };
+  }
+
+  private static Comparator<Plan> eventDateOrder() {
+    return Comparator
+      .comparing(
+        (Plan plan) -> plan.getEventDate(),
+        Comparator.nullsLast(Comparator.naturalOrder())
+      )
+      .thenComparing(plan -> normalize(plan.getName()))
+      .thenComparing(Plan::getId);
+  }
+
+  private static Comparator<Plan> nameOrder() {
+    return Comparator
+      .comparing((Plan plan) -> normalize(plan.getName()))
+      .thenComparing(
+        (Plan plan) -> plan.getEventDate(),
+        Comparator.nullsLast(Comparator.naturalOrder())
+      )
+      .thenComparing(Plan::getId);
   }
 
   private static boolean matchesText(Plan plan, String text) {

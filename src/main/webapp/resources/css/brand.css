@@ -160,13 +160,6 @@ html[data-theme="dark"] .divide-gray-200 > * { border-color: var(--dark-border);
 html[data-theme="dark"] .theme-icon-moon { display: none; }
 html[data-theme="dark"] .theme-icon-sun { display: block; }
 
-/* --- Indicador del item "Tema" del modal autenticado ([PROF+THEME]): el badge dice el modo
-       VIGENTE, no la accion. Los dos textos viajan en el boton y el modo decide cual se ve,
-       mismo patron que los iconos: no hay estado que sincronizar desde JS. --- */
-.theme-label-dark { display: none; }
-html[data-theme="dark"] .theme-label-light { display: none; }
-html[data-theme="dark"] .theme-label-dark { display: inline; }
-
 /* ============================ COMPONENTES COMPARTIDOS ============================
  *
  * [DIS] 17-DIS: una declaracion por componente, consumida por la landing y por la app.

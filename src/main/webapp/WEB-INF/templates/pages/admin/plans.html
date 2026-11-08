@@ -1,0 +1,87 @@
+<!DOCTYPE HTML>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{layouts/base :: head('Plans')}"></head>
+
+<body th:replace="~{layouts/base :: layout(~{::main})}">
+
+  <main class="flex-1 p-4">
+    <div class="mx-auto max-w-5xl">
+      <div class="mb-6 flex items-center justify-between">
+        <h2 class="text-2xl font-semibold text-gray-900">Plans</h2>
+        <a th:href="@{/admin/plans/new}"
+          class="rounded-md bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700">
+          + New Plan
+        </a>
+      </div>
+
+      <p th:if="${error}" class="mb-4 rounded-md bg-red-100 px-4 py-3 text-sm text-red-700"
+        th:text="${error}">error</p>
+
+      <!-- [MOBILE] Scroll horizontal propio de la tabla; la pagina no se desborda. -->
+      <div class="overflow-x-auto">
+        <table class="w-full border-collapse bg-white shadow-md">
+        <thead>
+          <tr class="border-b border-gray-200 bg-gray-50 text-left text-sm font-medium text-gray-600">
+            <th class="px-4 py-3">Plan</th>
+            <th class="px-4 py-3">Owner</th>
+            <th class="px-4 py-3">Visibility</th>
+            <th class="px-4 py-3">Status</th>
+            <th class="px-4 py-3">Participants</th>
+            <th class="px-4 py-3 text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="p : ${plans}" class="border-b border-gray-100 hover:bg-gray-50">
+            <td class="px-4 py-3 text-sm">
+              <a th:href="@{/admin/plans/{id}(id=${p.id})}"
+                class="font-medium text-blue-700 hover:underline" th:text="${p.name}">name</a>
+            </td>
+            <td class="px-4 py-3 text-sm text-gray-700" th:with="owner=${p.administrator}"
+              th:text="${owner == null ? '' : #strings.trim((owner.firstName == null ? '' : owner.firstName) + ' ' + (owner.lastName == null ? '' : owner.lastName))}">owner</td>
+            <td class="px-4 py-3 text-sm">
+              <span th:if="${p.isPublic}"
+                class="inline-block rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">PUBLIC</span>
+              <span th:unless="${p.isPublic}"
+                class="inline-block rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">PRIVATE</span>
+            </td>
+            <td class="px-4 py-3 text-sm">
+              <span th:if="${p.active}"
+                class="inline-block rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">Active</span>
+              <span th:unless="${p.active}"
+                class="inline-block rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">Inactive</span>
+            </td>
+            <td class="px-4 py-3 text-sm text-gray-700" th:text="${#lists.size(p.participants)}">0</td>
+            <td class="flex justify-end gap-2 px-4 py-3">
+              <a th:href="@{/admin/plans/{id}/edit(id=${p.id})}"
+                class="rounded bg-gray-200 px-3 py-1 text-sm font-medium text-gray-700 transition hover:bg-gray-300">
+                Edit
+              </a>
+              <!-- El form manda el estado destino, no el actual: un solo boton sirve para las dos direcciones. -->
+              <form th:action="@{/admin/plans/{id}/toggle-active(id=${p.id})}" method="POST">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <input type="hidden" name="active" th:value="${!p.active}" />
+                <button type="submit" th:class="${p.active} ? 'rounded bg-yellow-100 px-3 py-1 text-sm font-medium text-yellow-700 transition hover:bg-yellow-200' : 'rounded bg-green-100 px-3 py-1 text-sm font-medium text-green-700 transition hover:bg-green-200'"
+                  th:text="${p.active} ? 'Deactivate' : 'Activate'">Deactivate</button>
+              </form>
+              <form th:action="@{/admin/plans/{id}/delete(id=${p.id})}" method="POST">
+                <input type="hidden" name="_method" value="DELETE" />
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <button type="submit"
+                  class="rounded bg-red-100 px-3 py-1 text-sm font-medium text-red-700 transition hover:bg-red-200">
+                  Delete
+                </button>
+              </form>
+            </td>
+          </tr>
+        </tbody>
+        </table>
+      </div>
+
+      <p th:if="${#lists.isEmpty(plans)}" class="mt-8 text-center text-gray-500">No plans found.</p>
+    </div>
+  </main>
+
+</body>
+
+</html>

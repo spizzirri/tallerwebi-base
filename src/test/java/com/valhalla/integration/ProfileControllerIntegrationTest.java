@@ -676,27 +676,36 @@ public class ProfileControllerIntegrationTest {
       .andExpect(content().string(containsString("name=\"theme-preference\" content=\"dark\"")));
   }
 
-  // --- [PROF+THEME] I-19: el modal autenticado rinde la entrada Tema activa ---
+  // --- [PROF+THEME] I-19: la sesion autenticada rinde el toggle del navbar y no el item Tema ---
 
   @Test
   @WithMockUser(username = SELF_EMAIL)
-  public void authenticatedProfileRendersTheThemeEntryInTheMenu() throws Exception {
+  public void authenticatedProfileRendersTheNavbarThemeToggle() throws Exception {
+    User self = userRepository.findById(selfId).orElseThrow();
+    self.setThemePreference("dark");
+    userRepository.save(self);
+
     this.mockMvc.perform(get("/profile/" + selfId))
       .andExpect(status().isOk())
-      .andExpect(content().string(containsString("id=\"menu-theme\"")))
-      .andExpect(content().string(containsString("action=\"/profile/theme\"")))
-      .andExpect(content().string(containsString("theme-label-light")))
-      .andExpect(content().string(not(containsString("type=\"button\" data-theme-toggle"))));
+      .andExpect(content().string(containsString("id=\"navbar-theme-form\"")))
+      .andExpect(content().string(containsString("type=\"submit\" data-theme-toggle")))
+      .andExpect(content().string(not(containsString("id=\"menu-theme\""))))
+      .andExpect(content().string(containsString("name=\"theme-preference\" content=\"dark\"")));
   }
 
-  // --- [PROF+THEME] I-20: el anónimo conserva el toggle standalone y no tiene modal ---
+  // --- [PROF+THEME] I-20: el anonimo no tiene control de tema ni menu autenticado ---
 
   @Test
-  public void anonymousProfileKeepsTheNavbarToggleAndRendersNoMenu() throws Exception {
+  public void anonymousProfileRendersNoNavbarThemeToggleAndNoMenu() throws Exception {
+    // La assertion se ancla al markup del toggle, no al string suelto: el script de
+    // layouts/base menciona "[data-theme-toggle]" como selector en todos los renders,
+    // tambien en el del anonimo.
     this.mockMvc.perform(get("/profile/" + selfId))
       .andExpect(status().isOk())
-      .andExpect(content().string(containsString("type=\"button\" data-theme-toggle")))
+      .andExpect(content().string(not(containsString("id=\"navbar-theme-form\""))))
+      .andExpect(content().string(not(containsString("type=\"submit\" data-theme-toggle"))))
       .andExpect(content().string(not(containsString("id=\"menu-theme\""))))
+      .andExpect(content().string(not(containsString("id=\"btn-logout\""))))
       .andExpect(content().string(not(containsString("name=\"theme-preference\" content="))));
   }
 

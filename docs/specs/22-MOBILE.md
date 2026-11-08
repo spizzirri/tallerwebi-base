@@ -69,10 +69,11 @@ al medir boxes.
   los paneles vuelven visibles sin tocar ninguna tab.
 - **T-MOB-005 — tablas del admin en phone:** scrolleable en su contenedor; el resto de la vista
   sin desborde; una fila de datos visible.
-- **T-MOB-006 — navbar:** anónimo **no** tiene hamburguesa (pinned por `PublicPlansListE2E`,
-  que además pinea el orden de texto `PlanIt, Para vos, Register, Login, Cambiar tema`);
-  autenticado la tiene con ≥44 px, el menú se abre con los mismos destinos + toggle de tema, y
-  el toggle de tema anónimo **comparte fila con el logo** (no huérfano en una tercera fila).
+- **T-MOB-006 — navbar:** anónimo **no** tiene hamburguesa ni control de tema (pinned por
+  `PublicPlansListE2E`, que además pinea el orden de texto `PlanIt, Para vos, Register, Login`);
+  autenticado la tiene con ≥44 px, el menú se abre con los mismos destinos, y el toggle de tema
+  autenticado —hijo directo del nav— **comparte fila con el logo** (no huérfano en una tercera
+  fila), pegado a la hamburguesa contra el canto derecho.
 - **T-MOB-008 — detalle del plan a 320 px:** sin scroll horizontal, el título del plan mide
   ≥60 px de ancho (catch del bug de letras-sueltas por `overflow-wrap: anywhere` + paddings
   encadenados), acciones y datos del itinerario visibles. (La numeración salta el 007: esa
@@ -83,11 +84,14 @@ al medir boxes.
 - **Hamburguesa solo autenticada.** El navbar anónimo (3 links) fluye con `flex-wrap`: un E2E
   de PPV pinea que el navbar anónimo **no** tiene `#navbar-menu-btn`, y sumarle la hamburguesa
   rompía ese contrato sin ganancia real. En desktop el navbar anónimo muestra todo en una fila.
-- **Toggle de tema anónimo como hijo directo del `<nav>`.** Vivió dentro del bloque de links y
-  a 296–390 px el bloque envolvía a una tercera fila con el toggle suelto. Pasa a hijo directo
-  del nav, **después** de los links (el orden de texto que pinnegan los helpers E2E no cambia),
-  con `order-last md:order-none`: en mobile queda en la fila del logo; en desktop,
-  `md:ml-auto` del bloque de links lo devuelve al cluster derecho.
+- **Toggle de tema como hijo directo del `<nav>`, solo con sesión.** Vivió dentro del bloque de
+  links (anónimo) y a 296–390 px el bloque envolvía a una tercera fila con el toggle suelto. Pasa
+  a hijo directo del nav, **después** de los links, con `order-last md:order-none`: en mobile
+  queda en la fila del logo; en desktop, `md:order-none` lo deja junto al cluster derecho. Desde
+  v2.7 ([PROF+THEME]) el toggle existe **solo** en la sesión autenticada y es el submit de un
+  form `POST /profile/theme`; la hamburguesa gana `ml-auto` para que el par [hamburguesa][toggle]
+  quede pegado al canto derecho y el bloque autenticado de desktop gana `md:ml-auto` para no
+  centrarse con el tercer hijo. El anónimo no tiene control de tema: sigue al sistema.
 - **Touch targets:** ≥44 px solo en la hamburguesa (AC-06 literal de la card); el resto de los
   controles quedó en el estándar actual (~36 px) — desviación asumida.
 - **Padding inferior de la fila de links en mobile.** El nav no declara padding vertical: con
@@ -124,10 +128,12 @@ al medir boxes.
 
 `flex flex-wrap items-center justify-between gap-x-4 gap-y-1`. Bloque anónimo con
 `order-last md:order-none md:ml-auto w-full md:w-auto` (fila propia full-width en mobile,
-cluster derecho en desktop). Hamburguesa `md:hidden` con `h-11 w-11` (44 px) y
-`data-menu-toggle`. Menú (`components/navbar-menu.html`): el menú modal existente con un bloque
-`md:hidden` que replica los destinos (Para vos/Explore/Plans, o Users/Places si admin, + toggle
-de tema).
+cluster derecho en desktop). Bloque autenticado de desktop con `hidden md:flex md:ml-auto`.
+Hamburguesa `md:hidden ml-auto` con `h-11 w-11` (44 px) y `data-menu-toggle`. Toggle de tema
+autenticado: form hijo directo del nav con `order-last md:order-none` y
+`button[type=submit][data-theme-toggle]` adentro. Menú (`components/navbar-menu.html`): el menú
+modal existente con un bloque `md:hidden` que replica los destinos (Para vos/Explore/Plans, o
+Users/Places si admin).
 
 ### 2. Tablas con scroll propio
 
@@ -163,10 +169,11 @@ verificación en `target/`: `navbar-anon-mobile.png`, `detail-mobile-320.png`,
 
 ## Archivos a crear/modificar
 
-- `src/main/webapp/WEB-INF/templates/components/navbar.html` — flex-wrap, hamburguesa,
-  bloque anónimo con `order`, toggle de tema como hijo directo del nav.
+- `src/main/webapp/WEB-INF/templates/components/navbar.html` — flex-wrap, hamburguesa (`ml-auto`),
+  bloque anónimo con `order`, bloque autenticado con `md:ml-auto`, toggle de tema como hijo
+  directo del nav (form POST, solo autenticado).
 - `src/main/webapp/WEB-INF/templates/components/navbar-menu.html` — bloque `md:hidden` de
-  destinos para el menú de la hamburguesa + toggle de tema.
+  destinos para el menú de la hamburguesa (sin el item Tema desde v2.7).
 - `src/main/webapp/WEB-INF/templates/pages/plans/detail.html` — media query ≤575 px.
 - `src/main/webapp/WEB-INF/templates/pages/plans/list.html` — tabla con `overflow-x-auto`.
 - `src/main/webapp/WEB-INF/templates/pages/places/list.html` — explorador apilado +

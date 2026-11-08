@@ -13,6 +13,7 @@ import com.valhalla.domain.place.Place;
 import com.valhalla.domain.place.PlaceCategory;
 import com.valhalla.domain.planplace.PlanPlace;
 import com.valhalla.domain.rating.RatingSummary;
+import com.valhalla.domain.user.User;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -529,8 +530,147 @@ public class PlanDiscoveryTest {
     assertThat(found.get(1).getId(), is(equalTo(later.getId())));
   }
 
+  @Test
+  public void planItPlansComeFirstUnderPopularityEvenWithAHigherRatedUserPlan() {
+    Plan userPlan = plan(210, "Muy popular", TODAY);
+    Plan planItPlan = plan(211, "Plan de la app", TODAY);
+    organizer(planItPlan, PlanDiscovery.PLANIT_EMAIL);
+    Map<UUID, RatingSummary> summaries = Map.of(
+      userPlan.getId(),
+      new RatingSummary(userPlan.getId(), 5.0, 50L)
+    );
+
+    List<Plan> ordered = PlanDiscovery.orderByPopularity(
+      List.of(userPlan, planItPlan),
+      summaries,
+      Map.of()
+    );
+
+    assertThat(ordered.get(0).getId(), is(equalTo(planItPlan.getId())));
+    assertThat(ordered.get(1).getId(), is(equalTo(userPlan.getId())));
+  }
+
+  @Test
+  public void planItPlansComeFirstUnderDateSort() {
+    Plan soonerUserPlan = plan(212, "Antes", TODAY);
+    Plan laterPlanItPlan = plan(213, "Despues", TODAY.plusDays(10));
+    organizer(laterPlanItPlan, PlanDiscovery.PLANIT_EMAIL);
+
+    List<Plan> found = discover(
+      List.of(soonerUserPlan, laterPlanItPlan),
+      PlanDiscoveryQuery.parse(null, null, null, "date")
+    );
+
+    assertThat(found.get(0).getId(), is(equalTo(laterPlanItPlan.getId())));
+    assertThat(found.get(1).getId(), is(equalTo(soonerUserPlan.getId())));
+  }
+
+  @Test
+  public void planItPlansComeFirstUnderNameSort() {
+    Plan alfaUserPlan = plan(214, "Alfa", TODAY);
+    Plan zetaPlanItPlan = plan(215, "Zeta", TODAY);
+    organizer(zetaPlanItPlan, PlanDiscovery.PLANIT_EMAIL);
+
+    List<Plan> found = discover(
+      List.of(alfaUserPlan, zetaPlanItPlan),
+      PlanDiscoveryQuery.parse(null, null, null, "name")
+    );
+
+    assertThat(found.get(0).getId(), is(equalTo(zetaPlanItPlan.getId())));
+    assertThat(found.get(1).getId(), is(equalTo(alfaUserPlan.getId())));
+  }
+
+  @Test
+  public void planItFirstStillHoldsWithATextFilter() {
+    Plan matchingUserPlan = plan(216, "Museo popular", "Museo y bar", TODAY);
+    Plan matchingPlanItPlan = plan(217, "Museo de la app", "Museo", TODAY);
+    Plan filteredOutPlanItPlan = plan(218, "Bar de la app", "Bar", TODAY);
+    organizer(matchingPlanItPlan, PlanDiscovery.PLANIT_EMAIL);
+    organizer(filteredOutPlanItPlan, PlanDiscovery.PLANIT_EMAIL);
+    Map<UUID, RatingSummary> summaries = Map.of(
+      matchingUserPlan.getId(),
+      new RatingSummary(matchingUserPlan.getId(), 5.0, 50L)
+    );
+
+    List<Plan> found = discover(
+      List.of(matchingUserPlan, matchingPlanItPlan, filteredOutPlanItPlan),
+      PlanDiscoveryQuery.parse("museo", null, null, null),
+      summaries
+    );
+
+    assertThat(found, hasSize(2));
+    assertThat(found.get(0).getId(), is(equalTo(matchingPlanItPlan.getId())));
+    assertThat(found.get(1).getId(), is(equalTo(matchingUserPlan.getId())));
+  }
+
+  @Test
+  public void planItFirstKeepsTheRelativeOrderInsideEachGroup() {
+    Plan alfaPlanIt = plan(219, "Alfa app", TODAY);
+    Plan zetaPlanIt = plan(220, "Zeta app", TODAY);
+    Plan alfaUser = plan(221, "Alfa usuario", TODAY);
+    Plan zetaUser = plan(222, "Zeta usuario", TODAY);
+    organizer(alfaPlanIt, PlanDiscovery.PLANIT_EMAIL);
+    organizer(zetaPlanIt, PlanDiscovery.PLANIT_EMAIL);
+
+    List<Plan> found = discover(
+      List.of(alfaUser, zetaPlanIt, zetaUser, alfaPlanIt),
+      PlanDiscoveryQuery.parse(null, null, null, "name")
+    );
+
+    assertThat(found.get(0).getId(), is(equalTo(alfaPlanIt.getId())));
+    assertThat(found.get(1).getId(), is(equalTo(zetaPlanIt.getId())));
+    assertThat(found.get(2).getId(), is(equalTo(alfaUser.getId())));
+    assertThat(found.get(3).getId(), is(equalTo(zetaUser.getId())));
+  }
+
+  @Test
+  public void planWithoutAdministratorDoesNotBreakPlanItFirst() {
+    Plan withoutAdministrator = plan(223, "Sin dueno", TODAY);
+    Plan planItPlan = plan(224, "Plan de la app", TODAY);
+    organizer(planItPlan, PlanDiscovery.PLANIT_EMAIL);
+
+    List<Plan> ordered = PlanDiscovery.orderByPopularity(
+      List.of(withoutAdministrator, planItPlan),
+      Map.of(),
+      Map.of()
+    );
+
+    assertThat(ordered.get(0).getId(), is(equalTo(planItPlan.getId())));
+    assertThat(ordered.get(1).getId(), is(equalTo(withoutAdministrator.getId())));
+  }
+
+  @Test
+  public void publicDateOrderUsedByTheSidebarPutsPlanItFirst() {
+    Plan soonerUserPlan = plan(225, "Antes", TODAY);
+    Plan laterPlanItPlan = plan(226, "Despues", TODAY.plusDays(10));
+    organizer(laterPlanItPlan, PlanDiscovery.PLANIT_EMAIL);
+
+    List<Plan> ordered = List
+      .of(soonerUserPlan, laterPlanItPlan)
+      .stream()
+      .sorted(PlanDiscovery.publicDateOrder())
+      .toList();
+
+    assertThat(ordered.get(0).getId(), is(equalTo(laterPlanItPlan.getId())));
+    assertThat(ordered.get(1).getId(), is(equalTo(soonerUserPlan.getId())));
+  }
+
+  /** [PABM] Una entrada nula no es de PlanIt: el comparador nunca recibe un plan suelto del repo. */
+  @Test
+  public void isPlanItIsFalseForANullPlan() {
+    assertThat(PlanDiscovery.isPlanIt(null), is(false));
+  }
+
   private List<Plan> discover(List<Plan> plans, PlanDiscoveryQuery query) {
-    return PlanDiscovery.discover(plans, Map.of(), Map.of(), query, TODAY);
+    return discover(plans, query, Map.of());
+  }
+
+  private List<Plan> discover(
+    List<Plan> plans,
+    PlanDiscoveryQuery query,
+    Map<UUID, RatingSummary> summaries
+  ) {
+    return PlanDiscovery.discover(plans, summaries, Map.of(), query, TODAY);
   }
 
   private Plan plan(int number, String name, LocalDate eventDate) {
@@ -552,5 +692,11 @@ public class PlanDiscoveryTest {
     PlanPlace planPlace = new PlanPlace();
     planPlace.setPlace(place);
     plan.addPlanPlace(planPlace);
+  }
+
+  private void organizer(Plan plan, String email) {
+    User administrator = new User();
+    administrator.setEmail(email);
+    plan.setAdministrator(administrator);
   }
 }

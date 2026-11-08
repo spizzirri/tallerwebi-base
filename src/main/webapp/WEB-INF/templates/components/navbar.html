@@ -38,10 +38,12 @@
   <!-- [MOBILE] Hamburguesa del menu: solo con sesion (el E2E pinnea que el navbar anonimo NO la
        tiene) y solo por debajo de md. Abre el mismo modal del avatar via data-menu-toggle, asi
        que no hay JS nuevo: los destinos viajan dentro de #navbar-menu (bloque md:hidden).
-       Sin texto en el contenido (aria-label) para que getNavbarItems no la cuente en desktop. -->
+       Sin texto en el contenido (aria-label) para que getNavbarItems no la cuente en desktop.
+       ml-auto empuja el par [hamburguesa][toggle] contra el canto derecho en mobile, ahora
+       que el toggle es el ultimo hijo del nav. -->
   <button type="button" id="navbar-menu-btn" data-menu-toggle="navbar-menu"
     sec:authorize="isAuthenticated()"
-    class="navbar-menu-btn md:hidden inline-flex h-11 w-11 items-center justify-center rounded-md bg-primary hover:bg-secondary"
+    class="navbar-menu-btn md:hidden ml-auto inline-flex h-11 w-11 items-center justify-center rounded-md bg-primary hover:bg-secondary"
     aria-label="Abrir menu" aria-haspopup="true" aria-expanded="false" aria-controls="navbar-menu">
     <svg class="h-5 w-5" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="2" stroke-linecap="round">
@@ -49,8 +51,10 @@
     </svg>
   </button>
 
-  <!-- Usuario AUTENTICADO: en mobile los links se esconden (van al menu de la hamburguesa) -->
-  <div sec:authorize="isAuthenticated()" class="hidden md:flex items-center gap-4 text-sm">
+  <!-- Usuario AUTENTICADO: en mobile los links se esconden (van al menu de la hamburguesa).
+       md:ml-auto mantiene este cluster contra el canto derecho en desktop aunque el nav suma
+       un tercer hijo visible (el form del toggle de tema). -->
+  <div sec:authorize="isAuthenticated()" class="hidden md:flex md:ml-auto items-center gap-4 text-sm">
     <!-- Front door to the admin panel; the only destination an admin needs, and only while
          inside /admin/**. Outside that area the admin gets the user menu instead. -->
     <a th:href="@{/admin/users}" th:if="${showAdminNav}"
@@ -60,6 +64,10 @@
     <a th:href="@{/admin/places}" th:if="${showAdminNav}"
       class="btn-cta">
       Places
+    </a>
+    <a th:href="@{/admin/plans}" th:if="${showAdminNav}"
+      class="btn-cta">
+      Plans
     </a>
 
     <!-- Rutas del usuario común: /for-you es el feed (el home post-login) y /plans su
@@ -120,17 +128,18 @@
       </span>
     </button>
 
-    <!-- [PROF+THEME] El toggle standalone ya no vive en la rama autenticada: el control de
-         tema es el item "Tema" del modal (components/navbar-menu.html), que persiste la
-         preferencia en el usuario. El anónimo conserva el toggle de [THEME] al final del nav. -->
+    <!-- [PROF+THEME] El toggle de tema NO vive en este bloque: es un form hijo directo del
+         <nav> (mas abajo) para que en mobile quede en la fila del logo, pegado a la
+         hamburguesa. El item "Tema" del modal se retiro. -->
   </div>
 
   <!-- Usuario NO AUTENTICADO: sin hamburguesa (decision fijada en PublicPlansListE2E), asi que
        los links fluyen con flex-wrap en pantallas angostas. order-last + w-full en mobile: el
        bloque baja a su propia fila completa; en desktop, md:order-none + md:ml-auto lo devuelve
-       a la derecha, pegado al toggle de tema. pb-3 en mobile: el nav no tiene padding vertical
-       y esta ultima fila quedaba flush contra el canto inferior (los pills azules tocaban el
-       borde con la seccion de abajo); md:pb-0 conserva el desktop pixel-identico. -->
+       a la derecha. pb-3 en mobile: el nav no tiene padding vertical y esta ultima fila quedaba
+       flush contra el canto inferior (los pills azules tocaban el borde con la seccion de
+       abajo); md:pb-0 conserva el desktop pixel-identico. El anonimo no tiene ningun control de
+       tema: sin sesion, el modo sigue al sistema ([THEME]). -->
   <div sec:authorize="!isAuthenticated()"
     class="order-last md:order-none md:ml-auto w-full md:w-auto flex flex-wrap items-center justify-end gap-x-4 gap-y-1 pb-3 text-sm md:pb-0">
     <a th:href="@{/for-you}"
@@ -148,23 +157,33 @@
 
   </div>
 
-  <!-- [MOBILE] Toggle de tema como hijo directo del nav, DESPUES de los links: el orden de
-       texto que pinnea WebPage.getNavbarItems queda identico (PlanIt, Para vos, Register,
-       Login, Cambiar tema). order-last lo deja, en mobile, en la fila del logo en vez de
-       huerfano en una tercera fila; en desktop md:order-none lo devuelve al cluster de la
-       derecha, que el ml-auto del bloque de links empuja contra el canto. El sr-only es el
-       nombre accesible y el texto que leen los helpers E2E. -->
-  <button type="button" data-theme-toggle title="Cambiar tema" sec:authorize="!isAuthenticated()"
-    class="theme-toggle inline-flex items-center justify-center rounded-md bg-primary px-3 py-2 hover:bg-secondary">
-    <svg class="theme-icon-moon h-5 w-5" aria-hidden="true" viewBox="0 0 24 24" fill="none"
-      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
-    </svg>
-    <svg class="theme-icon-sun h-5 w-5" aria-hidden="true" viewBox="0 0 24 24" fill="none"
-      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="12" cy="12" r="4" />
-      <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
-    </svg>
-    <span class="sr-only">Cambiar tema</span>
-  </button>
+  <!-- [PROF+THEME] Toggle de tema: solo con sesion iniciada. Es un form POST a
+       /profile/theme (CSRF incluido) porque la preferencia manda sobre localStorage: un
+       toggle que solo escriba el storage se revierte en la proxima carga. El hidden del
+       tema arranca en el opuesto del modo preferido para que el form funcione sin JS; el
+       script de layouts/base lo recalcula al enviar desde data-theme, que es el modo real
+       ya aplicado. El redirect vuelve a la pagina actual (admin incluido) y el controller
+       lo valida. Hijo directo del nav y order-last: en mobile queda en la fila del logo,
+       pegado a la hamburguesa, y en desktop md:order-none lo deja junto al cluster de la
+       derecha. El sr-only es el nombre accesible y el texto que leen los helpers E2E. -->
+  <form th:action="@{/profile/theme}" method="POST" id="navbar-theme-form"
+    sec:authorize="isAuthenticated()" class="order-last md:order-none">
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+    <input type="hidden" name="theme" id="navbar-theme-value"
+      th:value="${userThemePreference == 'dark'} ? 'light' : 'dark'">
+    <input type="hidden" name="redirect" th:value="${themeRedirectUrl}">
+    <button type="submit" data-theme-toggle title="Cambiar tema"
+      class="theme-toggle inline-flex items-center justify-center rounded-md bg-primary px-3 py-2 hover:bg-secondary">
+      <svg class="theme-icon-moon h-5 w-5" aria-hidden="true" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+      </svg>
+      <svg class="theme-icon-sun h-5 w-5" aria-hidden="true" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="4" />
+        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+      </svg>
+      <span class="sr-only">Cambiar tema</span>
+    </button>
+  </form>
 </nav>
