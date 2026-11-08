@@ -62,6 +62,13 @@ y esta spec se amplía con un AC nuevo por item, sin renumerar los existentes.
 | AC-17 | El editor de fecha/hora del modal se muestra a quien puede editar el plan (administrador o editor) y no aparece para el resto |
 | AC-18 | El diálogo del detalle declara `aria-labelledby` apuntando a su título, recibe el foco al abrirse y se cierra con Escape |
 
+> **Actualización 2026-10-28 — 25-STD:** AC-09 y V-09 quedan **supersedidos**, y con ellos la
+> decisión de "Notas / decisiones de diseño" que decía *"Los tiles del resumen no se tocan
+> (AC-09)"*. La ficha pasó a ser 4 chips (fecha · hora · visibilidad · código) sobre
+> `--bs-secondary-bg` con la descripción en clamp de 3 líneas: no hay celdas grises, no hay tile
+> ADMINISTRADOR (el badge "Dueño" vive en Participantes) y la regla dark de `.bg-light` de esta
+> vista se retiró con los tiles. Ver `docs/specs/25-STD.md`.
+
 ## Escenarios de Test
 
 Es una spec de diseño: no hay lógica nueva, así que no hay clases de test U/I/S nuevas. La

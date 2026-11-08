@@ -24,7 +24,8 @@ public class PlanParticipantsE2E extends E2eBase {
 
   private static final String PLAN_NAME = "Roles E2E";
   private static final String EDITOR_EMAIL = "editor.participantes@unlam.edu.ar";
-  private static final String PARTICIPANTS = "section[aria-labelledby='participants-heading']";
+  // [STD] La lista completa vive en la card centrada de Participantes.
+  private static final String PARTICIPANTS = "#participants-dialog";
   private static final String ROLE_FORM = PARTICIPANTS + " button:has-text('Guardar rol')";
 
   @Test
@@ -45,6 +46,9 @@ public class PlanParticipantsE2E extends E2eBase {
       PlansPage plans = new PlansPage(page);
       plans.createPlanViaExplore(PLAN_NAME, "Prueba de roles y privacidad", isoDateIn(30));
       String detailUrl = page.url();
+      // [STD] Invitar es un accordion dentro de la card centrada de Participantes.
+      plans.openParticipants();
+      page.locator("button[aria-controls='invite-panel']").click();
       page.locator("#invitation-email").fill(EDITOR_EMAIL);
       page.locator("#invitation-role").selectOption("editor");
       page
@@ -57,7 +61,9 @@ public class PlanParticipantsE2E extends E2eBase {
       editorPage.locator("form[action*='/invitations/'] button[value='true']").click();
       editorPage.waitForLoadState();
       editorPage.navigate(detailUrl);
-      new PlansPage(editorPage).waitForDetailPath();
+      PlansPage editorPlans = new PlansPage(editorPage);
+      editorPlans.waitForDetailPath();
+      editorPlans.openParticipants();
 
       // AC-14/AC-15: insignia visible, sin formulario de rol y sin email como texto.
       Locator editorSection = editorPage.locator(PARTICIPANTS);
@@ -67,6 +73,7 @@ public class PlanParticipantsE2E extends E2eBase {
 
       // El dueño sí ve el formulario; su texto visible tampoco expone el correo.
       page.reload();
+      plans.openParticipants();
       assertThat(page.locator(ROLE_FORM)).hasCount(1);
       assertFalse(page.locator(PARTICIPANTS).innerText().contains(EDITOR_EMAIL));
       page
@@ -74,6 +81,7 @@ public class PlanParticipantsE2E extends E2eBase {
         .selectOption("guest");
       page.locator(ROLE_FORM).click();
       page.waitForLoadState();
+      plans.openParticipants();
       assertThat(
         page.locator(PARTICIPANTS + " form[action*='/participants/role'] select[name='role']")
       )
@@ -81,6 +89,7 @@ public class PlanParticipantsE2E extends E2eBase {
 
       // La degradación se ve del lado de la editora, que sigue sin control de roles.
       editorPage.reload();
+      editorPlans.openParticipants();
       assertThat(editorPage.locator(PARTICIPANTS + " .badge:has-text('Participante')")).hasCount(1);
       assertThat(editorPage.locator(ROLE_FORM)).hasCount(0);
     }

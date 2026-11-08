@@ -19,15 +19,37 @@
 
     <style>
         [v-cloak] { display: none; }
-        #configuracion,
-        #config-roles,
-        #banned-participants { scroll-margin-top: 1rem; }
+        /* [STD-014/AC-13] El diálogo de la ficha del lugar comparte el chrome de las cards del
+           tablero: radio 16, padding 24, superficie --bs-*, sombra y backdrop. El reset de
+           Tailwind (margin:0 en *) pisa el margin:auto nativo del <dialog>: sin esta regla el
+           modal queda pegado al borde superior izquierdo (0 / 720 px de aire). */
+        .plan-modal {
+            inset: 0;
+            margin: auto;
+            width: min(560px, 92vw);
+            max-height: 86dvh;
+            overflow-y: auto;
+            padding: 24px;
+            border: 0;
+            border-radius: 16px;
+            background: var(--bs-body-bg);
+            color: var(--bs-body-color);
+            box-shadow: 0 18px 44px rgb(0 0 0 / 0.35);
+        }
+        .plan-modal::backdrop { background: rgb(0 0 0 / 0.45); }
+        /* [STD-011] Variante C: el mapa es la celda central del tablero (no el fondo del stage);
+           su alto lo da la grilla y el radius/recorte queda aca. */
         #map {
-            height: 480px;
+            grid-area: map;
+            position: relative;
             width: 100%;
-            border-radius: 8px;
+            height: 100%;
+            min-height: 0;
+            border-radius: 16px;
+            overflow: hidden;
         }
         .itinerary-panel { background: var(--bs-body-bg); border: 1px solid var(--bs-border-color); border-radius: 8px; padding: 20px; }
+        .itinerary-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
         .itinerary-heading { color: var(--bs-body-color); letter-spacing: -0.03em; }
         .itinerary-count { background: var(--bs-secondary-bg); color: var(--bs-body-color); border-radius: 20px; padding: 6px 12px; font-size: .8rem; font-weight: 600; }
         .itinerary-list { list-style: none; padding: 0; margin: 12px 0 0; }
@@ -61,18 +83,25 @@
            apoya en los .cat-* del mapa (mismos colores, definidos más abajo en este style, así
            que ganan al fondo base del chip). Los bloques usan variables --bs-* para que
            Bootstrap re-coloree en modo oscuro como el resto de la página. */
-        .place-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+        .place-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 16px; }
         .place-head-text { min-width: 0; }
-        .place-chip { display: inline-block; margin-top: 4px; padding: 2px 10px; border-radius: 999px; background-color: #6c757d; color: #fff; font-size: .72rem; font-weight: 700; letter-spacing: .02em; }
-        .place-facts { margin: 0; }
-        .place-fact { padding: 10px 0; border-top: 1px solid var(--bs-border-color); }
-        .place-fact:first-child { padding-top: 0; border-top: 0; }
+        .place-head h4 { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.03em; }
+        .place-chip { display: inline-flex; align-items: center; gap: 5px; margin-top: 4px; padding: 2px 10px; border-radius: 999px; background-color: #6c757d; color: #fff; font-size: .72rem; font-weight: 700; letter-spacing: .02em; }
+        /* [STD-014/AC-13] Los bloques del dl se leen como los chips de la ficha del plan:
+           misma superficie --bs-secondary-bg y mismo radio, sin líneas separadoras. En >= 576 px
+           van en dos columnas; las descripciones largas ocupan la fila entera. */
+        .place-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 0; }
+        .place-fact { padding: 10px 12px; border-radius: 10px; background: var(--bs-secondary-bg); }
+        .place-fact--wide { grid-column: 1 / -1; }
         .place-fact dt { display: flex; align-items: center; gap: 6px; margin-bottom: 2px; color: var(--bs-secondary-color); font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
         .place-fact dt svg { flex: 0 0 auto; }
         .place-fact dd { margin: 0; color: var(--bs-body-color); font-size: .95rem; overflow-wrap: anywhere; }
         .place-schedule { display: flex; flex-wrap: wrap; gap: 8px 16px; }
-        .visit-editor { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--bs-border-color); }
+        .visit-editor { margin-top: 16px; padding: 12px; border: 1px solid var(--bs-border-color); border-radius: 12px; background: var(--bs-tertiary-bg); }
         .visit-editor-heading { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--bs-secondary-color); margin-bottom: 8px; }
+        @media (max-width: 575px) {
+            .place-facts { grid-template-columns: minmax(0, 1fr); }
+        }
         .stop-description { color: var(--bs-secondary-color); font-size: .85rem; margin: 4px 0 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .stop-directions { display: inline-flex; align-items: center; margin-top: 6px; color: var(--bs-primary); font-size: .85rem; font-weight: 600; text-decoration: none; }
         .stop-directions:hover { text-decoration: underline; }
@@ -231,12 +260,8 @@
         [data-bs-theme="dark"] .stop-category,
         [data-bs-theme="dark"] .itinerary-empty,
         [data-bs-theme="dark"] .stop-remove:hover { background: var(--bs-tertiary-bg); }
-        /* [DIS] Los tiles del resumen (.bg-light) usan --bs-light, que Bootstrap NO redefine en
-           dark: queda #f8f9fa (mancha blanca) y el texto hereda --bs-body-color (#adb5bd), gris
-           sobre blanco = ilegible ("letras apagadas"). Pintamos .bg-light con --bs-tertiary-bg en
-           dark (solo lo usa el resumen) para que el tile sea superficie oscura y el texto claro
-           respire. El !important pisa a la utilidad .bg-light de Bootstrap. */
-        [data-bs-theme="dark"] .bg-light { background-color: var(--bs-tertiary-bg) !important; }
+        /* [25-STD] La regla que re-coloreaba los tiles .bg-light del resumen se retiro con los
+           tiles: la ficha ahora son chips sobre --bs-secondary-bg, que si cambia en dark. */
 
         /* ===================== [DIS] 17-DIS =====================
            Van en el bloque de despues de headContent: tiene que pisar a brand.css (su <link>
@@ -267,14 +292,33 @@
            La imagen decorativa queda para la card [IMG]. Sin backend. */
         .plan-header {
             background-color: var(--primary);
-            min-height: 96px;
+            /* [STD-009] Banda más baja: con el título chico (1.35 rem) no hace falta la altura
+               de 96 px, y la fila de acciones gana aire sin desplazar el stage. */
+            min-height: 72px;
             border-radius: 0.5rem;
         }
 
         .plan-header h2 {
+            /* [STD-009/AC-09] Título sin protagonismo: 2 rem (main h2) → 1.35 rem, para que
+               Configuración/Eliminar respiren en la misma fila. */
+            font-size: 1.35rem;
             color: var(--white);
             text-shadow: 0 1px 2px rgb(0 0 0 / 0.4);
         }
+
+        /* [STD-015/AC-14] La cabecera usa la misma grilla de tres columnas que el tablero: la
+           banda ocupa las dos primeras (así termina exactamente donde termina el mapa) y las
+           acciones viven en la tercera, sobre "Tu recorrido". Los dos botones comparten alto y
+           el destructivo va en outline para no competir con la banda. */
+        .plan-toolbar {
+            display: grid;
+            grid-template-columns: minmax(280px, 340px) minmax(0, 1fr) minmax(280px, 360px);
+            align-items: stretch;
+            gap: 16px;
+        }
+        .plan-toolbar .plan-header { grid-column: 1 / 3; }
+        .plan-toolbar-actions { grid-column: 3; justify-content: flex-end; }
+        .plan-toolbar-actions .btn { min-height: 40px; font-weight: 600; }
 
         /* [DIS] AC-10: switch con la paleta (knob blanco saliendo de --primary, inactivo de
            los grises) y el estado a la vista: el span que dice Privado/Publico es uno solo,
@@ -296,6 +340,158 @@
         #isPublic { background-color: var(--gray); border-color: var(--gray); }
 
         #isPublic:checked { background-color: var(--primary); border-color: var(--primary); }
+
+        /* ===================== [STD] 25-STD ===================== */
+
+        /* [STD] AC-01: chips de lectura de la ficha — label chico sobre el valor dentro de la
+             misma pildora. Todo por --bs-*: data-bs-theme re-colorea en oscuro sin reglas extra. */
+        .plan-chip {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1px;
+            padding: 6px 12px;
+            border-radius: 10px;
+            background: var(--bs-secondary-bg);
+            line-height: 1.2;
+        }
+        .plan-chip__label {
+            font-size: .65rem;
+            font-weight: 700;
+            letter-spacing: .05em;
+            text-transform: uppercase;
+            color: var(--bs-secondary-color);
+        }
+        .plan-chip__value {
+            font-size: .95rem;
+            font-weight: 600;
+            color: var(--bs-body-color);
+            white-space: nowrap;
+        }
+
+        /* [STD] AC-01: clamp de 3 lineas para la descripcion de la ficha. -webkit-line-clamp es
+             el valor que clava el test E2E via getComputedStyle; pre-wrap conserva los saltos. */
+        .plan-description-clamp {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            white-space: pre-wrap;
+        }
+
+        /* [STD-011] Variante C (AC-10): tablero de tres columnas dentro de un stage con el alto
+             restante del viewport. Izquierda: la ficha (fila auto, siempre visible) y
+             Participantes debajo (fila 1fr con scroll propio), asi la ficha queda quieta mientras
+             scrollea la lista de participantes sin usar position: fixed. Centro: el mapa, que
+             ocupa las dos filas. Derecha: "Tu recorrido", con scroll propio en toda la altura.
+             En < 992 px se apila en el orden pedido: ficha -> mapa -> solicitudes ->
+             participantes -> recorrido. El DOM no se mueve (los recortes de integracion dependen
+             de su orden): las areas de la grilla son las que ubican cada card. */
+        .plan-stage {
+            display: grid;
+            grid-template-columns: minmax(280px, 340px) minmax(0, 1fr) minmax(280px, 360px);
+            /* La ficha se lleva su alto de contenido (el clamp de la descripción lo acota) y
+               Participantes todo el resto con scroll propio: por eso la ficha queda quieta. */
+            grid-template-rows: auto minmax(0, 1fr);
+            grid-template-areas:
+                'ficha map recorrido'
+                'side  map recorrido';
+            gap: 16px;
+            height: calc(100dvh - 15rem);
+            min-height: 520px;
+            max-height: 980px;
+        }
+        #plan-summary { grid-area: ficha; }
+        #itinerary-panel { grid-area: recorrido; }
+        .plan-side {
+            grid-area: side;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            min-height: 0;
+            overflow-y: auto;
+        }
+        .plan-sheet {
+            min-height: 0;
+            overflow-y: auto;
+            border-radius: 16px;
+            /* El .mb-4 del markup sumaria 24 px dentro de una celda de grilla: el aire lo da
+               el gap del tablero. */
+            margin-bottom: 0 !important;
+        }
+        #config-solicitudes.plan-sheet { background: var(--bs-body-bg); }
+        /* [STD] Cards resumen de la columna: muestran el vistazo y el detalle completo se abre en
+           una card centrada. Sin scroll interno, así ninguna queda recortada. */
+        .plan-summary-card { overflow: visible; flex: 0 0 auto; }
+        .plan-summary-card .list-group-item { background: transparent; }
+        .plan-request-notice {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        /* Aviso de solicitud pendiente: la card resumen se destaca y abre la card centrada. */
+        .plan-summary-card--alert {
+            box-shadow: 0 0 0 2px rgb(255 193 7 / 0.6);
+        }
+        /* [STD-012] Claro y oscuro: .btn-outline-secondary hereda --bs-secondary, que sobre la
+           card oscura queda casi ilegible. En oscuro se aclara al color de texto. */
+        html[data-theme="dark"] .plan-stage .btn-outline-secondary {
+            color: var(--bs-body-color);
+            border-color: var(--bs-border-color);
+        }
+        /* [STD-011/AC-11] Las acciones de la parada bajan a su propia fila: en una columna de
+           ~360 px, al lado del contenido se aplastaban. El bloque mobile de mas abajo repite la
+           idea con su propia alineacion. */
+        .itinerary-stop { flex-wrap: wrap; }
+        .stop-actions { flex: 1 1 100%; justify-content: flex-end; }
+        /* [STD-011/AC-11] Ficha: chips en grilla de dos columnas y el boton Editar al pie, en su
+           propia fila, para que no compita con los chips. */
+        .plan-chips {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+        }
+        .plan-chips .plan-chip { min-width: 0; }
+        /* [STD-011/AC-11] Participantes: nombre y badge arriba, acciones en su fila debajo. */
+        .participants-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+        /* La card resumen de participantes no estira: el detalle vive en la card centrada. */
+        #participants-section { flex: 0 0 auto; }
+        .participant-row {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 8px;
+        }
+        .participant-main {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            min-width: 0;
+        }
+        .participant-actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+        }
+        @media (max-width: 991.98px) {
+            .plan-stage {
+                grid-template-columns: minmax(0, 1fr);
+                grid-template-rows: auto;
+                grid-template-areas: 'ficha' 'map' 'side' 'recorrido';
+                height: auto;
+                min-height: 0;
+                max-height: none;
+            }
+            #map { height: 320px; }
+            .plan-sheet, .plan-side { overflow: visible; }
+            /* [STD-015] La cabecera apila la banda y las acciones, y las acciones se alinean a
+               la izquierda como el resto de la vista angosta. */
+            .plan-toolbar { grid-template-columns: minmax(0, 1fr); }
+            .plan-toolbar .plan-header, .plan-toolbar-actions { grid-column: 1 / -1; }
+            .plan-toolbar-actions { justify-content: flex-start; }
+        }
     </style>
 </head>
 <body th:replace="~{layouts/base :: layout(~{::main})}">
@@ -303,24 +499,30 @@
 <!-- [DIS] AC-11: pb-5 para que la ultima seccion no pegue con el borde inferior. -->
 <main class="container-fluid px-5 pb-5">
     <div id="plan-app" v-cloak>
-    <!-- [DIS] AC-08/AC-14: una sola fila de cabecera. La banda con imagen por defecto
-         acompana al titulo (overlay de tokens de marca para que el texto respire) y las
-         acciones quedan agrupadas a la derecha, con gap visible entre todos los botones.
+    <!-- [DIS] AC-08/AC-14: una sola fila de cabecera. [STD-015/AC-14] La fila usa la grilla del
+         tablero: la banda ocupa las dos primeras columnas (termina donde termina el mapa) y las
+         acciones quedan en la tercera, alineadas con la columna derecha.
          AC-13: Clonar plan solo para participantes que no administran — el plan recien
          clonado lo tiene el clonador como admin, asi que su propia copia no lo muestra. -->
-    <div class="d-flex align-items-stretch gap-3 mb-4 mt-4 flex-wrap">
-        <div class="plan-header flex-grow-1 d-flex align-items-center px-3 py-2 rounded">
+    <div class="plan-toolbar mb-4 mt-4">
+        <div class="plan-header d-flex align-items-center px-3 py-2 rounded">
             <h2 class="fw-bold m-0" th:text="${plan.name}">Nombre del plan</h2>
         </div>
-        <div class="d-flex flex-wrap align-items-center gap-2">
+        <div class="plan-toolbar-actions d-flex flex-wrap align-items-center gap-2">
+            <!-- [STD] AC-03: el aviso de solicitudes vive en la cabecera y solo se pinta con >=1.
+                 Es un botón: abre la card centrada de solicitudes, sin saltos dentro del tablero. -->
+            <button th:if="${canHandleRequests and !#lists.isEmpty(joinRequests)}" type="button"
+                    class="badge rounded-pill text-bg-warning border-0 flex-shrink-0"
+                    aria-haspopup="dialog" aria-controls="join-requests-dialog"
+                    data-dialog="join-requests-dialog" @click="openRequests">Solicitudes <span th:text="${#lists.size(joinRequests)}">1</span></button>
             <!-- [MARK] Guardar para clonar despues: solo planes publicos y con sesion. -->
             <div th:if="${canBookmark}" class="flex-shrink-0">
                 <div th:replace="~{components/bookmark-button :: toggle(${plan.id}, ${isBookmarked}, ${currentPath})}"></div>
             </div>
-            <a th:if="${canEditPlan}" href="#configuracion" class="btn btn-outline-secondary d-inline-flex align-items-center gap-2"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" /></svg>Configuración del plan</a>
+            <button th:if="${canEditPlan}" type="button" class="btn btn-outline-secondary d-inline-flex align-items-center gap-2" aria-haspopup="dialog" aria-controls="plan-config-dialog" data-dialog="plan-config-dialog" @click="openConfig"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" /></svg>Configuración</button>
             <form th:if="${isPlanAdministrator}" th:action="@{/plans/{id}/delete(id=${plan.id})}" method="POST">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                <button type="submit" class="btn btn-danger d-inline-flex align-items-center gap-2"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /><line x1="10" x2="10" y1="11" y2="17" /><line x1="14" x2="14" y1="11" y2="17" /></svg>Eliminar plan</button>
+                <button type="submit" class="btn btn-outline-danger d-inline-flex align-items-center gap-2"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /><line x1="10" x2="10" y1="11" y2="17" /><line x1="14" x2="14" y1="11" y2="17" /></svg>Eliminar plan</button>
             </form>
             <form th:if="${isPlanParticipant == true and isPlanAdministrator != true}" th:action="@{/plans/{id}/leave(id=${plan.id})}" method="POST">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
@@ -330,232 +532,252 @@
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                 <button type="submit" class="btn btn-outline-primary d-inline-flex align-items-center gap-2"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2" ry="2" /><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" /></svg>Clonar plan</button>
             </form>
-        <div th:if="${canEditPlan}" class="position-relative" @focusout="closePlanOptions" @keydown.esc.prevent="planOptionsOpen = false; planOptionsButton.focus()">
-            <button ref="planOptionsButton" type="button" class="btn btn-outline-secondary" @click="planOptionsOpen = !planOptionsOpen" :aria-expanded="planOptionsOpen" aria-controls="plan-options-menu">
-                <span class="me-1" v-html="iconHtml('ellipsis', 16)"></span> M&aacute;s opciones
-            </button>
-            <div v-cloak v-show="planOptionsOpen" id="plan-options-menu" class="dropdown-menu dropdown-menu-end show position-absolute end-0 mt-2">
-                <a class="dropdown-item" href="#banned-participants" aria-controls="banned-participants" @click="planOptionsOpen = false">Ver miembros baneados</a>
-            </div>
-        </div>
         </div>
     </div>
 
-    <div class="row g-4">
-        <div class="col-md-7">
-            <div class="card border-0 shadow-sm p-3 mb-4">
-                <div id="map"></div>
+    <!-- [STD-011] Variante C (AC-10): tablero de tres columnas —ficha fija a la izquierda con la
+         lista de participantes debajo, mapa al centro y "Tu recorrido" a la derecha—, sin
+         pestañas: las tres cards se ven al cargar. El DOM conserva su orden (ficha, mapa,
+         recorrido, solicitudes, participantes, configuración al pie y diálogo de la ficha), que
+         es el que esperan los recortes de integración: no escribir acá los literales que esos
+         tests usan como anclas. -->
+    <div class="plan-stage">
+        <div id="plan-summary" class="card border-0 shadow-sm p-4 mb-4 plan-sheet">
+            <div class="plan-chips mb-3">
+                <span class="plan-chip">
+                    <small class="plan-chip__label">FECHA</small>
+                    <!-- [SCH] dd/mm/yyyy, el mismo formato visible que la vista pública y el
+                         itinerario; el input del form de edición sigue pidiendo ISO. -->
+                    <span class="plan-chip__value" th:text="${plan.eventDate != null ? #temporals.format(plan.eventDate, 'dd/MM/yyyy') : 'Sin fecha'}">01/12/2026</span>
+                </span>
+                <span class="plan-chip">
+                    <small class="plan-chip__label">HORA</small>
+                    <span class="plan-chip__value" th:text="${plan.eventTime != null ? #temporals.format(plan.eventTime, 'HH:mm') : 'Sin hora'}">18:30</span>
+                </span>
+                <span class="plan-chip">
+                    <small class="plan-chip__label">VISIBILIDAD</small>
+                    <span class="plan-chip__value" th:text="${plan.isPublic != null && plan.isPublic ? 'Público' : 'Privado'}">Privado</span>
+                </span>
+                <span class="plan-chip">
+                    <small class="plan-chip__label">CÓDIGO</small>
+                    <span class="plan-chip__value" th:text="${plan.shortCode}">BD0F615A</span>
+                </span>
             </div>
-
-            <div th:if="${canEditPlan}" class="card border-0 shadow-sm p-4 mb-4">
-                <h5 class="fw-bold mb-3">Agregar lugar al plan</h5>
-                <div class="row g-2">
-                    <div class="col-md-9">
-                        <select v-model="selectedPlaceId" class="form-select" aria-label="Lugar para agregar al plan">
-                            <option :value="null" disabled>-- Seleccionar un lugar disponible --</option>
-                            <option v-for="place in availablePlaces" :key="place.id" :value="place.id">
-                                {{ place.name }} ({{ place.category }})
-                            </option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <button @click="addPlace" type="button" class="btn btn-success w-100 fw-bold" :disabled="!selectedPlaceId || saving">
-                            + Agregar
-                        </button>
-                    </div>
-                </div>
+            <p id="plan-description" class="mb-0 text-break plan-description-clamp"
+               th:text="${#strings.isEmpty(plan.description) ? 'Sin descripci&oacute;n' : plan.description}">Descripci&oacute;n del plan</p>
+            <!-- [STD-011/AC-11] El boton de edicion vive al pie de la ficha: en una columna de
+                 ~360 px, al lado de los chips quedaba aplastado. [STD] Abre la card de
+                 configuración centrada, sin sumar scroll a la página. -->
+            <div th:if="${canEditPlan}" class="d-flex justify-content-end mt-3">
+                <button type="button" class="btn btn-outline-secondary btn-sm"
+                        aria-haspopup="dialog" aria-controls="plan-config-dialog" data-dialog="plan-config-dialog"
+                        @click="openConfig">Editar</button>
             </div>
-
-            <section class="itinerary-panel" aria-labelledby="itinerary-heading">
-                <div class="d-flex justify-content-between align-items-center gap-2">
-                    <h5 id="itinerary-heading" class="itinerary-heading fw-bold m-0">Tu recorrido</h5>
-                    <span class="itinerary-count">{{ planPlaces.length }} {{ planPlaces.length === 1 ? 'parada' : 'paradas' }}</span>
-                </div>
-                <p class="text-muted small mt-2 mb-0" th:if="${canEditPlan}">Arrastr&aacute; las tarjetas para organizar tu recorrido.</p>
-                <div v-if="planPlaces.length === 0" class="itinerary-empty">
-                    <span class="mb-3 d-inline-block" v-html="iconHtml('map-pinned', 28)"></span>
-                    <p class="fw-semibold mb-1">El recorrido est&aacute; por comenzar</p>
-                    <span class="small">Los lugares del plan aparecer&aacute;n ac&aacute;.</span>
-                </div>
-                <div v-for="group in dayGroups" :key="group.key" class="itinerary-day">
-                    <h6 v-if="dayCount > 1" class="itinerary-day-heading">{{ group.label }}</h6>
-                    <ol class="itinerary-list">
-                        <li v-for="stop in group.stops"
-                            :key="stop.item.entryId || stop.index"
-                            class="place-item"
-                            th:attr="draggable=${canEditPlan}"
-                            @dragstart="onDragStart(stop.index)"
-                            @dragover.prevent
-                            @drop="onDrop(stop.index)">
-                            <!-- [DIS] AC-12: handle decorativo en el borde izquierdo de la card,
-                                 solo con permiso de edicion. El arrastre real sigue mandado en el
-                                 <li> draggable: place-item y sus selectores no cambian. -->
-                            <span th:if="${canEditPlan}" class="drag-handle" aria-hidden="true">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <circle cx="9" cy="12" r="1" />
-                                    <circle cx="9" cy="5" r="1" />
-                                    <circle cx="9" cy="19" r="1" />
-                                    <circle cx="15" cy="12" r="1" />
-                                    <circle cx="15" cy="5" r="1" />
-                                    <circle cx="15" cy="19" r="1" />
-                                </svg>
-                            </span>
-                            <!-- La numeración es global (no por día): es la misma que usan los
-                                 marcadores del mapa. -->
-                            <span class="itinerary-step">{{ stop.index + 1 }}</span>
-                            <!-- [DIS] AC-01: clase doble — .place-card aporta el chrome compartido
-                                 con el landing; .itinerary-stop conserva las reglas propias del
-                                 detalle (fondo --bs-body-bg, ajuste mobile, reduced-motion). -->
-                            <div class="itinerary-stop place-card">
-                                <div class="stop-content">
-                                    <div class="stop-heading">
-                                        <button type="button" class="stop-title" @click="showPlace(stop.item)">{{ stop.item.name }}</button>
-                                        <span class="stop-category"><span v-html="categoryIconHtml(stop.item.category, 14)"></span>{{ getCategoryLabel(stop.item.category) }}</span>
-                                        <span v-if="stop.item.timePinned" class="stop-pinned" title="Horario fijado a mano">
-                                            <span v-html="iconHtml('pin', 12)"></span>Fijado
-                                        </span>
-                                    </div>
-                                    <div class="stop-schedule">
-                                        <span v-if="stop.timeRange"><span class="me-1" v-html="iconHtml('clock', 14)"></span>{{ stop.timeRange }}</span>
-                                        <span v-if="stop.durationLabel"><span class="me-1" v-html="iconHtml('hourglass', 14)"></span>{{ stop.durationLabel }}</span>
-                                        <!-- La fecha solo aparece cuando la parada cae fuera de la
-                                             jornada del plan: repetir el Día 1 en cada parada sobra. -->
-                                        <span v-if="stop.dateLabel"><span class="me-1" v-html="iconHtml('calendar', 14)"></span>{{ stop.dateLabel }}</span>
-                                        <span v-if="!stop.timeRange">Horario por definir</span>
-                                    </div>
-                                    <p v-if="stop.item.description" class="stop-description">{{ stop.item.description }}</p>
-                                    <!-- [MAPS] Como llegar en la lista del itinerario, ademas del mapa:
-                                         mismo link que la ficha y el popup (direccion de texto). -->
-                                    <a v-if="stop.item.address" class="stop-directions" :href="directionsUrl(stop.item)"
-                                        target="_blank" rel="noopener">
-                                        <span class="me-1" v-html="iconHtml('navigation', 14)"></span>C&oacute;mo llegar
-                                    </a>
-                                </div>
-                                <div class="stop-actions">
-                                    <button type="button" class="stop-details" @click="showPlace(stop.item)">Ver m&aacute;s</button>
-                                    <button th:if="${canEditPlan}" @click="removePlace(stop.index)" type="button" class="stop-remove" :disabled="saving">
-                                        <span class="me-1" v-html="iconHtml('trash-2', 14)"></span>Eliminar
-                                    </button>
-                                </div>
-                            </div>
-                        </li>
-                    </ol>
-                </div>
-            </section>
         </div>
 
-        <div class="col-md-5">
-            <div id="plan-summary" class="card border-0 shadow-sm p-4 mb-4">
-                <!-- [DIS] AC-09: el fondo gris vive en un div interno, no en la columna.
-                      bg-light sobre la col pisaba el padding del gutter (.p-3 es !important)
-                      y los tiles grises se tocaban horizontalmente; ahora el gutter de
-                      Bootstrap (16px en ambos ejes) queda a la vista entre tiles. -->
-                <div class="row g-3">
-                    <div class="col-12">
-                        <div class="bg-light p-3 rounded h-100">
-                            <small class="text-muted d-block fw-bold text-uppercase" style="font-size: 0.75rem;">DESCRIPCI&Oacute;N</small>
-                            <p id="plan-description" class="mb-0 text-break" style="white-space: pre-wrap;"
-                               th:text="${#strings.isEmpty(plan.description) ? 'Sin descripci&oacute;n' : plan.description}">Descripci&oacute;n del plan</p>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="bg-light p-3 rounded h-100">
-                            <small class="text-muted d-block fw-bold text-uppercase" style="font-size: 0.75rem;">FECHA</small>
-                            <!-- [SCH] dd/mm/yyyy, el mismo formato visible que la vista pública y el
-                                 itinerario; el input del form de edición sigue pidiendo ISO. -->
-                            <span th:text="${plan.eventDate != null ? #temporals.format(plan.eventDate, 'dd/MM/yyyy') : 'Sin fecha'}">01/12/2026</span>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="bg-light p-3 rounded h-100">
-                            <small class="text-muted d-block fw-bold text-uppercase" style="font-size: 0.75rem;">HORA</small>
-                            <span th:text="${plan.eventTime != null ? #temporals.format(plan.eventTime, 'HH:mm') : 'Sin hora'}">18:30</span>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="bg-light p-3 rounded h-100">
-                            <small class="text-muted d-block fw-bold text-uppercase" style="font-size: 0.75rem;">VISIBILIDAD</small>
-                            <span th:text="${plan.isPublic != null && plan.isPublic ? 'Público' : 'Privado'}">Privado</span>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="bg-light p-3 rounded h-100">
-                            <small class="text-muted d-block fw-bold text-uppercase" style="font-size: 0.75rem;">ADMINISTRADOR</small>
-                            <!-- [PROF] AC-22/PROF-014: el email del admin deja de ser la etiqueta; aca
-                                 se ve el nombre y linkea al perfil publico (es un usuario real). -->
-                            <a th:if="${plan.administrator != null}"
-                              th:href="@{/profile/{id}(id=${plan.administrator.id})}"
-                              th:text="${#strings.trim((plan.administrator.firstName == null ? '' : plan.administrator.firstName) + ' ' + (plan.administrator.lastName == null ? '' : plan.administrator.lastName))}"
-                              class="text-decoration-none text-decoration-underline-hover">Administrador</a>
-                            <span th:if="${plan.administrator == null}">Sin administrador</span>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="bg-light p-3 rounded h-100">
-                            <small class="text-muted d-block fw-bold text-uppercase" style="font-size: 0.75rem;">CÓDIGO</small>
-                            <span th:text="${plan.shortCode}">BD0F615A</span>
-                        </div>
-                    </div>
+        <div id="map"></div>
+
+        <section id="itinerary-panel" class="itinerary-panel plan-sheet" aria-labelledby="itinerary-heading">
+            <div class="itinerary-head">
+                <h5 id="itinerary-heading" class="itinerary-heading fw-bold m-0">Tu recorrido</h5>
+                <span class="itinerary-count">{{ planPlaces.length }} {{ planPlaces.length === 1 ? 'parada' : 'paradas' }}</span>
+            </div>
+            <!-- [STD] AC-05: agregar lugar es una accion del recorrido, no una card propia: el
+             boton vive en la cabecera del panel y el picker se despliega colapsado debajo,
+             sin consumir layout hasta que se pide. [STD-011/AC-11] A todo el ancho: la
+             columna del recorrido mide ~360 px. -->
+            <button th:if="${canEditPlan}" type="button" class="btn btn-outline-success btn-sm w-100 mt-2"
+                aria-controls="add-place-panel" :aria-expanded="addPlaceOpen"
+                @click="addPlaceOpen = !addPlaceOpen">Agregar lugar al plan</button>
+            <div th:if="${canEditPlan}" id="add-place-panel" v-cloak v-show="addPlaceOpen">
+                <div class="d-flex flex-column gap-2 mt-3">
+                    <select v-model="selectedPlaceId" class="form-select" aria-label="Lugar para agregar al plan">
+                        <option :value="null" disabled>-- Seleccionar un lugar disponible --</option>
+                        <option v-for="place in availablePlaces" :key="place.id" :value="place.id">
+                            {{ place.name }} ({{ place.category }})
+                        </option>
+                    </select>
+                    <button @click="addPlace" type="button" class="btn btn-success w-100 fw-bold" :disabled="!selectedPlaceId || saving">
+                        + Agregar
+                    </button>
                 </div>
             </div>
-
-            <section th:if="${canHandleRequests}" id="config-solicitudes" class="card border-0 shadow-sm p-4 mb-4" aria-labelledby="join-requests-heading">
-                <h5 id="join-requests-heading" class="fw-bold mb-3">Solicitudes</h5>
-                <p th:if="${#lists.isEmpty(joinRequests)}" class="text-muted mb-0">No hay solicitudes pendientes.</p>
-                <ul th:unless="${#lists.isEmpty(joinRequests)}" class="list-group list-group-flush">
-                    <li th:each="request : ${joinRequests}" class="list-group-item d-flex flex-wrap align-items-center justify-content-between gap-3 px-0">
-                        <a th:href="@{/profile/{id}(id=${request.requesterId})}" th:text="${request.requesterName}">Ver perfil</a>
-                        <form th:action="@{/plans/{id}/join-requests/{rid}/respond(id=${plan.id},rid=${request.id})}" method="post" class="d-flex gap-2 mb-0">
-                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                            <button type="submit" name="action" value="accept" class="btn btn-primary btn-sm">Aceptar</button>
-                            <button type="submit" name="action" value="reject" class="btn btn-outline-danger btn-sm">Rechazar</button>
-                        </form>
+            <p class="text-muted small mt-2 mb-0" th:if="${canEditPlan}">Arrastr&aacute; las tarjetas para organizar tu recorrido.</p>
+            <div v-if="planPlaces.length === 0" class="itinerary-empty">
+                <span class="mb-3 d-inline-block" v-html="iconHtml('map-pinned', 28)"></span>
+                <p class="fw-semibold mb-1">El recorrido est&aacute; por comenzar</p>
+                <span class="small">Los lugares del plan aparecer&aacute;n ac&aacute;.</span>
+            </div>
+            <div v-for="group in dayGroups" :key="group.key" class="itinerary-day">
+                <h6 v-if="dayCount > 1" class="itinerary-day-heading">{{ group.label }}</h6>
+                <ol class="itinerary-list">
+                    <li v-for="stop in group.stops"
+                        :key="stop.item.entryId || stop.index"
+                        class="place-item"
+                        th:attr="draggable=${canEditPlan}"
+                        @dragstart="onDragStart(stop.index)"
+                        @dragover.prevent
+                        @drop="onDrop(stop.index)">
+                        <!-- [DIS] AC-12: handle decorativo en el borde izquierdo de la card,
+                             solo con permiso de edicion. El arrastre real sigue mandado en el
+                             <li> draggable: place-item y sus selectores no cambian. -->
+                        <span th:if="${canEditPlan}" class="drag-handle" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="9" cy="12" r="1" />
+                                <circle cx="9" cy="5" r="1" />
+                                <circle cx="9" cy="19" r="1" />
+                                <circle cx="15" cy="12" r="1" />
+                                <circle cx="15" cy="5" r="1" />
+                                <circle cx="15" cy="19" r="1" />
+                            </svg>
+                        </span>
+                        <!-- La numeración es global (no por día): es la misma que usan los
+                             marcadores del mapa. -->
+                        <span class="itinerary-step">{{ stop.index + 1 }}</span>
+                        <!-- [DIS] AC-01: clase doble — .place-card aporta el chrome compartido
+                             con el landing; .itinerary-stop conserva las reglas propias del
+                             detalle (fondo --bs-body-bg, ajuste mobile, reduced-motion). -->
+                        <div class="itinerary-stop place-card">
+                            <div class="stop-content">
+                                <div class="stop-heading">
+                                    <button type="button" class="stop-title" @click="showPlace(stop.item)">{{ stop.item.name }}</button>
+                                    <span class="stop-category"><span v-html="categoryIconHtml(stop.item.category, 14)"></span>{{ getCategoryLabel(stop.item.category) }}</span>
+                                    <span v-if="stop.item.timePinned" class="stop-pinned" title="Horario fijado a mano">
+                                        <span v-html="iconHtml('pin', 12)"></span>Fijado
+                                    </span>
+                                </div>
+                                <div class="stop-schedule">
+                                    <span v-if="stop.timeRange"><span class="me-1" v-html="iconHtml('clock', 14)"></span>{{ stop.timeRange }}</span>
+                                    <span v-if="stop.durationLabel"><span class="me-1" v-html="iconHtml('hourglass', 14)"></span>{{ stop.durationLabel }}</span>
+                                    <!-- La fecha solo aparece cuando la parada cae fuera de la
+                                         jornada del plan: repetir el Día 1 en cada parada sobra. -->
+                                    <span v-if="stop.dateLabel"><span class="me-1" v-html="iconHtml('calendar', 14)"></span>{{ stop.dateLabel }}</span>
+                                    <span v-if="!stop.timeRange">Horario por definir</span>
+                                </div>
+                                <p v-if="stop.item.description" class="stop-description">{{ stop.item.description }}</p>
+                                <!-- [MAPS] Como llegar en la lista del itinerario, ademas del mapa:
+                                     mismo link que la ficha y el popup (direccion de texto). -->
+                                <a v-if="stop.item.address" class="stop-directions" :href="directionsUrl(stop.item)"
+                                    target="_blank" rel="noopener">
+                                    <span class="me-1" v-html="iconHtml('navigation', 14)"></span>C&oacute;mo llegar
+                                </a>
+                            </div>
+                            <div class="stop-actions">
+                                <button type="button" class="stop-details" @click="showPlace(stop.item)">Ver m&aacute;s</button>
+                                <button th:if="${canEditPlan}" @click="removePlace(stop.index)" type="button" class="stop-remove" :disabled="saving">
+                                    <span class="me-1" v-html="iconHtml('trash-2', 14)"></span>Eliminar
+                                </button>
+                            </div>
+                        </div>
                     </li>
-                </ul>
+                </ol>
+            </div>
+        </section>
+
+        <aside class="plan-side">
+            <!-- [STD] Solicitudes y Participantes quedan como cards resumen en la columna: el
+                 contenido completo se abre en una card centrada, sin scroll interno que las
+                 recorte. Cuando hay pedidos pendientes, Solicitudes avisa y abre la card. -->
+            <section th:if="${canHandleRequests}" id="config-solicitudes" class="card border-0 shadow-sm p-4 mb-4 plan-sheet plan-summary-card"
+                     th:classappend="${!#lists.isEmpty(joinRequests)} ? 'plan-summary-card--alert'" aria-labelledby="join-requests-heading">
+                <div class="d-flex align-items-center justify-content-between gap-3">
+                    <h5 id="join-requests-heading" class="fw-bold m-0">
+                        Solicitudes
+                        <span th:if="${!#lists.isEmpty(joinRequests)}" class="badge text-bg-warning ms-1" th:text="${#lists.size(joinRequests)}">1</span>
+                    </h5>
+                    <button th:if="${!#lists.isEmpty(joinRequests)}" type="button" class="btn btn-outline-secondary btn-sm text-nowrap"
+                            aria-haspopup="dialog" aria-controls="join-requests-dialog" data-dialog="join-requests-dialog" @click="openRequests">Ver</button>
+                </div>
+                <p th:if="${#lists.isEmpty(joinRequests)}" class="text-muted mb-0 mt-2">No hay solicitudes pendientes.</p>
+                <p th:unless="${#lists.isEmpty(joinRequests)}" class="plan-request-notice mb-0 mt-2">
+                    <span class="badge text-bg-warning">Nueva</span>
+                    <span th:text="${#lists.size(joinRequests) == 1 ? 'Tenés 1 solicitud para responder.' : 'Tenés ' + #lists.size(joinRequests) + ' solicitudes para responder.'}">Tenés 1 solicitud para responder.</span>
+                </p>
             </section>
 
-            <section class="card border-0 shadow-sm p-4 mb-4" aria-labelledby="participants-heading">
+            <section id="participants-section" class="card border-0 shadow-sm p-4 mb-4 plan-sheet plan-summary-card" aria-labelledby="participants-heading">
+                <!-- [TOA] Los avisos de éxito son toasts: se ven tras el redirect aunque la card
+                     centrada esté cerrada. -->
                 <span hidden data-toast th:if="${participantSuccess}" th:text="${participantSuccess}"></span>
                 <span hidden data-toast th:if="${invitationSuccess}" th:text="${invitationSuccess}"></span>
                 <div th:if="${invitationError}" class="alert alert-danger" role="alert" th:text="${invitationError}"></div>
-                <form th:if="${canInvite}" th:action="@{/plans/{id}/participants/invite(id=${plan.id})}" method="POST" class="mb-4">
-                    <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                    <h5 class="fw-bold mb-3">Invitar a alguien</h5>
-                    <label for="invitation-email" class="form-label">Correo electr&oacute;nico</label>
-                    <input id="invitation-email" name="participantEmail" type="email" required class="form-control mb-2" placeholder="persona@ejemplo.com" />
-                    <p class="text-muted small">La persona debe tener una cuenta registrada. Podr&aacute; aceptar o rechazar la invitaci&oacute;n en Mis planes.</p>
-                    <div th:if="${canEditPlan}" class="mb-3">
-                        <label for="invitation-role" class="form-label">Rol</label>
-                        <select id="invitation-role" name="role" class="form-select">
-                            <option value="guest">Participante</option>
-                            <option value="editor">Editor</option>
+                <div class="d-flex align-items-center justify-content-between gap-3">
+                    <h5 id="participants-heading" class="fw-bold m-0">
+                        Participantes <span class="badge bg-secondary" th:text="${participantEmails == null ? 0 : #lists.size(participantEmails)}">0</span>
+                    </h5>
+                    <button type="button" class="btn btn-outline-secondary btn-sm text-nowrap"
+                            aria-haspopup="dialog" aria-controls="participants-dialog" data-dialog="participants-dialog" @click="openParticipants">Ver</button>
+                </div>
+                <ul th:unless="${#lists.isEmpty(participantEmails)}" class="list-group list-group-flush mt-1">
+                    <li th:each="participant, stat : ${participants}" th:if="${stat.count lt 4}"
+                        class="list-group-item px-0 py-1 border-0 d-flex align-items-center gap-2 text-break"
+                        th:with="email=${participant.email}, displayName=${#strings.trim((participant.firstName == null ? '' : participant.firstName) + ' ' + (participant.lastName == null ? '' : participant.lastName))}">
+                        <span th:text="${#strings.isEmpty(displayName) ? 'Sin nombre' : displayName}">Nombre</span>
+                        <span th:if="${plan.isAdministrator(email)}" class="badge bg-primary flex-shrink-0">Due&ntilde;o</span>
+                        <span th:if="${!isPlanAdministrator and !plan.isAdministrator(email)}" class="badge bg-secondary flex-shrink-0" th:text="${plan.isEditor(email) ? 'Editor' : 'Participante'}">Participante</span>
+                    </li>
+                </ul>
+                <p th:if="${#lists.size(participants) gt 3}" class="text-muted small mb-0 mt-1" th:text="${'+' + (#lists.size(participants) - 3) + ' más'}">+2 más</p>
+                <p th:if="${#lists.isEmpty(participantEmails)}" class="text-muted small mb-0 mt-2">Todav&iacute;a no se ha unido nadie al plan.</p>
+            </section>
+        </aside>
+    </div>
+
+    <!-- [STD] Participantes en card centrada: lista completa, invitar y baneados. -->
+    <dialog id="participants-dialog" ref="participantsDialog" class="plan-modal"
+            aria-labelledby="participants-dialog-heading" tabindex="-1">
+        <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
+            <h5 id="participants-dialog-heading" class="fw-bold m-0">
+                Participantes <span class="badge bg-secondary" th:text="${participantEmails == null ? 0 : #lists.size(participantEmails)}">0</span>
+            </h5>
+            <div class="d-flex align-items-center gap-2">
+                <button th:if="${canInvite}" type="button" class="btn btn-outline-primary btn-sm text-nowrap"
+                        aria-controls="invite-panel" :aria-expanded="inviteOpen"
+                        @click="inviteOpen = !inviteOpen">Invitar a alguien</button>
+                <button type="button" class="btn-close flex-shrink-0" aria-label="Cerrar participantes"
+                        data-close-dialog @click="participantsDialog.close()"></button>
+            </div>
+        </div>
+        <div class="participants-dialog-body">
+                <div th:if="${canInvite}" id="invite-panel" v-cloak v-show="inviteOpen" class="mb-4 border-top">
+                    <form th:action="@{/plans/{id}/participants/invite(id=${plan.id})}" method="POST" class="pt-3">
+                        <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <label for="invitation-email" class="form-label">Correo electr&oacute;nico</label>
+                        <input id="invitation-email" name="participantEmail" type="email" required class="form-control mb-2" placeholder="persona@ejemplo.com" />
+                        <p class="text-muted small">La persona debe tener una cuenta registrada. Podr&aacute; aceptar o rechazar la invitaci&oacute;n en Mis planes.</p>
+                        <div th:if="${canEditPlan}" class="mb-3">
+                            <label for="invitation-role" class="form-label">Rol</label>
+                            <select id="invitation-role" name="role" class="form-select">
+                                <option value="guest">Participante</option>
+                                <option value="editor">Editor</option>
+                            </select>
+                        </div>
+                        <input th:unless="${canEditPlan}" type="hidden" name="role" value="guest" />
+                        <label for="invitation-channel" class="form-label">Enviar invitación</label>
+                        <select id="invitation-channel" name="channel" class="form-select mb-3">
+                            <option th:if="${canInviteInternal}" value="app">Dentro de la app</option>
+                            <option th:if="${canInviteByEmail}" value="email">Por email y en Mis planes</option>
                         </select>
-                    </div>
-                    <input th:unless="${canEditPlan}" type="hidden" name="role" value="guest" />
-                    <label for="invitation-channel" class="form-label">Enviar invitación</label>
-                    <select id="invitation-channel" name="channel" class="form-select mb-3">
-                        <option th:if="${canInviteInternal}" value="app">Dentro de la app</option>
-                        <option th:if="${canInviteByEmail}" value="email">Por email y en Mis planes</option>
-                    </select>
-                    <button type="submit" class="btn btn-primary">Invitar</button>
-                </form>
-                <h5 id="participants-heading" class="fw-bold mb-3">
-                    Participantes <span class="badge bg-secondary" th:text="${participantEmails == null ? 0 : #lists.size(participantEmails)}">0</span>
-                </h5>
+                        <button type="submit" class="btn btn-primary">Invitar</button>
+                    </form>
+                </div>
                 <p class="text-muted small mb-0" th:if="${#lists.isEmpty(participantEmails)}">Todav&iacute;a no se ha unido nadie al plan.</p>
                 <ol class="list-group list-group-numbered" th:unless="${#lists.isEmpty(participantEmails)}">
-                    <li class="list-group-item d-flex flex-wrap align-items-center gap-2" th:each="participant : ${participants}" th:with="email=${participant.email}, displayName=${#strings.trim((participant.firstName == null ? '' : participant.firstName) + ' ' + (participant.lastName == null ? '' : participant.lastName))}">
-                        <div class="flex-grow-1 text-break" style="min-width: 0;">
+                    <li class="list-group-item participant-row" th:each="participant : ${participants}" th:with="email=${participant.email}, displayName=${#strings.trim((participant.firstName == null ? '' : participant.firstName) + ' ' + (participant.lastName == null ? '' : participant.lastName))}">
+                        <div class="participant-main">
+                            <div class="text-break" style="min-width: 0;">
                             <!-- [PROF] AC-22/PROF-014: el nombre del participante linkea a su
                                  perfil publico. El email es interno: no se muestra como texto,
                                  solo viaja en los inputs hidden de las acciones autorizadas. -->
                             <a th:href="@{/profile/{id}(id=${participant.id})}" class="text-decoration-none"
                               th:text="${#strings.isEmpty(displayName) ? 'Sin nombre' : displayName}">Nombre completo</a>
-                        </div>
+                            </div>
                         <span th:if="${plan.isAdministrator(email)}" class="badge bg-primary flex-shrink-0">Due&ntilde;o</span>
                         <!-- El dueño es el único que reasigna roles existentes; los editores ven el
                              rol como badge (siguen pudiendo invitar y proponer Editor). -->
                         <span th:if="${!isPlanAdministrator and !plan.isAdministrator(email)}" class="badge bg-secondary flex-shrink-0" th:text="${plan.isEditor(email) ? 'Editor' : 'Participante'}">Participante</span>
+                        </div>
+                        <div class="participant-actions">
                         <form th:if="${isPlanAdministrator and !plan.isAdministrator(email)}" th:action="@{/plans/{id}/participants/role(id=${plan.id})}" method="POST" class="d-flex align-items-center gap-2 flex-shrink-0 mb-0">
                             <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                             <input type="hidden" name="participantEmail" th:value="${email}" />
@@ -575,22 +797,59 @@
                             <input type="hidden" name="participantEmail" th:value="${email}" />
                             <button type="submit" class="btn btn-sm btn-outline-danger text-nowrap" th:aria-label="${'Banear del plan a ' + (#strings.isEmpty(displayName) ? 'esta persona' : displayName)}" title="No podr&aacute; volver a unirse al plan">Banear</button>
                         </form>
+                        </div>
                     </li>
                 </ol>
-            </section>
+                <!-- [STD-010/AC-09] "Ver miembros baneados" sale de "Más opciones" (fuera de la
+                     cabecera) y vive al pie de Participantes: abre su propio diálogo, el mismo
+                     retorno de foco con Escape (bannedTrigger). -->
+                <div th:if="${canEditPlan}" class="mt-3 pt-3 border-top">
+                    <button ref="bannedTrigger" type="button" class="btn btn-outline-secondary btn-sm"
+                            aria-haspopup="dialog" aria-controls="banned-participants"
+                            data-dialog="banned-participants" @click="openBanned">
+                        Ver miembros baneados
+                        <span th:if="${bannedParticipants != null and !#lists.isEmpty(bannedParticipants)}"
+                              class="badge bg-secondary ms-1" th:text="${#lists.size(bannedParticipants)}">0</span>
+                    </button>
+                </div>
         </div>
-    </div>
+    </dialog>
 
-    <!-- [PLN] Una sola superficie de configuración dentro del detalle. El dueño ve los
-         permisos de roles; editores y dueño comparten datos, roles y bans. -->
-    <section th:if="${canEditPlan}" id="configuracion" class="card border-0 shadow-sm p-4 mt-4"
-             aria-labelledby="configuracion-heading">
-        <h5 id="configuracion-heading" class="fw-bold mb-4">Configuración del plan</h5>
+    <!-- [STD] Solicitudes en card centrada: aceptar o rechazar sin recortes. -->
+    <dialog th:if="${canHandleRequests}" id="join-requests-dialog" ref="requestsDialog" class="plan-modal"
+            aria-labelledby="join-requests-dialog-heading" tabindex="-1">
+        <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
+            <h5 id="join-requests-dialog-heading" class="fw-bold m-0">Solicitudes</h5>
+            <button type="button" class="btn-close flex-shrink-0" aria-label="Cerrar solicitudes"
+                    data-close-dialog @click="requestsDialog.close()"></button>
+        </div>
+        <p th:if="${#lists.isEmpty(joinRequests)}" class="text-muted mb-0">No hay solicitudes pendientes.</p>
+        <ul th:unless="${#lists.isEmpty(joinRequests)}" class="list-group list-group-flush">
+            <li th:each="request : ${joinRequests}" class="list-group-item d-flex flex-wrap align-items-center justify-content-between gap-3 px-0">
+                <a th:href="@{/profile/{id}(id=${request.requesterId})}" th:text="${request.requesterName}">Ver perfil</a>
+                <form th:action="@{/plans/{id}/join-requests/{rid}/respond(id=${plan.id},rid=${request.id})}" method="post" class="d-flex gap-2 mb-0">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <button type="submit" name="action" value="accept" class="btn btn-primary btn-sm">Aceptar</button>
+                    <button type="submit" name="action" value="reject" class="btn btn-outline-danger btn-sm">Rechazar</button>
+                </form>
+            </li>
+        </ul>
+    </dialog>
 
-        <div th:if="${settingsSaved}" class="alert alert-success" role="status" th:text="${settingsSaved}"></div>
-
-        <div class="d-flex flex-column gap-4">
-            <article id="config-datos" class="border rounded p-3" aria-labelledby="config-datos-heading">
+    <!-- [STD] La configuración es una card centrada (mismo chrome que la ficha del lugar): el
+         botón "Configuración" de la cabecera y el "Editar" de la ficha la abren sin navegar y
+         sin sumar scroll a la página. -->
+    <dialog th:if="${canEditPlan}" id="plan-config-dialog" ref="configDialog" class="plan-modal"
+            aria-labelledby="configuracion-heading" tabindex="-1">
+        <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
+            <h5 id="configuracion-heading" class="fw-bold m-0">Configuración del plan</h5>
+            <button type="button" class="btn-close flex-shrink-0" aria-label="Cerrar la configuración"
+                    data-close-dialog @click="configDialog.close()"></button>
+        </div>
+        <div id="configuracion">
+            <div th:if="${settingsSaved}" class="alert alert-success" role="status" th:text="${settingsSaved}"></div>
+            <div class="d-flex flex-column gap-4">
+<article id="config-datos" class="border rounded p-3" aria-labelledby="config-datos-heading">
                 <h6 id="config-datos-heading" class="fw-bold mb-3">Datos básicos</h6>
 
                 <form th:action="@{/plans/{id}(id=${plan.id})}" th:object="${plan}" method="POST">
@@ -664,10 +923,21 @@
                 </form>
                 <p th:unless="${isPlanAdministrator}" class="text-muted mb-0">Solo el dueño del plan puede cambiar estas capacidades.</p>
             </article>
+            </div>
+        </div>
+    </dialog>
 
-            <article id="banned-participants" class="border rounded p-3" aria-labelledby="banned-participants-title">
-                <h6 id="banned-participants-title" class="fw-bold mb-3">Miembros baneados <span class="badge bg-secondary" th:text="${bannedParticipants == null ? 0 : #lists.size(bannedParticipants)}">0</span></h6>
-                <p th:if="${bannedParticipants == null or #lists.isEmpty(bannedParticipants)}" class="text-muted small mb-0">No hay usuarios baneados en este plan.</p>
+    <!-- [STD-010/AC-09] Miembros baneados: diálogo propio que se abre desde Participantes. -->
+    <dialog th:if="${canEditPlan}" id="banned-participants" ref="bannedDialog" class="plan-modal"
+            aria-labelledby="banned-participants-title" tabindex="-1">
+        <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
+            <h6 id="banned-participants-title" class="fw-bold m-0">Miembros baneados
+                <span class="badge bg-secondary" th:text="${bannedParticipants == null ? 0 : #lists.size(bannedParticipants)}">0</span>
+            </h6>
+            <button type="button" class="btn-close flex-shrink-0" aria-label="Cerrar miembros baneados"
+                    data-close-dialog @click="bannedDialog.close()"></button>
+        </div>
+<p th:if="${bannedParticipants == null or #lists.isEmpty(bannedParticipants)}" class="text-muted small mb-0">No hay usuarios baneados en este plan.</p>
                 <div th:unless="${bannedParticipants == null or #lists.isEmpty(bannedParticipants)}">
                     <p class="text-muted small">Al quitar el baneo, la persona podrá volver a unirse. No recuperará su participación ni su rol anterior automáticamente.</p>
                     <ul class="list-group list-group-flush">
@@ -684,9 +954,7 @@
                         </li>
                     </ul>
                 </div>
-            </article>
-        </div>
-    </section>
+    </dialog>
 
     <p v-if="requestError" class="alert alert-danger mt-3" role="alert">{{ requestError }}</p>
     <!-- [DIS-B02/B04] Ficha del lugar: título + chip de categoría arriba, bloques con icono
@@ -694,14 +962,14 @@
          horario para quien puede editar. tabindex="-1" y el render previo a showModal
          (plans-detail.js) hacen que el dialog abra con su título ya montado: aria-labelledby
          resuelve y el foco cae dentro; Escape lo cierra (nativo del <dialog>). -->
-    <dialog ref="placeDialog" aria-labelledby="place-detail-title" tabindex="-1" class="border-0 rounded shadow p-4" style="max-width: 560px; width: 90%;">
+    <dialog ref="placeDialog" aria-labelledby="place-detail-title" tabindex="-1" class="plan-modal">
         <template v-if="selectedEntry">
             <div class="place-head">
                 <div class="place-head-text">
                     <h4 id="place-detail-title" class="m-0">{{ selectedEntry.name }}</h4>
-                    <span class="place-chip" :class="'cat-' + (selectedEntry.category || 'DEFAULT')">{{ selectedEntry.category || 'Sin categoría' }}</span>
+                    <span class="place-chip" :class="'cat-' + (selectedEntry.category || 'DEFAULT')"><span v-html="categoryIconHtml(selectedEntry.category, 12)"></span>{{ getCategoryLabel(selectedEntry.category) }}</span>
                 </div>
-                <button type="button" class="btn-close" aria-label="Cerrar" @click="placeDialog.close()"></button>
+                <button type="button" class="btn-close" aria-label="Cerrar" data-close-dialog @click="placeDialog.close()"></button>
             </div>
             <dl class="place-facts">
                 <div class="place-fact">
@@ -720,11 +988,11 @@
                             target="_blank" rel="noopener">Abrir en Google Maps</a></dd>
                     </div>
                 </template>
-                <div class="place-fact">
+                <div class="place-fact place-fact--wide">
                     <dt><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" /><path d="M14 2v5a1 1 0 0 0 1 1h5" /><path d="M10 9H8" /><path d="M16 13H8" /><path d="M16 17H8" /></svg>Descripción del lugar</dt>
                     <dd>{{ selectedEntry.placeDescription || 'Sin descripción' }}</dd>
                 </div>
-                <div class="place-fact">
+                <div class="place-fact place-fact--wide">
                     <dt><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 5H3" /><path d="M15 12H3" /><path d="M17 19H3" /></svg>Descripción de la visita</dt>
                     <dd>{{ selectedEntry.description || 'Sin descripción' }}</dd>
                 </div>
@@ -796,6 +1064,27 @@
     <!-- Lucide vendorizado: un script clasico se ejecuta antes que el type="module" de abajo,
          asi window.lucide ya existe cuando el modulo arma sus iconos. -->
     <script th:src="@{/js/lucide.min.js}"></script>
+
+    <!-- [STD] Red de seguridad para las cards. Cada disparador lleva data-dialog y cada X
+         data-close-dialog; este listener nativo los resuelve. El modulo JS se cachea aparte de
+         la plantilla: si el navegador conserva una version vieja, los @click nuevos no existen y
+         "Ver" quedaria muerto. El markup siempre llega fresco. Con el modulo al dia el @click
+         abre primero y el guard (!dialog.open) evita el showModal duplicado. -->
+    <script>
+      document.addEventListener('click', (event) => {
+        const opener = event.target.closest('[data-dialog]');
+        if (opener) {
+          const dialog = document.getElementById(opener.getAttribute('data-dialog'));
+          if (dialog && !dialog.open) dialog.showModal();
+          return;
+        }
+        const closer = event.target.closest('[data-close-dialog]');
+        if (closer) {
+          const openDialog = closer.closest('dialog');
+          if (openDialog && openDialog.open) openDialog.close();
+        }
+      });
+    </script>
 
     <!-- The module cannot read Thymeleaf, so the page hands it exactly these five values.
          `th:inline` is the accepted literal form (docs/guide-js.md R3): the two lists are

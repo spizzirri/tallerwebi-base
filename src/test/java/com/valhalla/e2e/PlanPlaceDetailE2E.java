@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Response;
+import com.microsoft.playwright.options.LoadState;
 import com.microsoft.playwright.options.SelectOption;
 import com.valhalla.e2e.views.PlansPage;
 import java.nio.file.Path;
@@ -35,6 +36,7 @@ public class PlanPlaceDetailE2E extends E2eBase {
   // el #plan-date del wizard lleva min=${today}, así que un literal duro vence contra el reloj.
   private static final String PLAN_TIME = "20:00";
   private static final String START_TIME = "18:30";
+  private static final String PLAN_DESCRIPTION = "Itinerario con horarios de visita";
   private static final String PINNED_TIME = "10:30";
   private String eventDate;
   private String pinnedDate;
@@ -82,7 +84,9 @@ public class PlanPlaceDetailE2E extends E2eBase {
     assertThat(page.locator("input[name='eventTime']")).hasValue(START_TIME);
 
     // The start time belongs to the edit form: changing it re-derives the whole chain, so the
-    // summary and the stop's chip have to move together.
+    // summary and the stop's chip have to move together. La configuración vive en una card
+    // centrada: se abre antes de tocar el form.
+    plans.openPlanConfig();
     page.locator("input[name='eventTime']").fill(PLAN_TIME);
     page.getByText("Guardar cambios", new Page.GetByTextOptions().setExact(true)).click();
     plans.waitForDetailPath();
@@ -288,13 +292,318 @@ public class PlanPlaceDetailE2E extends E2eBase {
   }
 
   /**
+   * [STD-014] "Ver más" abre la ficha del lugar como una card más del tablero: centrada en el
+   * viewport, con el mismo radio de 16 px, la misma superficie y sombra que las cards, y con
+   * cada bloque del {@code dl} como chip de lectura (mismo fondo que los chips de la ficha del
+   * plan). Antes el reset de márgenes de Tailwind dejaba el {@code <dialog>} nativo pegado al
+   * borde superior izquierdo, con radio de 6 px y bloques separados por líneas.
+   */
+  @Test
+  void opensThePlaceCardAsACenteredModalLikeTheRestOfTheCards() {
+    createPlanWithAVisit();
+
+    Locator dialog = openStopDetails(0);
+
+    Map<String, Object> chrome = (Map<String, Object>) page.evaluate(
+      """
+      () => {
+        const d = document.querySelector('dialog[aria-labelledby=place-detail-title]');
+        const r = d.getBoundingClientRect();
+        const s = getComputedStyle(d);
+        const chip = getComputedStyle(document.querySelector('#plan-summary .plan-chip'));
+        const fact = getComputedStyle(d.querySelector('.place-fact'));
+        return {
+          leftGap: r.left,
+          rightGap: window.innerWidth - r.right,
+          topGap: r.top,
+          bottomGap: window.innerHeight - r.bottom,
+          radius: s.borderTopLeftRadius,
+          padding: s.paddingTop,
+          shadow: s.boxShadow,
+          background: s.backgroundColor,
+          factBackground: fact.backgroundColor,
+          factRadius: fact.borderTopLeftRadius,
+          factBorderTop: fact.borderTopWidth,
+          chipBackground: chip.backgroundColor
+        };
+      }
+      """
+    );
+
+    double leftGap = ((Number) chrome.get("leftGap")).doubleValue();
+    double rightGap = ((Number) chrome.get("rightGap")).doubleValue();
+    assertTrue(
+      Math.abs(leftGap - rightGap) <= 2,
+      "la card tiene que quedar centrada en horizontal, no pegada a un borde: " + chrome
+    );
+    assertTrue(
+      ((Number) chrome.get("topGap")).doubleValue() > 0 &&
+      ((Number) chrome.get("bottomGap")).doubleValue() > 0,
+      "la card no puede tocar el borde superior ni inferior del viewport: " + chrome
+    );
+    assertEquals("16px", chrome.get("radius"), "mismo radio que las cards del tablero");
+    assertEquals("24px", chrome.get("padding"), "mismo aire interno que el resto de las cards");
+    assertFalse(
+      "none".equals(chrome.get("shadow")),
+      "la card flota con sombra, como las demás: " + chrome
+    );
+    assertEquals(
+      chrome.get("chipBackground"),
+      chrome.get("factBackground"),
+      "cada bloque de la ficha del lugar se lee como un chip de la ficha del plan"
+    );
+    assertEquals("10px", chrome.get("factRadius"), "los chips comparten radio con los del plan");
+    assertEquals("0px", chrome.get("factBorderTop"), "los bloques ya no se separan con líneas");
+
+    // El chip de categoría se lee igual que en la card del recorrido: label en español + icono,
+    // no el enum crudo del catálogo.
+    String cardCategory = page.locator(".place-item .stop-category").first().innerText().trim();
+    String dialogCategory = dialog.locator(".place-chip").innerText().trim();
+    assertEquals(
+      cardCategory,
+      dialogCategory,
+      "el chip de la ficha del lugar repite el label de la card del recorrido"
+    );
+    assertThat(dialog.locator(".place-chip svg")).hasCount(1);
+  }
+
+  /**
+   * [STD-001/003/004/005] La vista de dueño queda compacta: cada dato del plan aparece una sola
+   * vez en el tablero (la ficha manda y el form de edición vive en la card de configuración), la
+   * card de solicitudes avisa cuando no hay pendientes, "Invitar a alguien" está plegado dentro de
+   * Participantes y "Agregar lugar al plan" es botón de la cabecera de "Tu recorrido".
+   */
+  @Test
+  void keepsTheOwnerViewCompactAndWithoutRepeatedData() {
+    createPlanWithAVisit();
+
+    // AC-01: los values del form de edición no están en la vista base. La card de configuración
+    // cerrada no cuenta: display:none la saca del texto visible y del filtro de inputs visibles.
+    String visibleValues = (String) page.evaluate(
+      """
+      () => [...document.querySelectorAll('input, textarea, select')]
+        .filter(el => el.type !== 'hidden' && el.offsetParent !== null)
+        .map(el => el.value)
+        .filter(Boolean)
+        .join('|')
+      """
+    );
+    assertFalse(
+      visibleValues.contains(planName),
+      "el nombre no vive en un input visible: " + visibleValues
+    );
+    assertFalse(visibleValues.contains(eventDate), "la fecha solo en la ficha: " + visibleValues);
+    assertFalse(visibleValues.contains(START_TIME), "la hora solo en la ficha: " + visibleValues);
+
+    // AC-01: la ficha es la fuente de lectura — 4 chips (fecha, hora, visibilidad, código) y una
+    // descripción con clamp de 3 líneas; el tile ADMINISTRADOR ya no existe.
+    Locator summary = page.locator("#plan-summary");
+    assertThat(summary.locator(".plan-chip")).hasCount(4);
+    assertThat(summary).containsText(dateLabel(eventDate));
+    assertThat(summary).containsText(START_TIME);
+    assertThat(summary).containsText("Privado");
+    assertThat(summary).containsText("CÓDIGO");
+    String lineClamp = (String) page.evaluate(
+      "() => getComputedStyle(document.querySelector('#plan-description')).webkitLineClamp"
+    );
+    assertEquals("3", lineClamp, "la descripción de la ficha se clampa a 3 líneas");
+
+    // AC-01: cada dato visible ocurre una sola vez. La hora del chip se cuenta dentro de la
+    // ficha, no en la página: el recorrido también muestra una hora —la derivada de la parada,
+    // que es otro dato—.
+    String text = page.locator("body").innerText();
+    assertEquals(1, occurrences(text, planName), "el nombre se ve una sola vez");
+    assertEquals(1, occurrences(text, PLAN_DESCRIPTION), "la descripción se ve una sola vez");
+    assertEquals(1, occurrences(text, dateLabel(eventDate)), "la fecha se ve una sola vez");
+    assertEquals(
+      1,
+      occurrences(summary.innerText(), START_TIME),
+      "la hora se ve una sola vez en la ficha"
+    );
+    assertFalse(summary.innerText().contains("ADMINISTRADOR"), "el admin sale de la ficha");
+    assertThat(page.locator("input[name='eventDate']:visible")).hasCount(0);
+
+    // AC-01: Participantes es la única fuente del administrador (badge "Dueño").
+    assertThat(page.locator("section:has(#participants-heading)")).containsText("Dueño");
+
+    // AC-03: sin solicitudes pendientes la card muestra el estado vacío (PLN #58) y el badge de
+    // la cabecera no se pinta.
+    assertTrue(
+      text.contains("No hay solicitudes pendientes."),
+      "la card avisa que no hay solicitudes"
+    );
+    assertThat(page.locator("#config-solicitudes")).isVisible();
+    assertThat(page.locator(".plan-toolbar a[href='#config-solicitudes']")).hasCount(0);
+
+    // AC-04: "Invitar a alguien" es un accordion dentro de la card centrada de Participantes:
+    // colapsado, con aria-expanded, que despliega el form y lo vuelve a ocultar.
+    plans.openParticipants();
+    Locator inviteToggle = page.locator("button[aria-controls='invite-panel']");
+    assertThat(inviteToggle).hasText("Invitar a alguien");
+    assertThat(inviteToggle).hasAttribute("aria-expanded", "false");
+    assertThat(page.locator("#invite-panel")).isHidden();
+    inviteToggle.click();
+    assertThat(inviteToggle).hasAttribute("aria-expanded", "true");
+    assertThat(page.locator("#invitation-email")).isVisible();
+    inviteToggle.click();
+    assertThat(page.locator("#invite-panel")).isHidden();
+    page.keyboard().press("Escape");
+    assertThat(page.locator("#participants-dialog")).isHidden();
+
+    // AC-05: "Agregar lugar al plan" es un botón de la cabecera de "Tu recorrido" que despliega
+    // el picker; la card propia ya no existe.
+    assertThat(page.locator("h5:has-text('Agregar lugar al plan')")).hasCount(0);
+    Locator addToggle = page.locator(".itinerary-panel button[aria-controls='add-place-panel']");
+    assertThat(addToggle).hasText("Agregar lugar al plan");
+    assertThat(page.locator("#add-place-panel")).isHidden();
+    addToggle.click();
+    assertThat(page.getByLabel("Lugar para agregar al plan")).isVisible();
+  }
+
+  /**
+   * [STD-002] La edición de metadatos se abre desde el botón "Editar" de la ficha en una card
+   * centrada con el a11y del AC-18 de 17-DIS: aria-labelledby hacia su título, foco al abrir y
+   * Escape cierra devolviendo el foco. Guarda con el mismo POST y la vista base no muestra form.
+   */
+  @Test
+  void editsPlanMetadataFromAModalWithDialogA11y() {
+    createPlanWithAVisit();
+
+    Locator dialog = page.locator("#plan-config-dialog");
+    Locator trigger = page.locator("#plan-summary button:has-text('Editar')");
+    assertThat(trigger).isVisible();
+
+    // Cerrada hasta que se pide: el form no está en el layout.
+    assertThat(dialog).isHidden();
+    assertThat(page.locator("input[name='eventDate']:visible")).hasCount(0);
+
+    trigger.click();
+    assertThat(dialog).isVisible();
+    assertThat(dialog).hasAttribute("aria-labelledby", "configuracion-heading");
+    boolean focusInside = Boolean.TRUE.equals(
+      page.evaluate(
+        "() => document.getElementById('plan-config-dialog').contains(document.activeElement)"
+      )
+    );
+    assertTrue(focusInside, "abrir la configuración tiene que dejar el foco adentro");
+    assertThat(page.locator("#config-datos input[name='eventDate']")).hasValue(eventDate);
+    assertThat(page.locator("#config-datos input[name='name']")).hasValue(planName);
+
+    // Escape cierra (comportamiento nativo del <dialog>) y devuelve el foco al botón.
+    page.keyboard().press("Escape");
+    page.waitForTimeout(150);
+    assertThat(dialog).isHidden();
+    assertThat(trigger).isFocused();
+
+    // Round trip: cambiar la hora desde la card y guardar rederige con el valor nuevo en la
+    // ficha, y la vista base sigue sin form visible.
+    trigger.click();
+    page.locator("#config-datos input[name='eventTime']").fill(PLAN_TIME);
+    page.locator("#config-datos button:has-text('Guardar cambios')").click();
+    plans.waitForDetailPath();
+    assertThat(page.locator("#plan-summary")).containsText(PLAN_TIME);
+    assertThat(page.locator("input[name='eventTime']:visible")).hasCount(0);
+  }
+
+  /**
+   * [STD-011/AC-10] Variante C (2026-11-03, intercambio del 2026-11-04): tablero de tres columnas
+   * —ficha fija a la izquierda con Participantes debajo, mapa al centro y "Tu recorrido" a la
+   * derecha—, sin pestañas: las tres cards se ven al cargar. La ficha no se mueve al scrollear el
+   * recorrido y la página sigue bajo el presupuesto de scroll de la spec: ≤1.500 px en desktop y
+   * ≤2.800 px en 390.
+   */
+  @Test
+  void laysOutTheFichaFixedOnTheLeftWithParticipantsUnderItAndTheItineraryOnTheRight() {
+    createPlanWithAVisit();
+    page.waitForLoadState(LoadState.NETWORKIDLE);
+    page.waitForTimeout(300);
+
+    // Desktop: las tres cards visibles, cada una en su columna.
+    page.setViewportSize(1440, 900);
+    page.waitForTimeout(300);
+    assertThat(page.locator("#plan-summary")).isVisible();
+    assertThat(page.locator(".itinerary-panel")).isVisible();
+    assertThat(page.locator("#participants-section")).isVisible();
+
+    Locator ficha = page.locator("#plan-summary");
+    Locator mapa = page.locator("#map");
+    Locator recorrido = page.locator(".itinerary-panel");
+    Locator participantes = page.locator("#participants-section");
+    double fichaX = ficha.boundingBox().x;
+    double mapaX = mapa.boundingBox().x;
+    double participantesX = participantes.boundingBox().x;
+    double recorridoX = recorrido.boundingBox().x;
+    assertTrue(fichaX < mapaX, "la ficha va a la izquierda del mapa");
+    assertTrue(mapaX < recorridoX, "el recorrido va a la derecha del mapa");
+    assertTrue(participantesX < mapaX, "participantes va a la izquierda del mapa");
+    assertEquals(fichaX, participantesX, 1.0, "participantes comparte la columna de la ficha");
+    assertTrue(
+      participantes.boundingBox().y > ficha.boundingBox().y,
+      "participantes va debajo de la ficha"
+    );
+    assertTrue(
+      recorrido.boundingBox().y <= ficha.boundingBox().y,
+      "el recorrido arranca a la altura de la ficha, en su propia columna"
+    );
+
+    // [STD-015/AC-14] La banda del título termina donde termina el mapa: el encabezado usa las
+    // mismas tres columnas del tablero y las acciones viven en la tercera. "Configuración del
+    // plan" pasa a "Configuración" y los dos botones comparten alto.
+    Locator banda = page.locator(".plan-header");
+    double bandaRight = banda.boundingBox().x + banda.boundingBox().width;
+    double mapaRight = mapa.boundingBox().x + mapa.boundingBox().width;
+    assertEquals(mapaRight, bandaRight, 2.0, "la banda azul termina donde termina el mapa");
+
+    Locator configuracion = page.locator(
+      ".plan-toolbar button[aria-controls='plan-config-dialog']"
+    );
+    assertEquals(
+      "Configuración",
+      configuracion.innerText().trim(),
+      "el botón ya no dice 'del plan'"
+    );
+    double configH = configuracion.boundingBox().height;
+    double eliminarH = page
+      .getByRole(
+        com.microsoft.playwright.options.AriaRole.BUTTON,
+        new Page.GetByRoleOptions().setName("Eliminar plan")
+      )
+      .boundingBox()
+      .height;
+    assertEquals(configH, eliminarH, 1.0, "las dos acciones de la cabecera comparten alto");
+
+    // La ficha queda quieta: scrollear el recorrido no la mueve.
+    double fichaY = ficha.boundingBox().y;
+    page.locator(".itinerary-panel").evaluate("el => el.scrollTop = el.scrollHeight");
+    page.waitForTimeout(200);
+    assertEquals(fichaY, ficha.boundingBox().y, "la ficha no se mueve al scrollear el recorrido");
+
+    // Presupuesto desktop.
+    long desktop = scrollHeight();
+    assertTrue(desktop <= 1500, "desktop quedó en " + desktop + " px, techo 1500");
+
+    // Mobile 390: apilado ficha -> mapa -> participantes -> recorrido, bajo el techo.
+    page.setViewportSize(390, 844);
+    page.waitForTimeout(300);
+    double yFicha = ficha.boundingBox().y;
+    double yMapa = mapa.boundingBox().y;
+    double yParticipantes = participantes.boundingBox().y;
+    double yRecorrido = recorrido.boundingBox().y;
+    assertTrue(yFicha < yMapa, "390: la ficha va primero");
+    assertTrue(yMapa < yParticipantes, "390: participantes va antes que el recorrido");
+    assertTrue(yParticipantes < yRecorrido, "390: el recorrido va último");
+    long mobile = scrollHeight();
+    assertTrue(mobile <= 2800, "390 quedó en " + mobile + " px, techo 2800");
+  }
+
+  /**
    * The create panel of {@code /explore}. Step 1 owns the plan's date and start time — the stop
    * does not ask for an hour any more — so the schedule the detail shows comes from these two.
    */
   private void createPlanWithAVisit() {
     plans.navigateToCreatePlanModal();
     plans.typeName(planName);
-    plans.typeDescription("Itinerario con horarios de visita");
+    plans.typeDescription(PLAN_DESCRIPTION);
     plans.typeEventDate(eventDate);
     plans.typeStartTime(START_TIME);
     plans.clickNextStep();
@@ -304,8 +613,16 @@ public class PlanPlaceDetailE2E extends E2eBase {
     plans.waitForDetailPath();
   }
 
-  /** Detail page form: picks the first place the itinerary does not hold yet and adds it. */
+  /**
+   * Detail page form: picks the first place the itinerary does not hold yet and adds it.
+   * [STD-005] El picker vive detrás de un botón en la cabecera del recorrido: si el toggle
+   * existe y el panel está colapsado se expande primero (idempotente en los dos estados).
+   */
   private void addPlaceToPlan() {
+    Locator addToggle = page.locator(".itinerary-panel button[aria-controls='add-place-panel']");
+    if (addToggle.count() > 0 && !page.locator("#add-place-panel").isVisible()) {
+      addToggle.click();
+    }
     page.getByLabel("Lugar para agregar al plan").selectOption(new SelectOption().setIndex(1));
     page.getByText("+ Agregar", new Page.GetByTextOptions().setExact(true)).click();
   }
@@ -388,6 +705,22 @@ public class PlanPlaceDetailE2E extends E2eBase {
       updated,
       "the itinerary endpoint has to accept a new visit date and time"
     );
+  }
+
+  private static int occurrences(String haystack, String needle) {
+    int count = 0;
+    for (
+      int at = haystack.indexOf(needle);
+      at >= 0;
+      at = haystack.indexOf(needle, at + needle.length())
+    ) {
+      count++;
+    }
+    return count;
+  }
+
+  private long scrollHeight() {
+    return ((Number) page.evaluate("() => document.documentElement.scrollHeight")).longValue();
   }
 
   private void screenshotItinerary() {

@@ -48,6 +48,7 @@ public class PlanScheduleE2E extends E2eBase {
   @Test
   void E01_elHorarioDerivadoSeVeYSeRecalculaAlReordenar() {
     createPlanWithThreeStops();
+    // sobre las stop-details exigen que esté abierta.
 
     // El itinerario ya muestra el horario derivado, sin tocar nada: al menos dos paradas tienen
     // su chip con rango. El hasCount va primero porque es el que reintenta hasta que Vue monta
@@ -70,9 +71,12 @@ public class PlanScheduleE2E extends E2eBase {
     assertThat(page.locator("input[name='dayEndTime']")).hasCount(0);
     assertThat(page.locator("select[name='transportMode']")).hasValue(TRANSPORT_MODE);
 
-    // Reordenar: la primera parada pasa a la segunda, por el mismo drag & drop que usa
-    // PlanPlaceDetailE2E. Se lee antes el texto de esa parada (título y rango) para comparar
-    // después el mismo caso, no la posición.
+    // Reordenar: la primera parada pasa a la segunda, con el mismo drag & drop sintético que usa
+    // PlanPlaceDetailE2E. [STD-011] En la variante C el recorrido vive en una columna con scroll
+    // propio, así que un arrastre por coordenadas puede quedarse a mitad de camino; los
+    // DragEvent sobre los <li> ejercitan los mismos handlers (@dragstart/@drop) sin depender del
+    // viewport. Se lee antes el texto de esa parada (título y rango) para comparar después el
+    // mismo caso, no la posición.
     Locator titles = page.locator(".stop-title");
     Locator schedules = page.locator("li.place-item .stop-schedule");
     String movedTitle = titles.nth(0).innerText();
@@ -81,7 +85,24 @@ public class PlanScheduleE2E extends E2eBase {
 
     Response reorder = page.waitForResponse(
       "**/reorder",
-      () -> page.locator("li.place-item").nth(0).dragTo(page.locator("li.place-item").nth(1))
+      () ->
+        page.evaluate(
+          """
+          () => {
+            const items = document.querySelectorAll('.place-item');
+            const dataTransfer = new DataTransfer();
+            const event = (type) => new DragEvent(type, {
+              bubbles: true,
+              cancelable: true,
+              dataTransfer
+            });
+            items[0].dispatchEvent(event('dragstart'));
+            items[1].dispatchEvent(event('dragover'));
+            items[1].dispatchEvent(event('drop'));
+            items[0].dispatchEvent(event('dragend'));
+          }
+          """
+        )
     );
     assertEquals(200, reorder.status(), "el reorden tiene que guardarlo el servidor");
 

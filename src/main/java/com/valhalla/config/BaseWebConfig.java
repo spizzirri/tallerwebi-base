@@ -10,6 +10,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Scope;
+import org.springframework.http.CacheControl;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -48,14 +49,31 @@ public abstract class BaseWebConfig implements WebMvcConfigurer {
 
   @Override
   public void addResourceHandlers(final ResourceHandlerRegistry registry) {
-    registry.addResourceHandler("/css/**").addResourceLocations("/resources/css/");
-    registry.addResourceHandler("/js/**").addResourceLocations("/resources/core/js/");
-    registry.addResourceHandler("/images/**").addResourceLocations("/resources/images/");
+    // [STD] Sin Cache-Control, el navegador aplica frescura heurística sobre estos archivos y
+    // puede servir un plans-detail.js viejo contra un template nuevo: los @click nuevos
+    // (openParticipants/openRequests) quedaban sin handler y los botones "Ver" no hacían nada.
+    // no-cache no desactiva la caché: obliga a revalidar y el 304 mantiene la descarga barata.
+    CacheControl noCache = CacheControl.noCache();
+    registry
+      .addResourceHandler("/css/**")
+      .addResourceLocations("/resources/css/")
+      .setCacheControl(noCache);
+    registry
+      .addResourceHandler("/js/**")
+      .addResourceLocations("/resources/core/js/")
+      .setCacheControl(noCache);
+    registry
+      .addResourceHandler("/images/**")
+      .addResourceLocations("/resources/images/")
+      .setCacheControl(noCache);
     // El manifest va como /manifest.json y no como site.webmanifest: Spring no tiene la
     // extensión .webmanifest en su mime.types, así que esa ruta se sirve como
     // application/octet-stream y el navegador descarta el manifest en vez de usarlo. Solo
     // este path resuelve contra /resources/, que tampoco lo expone entero.
-    registry.addResourceHandler("/manifest.json").addResourceLocations("/resources/");
+    registry
+      .addResourceHandler("/manifest.json")
+      .addResourceLocations("/resources/")
+      .setCacheControl(noCache);
   }
 
   /**

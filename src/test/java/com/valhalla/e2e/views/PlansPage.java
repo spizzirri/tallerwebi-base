@@ -134,6 +134,39 @@ public class PlansPage extends WebPage {
     return this.getElementText("main h2");
   }
 
+  /**
+   * [STD] La configuración del plan vive en una card centrada: se abre desde la cabecera antes
+   * de tocar sus inputs. Idempotente — si ya está abierta no vuelve a clicar.
+   */
+  public void openPlanConfig() {
+    Locator dialog = page.locator("#plan-config-dialog");
+    if (!dialog.isVisible()) {
+      page.locator(".plan-toolbar button[aria-controls='plan-config-dialog']").click();
+      dialog.waitFor();
+    }
+  }
+
+  /**
+   * [STD] Participantes es una card resumen: el contenido completo se abre en una card centrada.
+   * Idempotente, para poder llamarlo también después de cada reload.
+   */
+  public void openParticipants() {
+    Locator dialog = page.locator("#participants-dialog");
+    if (!dialog.isVisible()) {
+      page.locator(".plan-side button[aria-controls='participants-dialog']").click();
+      dialog.waitFor();
+    }
+  }
+
+  /** [STD] Solicitudes también abre su propia card centrada (y su aviso de la cabecera). */
+  public void openRequests() {
+    Locator dialog = page.locator("#join-requests-dialog");
+    if (!dialog.isVisible()) {
+      page.locator(".plan-side button[aria-controls='join-requests-dialog']").click();
+      dialog.waitFor();
+    }
+  }
+
   /** Rows of the listing table. Zero is the only value that proves a delete really deleted. */
   public int getPlanCount() {
     return this.page.locator("tbody tr").count();

@@ -7,6 +7,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -125,6 +126,22 @@ public class BrandingPagesTest {
     assertThat(css, containsString("--typeface-serif"));
     assertThat(css, containsString("--primary"));
     assertThat(css, containsString("--secondary"));
+  }
+
+  // [STD] Los módulos JS llevan los handlers de los botones (openParticipants, openRequests).
+  // Sin Cache-Control el navegador les aplica frescura heurística y puede servir un
+  // plans-detail.js viejo contra un template nuevo: los botones nuevos quedan sin handler y no
+  // hacen nada. no-cache obliga a revalidar en cada carga (304 si el archivo no cambió).
+  @Test
+  public void shouldMakeStaticModulesRevalidateOnEveryLoad() throws Exception {
+    mockMvc
+      .perform(get("/js/pages/plans-detail.js"))
+      .andExpect(status().isOk())
+      .andExpect(header().string("Cache-Control", containsString("no-cache")));
+    mockMvc
+      .perform(get("/css/brand.css"))
+      .andExpect(status().isOk())
+      .andExpect(header().string("Cache-Control", containsString("no-cache")));
   }
 
   // I-06 (AC-03, AC-04): el mapa del marker y el del panel salen del token, no de un hex.

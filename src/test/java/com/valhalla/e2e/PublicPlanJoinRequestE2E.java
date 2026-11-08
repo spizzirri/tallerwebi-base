@@ -42,6 +42,8 @@ public class PublicPlanJoinRequestE2E extends E2eBase {
         .containsText("Ya enviaste tu solicitud");
 
       page.reload();
+      // [STD] Aceptar vive en la card centrada de Solicitudes.
+      plans.openRequests();
       page.locator("form[action*='/join-requests/'] button[value='accept']").click();
       assertThat(page.locator("form[action*='/join-requests/']")).hasCount(0);
       visitorPage.navigate(publicUrl);

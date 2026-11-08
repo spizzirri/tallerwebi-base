@@ -63,13 +63,24 @@ createApp({
         const requestError = ref('');
         const saving = ref(false);
         const placeDialog = ref(null);
-        const planOptionsOpen = ref(false);
-        const planOptionsButton = ref(null);
-        const closePlanOptions = (event) => {
-            if (!event.currentTarget.contains(event.relatedTarget)) {
-                planOptionsOpen.value = false;
-            }
-        };
+        // [STD] La configuración del plan y los miembros baneados son cards centradas: se abren
+        // desde la cabecera y desde Participantes, sin navegar ni sumar scroll a la página.
+        const configDialog = ref(null);
+        const openConfig = () => configDialog.value.showModal();
+        const bannedDialog = ref(null);
+        // [STD-009] bannedTrigger devuelve el foco al botón de Participantes al cerrar el diálogo.
+        const bannedTrigger = ref(null);
+        const openBanned = () => bannedDialog.value.showModal();
+        // [STD] Solicitudes y Participantes son cards resumen: el contenido completo se abre en
+        // una card centrada (la notificación de solicitudes abre la misma card).
+        const participantsDialog = ref(null);
+        const openParticipants = () => participantsDialog.value.showModal();
+        const requestsDialog = ref(null);
+        const openRequests = () => requestsDialog.value.showModal();
+        // [STD] 25-STD: los dos paneles plegables (invitar, agregar lugar) arrancan cerrados
+        // para que la vista base no pinte formularios ni consuma scroll.
+        const inviteOpen = ref(false);
+        const addPlaceOpen = ref(false);
 
         // Leaflet owns these three and the template never reads them, so they are not refs.
         let map = null;
@@ -299,6 +310,12 @@ createApp({
                 attribution: '&copy; OpenStreetMap'
             }).addTo(map);
 
+            // [STD-VB] El mapa ya no mide 480 px fijos: llena el stage, cuya altura cambia con
+            // el viewport. Sin invalidateSize Leaflet conserva el tamaño viejo y las tiles
+            // quedan corridas (mismo patrón que places-list.js).
+            new ResizeObserver(() => map.invalidateSize({ pan: false })).observe(map.getContainer());
+            requestAnimationFrame(() => map.invalidateSize({ pan: false }));
+
             renderMarkers();
         };
 
@@ -450,8 +467,9 @@ createApp({
 
         return {
             allPlaces, planPlaces, selectedPlaceId, selectedEntry, requestError, saving,
-            // El menú "Más opciones" usa estos controles desde la plantilla.
-            planOptionsOpen, planOptionsButton, closePlanOptions,
+            inviteOpen, addPlaceOpen,
+            configDialog, openConfig, bannedDialog, bannedTrigger, openBanned,
+            participantsDialog, openParticipants, requestsDialog, openRequests,
             placeDialog, availablePlaces, dayGroups, dayCount, directionsUrl,
             getCategoryLabel, iconHtml, categoryIconHtml, showPlace, updateEntry, addPlace,
             removePlace, onDragStart, onDrop

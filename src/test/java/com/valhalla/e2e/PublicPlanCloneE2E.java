@@ -76,6 +76,8 @@ public class PublicPlanCloneE2E extends E2eBase {
       .locator(".place-item")
       .first()
       .waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.ATTACHED));
+    // [STD] La configuración es una card centrada: se abre antes de tocar el switch.
+    plans.openPlanConfig();
     page.locator("#isPublic").check();
     page.locator("button:has-text('Guardar cambios')").click();
     plans.waitForDetailPath();
