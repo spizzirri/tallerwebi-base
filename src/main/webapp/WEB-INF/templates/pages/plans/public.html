@@ -75,6 +75,7 @@
 
     <p class="mt-2 text-gray-600" th:if="${!#strings.isEmpty(plan.description)}"
       th:text="${plan.description}"></p>
+    <th:block th:replace="~{components/plan-budget :: summary}"></th:block>
 
     <p class="mt-2 text-gray-700" th:if="${plan.eventDate != null or plan.eventTime != null}">
       <strong>Fecha:</strong>

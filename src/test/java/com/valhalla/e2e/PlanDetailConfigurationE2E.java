@@ -14,6 +14,66 @@ import org.junit.jupiter.api.Test;
  */
 public class PlanDetailConfigurationE2E extends E2eBase {
 
+  /** E-PRE-01: budget editing shares the metadata dialog, including server errors. */
+  @Test
+  void ownerEditsBudgetInThePlanDialogAndRecoversFromInvalidRange() {
+    signInAsAdmin();
+    PlansPage plans = new PlansPage(page);
+    plans.createPlanViaExplore("Plan con presupuesto", "Salidas y entradas", isoDateIn(30));
+    String detailUrl = page.url();
+    Locator config = page.locator("#plan-config-dialog");
+    Locator trigger = page.locator("#plan-summary button:has-text('Editar')");
+    Locator budget = config.locator("#config-presupuesto");
+    Locator summary = page.locator("#presupuesto");
+
+    assertThat(summary).containsText("Sin estimar");
+    assertThat(config).isHidden();
+    assertThat(page.locator("#plan-summary form[action$='/budget']")).hasCount(0);
+    trigger.click();
+    assertThat(config).isVisible();
+    assertThat(budget).isVisible();
+    budget.locator("#budget-min").fill("1500.50");
+    budget.locator("#budget-max").fill("2500");
+    budget.locator("#budget-notes").fill("Comida y entradas. Transporte aparte.");
+    budget.locator("button[type='submit']").click();
+    assertThat(page).hasURL(detailUrl + "#presupuesto");
+    assertThat(config).isHidden();
+    assertThat(summary).containsText("1.500,50");
+    assertThat(summary).containsText("2.500,00");
+    assertThat(summary).containsText("Comida y entradas. Transporte aparte.");
+
+    page.reload();
+    trigger.click();
+    assertThat(budget.locator("#budget-min")).hasValue("1500.50");
+    assertThat(budget.locator("#budget-max")).hasValue("2500.00");
+    budget.locator("#budget-min").fill("3000");
+    budget.locator("#budget-max").fill("1000");
+    budget.locator("button[type='submit']").click();
+
+    // Both values satisfy HTML constraints; their order must be rejected by the server.
+    assertThat(page).hasURL(detailUrl + "/budget");
+    assertThat(config).isVisible();
+    assertThat(budget.locator("[role='alert']")).isVisible();
+    assertThat(budget.locator("#budget-min")).hasValue("3000");
+    assertThat(budget.locator("#budget-max")).hasValue("1000");
+    assertThat(budget.locator("#budget-notes")).hasValue("Comida y entradas. Transporte aparte.");
+    assertThat(summary).containsText("1.500,50");
+    assertThat(summary).containsText("2.500,00");
+
+    budget.locator("#budget-min").fill("2000");
+    budget.locator("#budget-max").fill("2000");
+    budget.locator("button[type='submit']").click();
+    assertThat(page).hasURL(detailUrl + "#presupuesto");
+    assertThat(config).isHidden();
+    trigger.click();
+    assertThat(budget.locator("[role='alert']")).hasCount(0);
+    assertThat(budget.locator("#budget-min")).hasValue("2000.00");
+    assertThat(budget.locator("#budget-max")).hasValue("2000.00");
+    page.keyboard().press("Escape");
+    assertThat(config).isHidden();
+    assertThat(summary).containsText("2.000,00");
+  }
+
   @Test
   void ownerConfiguresThePlanFromTheDetailWithoutLeavingThePage() {
     signInAsAdmin();

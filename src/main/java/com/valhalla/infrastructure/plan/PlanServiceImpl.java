@@ -304,6 +304,19 @@ public class PlanServiceImpl implements PlanService { // NOPMD — intentional: 
   }
 
   @Override
+  public void updateBudget(UUID id, com.valhalla.domain.plan.PlanBudget budget, String userEmail) {
+    Plan plan = getEditablePlan(id, userEmail);
+    plan.setBudget(
+      new com.valhalla.domain.plan.PlanBudget(
+        budget.getMinimum(),
+        budget.getMaximum(),
+        budget.getNotes()
+      )
+    );
+    planRepository.save(plan);
+  }
+
+  @Override
   @Transactional(readOnly = true)
   public Plan getEditablePlan(UUID id, String userEmail) {
     Plan plan = planRepository.findById(id).orElseThrow(PlanNotFoundException::new);
@@ -786,6 +799,13 @@ public class PlanServiceImpl implements PlanService { // NOPMD — intentional: 
     Plan copy = new Plan();
     copy.setName(source.getName());
     copy.setDescription(source.getDescription());
+    copy.setBudget(
+      new com.valhalla.domain.plan.PlanBudget(
+        source.getBudget().getMinimum(),
+        source.getBudget().getMaximum(),
+        source.getBudget().getNotes()
+      )
+    );
     copy.setEventDate(source.getEventDate());
     copy.setEventTime(source.getEventTime());
     // The copy is born private: publishing is the new owner's decision (AC-04).

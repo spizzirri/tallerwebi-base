@@ -128,3 +128,5 @@ rejection leaves participation unchanged. Both responses remove the pending invi
 | **Popularity** | Feed ordering from ratings and participants (Bayesian score, participants/date/name/id as tiebreaks). Computed, never shown; the card still shows only average and count |
 | **Marker** | Visual pin on the map representing a place |
 | **Popup** | Info window that opens when clicking a marker |
+
+**Plan budget**: Optional estimated spending range in ARS per person for the entire itinerary, with an optional note explaining inclusions. Zero means free; absent amounts mean not estimated. Only the owner and Editors can edit it. Visible to anyone authorized to read the plan, including its public view, and copied when cloning a live plan.

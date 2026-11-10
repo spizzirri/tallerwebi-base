@@ -730,3 +730,22 @@ File: `src/main/webapp/WEB-INF/templates/pages/plans/detail.html`
 | `templates/pages/plans/list.html` | Create (with CSRF token in delete form) |
 | `templates/pages/plans/new.html` | Create (with CSRF token + validation errors) |
 | `templates/pages/plans/detail.html` | Create |
+
+## Presupuesto estimado del plan
+
+- El detalle y la vista publica muestran un rango de gasto estimado en ARS por persona para todo el recorrido y una aclaracion opcional (hasta 500 caracteres) sobre lo que incluye.
+- El formulario de presupuesto se encuentra dentro del dialogo Editar/Configuracion del plan, junto a los datos basicos. Los errores vuelven a abrir el dialogo en el presupuesto.
+- Solo owner y Editor pueden guardar o quitar la estimacion. La autorizacion se verifica en el servidor y el POST exige CSRF.
+- Los importes son opcionales en conjunto, no negativos, con hasta dos decimales y un maximo de 9.999.999.999,99; el limite superior debe ser mayor o igual al inferior.
+- Importes iguales se muestran como monto unico. Cero es una estimacion gratuita; dos importes vacios significan "Sin estimar" y permiten conservar una aclaracion.
+- Un error conserva el formulario y no modifica el presupuesto guardado. Los demas formularios del plan no sobrescriben el presupuesto.
+- Al clonar un plan accesible se copia su presupuesto. Los snapshots previos de Guardados no incluyen presupuesto.
+- Persistencia: columnas nullable `budget_min`, `budget_max` (decimal 12,2) y `budget_notes` (varchar 500) en `plans`. El `hbm2ddl.auto=update` existente las incorpora al iniciar sin resetear datos; planes previos quedan sin estimar.
+
+### Escenarios de test del presupuesto
+
+`PlanBudgetIntegrationTest`: I-PRE-01 owner y editor guardan rango, persistencia tras flush/clear, detalle y vista publica renderizan, clon conserva importes y aclaracion; I-PRE-02 entradas invalidas no guardan; S-PRE-01 participante no puede escribir y POST sin CSRF se rechaza; I-PRE-03 cero es gratuito, importes vacios quitan estimacion.
+
+`PlanDetailConfigurationE2E`: E-PRE-01 abre Editar desde la ficha, guarda un rango con aclaracion, verifica persistencia al recargar, rechaza un rango invertido conservando datos y reabriendo el dialogo, y permite corregirlo a un monto fijo.
+
+`PlanBudgetTest`: U-PRE-01 a U-PRE-08 cubren ausencia de estimacion, monto fijo sin dependencia de escala decimal, gratuidad, limites inclusivos de importes y notas, importes incompletos o invalidos en ambos extremos, rango invertido, notas demasiado largas y columnas nullable hidratadas parcialmente por JPA. Se ejecutan en el gate completo de backend con los umbrales de cobertura existentes.

@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.UUID;
 
 public interface PlanService {
+  void updateBudget(UUID id, PlanBudget budget, String userEmail);
+
   Plan getSharedPlan(UUID id);
   void requestToJoin(UUID id, String userEmail);
   void respondToJoinRequest(UUID id, UUID requestId, String action, String userEmail);
@@ -71,7 +73,7 @@ public interface PlanService {
   Plan joinPlan(String shortCode, String userEmail);
   Plan updatePlan(UUID id, Plan changes, String ownerEmail);
   void deleteOwnedPlan(UUID id, String ownerEmail);
-  /** [CLO] Copia propia y editable de un plan accesible: nuevo dueño, nuevo shortCode. */
+  /** [CLO] Copia propia y editable de un plan accesible: nuevo dueÃ±o, nuevo shortCode. */
   Plan clonePlan(UUID id, String clonerEmail);
   /** [TOP] Participantes por plan, para el ranking del feed. Vacio si no hay ids. */
   Map<UUID, Long> getParticipantCounts(Collection<UUID> planIds);
@@ -87,7 +89,7 @@ public interface PlanService {
   void changeParticipantRoleAny(UUID id, String participantEmail, String role);
   void removeParticipantAny(UUID id, String participantEmail, String adminEmail);
   /**
-   * [PABM] AC-20: invitación desde el admin. Actúa con la autoridad del dueño del plan, así que
+   * [PABM] AC-20: invitaciÃ³n desde el admin. ActÃºa con la autoridad del dueÃ±o del plan, asÃ­ que
    * las reglas de {@link #inviteParticipant(UUID, String, String, String, String)} no cambian.
    */
   void inviteParticipantAny(UUID id, String participantEmail, String role);

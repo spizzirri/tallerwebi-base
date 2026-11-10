@@ -44,6 +44,17 @@ public class Plan {
   @Embedded
   private PlanSchedule schedule = new PlanSchedule();
 
+  @Embedded
+  private PlanBudget budget = new PlanBudget();
+
+  public PlanBudget getBudget() {
+    return budget == null ? new PlanBudget() : budget;
+  }
+
+  public void setBudget(PlanBudget budget) {
+    this.budget = budget;
+  }
+
   private Boolean isPublic = false;
 
   // [PABM] Visibilidad en los listados publicos: con active=false el plan no aparece en /for-you,

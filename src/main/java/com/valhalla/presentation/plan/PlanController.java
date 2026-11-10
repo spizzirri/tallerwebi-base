@@ -51,6 +51,7 @@ public class PlanController {
   private static final String REDIRECT_EXPLORE = "redirect:/explore";
   private static final String ATTR_PLANS = "plans";
   private static final String ATTR_PLAN = "plan";
+  private static final String ATTR_BUDGET_FORM = "budgetForm";
 
   // [SCH] Defaults del planificador cuando el form no manda la ventana del dia ni el modo: los
   // mismos que asume un plan viejo sin esas columnas.
@@ -99,6 +100,11 @@ public class PlanController {
     String userEmail = authentication == null ? null : authentication.getName();
     Plan plan = planService.getParticipatingPlan(id, userEmail);
     model.put(ATTR_PLAN, plan);
+    PlanBudgetRequest budgetForm = new PlanBudgetRequest();
+    budgetForm.setMinimum(plan.getBudget().getMinimum());
+    budgetForm.setMaximum(plan.getBudget().getMaximum());
+    budgetForm.setNotes(plan.getBudget().getNotes());
+    model.put(ATTR_BUDGET_FORM, budgetForm);
     model.put("canEditPlan", plan.canEdit(userEmail));
     model.put("isPlanAdministrator", plan.isAdministrator(userEmail));
     model.put("isPlanParticipant", plan.isParticipant(userEmail));
@@ -126,6 +132,36 @@ public class PlanController {
     model.put("planDateIso", plan.getEventDate() == null ? null : plan.getEventDate().toString());
     addBookmarkFlags(model, plan, userEmail);
     return new ModelAndView(VIEW_PLAN_DETAIL, model);
+  }
+
+  @PostMapping("/{id}/budget")
+  public ModelAndView updateBudget(
+    @PathVariable UUID id,
+    @ModelAttribute(ATTR_BUDGET_FORM) PlanBudgetRequest form,
+    BindingResult errors,
+    Authentication authentication
+  ) {
+    planService.getEditablePlan(id, authentication.getName());
+    if (!errors.hasErrors()) {
+      try {
+        planService.updateBudget(
+          id,
+          new com.valhalla.domain.plan.PlanBudget(
+            form.getMinimum(),
+            form.getMaximum(),
+            form.getNotes()
+          ),
+          authentication.getName()
+        );
+        return confirmed(REDIRECT_PLAN_DETAIL + id + "#presupuesto", "Presupuesto guardado.");
+      } catch (IllegalArgumentException exception) {
+        errors.reject("budget.invalid", exception.getMessage());
+      }
+    }
+    ModelAndView view = showPlan(id, authentication);
+    view.addObject(ATTR_BUDGET_FORM, form);
+    view.addObject(BindingResult.MODEL_KEY_PREFIX + ATTR_BUDGET_FORM, errors);
+    return view;
   }
 
   /** Autor + participantes sin duplicados, ordenados por email (la vista pinta el rol). */

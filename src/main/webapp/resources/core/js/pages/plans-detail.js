@@ -453,6 +453,11 @@ createApp({
         };
 
         onMounted(async () => {
+            if (configDialog.value?.dataset.budgetInvalid === 'true') {
+                openConfig();
+                document.getElementById('config-presupuesto')?.scrollIntoView({ block: 'nearest' });
+            }
+
             try {
                 const response = await apiFetch(catalogUrl);
                 allPlaces.value = await response.json();

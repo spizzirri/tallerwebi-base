@@ -571,6 +571,7 @@
             </div>
             <p id="plan-description" class="mb-0 text-break plan-description-clamp"
                th:text="${#strings.isEmpty(plan.description) ? 'Sin descripci&oacute;n' : plan.description}">Descripci&oacute;n del plan</p>
+            <th:block th:replace="~{components/plan-budget :: summary}"></th:block>
             <!-- [STD-011/AC-11] El boton de edicion vive al pie de la ficha: en una columna de
                  ~360 px, al lado de los chips quedaba aplastado. [STD] Abre la card de
                  configuración centrada, sin sumar scroll a la página. -->
@@ -846,7 +847,8 @@
          botón "Configuración" de la cabecera y el "Editar" de la ficha la abren sin navegar y
          sin sumar scroll a la página. -->
     <dialog th:if="${canEditPlan}" id="plan-config-dialog" ref="configDialog" class="plan-modal"
-            aria-labelledby="configuracion-heading" tabindex="-1">
+            aria-labelledby="configuracion-heading" tabindex="-1"
+            th:attr="data-budget-invalid=${#fields.hasErrors('budgetForm.*')}">
         <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
             <h5 id="configuracion-heading" class="fw-bold m-0">Configuración del plan</h5>
             <button type="button" class="btn-close flex-shrink-0" aria-label="Cerrar la configuración"
@@ -915,6 +917,23 @@
                     <div class="d-flex justify-content-end">
                         <button type="submit" class="btn btn-primary px-4 fw-bold d-inline-flex align-items-center gap-2" :disabled="saving"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" /><path d="M17 21v-8H7v8" /><path d="M7 3v5h8" /></svg>Guardar cambios</button>
                     </div>
+                </form>
+            </article>
+
+            <article id="config-presupuesto" class="border rounded p-3" aria-labelledby="config-presupuesto-heading">
+                <h6 id="config-presupuesto-heading" class="fw-bold mb-3">Presupuesto estimado</h6>
+                <form th:action="@{/plans/{id}/budget(id=${plan.id})}" method="post" th:object="${budgetForm}" class="mt-2">
+                    <div th:if="${#fields.hasAnyErrors()}" role="alert" class="alert alert-danger small">
+                        Revis&aacute; los importes: complet&aacute; ambos o dej&aacute; ambos vac&iacute;os, con hasta dos decimales. El m&aacute;ximo debe ser mayor o igual al m&iacute;nimo. La aclaraci&oacute;n admite hasta 500 caracteres.
+                    </div>
+                    <label for="budget-min" class="form-label small">Desde (ARS por persona)</label>
+                    <input id="budget-min" type="number" th:field="*{minimum}" min="0" max="9999999999.99" step="0.01" class="form-control mb-2">
+                    <label for="budget-max" class="form-label small">Hasta (ARS por persona)</label>
+                    <input id="budget-max" type="number" th:field="*{maximum}" min="0" max="9999999999.99" step="0.01" class="form-control mb-2">
+                    <label for="budget-notes" class="form-label small">Qu&eacute; incluye (opcional)</label>
+                    <textarea id="budget-notes" th:field="*{notes}" maxlength="500" rows="2" placeholder="Comida, entradas y transporte. Bebidas aparte." class="form-control mb-2"></textarea>
+                    <p class="small text-muted">Para un monto fijo, us&aacute; el mismo valor en ambos campos. Para quitar la estimaci&oacute;n, vaci&aacute; ambos importes.</p>
+                    <button class="btn btn-outline-secondary btn-sm" type="submit">Guardar presupuesto</button>
                 </form>
             </article>
 
