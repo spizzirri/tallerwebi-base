@@ -1,0 +1,117 @@
+<!DOCTYPE HTML>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<!-- Ficha publica de un lugar [PSHARE]: es el destino de /places/{id} y la pagina que se
+     comparte por URL. El modelo lo arma PlaceController: @place (direccion, coordenadas y
+     foto) + publicPlans (los planes PUBLICOS que lo incluyen) + los metas de compartir
+     (pageTitle, og*, pageDescription).
+
+     Como pages/plans/public.html, head propio: previewMeta va primero para que los scrapers
+     lean los og* antes que cualquier stylesheet, y el resto del head compartido entra por
+     headTail (ahi vive el meta public-base-url que lee share-plan.js). Sin formularios no
+     hace falta el head() con sus CSRF. -->
+<head>
+  <th:block th:replace="~{layouts/base :: previewMeta(${place.name})}"></th:block>
+  <!-- Leaflet CSS, vendorizado con la version fija (1.9.4) en el repo, igual que en la vista
+       publica de un plan: un CDN caido dejo el mapa muerto en otro lado. -->
+  <link rel="stylesheet" th:href="@{/css/leaflet.css}" />
+  <style>
+    #place-map {
+      height: 320px;
+      width: 100%;
+      border-radius: 0.5rem;
+    }
+  </style>
+  <th:block th:replace="~{layouts/base :: headTail(${place.name})}"></th:block>
+</head>
+
+<body th:replace="~{layouts/base :: layout(~{::main})}">
+
+  <main class="mx-auto w-full max-w-3xl flex-1 px-4 py-8">
+    <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Lugar</p>
+    <div class="mt-1 flex items-start justify-between gap-3">
+      <h1 class="text-3xl font-bold text-black" th:text="${place.name}">Lugar</h1>
+      <!-- [PSHARE-003] Compartir: reusa share-plan.js tal cual los planes, con la URL de esta
+           ficha en data-share-url. El script la absolutiza contra el meta public-base-url. -->
+      <button type="button" data-share-plan
+        th:attr="data-share-url=@{/places/{id}(id=${place.id})}"
+        class="inline-flex shrink-0 items-center gap-2 rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50">
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" /><polyline points="16 6 12 2 8 6" /><line x1="12" x2="12" y1="2" y2="15" /></svg>
+        Compartir
+      </button>
+    </div>
+
+    <p class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-600">
+      <span class="font-medium text-gray-900"
+        th:text="${#strings.capitalize(#strings.toLowerCase(place.category))}">Categoría</span>
+      <span th:if="${place.address}" th:text="${place.address}">Dirección</span>
+      <!-- [PSHARE-005] Como llegar a Google Maps con las COORDENADAS del lugar
+           (destination=lat,lng), el mismo estilo de link que las paradas de un plan. Sin
+           coordenadas no hay link, igual que en el panel lateral de /explore. -->
+      <a th:if="${place.latitude != null and place.longitude != null}"
+        th:href="|https://www.google.com/maps/dir/?api=1&destination=${place.latitude},${place.longitude}|"
+        target="_blank" rel="noopener"
+        class="font-medium text-blue-600 underline-offset-4 hover:underline">Cómo llegar</a>
+    </p>
+
+    <!-- La foto del lugar, la misma que declara og:image (con la marca de agua del dataset
+         como fallback la pagina no la pinta: el meta sigue yendo a la de marca). -->
+    <img th:if="${place.imageUrl != null and !#strings.isEmpty(place.imageUrl)}"
+      th:src="${place.imageUrl}" th:alt="${place.name}"
+      class="mt-4 w-full rounded-xl bg-gray-100 object-cover" />
+
+    <p class="mt-4 text-sm leading-6 text-gray-700" th:if="${place.description}"
+      th:text="${place.description}">Descripción</p>
+
+    <!-- [PSHARE-001] Mapa del lugar: Leaflet vendorizado con un solo marker. El seed lo
+         serializa Thymeleaf (th:inline, guide-js R3); place-detail.js solo lo consume. -->
+    <div th:if="${place.latitude != null and place.longitude != null}" id="place-map"
+      class="mt-4" role="img" th:attr="aria-label=${'Mapa de ' + place.name}"></div>
+
+    <!-- [PSHARE-001] Los planes PUBLICOS que incluyen el lugar, linkeados a su vista publica. -->
+    <section class="mt-8">
+      <h2 class="text-lg font-semibold text-gray-900">Planes públicos que incluyen este lugar</h2>
+      <div th:if="${!publicPlans.isEmpty()}" class="mt-3 grid gap-4 sm:grid-cols-2">
+        <article th:each="plan : ${publicPlans}"
+          class="overflow-hidden rounded-lg bg-white shadow-md">
+          <a th:href="@{/plans/{id}/public(id=${plan.id})}" class="flex flex-col gap-1 p-5">
+            <h3 class="text-base font-semibold text-gray-900" th:text="${plan.name}">Plan</h3>
+            <p class="text-sm text-gray-600 line-clamp-2" th:text="${plan.description}">Descripción</p>
+            <p class="text-xs text-gray-500" th:if="${plan.eventDate != null}">
+              Fecha:
+              <span th:text="${#temporals.format(plan.eventDate, 'dd/MM/yyyy')}">00/00/0000</span>
+            </p>
+          </a>
+        </article>
+      </div>
+      <p class="mt-3 rounded-md bg-white p-6 text-center text-sm text-gray-600 shadow-md"
+        th:if="${publicPlans.isEmpty()}">Todavía ningún plan público incluye este lugar.</p>
+    </section>
+
+    <!-- Leaflet va adentro de <main> como en public.html: el layout(base :: layout) solo
+         copia <main>, cualquier tag hermano se descarta. -->
+    <script th:src="@{/js/leaflet.js}"></script>
+
+    <!-- Los iconos de categoria del marker salen de lucide como en /explore: este script
+         clasico corre antes de los modulos, asi window.lucide ya existe cuando se arma. -->
+    <script th:src="@{/js/lucide.min.js}"></script>
+
+    <!-- El lugar lo serializa Thymeleaf; el modulo solo lo consume. Un nombre con una
+         etiqueta de script adentro llega escapado y se inserta con textContent, nunca
+         como HTML. -->
+    <script th:inline="javascript">
+      window.PLACE_DETAIL_SEED = {
+        name: /*[[${place.name}]]*/ '',
+        category: /*[[${place.category}]]*/ '',
+        latitude: /*[[${place.latitude}]]*/ null,
+        longitude: /*[[${place.longitude}]]*/ null
+      };
+    </script>
+    <script type="module" th:src="@{/js/pages/place-detail.js}"></script>
+    <script th:src="@{/js/share-plan.js}"></script>
+  </main>
+
+</body>
+
+</html>

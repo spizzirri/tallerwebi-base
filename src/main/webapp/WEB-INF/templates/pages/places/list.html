@@ -226,6 +226,12 @@
             <p v-if="selectedPlace.description" class="whitespace-pre-line text-sm leading-6 text-gray-700">
               {{ selectedPlace.description }}
             </p>
+            <!-- [PSHARE-004] Ver ficha: desde el panel lateral se llega a la pagina
+                 compartible /places/{id} del lugar, que es donde vive el mapa y los
+                 planes publicos que lo incluyen. Fuera del <dl> para que aparezca
+                 aunque el lugar no tenga horarios, telefono, web ni coordenadas. -->
+            <a :href="'/places/' + selectedPlace.id"
+              class="self-start text-sm font-medium text-blue-600 underline-offset-2 hover:underline">Ver ficha</a>
             <!-- [APL] Picker de plan inline en el panel de detalle: select + boton, sin
                  modal (AC3). El boton vive fuera del <article> de la tarjeta para no
                  chocar con el selector de e2e de addDraftPlace

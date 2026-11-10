@@ -152,6 +152,10 @@ public class SecurityConfig {
     return http.build();
   }
 
+  /** [PSHARE] Ficha de /places/{id}: solo ids UUID llegan al controller. */
+  private static final String PLACE_FICHA_PATH =
+    "/places/{id:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}";
+
   /**
    * Superficie publica de la cadena default: solo GETs abiertos; cualquier otro verbo de esas rutas
    * y el resto del sitio cae en anyRequest().authenticated().
@@ -162,6 +166,11 @@ public class SecurityConfig {
    * sigue exigiendo estar autenticado. [PROF] La vista publica del perfil es abierta (11-PROF v2.3:
    * el link compartido funciona sin sesion), pero solo el GET con id UUID: GET /profile (atajo "mi
    * perfil") y el POST quedan autenticados.
+   *
+   * <p>[PSHARE] La ficha de un lugar ({@link #PLACE_FICHA_PATH}, GET y HEAD como el plan publico:
+   * un scraper tira HEAD primero y con 302 al login descarta el preview) y el GET /sitemap.xml
+   * tambien son abiertos. Con basura en /places el matcher no aplica y manda la sesion; el id
+   * inexistente llega a PlaceController y responde 404, no el redirect del ABM.
    */
   private void defaultAuthorizationRules(
     AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auth
@@ -192,6 +201,12 @@ public class SecurityConfig {
         org.springframework.http.HttpMethod.GET,
         "/profile/{id:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}"
       )
+      .permitAll()
+      .requestMatchers(org.springframework.http.HttpMethod.GET, PLACE_FICHA_PATH)
+      .permitAll()
+      .requestMatchers(org.springframework.http.HttpMethod.HEAD, PLACE_FICHA_PATH)
+      .permitAll()
+      .requestMatchers(org.springframework.http.HttpMethod.GET, "/sitemap.xml")
       .permitAll()
       .requestMatchers("/api/**")
       .authenticated()
