@@ -30,6 +30,11 @@ public interface PlanService {
    * vacio cuando no se sigue a nadie; el orden y los filtros siguen siendo de {@code PlanDiscovery}.
    */
   List<Plan> getPublicPlansByAdministrators(Collection<UUID> administratorIds);
+  /**
+   * [PSHARE] Los planes PUBLICOS que incluyen un lugar: los que lista la ficha /places/{id}.
+   * Mismo filtro de visibilidad que {@link #getPublicPlans()} (solo publicos y activos).
+   */
+  List<Plan> getPublicPlansByPlaceId(UUID placeId);
   Plan getOwnedPlan(UUID id, String ownerEmail);
   Plan getEditablePlan(UUID id, String userEmail);
   void changeParticipantRole(UUID id, String participantEmail, String role, String userEmail);

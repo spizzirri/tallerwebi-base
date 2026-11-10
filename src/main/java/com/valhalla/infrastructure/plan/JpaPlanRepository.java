@@ -53,6 +53,18 @@ public interface JpaPlanRepository extends JpaRepository<Plan, UUID> {
   );
 
   /**
+   * [PSHARE] Los planes publicos que incluyen un lugar, para la ficha /places/{id}. El join es
+   * por la tabla puente plan_places; explicita como {@link #findByIsPublicTrue()} porque el
+   * atributo isPublic resuelve ambiguo en derived queries. Orden por nombre: la ficha muestra la
+   * lista en un orden estable.
+   */
+  @Query(
+    "select distinct plan from Plan plan join plan.planPlaces entry " +
+    "where entry.place.id = :placeId and plan.isPublic = true order by plan.name asc"
+  )
+  List<Plan> findByIsPublicTrueAndPlaceId(@Param("placeId") UUID placeId);
+
+  /**
    * [TOP] Participantes por plan, con {@code left join} para que un plan sin participantes
    * aparezca con {@code 0} en vez de ausente. El owner no cuenta: no vive en esta tabla.
    */

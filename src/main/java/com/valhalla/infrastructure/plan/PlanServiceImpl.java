@@ -271,6 +271,21 @@ public class PlanServiceImpl implements PlanService { // NOPMD — intentional: 
   }
 
   /**
+   * [PSHARE] Los planes PUBLICOS que incluyen un lugar, para la ficha /places/{id}. Misma
+   * visibilidad que {@link #getPublicPlans()}: el filtro de activos vive aca y la query solo
+   * trae los publicos que tocan el lugar (join por plan_places).
+   */
+  @Override
+  @Transactional(readOnly = true)
+  public List<Plan> getPublicPlansByPlaceId(UUID placeId) {
+    return planRepository
+      .findByIsPublicTrueAndPlaceId(placeId)
+      .stream()
+      .filter(Plan::getActive)
+      .toList();
+  }
+
+  /**
    * [FOLLOW] Planes publicos de los autores seguidos: el conjunto lo elige el follow, el orden y
    * los filtros siguen siendo de {@code PlanDiscovery}, asi que la query no ordena (AC-08, AC-15).
    *

@@ -101,9 +101,18 @@ public class PlacesViewE2E extends E2eBase {
 
     assertThat(panel.locator("h2").textContent(), containsString("El Sanjuanino"));
     assertThat(page.locator(".leaflet-popup").textContent(), containsString("RESTAURANT"));
-    // [MAPS] El popup ganó el link "Cómo llegar": es el único contenido linkeable, y el
-    // marcador clickeado siempre tiene dirección (la del lugar que se muestra en la ficha).
-    Locator directions = page.locator(".leaflet-popup-content a");
+    // [PSHARE-004] El popup linkea a la ficha publica del lugar: href relativo a la raiz
+    // /places/{id}, que el navegador resuelve contra el origin de la pagina.
+    Locator ficha = page.locator(".leaflet-popup-content a[href^='/places/']");
+    assertThat(ficha.count(), is(equalTo(1)));
+    assertThat(ficha.textContent(), is(equalTo("Ver ficha")));
+    assertThat(
+      ficha.getAttribute("href"),
+      matchesPattern("/places/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")
+    );
+    // [MAPS] El otro link es "Como llegar": directions de Google Maps con la DIRECCION del
+    // lugar (url-encoded), no la coordenada. El marcador clickeado siempre tiene direccion.
+    Locator directions = page.locator(".leaflet-popup-content a[href*='google.com']");
     assertThat(directions.count(), is(equalTo(1)));
     assertThat(directions.textContent(), is(equalTo("Cómo llegar")));
     assertThat(

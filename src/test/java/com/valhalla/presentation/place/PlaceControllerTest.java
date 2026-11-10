@@ -5,7 +5,10 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.Mockito.mock;
 
+import com.valhalla.domain.place.PlaceService;
+import com.valhalla.domain.plan.PlanService;
 import com.valhalla.domain.plan.PlanSettings;
 import java.security.Principal;
 import java.time.LocalDate;
@@ -23,7 +26,9 @@ public class PlaceControllerTest {
 
   @BeforeEach
   public void init() {
-    controller = new PlaceController();
+    // [PSHARE] El controller gano PlaceService y PlanService para la ficha /places/{id}; el
+    // listado de /explore no los toca, asi que mocks alcanzan para esta unit test.
+    controller = new PlaceController(mock(PlaceService.class), mock(PlanService.class));
   }
 
   @Test

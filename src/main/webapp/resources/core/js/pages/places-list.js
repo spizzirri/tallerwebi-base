@@ -421,7 +421,15 @@ createApp({
       // direccion de texto (no la coordenada) para no mandar a otra calle, con el
       // nombre delante para desambiguar.
       el('br'),
-      directionsLink(place, { class: 'text-primary fw-medium d-inline-block mt-1' })
+      directionsLink(place, { class: 'text-primary fw-medium d-inline-block mt-1' }),
+      // [PSHARE-004] Ver ficha: desde el popup del mapa se llega a la pagina compartible
+      // /places/{id} del lugar, sin salir del listado (el href es relativo a la raiz).
+      el('br'),
+      el('a', {
+        href: '/places/' + place.id,
+        text: 'Ver ficha',
+        class: 'text-primary fw-medium d-inline-block mt-1'
+      })
     ]);
 
     const updateMarkers = () => {
