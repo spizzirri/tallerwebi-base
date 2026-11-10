@@ -18,6 +18,12 @@ services:
       timeout: 3s
       retries: 20
     restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
 
   app:
     build:
@@ -58,6 +64,8 @@ services:
       - maven_cache:/root/.m2
     command: sh docker-dev.sh
     restart: unless-stopped
+
+
 
 volumes:
   postgres_data:
