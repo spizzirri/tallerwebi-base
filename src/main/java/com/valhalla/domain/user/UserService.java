@@ -6,6 +6,11 @@ import java.util.UUID;
 
 public interface UserService {
   List<User> findAll();
+  /**
+   * [USEARCH] Personas cuyo nombre o apellido contiene la consulta, sin importar mayusculas ni
+   * acentos. El propio usuario queda fuera: buscarse a uno mismo no ofrece nada que seguir.
+   */
+  List<User> searchByName(String query, UUID excludeUserId);
   User findById(UUID id);
   /** [PROF] El principal del principal de sesión lleva el email, no el id: este método lo cruza. */
   User getByEmail(String email);

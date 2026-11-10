@@ -6,6 +6,7 @@ import com.valhalla.domain.exception.UserNotFoundException;
 import com.valhalla.domain.plan.PlanRepository;
 import com.valhalla.domain.user.User;
 import com.valhalla.domain.user.UserRepository;
+import com.valhalla.domain.user.UserSearchText;
 import com.valhalla.domain.user.UserService;
 import java.util.List;
 import java.util.Optional;
@@ -42,6 +43,21 @@ public class UserServiceImpl implements UserService {
   @Transactional(readOnly = true)
   public List<User> findAll() {
     return userRepository.findAll();
+  }
+
+  /**
+   * [USEARCH] El texto viaja normalizado y con los comodines escapados: la query hace el LIKE y
+   * excluye al propio usuario, de modo que una busqueda vacia o solo de comodines no liste a todo
+   * el mundo.
+   */
+  @Override
+  @Transactional(readOnly = true)
+  public List<User> searchByName(String query, UUID excludeUserId) {
+    String normalized = UserSearchText.normalize(query);
+    if (normalized.isEmpty()) {
+      return List.of();
+    }
+    return userRepository.searchByName(UserSearchText.escapeLike(normalized), excludeUserId);
   }
 
   @Override

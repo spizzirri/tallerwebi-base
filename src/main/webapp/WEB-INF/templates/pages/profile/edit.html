@@ -181,6 +181,16 @@
           <span th:text="${followerCount}">0</span> seguidores ·
           <span th:text="${followingCount}">0</span> seguidos
         </p>
+        <!-- [USEARCH] Acceso directo desde el perfil propio al buscador de personas. -->
+        <a th:href="@{/users}"
+          class="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:underline">
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+          </svg>
+          Buscar usuarios para seguir
+        </a>
 
         <!-- [FOLLOW] AC-05: las mismas dos listas que la vista publica, con los datos del usuario
              en sesion. Solo nombre, avatar y link al perfil (AC-12). -->

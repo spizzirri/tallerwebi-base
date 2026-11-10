@@ -24,6 +24,11 @@ public class UserRepositoryImpl implements UserRepository {
   }
 
   @Override
+  public List<User> searchByName(String normalizedQuery, UUID excludeUserId) {
+    return jpaUserRepository.searchByName(normalizedQuery, excludeUserId);
+  }
+
+  @Override
   public Optional<User> findById(UUID id) {
     return jpaUserRepository.findById(id);
   }

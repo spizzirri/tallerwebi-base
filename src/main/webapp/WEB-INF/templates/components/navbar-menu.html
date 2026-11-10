@@ -28,6 +28,16 @@
       </div>
     </div>
 
+    <!-- [USEARCH] Mismo buscador con debounce que el navbar de escritorio, acotado al menu que
+         existe en mobile (donde los links del nav estan ocultos). Sin boton: Enter envia el form. -->
+    <form th:action="@{/users}" method="get" role="search" th:unless="${showAdminNav}"
+      class="border-b border-gray-100 px-3 py-2 md:hidden">
+      <label for="menu-user-search" class="sr-only">Buscar usuarios</label>
+      <input id="menu-user-search" data-user-search name="q" type="search"
+        placeholder="Buscar usuarios" autocomplete="off"
+        class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" />
+    </form>
+
     <div class="py-1" role="menu">
       <!-- [MOBILE] Destinos del navbar: visibles solo por debajo de md, donde los links del
            <nav> estan ocultos tras la hamburguesa. En desktop el panel los ignora (md:hidden)

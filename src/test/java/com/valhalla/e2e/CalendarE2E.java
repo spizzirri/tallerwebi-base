@@ -70,6 +70,9 @@ class CalendarE2E extends E2eBase {
           )
       );
       day.click();
+      // El click recarga la misma URL: el escudo FOUC de base.html vuelve a ocultar la
+      // página hasta que Tailwind compila; isVisible() no tiene retry y perdía la carrera.
+      awaitStyles();
       assertThat(page.locator(AGENDA + " a")).containsText(NAME);
       assertTrue(page.locator(AGENDA + " a").isVisible());
       if (viewport[0] >= 768) {

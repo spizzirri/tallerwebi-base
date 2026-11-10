@@ -1,0 +1,106 @@
+<!DOCTYPE HTML>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{layouts/base :: head('Buscar usuarios - PlanIt')}"></head>
+
+<body th:replace="~{layouts/base :: layout(~{::main})}">
+
+  <!-- [USEARCH] Buscador de personas para seguir. La ruta exige sesion; la lista NUNCA se rinde
+       sin consulta (ni con una consulta sin resultados): los estados vacios son parte del
+       contrato, no un fallback. -->
+  <main class="flex-1 p-4">
+    <div class="mx-auto max-w-3xl space-y-6">
+
+      <section class="rounded-lg bg-white p-8 shadow-md" aria-labelledby="user-search-title">
+        <h1 id="user-search-title" class="text-2xl font-semibold text-gray-900">Buscar usuarios</h1>
+        <p class="mt-1 text-sm text-gray-500">
+          Encontra personas por nombre o apellido para seguir sus planes publicos.
+        </p>
+
+        <!-- GET nativo: sin JS el boton sigue funcionando; el debounce del navbar es un atajo. -->
+        <form th:action="@{/users}" method="get" role="search" class="mt-4 flex flex-wrap gap-2">
+          <label for="user-search" class="sr-only">Buscar por nombre o apellido</label>
+          <input id="user-search" name="q" type="search" th:value="${q}"
+            placeholder="Nombre o apellido" autocomplete="off" autofocus
+            class="min-w-0 flex-1 rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none" />
+          <button type="submit"
+            class="rounded-md bg-primary px-4 py-2 font-medium text-white transition hover:bg-secondary">
+            Buscar
+          </button>
+        </form>
+      </section>
+
+      <!-- Estado inicial: no hay consulta, asi que no hay listado. -->
+      <section th:if="${#strings.isEmpty(q)}" data-search-idle
+        class="rounded-lg bg-white p-10 text-center shadow-md">
+        <p class="text-lg text-gray-600">Escribi un nombre o apellido para empezar.</p>
+        <p class="mt-2 text-sm text-gray-500">
+          Tambien podes
+          <a th:href="@{/for-you}" class="text-blue-600 hover:underline">llegar a una persona desde un plan</a>
+          que te haya gustado.
+        </p>
+      </section>
+
+      <!-- [USEARCH-006/007] Con consulta y sin coincidencias: mensaje explicito con el texto
+           buscado. Nunca se cae a "todos los usuarios". -->
+      <section th:if="${!#strings.isEmpty(q) and results.isEmpty()}" data-search-empty
+        class="rounded-lg bg-white p-10 text-center shadow-md">
+        <p class="text-lg text-gray-700">
+          No encontramos usuarios para
+          <span class="font-semibold" th:text="${'“' + q + '”'}">“consulta”</span>.
+        </p>
+        <p class="mt-2 text-sm text-gray-500">
+          Proba con otro nombre o apellido. Tambien podes
+          <a th:href="@{/for-you}" class="text-blue-600 hover:underline">llegar a una persona desde un plan</a>.
+        </p>
+      </section>
+
+      <!-- [USEARCH-003] Una fila por persona; el boton refleja el grafo ya existente. -->
+      <section th:if="${!#strings.isEmpty(q) and !results.isEmpty()}" aria-labelledby="results-title">
+        <h2 id="results-title" class="text-lg font-semibold text-gray-900">
+          Resultados para <span th:text="${'“' + q + '”'}">“consulta”</span>
+        </h2>
+
+        <ul class="mt-4 space-y-3">
+          <li th:each="result : ${results}" data-user-result
+            th:attr="data-user-id=${result.id}"
+            class="flex flex-wrap items-center gap-4 rounded-lg bg-white p-4 shadow-md">
+            <img th:if="${!#strings.isEmpty(result.avatarUrl)}" th:src="${result.avatarUrl}" alt=""
+              class="h-12 w-12 rounded-full object-cover" />
+            <span th:if="${#strings.isEmpty(result.avatarUrl)}"
+              class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-secondary font-serif text-lg font-bold text-black"
+              th:text="${#strings.isEmpty(result.name) ? 'U' : #strings.toUpperCase(#strings.substring(result.name, 0, 1))}"
+              aria-hidden="true">U</span>
+
+            <div class="min-w-0 flex-1">
+              <a th:href="@{/profile/{id}(id=${result.id})}"
+                class="block truncate text-base font-semibold text-gray-900 hover:underline"
+                th:text="${#strings.isEmpty(result.name) ? 'Usuario' : result.name}">Nombre</a>
+              <p class="text-sm text-gray-500">
+                <span th:text="${result.publicPlanCount}">0</span>
+                <span th:text="${result.publicPlanCount == 1} ? 'plan publico' : 'planes publicos'">planes publicos</span>
+              </p>
+            </div>
+
+            <!-- [USEARCH-004] El POST vuelve a esta misma busqueda: el boton se re-renderiza como
+                 Siguiendo sin salir del listado. El anonimo no llega aca (la ruta exige sesion). -->
+            <form method="post"
+              th:action="${result.following} ? @{/users/{id}/unfollow(id=${result.id})} : @{/users/{id}/follow(id=${result.id})}">
+              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+              <input type="hidden" name="q" th:value="${q}">
+              <button type="submit" th:attr="data-following=${result.following}"
+                th:text="${result.following} ? 'Siguiendo' : 'Seguir'"
+                class="rounded-md px-4 py-2 font-medium transition"
+                th:classappend="${result.following} ? 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50' : 'bg-primary text-white hover:bg-secondary'">
+                Seguir
+              </button>
+            </form>
+          </li>
+        </ul>
+      </section>
+    </div>
+  </main>
+
+</body>
+
+</html>

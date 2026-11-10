@@ -82,6 +82,36 @@ public class UserServiceTest {
     verify(this.userRepositoryMock, times(1)).findAll();
   }
 
+  // --- T-USEARCH-001 ---
+
+  @Test
+  public void searchByNameNormalizesCaseAndAccentsAndExcludesTheSessionUser() {
+    // given: la query llega con mayusculas, acentos y espacios de los extremos
+    User expected = new User();
+    expected.setId(OTHER_USER_ID);
+    expected.setFirstName("José");
+    expected.setLastName("Álvarez");
+    when(this.userRepositoryMock.searchByName("jose alvarez", SESSION_USER_ID))
+      .thenReturn(List.of(expected));
+
+    // when
+    List<User> actual = this.userService.searchByName("  JOSÉ ÁLVAREZ  ", SESSION_USER_ID);
+
+    // then: la normalizacion ocurre antes de la query y el propio usuario viaja como exclusion
+    assertThat(actual, is(equalTo(List.of(expected))));
+    verify(this.userRepositoryMock, times(1)).searchByName("jose alvarez", SESSION_USER_ID);
+  }
+
+  @Test
+  public void searchByNameWithABlankQueryNeverListsAllUsers() {
+    // when
+    List<User> actual = this.userService.searchByName("   ", SESSION_USER_ID);
+
+    // then: no hay consulta a la base y no se devuelve ningun usuario
+    assertThat(actual, is(equalTo(List.of())));
+    verify(this.userRepositoryMock, never()).searchByName(any(), any());
+  }
+
   @Test
   public void shouldReturnUserWhenFindByIdExists() {
     // given

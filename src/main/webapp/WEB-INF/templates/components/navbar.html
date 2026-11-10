@@ -70,6 +70,18 @@
       Plans
     </a>
 
+    <!-- [USEARCH] Buscador de personas con debounce: el script del final del fragment navega a
+         /users?q= 300 ms despues de la ultima tecla. Sin boton, para no sumar un item al set que
+         pinnean los E2E del navbar; Enter sigue enviando el form nativo. Va antes de "Para vos"
+         para que el acceso a personas quede a la izquierda del feed. -->
+    <form th:action="@{/users}" method="get" role="search" th:unless="${showAdminNav}"
+      class="hidden md:block">
+      <label for="navbar-user-search" class="sr-only">Buscar usuarios</label>
+      <input id="navbar-user-search" data-user-search name="q" type="search"
+        placeholder="Buscar usuarios" autocomplete="off"
+        class="w-44 rounded-md border border-gray-600 bg-black px-3 py-2 text-sm text-white placeholder:text-gray-400 focus:border-secondary focus:outline-none" />
+    </form>
+
     <!-- Rutas del usuario común: /for-you es el feed (el home post-login) y /plans su
          listado. /explore es el catálogo. Se muestran en todo el área de usuario, también
          para una sesión ADMIN que la está navegando. -->
@@ -157,6 +169,10 @@
 
   </div>
 
+  <!-- [USEARCH] El debounce vive en /js/user-search.js: comparte el input de escritorio y el del
+       menú mobile, que es un hermano posterior del nav, así que el script carga con defer y
+       consulta el DOM cuando ya están los dos. -->
+  <script th:src="@{/js/user-search.js}" defer></script>
   <!-- [PROF+THEME] Toggle de tema: solo con sesion iniciada. Es un form POST a
        /profile/theme (CSRF incluido) porque la preferencia manda sobre localStorage: un
        toggle que solo escriba el storage se revierte en la proxima carga. El hidden del
