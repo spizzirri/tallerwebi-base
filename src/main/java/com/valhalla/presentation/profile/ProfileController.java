@@ -5,6 +5,8 @@ import com.valhalla.domain.exception.UserNotFoundException;
 import com.valhalla.domain.follow.FollowService;
 import com.valhalla.domain.plan.Plan;
 import com.valhalla.domain.plan.PlanService;
+import com.valhalla.domain.rating.PlanRatingService;
+import com.valhalla.domain.rating.RatingSummary;
 import com.valhalla.domain.user.User;
 import com.valhalla.domain.user.UserService;
 import com.valhalla.presentation.bookmark.BookmarkCards;
@@ -56,18 +58,21 @@ public class ProfileController {
   private final PlanService planService;
   private final PlanBookmarkService planBookmarkService;
   private final FollowService followService;
+  private final PlanRatingService planRatingService;
 
   @Autowired
   public ProfileController(
     UserService userService,
     PlanService planService,
     PlanBookmarkService planBookmarkService,
-    FollowService followService
+    FollowService followService,
+    PlanRatingService planRatingService
   ) {
     this.userService = userService;
     this.planService = planService;
     this.planBookmarkService = planBookmarkService;
     this.followService = followService;
+    this.planRatingService = planRatingService;
   }
 
   /**
@@ -267,8 +272,29 @@ public class ProfileController {
         .map(BookmarkCards::card)
         .toList()
     );
+    // [MYRAT] "Mis calificaciones" tambien es privada del dueno: solo esta seccion la pinta
+    // (AC-09). El agregado global de cada plan sale de un solo lookup por request.
+    model.put("myRatings", myRatingsOf(owner));
     putFollowData(model, owner);
     return model;
+  }
+
+  /**
+   * [MYRAT] Filas de "Mis calificaciones": una por plan calificado, con el puntaje propio y el
+   * agregado global. Un plan sin calificaciones agregadas no deberia existir (hay una calificacion
+   * propia), pero el default mantiene el contrato del feed: promedio null y count 0.
+   */
+  private List<Map<String, Object>> myRatingsOf(User owner) {
+    Map<UUID, RatingSummary> summaries = this.planRatingService.getSummariesByPlanId();
+    return this.planRatingService.getRatingsByUser(owner.getEmail())
+      .stream()
+      .map(view ->
+        RatedPlanCards.row(
+          view,
+          summaries.getOrDefault(view.planId(), new RatingSummary(view.planId(), null, 0L))
+        )
+      )
+      .toList();
   }
 
   /**

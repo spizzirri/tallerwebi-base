@@ -129,6 +129,19 @@
         Guardados
       </a>
 
+      <!-- [MYRAT] AC-08: indice del perfil, misma forma que Guardados: el atajo /profile resuelve
+           el id y el fragmento #my-ratings sobrevive al 302. -->
+      <a role="menuitem" th:href="@{/profile#my-ratings}" id="menu-my-ratings"
+        class="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100" data-menu-item>
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path
+            d="M12 2.9l2.8 5.7 6.3.9-4.6 4.4 1.1 6.3-5.6-3-5.6 3 1.1-6.3L3 9.5l6.3-.9z">
+          </path>
+        </svg>
+        Mis calificaciones
+      </a>
+
       <!-- [FOLLOW] AC-06: "Siguiendo" ya es navegable y lleva a la seccion #follow del perfil
            propio (el atajo /profile resuelve el id y el fragmento sobrevive al 302). -->
       <a role="menuitem" th:href="@{/profile#follow}" id="menu-following"

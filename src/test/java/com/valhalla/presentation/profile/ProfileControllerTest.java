@@ -15,9 +15,13 @@ import com.valhalla.domain.bookmark.PlanBookmarkService;
 import com.valhalla.domain.exception.UserNotFoundException;
 import com.valhalla.domain.follow.FollowService;
 import com.valhalla.domain.plan.PlanService;
+import com.valhalla.domain.rating.PlanRatingService;
+import com.valhalla.domain.rating.RatedPlanView;
+import com.valhalla.domain.rating.RatingSummary;
 import com.valhalla.domain.user.User;
 import com.valhalla.domain.user.UserService;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,6 +45,7 @@ public class ProfileControllerTest {
   private static final UUID FAN_ID = UUID.fromString("0192f0a1-0000-7000-8000-000000000007");
   private static final UUID IDOL_ID = UUID.fromString("0192f0a1-0000-7000-8000-000000000008");
   private static final UUID MISSING_ID = UUID.fromString("0192f0a1-0000-7000-8000-0000000003e7");
+  private static final UUID RATED_PLAN_ID = UUID.fromString("0192f0a1-0000-7000-8000-0000000000ca");
   private static final String VIEWER_EMAIL = "viewer@test.com";
   private static final String OWNER_EMAIL = "owner@test.com";
   private static final String VIEW_PUBLIC = "pages/profile/view";
@@ -53,6 +58,7 @@ public class ProfileControllerTest {
   private PlanService planServiceMock;
   private PlanBookmarkService planBookmarkServiceMock;
   private FollowService followServiceMock;
+  private PlanRatingService planRatingServiceMock;
   private Authentication viewer;
 
   @BeforeEach
@@ -61,12 +67,14 @@ public class ProfileControllerTest {
     this.planServiceMock = mock(PlanService.class);
     this.planBookmarkServiceMock = mock(PlanBookmarkService.class);
     this.followServiceMock = mock(FollowService.class);
+    this.planRatingServiceMock = mock(PlanRatingService.class);
     this.controller =
       new ProfileController(
         this.userServiceMock,
         this.planServiceMock,
         this.planBookmarkServiceMock,
-        this.followServiceMock
+        this.followServiceMock,
+        this.planRatingServiceMock
       );
     when(this.planServiceMock.getPublicPlans()).thenReturn(List.of());
     this.viewer = authenticated(VIEWER_EMAIL);
@@ -102,6 +110,9 @@ public class ProfileControllerTest {
     // AC-12: el modelo de la vista publica no publica email ni rol como datos del perfil
     assertThat(view.getModel().containsKey("email"), is(false));
     assertThat(view.getModel().containsKey("role"), is(false));
+    // [MYRAT] AC-09: "Mis calificaciones" es privada del dueno, la vista publica no la arma
+    assertThat(view.getModel().containsKey("myRatings"), is(false));
+    verify(this.planRatingServiceMock, never()).getRatingsByUser(any(String.class));
     verify(this.followServiceMock, times(1)).isFollowing(VIEWER_ID, OWNER_ID);
   }
 
@@ -170,6 +181,11 @@ public class ProfileControllerTest {
     when(this.followServiceMock.countFollowing(VIEWER_ID)).thenReturn(1L);
     when(this.followServiceMock.followers(VIEWER_ID)).thenReturn(List.of(follower));
     when(this.followServiceMock.following(VIEWER_ID)).thenReturn(List.of(followed));
+    // [MYRAT] AC-04/AC-05: una calificacion propia con el agregado global del plan
+    when(this.planRatingServiceMock.getRatingsByUser(VIEWER_EMAIL))
+      .thenReturn(List.of(new RatedPlanView(RATED_PLAN_ID, "Bariloche", 4, true, false)));
+    when(this.planRatingServiceMock.getSummariesByPlanId())
+      .thenReturn(Map.of(RATED_PLAN_ID, new RatingSummary(RATED_PLAN_ID, 4.5, 12L)));
 
     // when
     ModelAndView view = this.controller.view(VIEWER_ID, this.viewer);
@@ -182,6 +198,32 @@ public class ProfileControllerTest {
     assertThat(view.getModel().get("followers"), is(equalTo(List.of(follower))));
     assertThat(view.getModel().get("following"), is(equalTo(List.of(followed))));
     verify(this.followServiceMock, never()).isFollowing(any(UUID.class), any(UUID.class));
+
+    // AC-05: la fila lleva el puntaje propio y el promedio/cantidad globales
+    List<?> myRatings = (List<?>) view.getModel().get("myRatings");
+    assertThat(myRatings.size(), is(1));
+    Map<?, ?> row = (Map<?, ?>) myRatings.get(0);
+    assertThat(row.get("name"), is(equalTo("Bariloche")));
+    assertThat(row.get("score"), is(equalTo(4)));
+    assertThat(row.get("ratingAverage"), is(equalTo(4.5)));
+    assertThat(row.get("ratingCount"), is(equalTo(12L)));
+  }
+
+  // --- [MYRAT] el perfil propio sin calificaciones deja la lista vacia (AC-07) ---
+
+  @Test
+  public void U10f_view_propiaSinCalificacionesDejaLaListaVacia() {
+    // given: el dueno no califico ningun plan, y el mock no tiene agregados
+    when(this.userServiceMock.findById(VIEWER_ID))
+      .thenReturn(user(VIEWER_ID, VIEWER_EMAIL, "Ana", "Perez"));
+    when(this.planRatingServiceMock.getRatingsByUser(VIEWER_EMAIL)).thenReturn(List.of());
+
+    // when
+    ModelAndView view = this.controller.view(VIEWER_ID, this.viewer);
+
+    // then: el template cae al estado vacio con el link a /for-you
+    assertThat(view.getViewName(), is(VIEW_EDIT));
+    assertThat(view.getModel().get("myRatings"), is(equalTo(List.of())));
   }
 
   // --- POST /profile/{id}/follow ---

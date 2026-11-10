@@ -8,6 +8,9 @@ import java.util.UUID;
 public interface PlanRatingRepository {
   Optional<PlanRating> findByPlanIdAndUserEmail(UUID planId, String email);
 
+  /** [MYRAT] Todas las calificaciones del usuario, mas recientes primero. */
+  List<PlanRating> findByUserEmail(String email);
+
   List<RatingSummary> findSummaries();
 
   PlanRating save(PlanRating rating);

@@ -16,6 +16,16 @@ public interface JpaPlanRatingRepository extends JpaRepository<PlanRating, UUID>
   Optional<PlanRating> findByPlanIdAndUserEmail(UUID planId, String email);
 
   /**
+   * [MYRAT] Las calificaciones del usuario para la seccion "Mis calificaciones" del perfil. El id
+   * es UUID v7, asi que el orden descendente es el de calificacion mas reciente primero, el mismo
+   * criterio que Guardados.
+   */
+  @Query(
+    "select rating from PlanRating rating where rating.user.email = :email order by rating.id desc"
+  )
+  List<PlanRating> findByUserEmail(String email);
+
+  /**
    * [CAL] Una sola query agrupada alimenta el indicador de todas las tarjetas: sin N+1 en el feed
    * y sin coleccion inversa en Plan (ver 16-CAL.md).
    */

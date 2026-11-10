@@ -16,6 +16,7 @@ import com.valhalla.domain.plan.Plan;
 import com.valhalla.domain.plan.PlanRepository;
 import com.valhalla.domain.rating.PlanRating;
 import com.valhalla.domain.rating.PlanRatingRepository;
+import com.valhalla.domain.rating.RatedPlanView;
 import com.valhalla.domain.rating.RatingSummary;
 import com.valhalla.domain.user.User;
 import com.valhalla.domain.user.UserRepository;
@@ -181,6 +182,82 @@ public class PlanRatingServiceImplTest {
     assertThat(this.ratingService.getMyRating(PLAN_ID, EMAIL), is(nullValue()));
   }
 
+  // --- [MYRAT] getRatingsByUser: filas del perfil ---
+
+  @Test
+  public void T_MYRAT_001_getRatingsByUser_devuelveSoloLasDelUsuarioYEnOrdenEstable() {
+    Plan first = plan(PLAN_ID, "Primero", true);
+    Plan second = plan(UUID.fromString("0192f0a1-0000-7000-8000-0000000000cb"), "Segundo", true);
+    when(this.planRatingRepositoryMock.findByUserEmail(EMAIL))
+      .thenReturn(
+        List.of(
+          new PlanRating(first, user(USER_ID, EMAIL), 5),
+          new PlanRating(second, user(USER_ID, EMAIL), 2)
+        )
+      );
+
+    List<RatedPlanView> ratings = this.ratingService.getRatingsByUser(EMAIL);
+
+    assertThat(ratings.size(), is(2));
+    assertThat(ratings.get(0).planName(), is("Primero"));
+    assertThat(ratings.get(0).score(), is(5));
+    assertThat(ratings.get(1).planName(), is("Segundo"));
+    assertThat(ratings.get(1).score(), is(2));
+    verify(this.planRatingRepositoryMock, times(1)).findByUserEmail(EMAIL);
+  }
+
+  @Test
+  public void T_MYRAT_002_getRatingsByUser_marcaNoAccesibleUnPlanPrivadoAjeno() {
+    Plan plan = plan(PLAN_ID, "Privado ajeno", false);
+    when(this.planRatingRepositoryMock.findByUserEmail(EMAIL))
+      .thenReturn(List.of(new PlanRating(plan, user(USER_ID, EMAIL), 3)));
+
+    RatedPlanView rating = this.ratingService.getRatingsByUser(EMAIL).get(0);
+
+    assertThat(rating.accessible(), is(false));
+    assertThat(rating.member(), is(false));
+  }
+
+  @Test
+  public void T_MYRAT_003_getRatingsByUser_unParticipanteConservaElAccesoAlPlanPrivado() {
+    Plan plan = plan(PLAN_ID, "Privado propio", false);
+    plan.getParticipants().add(user(USER_ID, EMAIL));
+    when(this.planRatingRepositoryMock.findByUserEmail(EMAIL))
+      .thenReturn(List.of(new PlanRating(plan, user(USER_ID, EMAIL), 3)));
+
+    RatedPlanView rating = this.ratingService.getRatingsByUser(EMAIL).get(0);
+
+    assertThat(rating.accessible(), is(true));
+    assertThat(rating.member(), is(true));
+  }
+
+  @Test
+  public void T_MYRAT_004_getRatingsByUser_elBanYElPlanDesactivadoQuitanElAcceso() {
+    Plan banned = plan(PLAN_ID, "Publico con ban", true);
+    banned.getBannedUsers().add(user(USER_ID, EMAIL));
+    Plan inactive = plan(UUID.fromString("0192f0a1-0000-7000-8000-0000000000cc"), "Inactivo", true);
+    inactive.setActive(false);
+    when(this.planRatingRepositoryMock.findByUserEmail(EMAIL))
+      .thenReturn(
+        List.of(
+          new PlanRating(banned, user(USER_ID, EMAIL), 1),
+          new PlanRating(inactive, user(USER_ID, EMAIL), 2)
+        )
+      );
+
+    List<RatedPlanView> ratings = this.ratingService.getRatingsByUser(EMAIL);
+
+    assertThat(ratings.get(0).accessible(), is(false));
+    assertThat(ratings.get(1).accessible(), is(false));
+  }
+
+  @Test
+  public void T_MYRAT_005_getRatingsByUser_sinEmailNoConsultaLaBase() {
+    assertThat(this.ratingService.getRatingsByUser(null).isEmpty(), is(true));
+    assertThat(this.ratingService.getRatingsByUser(" ").isEmpty(), is(true));
+    verify(this.planRatingRepositoryMock, never()).findByUserEmail(any());
+  }
+
   private static Plan publicPlan() {
     Plan plan = new Plan();
     plan.setName("Plan publico");
@@ -192,6 +269,14 @@ public class PlanRatingServiceImplTest {
     Plan plan = new Plan();
     plan.setName("Plan privado");
     plan.setIsPublic(false);
+    return plan;
+  }
+
+  private static Plan plan(UUID id, String name, boolean isPublic) {
+    Plan plan = new Plan();
+    plan.setId(id);
+    plan.setName(name);
+    plan.setIsPublic(isPublic);
     return plan;
   }
 

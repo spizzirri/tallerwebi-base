@@ -144,8 +144,9 @@ entren comentarios, extienden el modelo; no reutilizan un stub.
 - **Comentarios en planes publicos**: feature propia, card nueva. El modelo de calificaciones no
   la anticipa.
 - **"Mis calificaciones" en el perfil**: una seccion del perfil del usuario con todas las
-  calificaciones que hizo, para reconocer de un vistazo los planes que ya califico. Bloqueado por
-  la feature [PROF] de perfil de usuario: se construye cuando el perfil exista.
+  calificaciones que hizo, para reconocer de un vistazo los planes que ya califico. **Entregado por
+  `[MYRAT]` (`26-MYRAT.md`)**: `PlanRatingRepository.findByUserEmail` +
+  `PlanRatingService.getRatingsByUser` alimentan la seccion `#my-ratings` del perfil propio.
 
 ## Archivos a crear/modificar
 

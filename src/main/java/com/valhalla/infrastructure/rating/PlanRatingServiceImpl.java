@@ -6,9 +6,11 @@ import com.valhalla.domain.plan.PlanRepository;
 import com.valhalla.domain.rating.PlanRating;
 import com.valhalla.domain.rating.PlanRatingRepository;
 import com.valhalla.domain.rating.PlanRatingService;
+import com.valhalla.domain.rating.RatedPlanView;
 import com.valhalla.domain.rating.RatingSummary;
 import com.valhalla.domain.user.User;
 import com.valhalla.domain.user.UserRepository;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
@@ -93,5 +95,34 @@ public class PlanRatingServiceImpl implements PlanRatingService {
       .findSummaries()
       .stream()
       .collect(Collectors.toMap(RatingSummary::planId, Function.identity()));
+  }
+
+  /**
+   * [MYRAT] Lee las calificaciones del usuario y traduce cada una a la fila del perfil. La
+   * accesibilidad replica las reglas reales del proyecto: el dueno y los participantes entran
+   * siempre; el resto solo a un plan publico, activo y sin ban ([PABM]). Un plan borrado no aparece
+   * porque [CAL] AC-12 borra sus calificaciones con el.
+   */
+  @Override
+  @Transactional(readOnly = true)
+  public List<RatedPlanView> getRatingsByUser(String email) {
+    if (email == null || email.isBlank()) {
+      return List.of();
+    }
+    return planRatingRepository
+      .findByUserEmail(email)
+      .stream()
+      .map(rating -> toView(rating, email))
+      .toList();
+  }
+
+  private static RatedPlanView toView(PlanRating rating, String email) {
+    Plan plan = rating.getPlan();
+    boolean member = plan.isAdministrator(email) || plan.isParticipant(email);
+    boolean accessible =
+      !plan.isBanned(email) &&
+      (member ||
+        (Boolean.TRUE.equals(plan.getActive()) && Boolean.TRUE.equals(plan.getIsPublic())));
+    return new RatedPlanView(plan.getId(), plan.getName(), rating.getScore(), accessible, member);
   }
 }

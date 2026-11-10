@@ -175,6 +175,56 @@
         </div>
       </section>
 
+      <!-- [MYRAT] Mis calificaciones (AC-04/AC-05/AC-06/AC-07): privada del dueno, entre Guardados
+           y Seguidores. Cada fila trae el plan calificado, el puntaje propio y el agregado global;
+           un plan que dejo de ser accesible conserva el nombre y suma el badge, sin link. -->
+      <section id="my-ratings" class="rounded-lg bg-white p-8 shadow-md">
+        <h2 class="text-lg font-semibold text-gray-900">
+          Mis calificaciones
+          <span class="ml-1 text-sm font-normal text-gray-500" data-my-ratings-count
+            th:text="${myRatings.size()}">0</span>
+        </h2>
+        <p th:if="${myRatings.isEmpty()}" class="mt-2 text-sm text-gray-500" data-my-ratings-empty>
+          Todavía no calificaste ningún plan. <a th:href="@{/for-you}"
+            class="text-blue-600 hover:underline">Ver planes para calificar</a>.
+        </p>
+
+        <ul th:if="${!myRatings.isEmpty()}" data-my-ratings-list
+          class="mt-4 divide-y divide-gray-100">
+          <li th:each="rating : ${myRatings}" data-my-rating-row
+            class="flex flex-wrap items-center gap-x-4 gap-y-2 py-3">
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-2">
+                <h3 class="truncate text-base font-medium text-gray-900">
+                  <a th:if="${rating.accessible}"
+                    th:href="${rating.member} ? @{/plans/{id}(id=${rating.planId})} : @{/plans/{id}/public(id=${rating.planId})}"
+                    class="hover:underline" th:text="${rating.name}">Nombre del plan</a>
+                  <span th:unless="${rating.accessible}" th:text="${rating.name}">Nombre del plan</span>
+                </h3>
+                <span th:if="${rating.badge != null}" th:text="${rating.badge}" data-my-rating-badge
+                  class="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800"></span>
+              </div>
+              <!-- [CAL] El puntaje propio es estatico: base gris + capa amarilla clipada al
+                   score/5, la misma tecnica del indicador, sin widget interactivo. -->
+              <span class="relative mt-1 inline-block select-none text-base leading-none" role="img"
+                th:attr="aria-label='Tu calificación: ' + ${rating.score} + ' de 5'">
+                <span class="rating-stars-base" aria-hidden="true"><th:block
+                  th:each="s : ${#numbers.sequence(1, 5)}"
+                  th:insert="~{components/stars :: star}"></th:block></span>
+                <span class="rating-stars-fill" aria-hidden="true"
+                  th:style="'width:' + ${rating.score * 20} + '%'"><th:block
+                  th:each="s : ${#numbers.sequence(1, 5)}"
+                  th:insert="~{components/stars :: star}"></th:block></span>
+              </span>
+            </div>
+
+            <!-- AC-05: promedio y cantidad globales del plan, el mismo indicador del feed. -->
+            <th:block
+              th:replace="~{components/rating :: indicator(${rating.ratingAverage}, ${rating.ratingCount}, 'text-base', 'text-xs', true)}"></th:block>
+          </li>
+        </ul>
+      </section>
+
       <section id="follow" class="rounded-lg bg-white p-8 shadow-md">
         <h2 class="text-lg font-semibold text-gray-900">Seguidores y seguidos</h2>
         <p class="mt-1 text-sm text-gray-500">

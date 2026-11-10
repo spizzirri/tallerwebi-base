@@ -259,6 +259,9 @@ infra de upload).
   de ser placeholder — `[FOLLOW]` lo provee con contadores y las dos listas (seguidores/seguidos)
   en `edit.html` y `view.html`; Guardados (`#bookmarks`) sigue siendo el placeholder de `[MARK]`.
   La sección Tema (`#theme`) se retiró de la vista en v2.4 (vive en el navbar desde v2.7).
+  **v2.8:** `[MYRAT]` (`26-MYRAT.md`) suma `#my-ratings` entre `#bookmarks` y `#follow`, con el
+  mismo patrón de contador, estado vacío y entrada en el modal; sigue siendo privada del dueño y
+  `view.html` no la renderiza.
 - **El tema se resuelve escalonado y persiste por sesión.** Etapa 1 (PROF-009): el modal sin
   entrada de tema, el toggle provisorio de [THEME] de pie. Etapa 2 (PROF-010/011, card
   `[PROF+THEME]`, tras el merge de [THEME]): la entrada "Tema" entra **activa al modal

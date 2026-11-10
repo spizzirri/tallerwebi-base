@@ -25,6 +25,11 @@ public class PlanRatingRepositoryImpl implements PlanRatingRepository {
   }
 
   @Override
+  public List<PlanRating> findByUserEmail(String email) {
+    return jpaPlanRatingRepository.findByUserEmail(email);
+  }
+
+  @Override
   public List<RatingSummary> findSummaries() {
     return jpaPlanRatingRepository.findSummaries();
   }
