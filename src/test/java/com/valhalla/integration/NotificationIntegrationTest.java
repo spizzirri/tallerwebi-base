@@ -423,13 +423,17 @@ public class NotificationIntegrationTest {
     assertThat(countOccurrences(html, "data-testid=\"notification-group\""), is(1));
     assertThat(countOccurrences(html, "data-testid=\"notification\""), is(0));
     assertThat(html, containsString("Ana y 2 más"));
+    // El grupo es un desplegable con una fila por notificacion y acciones individuales.
+    assertThat(countOccurrences(html, "data-testid=\"notification-group-member\""), is(3));
+    assertThat(countOccurrences(html, "data-testid=\"notification-group-member-read\""), is(3));
+    assertThat(countOccurrences(html, "data-testid=\"notification-group-member-delete\""), is(3));
     // [NGRP-004] El badge sigue contando las tres filas, no el grupo.
     assertThat(html, containsString("data-notifications-count=\"3\""));
     assertThat(this.notificationService.unreadCount(this.recipientId), is(3L));
   }
 
   @Test
-  public void I16_abrirElGrupoMarcaTodasSusFilasComoLeidas() throws Exception {
+  public void I16_marcarElGrupoMarcaTodasSusFilasComoLeidas() throws Exception {
     follow("ngrp.read.ana@test.com", "Ana", "A");
     follow("ngrp.read.luis@test.com", "Luis", "B");
     follow("ngrp.read.marta@test.com", "Marta", "C");

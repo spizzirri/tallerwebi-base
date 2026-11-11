@@ -1,6 +1,7 @@
 package com.valhalla.e2e;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.microsoft.playwright.Locator;
@@ -92,7 +93,7 @@ public class NotificationE2E extends E2eBase {
   }
 
   @Test
-  void E02_tresSeguidoresSeVenComoUnGrupoYAlAbrirloSeMarcanTodasLasFilas() {
+  void E02_tresSeguidoresSeVenComoUnGrupoDesplegableYSePuedenMarcarTodas() {
     // --- arrange: el admin publica un plan y tres usuarios lo siguen ---
     signInAsAdmin();
     new PlansPage(page)
@@ -128,15 +129,24 @@ public class NotificationE2E extends E2eBase {
     signInAsAdmin();
     web.navigate(web.baseUrl() + "/notifications");
     Locator group = page.locator("[data-testid=\"notification-group\"]");
+    Locator members = page.locator("[data-testid=\"notification-group-member\"]");
     assertEquals(1, group.count());
     assertTrue(group.textContent().contains("Ana y 2 más"));
+    assertEquals(3, members.count());
+    assertFalse(members.first().isVisible());
     assertEquals(
       "3",
       page.locator("#navbar-notifications").getAttribute("data-notifications-count")
     );
 
-    // --- [NGRP-003] abrir el grupo marca las tres filas ---
-    page.locator("[data-testid=\"notification-group-open\"]").click();
+    // --- el desplegable muestra una fila por notificacion, con marcar y tachito ---
+    page.locator("[data-testid=\"notification-group-toggle\"]").click();
+    assertTrue(members.first().isVisible());
+    assertEquals(3, page.locator("[data-testid=\"notification-group-member-read\"]").count());
+    assertEquals(3, page.locator("[data-testid=\"notification-group-member-delete\"]").count());
+
+    // --- [NGRP-003] marcar el grupo marca las tres filas ---
+    page.locator("[data-testid=\"notification-group-read\"]").click();
     web.waitForPath("/notifications");
     assertEquals(
       "0",
