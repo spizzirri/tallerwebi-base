@@ -1,5 +1,7 @@
 package com.valhalla.presentation.notification;
 
+import com.valhalla.domain.notification.Notification;
+import com.valhalla.domain.notification.NotificationGrouping;
 import com.valhalla.domain.notification.NotificationService;
 import com.valhalla.domain.user.User;
 import com.valhalla.domain.user.UserService;
@@ -71,8 +73,9 @@ public class NotificationController {
     if (currentPage >= totalPages) {
       currentPage = Math.max(0, totalPages - 1);
     }
-    List<?> notifications = notificationService.list(me.getId(), currentPage, PAGE_SIZE);
+    List<Notification> notifications = notificationService.list(me.getId(), currentPage, PAGE_SIZE);
     model.addObject("notifications", notifications);
+    model.addObject("groups", NotificationGrouping.group(notifications));
     model.addObject(PAGE_PARAM, currentPage);
     model.addObject("totalPages", Math.max(1, totalPages));
     model.addObject("hasPrev", currentPage > 0);
@@ -93,6 +96,23 @@ public class NotificationController {
   ) {
     User me = userService.getByEmail(authentication.getName());
     notificationService.markRead(me.getId(), id);
+    return new ModelAndView(REDIRECT_LIST + "?page=" + Math.max(0, page));
+  }
+
+  /**
+   * [NGRP-003] Abrir un grupo marca como leidas todas sus filas. El formulario manda los ids del
+   * grupo; la busqueda de cada marcado sigue cruzando destinatario, asi un id ajeno es no-op.
+   */
+  @PostMapping("/group/read")
+  public ModelAndView markGroupRead(
+    @RequestParam(name = "ids", required = false) List<UUID> ids,
+    @RequestParam(name = PAGE_PARAM, defaultValue = "0") int page,
+    Authentication authentication
+  ) {
+    User me = userService.getByEmail(authentication.getName());
+    if (ids != null) {
+      ids.forEach(id -> notificationService.markRead(me.getId(), id));
+    }
     return new ModelAndView(REDIRECT_LIST + "?page=" + Math.max(0, page));
   }
 

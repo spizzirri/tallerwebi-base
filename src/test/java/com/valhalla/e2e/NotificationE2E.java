@@ -25,6 +25,8 @@ public class NotificationE2E extends E2eBase {
   private static final String PLAN_NAME = "Plan del autor notificado";
   private static final String PLAN_DESCRIPTION = "Un plan publico que genera la notificacion";
   private static final String PLAN_DATE = "2026-12-31";
+  private static final String GROUP_PLAN_NAME = "Plan del autor con grupo";
+  private static final String GROUP_PLAN_DESCRIPTION = "Un plan publico que genera tres seguidores";
 
   private static final String FOLLOWER_EMAIL = "rosa.notif@unlam.edu.ar";
   private static final String FOLLOWER_PASSWORD = "secret123";
@@ -89,11 +91,71 @@ public class NotificationE2E extends E2eBase {
     assertEquals(1, page.locator("#notifications-empty").count());
   }
 
+  @Test
+  void E02_tresSeguidoresSeVenComoUnGrupoYAlAbrirloSeMarcanTodasLasFilas() {
+    // --- arrange: el admin publica un plan y tres usuarios lo siguen ---
+    signInAsAdmin();
+    new PlansPage(page)
+      .createPublicPlanViaExplore(GROUP_PLAN_NAME, GROUP_PLAN_DESCRIPTION, PLAN_DATE);
+
+    String[][] followers = {
+      { "Ana", "A", "ana.ngrp@unlam.edu.ar" },
+      { "Luis", "B", "luis.ngrp@unlam.edu.ar" },
+      { "Marta", "C", "marta.ngrp@unlam.edu.ar" },
+    };
+    for (String[] follower : followers) {
+      newContext();
+      WebPage web = new WebPage(page);
+      RegisterPage register = new RegisterPage(page);
+      register.typeFirstName(follower[0]);
+      register.typeLastName(follower[1]);
+      register.typeEmail(follower[2]);
+      register.typePassword(FOLLOWER_PASSWORD);
+      register.typeConfirmPassword(FOLLOWER_PASSWORD);
+      register.clickRegister();
+      web.waitForPath(LoginRedirects.USER_LANDING);
+
+      String authorPath = authorPathFromFeed(GROUP_PLAN_NAME);
+      web.navigate(web.baseUrl() + authorPath);
+      page.waitForSelector("#btn-follow:text-is('Seguir')");
+      page.locator("#btn-follow").click();
+      page.waitForSelector("#btn-follow:text-is('Dejar de seguir')");
+    }
+
+    // --- el autor ve un solo item con los tres nombres resumidos ---
+    newContext();
+    WebPage web = new WebPage(page);
+    signInAsAdmin();
+    web.navigate(web.baseUrl() + "/notifications");
+    Locator group = page.locator("[data-testid=\"notification-group\"]");
+    assertEquals(1, group.count());
+    assertTrue(group.textContent().contains("Ana y 2 más"));
+    assertEquals(
+      "3",
+      page.locator("#navbar-notifications").getAttribute("data-notifications-count")
+    );
+
+    // --- [NGRP-003] abrir el grupo marca las tres filas ---
+    page.locator("[data-testid=\"notification-group-open\"]").click();
+    web.waitForPath("/notifications");
+    assertEquals(
+      "0",
+      page.locator("#navbar-notifications").getAttribute("data-notifications-count")
+    );
+    assertEquals(0, page.locator("[data-testid=\"notification-group\"]").count());
+    assertEquals(3, page.locator("[data-testid=\"notification\"]").count());
+    assertEquals(0, page.locator(".btn-mark-read").count());
+  }
+
   /** Ruta del perfil del autor, leida de la tarjeta del plan en el feed (como FollowE2E). */
   private String authorPathFromFeed() {
+    return authorPathFromFeed(PLAN_NAME);
+  }
+
+  private String authorPathFromFeed(String planName) {
     Locator card = page
       .locator("main article")
-      .filter(new Locator.FilterOptions().setHasText(PLAN_NAME));
+      .filter(new Locator.FilterOptions().setHasText(planName));
     assertEquals(1, card.count());
     return card.locator("a[href*='/profile/']").first().getAttribute("href");
   }

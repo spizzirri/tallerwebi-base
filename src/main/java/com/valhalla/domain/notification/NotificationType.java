@@ -37,5 +37,13 @@ public enum NotificationType {
   EDITOR_ROLE_GRANTED,
 
   /** The recipient's Editor role was revoked. */
-  EDITOR_ROLE_REVOKED,
+  EDITOR_ROLE_REVOKED;
+
+  /**
+   * [NGRP-005] Solo los eventos que se repiten sin pedir una decision distinta se agrupan.
+   * Invitaciones, solicitudes y avisos de acceso conservan una fila por evento.
+   */
+  public boolean isRepeatable() {
+    return this == NEW_FOLLOWER || this == NEW_PARTICIPANT || this == NEW_PLAN;
+  }
 }

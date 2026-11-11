@@ -2,13 +2,16 @@ package com.valhalla.presentation.notification;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.valhalla.domain.notification.Notification;
 import com.valhalla.domain.notification.NotificationService;
+import com.valhalla.domain.notification.NotificationType;
 import com.valhalla.domain.user.User;
 import com.valhalla.domain.user.UserService;
 import java.util.List;
@@ -30,6 +33,9 @@ public class NotificationControllerTest {
   private static final String ME_EMAIL = "grace@test.com";
   private static final UUID NOTIFICATION_ID = UUID.fromString(
     "0192f0a1-0000-7000-8000-000000000077"
+  );
+  private static final UUID OTHER_NOTIFICATION_ID = UUID.fromString(
+    "0192f0a1-0000-7000-8000-000000000078"
   );
 
   private NotificationController controller;
@@ -55,7 +61,7 @@ public class NotificationControllerTest {
   @Test
   public void U01_list_primeraPaginaTieneSiguienteSinPrevio() {
     // given: 25 notificaciones, ventana de 10
-    List<Notification> page = List.of(mock(Notification.class));
+    List<Notification> page = List.of(notification());
     when(this.notificationServiceMock.count(ME_ID)).thenReturn(25L);
     when(this.notificationServiceMock.list(ME_ID, 0, NotificationController.PAGE_SIZE))
       .thenReturn(page);
@@ -64,6 +70,7 @@ public class NotificationControllerTest {
 
     assertThat(view.getViewName(), is("pages/notifications/list"));
     assertThat(view.getModel().get("notifications"), is(page));
+    assertThat(((List<?>) view.getModel().get("groups")).size(), is(1));
     assertThat(view.getModel().get("page"), is(0));
     assertThat(view.getModel().get("hasPrev"), is(false));
     assertThat(view.getModel().get("hasNext"), is(true));
@@ -94,7 +101,7 @@ public class NotificationControllerTest {
 
   @Test
   public void U04_feedPartial_devuelveLaBandejaSinLayout() {
-    List<Notification> page = List.of(mock(Notification.class));
+    List<Notification> page = List.of(notification());
     when(this.notificationServiceMock.count(ME_ID)).thenReturn(25L);
     when(this.notificationServiceMock.list(ME_ID, 1, NotificationController.PAGE_SIZE))
       .thenReturn(page);
@@ -138,6 +145,24 @@ public class NotificationControllerTest {
   }
 
   @Test
+  public void U09_markGroupRead_marcaTodasLasFilasYConservaLaPagina() {
+    ModelAndView view =
+      this.controller.markGroupRead(List.of(NOTIFICATION_ID, OTHER_NOTIFICATION_ID), 2, this.me);
+
+    verify(this.notificationServiceMock, times(1)).markRead(ME_ID, NOTIFICATION_ID);
+    verify(this.notificationServiceMock, times(1)).markRead(ME_ID, OTHER_NOTIFICATION_ID);
+    assertThat(view.getViewName(), is("redirect:/notifications?page=2"));
+  }
+
+  @Test
+  public void U10_markGroupRead_sinIdsNoMarcaNadaYNormalizaLaPagina() {
+    ModelAndView view = this.controller.markGroupRead(null, -3, this.me);
+
+    verify(this.notificationServiceMock, never()).markRead(any(), any());
+    assertThat(view.getViewName(), is("redirect:/notifications?page=0"));
+  }
+
+  @Test
   public void U07_markAllRead_delegaLaEscrituraMasiva() {
     ModelAndView view = this.controller.markAllRead(this.me);
 
@@ -151,5 +176,9 @@ public class NotificationControllerTest {
 
     verify(this.notificationServiceMock, times(1)).delete(ME_ID, NOTIFICATION_ID);
     assertThat(view.getViewName(), is("redirect:/notifications?page=3"));
+  }
+
+  private static Notification notification() {
+    return new Notification(new User(), null, NotificationType.NEW_FOLLOWER);
   }
 }

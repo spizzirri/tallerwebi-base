@@ -161,6 +161,13 @@ public class NotificationIntegrationTest {
         );
     }
 
+    // [NGRP] La paginacion es por filas. Se marcan leidas para que el grupo no colapse los 11
+    // seguidores en un solo item y el test siga midiendo la ventana de 10. Se hace fila por fila
+    // porque el test es @Transactional y el update masivo no refresca el persistence context.
+    for (Notification notification : this.notificationService.list(this.recipientId, 0, 100)) {
+      this.notificationService.markRead(this.recipientId, notification.getId());
+    }
+
     String firstPage =
       this.mockMvc.perform(get("/notifications").with(user(RECIPIENT_EMAIL)))
         .andExpect(status().isOk())
@@ -398,11 +405,66 @@ public class NotificationIntegrationTest {
     assertThat(html, containsString("Todavía no tenés notificaciones."));
   }
 
+  // --- [NGRP] agrupacion en lectura ---
+
+  @Test
+  public void I15_tresSeguidoresNuevosSeVenComoUnSoloGrupoYElBadgeCuentaFilas() throws Exception {
+    follow("ngrp.ana@test.com", "Ana", "A");
+    follow("ngrp.luis@test.com", "Luis", "B");
+    follow("ngrp.marta@test.com", "Marta", "C");
+
+    String html =
+      this.mockMvc.perform(get("/notifications").with(user(RECIPIENT_EMAIL)))
+        .andExpect(status().isOk())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+
+    assertThat(countOccurrences(html, "data-testid=\"notification-group\""), is(1));
+    assertThat(countOccurrences(html, "data-testid=\"notification\""), is(0));
+    assertThat(html, containsString("Ana y 2 más"));
+    // [NGRP-004] El badge sigue contando las tres filas, no el grupo.
+    assertThat(html, containsString("data-notifications-count=\"3\""));
+    assertThat(this.notificationService.unreadCount(this.recipientId), is(3L));
+  }
+
+  @Test
+  public void I16_abrirElGrupoMarcaTodasSusFilasComoLeidas() throws Exception {
+    follow("ngrp.read.ana@test.com", "Ana", "A");
+    follow("ngrp.read.luis@test.com", "Luis", "B");
+    follow("ngrp.read.marta@test.com", "Marta", "C");
+
+    List<Notification> rows = this.notificationService.list(this.recipientId, 0, 10);
+    assertThat(rows, hasSize(3));
+    String[] ids = rows.stream().map(row -> row.getId().toString()).toArray(String[]::new);
+
+    this.mockMvc.perform(
+        post("/notifications/group/read").param("ids", ids).with(user(RECIPIENT_EMAIL)).with(csrf())
+      )
+      .andExpect(status().is3xxRedirection());
+
+    assertThat(this.notificationService.unreadCount(this.recipientId), is(0L));
+    assertThat(
+      this.notificationService.list(this.recipientId, 0, 10)
+        .stream()
+        .allMatch(Notification::isRead),
+      is(true)
+    );
+  }
+
   // --- helpers ---
 
   private void followAdaToGrace() throws Exception {
     this.mockMvc.perform(
         post("/profile/" + this.recipientId + "/follow").with(user(ACTOR_EMAIL)).with(csrf())
+      )
+      .andExpect(status().is3xxRedirection());
+  }
+
+  private void follow(String email, String firstName, String lastName) throws Exception {
+    givenUser(email, firstName, lastName);
+    this.mockMvc.perform(
+        post("/profile/" + this.recipientId + "/follow").with(user(email)).with(csrf())
       )
       .andExpect(status().is3xxRedirection());
   }
