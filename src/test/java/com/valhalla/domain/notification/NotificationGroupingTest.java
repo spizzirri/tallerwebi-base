@@ -17,7 +17,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * [NGRP] T-NGRP-001/002: reglas de agrupacion por tipo, plan y ventana de 24 h; los tipos que no
- * se repiten y las filas leidas quedan sueltas.
+ * se repiten quedan sueltos y las filas leidas siguen dentro de su grupo.
  */
 public class NotificationGroupingTest {
 
@@ -119,7 +119,7 @@ public class NotificationGroupingTest {
   }
 
   @Test
-  public void G06_lasFilasLeidasNoSeAgrupan() {
+  public void G06_lasFilasLeidasSiguenEnElGrupoPeroNoCuentanParaElBadge() {
     Notification read = notification(NotificationType.NEW_FOLLOWER, null, NOW, "Ana", "A");
     read.markAsRead();
     Notification otherRead = notification(
@@ -130,12 +130,20 @@ public class NotificationGroupingTest {
       "B"
     );
     otherRead.markAsRead();
+    Notification unread = notification(
+      NotificationType.NEW_FOLLOWER,
+      null,
+      NOW.minusSeconds(120),
+      "Marta",
+      "C"
+    );
 
-    List<NotificationGroup> groups = NotificationGrouping.group(List.of(read, otherRead));
+    List<NotificationGroup> groups = NotificationGrouping.group(List.of(read, otherRead, unread));
 
-    assertThat(groups, hasSize(2));
-    assertThat(groups.get(0).isGrouped(), is(false));
-    assertThat(groups.get(0).getUnreadCount(), is(0));
+    assertThat(groups, hasSize(1));
+    assertThat(groups.getFirst().isGrouped(), is(true));
+    assertThat(groups.getFirst().getNotifications(), contains(read, otherRead, unread));
+    assertThat(groups.getFirst().getUnreadCount(), is(1));
   }
 
   @Test

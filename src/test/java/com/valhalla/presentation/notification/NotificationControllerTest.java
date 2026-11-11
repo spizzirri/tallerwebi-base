@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.valhalla.domain.notification.Notification;
@@ -32,6 +33,9 @@ public class NotificationControllerTest {
   private static final UUID NOTIFICATION_ID = UUID.fromString(
     "0192f0a1-0000-7000-8000-000000000077"
   );
+  private static final UUID OTHER_NOTIFICATION_ID = UUID.fromString(
+    "0192f0a1-0000-7000-8000-000000000078"
+  );
 
   private NotificationController controller;
   private NotificationService notificationServiceMock;
@@ -58,6 +62,7 @@ public class NotificationControllerTest {
     // given: 25 notificaciones, ventana de 10
     List<Notification> page = List.of(notification());
     when(this.notificationServiceMock.count(ME_ID)).thenReturn(25L);
+    when(this.notificationServiceMock.unreadCount(ME_ID)).thenReturn(4L);
     when(this.notificationServiceMock.list(ME_ID, 0, NotificationController.PAGE_SIZE))
       .thenReturn(page);
 
@@ -66,6 +71,7 @@ public class NotificationControllerTest {
     assertThat(view.getViewName(), is("pages/notifications/list"));
     assertThat(view.getModel().get("notifications"), is(page));
     assertThat(((List<?>) view.getModel().get("groups")).size(), is(1));
+    assertThat(view.getModel().get("readNotificationCount"), is(21L));
     assertThat(view.getModel().get("page"), is(0));
     assertThat(view.getModel().get("hasPrev"), is(false));
     assertThat(view.getModel().get("hasNext"), is(true));
@@ -153,6 +159,32 @@ public class NotificationControllerTest {
 
     verify(this.notificationServiceMock, times(1)).delete(ME_ID, NOTIFICATION_ID);
     assertThat(view.getViewName(), is("redirect:/notifications?page=3"));
+  }
+
+  @Test
+  public void U09_deleteRead_borraLasLeidasDelDestinatarioYConservaLaPagina() {
+    ModelAndView view = this.controller.deleteRead(2, this.me);
+
+    verify(this.notificationServiceMock, times(1)).deleteRead(ME_ID);
+    assertThat(view.getViewName(), is("redirect:/notifications?page=2"));
+  }
+
+  @Test
+  public void U10_deleteGroup_borraCadaFilaDelGrupoYConservaLaPagina() {
+    ModelAndView view =
+      this.controller.deleteGroup(List.of(NOTIFICATION_ID, OTHER_NOTIFICATION_ID), 2, this.me);
+
+    verify(this.notificationServiceMock, times(1)).delete(ME_ID, NOTIFICATION_ID);
+    verify(this.notificationServiceMock, times(1)).delete(ME_ID, OTHER_NOTIFICATION_ID);
+    assertThat(view.getViewName(), is("redirect:/notifications?page=2"));
+  }
+
+  @Test
+  public void U11_deleteGroup_sinIdsNoBorraNadaYNormalizaLaPagina() {
+    ModelAndView view = this.controller.deleteGroup(null, -3, this.me);
+
+    verifyNoInteractions(this.notificationServiceMock);
+    assertThat(view.getViewName(), is("redirect:/notifications?page=0"));
   }
 
   private static Notification notification() {

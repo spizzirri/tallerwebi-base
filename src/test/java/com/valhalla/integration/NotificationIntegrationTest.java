@@ -16,6 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.valhalla.domain.notification.Notification;
 import com.valhalla.domain.notification.NotificationService;
+import com.valhalla.domain.notification.NotificationType;
 import com.valhalla.domain.plan.Plan;
 import com.valhalla.domain.plan.PlanService;
 import com.valhalla.domain.user.User;
@@ -161,13 +162,6 @@ public class NotificationIntegrationTest {
         );
     }
 
-    // [NGRP] La paginacion es por filas. Se marcan leidas para que el grupo no colapse los 11
-    // seguidores en un solo item y el test siga midiendo la ventana de 10. Se hace fila por fila
-    // porque el test es @Transactional y el update masivo no refresca el persistence context.
-    for (Notification notification : this.notificationService.list(this.recipientId, 0, 100)) {
-      this.notificationService.markRead(this.recipientId, notification.getId());
-    }
-
     String firstPage =
       this.mockMvc.perform(get("/notifications").with(user(RECIPIENT_EMAIL)))
         .andExpect(status().isOk())
@@ -182,8 +176,11 @@ public class NotificationIntegrationTest {
         .getContentAsString();
 
     assertThat(this.notificationService.count(this.recipientId), is(11L));
-    // pagina 0: 10 filas y link a la siguiente; pagina 1: la fila restante
-    assertThat(countOccurrences(firstPage, "data-testid=\"notification\""), is(10));
+    // [NGRP] La pagina sigue siendo de 10 filas: las 10 primeras se dibujan como miembros del
+    // grupo y la pagina siguiente trae la fila que sobra.
+    assertThat(countOccurrences(firstPage, "data-testid=\"notification-group\""), is(1));
+    assertThat(countOccurrences(firstPage, "data-testid=\"notification-group-member\""), is(10));
+    assertThat(countOccurrences(firstPage, "data-testid=\"notification\""), is(0));
     assertThat(countOccurrences(secondPage, "data-testid=\"notification\""), is(1));
     assertThat(firstPage, containsString("href=\"/notifications?page=1\""));
     assertThat(secondPage, containsString("href=\"/notifications?page=0\""));
@@ -456,10 +453,72 @@ public class NotificationIntegrationTest {
         .andReturn()
         .getResponse()
         .getContentAsString();
-    assertThat(countOccurrences(html, "data-testid=\"notification\""), is(1));
+    assertThat(countOccurrences(html, "data-testid=\"notification\""), is(0));
     assertThat(countOccurrences(html, "data-testid=\"notification-group\""), is(1));
-    assertThat(countOccurrences(html, "data-testid=\"notification-group-member\""), is(2));
+    assertThat(countOccurrences(html, "data-testid=\"notification-group-member\""), is(3));
+    assertThat(countOccurrences(html, "data-testid=\"notification-group-member-read\""), is(2));
     assertThat(html, containsString("data-notifications-count=\"2\""));
+    assertThat(html, containsString("data-read=\"true\""));
+  }
+
+  @Test
+  public void I17_borrarLeidasBorraSoloLasLeidasYConservaLasPendientes() throws Exception {
+    follow("ngrp.del.ana@test.com", "Ana", "A");
+    follow("ngrp.del.luis@test.com", "Luis", "B");
+    follow("ngrp.del.marta@test.com", "Marta", "C");
+
+    List<Notification> rows = this.notificationService.list(this.recipientId, 0, 10);
+    assertThat(rows, hasSize(3));
+    this.notificationService.markRead(this.recipientId, rows.get(0).getId());
+    this.notificationService.markRead(this.recipientId, rows.get(1).getId());
+
+    this.mockMvc.perform(
+        post("/notifications/delete-read").with(user(RECIPIENT_EMAIL)).with(csrf())
+      )
+      .andExpect(status().is3xxRedirection());
+
+    assertThat(this.notificationService.count(this.recipientId), is(1L));
+    assertThat(this.notificationService.unreadCount(this.recipientId), is(1L));
+    assertThat(
+      this.notificationService.list(this.recipientId, 0, 10).getFirst().isRead(),
+      is(false)
+    );
+  }
+
+  @Test
+  public void I18_borrarGrupoBorraTodasSusFilasYNoLasAjenasAlGrupo() throws Exception {
+    follow("ngrp.grupo.ana@test.com", "Ana", "A");
+    follow("ngrp.grupo.luis@test.com", "Luis", "B");
+    follow("ngrp.grupo.marta@test.com", "Marta", "C");
+    this.notificationService.notifyInvitation(
+        this.userRepository.findById(this.actorId).orElseThrow(),
+        this.userRepository.findById(this.recipientId).orElseThrow(),
+        UUID.randomUUID(),
+        "Plan fuera del grupo"
+      );
+
+    List<UUID> groupIds =
+      this.notificationService.list(this.recipientId, 0, 10)
+        .stream()
+        .filter(notification -> notification.getType() == NotificationType.NEW_FOLLOWER)
+        .map(Notification::getId)
+        .toList();
+    assertThat(groupIds, hasSize(3));
+
+    this.mockMvc.perform(
+        post("/notifications/group/delete")
+          .param("ids", groupIds.stream().map(UUID::toString).toArray(String[]::new))
+          .with(user(RECIPIENT_EMAIL))
+          .with(csrf())
+      )
+      .andExpect(status().is3xxRedirection());
+
+    assertThat(this.notificationService.count(this.recipientId), is(1L));
+    assertThat(this.notificationService.unreadCount(this.recipientId), is(1L));
+    assertThat(
+      this.notificationService.list(this.recipientId, 0, 10).getFirst().getType(),
+      is(NotificationType.PLAN_INVITATION)
+    );
   }
 
   // --- helpers ---

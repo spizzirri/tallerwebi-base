@@ -69,6 +69,7 @@ public class NotificationController {
     User me = userService.getByEmail(authentication.getName());
     int currentPage = Math.max(0, page);
     long total = notificationService.count(me.getId());
+    long unread = notificationService.unreadCount(me.getId());
     int totalPages = (int) ((total + PAGE_SIZE - 1) / PAGE_SIZE);
     if (currentPage >= totalPages) {
       currentPage = Math.max(0, totalPages - 1);
@@ -77,6 +78,7 @@ public class NotificationController {
     model.addObject("notifications", notifications);
     model.addObject("groups", NotificationGrouping.group(notifications));
     model.addObject(PAGE_PARAM, currentPage);
+    model.addObject("readNotificationCount", Math.max(0, total - unread));
     model.addObject("totalPages", Math.max(1, totalPages));
     model.addObject("hasPrev", currentPage > 0);
     model.addObject("hasNext", currentPage + 1 < totalPages);
@@ -96,7 +98,7 @@ public class NotificationController {
   ) {
     User me = userService.getByEmail(authentication.getName());
     notificationService.markRead(me.getId(), id);
-    return new ModelAndView(REDIRECT_LIST + "?page=" + Math.max(0, page));
+    return redirectToPage(page);
   }
 
   /** [NOTIF] AC-06: vaciar el badge de una accion. */
@@ -105,6 +107,34 @@ public class NotificationController {
     User me = userService.getByEmail(authentication.getName());
     notificationService.markAllRead(me.getId());
     return new ModelAndView(REDIRECT_LIST);
+  }
+
+  /** Borrar en bloque las notificaciones ya leidas, sin tocar las pendientes. */
+  @PostMapping("/delete-read")
+  public ModelAndView deleteRead(
+    @RequestParam(name = PAGE_PARAM, defaultValue = "0") int page,
+    Authentication authentication
+  ) {
+    User me = userService.getByEmail(authentication.getName());
+    notificationService.deleteRead(me.getId());
+    return redirectToPage(page);
+  }
+
+  /**
+   * [NGRP-006] Borrar todas las filas de un grupo. Cada borrado cruza el id con el destinatario
+   * de la sesion, asi que un id ajeno es un no-op.
+   */
+  @PostMapping("/group/delete")
+  public ModelAndView deleteGroup(
+    @RequestParam(name = "ids", required = false) List<UUID> ids,
+    @RequestParam(name = PAGE_PARAM, defaultValue = "0") int page,
+    Authentication authentication
+  ) {
+    User me = userService.getByEmail(authentication.getName());
+    if (ids != null) {
+      ids.forEach(id -> notificationService.delete(me.getId(), id));
+    }
+    return redirectToPage(page);
   }
 
   /**
@@ -119,6 +149,10 @@ public class NotificationController {
   ) {
     User me = userService.getByEmail(authentication.getName());
     notificationService.delete(me.getId(), id);
+    return redirectToPage(page);
+  }
+
+  private static ModelAndView redirectToPage(int page) {
     return new ModelAndView(REDIRECT_LIST + "?page=" + Math.max(0, page));
   }
 }

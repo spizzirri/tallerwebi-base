@@ -33,7 +33,7 @@ public class NotificationE2E extends E2eBase {
   private static final String FOLLOWER_PASSWORD = "secret123";
 
   @Test
-  void E01_seguirAAlguienLePintaElBadgeYElCentroMarcaLeida() {
+  void E01_seguirAAlguienLePintaElBadgeYElCentroMarcaYBorraLeidas() {
     // --- arrange: el admin publica un plan publico ---
     signInAsAdmin();
     new PlansPage(page).createPublicPlanViaExplore(PLAN_NAME, PLAN_DESCRIPTION, PLAN_DATE);
@@ -85,11 +85,11 @@ public class NotificationE2E extends E2eBase {
     );
     assertEquals(0, page.locator(".btn-mark-read").count());
 
-    // --- AC-18: el tachito tira la fila y la bandeja queda vacia ---
-    page.locator(".btn-delete-notification").first().click();
-    web.waitForPath("/notifications");
+    // --- la limpieza de leidas tira la fila y la bandeja queda vacia ---
+    page.onDialog(dialog -> dialog.accept());
+    page.locator("[data-testid=\"notifications-delete-read\"]").click();
+    page.waitForSelector("#notifications-empty");
     assertEquals(0, page.locator("[data-testid=\"notification\"]").count());
-    assertEquals(1, page.locator("#notifications-empty").count());
   }
 
   @Test
@@ -146,17 +146,28 @@ public class NotificationE2E extends E2eBase {
     assertEquals(3, page.locator("[data-testid=\"notification-group-member-delete\"]").count());
     assertEquals(0, page.locator("[data-testid=\"notification-group-read\"]").count());
 
-    // --- marcar una fila solo baja esa fila: el grupo sigue con las otras dos ---
+    // --- marcar una fila solo la atenua: el grupo sigue con las tres ---
     page.locator("[data-testid=\"notification-group-member-read\"]").first().click();
-    page.waitForSelector("[data-testid=\"notification\"][data-read=\"true\"]");
+    page.waitForSelector("#navbar-notifications[data-notifications-count=\"2\"]");
+    assertEquals(1, page.locator("[data-testid=\"notification-group\"]").count());
+    assertEquals(0, page.locator("[data-testid=\"notification\"]").count());
+    assertEquals(3, page.locator("[data-testid=\"notification-group-member\"]").count());
+    assertEquals(2, page.locator("[data-testid=\"notification-group-member-read\"]").count());
+
+    // --- el encabezado del grupo borra todas sus filas, leidas incluidas ---
+    page.locator("[data-testid=\"notification-group-toggle\"]").click();
+    assertTrue(
+      page.locator("[data-testid=\"notification-group-member\"][data-read=\"true\"]").isVisible()
+    );
+    page.onDialog(dialog -> dialog.accept());
+    page.locator("[data-testid=\"notification-group-delete\"]").click();
+    page.waitForSelector("#notifications-empty");
     assertEquals(
-      "2",
+      "0",
       page.locator("#navbar-notifications").getAttribute("data-notifications-count")
     );
-    assertEquals(1, page.locator("[data-testid=\"notification-group\"]").count());
-    assertEquals(1, page.locator("[data-testid=\"notification\"]").count());
-    assertEquals(2, page.locator("[data-testid=\"notification-group-member\"]").count());
-    assertEquals(0, page.locator("[data-testid=\"notification-group-read\"]").count());
+    assertEquals(0, page.locator("[data-testid=\"notification-group\"]").count());
+    assertEquals(0, page.locator("[data-testid=\"notification-group-member\"]").count());
   }
 
   /** Ruta del perfil del autor, leida de la tarjeta del plan en el feed (como FollowE2E). */

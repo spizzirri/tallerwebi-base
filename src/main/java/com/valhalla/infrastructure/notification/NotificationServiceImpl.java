@@ -187,6 +187,12 @@ public class NotificationServiceImpl implements NotificationService {
 
   @Override
   @Transactional
+  public void deleteRead(UUID recipientId) {
+    notificationRepository.deleteRead(recipientId);
+  }
+
+  @Override
+  @Transactional
   public void delete(UUID recipientId, UUID notificationId) {
     notificationRepository
       .findByIdAndRecipientId(notificationId, recipientId)

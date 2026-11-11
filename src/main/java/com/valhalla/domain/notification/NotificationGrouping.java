@@ -7,12 +7,13 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * [NGRP] Reglas de lectura para agrupar notificaciones no leidas.
+ * [NGRP] Reglas de lectura para agrupar notificaciones repetibles.
  *
  * <p>Se agrupan solo los tipos repetibles ({@link NotificationType#isRepeatable()}): seguidores,
  * participantes y planes publicados. Las invitaciones, solicitudes y avisos de acceso conservan
  * una fila por evento porque cada una pide una decision distinta (NGRP-005). Las filas leidas
- * tambien quedan sueltas: el grupo existe para bajar el ruido de lo pendiente.
+ * siguen dentro del grupo: marcarlas no lo desarma, solo las muestra atenuadas. El conteo del
+ * badge sigue siendo por fila no leida.
  */
 public final class NotificationGrouping {
 
@@ -43,7 +44,7 @@ public final class NotificationGrouping {
   }
 
   private static GroupKey groupKeyOf(Notification notification) {
-    if (notification.isRead() || !notification.getType().isRepeatable()) {
+    if (!notification.getType().isRepeatable()) {
       return null;
     }
     return new GroupKey(notification.getType(), notification.getRelatedPlanId());

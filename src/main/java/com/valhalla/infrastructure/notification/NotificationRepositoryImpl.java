@@ -56,6 +56,11 @@ public class NotificationRepositoryImpl implements NotificationRepository {
   }
 
   @Override
+  public void deleteRead(UUID recipientId) {
+    jpaNotificationRepository.deleteRead(recipientId);
+  }
+
+  @Override
   public void delete(Notification notification) {
     jpaNotificationRepository.delete(notification);
   }

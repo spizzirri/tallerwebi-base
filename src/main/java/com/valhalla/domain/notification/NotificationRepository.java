@@ -26,6 +26,9 @@ public interface NotificationRepository {
   /** Marca todas las leidas pendientes del destinatario en una sola escritura. */
   void markAllRead(UUID recipientId);
 
+  /** Borra en bloque solo las filas ya leidas del destinatario. */
+  void deleteRead(UUID recipientId);
+
   /** Tirar una fila: el borrado es fisico, la bandeja no es un archivo historico (AC-18). */
   void delete(Notification notification);
 }

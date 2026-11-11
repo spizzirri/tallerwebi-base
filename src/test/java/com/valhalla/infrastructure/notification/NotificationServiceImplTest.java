@@ -267,6 +267,13 @@ public class NotificationServiceImplTest {
   }
 
   @Test
+  public void U15_deleteReadDelegaElBorradoMasivo() {
+    this.notificationService.deleteRead(RECIPIENT_ID);
+
+    verify(this.repositoryMock, times(1)).deleteRead(RECIPIENT_ID);
+  }
+
+  @Test
   public void U14_delete_tiraLaFilaPropiaYNiRopaAjenaNiInexistente() {
     // given: una fila del destinatario y una busqueda que no encuentra nada para el resto
     Notification found = new Notification(
