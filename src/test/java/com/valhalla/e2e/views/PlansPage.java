@@ -135,13 +135,13 @@ public class PlansPage extends WebPage {
   }
 
   /**
-   * [STD] La configuración del plan vive en una card centrada: se abre desde la cabecera antes
-   * de tocar sus inputs. Idempotente — si ya está abierta no vuelve a clicar.
+   * [STD] La configuración del plan vive en una card centrada: se abre desde "Editar" al pie de
+   * la ficha antes de tocar sus inputs. Idempotente — si ya está abierta no vuelve a clicar.
    */
   public void openPlanConfig() {
     Locator dialog = page.locator("#plan-config-dialog");
     if (!dialog.isVisible()) {
-      page.locator(".plan-toolbar button[aria-controls='plan-config-dialog']").click();
+      page.locator("#plan-summary button[aria-controls='plan-config-dialog']").click();
       dialog.waitFor();
     }
   }

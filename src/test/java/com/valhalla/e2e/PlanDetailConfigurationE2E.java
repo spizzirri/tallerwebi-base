@@ -117,10 +117,10 @@ public class PlanDetailConfigurationE2E extends E2eBase {
     );
     assertTrue(requestsAfterSummaryBeforeInvite);
 
-    // [STD] La configuración es una card centrada: se abre desde la cabecera, sin sumar scroll.
+    // [STD] La configuración es una card centrada: se abre desde "Editar" de la ficha, sin scroll.
     Locator config = page.locator("#plan-config-dialog");
     Locator configTrigger = page.locator(
-      ".plan-toolbar button[aria-controls='plan-config-dialog']"
+      "#plan-summary button[aria-controls='plan-config-dialog']"
     );
     assertThat(config).isHidden();
     configTrigger.click();

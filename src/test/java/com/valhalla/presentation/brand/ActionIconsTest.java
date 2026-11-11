@@ -47,7 +47,6 @@ public class ActionIconsTest {
   private static final String EYE = "M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0";
   private static final String TRASH = "M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6";
   private static final String LOG_OUT = "M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4";
-  private static final String SETTINGS_GLYPH = "M12.22 2h-.44a2 2 0 0 0-2 2v.18";
   private static final String CHECK = "M20 6 9 17l-5-5";
   private static final String CLOSE = "M18 6 6 18";
   private static final String SAVE = "M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8";
@@ -59,7 +58,7 @@ public class ActionIconsTest {
     PUBLIC_PLAN,
     5, // Unirme (form + link), Clonar (form + link), Ver mi plan
     DETAIL,
-    6, // Configuración, Eliminar, Salir, Clonar, Guardar cambios, Guardar permisos
+    5, // Eliminar, Salir, Clonar, Guardar cambios, Guardar permisos
     MY_PLANS,
     8, // Crear plan, Unirme, Ver detalle x3, Eliminar, Aceptar, Rechazar
     PROFILE_EDIT,
@@ -86,7 +85,6 @@ public class ActionIconsTest {
     assertThat(read(PUBLIC_PLAN), containsString(COPY));
     assertThat(read(PUBLIC_PLAN), containsString(EYE));
 
-    assertThat(read(DETAIL), containsString(SETTINGS_GLYPH));
     assertThat(read(DETAIL), containsString(TRASH));
     assertThat(read(DETAIL), containsString(LOG_OUT));
     assertThat(read(DETAIL), containsString(COPY));
