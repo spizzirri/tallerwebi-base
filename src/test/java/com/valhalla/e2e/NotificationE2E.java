@@ -93,7 +93,7 @@ public class NotificationE2E extends E2eBase {
   }
 
   @Test
-  void E02_tresSeguidoresSeVenComoUnGrupoDesplegableYSePuedenMarcarTodas() {
+  void E02_tresSeguidoresSeVenComoUnGrupoDesplegableYSeMarcanPorFila() {
     // --- arrange: el admin publica un plan y tres usuarios lo siguen ---
     signInAsAdmin();
     new PlansPage(page)
@@ -144,17 +144,19 @@ public class NotificationE2E extends E2eBase {
     assertTrue(members.first().isVisible());
     assertEquals(3, page.locator("[data-testid=\"notification-group-member-read\"]").count());
     assertEquals(3, page.locator("[data-testid=\"notification-group-member-delete\"]").count());
+    assertEquals(0, page.locator("[data-testid=\"notification-group-read\"]").count());
 
-    // --- [NGRP-003] marcar el grupo marca las tres filas ---
-    page.locator("[data-testid=\"notification-group-read\"]").click();
-    web.waitForPath("/notifications");
+    // --- marcar una fila solo baja esa fila: el grupo sigue con las otras dos ---
+    page.locator("[data-testid=\"notification-group-member-read\"]").first().click();
+    page.waitForSelector("[data-testid=\"notification\"][data-read=\"true\"]");
     assertEquals(
-      "0",
+      "2",
       page.locator("#navbar-notifications").getAttribute("data-notifications-count")
     );
-    assertEquals(0, page.locator("[data-testid=\"notification-group\"]").count());
-    assertEquals(3, page.locator("[data-testid=\"notification\"]").count());
-    assertEquals(0, page.locator(".btn-mark-read").count());
+    assertEquals(1, page.locator("[data-testid=\"notification-group\"]").count());
+    assertEquals(1, page.locator("[data-testid=\"notification\"]").count());
+    assertEquals(2, page.locator("[data-testid=\"notification-group-member\"]").count());
+    assertEquals(0, page.locator("[data-testid=\"notification-group-read\"]").count());
   }
 
   /** Ruta del perfil del autor, leida de la tarjeta del plan en el feed (como FollowE2E). */

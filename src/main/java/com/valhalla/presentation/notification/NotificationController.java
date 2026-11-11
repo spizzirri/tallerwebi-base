@@ -99,23 +99,6 @@ public class NotificationController {
     return new ModelAndView(REDIRECT_LIST + "?page=" + Math.max(0, page));
   }
 
-  /**
-   * [NGRP-003] Abrir un grupo marca como leidas todas sus filas. El formulario manda los ids del
-   * grupo; la busqueda de cada marcado sigue cruzando destinatario, asi un id ajeno es no-op.
-   */
-  @PostMapping("/group/read")
-  public ModelAndView markGroupRead(
-    @RequestParam(name = "ids", required = false) List<UUID> ids,
-    @RequestParam(name = PAGE_PARAM, defaultValue = "0") int page,
-    Authentication authentication
-  ) {
-    User me = userService.getByEmail(authentication.getName());
-    if (ids != null) {
-      ids.forEach(id -> notificationService.markRead(me.getId(), id));
-    }
-    return new ModelAndView(REDIRECT_LIST + "?page=" + Math.max(0, page));
-  }
-
   /** [NOTIF] AC-06: vaciar el badge de una accion. */
   @PostMapping("/read-all")
   public ModelAndView markAllRead(Authentication authentication) {

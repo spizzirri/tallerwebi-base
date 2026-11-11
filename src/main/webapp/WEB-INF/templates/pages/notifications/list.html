@@ -233,10 +233,9 @@
             </div>
           </li>
 
-          <!-- [NGRP-001/002/003/006] Un item por grupo no leido. El resumen de actores se deriva
-               de las filas y el item es un desplegable: al abrirlo se ven las notificaciones que
-               lo componen, cada una con "Marcar leida" y su tachito. El boton del encabezado
-               marca todo el grupo; abrir el desplegable no cambia el estado de las filas. -->
+          <!-- [NGRP-001/002/005/006] Un item por grupo no leido. El resumen se despliega y
+               muestra las filas que lo componen. Cada fila se marca o se borra por separado:
+               no hay un "marcar todas" propio del grupo. -->
           <li th:unless="${!group.grouped}" data-testid="notification-group"
             class="notification-row notification-row--unread flex items-start gap-3 rounded-xl border px-4 py-3.5">
             <span
@@ -266,29 +265,62 @@
                   </span>
                 </summary>
 
-                <ul class="mt-2 space-y-1 border-t border-gray-100 pt-2">
+                <ul class="mt-2 divide-y divide-gray-100 border-t border-gray-100 pt-1">
                   <li th:each="n : ${group.notifications}" data-testid="notification-group-member"
                     th:with="actorName=${((n.actor.firstName == null ? '' : n.actor.firstName) + ' ' + (n.actor.lastName == null ? '' : n.actor.lastName)).trim()}"
-                    class="flex items-center justify-between gap-3 text-xs text-gray-500">
-                    <span class="min-w-0 flex-1">
-                      <a th:href="@{/profile/{id}(id=${n.actor.id})}"
-                        class="font-semibold text-gray-700 hover:underline"
-                        th:text="${#strings.isEmpty(actorName)} ? 'Alguien' : ${actorName}">Ana</a>
-                      <span class="text-gray-500" th:switch="${n.type.name()}">
-                        <span th:case="'NEW_FOLLOWER'">te empezó a seguir</span>
-                        <span th:case="'NEW_PARTICIPANT'">se unió a tu plan</span>
-                        <span th:case="'NEW_PLAN'">publicó</span>
+                    class="flex items-start gap-3 py-2.5">
+                    <a th:href="@{/profile/{id}(id=${n.actor.id})}" class="shrink-0" tabindex="-1"
+                      aria-hidden="true">
+                      <span
+                        class="navbar-avatar relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-secondary font-serif text-sm font-bold text-black">
+                        <span
+                          th:text="${#strings.isEmpty(actorName)} ? 'U' : ${#strings.substring(actorName, 0, 1)}">U</span>
+                        <img th:if="${n.actor.avatarUrl != null}" th:src="${n.actor.avatarUrl}" alt=""
+                          onerror="this.remove()" class="absolute inset-0 h-full w-full object-cover" />
                       </span>
-                      <time th:if="${n.createdAt != null}" class="notif-time ml-1"
-                        th:attr="datetime=${n.createdAt}"
-                        th:text="${#temporals.format(n.createdAt.atZone(T(java.time.ZoneId).systemDefault()), 'dd/MM/yyyy HH:mm')}">01/01/2026 12:00</time>
-                    </span>
-                    <span class="flex shrink-0 items-center gap-1">
+                    </a>
+                    <div class="min-w-0 flex-1">
+                      <p class="text-sm leading-snug text-gray-800">
+                        <a th:href="@{/profile/{id}(id=${n.actor.id})}"
+                          class="font-semibold text-gray-900 hover:underline"
+                          th:text="${#strings.isEmpty(actorName)} ? 'Alguien' : ${actorName}">Ana</a>
+                        <th:block th:switch="${n.type.name()}">
+                          <th:block th:case="'NEW_FOLLOWER'">
+                            <span class="text-gray-600">te empezó a seguir</span>
+                          </th:block>
+                          <th:block th:case="'NEW_PARTICIPANT'">
+                            <span class="text-gray-600">se unió a tu plan</span>
+                            <a th:if="${n.relatedPlanId != null}"
+                              th:href="@{/plans/{id}(id=${n.relatedPlanId})}"
+                              class="font-semibold text-blue-600 hover:underline"
+                              th:text="${n.relatedPlanName}">Plan</a>
+                            <span th:unless="${n.relatedPlanId != null}"
+                              class="font-semibold text-gray-700" th:text="${n.relatedPlanName}">Plan</span>
+                          </th:block>
+                          <th:block th:case="'NEW_PLAN'">
+                            <span class="text-gray-600">publicó</span>
+                            <a th:if="${n.relatedPlanId != null}"
+                              th:href="@{/plans/{id}/public(id=${n.relatedPlanId})}"
+                              class="font-semibold text-blue-600 hover:underline"
+                              th:text="${n.relatedPlanName}">Plan</a>
+                            <span th:unless="${n.relatedPlanId != null}"
+                              class="font-semibold text-gray-700" th:text="${n.relatedPlanName}">Plan</span>
+                          </th:block>
+                        </th:block>
+                      </p>
+                      <p class="mt-1 flex items-center gap-2 text-xs text-gray-500">
+                        <span class="notification-dot" aria-hidden="true"></span>
+                        <time th:if="${n.createdAt != null}" class="notif-time"
+                          th:attr="datetime=${n.createdAt}"
+                          th:text="${#temporals.format(n.createdAt.atZone(T(java.time.ZoneId).systemDefault()), 'dd/MM/yyyy HH:mm')}">01/01/2026 12:00</time>
+                      </p>
+                    </div>
+                    <div class="flex shrink-0 items-center gap-1 self-center">
                       <form method="post" th:action="@{/notifications/{id}/read(id=${n.id})}">
                         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                         <input type="hidden" name="page" th:value="${page}">
                         <button type="submit" data-testid="notification-group-member-read"
-                          class="btn-mark-read rounded-full border border-gray-300 px-2.5 py-1 text-[11px] font-medium text-blue-600 transition hover:bg-gray-100">
+                          class="btn-mark-read rounded-full border border-gray-300 px-3 py-1.5 text-xs font-medium text-blue-600 transition hover:bg-gray-100">
                           Marcar leída
                         </button>
                       </form>
@@ -296,7 +328,7 @@
                         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                         <input type="hidden" name="page" th:value="${page}">
                         <button type="submit" data-testid="notification-group-member-delete"
-                          class="btn-delete-notification rounded-full p-1.5 text-gray-500 transition hover:bg-gray-100 hover:text-red-600"
+                          class="btn-delete-notification rounded-full p-2 text-gray-500 transition hover:bg-gray-100 hover:text-red-600"
                           th:attr="aria-label='Eliminar esta notificación', title='Eliminar esta notificación'">
                           <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -308,20 +340,11 @@
                           </svg>
                         </button>
                       </form>
-                    </span>
+                    </div>
                   </li>
                 </ul>
               </details>
             </div>
-            <form method="post" th:action="@{/notifications/group/read}" class="shrink-0 self-start">
-              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-              <input type="hidden" name="page" th:value="${page}">
-              <input type="hidden" name="ids" th:each="n : ${group.notifications}" th:value="${n.id}">
-              <button type="submit" data-testid="notification-group-read"
-                class="btn-mark-group-read rounded-full border border-gray-300 px-3 py-1.5 text-xs font-medium text-blue-600 transition hover:bg-gray-100">
-                Marcar leídas
-              </button>
-            </form>
           </li>
           </th:block>
         </ul>

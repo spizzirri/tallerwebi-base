@@ -427,33 +427,39 @@ public class NotificationIntegrationTest {
     assertThat(countOccurrences(html, "data-testid=\"notification-group-member\""), is(3));
     assertThat(countOccurrences(html, "data-testid=\"notification-group-member-read\""), is(3));
     assertThat(countOccurrences(html, "data-testid=\"notification-group-member-delete\""), is(3));
+    // No hay una accion general de grupo: cada fila se marca por separado.
+    assertThat(countOccurrences(html, "data-testid=\"notification-group-read\""), is(0));
     // [NGRP-004] El badge sigue contando las tres filas, no el grupo.
     assertThat(html, containsString("data-notifications-count=\"3\""));
     assertThat(this.notificationService.unreadCount(this.recipientId), is(3L));
   }
 
   @Test
-  public void I16_marcarElGrupoMarcaTodasSusFilasComoLeidas() throws Exception {
+  public void I16_marcarUnaFilaDelGrupoSoloBajaEsaFila() throws Exception {
     follow("ngrp.read.ana@test.com", "Ana", "A");
     follow("ngrp.read.luis@test.com", "Luis", "B");
     follow("ngrp.read.marta@test.com", "Marta", "C");
 
     List<Notification> rows = this.notificationService.list(this.recipientId, 0, 10);
     assertThat(rows, hasSize(3));
-    String[] ids = rows.stream().map(row -> row.getId().toString()).toArray(String[]::new);
+    UUID firstId = rows.getFirst().getId();
 
     this.mockMvc.perform(
-        post("/notifications/group/read").param("ids", ids).with(user(RECIPIENT_EMAIL)).with(csrf())
+        post("/notifications/" + firstId + "/read").with(user(RECIPIENT_EMAIL)).with(csrf())
       )
       .andExpect(status().is3xxRedirection());
 
-    assertThat(this.notificationService.unreadCount(this.recipientId), is(0L));
-    assertThat(
-      this.notificationService.list(this.recipientId, 0, 10)
-        .stream()
-        .allMatch(Notification::isRead),
-      is(true)
-    );
+    assertThat(this.notificationService.unreadCount(this.recipientId), is(2L));
+    String html =
+      this.mockMvc.perform(get("/notifications").with(user(RECIPIENT_EMAIL)))
+        .andExpect(status().isOk())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+    assertThat(countOccurrences(html, "data-testid=\"notification\""), is(1));
+    assertThat(countOccurrences(html, "data-testid=\"notification-group\""), is(1));
+    assertThat(countOccurrences(html, "data-testid=\"notification-group-member\""), is(2));
+    assertThat(html, containsString("data-notifications-count=\"2\""));
   }
 
   // --- helpers ---
