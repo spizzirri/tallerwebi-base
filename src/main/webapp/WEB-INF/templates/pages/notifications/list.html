@@ -246,10 +246,8 @@
             </div>
           </li>
 
-          <!-- [NGRP-001/002/005/006] Un item por grupo repetible. El resumen se despliega y
-               muestra todas sus filas: las leidas quedan atenuadas, sin boton de marcar, para
-               que el grupo no se desarme al leer una. Cada fila se borra por separado y el
-               encabezado permite borrar todas las del grupo. -->
+          <!-- [NGRP] Un item por grupo repetible. Abrirlo marca todas sus filas como leidas;
+               cada fila conserva su borrado individual. -->
           <li th:unless="${!group.grouped}" data-testid="notification-group"
             class="notification-row flex items-start gap-3 rounded-xl border px-4 py-3.5"
             th:classappend="${group.unreadCount > 0} ? 'notification-row--unread' : 'notification-row--read'">
@@ -257,7 +255,8 @@
               class="navbar-avatar flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary font-serif text-base font-bold text-black"
               th:text="${group.notifications.size()}">3</span>
             <div class="min-w-0 flex-1">
-              <details class="notification-group">
+              <details class="notification-group"
+                th:attr="open=${openGroup != null and openGroup == group.notifications[0].id}, data-mark-read=${group.unreadCount > 0}">
                 <summary data-testid="notification-group-toggle"
                   class="flex cursor-pointer items-start justify-between gap-3">
                   <span class="min-w-0 flex-1">
@@ -281,6 +280,13 @@
                   </span>
                 </summary>
 
+                <form th:if="${group.unreadCount > 0}" method="post"
+                  th:action="@{/notifications/group/read}" data-testid="notification-group-read-form">
+                  <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                  <input type="hidden" name="page" th:value="${page}">
+                  <input type="hidden" name="openGroup" th:value="${group.notifications[0].id}">
+                  <input type="hidden" name="ids" th:each="n : ${group.notifications}" th:value="${n.id}">
+                </form>
                 <ul class="mt-2 divide-y divide-gray-100 border-t border-gray-100 pt-1">
                   <li th:each="n : ${group.notifications}" data-testid="notification-group-member"
                     th:attr="data-read=${n.read}"
@@ -334,15 +340,6 @@
                       </p>
                     </div>
                     <div class="flex shrink-0 items-center gap-1 self-center">
-                      <form th:if="${!n.read}" method="post"
-                        th:action="@{/notifications/{id}/read(id=${n.id})}">
-                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                        <input type="hidden" name="page" th:value="${page}">
-                        <button type="submit" data-testid="notification-group-member-read"
-                          class="btn-mark-read rounded-full border border-gray-300 px-3 py-1.5 text-xs font-medium text-blue-600 transition hover:bg-gray-100">
-                          Marcar leída
-                        </button>
-                      </form>
                       <form method="post" th:action="@{/notifications/{id}/delete(id=${n.id})}">
                         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                         <input type="hidden" name="page" th:value="${page}">
@@ -436,6 +433,20 @@
         let feed = document.getElementById("notifications-feed");
         formatTimes(feed);
 
+        function bindGroupRead(root) {
+          root.querySelectorAll("details[data-mark-read='true']").forEach(function (details) {
+            const summary = details.querySelector("summary");
+            summary.addEventListener("click", function () {
+              if (details.open || details.dataset.readSubmitted === "true") return;
+              const form = details.querySelector("[data-testid='notification-group-read-form']");
+              if (!form) return;
+              details.dataset.readSubmitted = "true";
+              form.requestSubmit();
+            });
+          });
+        }
+        bindGroupRead(feed);
+
         let loading = false;
         section.addEventListener("click", function (e) {
           const link = e.target.closest("#notifications-prev, #notifications-next");
@@ -453,6 +464,7 @@
               feed.replaceWith(next);
               feed = next;
               formatTimes(feed);
+              bindGroupRead(feed);
               history.replaceState(null, "", link.href);
               feed.scrollIntoView({ behavior: "smooth", block: "start" });
             })

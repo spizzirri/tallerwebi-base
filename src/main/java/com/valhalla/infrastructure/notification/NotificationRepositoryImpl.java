@@ -2,6 +2,8 @@ package com.valhalla.infrastructure.notification;
 
 import com.valhalla.domain.notification.Notification;
 import com.valhalla.domain.notification.NotificationRepository;
+import com.valhalla.domain.notification.NotificationType;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -48,6 +50,21 @@ public class NotificationRepositoryImpl implements NotificationRepository {
   @Override
   public Optional<Notification> findByIdAndRecipientId(UUID id, UUID recipientId) {
     return jpaNotificationRepository.findByIdAndRecipientId(id, recipientId);
+  }
+
+  @Override
+  public boolean existsByRecipientIdAndActorIdAndTypeAndCreatedAtAfter(
+    UUID recipientId,
+    UUID actorId,
+    NotificationType type,
+    Instant since
+  ) {
+    return jpaNotificationRepository.existsByRecipientIdAndActorIdAndTypeAndCreatedAtAfter(
+      recipientId,
+      actorId,
+      type,
+      since
+    );
   }
 
   @Override

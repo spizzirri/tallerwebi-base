@@ -6,6 +6,8 @@ import com.valhalla.domain.notification.NotificationRepository;
 import com.valhalla.domain.notification.NotificationService;
 import com.valhalla.domain.notification.NotificationType;
 import com.valhalla.domain.user.User;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -24,6 +26,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class NotificationServiceImpl implements NotificationService {
 
+  /** [NOTIF] Ventana anti-spam para no repetir "empezó a seguir" del mismo actor. */
+  private static final Duration FOLLOWER_NOTIFICATION_WINDOW = Duration.ofHours(24);
+
   private final NotificationRepository notificationRepository;
   private final FollowRepository followRepository;
 
@@ -39,6 +44,17 @@ public class NotificationServiceImpl implements NotificationService {
   @Override
   @Transactional
   public void notifyNewFollower(User follower, User followed) {
+    Instant since = Instant.now().minus(FOLLOWER_NOTIFICATION_WINDOW);
+    boolean alreadyNotified =
+      notificationRepository.existsByRecipientIdAndActorIdAndTypeAndCreatedAtAfter(
+        followed.getId(),
+        follower.getId(),
+        NotificationType.NEW_FOLLOWER,
+        since
+      );
+    if (alreadyNotified) {
+      return;
+    }
     notificationRepository.save(
       new Notification(followed, follower, NotificationType.NEW_FOLLOWER)
     );

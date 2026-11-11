@@ -66,7 +66,7 @@ public class NotificationControllerTest {
     when(this.notificationServiceMock.list(ME_ID, 0, NotificationController.PAGE_SIZE))
       .thenReturn(page);
 
-    ModelAndView view = this.controller.list(0, this.me);
+    ModelAndView view = this.controller.list(0, null, this.me);
 
     assertThat(view.getViewName(), is("pages/notifications/list"));
     assertThat(view.getModel().get("notifications"), is(page));
@@ -82,7 +82,7 @@ public class NotificationControllerTest {
   public void U02_list_paginaNegativaSeAclampaACero() {
     when(this.notificationServiceMock.count(ME_ID)).thenReturn(5L);
 
-    this.controller.list(-4, this.me);
+    this.controller.list(-4, null, this.me);
 
     verify(this.notificationServiceMock, times(1)).list(ME_ID, 0, NotificationController.PAGE_SIZE);
   }
@@ -92,7 +92,7 @@ public class NotificationControllerTest {
     // given: 25 notificaciones (3 paginas), piden la 9
     when(this.notificationServiceMock.count(ME_ID)).thenReturn(25L);
 
-    ModelAndView view = this.controller.list(9, this.me);
+    ModelAndView view = this.controller.list(9, null, this.me);
 
     verify(this.notificationServiceMock, times(1)).list(ME_ID, 2, NotificationController.PAGE_SIZE);
     assertThat(view.getModel().get("page"), is(2));
@@ -107,7 +107,7 @@ public class NotificationControllerTest {
     when(this.notificationServiceMock.list(ME_ID, 1, NotificationController.PAGE_SIZE))
       .thenReturn(page);
 
-    ModelAndView view = this.controller.feedPartial(1, this.me);
+    ModelAndView view = this.controller.feedPartial(1, null, this.me);
 
     assertThat(view.getViewName(), is("pages/notifications/list :: feed"));
     assertThat(view.getModel().get("notifications"), is(page));
@@ -121,7 +121,7 @@ public class NotificationControllerTest {
     // given: cuenta 0 — ni siquiera existe una pagina -1
     when(this.notificationServiceMock.count(ME_ID)).thenReturn(0L);
 
-    ModelAndView view = this.controller.list(0, this.me);
+    ModelAndView view = this.controller.list(0, null, this.me);
 
     assertThat(view.getModel().get("notifications"), is(List.of()));
     assertThat(view.getModel().get("hasPrev"), is(false));

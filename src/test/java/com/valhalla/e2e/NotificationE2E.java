@@ -13,7 +13,7 @@ import com.valhalla.presentation.shared.LoginRedirects;
 import org.junit.jupiter.api.Test;
 
 /**
- * [NOTIF] E-01 (docs/specs/25-NOTIF.md): badge en la navbar y navegacion al centro.
+ * [NOTIF/NGRP] E-01/E-02 (docs/specs/25-NOTIF.md): badge, centro y apertura de grupo.
  *
  * <p>Arrange como en {@link FollowE2E}: el admin (unico usuario garantizado por la seed) publica
  * un plan, una follower registrada por UI lo sigue. La segunda sesion (newContext) entra como el
@@ -139,26 +139,20 @@ public class NotificationE2E extends E2eBase {
       page.locator("#navbar-notifications").getAttribute("data-notifications-count")
     );
 
-    // --- el desplegable muestra una fila por notificacion, con marcar y tachito ---
+    // --- abrir el grupo marca todas sus filas como leidas y lo deja abierto ---
     page.locator("[data-testid=\"notification-group-toggle\"]").click();
+    page.waitForSelector("#navbar-notifications[data-notifications-count=\"0\"]");
     assertTrue(members.first().isVisible());
-    assertEquals(3, page.locator("[data-testid=\"notification-group-member-read\"]").count());
+    assertEquals(
+      3,
+      page.locator("[data-testid=\"notification-group-member\"][data-read=\"true\"]").count()
+    );
     assertEquals(3, page.locator("[data-testid=\"notification-group-member-delete\"]").count());
-    assertEquals(0, page.locator("[data-testid=\"notification-group-read\"]").count());
-
-    // --- marcar una fila solo la atenua: el grupo sigue con las tres ---
-    page.locator("[data-testid=\"notification-group-member-read\"]").first().click();
-    page.waitForSelector("#navbar-notifications[data-notifications-count=\"2\"]");
     assertEquals(1, page.locator("[data-testid=\"notification-group\"]").count());
     assertEquals(0, page.locator("[data-testid=\"notification\"]").count());
     assertEquals(3, page.locator("[data-testid=\"notification-group-member\"]").count());
-    assertEquals(2, page.locator("[data-testid=\"notification-group-member-read\"]").count());
 
-    // --- el encabezado del grupo borra todas sus filas, leidas incluidas ---
-    page.locator("[data-testid=\"notification-group-toggle\"]").click();
-    assertTrue(
-      page.locator("[data-testid=\"notification-group-member\"][data-read=\"true\"]").isVisible()
-    );
+    // --- el encabezado del grupo borra todas sus filas ---
     page.onDialog(dialog -> dialog.accept());
     page.locator("[data-testid=\"notification-group-delete\"]").click();
     page.waitForSelector("#notifications-empty");

@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -64,6 +65,26 @@ public class NotificationServiceImplTest {
     assertThat(saved.getRecipient().getId(), is(RECIPIENT_ID));
     assertThat(saved.getActor().getId(), is(ACTOR_ID));
     assertThat(saved.getType(), is(NotificationType.NEW_FOLLOWER));
+  }
+
+  @Test
+  public void U01b_newFollower_noRepiteSiYaSeNotificoEnLaVentana() {
+    when(
+      this.repositoryMock.existsByRecipientIdAndActorIdAndTypeAndCreatedAtAfter(
+          eq(RECIPIENT_ID),
+          eq(ACTOR_ID),
+          eq(NotificationType.NEW_FOLLOWER),
+          any()
+        )
+    )
+      .thenReturn(true);
+
+    this.notificationService.notifyNewFollower(
+        user(ACTOR_ID, "ana@test.com"),
+        user(RECIPIENT_ID, "grace@test.com")
+      );
+
+    verify(this.repositoryMock, never()).save(any(Notification.class));
   }
 
   // --- notifyNewParticipant ---

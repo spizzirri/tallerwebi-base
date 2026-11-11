@@ -34,6 +34,7 @@ public class NotificationController {
   private static final String VIEW_LIST = "pages/notifications/list";
   private static final String REDIRECT_LIST = "redirect:/notifications";
   private static final String PAGE_PARAM = "page";
+  private static final String OPEN_GROUP_PARAM = "openGroup";
 
   private final NotificationService notificationService;
   private final UserService userService;
@@ -47,9 +48,10 @@ public class NotificationController {
   @GetMapping
   public ModelAndView list(
     @RequestParam(name = PAGE_PARAM, defaultValue = "0") int page,
+    @RequestParam(name = OPEN_GROUP_PARAM, required = false) UUID openGroup,
     Authentication authentication
   ) {
-    return feed(new ModelAndView(VIEW_LIST), page, authentication);
+    return feed(new ModelAndView(VIEW_LIST), page, openGroup, authentication);
   }
 
   /**
@@ -59,13 +61,19 @@ public class NotificationController {
   @GetMapping(params = "partial")
   public ModelAndView feedPartial(
     @RequestParam(name = PAGE_PARAM, defaultValue = "0") int page,
+    @RequestParam(name = OPEN_GROUP_PARAM, required = false) UUID openGroup,
     Authentication authentication
   ) {
-    return feed(new ModelAndView(VIEW_LIST + " :: feed"), page, authentication);
+    return feed(new ModelAndView(VIEW_LIST + " :: feed"), page, openGroup, authentication);
   }
 
   /** Ventana pedida fuera de rango: aclamp a la ultima, para que F5 y fragmento pinten lo mismo. */
-  private ModelAndView feed(ModelAndView model, int page, Authentication authentication) {
+  private ModelAndView feed(
+    ModelAndView model,
+    int page,
+    UUID openGroup,
+    Authentication authentication
+  ) {
     User me = userService.getByEmail(authentication.getName());
     int currentPage = Math.max(0, page);
     long total = notificationService.count(me.getId());
@@ -77,6 +85,7 @@ public class NotificationController {
     List<Notification> notifications = notificationService.list(me.getId(), currentPage, PAGE_SIZE);
     model.addObject("notifications", notifications);
     model.addObject("groups", NotificationGrouping.group(notifications));
+    model.addObject("openGroup", openGroup);
     model.addObject(PAGE_PARAM, currentPage);
     model.addObject("readNotificationCount", Math.max(0, total - unread));
     model.addObject("totalPages", Math.max(1, totalPages));
@@ -135,6 +144,23 @@ public class NotificationController {
       ids.forEach(id -> notificationService.delete(me.getId(), id));
     }
     return redirectToPage(page);
+  }
+
+  /** [NGRP-003] Abrir el grupo marca todas sus filas propias como leidas y lo deja desplegado. */
+  @PostMapping("/group/read")
+  public ModelAndView markGroupRead(
+    @RequestParam(name = "ids", required = false) List<UUID> ids,
+    @RequestParam(name = PAGE_PARAM, defaultValue = "0") int page,
+    @RequestParam(name = OPEN_GROUP_PARAM) UUID openGroup,
+    Authentication authentication
+  ) {
+    User me = userService.getByEmail(authentication.getName());
+    if (ids != null) {
+      ids.forEach(id -> notificationService.markRead(me.getId(), id));
+    }
+    return new ModelAndView(
+      REDIRECT_LIST + "?page=" + Math.max(0, page) + "&openGroup=" + openGroup
+    );
   }
 
   /**

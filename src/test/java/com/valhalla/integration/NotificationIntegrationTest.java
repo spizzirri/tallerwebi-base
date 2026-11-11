@@ -10,6 +10,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrlPattern;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
@@ -127,6 +128,20 @@ public class NotificationIntegrationTest {
         post("/profile/" + this.recipientId + "/unfollow").with(user(ACTOR_EMAIL)).with(csrf())
       );
     // [NOTIF] AC-02: dejar de seguir NO borra la notificacion ni la marca: la marca es del lector.
+    assertThat(this.notificationService.unreadCount(this.recipientId), is(1L));
+  }
+
+  @Test
+  public void I04b_dejarDeSeguirYVolverASeguirEnLaVentanaNoDuplica() throws Exception {
+    followAdaToGrace();
+    this.mockMvc.perform(
+        post("/profile/" + this.recipientId + "/unfollow").with(user(ACTOR_EMAIL)).with(csrf())
+      )
+      .andExpect(status().is3xxRedirection());
+
+    followAdaToGrace();
+
+    assertThat(this.notificationService.count(this.recipientId), is(1L));
     assertThat(this.notificationService.unreadCount(this.recipientId), is(1L));
   }
 
@@ -422,17 +437,16 @@ public class NotificationIntegrationTest {
     assertThat(html, containsString("Ana y 2 más"));
     // El grupo es un desplegable con una fila por notificacion y acciones individuales.
     assertThat(countOccurrences(html, "data-testid=\"notification-group-member\""), is(3));
-    assertThat(countOccurrences(html, "data-testid=\"notification-group-member-read\""), is(3));
+    assertThat(countOccurrences(html, "data-testid=\"notification-group-read-form\""), is(1));
     assertThat(countOccurrences(html, "data-testid=\"notification-group-member-delete\""), is(3));
-    // No hay una accion general de grupo: cada fila se marca por separado.
-    assertThat(countOccurrences(html, "data-testid=\"notification-group-read\""), is(0));
+    assertThat(countOccurrences(html, "data-testid=\"notification-group-member-read\""), is(0));
     // [NGRP-004] El badge sigue contando las tres filas, no el grupo.
     assertThat(html, containsString("data-notifications-count=\"3\""));
     assertThat(this.notificationService.unreadCount(this.recipientId), is(3L));
   }
 
   @Test
-  public void I16_marcarUnaFilaDelGrupoSoloBajaEsaFila() throws Exception {
+  public void I16_abrirElGrupoMarcaTodasSusFilasComoLeidas() throws Exception {
     follow("ngrp.read.ana@test.com", "Ana", "A");
     follow("ngrp.read.luis@test.com", "Luis", "B");
     follow("ngrp.read.marta@test.com", "Marta", "C");
@@ -442,13 +456,26 @@ public class NotificationIntegrationTest {
     UUID firstId = rows.getFirst().getId();
 
     this.mockMvc.perform(
-        post("/notifications/" + firstId + "/read").with(user(RECIPIENT_EMAIL)).with(csrf())
+        post("/notifications/group/read")
+          .param("ids", rows.stream().map(row -> row.getId().toString()).toArray(String[]::new))
+          .param("openGroup", firstId.toString())
+          .with(user(RECIPIENT_EMAIL))
+          .with(csrf())
       )
-      .andExpect(status().is3xxRedirection());
+      .andExpect(status().is3xxRedirection())
+      .andExpect(redirectedUrl("/notifications?page=0&openGroup=" + firstId));
 
-    assertThat(this.notificationService.unreadCount(this.recipientId), is(2L));
+    assertThat(this.notificationService.unreadCount(this.recipientId), is(0L));
+    assertThat(
+      this.notificationService.list(this.recipientId, 0, 10)
+        .stream()
+        .allMatch(Notification::isRead),
+      is(true)
+    );
     String html =
-      this.mockMvc.perform(get("/notifications").with(user(RECIPIENT_EMAIL)))
+      this.mockMvc.perform(
+          get("/notifications").param("openGroup", firstId.toString()).with(user(RECIPIENT_EMAIL))
+        )
         .andExpect(status().isOk())
         .andReturn()
         .getResponse()
@@ -456,8 +483,9 @@ public class NotificationIntegrationTest {
     assertThat(countOccurrences(html, "data-testid=\"notification\""), is(0));
     assertThat(countOccurrences(html, "data-testid=\"notification-group\""), is(1));
     assertThat(countOccurrences(html, "data-testid=\"notification-group-member\""), is(3));
-    assertThat(countOccurrences(html, "data-testid=\"notification-group-member-read\""), is(2));
-    assertThat(html, containsString("data-notifications-count=\"2\""));
+    assertThat(countOccurrences(html, "data-testid=\"notification-group-member-read\""), is(0));
+    assertThat(html, containsString("data-notifications-count=\"0\""));
+    assertThat(html, containsString("<details class=\"notification-group\" open=\"open\""));
     assertThat(html, containsString("data-read=\"true\""));
   }
 

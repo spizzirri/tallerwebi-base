@@ -1,6 +1,8 @@
 package com.valhalla.infrastructure.notification;
 
 import com.valhalla.domain.notification.Notification;
+import com.valhalla.domain.notification.NotificationType;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -27,6 +29,14 @@ public interface JpaNotificationRepository extends JpaRepository<Notification, U
   long countByRecipientIdAndReadIsFalse(UUID recipientId);
 
   Optional<Notification> findByIdAndRecipientId(UUID id, UUID recipientId);
+
+  /** [NOTIF] Evita duplicados si el mismo actor ya notifico en la ventana. */
+  boolean existsByRecipientIdAndActorIdAndTypeAndCreatedAtAfter(
+    UUID recipientId,
+    UUID actorId,
+    NotificationType type,
+    Instant since
+  );
 
   /** Una sola escritura para "marcar todas como leidas": sin SELECT + N UPDATEs. */
   @Modifying

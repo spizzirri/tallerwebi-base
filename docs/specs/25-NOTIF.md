@@ -30,9 +30,9 @@ quedan como card separada.
 
 ## Decisiones / aclaraciones
 
-- **Sin agrupación en esta entrega.** Cada evento persiste su propia fila: "Ana te empezó a seguir"
-  y "Luis te empezó a seguir" son dos notificaciones. Agrupar ("Ana, Luis y 3 más") queda para una
-  entrega siguiente; no condiciona el modelo porque cada fila guarda actor y tipo por separado.
+- **Agrupación de lectura (NGRP).** Cada evento conserva su propia fila persistida. En la bandeja,
+  las filas no leídas de tipos repetibles se agrupan por tipo, plan y ventana de 24 horas; abrir un
+  grupo marca todas sus filas como leídas. El badge y la paginación siguen contando filas.
 - **El evento se escribe en la transacción del hecho.** No hay bus de eventos: el que dispara la
   accion (`FollowServiceImpl`, `PlanServiceImpl`) ya tiene los usuarios resueltos y llama directo a
   `NotificationService`. Un follow repetido o un join de quien ya participa no notifican porque el
@@ -44,6 +44,12 @@ quedan como card separada.
   decision de producto: la notificacion es un hecho historico, no una vista viva.
 - **Unfollow no borra ni marca.** Dejar de seguir no toca las notificaciones existentes: leer o
   marcar es decision del destinatario, no del evento que las genero (AC-11).
+- **Anti-spam de nuevo seguidor.** Si la misma persona deja de seguir y vuelve a seguir dentro de
+  las 24 horas de la notificacion previa, no se crea otra fila. Pasada esa ventana, un nuevo follow
+  vuelve a notificar (AC-01).
+- **Anti-spam y agrupación son reglas distintas.** El anti-spam evita filas repetidas del mismo
+  seguidor dentro de 24 horas; la agrupación de lectura resume filas de actores repetibles sin
+  fusionar los eventos persistidos.
 - **El badge es server-rendered.** `CurrentUserControllerAdvice` expone `unreadNotificationCount`
   en cada request; el render del redirect ya descuenta lo marcado, sin JS ni polling. En 0 no se
   pinta badge.
@@ -91,7 +97,7 @@ quedan como card separada.
 
 | # | Criterio |
 |---|----------|
-| AC-01 | Seguir a un usuario crea UNA notificacion "X te empezó a seguir" para el seguido; repetir el follow no duplica la notificacion |
+| AC-01 | Seguir a un usuario crea una notificacion "X te empezó a seguir" para el seguido; repetir el follow o dejar de seguir y volver a seguir dentro de 24 horas no duplica la notificacion |
 | AC-02 | Cuando un usuario pasa a ser participante de un plan ajeno (unirse por short code, solicitud aceptada o invitacion aceptada), el dueño recibe "X se unió a tu plan Y" |
 | AC-03 | Crear un plan publico, o pasar un plan de privado a publico, crea "X publicó un plan nuevo Y" para cada seguidor del autor; editar un plan ya publico no notifica |
 | AC-04 | `GET /notifications` lista las notificaciones del usuario de la sesion, mas nuevas primero, 10 por pagina, con paginacion previa/siguiente por `?page=N` |
@@ -113,6 +119,17 @@ quedan como card separada.
 | AC-20 | Banear a un participante crea una notificación para esa persona con el nombre del plan, pero sin `relatedPlanId` ni enlace al plan |
 | AC-21 | Promover o degradar a un participante crea una notificación con enlace al plan; repetir el rol actual no crea otra |
 
+## Agrupación de lectura ([NGRP])
+
+| # | Criterio |
+|---|----------|
+| NGRP-001 | Las notificaciones no leídas de igual tipo, plan y ventana de 24 horas aparecen como un grupo |
+| NGRP-002 | El texto resume los actores: "Ana y 2 más" o "Ana, Luis y 3 más" |
+| NGRP-003 | Abrir un grupo marca como leídas todas sus filas y mantiene el grupo desplegado |
+| NGRP-004 | El badge y la paginación cuentan filas, no grupos |
+| NGRP-005 | Solo se agrupan seguidores, participantes y planes de usuarios seguidos; invitaciones, solicitudes y avisos de acceso quedan individuales |
+| NGRP-006 | Cada fila dentro del grupo conserva su borrado individual |
+
 ## Escenarios de Test
 
 ### Tests Unitarios (`domain/notification/NotificationTest.java`)
@@ -128,7 +145,7 @@ quedan como card separada.
 
 | # | Test | AC que cubre |
 |---|------|-------------|
-| U-01 | `notifyNewFollower` guarda la notificacion al seguido | AC-01 |
+| U-01 | `notifyNewFollower` guarda la notificacion al seguido y omite otra si el mismo actor ya notifico en las ultimas 24 horas | AC-01 |
 | U-02 | `notifyNewParticipant` guarda al dueño con el plan congelado | AC-02 |
 | U-03 | Sin dueño o dueño == participante no escribe nada | AC-02 |
 | U-04 | `notifyNewPlan` escribe una fila por cada seguidor | AC-03 |
@@ -142,6 +159,13 @@ quedan como card separada.
 | U-12 | `notifyJoinRequestResponse` aceptada guarda al solicitante con tipo `JOIN_REQUEST_ACCEPTED` | AC-16 |
 | U-13 | `notifyJoinRequestResponse` rechazada usa `JOIN_REQUEST_REJECTED` | AC-16 |
 | U-14 | `delete` tira la fila del destinatario; id ajeno o inexistente no borra nada | AC-18, AC-09 |
+
+### Tests Unitarios (`domain/notification/NotificationGroupingTest.java`)
+
+| # | Test | Criterio que cubre |
+|---|------|--------------------|
+| T-NGRP-001 | Agrupación por tipo, plan y ventana de 24 horas; texto de actores | NGRP-001, NGRP-002 |
+| T-NGRP-002 | Invitaciones, solicitudes y otros tipos no repetibles quedan individuales | NGRP-005 |
 
 ### Tests Unitarios (`infrastructure/follow/FollowServiceImplTest.java` y `infrastructure/plan/PlanServiceImplTest.java`)
 
@@ -181,7 +205,7 @@ quedan como card separada.
 
 | # | Test | AC que cubre |
 |---|------|-------------|
-| I-01 | El follow crea la notificacion y el listado la muestra como fila de pendiente | AC-01, AC-04, AC-17 |
+| I-01 | El follow crea la notificacion, unfollow + refollow dentro de 24 horas no duplica y el listado muestra la fila pendiente | AC-01, AC-04, AC-17 |
 | I-03 | Marcar leida individual baja el badge y la fila pasa a estado leido | AC-06, AC-17 |
 | I-04 | Dejar de seguir no borra ni marca la notificacion | AC-11 |
 | I-05 | Marcar todas vacia el badge de una accion | AC-06 |
@@ -194,12 +218,17 @@ quedan como card separada.
 | I-12 | Solicitud de unión notifica al dueño con link a la seccion Solicitudes | AC-15, AC-07 |
 | I-13 | Aceptar y rechazar notifican al solicitante, cada uno a su destino | AC-16, AC-07 |
 | I-14 | El tachito saca la fila propia y la bandeja queda vacia; el id de una fila ajena no borra nada y sin CSRF es 403 | AC-18, AC-09, AC-13, AC-10 |
+| T-NGRP-003 | Abrir un grupo marca todas sus filas como leídas y lo deja desplegado | NGRP-003 |
+| T-NGRP-004 | El badge sigue contando filas; tres seguidores aparecen en un grupo | NGRP-001, NGRP-002, NGRP-004 |
+| T-NGRP-005 | Se puede borrar una fila individual y borrar el grupo completo | NGRP-006 |
 
 ### E2E (minimos)
 
 | # | Test | Flujo | AC que cubre |
 |---|------|-------|-------------|
 | E-01 | `NotificationE2E` | Seguir a un autor por UI; el autor ve el badge en la campana, navega al centro, marca leida, el badge vuelve a 0 y el tachito deja la bandeja vacia | AC-01, AC-05, AC-06, AC-07, AC-18 |
+| E-02 | `NotificationE2E` | Tres seguidores nuevos aparecen en un grupo "Ana y 2 más"; abrirlo marca las tres filas como leídas y permite borrarlas | NGRP-001..NGRP-006 |
+| T-NGRP-006 | Gate: `pwsh -File scripts/gate.ps1 all` en verde | Todos |
 
 ## Referencia de Implementacion
 
@@ -275,7 +304,8 @@ void delete(UUID recipientId, UUID notificationId);              // mismo cruce:
 ### 4. Hooks en origen
 
 - `FollowServiceImpl.follow`: tras `save(new Follow(...))`, `notifyNewFollower(follower, followed)`.
-  El early-return del follow repetido corta antes: no hay duplicados (AC-01).
+  El early-return evita el follow repetido y el servicio de notificaciones aplica una ventana de
+  24 horas por destinatario, actor y tipo para evitar duplicados tras unfollow + refollow (AC-01).
 - `PlanServiceImpl`: `notifyNewParticipant` en los tres caminos que suman participante
   (`joinPlan` publico, `respondToJoinRequest` accept, `respondToInvitation` accept);
   `notifyNewPlan` en `createPlan` si `isPublic` y en `updatePlan` cuando `isPublic` pasa de
