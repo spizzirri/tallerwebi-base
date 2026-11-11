@@ -352,22 +352,14 @@ html[data-theme="dark"] details > summary:hover {
 }
 
 /* [NGRP] El grupo se abre con <details>: sin JS, accesible por teclado y con el mismo
- * estado visual de pendiente que una fila suelta. El marcador nativo se oculta y el
- * chevron propio gira cuando el grupo esta abierto. */
+ * estado visual de pendiente que una fila suelta. El marcador nativo se oculta; el
+ * chevron sale del ::after global de details y gira solo cuando el grupo esta abierto. */
 .notification-group > summary {
   list-style: none;
 }
 
 .notification-group > summary::-webkit-details-marker {
   display: none;
-}
-
-.notification-group-chevron {
-  transition: transform 0.15s ease;
-}
-
-.notification-group[open] .notification-group-chevron {
-  transform: rotate(180deg);
 }
 
 .notification-row--read {
